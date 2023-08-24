@@ -307,7 +307,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     valuesMap.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
 
     String query =
-        "       SELECT patient_id "
+        "       SELECT start.patient_id, "
+            + "        start.first_pickup AS first_pickup "
             + " FROM ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
             + "       ) start ";
@@ -894,7 +895,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
 
     String query =
-        "SELECT p.patient_id, FLOOR(DATEDIFF(art.art_pickup_date,ps.birthdate)/365) AS age "
+        "SELECT p.patient_id, FLOOR(DATEDIFF(art.first_pickup,ps.birthdate)/365) AS age "
             + "FROM patient p "
             + "     INNER JOIN ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)

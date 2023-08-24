@@ -69,11 +69,11 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn("counter", new PersonIdDataDefinition(), "", new ObjectCounterConverter());
 
     // A2- Coorte: (coluna B)
-    pdd.addColumn(
-        "coort",
-        listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24Months(),
-        "evaluationYear=${evaluationYear},location=${location}",
-        null);
+    //    pdd.addColumn(
+    //        "coort",
+    //        listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24Months(),
+    //        "evaluationYear=${evaluationYear},location=${location}",
+    //        null);
 
     // A3- Sexo: (coluna C)
     pdd.addColumn("gender", new GenderDataDefinition(), "", new MaleFemaleConverter());
