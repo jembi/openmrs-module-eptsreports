@@ -442,78 +442,83 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * <li>Óbitos (DAH_RF25)
    *
    * @see #getPatientsWhoSuspendedTarvOrAreTransferredOut(int, int, boolean, boolean)
-   * @see #getPatientsWhoDied()
+   * @see #getPatientsWhoDied(boolean)
    * @return {@link String}
    */
-  public String getPatientsWhoAbandonedTarvQuery() {
-    return "SELECT   final.patient_id, "
-        + "         'Abandono' "
-        + "FROM     ( "
-        + "                  SELECT   most_recent.patient_id, "
-        + "                           date_add(Max(most_recent.value_datetime), interval 60 day) final_encounter_date "
-        + "                  FROM     ( "
-        + "                                      SELECT     p.patient_id, "
-        + "                                                 max(o.value_datetime) value_datetime "
-        + "                                      FROM       patient p "
-        + "                                      INNER JOIN encounter e "
-        + "                                      ON         e.patient_id = p.patient_id "
-        + "                                      INNER JOIN obs o "
-        + "                                      ON         o.encounter_id = e.encounter_id "
-        + "                                      WHERE      p.voided = 0 "
-        + "                                      AND        e.voided = 0 "
-        + "                                      AND        o.voided = 0 "
-        + "                                      AND        e.encounter_type = ${18} "
-        + "                                      AND        o.concept_id = ${5096} "
-        + "                                      AND        o.value_datetime IS NOT NULL "
-        + "                                      AND        o.value_datetime <= :endDate  "
-        + "                                      AND        e.location_id = :location  "
-        + "                                      GROUP BY   p.patient_id "
-        + "                                      UNION "
-        + "                                      SELECT     p.patient_id, "
-        + "                                                 date_add(max(o2.value_datetime), interval 30 day) value_datetime "
-        + "                                      FROM       patient p "
-        + "                                      INNER JOIN encounter e "
-        + "                                      ON         e.patient_id = p.patient_id "
-        + "                                      INNER JOIN obs o "
-        + "                                      ON         o.encounter_id = e.encounter_id "
-        + "                                      INNER JOIN obs o2 "
-        + "                                      ON         o2.encounter_id = e.encounter_id "
-        + "                                      WHERE      p.voided = 0 "
-        + "                                      AND        e.voided = 0 "
-        + "                                      AND        o.voided = 0 "
-        + "                                      AND        o2.voided = 0 "
-        + "                                      AND        e.encounter_type = ${52} "
-        + "                                      AND        ( "
-        + "                                                            o.concept_id = ${23865} "
-        + "                                                 AND        o.value_coded = ${1065}) "
-        + "                                      AND        ( "
-        + "                                                            o2.concept_id = ${23866} "
-        + "                                                 AND        o2.value_datetime IS NOT NULL "
-        + "                                                 AND        o2.value_datetime <= :endDate ) "
-        + "                                      AND        e.location_id =  :location "
-        + "                                      GROUP BY   p.patient_id) most_recent "
-        + "                  GROUP BY most_recent.patient_id "
-        + "                  HAVING   final_encounter_date <= :endDate ) final "
-        + "WHERE    final.patient_id NOT IN ( "
-        + new EptsQueriesUtil()
-            .unionBuilder(
-                getPatientsWhoSuspendedTarvOrAreTransferredOut(
-                    hivMetadata
-                        .getTransferredOutToAnotherHealthFacilityWorkflowState()
-                        .getProgramWorkflowStateId(),
-                    hivMetadata.getTransferredOutConcept().getConceptId(),
-                    true,
-                    true))
-            .union(
-                getPatientsWhoSuspendedTarvOrAreTransferredOut(
-                    hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId(),
-                    hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
-                    false,
-                    true))
-            .union(getPatientsWhoDied())
-            .buildQuery()
-        + ") "
-        + "GROUP BY final.patient_id";
+  public String getPatientsWhoAbandonedTarvQuery(boolean isForDataDefinition) {
+    String fromSQL =
+        "FROM     ( "
+            + "                  SELECT   most_recent.patient_id, "
+            + "                           date_add(Max(most_recent.value_datetime), interval 60 day) final_encounter_date "
+            + "                  FROM     ( "
+            + "                                      SELECT     p.patient_id, "
+            + "                                                 max(o.value_datetime) value_datetime "
+            + "                                      FROM       patient p "
+            + "                                      INNER JOIN encounter e "
+            + "                                      ON         e.patient_id = p.patient_id "
+            + "                                      INNER JOIN obs o "
+            + "                                      ON         o.encounter_id = e.encounter_id "
+            + "                                      WHERE      p.voided = 0 "
+            + "                                      AND        e.voided = 0 "
+            + "                                      AND        o.voided = 0 "
+            + "                                      AND        e.encounter_type = ${18} "
+            + "                                      AND        o.concept_id = ${5096} "
+            + "                                      AND        o.value_datetime IS NOT NULL "
+            + "                                      AND        o.value_datetime <= :endDate  "
+            + "                                      AND        e.location_id = :location  "
+            + "                                      GROUP BY   p.patient_id "
+            + "                                      UNION "
+            + "                                      SELECT     p.patient_id, "
+            + "                                                 date_add(max(o2.value_datetime), interval 30 day) value_datetime "
+            + "                                      FROM       patient p "
+            + "                                      INNER JOIN encounter e "
+            + "                                      ON         e.patient_id = p.patient_id "
+            + "                                      INNER JOIN obs o "
+            + "                                      ON         o.encounter_id = e.encounter_id "
+            + "                                      INNER JOIN obs o2 "
+            + "                                      ON         o2.encounter_id = e.encounter_id "
+            + "                                      WHERE      p.voided = 0 "
+            + "                                      AND        e.voided = 0 "
+            + "                                      AND        o.voided = 0 "
+            + "                                      AND        o2.voided = 0 "
+            + "                                      AND        e.encounter_type = ${52} "
+            + "                                      AND        ( "
+            + "                                                            o.concept_id = ${23865} "
+            + "                                                 AND        o.value_coded = ${1065}) "
+            + "                                      AND        ( "
+            + "                                                            o2.concept_id = ${23866} "
+            + "                                                 AND        o2.value_datetime IS NOT NULL "
+            + "                                                 AND        o2.value_datetime <= :endDate ) "
+            + "                                      AND        e.location_id =  :location "
+            + "                                      GROUP BY   p.patient_id) most_recent "
+            + "                  GROUP BY most_recent.patient_id "
+            + "                  HAVING   final_encounter_date <= :endDate ) final "
+            + "WHERE    final.patient_id NOT IN ( "
+            + new EptsQueriesUtil()
+                .unionBuilder(
+                    getPatientsWhoSuspendedTarvOrAreTransferredOut(
+                        hivMetadata
+                            .getTransferredOutToAnotherHealthFacilityWorkflowState()
+                            .getProgramWorkflowStateId(),
+                        hivMetadata.getTransferredOutConcept().getConceptId(),
+                        true,
+                        true))
+                .union(
+                    getPatientsWhoSuspendedTarvOrAreTransferredOut(
+                        hivMetadata
+                            .getSuspendedTreatmentWorkflowState()
+                            .getProgramWorkflowStateId(),
+                        hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
+                        false,
+                        true))
+                .union(getPatientsWhoDied(false))
+                .buildQuery()
+            + ") "
+            + "GROUP BY final.patient_id";
+
+    return isForDataDefinition
+        ? "SELECT final.patient_id, 'Abandono' ".concat(fromSQL)
+        : " SELECT final.patient_id ".concat(fromSQL);
   }
 
   /**
@@ -528,94 +533,98 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    *
    * @return {@link String}
    */
-  public String getPatientsWhoDied() {
-    return "  SELECT mostrecent.patient_id, ' Óbito'  "
-        + "FROM ("
-        + " SELECT lastest.patient_id ,Max(lastest.last_date) as  deceased_date "
-        + " FROM (  "
-        + "    "
-        + "SELECT p.patient_id ,ps.start_date AS last_date  "
-        + "    FROM patient p   "
-        + "        INNER JOIN patient_program pg   "
-        + "            ON p.patient_id=pg.patient_id   "
-        + "        INNER JOIN patient_state ps   "
-        + "            ON pg.patient_program_id=ps.patient_program_id   "
-        + "    WHERE pg.voided=0   "
-        + "        AND ps.voided=0   "
-        + "        AND p.voided=0   "
-        + "        AND pg.program_id= ${2}  "
-        + "        AND ps.state = ${10} "
-        + "        AND ps.end_date is null "
-        + "        AND ps.start_date <= :endDate   "
-        + "        AND pg.location_id= :location   "
-        + "         GROUP BY p.patient_id  "
-        + "  "
-        + "    UNION  "
-        + "  "
-        + "    SELECT  p.patient_id,  Max(e.encounter_datetime) AS deceased_date  "
-        + "    FROM patient p    "
-        + "        INNER JOIN encounter e   "
-        + "            ON e.patient_id=p.patient_id   "
-        + "        INNER JOIN obs o   "
-        + "            ON o.encounter_id=e.encounter_id   "
-        + "    WHERE  p.voided = 0   "
-        + "        AND e.voided = 0   "
-        + "        AND o.voided = 0   "
-        + "        AND e.encounter_type = ${6}   "
-        + "        AND o.concept_id = ${6273}  "
-        + "        AND o.value_coded = ${1366} "
-        + "        AND e.encounter_datetime <= :endDate   "
-        + "        AND e.location_id =  :location   "
-        + "         GROUP BY p.patient_id  "
-        + "  "
-        + "    UNION   "
-        + "  "
-        + "    SELECT  p.patient_id , Max(o.obs_datetime) AS deceased_date  "
-        + "    FROM patient p    "
-        + "        INNER JOIN encounter e   "
-        + "            ON e.patient_id=p.patient_id   "
-        + "        INNER JOIN obs o   "
-        + "            ON o.encounter_id=e.encounter_id   "
-        + "    WHERE  p.voided = 0   "
-        + "        AND e.voided = 0   "
-        + "        AND o.voided = 0   "
-        + "        AND e.encounter_type = ${53}  "
-        + "        AND o.concept_id = ${6272}  "
-        + "        AND o.value_coded = ${1366} "
-        + "        AND o.obs_datetime <= :endDate   "
-        + "        AND e.location_id =  :location  "
-        + "         GROUP BY p.patient_id  "
-        + " UNION "
-        + " SELECT p.person_id, p.death_date AS deceased_date "
-        + "                FROM   person p "
-        + "                WHERE  p.voided = 0"
-        + "                   AND p.dead = 1 "
-        + "                   AND p.death_date <= :endDate "
-        + ") lastest   "
-        + " WHERE lastest.patient_id NOT IN( "
-        + " SELECT p.patient_id  "
-        + "      FROM   patient p  "
-        + "             JOIN encounter e  "
-        + "               ON p.patient_id = e.patient_id  "
-        + "      WHERE  p.voided = 0  "
-        + "             AND e.voided = 0  "
-        + "             AND e.encounter_type = ${6}   "
-        + "             AND e.location_id = :location  "
-        + "             AND e.encounter_datetime > lastest.deceased_date  "
-        + "                 UNION"
-        + "  SELECT p.patient_id"
-        + "      FROM   patient p"
-        + "            JOIN encounter e ON p.patient_id = e.patient_id "
-        + "            JOIN obs o ON e.encounter_id = o.encounter_id "
-        + "     WHERE  p.voided = 0"
-        + "            AND e.voided = 0 "
-        + "            AND o.voided = 0 "
-        + "            AND e.encounter_type = ${52}   "
-        + "              AND o.concept_id = ${23866}   "
-        + "              AND o.value_datetime > lastest.deceased_date"
-        + " )  "
-        + " GROUP BY lastest.patient_id )mostrecent "
-        + " GROUP BY mostrecent.patient_id";
+  public String getPatientsWhoDied(boolean isForDataDefinition) {
+    String fromSQL =
+        "FROM ("
+            + " SELECT lastest.patient_id ,Max(lastest.deceased_date) as  deceased_date "
+            + " FROM (  "
+            + "    "
+            + "SELECT p.patient_id ,ps.start_date AS deceased_date  "
+            + "    FROM patient p   "
+            + "        INNER JOIN patient_program pg   "
+            + "            ON p.patient_id=pg.patient_id   "
+            + "        INNER JOIN patient_state ps   "
+            + "            ON pg.patient_program_id=ps.patient_program_id   "
+            + "    WHERE pg.voided=0   "
+            + "        AND ps.voided=0   "
+            + "        AND p.voided=0   "
+            + "        AND pg.program_id= ${2}  "
+            + "        AND ps.state = ${10} "
+            + "        AND ps.end_date is null "
+            + "        AND ps.start_date <= :endDate   "
+            + "        AND pg.location_id= :location   "
+            + "         GROUP BY p.patient_id  "
+            + "  "
+            + "    UNION  "
+            + "  "
+            + "    SELECT  p.patient_id,  Max(e.encounter_datetime) AS deceased_date  "
+            + "    FROM patient p    "
+            + "        INNER JOIN encounter e   "
+            + "            ON e.patient_id=p.patient_id   "
+            + "        INNER JOIN obs o   "
+            + "            ON o.encounter_id=e.encounter_id   "
+            + "    WHERE  p.voided = 0   "
+            + "        AND e.voided = 0   "
+            + "        AND o.voided = 0   "
+            + "        AND e.encounter_type = ${6}   "
+            + "        AND o.concept_id = ${6273}  "
+            + "        AND o.value_coded = ${1366} "
+            + "        AND e.encounter_datetime <= :endDate   "
+            + "        AND e.location_id =  :location   "
+            + "         GROUP BY p.patient_id  "
+            + "  "
+            + "    UNION   "
+            + "  "
+            + "    SELECT  p.patient_id , Max(o.obs_datetime) AS deceased_date  "
+            + "    FROM patient p    "
+            + "        INNER JOIN encounter e   "
+            + "            ON e.patient_id=p.patient_id   "
+            + "        INNER JOIN obs o   "
+            + "            ON o.encounter_id=e.encounter_id   "
+            + "    WHERE  p.voided = 0   "
+            + "        AND e.voided = 0   "
+            + "        AND o.voided = 0   "
+            + "        AND e.encounter_type = ${53}  "
+            + "        AND o.concept_id = ${6272}  "
+            + "        AND o.value_coded = ${1366} "
+            + "        AND o.obs_datetime <= :endDate   "
+            + "        AND e.location_id =  :location  "
+            + "         GROUP BY p.patient_id  "
+            + " UNION "
+            + " SELECT p.person_id, p.death_date AS deceased_date "
+            + "                FROM   person p "
+            + "                WHERE  p.voided = 0"
+            + "                   AND p.dead = 1 "
+            + "                   AND p.death_date <= :endDate "
+            + ") lastest   "
+            + " WHERE lastest.patient_id NOT IN( "
+            + " SELECT p.patient_id  "
+            + "      FROM   patient p  "
+            + "             JOIN encounter e  "
+            + "               ON p.patient_id = e.patient_id  "
+            + "      WHERE  p.voided = 0  "
+            + "             AND e.voided = 0  "
+            + "             AND e.encounter_type = ${6}   "
+            + "             AND e.location_id = :location  "
+            + "             AND e.encounter_datetime > lastest.deceased_date  "
+            + "                 UNION"
+            + "  SELECT p.patient_id"
+            + "      FROM   patient p"
+            + "            JOIN encounter e ON p.patient_id = e.patient_id "
+            + "            JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "     WHERE  p.voided = 0"
+            + "            AND e.voided = 0 "
+            + "            AND o.voided = 0 "
+            + "            AND e.encounter_type = ${52}   "
+            + "              AND o.concept_id = ${23866}   "
+            + "              AND o.value_datetime > lastest.deceased_date"
+            + " )  "
+            + " GROUP BY lastest.patient_id )mostrecent "
+            + " GROUP BY mostrecent.patient_id";
+
+    return isForDataDefinition
+        ? "  SELECT mostrecent.patient_id, ' Óbito'  ".concat(fromSQL)
+        : " SELECT mostrecent.patient_id ".concat(fromSQL);
   }
 
   /**
@@ -624,36 +633,64 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * <li>1º levantamento registado na “Ficha Recepção/ Levantou ARVs?” com “Levantou ARV” = Sim
    *     (“Data de Levantamento”) sendo a data mais antiga dos critérios acima <= “Data Fim do
    *     Relatório”
+   *
    * @return {@link String}
    */
   public String getArtStartDateQuery() {
     return " SELECT art.patient_id, MIN(art.art_date) min_art_date FROM ( "
-            + " SELECT p.patient_id, MIN(e.encounter_datetime) art_date FROM patient p "
-            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + " WHERE e.encounter_type = ${18} "
-            + " AND e.encounter_datetime <= :endDate "
-            + " AND e.voided = 0 "
-            + " AND p.voided = 0 "
-            + " AND e.location_id = :location "
-            + " GROUP BY p.patient_id "
-            + " UNION "
-            + "    SELECT p.patient_id,  MIN(o.value_datetime) AS art_date FROM patient p "
-            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + " INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                         INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id  "
-            + "                         AND o.person_id = o2.person_id "
-            + " WHERE e.encounter_type = ${52} "
-            + " AND o.concept_id = ${23866} "
-            + "                 AND o.value_datetime <= :endDate "
-            + "                 AND o.voided = 0 "
-            + "                 AND o2.concept_id = ${23865} "
-            + "                 AND o2.value_coded = ${1065} "
-            + "                 AND o2.voided = 0 "
-            + " AND e.voided = 0 "
-            + " AND p.voided = 0 "
-            + " AND e.location_id = :location                 "
-            + " GROUP BY p.patient_id "
-            + " ) art  "
-            + " GROUP BY art.patient_id ";
+        + " SELECT p.patient_id, MIN(e.encounter_datetime) art_date FROM patient p "
+        + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
+        + " WHERE e.encounter_type = ${18} "
+        + " AND e.encounter_datetime <= :endDate "
+        + " AND e.voided = 0 "
+        + " AND p.voided = 0 "
+        + " AND e.location_id = :location "
+        + " GROUP BY p.patient_id "
+        + " UNION "
+        + "    SELECT p.patient_id,  MIN(o.value_datetime) AS art_date FROM patient p "
+        + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
+        + " INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "                         INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id  "
+        + "                         AND o.person_id = o2.person_id "
+        + " WHERE e.encounter_type = ${52} "
+        + " AND o.concept_id = ${23866} "
+        + "                 AND o.value_datetime <= :endDate "
+        + "                 AND o.voided = 0 "
+        + "                 AND o2.concept_id = ${23865} "
+        + "                 AND o2.value_coded = ${1065} "
+        + "                 AND o2.voided = 0 "
+        + " AND e.voided = 0 "
+        + " AND p.voided = 0 "
+        + " AND e.location_id = :location                 "
+        + " GROUP BY p.patient_id "
+        + " ) art  "
+        + " GROUP BY art.patient_id ";
+  }
+
+  public String getPatientsActiveOnTarv() {
+    return "SELECT  final.patient_id, 'Activo' "
+        + "FROM "
+        + "    ( "
+        + getArtStartDateQuery()
+        + " ) final "
+        + "WHERE final.patient_id NOT IN ("
+        + new EptsQueriesUtil()
+            .unionBuilder(getPatientsWhoAbandonedTarvQuery(false))
+            .union(
+                getPatientsWhoSuspendedTarvOrAreTransferredOut(
+                    hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId(),
+                    hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
+                    true,
+                    true))
+            .union(
+                getPatientsWhoSuspendedTarvOrAreTransferredOut(
+                    hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId(),
+                    hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
+                    false,
+                    true))
+            .union(getPatientsWhoDied(false))
+            .buildQuery()
+        + "     ) "
+        + "GROUP BY final.patient_id ";
   }
 }

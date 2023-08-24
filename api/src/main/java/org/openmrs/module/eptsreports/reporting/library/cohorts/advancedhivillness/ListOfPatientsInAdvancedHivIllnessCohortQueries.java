@@ -132,8 +132,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlCohortDefinition.setName("Utentes que Iniciaram o seguimento na Ficha DAH");
     sqlCohortDefinition.addParameters(getCohortParameters());
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    Map<String, Integer> map = new HashMap<>();
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
 
     String query =
         " SELECT p.patient_id "
@@ -149,7 +149,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
     query += "  AND e.location_id = :location " + "GROUP BY p.patient_id";
 
-    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor substitutor = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(substitutor.replace(query));
 
@@ -171,7 +171,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
         " Utentes com critério de CD4 para início de seguimento no Modelo de DAH");
     sqlCohortDefinition.addParameters(getCohortParameters());
 
-    Map<String, Integer> valuesMap = getStringIntegerMap();
+    Map<String, Integer> map = getStringIntegerMap();
 
     EptsQueriesUtil eptsQueriesUtil = new EptsQueriesUtil();
 
@@ -200,7 +200,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             .union(getCd4ResultBellowOneYearPid)
             .buildQuery();
 
-    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor substitutor = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(substitutor.replace(query));
 
@@ -227,25 +227,24 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
     sqlCohortDefinition.addParameters(getCohortParameters());
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
-    valuesMap.put("5018", hivMetadata.getChronicDiarrheaConcept().getConceptId());
-    valuesMap.put("3", hivMetadata.getAnemiaConcept().getConceptId());
-    valuesMap.put("5945", hivMetadata.getFeverConcept().getConceptId());
-    valuesMap.put("43", hivMetadata.getPneumoniaConcept().getConceptId());
-    valuesMap.put("60", hivMetadata.getMeningitisConcept().getConceptId());
-    valuesMap.put("126", hivMetadata.getGingivitisConcept().getConceptId());
-    valuesMap.put("6783", hivMetadata.getEstomatiteUlcerativaNecrotizanteConcept().getConceptId());
-    valuesMap.put("5334", hivMetadata.getCandidiaseOralConcept().getConceptId());
-    valuesMap.put("1294", hivMetadata.getCryptococcalMeningitisConcept().getConceptId());
-    valuesMap.put("1570", hivMetadata.getCervicalCancerConcept().getConceptId());
-    valuesMap.put("5340", hivMetadata.getCandidiaseEsofagicaConcept().getConceptId());
-    valuesMap.put("5344", hivMetadata.getHerpesSimplesConcept().getConceptId());
-    valuesMap.put("14656", hivMetadata.getCachexiaConcept().getConceptId());
-    valuesMap.put("7180", hivMetadata.getToxoplasmoseConcept().getConceptId());
-    valuesMap.put(
-        "6990", hivMetadata.getHivDiseaseResultingInEncephalopathyConcept().getConceptId());
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
+    map.put("5018", hivMetadata.getChronicDiarrheaConcept().getConceptId());
+    map.put("3", hivMetadata.getAnemiaConcept().getConceptId());
+    map.put("5945", hivMetadata.getFeverConcept().getConceptId());
+    map.put("43", hivMetadata.getPneumoniaConcept().getConceptId());
+    map.put("60", hivMetadata.getMeningitisConcept().getConceptId());
+    map.put("126", hivMetadata.getGingivitisConcept().getConceptId());
+    map.put("6783", hivMetadata.getEstomatiteUlcerativaNecrotizanteConcept().getConceptId());
+    map.put("5334", hivMetadata.getCandidiaseOralConcept().getConceptId());
+    map.put("1294", hivMetadata.getCryptococcalMeningitisConcept().getConceptId());
+    map.put("1570", hivMetadata.getCervicalCancerConcept().getConceptId());
+    map.put("5340", hivMetadata.getCandidiaseEsofagicaConcept().getConceptId());
+    map.put("5344", hivMetadata.getHerpesSimplesConcept().getConceptId());
+    map.put("14656", hivMetadata.getCachexiaConcept().getConceptId());
+    map.put("7180", hivMetadata.getToxoplasmoseConcept().getConceptId());
+    map.put("6990", hivMetadata.getHivDiseaseResultingInEncephalopathyConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id "
@@ -260,7 +259,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "  AND e.encounter_datetime <= :endDate "
             + "  AND e.location_id = :location";
 
-    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor substitutor = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(substitutor.replace(query));
 
@@ -268,7 +267,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   }
 
   /**
-   *
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getArtStartDateQuery()
    * @return {@link DataDefinition}
    */
   public DataDefinition getARTStartDate() {
@@ -278,17 +277,16 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    valuesMap.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-    valuesMap.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
-    valuesMap.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
-    valuesMap.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    Map<String, Integer> map = new HashMap<>();
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
 
-    String query =
-    listOfPatientsOnAdvancedHivIllnessQueries.getArtStartDateQuery();
+    String query = listOfPatientsOnAdvancedHivIllnessQueries.getArtStartDateQuery();
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
@@ -310,12 +308,12 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.setName("Data de Último Levantamento TARV");
     sqlPatientDataDefinition.addParameters(getCohortParameters());
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    valuesMap.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-    valuesMap.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
-    valuesMap.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
-    valuesMap.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    Map<String, Integer> map = new HashMap<>();
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
 
     String query =
         " SELECT pickup.patient_id, MAX(pickup.pickup_date) max_pickup_date FROM ( "
@@ -349,7 +347,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + " ) pickup  "
             + " GROUP BY pickup.patient_id ";
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
@@ -370,13 +368,13 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
-    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
-    valuesMap.put("1255", hivMetadata.getARVPlanConcept().getConceptId());
-    valuesMap.put("1705", hivMetadata.getRestartConcept().getConceptId());
-    valuesMap.put("6275", hivMetadata.getPreTarvConcept().getConceptId());
-    valuesMap.put("6276", hivMetadata.getArtStatus().getConceptId());
+    Map<String, Integer> map = new HashMap<>();
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("1255", hivMetadata.getARVPlanConcept().getConceptId());
+    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
+    map.put("6275", hivMetadata.getPreTarvConcept().getConceptId());
+    map.put("6276", hivMetadata.getArtStatus().getConceptId());
 
     String query =
         "SELECT e.patient_id, o.value_coded AS situation "
@@ -401,7 +399,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "  AND e.location_id = :location "
             + "GROUP BY e.patient_id";
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
@@ -422,8 +420,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    Map<String, Integer> map = new HashMap<>();
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
 
     String query =
         " SELECT p.patient_id, MAX(e.encounter_datetime) AS most_recent "
@@ -435,7 +433,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "  AND e.location_id = :location "
             + "GROUP BY p.patient_id";
 
-    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor substitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(substitutor.replace(query));
 
@@ -449,12 +447,12 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.setName(" Data de Registo de Estadio");
     sqlPatientDataDefinition.addParameters(getCohortParameters());
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
-    valuesMap.put("1206", hivMetadata.getWho3AdultStageConcept().getConceptId());
-    valuesMap.put("1207", hivMetadata.getWho4AdultStageConcept().getConceptId());
-    valuesMap.put("5356", hivMetadata.getcurrentWhoHivStageConcept().getConceptId());
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    map.put("1206", hivMetadata.getWho3AdultStageConcept().getConceptId());
+    map.put("1207", hivMetadata.getWho4AdultStageConcept().getConceptId());
+    map.put("5356", hivMetadata.getcurrentWhoHivStageConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id, "
@@ -475,7 +473,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "               AND e.location_id = :location "
             + "        GROUP  BY p.patient_id";
 
-    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor substitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(substitutor.replace(query));
 
@@ -489,12 +487,12 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.setName("Infecções Estadio OMS");
     sqlPatientDataDefinition.addParameters(getCohortParameters());
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
-    valuesMap.put("1206", hivMetadata.getWho3AdultStageConcept().getConceptId());
-    valuesMap.put("1207", hivMetadata.getWho4AdultStageConcept().getConceptId());
-    valuesMap.put("5356", hivMetadata.getcurrentWhoHivStageConcept().getConceptId());
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    map.put("1206", hivMetadata.getWho3AdultStageConcept().getConceptId());
+    map.put("1207", hivMetadata.getWho4AdultStageConcept().getConceptId());
+    map.put("5356", hivMetadata.getcurrentWhoHivStageConcept().getConceptId());
 
     String query =
         "SELECT e.patient_id, o.value_coded as estadio "
@@ -527,7 +525,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "  AND e.location_id = :location "
             + "GROUP BY e.patient_id";
 
-    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor substitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(substitutor.replace(query));
 
@@ -548,7 +546,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.setName("Data de resultado de CD4 Absoluto");
     sqlPatientDataDefinition.addParameters(getCohortParameters());
 
-    Map<String, Integer> valuesMap = getStringIntegerMap();
+    Map<String, Integer> map = getStringIntegerMap();
 
     EptsQueriesUtil eptsQueriesUtil = new EptsQueriesUtil();
 
@@ -560,7 +558,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             .union(listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBellowOneYear())
             .buildQuery();
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
@@ -581,7 +579,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.setName("Resultado de CD4 Absoluto");
     sqlPatientDataDefinition.addParameters(getCohortParameters());
 
-    Map<String, Integer> valuesMap = getStringIntegerMap();
+    Map<String, Integer> map = getStringIntegerMap();
 
     EptsQueriesUtil eptsQueriesUtil = new EptsQueriesUtil();
 
@@ -592,7 +590,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             .union(listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBellow1y())
             .buildQuery();
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
@@ -614,13 +612,13 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("1204", hivMetadata.getWhoStageIConcept().getConceptId());
-    valuesMap.put("1205", hivMetadata.getWhoStageIIConcept().getConceptId());
-    valuesMap.put("1206", hivMetadata.getWho3AdultStageConcept().getConceptId());
-    valuesMap.put("1207", hivMetadata.getWho4AdultStageConcept().getConceptId());
-    valuesMap.put("5356", hivMetadata.getcurrentWhoHivStageConcept().getConceptId());
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1204", hivMetadata.getWhoStageIConcept().getConceptId());
+    map.put("1205", hivMetadata.getWhoStageIIConcept().getConceptId());
+    map.put("1206", hivMetadata.getWho3AdultStageConcept().getConceptId());
+    map.put("1207", hivMetadata.getWho4AdultStageConcept().getConceptId());
+    map.put("5356", hivMetadata.getcurrentWhoHivStageConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id, "
@@ -640,7 +638,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "               AND e.location_id = :location "
             + "        GROUP  BY p.patient_id";
 
-    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor substitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(substitutor.replace(query));
 
@@ -661,13 +659,13 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("1204", hivMetadata.getWhoStageIConcept().getConceptId());
-    valuesMap.put("1205", hivMetadata.getWhoStageIIConcept().getConceptId());
-    valuesMap.put("1206", hivMetadata.getWho3AdultStageConcept().getConceptId());
-    valuesMap.put("1207", hivMetadata.getWho4AdultStageConcept().getConceptId());
-    valuesMap.put("5356", hivMetadata.getcurrentWhoHivStageConcept().getConceptId());
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1204", hivMetadata.getWhoStageIConcept().getConceptId());
+    map.put("1205", hivMetadata.getWhoStageIIConcept().getConceptId());
+    map.put("1206", hivMetadata.getWho3AdultStageConcept().getConceptId());
+    map.put("1207", hivMetadata.getWho4AdultStageConcept().getConceptId());
+    map.put("5356", hivMetadata.getcurrentWhoHivStageConcept().getConceptId());
 
     String query =
         "SELECT e.patient_id, o.value_coded as estadio "
@@ -699,7 +697,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "  AND e.location_id = :location "
             + "GROUP BY e.patient_id";
 
-    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor substitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(substitutor.replace(query));
 
@@ -722,16 +720,16 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("1065", hivMetadata.getYesConcept().getConceptId());
-    valuesMap.put("1204", hivMetadata.getWhoStageIConcept().getConceptId());
-    valuesMap.put("1205", hivMetadata.getWhoStageIIConcept().getConceptId());
-    valuesMap.put("1206", hivMetadata.getWho3AdultStageConcept().getConceptId());
-    valuesMap.put("1207", hivMetadata.getWho4AdultStageConcept().getConceptId());
-    valuesMap.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
-    valuesMap.put("5356", hivMetadata.getcurrentWhoHivStageConcept().getConceptId());
-    valuesMap.put("23761", hivMetadata.getActiveTBConcept().getConceptId());
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("1204", hivMetadata.getWhoStageIConcept().getConceptId());
+    map.put("1205", hivMetadata.getWhoStageIIConcept().getConceptId());
+    map.put("1206", hivMetadata.getWho3AdultStageConcept().getConceptId());
+    map.put("1207", hivMetadata.getWho4AdultStageConcept().getConceptId());
+    map.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
+    map.put("5356", hivMetadata.getcurrentWhoHivStageConcept().getConceptId());
+    map.put("23761", hivMetadata.getActiveTBConcept().getConceptId());
 
     String query =
         " SELECT tb.patient_id, 'TB' AS motivo_mudanca FROM ( "
@@ -782,7 +780,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "  AND e.encounter_datetime = estadio.consultation_date "
             + "  AND e.location_id = :location";
 
-    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor substitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(substitutor.replace(query));
 
@@ -805,16 +803,16 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("1065", hivMetadata.getYesConcept().getConceptId());
-    valuesMap.put("1204", hivMetadata.getWhoStageIConcept().getConceptId());
-    valuesMap.put("1205", hivMetadata.getWhoStageIIConcept().getConceptId());
-    valuesMap.put("1206", hivMetadata.getWho3AdultStageConcept().getConceptId());
-    valuesMap.put("1207", hivMetadata.getWho4AdultStageConcept().getConceptId());
-    valuesMap.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
-    valuesMap.put("5356", hivMetadata.getcurrentWhoHivStageConcept().getConceptId());
-    valuesMap.put("23761", hivMetadata.getActiveTBConcept().getConceptId());
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("1204", hivMetadata.getWhoStageIConcept().getConceptId());
+    map.put("1205", hivMetadata.getWhoStageIIConcept().getConceptId());
+    map.put("1206", hivMetadata.getWho3AdultStageConcept().getConceptId());
+    map.put("1207", hivMetadata.getWho4AdultStageConcept().getConceptId());
+    map.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
+    map.put("5356", hivMetadata.getcurrentWhoHivStageConcept().getConceptId());
+    map.put("23761", hivMetadata.getActiveTBConcept().getConceptId());
 
     String query =
         " SELECT tb.patient_id, 'TB' AS motivo_mudanca FROM ( "
@@ -884,7 +882,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "  AND e.encounter_datetime = estadio.consultation_date "
             + "  AND e.location_id = :location";
 
-    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor substitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(substitutor.replace(query));
 
@@ -905,7 +903,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.setName("Resultado do Último CD4 Absoluto");
     sqlPatientDataDefinition.addParameters(getCohortParameters());
 
-    Map<String, Integer> valuesMap = getStringIntegerMap();
+    Map<String, Integer> map = getStringIntegerMap();
 
     String query =
         " SELECT ps.person_id, o.value_numeric AS cd4_result "
@@ -945,7 +943,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "  AND o.obs_datetime = last_cd4.most_recent "
             + "  AND e.location_id = :location";
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
@@ -966,7 +964,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.setName("Resultado do Último CD4 Absoluto");
     sqlPatientDataDefinition.addParameters(getCohortParameters());
 
-    Map<String, Integer> valuesMap = getStringIntegerMap();
+    Map<String, Integer> map = getStringIntegerMap();
 
     EptsQueriesUtil eptsQueriesUtil = new EptsQueriesUtil();
 
@@ -980,7 +978,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
                     .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true))
             .buildQuery();
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
@@ -1002,14 +1000,14 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.setName("Resultado do Penúltimo CD4 Absoluto");
     sqlPatientDataDefinition.addParameters(getCohortParameters());
 
-    Map<String, Integer> valuesMap = getStringIntegerMap();
+    Map<String, Integer> map = getStringIntegerMap();
 
     String query =
         " SELECT result.person_id, result.value_numeric FROM ( "
             + listOfPatientsOnAdvancedHivIllnessQueries.getLastCd4OrResultDateBeforeMostRecentCd4()
             + " ) result ";
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
@@ -1031,14 +1029,14 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.setName("Data do Resultado do Penúltimo CD4 Absoluto");
     sqlPatientDataDefinition.addParameters(getCohortParameters());
 
-    Map<String, Integer> valuesMap = getStringIntegerMap();
+    Map<String, Integer> map = getStringIntegerMap();
 
     String query =
         " SELECT result.person_id, result.second_cd4_result FROM ( "
             + listOfPatientsOnAdvancedHivIllnessQueries.getLastCd4OrResultDateBeforeMostRecentCd4()
             + " ) result ";
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
@@ -1060,21 +1058,21 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
-    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
-    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
-    valuesMap.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
         " SELECT vl_result.patient_id, vl_result.viral_load FROM ( "
             + listOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
             + " ) AS vl_result GROUP BY vl_result.patient_id ";
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
@@ -1096,21 +1094,21 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
-    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
-    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
-    valuesMap.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
         " SELECT result_date.patient_id, MAX(result_date.most_recent) FROM ( "
             + listOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
             + " ) AS result_date GROUP BY result_date.patient_id ";
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
@@ -1132,14 +1130,14 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
-    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
-    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
-    valuesMap.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
         " SELECT vl_result.patient_id, vl_result.viral_load FROM ( "
@@ -1174,7 +1172,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + " GROUP BY p.patient_id "
             + " ) AS vl_result GROUP BY vl_result.patient_id ";
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
@@ -1196,14 +1194,14 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
-    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
-    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
-    valuesMap.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
         " SELECT result_date.patient_id, MAX(result_date.most_recent) FROM ( "
@@ -1238,7 +1236,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + " GROUP BY p.patient_id "
             + " ) AS result_date GROUP BY result_date.patient_id ";
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
@@ -1272,10 +1270,10 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, String> valuesMap = new HashMap<>();
-    valuesMap.put("encounterType", StringUtils.join(encounterTypeList, ","));
-    valuesMap.put("examConcept", StringUtils.join(examConceptList, ","));
-    valuesMap.put("resultConcept", StringUtils.join(resultConceptList, ","));
+    Map<String, String> map = new HashMap<>();
+    map.put("encounterType", StringUtils.join(encounterTypeList, ","));
+    map.put("examConcept", StringUtils.join(examConceptList, ","));
+    map.put("resultConcept", StringUtils.join(resultConceptList, ","));
 
     String fromSQL =
         "  FROM ( "
@@ -1300,7 +1298,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             ? " SELECT exam_result.patient_id, exam_result.value_coded ".concat(fromSQL)
             : " SELECT exam_result.patient_id, exam_result.recent_date ".concat(fromSQL);
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
@@ -1452,25 +1450,17 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
   /**
    * <b> Último Estado de Permanência TARV </b>
-   * <li>
-   *     Resposta = “Abandono”, os utentes em TARV que abandonaram o tratamento (DAH_RF24)
-   * </li>
-   * <li>
-   *     Resposta = “Óbito”, os utentes em TARV que foram óbito (DAH_RF25)
-   * </li>
-   * <li>
-   *    Resposta = “Suspenso”, os utentes em TARV que suspenderam o tratamento (DAH_RF24)
-   * </li>
-   * <li>
-   *    Resposta = “Activo”, os utentes activos em TARV (DAH_RF26)
-   * </li>
+   * <li>Resposta = “Abandono”, os utentes em TARV que abandonaram o tratamento (DAH_RF24)
+   * <li>Resposta = “Óbito”, os utentes em TARV que foram óbito (DAH_RF25)
+   * <li>Resposta = “Suspenso”, os utentes em TARV que suspenderam o tratamento (DAH_RF24)
+   * <li>Resposta = “Activo”, os utentes activos em TARV (DAH_RF26)
    *
    * @return {@link DataDefinition}
    */
   public DataDefinition getLastStateOfStayOnTarv() {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
 
-    sqlPatientDataDefinition.setName("get Patients Transferred In by end of the period ");
+    sqlPatientDataDefinition.setName("Get the Last State of stay ");
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -1478,6 +1468,13 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("1", hivMetadata.getHIVCareProgram().getProgramId());
     map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("10", hivMetadata.getArtDeadWorkflowState().getProgramWorkflowStateId());
+    map.put("8", hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put(
         "28",
         hivMetadata
@@ -1490,17 +1487,22 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             .getProgramWorkflowStateId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
     map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
     map.put("6275", hivMetadata.getPreTarvConcept().getConceptId());
     map.put("6276", hivMetadata.getArtStatus().getConceptId());
     map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
     map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("1709", hivMetadata.getSuspendedTreatmentConcept().getConceptId());
 
     String query =
         new EptsQueriesUtil()
             .unionBuilder(
-                listOfPatientsOnAdvancedHivIllnessQueries.getPatientsWhoAbandonedTarvQuery())
-            .union(listOfPatientsOnAdvancedHivIllnessQueries.getPatientsWhoDied())
+                listOfPatientsOnAdvancedHivIllnessQueries.getPatientsWhoAbandonedTarvQuery(true))
+            .union(listOfPatientsOnAdvancedHivIllnessQueries.getPatientsWhoDied(true))
             .union(
                 listOfPatientsOnAdvancedHivIllnessQueries
                     .getPatientsWhoSuspendedTarvOrAreTransferredOut(
@@ -1510,6 +1512,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
                         hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
                         false,
                         false))
+            .union(listOfPatientsOnAdvancedHivIllnessQueries.getPatientsActiveOnTarv())
             .buildQuery();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -1520,15 +1523,15 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   }
 
   private Map<String, Integer> getStringIntegerMap() {
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
-    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
-    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
-    valuesMap.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
-    valuesMap.put("165389", hivMetadata.getCD4LabsetConcept().getConceptId());
-    return valuesMap;
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("165389", hivMetadata.getCD4LabsetConcept().getConceptId());
+    return map;
   }
 
   /** Add parameters to Cohort Definitions */
