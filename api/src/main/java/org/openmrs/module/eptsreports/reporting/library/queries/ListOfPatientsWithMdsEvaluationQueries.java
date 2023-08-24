@@ -81,7 +81,9 @@ public class ListOfPatientsWithMdsEvaluationQueries {
 
   public static String getTranferredPatients(
       String inclusionEndMonthAndDay, int numberOfYearsEndDate) {
-    return "SELECT p.patient_id "
+    return " SELECT patient_id "
+        + " FROM ( "
+        + "SELECT p.patient_id "
         + "		        FROM   patient p "
         + "		                INNER JOIN encounter e ON p.patient_id = e.patient_id "
         + "		                INNER JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -94,8 +96,9 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         + "		         AND e.encounter_type = ${53} "
         + "		         AND ((o.concept_id = ${1369} AND o.value_coded = ${1065}) "
         + "		               AND (o2.concept_id = ${6300} AND o2.value_coded = ${6276})) "
-        + "		 	    UNION "
-        + "				SELECT p.patient_id "
+        + " UNION "
+        + "				SELECT p.patient_id, "
+        + "                     MAX(e.encounter_datetime) AS last_transfer "
         + "				FROM   patient p "
         + "					   INNER JOIN encounter e ON p.patient_id = e.patient_id "
         + "					   INNER JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -106,19 +109,16 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         + "				AND e.encounter_type = ${6} "
         + "				AND o.concept_id = ${6273} "
         + "				AND o.value_coded = ${1706} "
-        + "				AND o.obs_datetime <= DATE_SUB( "
+        + "				AND e.encounter_datetime <= DATE_SUB( "
         + "  CONCAT(:evaluationYear,"
         + inclusionEndMonthAndDay
-        + "        ) "
-        + "                                            ,INTERVAL "
+        + "        ) ,INTERVAL "
         + numberOfYearsEndDate
         + " YEAR) "
-        + "                 "
-        + "                UNION "
-        + "				SELECT trf_out_resumo.patient_id "
-        + "				FROM ( SELECT p.patient_id, "
-        + "							  MAX(o.obs_datetime) AS obs_date "
-        + "					   FROM   patient p "
+        + " UNION "
+        + "				SELECT p.patient_id, "
+        + "				  	   MAX(o.obs_datetime) AS last_transfer "
+        + "				FROM   patient p "
         + "							  INNER JOIN encounter e ON p.patient_id = e.patient_id "
         + "							  INNER JOIN obs o ON e.encounter_id = o.encounter_id "
         + "					   WHERE  p.voided = 0 "
@@ -131,11 +131,10 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         + "                  AND        o.obs_datetime <= DATE_SUB( "
         + "  CONCAT(:evaluationYear,"
         + inclusionEndMonthAndDay
-        + "        ) "
-        + "                                            ,INTERVAL "
+        + "        ) ,INTERVAL "
         + numberOfYearsEndDate
         + " YEAR) "
         + "                  GROUP BY   p.patient_id "
-        + "         )trf_out_resumo ";
+        + " ) transferred ";
   }
 }
