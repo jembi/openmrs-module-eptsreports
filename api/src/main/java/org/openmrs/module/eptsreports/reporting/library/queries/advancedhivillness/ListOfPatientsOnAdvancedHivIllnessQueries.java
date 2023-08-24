@@ -1,7 +1,14 @@
 package org.openmrs.module.eptsreports.reporting.library.queries.advancedhivillness;
 
+import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
 public class ListOfPatientsOnAdvancedHivIllnessQueries {
 
+  @Autowired private HivMetadata hivMetadata;
   /**
    *
    * <li>Utentes com registo do resultado de CD4 (absoluto) na “Ficha Clínica – Ficha Mestra” ou
@@ -13,7 +20,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * @param mostRecentDate Flag to return Most Recent date or Cd4 Result
    * @return {@link String}
    */
-  public static String getPatientsWithCD4AbsoluteResultOnPeriodQuery(
+  public String getPatientsWithCD4AbsoluteResultOnPeriodQuery(
       int valueNumeric, boolean mostRecentDate) {
 
     String fromSQL =
@@ -48,7 +55,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * @param mostRecentDate Flag to return Most Recent date or Cd4 Result
    * @return {@link String}
    */
-  public static String getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(
+  public String getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(
       int valueNumeric, boolean mostRecentDate) {
 
     String fromSQL =
@@ -81,14 +88,12 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    *
    * @return {@link String}
    */
-  public static String getCd4ResultOverOrEqualTo5years() {
-    return ListOfPatientsOnAdvancedHivIllnessQueries.getPatientsWithCD4AbsoluteResultOnPeriodQuery(
-            200, true)
+  public String getCd4ResultOverOrEqualTo5years() {
+    return getPatientsWithCD4AbsoluteResultOnPeriodQuery(200, true)
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=5 "
         + "  GROUP BY ps.person_id "
         + " UNION "
-        + ListOfPatientsOnAdvancedHivIllnessQueries
-            .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(200, true)
+        + getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(200, true)
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=5 "
         + "  GROUP BY ps.person_id ";
   }
@@ -105,15 +110,13 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    *
    * @return {@link String}
    */
-  public static String getCd4ResultBetweenOneAnd5years() {
-    return ListOfPatientsOnAdvancedHivIllnessQueries.getPatientsWithCD4AbsoluteResultOnPeriodQuery(
-            500, true)
+  public String getCd4ResultBetweenOneAnd5years() {
+    return getPatientsWithCD4AbsoluteResultOnPeriodQuery(500, true)
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=1 "
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <5 "
         + "  GROUP BY ps.person_id "
         + " UNION "
-        + ListOfPatientsOnAdvancedHivIllnessQueries
-            .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(500, true)
+        + getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(500, true)
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=1 "
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <5 "
         + "  GROUP BY ps.person_id ";
@@ -131,14 +134,12 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    *
    * @return {@link String}
    */
-  public static String getCd4ResultBellowOneYear() {
-    return ListOfPatientsOnAdvancedHivIllnessQueries.getPatientsWithCD4AbsoluteResultOnPeriodQuery(
-            750, true)
+  public String getCd4ResultBellowOneYear() {
+    return getPatientsWithCD4AbsoluteResultOnPeriodQuery(750, true)
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <1 "
         + "  GROUP BY ps.person_id "
         + " UNION "
-        + ListOfPatientsOnAdvancedHivIllnessQueries
-            .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(750, true)
+        + getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(750, true)
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <1 "
         + "  GROUP BY ps.person_id ";
   }
@@ -147,14 +148,12 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * @see #getCd4ResultOverOrEqualTo5years()
    * @return {@link String}
    */
-  public static String getCd4ResultOverOrEqualTo5y() {
-    return ListOfPatientsOnAdvancedHivIllnessQueries.getPatientsWithCD4AbsoluteResultOnPeriodQuery(
-            200, false)
+  public String getCd4ResultOverOrEqualTo5y() {
+    return getPatientsWithCD4AbsoluteResultOnPeriodQuery(200, false)
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=5 "
         + "  GROUP BY ps.person_id "
         + " UNION "
-        + ListOfPatientsOnAdvancedHivIllnessQueries
-            .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(200, false)
+        + getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(200, false)
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=5 "
         + "  GROUP BY ps.person_id ";
   }
@@ -163,15 +162,13 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * @see #getCd4ResultBetweenOneAnd5years()
    * @return {@link String}
    */
-  public static String getCd4ResultBetweenOneAnd5y() {
-    return ListOfPatientsOnAdvancedHivIllnessQueries.getPatientsWithCD4AbsoluteResultOnPeriodQuery(
-            500, false)
+  public String getCd4ResultBetweenOneAnd5y() {
+    return getPatientsWithCD4AbsoluteResultOnPeriodQuery(500, false)
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=1 "
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <5 "
         + "  GROUP BY ps.person_id "
         + " UNION "
-        + ListOfPatientsOnAdvancedHivIllnessQueries
-            .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(500, false)
+        + getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(500, false)
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=1 "
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <5 "
         + "  GROUP BY ps.person_id ";
@@ -181,14 +178,12 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * @see #getCd4ResultBellowOneYear()
    * @return {@link String}
    */
-  public static String getCd4ResultBellow1y() {
-    return ListOfPatientsOnAdvancedHivIllnessQueries.getPatientsWithCD4AbsoluteResultOnPeriodQuery(
-            750, false)
+  public String getCd4ResultBellow1y() {
+    return getPatientsWithCD4AbsoluteResultOnPeriodQuery(750, false)
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <1 "
         + "  GROUP BY ps.person_id "
         + " UNION "
-        + ListOfPatientsOnAdvancedHivIllnessQueries
-            .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(750, false)
+        + getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(750, false)
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <1 "
         + "  GROUP BY ps.person_id ";
   }
@@ -203,7 +198,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * @param mostRecentDate Flag to return Most Recent date or Cd4 Result
    * @return {@link String}
    */
-  public static String getPatientsWithCD4AbsoluteResultOnPeriodQuery(boolean mostRecentDate) {
+  public String getPatientsWithCD4AbsoluteResultOnPeriodQuery(boolean mostRecentDate) {
 
     String fromSQL =
         " FROM   person ps "
@@ -239,8 +234,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * @param mostRecentDate Flag to return Most Recent date or Cd4 Result
    * @return {@link String}
    */
-  public static String getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(
-      boolean mostRecentDate) {
+  public String getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(boolean mostRecentDate) {
 
     String fromSQL =
         " FROM "
@@ -260,7 +254,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         : " SELECT ps.person_id, o.value_numeric AS cd4_result ".concat(fromSQL);
   }
 
-  public static String getLastCd4OrResultDateBeforeMostRecentCd4() {
+  public String getLastCd4OrResultDateBeforeMostRecentCd4() {
     return " SELECT ps.person_id, o.value_numeric, MAX(e.encounter_datetime) AS second_cd4_result "
         + " FROM   person ps "
         + "       INNER JOIN encounter e "
@@ -268,8 +262,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "       INNER JOIN obs o "
         + "               ON e.encounter_id = o.encounter_id "
         + " INNER JOIN ( "
-        + ListOfPatientsOnAdvancedHivIllnessQueries.getPatientsWithCD4AbsoluteResultOnPeriodQuery(
-            true)
+        + getPatientsWithCD4AbsoluteResultOnPeriodQuery(true)
         + " ) last_cd4 ON last_cd4.person_id = ps.person_id "
         + "WHERE  ps.voided = 0 "
         + "       AND e.voided = 0 "
@@ -289,8 +282,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "    person ps INNER JOIN encounter e ON ps.person_id= e.patient_id "
         + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
         + " INNER JOIN ( "
-        + ListOfPatientsOnAdvancedHivIllnessQueries
-            .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true)
+        + getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true)
         + " ) last_cd4 ON last_cd4.person_id = ps.person_id "
         + "WHERE ps.voided = 0 AND e.voided = 0 AND o.voided = 0 "
         + "  AND e.encounter_type = ${53} "
@@ -301,7 +293,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "       GROUP BY ps.person_id ";
   }
 
-  public static String getVLoadResultAndMostRecent() {
+  public String getVLoadResultAndMostRecent() {
     return " SELECT p.patient_id, o.value_numeric AS viral_load, MAX(o.obs_datetime) AS most_recent FROM patient p "
         + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
         + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "

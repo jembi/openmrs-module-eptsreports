@@ -25,13 +25,19 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   private final HivMetadata hivMetadata;
 
   private final CommonMetadata commonMetadata;
+
+  private final ListOfPatientsOnAdvancedHivIllnessQueries listOfPatientsOnAdvancedHivIllnessQueries;
+
   String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
   @Autowired
   public ListOfPatientsInAdvancedHivIllnessCohortQueries(
-      HivMetadata hivMetadata, CommonMetadata commonMetadata) {
+      HivMetadata hivMetadata,
+      CommonMetadata commonMetadata,
+      ListOfPatientsOnAdvancedHivIllnessQueries listOfPatientsOnAdvancedHivIllnessQueries) {
     this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
+    this.listOfPatientsOnAdvancedHivIllnessQueries = listOfPatientsOnAdvancedHivIllnessQueries;
   }
 
   /**
@@ -172,19 +178,19 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     String Cd4ResultOverOrEqualTo5yearsPid =
         eptsQueriesUtil
             .patientIdQueryBuilder(
-                ListOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultOverOrEqualTo5years())
+                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultOverOrEqualTo5years())
             .getQuery();
 
     String getCd4ResultBetweenOneAnd5yearsPid =
         eptsQueriesUtil
             .patientIdQueryBuilder(
-                ListOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBetweenOneAnd5years())
+                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBetweenOneAnd5years())
             .getQuery();
 
     String getCd4ResultBellowOneYearPid =
         eptsQueriesUtil
             .patientIdQueryBuilder(
-                ListOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBellowOneYear())
+                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBellowOneYear())
             .getQuery();
 
     String query =
@@ -587,9 +593,9 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     String query =
         eptsQueriesUtil
             .unionBuilder(
-                ListOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultOverOrEqualTo5years())
-            .union(ListOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBetweenOneAnd5years())
-            .union(ListOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBellowOneYear())
+                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultOverOrEqualTo5years())
+            .union(listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBetweenOneAnd5years())
+            .union(listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBellowOneYear())
             .buildQuery();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
@@ -619,9 +625,9 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
     String query =
         eptsQueriesUtil
-            .unionBuilder(ListOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultOverOrEqualTo5y())
-            .union(ListOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBetweenOneAnd5y())
-            .union(ListOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBellow1y())
+            .unionBuilder(listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultOverOrEqualTo5y())
+            .union(listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBetweenOneAnd5y())
+            .union(listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBellow1y())
             .buildQuery();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
@@ -947,7 +953,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "       INNER JOIN obs o "
             + "               ON e.encounter_id = o.encounter_id "
             + " INNER JOIN ( "
-            + ListOfPatientsOnAdvancedHivIllnessQueries
+            + listOfPatientsOnAdvancedHivIllnessQueries
                 .getPatientsWithCD4AbsoluteResultOnPeriodQuery(true)
             + " ) last_cd4 ON last_cd4.person_id = ps.person_id "
             + "WHERE  ps.voided = 0 "
@@ -967,7 +973,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "    person ps INNER JOIN encounter e ON ps.person_id= e.patient_id "
             + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
             + " INNER JOIN ( "
-            + ListOfPatientsOnAdvancedHivIllnessQueries
+            + listOfPatientsOnAdvancedHivIllnessQueries
                 .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true)
             + " ) last_cd4 ON last_cd4.person_id = ps.person_id "
             + "WHERE ps.voided = 0 AND e.voided = 0 AND o.voided = 0 "
@@ -1005,10 +1011,10 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     String query =
         eptsQueriesUtil
             .unionBuilder(
-                ListOfPatientsOnAdvancedHivIllnessQueries
+                listOfPatientsOnAdvancedHivIllnessQueries
                     .getPatientsWithCD4AbsoluteResultOnPeriodQuery(true))
             .union(
-                ListOfPatientsOnAdvancedHivIllnessQueries
+                listOfPatientsOnAdvancedHivIllnessQueries
                     .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true))
             .buildQuery();
 
@@ -1038,7 +1044,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
     String query =
         " SELECT result.person_id, result.value_numeric FROM ( "
-            + ListOfPatientsOnAdvancedHivIllnessQueries.getLastCd4OrResultDateBeforeMostRecentCd4()
+            + listOfPatientsOnAdvancedHivIllnessQueries.getLastCd4OrResultDateBeforeMostRecentCd4()
             + " ) result ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
@@ -1067,7 +1073,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
     String query =
         " SELECT result.person_id, result.second_cd4_result FROM ( "
-            + ListOfPatientsOnAdvancedHivIllnessQueries.getLastCd4OrResultDateBeforeMostRecentCd4()
+            + listOfPatientsOnAdvancedHivIllnessQueries.getLastCd4OrResultDateBeforeMostRecentCd4()
             + " ) result ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
@@ -1103,7 +1109,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
     String query =
         " SELECT vl_result.patient_id, vl_result.viral_load FROM ( "
-            + ListOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
+            + listOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
             + " ) AS vl_result GROUP BY vl_result.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
@@ -1139,7 +1145,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
     String query =
         " SELECT result_date.patient_id, MAX(result_date.most_recent) FROM ( "
-            + ListOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
+            + listOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
             + " ) AS result_date GROUP BY result_date.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
@@ -1179,7 +1185,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "         INNER JOIN ( "
-            + ListOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
+            + listOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
             + "         ) last_vl ON last_vl.patient_id = p.patient_id "
             + " WHERE e.encounter_type = ${53} "
             + " AND (o.concept_id = ${856} AND o.value_numeric IS NOT NULL) "
@@ -1194,7 +1200,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "         INNER JOIN ( "
-            + ListOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
+            + listOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
             + "         ) last_vl ON last_vl.patient_id = p.patient_id "
             + " WHERE e.encounter_type IN(${6},${9},${13},${51}) "
             + " AND (o.concept_id = ${856} AND o.value_numeric IS NOT NULL) "
@@ -1243,7 +1249,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "         INNER JOIN ( "
-            + ListOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
+            + listOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
             + "         ) last_vl ON last_vl.patient_id = p.patient_id "
             + " WHERE e.encounter_type = ${53} "
             + " AND (o.concept_id = ${856} AND o.value_numeric IS NOT NULL) "
@@ -1258,7 +1264,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "         INNER JOIN ( "
-            + ListOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
+            + listOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
             + "         ) last_vl ON last_vl.patient_id = p.patient_id "
             + " WHERE e.encounter_type IN(${6},${9},${13},${51}) "
             + " AND (o.concept_id = ${856} AND o.value_numeric IS NOT NULL) "
