@@ -245,7 +245,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         dataSetDefinition,
         "positiveTbLam",
         "ClientsWithPositiveTbLam",
-        EptsReportUtils.map(positiveTbLam, inclusionPeriod),
+        EptsReportUtils.map(positiveTbLam, reportingPeriod),
         dissagregations());
 
     // Clients with negative Tb Lam
@@ -324,7 +324,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         dataSetDefinition,
         "positiveTbLamOnTreatment",
         "ClientsWithPositiveTbLamOnTbTreatment",
-        EptsReportUtils.map(positiveTbLamOnTreatmentInd, inclusionPeriod),
+        EptsReportUtils.map(positiveTbLamOnTreatmentInd, reportingPeriod),
         dissagregations());
 
     return dataSetDefinition;
