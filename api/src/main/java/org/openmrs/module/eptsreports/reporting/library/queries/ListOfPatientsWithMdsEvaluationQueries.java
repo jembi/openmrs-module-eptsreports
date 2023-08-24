@@ -97,6 +97,8 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         + "		         AND ((o.concept_id = ${1369} AND o.value_coded = ${1065}) "
         + "		               AND (o2.concept_id = ${6300} AND o2.value_coded = ${6276})) "
         + " UNION "
+        + "				SELECT patient_id "
+        + "				FROM ( "
         + "				SELECT p.patient_id, "
         + "                     MAX(e.encounter_datetime) AS last_transfer "
         + "				FROM   patient p "
@@ -115,7 +117,11 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         + "        ) ,INTERVAL "
         + numberOfYearsEndDate
         + " YEAR) "
+        + "              GROUP BY p.patient_id "
+        + "    ) transferred_out_clinical "
         + " UNION "
+        + "				SELECT patient_id "
+        + "				FROM ( "
         + "				SELECT p.patient_id, "
         + "				  	   MAX(o.obs_datetime) AS last_transfer "
         + "				FROM   patient p "
@@ -135,6 +141,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         + numberOfYearsEndDate
         + " YEAR) "
         + "                  GROUP BY   p.patient_id "
+        + "    ) transferred_out_resumo "
         + " ) transferred ";
   }
 }
