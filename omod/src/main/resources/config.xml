@@ -3559,6 +3559,14 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.tbLamPositivityLevelConceptUuid</property>
+		<defaultValue>5d11cf23-9c8b-4ee7-a2d4-b81993123d0d</defaultValue>
+		<description>
+			UUID for Tb Lam Positivity Level
+		</description>
+	</globalProperty>
+
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 
 		<include method="enterForm"/> </create> </allow> <signatures> <![CDATA[ import 

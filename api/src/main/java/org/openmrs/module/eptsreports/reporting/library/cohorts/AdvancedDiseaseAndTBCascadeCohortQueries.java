@@ -962,12 +962,33 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                   WHERE  e.voided = 0 "
             + "                          AND o.voided = 0 "
             + "                          AND o2.voided = 0 "
-            + "                          AND e.encounter_type IN ( ${6}, ${13} ) "
+            + "                          AND e.encounter_type  = ${6} "
             + "                          AND o.concept_id = ${23951} "
             + "                          AND o.value_coded = ${703} "
             + "                          AND o2.concept_id = ${165185} "
             + "                          AND o2.value_coded = "
                 .concat(tbLamGrade.getConceptId().toString())
+            + "                          AND e.location_id = :location "
+            + "                          AND e.encounter_datetime BETWEEN :startDate AND :endDate"
+            + "                   GROUP  BY e.patient_id "
+            + "                   UNION "
+            + " SELECT e.patient_id "
+            + "                   FROM   encounter e "
+            + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                          INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "                          INNER JOIN obs o3 ON o3.encounter_id = e.encounter_id "
+            + "                   WHERE  e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND o2.voided = 0 "
+            + "                          AND o3.voided = 0 "
+            + "                          AND e.encounter_type = ${13}  "
+            + "                          AND o.concept_id = ${23951} "
+            + "                          AND o.value_coded = ${703} "
+            + "                          AND o2.concept_id = ${165185} "
+            + "                          AND o2.value_coded = "
+                .concat(tbLamGrade.getConceptId().toString())
+            + "                          AND o3.concept_id =  ${165349} "
+            + "                          AND o3.obs_id = o2.obs_group_id"
             + "                          AND e.location_id = :location "
             + "                          AND e.encounter_datetime BETWEEN :startDate AND :endDate"
             + "                   GROUP  BY e.patient_id "
@@ -1423,6 +1444,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     map.put("165187", hivMetadata.getTwoPlusConcept().getConceptId());
     map.put("165186", hivMetadata.getOnePlusConcept().getConceptId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("165349", hivMetadata.getHivViralLoadConcept().getConceptId());
     return map;
   }
 
