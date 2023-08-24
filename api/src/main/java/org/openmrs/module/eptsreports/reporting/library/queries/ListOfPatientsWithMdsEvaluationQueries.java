@@ -37,8 +37,10 @@ public class ListOfPatientsWithMdsEvaluationQueries {
   }
 
   public static String getPatientArtStart(String inclusionEndMonthAndDay) {
-    return "SELECT p.patient_id, "
-        + "       Min(e.encounter_datetime) art_pickup_date "
+    return "SELECT first.patient_id, MIN(first.pickup_date) first_pickup "
+        + "       FROM ( "
+        + " SELECT p.patient_id, "
+        + "       Min(e.encounter_datetime) pickup_date "
         + "FROM   patient p "
         + "       INNER JOIN encounter e "
         + "               ON e.patient_id = p.patient_id "
@@ -52,7 +54,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         + "GROUP  BY p.patient_id "
         + "UNION "
         + "SELECT p.patient_id, "
-        + "       Min(o2.value_datetime) art_pickup_date "
+        + "       Min(o2.value_datetime) pickup_date "
         + "FROM   patient p "
         + "       INNER JOIN encounter e "
         + "               ON e.patient_id = p.patient_id "
@@ -69,11 +71,12 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         + "            AND o.concept_id = ${23865} "
         + "            AND o.value_coded = ${1065} "
         + "            AND o2.concept_id = ${23866} "
-        + "            AND o2.value_datetime IS NOT NULL "
         + "            AND o2.value_datetime <= CONCAT(:evaluationYear, "
         + inclusionEndMonthAndDay
         + "        ) "
-        + "GROUP  BY p.patient_id";
+        + "GROUP  BY p.patient_id "
+        + "        ) first "
+        + "     GROUP BY first.patient_id ";
   }
 
   public static String getTranferredPatients(
