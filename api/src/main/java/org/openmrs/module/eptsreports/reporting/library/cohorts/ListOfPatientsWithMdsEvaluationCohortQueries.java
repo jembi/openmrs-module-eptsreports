@@ -282,7 +282,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "        ), INTERVAL "
             + numberOfYearsStartDateFor24
             + " YEAR) "
-            + " AND  art_patient_12.first_pickup <= DATE_SUB( "
+            + " AND  art_patient_24.first_pickup <= DATE_SUB( "
             + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
             + "        ) ,INTERVAL  "

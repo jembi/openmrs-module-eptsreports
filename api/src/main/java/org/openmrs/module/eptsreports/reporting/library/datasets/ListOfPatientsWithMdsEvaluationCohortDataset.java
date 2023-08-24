@@ -289,8 +289,8 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B11 - Rastreado para TB em TODAS as consultas entre a data de inscrição no MDS e 12˚ mês de
     // TARV?: Coluna AH
     //    pdd.addColumn(
-    //        "tb_screening_b",
-    //        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreening(),
+    //        "tpt_start_date",
+    //        listOfPatientsWithMdsEvaluationCohortQueries.getTptInitiationDate(),
     //        "evaluationYear=${evaluationYear},location=${location}",
     //        null);
 
