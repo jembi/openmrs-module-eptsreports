@@ -59,7 +59,8 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.setParameters(getParameters());
 
     pdd.addRowFilter(
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsInitiatedART12Or24Months(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsInitiatedART12Or24Months(
+            2, 1, 3, 2),
         "evaluationYear=${evaluationYear},location=${location}");
 
     //  SECÇÃO A
