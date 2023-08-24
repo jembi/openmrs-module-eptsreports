@@ -143,6 +143,11 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "endDate=${endDate},location=${location}",
         new EmptyToNaoAndAnyToSimConverter());
     // 10 - Último Estado de Permanência TARV- Sheet 1: Column J
+    pdd.addColumn(
+        "last_state",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastStateOfStayOnTarv(),
+        "endDate=${endDate},location=${location}",
+        new EmptyToNaoAndAnyToSimConverter());
 
     // 11 - Situação TARV no Início do Seguimento de DAH Sheet 1: K
     pdd.addColumn(

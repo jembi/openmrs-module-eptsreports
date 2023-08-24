@@ -268,11 +268,6 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   }
 
   /**
-   * <b> Data Início TARV (1º levantamento)</b>
-   * <li>1º levantamento de ARVs registado no FILA (“Data de Levantamento”) ou
-   * <li>1º levantamento registado na “Ficha Recepção/ Levantou ARVs?” com “Levantou ARV” = Sim
-   *     (“Data de Levantamento”) sendo a data mais antiga dos critérios acima <= “Data Fim do
-   *     Relatório”
    *
    * @return {@link DataDefinition}
    */
@@ -291,34 +286,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     valuesMap.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
 
     String query =
-        " SELECT art.patient_id, MIN(art.art_date) min_art_date FROM ( "
-            + " SELECT p.patient_id, MIN(e.encounter_datetime) art_date FROM patient p "
-            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + " WHERE e.encounter_type = ${18} "
-            + " AND e.encounter_datetime <= :endDate "
-            + " AND e.voided = 0 "
-            + " AND p.voided = 0 "
-            + " AND e.location_id = :location "
-            + " GROUP BY p.patient_id "
-            + " UNION "
-            + "    SELECT p.patient_id,  MIN(o.value_datetime) AS art_date FROM patient p "
-            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + " INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                         INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id  "
-            + "                         AND o.person_id = o2.person_id "
-            + " WHERE e.encounter_type = ${52} "
-            + " AND o.concept_id = ${23866} "
-            + "                 AND o.value_datetime <= :endDate "
-            + "                 AND o.voided = 0 "
-            + "                 AND o2.concept_id = ${23865} "
-            + "                 AND o2.value_coded = ${1065} "
-            + "                 AND o2.voided = 0 "
-            + " AND e.voided = 0 "
-            + " AND p.voided = 0 "
-            + " AND e.location_id = :location                 "
-            + " GROUP BY p.patient_id "
-            + " ) art  "
-            + " GROUP BY art.patient_id ";
+    listOfPatientsOnAdvancedHivIllnessQueries.getArtStartDateQuery();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
@@ -474,10 +442,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     return sqlPatientDataDefinition;
   }
 
-  /**
-   * @see #getPatientsWithEstadioOnPeriod
-   * @return {@link DataDefinition}
-   */
+  /** @return {@link DataDefinition} */
   public DataDefinition getDateOfEstadioOnPeriod() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
@@ -517,10 +482,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     return sqlPatientDataDefinition;
   }
 
-  /**
-   * @see #getPatientsWithEstadioOnPeriod
-   * @return {@link DataDefinition}
-   */
+  /** @return {@link DataDefinition} */
   public DataDefinition getResultOfEstadioDuringPeriod() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
@@ -1346,7 +1308,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   }
 
   /**
-   * <b> Utentes Transferidos paraOutra US</b>
+   * <b> Utentes Transferidos para Outra US</b>
    * <li>utentes registados como ‘Suspensos’ (último estado de inscrição) no programa SERVIÇO TARV
    *     TRATAMENTO com “Data de Suspensão” <= “Data Fim” ou
    * <li>utentes com registo do último estado [“Mudança Estado Permanência TARV” (Coluna 21) = “T”
@@ -1384,91 +1346,17 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
 
     String query =
-        "  SELECT mostrecent.patient_id "
-            + "FROM ("
-            + " SELECT lastest.patient_id ,Max(lastest.last_date) as  last_date "
-            + " FROM (  "
-            + "    SELECT p.patient_id ,ps.start_date AS last_date  "
-            + "    FROM patient p   "
-            + "        INNER JOIN patient_program pg   "
-            + "            ON p.patient_id=pg.patient_id   "
-            + "        INNER JOIN patient_state ps   "
-            + "            ON pg.patient_program_id=ps.patient_program_id   "
-            + "    WHERE pg.voided=0   "
-            + "        AND ps.voided=0   "
-            + "        AND p.voided=0   "
-            + "        AND pg.program_id= ${2}  "
-            + "        AND ps.state = ${7}   "
-            + "        AND ps.end_date is null "
-            + "        AND ps.start_date <= :endDate   "
-            + "        AND pg.location_id= :location   "
-            + "         GROUP BY p.patient_id  "
-            + "  "
-            + "    UNION  "
-            + "  "
-            + "    SELECT  p.patient_id,  Max(e.encounter_datetime) AS last_date  "
-            + "    FROM patient p    "
-            + "        INNER JOIN encounter e   "
-            + "            ON e.patient_id=p.patient_id   "
-            + "        INNER JOIN obs o   "
-            + "            ON o.encounter_id=e.encounter_id   "
-            + "    WHERE  p.voided = 0   "
-            + "        AND e.voided = 0   "
-            + "        AND o.voided = 0   "
-            + "        AND e.encounter_type = ${6}   "
-            + "        AND o.concept_id = ${6273}  "
-            + "        AND o.value_coded =  ${1706}   "
-            + "        AND e.encounter_datetime <= :endDate   "
-            + "        AND e.location_id =  :location   "
-            + "         GROUP BY p.patient_id  "
-            + "  "
-            + "    UNION   "
-            + "  "
-            + "    SELECT  p.patient_id , Max(o.obs_datetime) AS last_date  "
-            + "    FROM patient p    "
-            + "        INNER JOIN encounter e   "
-            + "            ON e.patient_id=p.patient_id   "
-            + "        INNER JOIN obs o   "
-            + "            ON o.encounter_id=e.encounter_id   "
-            + "    WHERE  p.voided = 0   "
-            + "        AND e.voided = 0   "
-            + "        AND o.voided = 0   "
-            + "        AND e.encounter_type = ${53}  "
-            + "        AND o.concept_id = ${6272}  "
-            + "        AND o.value_coded = ${1706}   "
-            + "        AND o.obs_datetime <= :endDate   "
-            + "        AND e.location_id =  :location  "
-            + "         GROUP BY p.patient_id  "
-            + ") lastest   "
-            + " WHERE lastest.patient_id NOT IN( "
-            + " SELECT p.patient_id  "
-            + "      FROM   patient p  "
-            + "             JOIN encounter e  "
-            + "               ON p.patient_id = e.patient_id  "
-            + "      WHERE  p.voided = 0  "
-            + "             AND e.voided = 0  "
-            + "             AND e.encounter_type = ${6}   "
-            + "             AND e.location_id = :location  "
-            + "             AND e.encounter_datetime > lastest.last_date  "
-            + "                 UNION"
-            + "  SELECT p.patient_id"
-            + "      FROM   patient p"
-            + "            JOIN encounter e ON p.patient_id = e.patient_id "
-            + "            JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "     WHERE  p.voided = 0"
-            + "            AND e.voided = 0 "
-            + "            AND o.voided = 0 "
-            + "            AND e.encounter_type = ${52}   "
-            + "              AND o.concept_id = ${23866}   "
-            + "              AND o.value_datetime > lastest.last_date )  "
-            + " GROUP BY lastest.patient_id )mostrecent "
-            + " GROUP BY mostrecent.patient_id";
+        listOfPatientsOnAdvancedHivIllnessQueries.getPatientsWhoSuspendedTarvOrAreTransferredOut(
+            hivMetadata
+                .getTransferredOutToAnotherHealthFacilityWorkflowState()
+                .getProgramWorkflowStateId(),
+            hivMetadata.getTransferredOutConcept().getConceptId(),
+            true,
+            true);
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
-    String mappedQuery = stringSubstitutor.replace(query);
-
-    sqlCohortDefinition.setQuery(mappedQuery);
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
   }
@@ -1558,6 +1446,75 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     String mappedQuery = stringSubstitutor.replace(query);
 
     sqlPatientDataDefinition.setQuery(mappedQuery);
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b> Último Estado de Permanência TARV </b>
+   * <li>
+   *     Resposta = “Abandono”, os utentes em TARV que abandonaram o tratamento (DAH_RF24)
+   * </li>
+   * <li>
+   *     Resposta = “Óbito”, os utentes em TARV que foram óbito (DAH_RF25)
+   * </li>
+   * <li>
+   *    Resposta = “Suspenso”, os utentes em TARV que suspenderam o tratamento (DAH_RF24)
+   * </li>
+   * <li>
+   *    Resposta = “Activo”, os utentes activos em TARV (DAH_RF26)
+   * </li>
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getLastStateOfStayOnTarv() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+
+    sqlPatientDataDefinition.setName("get Patients Transferred In by end of the period ");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    //    ADD CONCEPTS HERE
+    Map<String, Integer> map = new HashMap<>();
+    map.put("1", hivMetadata.getHIVCareProgram().getProgramId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put(
+        "28",
+        hivMetadata
+            .getArtCareTransferredFromOtherHealthFacilityWorkflowState()
+            .getProgramWorkflowStateId());
+    map.put(
+        "29",
+        hivMetadata
+            .getTransferredFromOtherHealthFacilityWorkflowState()
+            .getProgramWorkflowStateId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
+    map.put("6275", hivMetadata.getPreTarvConcept().getConceptId());
+    map.put("6276", hivMetadata.getArtStatus().getConceptId());
+    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
+
+    String query =
+        new EptsQueriesUtil()
+            .unionBuilder(
+                listOfPatientsOnAdvancedHivIllnessQueries.getPatientsWhoAbandonedTarvQuery())
+            .union(listOfPatientsOnAdvancedHivIllnessQueries.getPatientsWhoDied())
+            .union(
+                listOfPatientsOnAdvancedHivIllnessQueries
+                    .getPatientsWhoSuspendedTarvOrAreTransferredOut(
+                        hivMetadata
+                            .getSuspendedTreatmentWorkflowState()
+                            .getProgramWorkflowStateId(),
+                        hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
+                        false,
+                        false))
+            .buildQuery();
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlPatientDataDefinition;
   }
