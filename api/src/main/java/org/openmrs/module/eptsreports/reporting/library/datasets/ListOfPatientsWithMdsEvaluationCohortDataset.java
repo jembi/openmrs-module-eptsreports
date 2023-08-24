@@ -69,11 +69,11 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn("counter", new PersonIdDataDefinition(), "", new ObjectCounterConverter());
 
     // A2- Coorte: (coluna B)
-    //    pdd.addColumn(
-    //        "coort",
-    //        listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24Months(),
-    //        "evaluationYear=${evaluationYear},location=${location}",
-    //        null);
+    pdd.addColumn(
+        "coort",
+        listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24Months(2, 1, 3, 2),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
 
     // A3- Sexo: (coluna C)
     pdd.addColumn("gender", new GenderDataDefinition(), "", new MaleFemaleConverter());
@@ -288,11 +288,11 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
 
     // B11 - Rastreado para TB em TODAS as consultas entre a data de inscrição no MDS e 12˚ mês de
     // TARV?: Coluna AH
-    pdd.addColumn(
-        "tb_screening_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreening(),
-        "evaluationYear=${evaluationYear},location=${location}",
-        null);
+    //    pdd.addColumn(
+    //        "tb_screening_b",
+    //        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreening(),
+    //        "evaluationYear=${evaluationYear},location=${location}",
+    //        null);
 
     // C1- Data do pedido da CV de seguimento: (coluna AP)
     pdd.addColumn(

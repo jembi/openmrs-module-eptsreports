@@ -219,7 +219,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {DataDefinition}
    */
-  public DataDefinition getCoort12Or24Months() {
+  public DataDefinition getCoort12Or24Months(
+      int numberOfYearsStartDateFor12,
+      int numberOfYearsEndDateFor12,
+      int numberOfYearsStartDateFor24,
+      int numberOfYearsEndDateFor24) {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("A.2 - Coorte: – Resposta = 12 meses ou Resposta = 24 meses.");
@@ -230,9 +234,13 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
     map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
     map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
     map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
     map.put("6276", hivMetadata.getArtStatus().getConceptId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
@@ -244,10 +252,21 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " FROM   ( "
             + "      SELECT art_patient_12.patient_id, '12 Meses' AS coort "
             + "     FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
             + "     ) art_patient_12 "
-            + " WHERE  art_patient_12.patient_id  "
+            + " WHERE  art_patient_12.first_pickup >= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionStartMonthAndDay
+            + "        ), INTERVAL "
+            + numberOfYearsStartDateFor12
+            + " YEAR) "
+            + " AND  art_patient_12.first_pickup <= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + "        ) ,INTERVAL  "
+            + numberOfYearsEndDateFor12
+            + " YEAR) "
+            + " AND art_patient_12.patient_id "
             + " NOT IN ( "
             + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
                 inclusionEndMonthAndDay, 1)
@@ -255,10 +274,21 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " UNION "
             + "     SELECT art_patient_24.patient_id, '24 Meses' AS coort "
             + "     FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
             + "     ) art_patient_24 "
-            + " WHERE  art_patient_24.patient_id  "
+            + " WHERE  art_patient_24.first_pickup >= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionStartMonthAndDay
+            + "        ), INTERVAL "
+            + numberOfYearsStartDateFor24
+            + " YEAR) "
+            + " AND  art_patient_12.first_pickup <= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + "        ) ,INTERVAL  "
+            + numberOfYearsEndDateFor24
+            + " YEAR) "
+            + " AND art_patient_24.patient_id "
             + " NOT IN ( "
             + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
                 inclusionEndMonthAndDay, 2)
