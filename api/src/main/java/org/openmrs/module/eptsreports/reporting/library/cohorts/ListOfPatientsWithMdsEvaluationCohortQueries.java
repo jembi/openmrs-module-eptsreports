@@ -455,6 +455,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("165305", tbMetadata.get1HPConcept().getConceptId());
     map.put("165306", tbMetadata.getLFXConcept().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
 
     String sql =
         "SELECT final_query.patient_id, "
@@ -462,7 +466,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "         WHEN final_query.encounter_date IS NULL THEN 'Sim' "
             + "         WHEN final_query.encounter_date IS NOT NULL THEN 'Não' "
             + "         ELSE '' "
-            + "       end "
+            + "       END "
             + "FROM   ( "
             + "         SELECT     p.patient_id, "
             + "                    e.encounter_datetime AS encounter_date "
@@ -474,7 +478,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "         INNER JOIN "
             + "                    ( "
             + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.art_start AS art_encounter "
+            + "                                  art_patient.first_pickup AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
             + "                           ) art_patient "
@@ -484,10 +488,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " AND o.voided = 0 "
             + " AND e.encounter_type = ${6} "
             + " AND e.location_id = :location "
-            + "  AND o.concept_id = ${23761} "
-            + "  AND o.value_coded = ${1065} "
-            + "  AND e.encounter_datetime >= art.art_encounter "
-            + "  AND e.encounter_datetime <= DATE_ADD ( art.art_encounter, INTERVAL 33 DAY ) "
+            + " AND o.concept_id = ${23761} "
+            + " AND o.value_coded = ${1065} "
+            + " AND e.encounter_datetime >= art.art_encounter "
+            + " AND e.encounter_datetime <= DATE_ADD( art.art_encounter, INTERVAL 33 DAY ) "
             + " GROUP  BY p.patient_id "
             + " UNION "
             + "         SELECT     p.patient_id, "
@@ -500,7 +504,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "         INNER JOIN "
             + "                    ( "
             + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.art_start AS art_encounter "
+            + "                                  art_patient.first_pickup AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
             + "                           ) art_patient "
@@ -510,10 +514,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " AND o.voided = 0 "
             + " AND e.encounter_type = ${6} "
             + " AND e.location_id = :location "
-            + "  AND o.concept_id = ${23758} "
-            + "  AND o.value_coded = ${1065} "
-            + "  AND e.encounter_datetime >= art.art_encounter "
-            + "  AND e.encounter_datetime <= DATE_ADD ( art.art_encounter, INTERVAL 33 DAY ) "
+            + " AND o.concept_id = ${23758} "
+            + " AND o.value_coded = ${1065} "
+            + " AND e.encounter_datetime >= art.art_encounter "
+            + " AND e.encounter_datetime <= DATE_ADD( art.art_encounter, INTERVAL 33 DAY ) "
             + " GROUP  BY p.patient_id "
             + " UNION "
             + "         SELECT     p.patient_id, "
@@ -526,7 +530,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "         INNER JOIN "
             + "                    ( "
             + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.art_start AS art_encounter "
+            + "                                  art_patient.first_pickup AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
             + "                           ) art_patient "
@@ -536,11 +540,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " AND o.voided = 0 "
             + " AND e.encounter_type = ${6} "
             + " AND e.location_id = :location "
-            + "               AND ( o.concept_id = ${1766} "
-            + "                     AND o.value_coded IN( ${1763}, ${1764}, ${1762}, ${1760}, "
-            + "                                           ${23760}, ${1765}, ${161} ) ) "
-            + "  AND e.encounter_datetime >= art.art_encounter "
-            + "  AND e.encounter_datetime <= DATE_ADD ( art.art_encounter, INTERVAL 33 DAY ) "
+            + " AND o.concept_id = ${1766} "
+            + " AND o.value_coded IN( ${1763}, ${1764}, ${1762}, ${1760}, "
+            + "                       ${23760}, ${1765}, ${161} ) "
+            + " AND e.encounter_datetime >= art.art_encounter "
+            + " AND e.encounter_datetime <= DATE_ADD( art.art_encounter, INTERVAL 33 DAY ) "
             + " GROUP  BY p.patient_id "
             + " UNION "
             + "         SELECT     p.patient_id, "
@@ -553,7 +557,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "         INNER JOIN "
             + "                    ( "
             + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.art_start AS art_encounter "
+            + "                                  art_patient.first_pickup AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
             + "                           ) art_patient "
@@ -563,10 +567,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " AND o.voided = 0 "
             + " AND e.encounter_type = ${6} "
             + " AND e.location_id = :location "
-            + "               AND o.concept_id = ${1268} "
-            + "               AND o.value_coded IN ( ${1256}, ${1257}, ${1267} ) "
-            + "  AND o.obs_datetime >= art.art_encounter "
-            + "  AND o.obs_datetime <= DATE_ADD ( art.art_encounter, INTERVAL 33 DAY ) "
+            + " AND o.concept_id = ${1268} "
+            + " AND o.value_coded IN ( ${1256}, ${1257}, ${1267} ) "
+            + " AND o.obs_datetime >= art.art_encounter "
+            + " AND o.obs_datetime <= DATE_ADD( art.art_encounter, INTERVAL 33 DAY ) "
             + " GROUP  BY p.patient_id "
             + " UNION "
             + "         SELECT     p.patient_id, "
@@ -579,21 +583,23 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "         INNER JOIN "
             + "                    ( "
             + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.art_start AS art_encounter "
+            + "                                  art_patient.first_pickup AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
             + "                           ) art_patient "
+            + " ) art ON art.patient_id = p.patient_id "
             + " WHERE  p.voided = 0 "
             + " AND e.voided = 0 "
             + " AND o.voided = 0 "
             + " AND e.encounter_type = ${53} "
             + " AND e.location_id = :location "
-            + "               AND o.concept_id = ${1406} "
-            + "               AND o.value_coded IN ( ${42} ) "
-            + "  AND o.obs_datetime >= art.art_encounter "
-            + "  AND o.obs_datetime <= DATE_ADD ( art.art_encounter, INTERVAL 33 DAY ) "
+            + " AND o.concept_id = ${1406} "
+            + " AND o.value_coded = ${42} "
+            + " AND o.obs_datetime >= art.art_encounter "
+            + " AND o.obs_datetime <= DATE_ADD( art.art_encounter, INTERVAL 33 DAY ) "
             + " GROUP  BY p.patient_id "
-            + "               ) AS final_query";
+            + "               ) AS final_query "
+            + "     GROUP BY final_query.patient_id";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
 
@@ -714,7 +720,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " AND ( o2.concept_id = ${165308} "
             + " AND o2.value_coded IN ( ${1256} ) ) ) "
             + " AND e.encounter_datetime >= art.art_pickup_date "
-            + " AND e.encounter_datetime <= DATE_ADD( art.art_pickup_date, INTERVAL 33 DAY) "
+            + " AND e.encounter_datetime <= DATE_ADD( art.art_pickup_date, INTERVAL 33 DAY ) "
             + " GROUP  BY p.patient_id "
             + " UNION "
             + "        SELECT     p.patient_id, "
@@ -740,7 +746,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " AND ( o2.concept_id = ${165308} "
             + " AND o2.value_coded IN ( ${1256} ) ) ) "
             + " AND o2.obs_datetime >= art.art_pickup_date "
-            + " AND o2.obs_datetime <= DATE_ADD( art.art_pickup_date, INTERVAL 33 DAY) "
+            + " AND o2.obs_datetime <= DATE_ADD( art.art_pickup_date, INTERVAL 33 DAY ) "
             + " GROUP  BY p.patient_id "
             + " UNION "
             + "         SELECT     p.patient_id, "
@@ -761,7 +767,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " AND o.concept_id = ${1719} "
             + " AND o.value_coded = ${165307} "
             + " AND e.encounter_datetime >= art.art_pickup_date "
-            + " AND e.encounter_datetime <= DATE_ADD( art.art_pickup_date, INTERVAL 33 DAY) "
+            + " AND e.encounter_datetime <= DATE_ADD( art.art_pickup_date, INTERVAL 33 DAY ) "
             + " GROUP  BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
