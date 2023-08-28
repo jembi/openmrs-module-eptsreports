@@ -1390,8 +1390,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * e 12 meses do Início TARV (“Data da Consulta com resultado CD4” >= “Data Início TARV” + 33 dias
    * e <= “Data Início TARV” + 12 meses).
    *
-   * <p>Nota 1: A “Data Início TARV” é a data registada na Ficha Resumo (“Data do Início TARV”).
-   * <br>
+   * <p>Nota 1: A “Data Início TARV” é definida no RF46. <br>
    * <br>
    *
    * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
@@ -1418,6 +1417,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
     map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
 
     String query =
         "                   SELECT cd4_2.patient_id, "
@@ -1447,16 +1450,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                                        enc.encounter_id "
             + "                                             INNER JOIN ( "
             + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.art_start AS art_encounter "
+            + "                                  art_patient.first_pickup AS art_encounter "
             + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
             + "                           ) art_patient "
-            + " WHERE  art_patient.patient_id  "
-            + " NOT IN ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
-                inclusionEndMonthAndDay, 1)
-            + " ) "
             + " ) art ON art.patient_id = enc.patient_id "
             + "       WHERE  pa.voided = 0 "
             + "       AND enc.voided = 0 "
@@ -1485,74 +1482,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "       AND enc2.encounter_type = ${6} "
             + "       AND obs2.concept_id = ${1695} "
             + "       AND obs2.value_numeric IS NOT NULL "
-            + "       GROUP BY cd4_2.patient_id "
-            + "UNION "
-            + "                   SELECT cd4_2.patient_id, "
-            + "                          Min(obs2.value_numeric) AS second_cd4_result "
-            + "                   FROM   patient cd4_2 "
-            + "                          INNER JOIN encounter enc2 "
-            + "                                 ON enc2.patient_id = cd4_2.patient_id "
-            + "                          INNER JOIN obs obs2 "
-            + "                                 ON enc2.encounter_id = obs2.encounter_id "
-            + "                          INNER JOIN ( "
-            + "                   SELECT cd4_1.patient_id, "
-            + "                          Min(obs1.value_numeric) AS first_cd4_result "
-            + "                   FROM   patient cd4_1 "
-            + "                          INNER JOIN encounter enc1 "
-            + "                                 ON enc1.patient_id = cd4_1.patient_id "
-            + "                          INNER JOIN obs obs1 "
-            + "                                 ON enc1.encounter_id = obs1.encounter_id "
-            + "                          INNER JOIN (SELECT pa.patient_id, "
-            + "                                             Min(enc.encounter_datetime) AS "
-            + "                                             encounter_date "
-            + "                                      FROM   patient pa "
-            + "                                             INNER JOIN encounter enc "
-            + "                                                     ON enc.patient_id = "
-            + "                                                        pa.patient_id "
-            + "                                             INNER JOIN obs "
-            + "                                                     ON obs.encounter_id = "
-            + "                                                        enc.encounter_id "
-            + "                                             INNER JOIN ( "
-            + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.art_start AS art_encounter "
-            + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
-            + "                           ) art_patient "
-            + " WHERE  art_patient.patient_id  "
-            + " NOT IN ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
-                inclusionEndMonthAndDay, 2)
-            + " ) "
-            + " ) art ON art.patient_id = enc.patient_id "
-            + "       WHERE  pa.voided = 0 "
-            + "       AND enc.voided = 0 "
-            + "       AND obs.voided = 0 "
-            + "       AND enc.encounter_type = ${6} "
-            + "       AND enc.location_id = :location "
-            + "       AND obs.concept_id = ${1695} "
-            + "       AND obs.value_numeric IS NOT NULL "
-            + "       AND enc.encounter_datetime >= DATE_ADD(art.art_encounter, INTERVAL 33 DAY) "
-            + "       AND enc.encounter_datetime <= DATE_ADD(art.art_encounter, INTERVAL 12 MONTH) "
-            + "       GROUP  BY pa.patient_id) first_cd4_result "
-            + "       ON first_cd4_result.patient_id = cd4_1.patient_id "
-            + "       WHERE  cd4_1.voided = 0 "
-            + "       AND enc1.voided = 0 "
-            + "       AND obs1.voided = 0 "
-            + "       AND enc1.encounter_type = ${6} "
-            + "       AND obs1.concept_id = ${1695} "
-            + "       AND obs1.value_numeric IS NOT NULL "
-            + "       AND enc1.encounter_datetime > first_cd4_result.encounter_date "
-            + "       GROUP BY cd4_1.patient_id) second_cd4_result "
-            + "       ON second_cd4_result.patient_id = cd4_2.patient_id "
-            + "       WHERE  cd4_2.voided = 0 "
-            + "       AND enc2.voided = 0"
-            + "       AND obs2.voided = 0"
-            + "       AND enc2.location_id = :location "
-            + "       AND enc2.encounter_type = ${6} "
-            + "       AND obs2.concept_id = ${1695} "
-            + "       AND obs2.value_numeric IS NOT NULL "
-            + "       GROUP BY cd4_2.patient_id";
+            + "       GROUP BY cd4_2.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1594,6 +1524,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
     map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
 
     String query =
         "       SELECT cd4.patient_id, "
@@ -1615,65 +1549,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                      enc.encounter_id "
             + "           INNER JOIN ( "
             + "     SELECT art_patient.patient_id, "
-            + "            art_patient.art_start AS art_encounter "
-            + "     FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
             + "                           ) art_patient "
-            + " WHERE  art_patient.patient_id  "
-            + " NOT IN ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
-                inclusionEndMonthAndDay, 1)
-            + " ) "
-            + " ) art ON art.patient_id = enc.patient_id "
-            + "       WHERE  pa.voided = 0 "
-            + "       AND enc.voided = 0 "
-            + "       AND obs.voided = 0 "
-            + "       AND enc.encounter_type = ${6} "
-            + "       AND enc.location_id = :location "
-            + "       AND obs.concept_id = ${1695} "
-            + "       AND obs.value_numeric IS NOT NULL "
-            + "       AND enc.encounter_datetime >= DATE_ADD(art.art_encounter, INTERVAL 12 MONTH) "
-            + "       AND enc.encounter_datetime <= DATE_ADD(art.art_encounter, INTERVAL 24 MONTH) "
-            + "       GROUP  BY pa.patient_id) most_recent_cd4 "
-            + "       ON most_recent_cd4.patient_id = cd4.patient_id "
-            + "       WHERE  cd4.voided = 0 "
-            + "       AND enc.voided = 0 "
-            + "       AND obs.voided = 0 "
-            + "       AND enc.encounter_type = ${6} "
-            + "       AND obs.concept_id = ${1695} "
-            + "       AND obs.value_numeric IS NOT NULL "
-            + "       GROUP BY cd4.patient_id "
-            + "UNION "
-            + "       SELECT cd4.patient_id, "
-            + "         obs.value_numeric AS cd4_result "
-            + "  FROM   patient cd4 "
-            + "         INNER JOIN encounter enc "
-            + "                ON enc.patient_id = cd4.patient_id "
-            + "         INNER JOIN obs  "
-            + "                ON enc.encounter_id = obs.encounter_id "
-            + "      INNER JOIN (SELECT pa.patient_id, "
-            + "    MAX(enc.encounter_datetime) AS "
-            + "                encounter_date "
-            + "    FROM   patient pa "
-            + "           INNER JOIN encounter enc "
-            + "                   ON enc.patient_id = "
-            + "                      pa.patient_id "
-            + "           INNER JOIN obs "
-            + "                   ON obs.encounter_id = "
-            + "                      enc.encounter_id "
-            + "           INNER JOIN ( "
-            + "     SELECT art_patient.patient_id, "
-            + "            art_patient.art_start AS art_encounter "
-            + "     FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
-            + "                           ) art_patient "
-            + " WHERE  art_patient.patient_id  "
-            + " NOT IN ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
-                inclusionEndMonthAndDay, 2)
-            + " ) "
             + " ) art ON art.patient_id = enc.patient_id "
             + "       WHERE  pa.voided = 0 "
             + "       AND enc.voided = 0 "
