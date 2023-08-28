@@ -28,8 +28,6 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   private ResumoMensalCohortQueries resumoMensalCohortQueries;
   private AgeCohortQueries ageCohortQueries;
 
-  private final String reportingPeriod =
-      "startDate=${endDate}-2m,endDate=${generationDate},location=${location}";
   private final String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
   @Autowired
@@ -915,16 +913,12 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     cd.addSearch(
         "startedTbTreatment",
-        EptsReportUtils.map(
-            txtbCohortQueries.tbTreatmentStartDateWithinReportingDate(), reportingPeriod));
-    cd.addSearch(
-        "tbProgram", EptsReportUtils.map(txtbCohortQueries.getInTBProgram(), reportingPeriod));
+        EptsReportUtils.map(txtbCohortQueries.tbTreatmentStartDateWithinReportingDate(), mappings));
+    cd.addSearch("tbProgram", EptsReportUtils.map(txtbCohortQueries.getInTBProgram(), mappings));
 
-    cd.addSearch(
-        "pumonaryTb", EptsReportUtils.map(txtbCohortQueries.getPulmonaryTB(), reportingPeriod));
+    cd.addSearch("pumonaryTb", EptsReportUtils.map(txtbCohortQueries.getPulmonaryTB(), mappings));
 
-    cd.addSearch(
-        "tbPlan", EptsReportUtils.map(txtbCohortQueries.getTBTreatmentStart(), reportingPeriod));
+    cd.addSearch("tbPlan", EptsReportUtils.map(txtbCohortQueries.getTBTreatmentStart(), mappings));
 
     cd.setCompositionString("startedTbTreatment OR tbProgram OR pumonaryTb OR tbPlan");
 
@@ -1041,9 +1035,9 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     cd.addSearch(
         "positiveFourPlus",
-        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeFourPlus(), reportingPeriod));
+        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeFourPlus(), mappings));
 
-    cd.addSearch("positiveThreePlus", EptsReportUtils.map(positiveThreePlus, reportingPeriod));
+    cd.addSearch("positiveThreePlus", EptsReportUtils.map(positiveThreePlus, mappings));
 
     cd.setCompositionString("positiveThreePlus AND NOT positiveFourPlus");
 
@@ -1063,9 +1057,9 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     cd.addSearch(
         "positiveThreePlus",
-        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeThreePlus(), reportingPeriod));
+        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeThreePlus(), mappings));
 
-    cd.addSearch("positiveTwoPlus", EptsReportUtils.map(positiveTwoPlus, reportingPeriod));
+    cd.addSearch("positiveTwoPlus", EptsReportUtils.map(positiveTwoPlus, mappings));
 
     cd.setCompositionString("positiveTwoPlus AND NOT positiveThreePlus");
 
@@ -1085,9 +1079,9 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     cd.addSearch(
         "positiveTwoPlus",
-        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeTwoPlus(), reportingPeriod));
+        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeTwoPlus(), mappings));
 
-    cd.addSearch("positiveOnePlus", EptsReportUtils.map(positiveOnePlus, reportingPeriod));
+    cd.addSearch("positiveOnePlus", EptsReportUtils.map(positiveOnePlus, mappings));
 
     cd.setCompositionString("positiveOnePlus AND NOT positiveTwoPlus");
 
@@ -1104,11 +1098,11 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     cd.addSearch(
         "positive",
-        EptsReportUtils.map(getPatientsWithTbLamResult(TbLamResult.POSITIVE), reportingPeriod));
+        EptsReportUtils.map(getPatientsWithTbLamResult(TbLamResult.POSITIVE), mappings));
 
     cd.addSearch(
         "positiveOnePlus",
-        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeOnePlus(), reportingPeriod));
+        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeOnePlus(), mappings));
 
     cd.setCompositionString("positive AND NOT positiveOnePlus");
 
@@ -1136,8 +1130,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addParameter(new Parameter("location", "End Date", Location.class));
 
     cd.addSearch(
-        "vlOnPeriod",
-        EptsReportUtils.map(getPatientsUnsuppressedVLDuringInclusion(), reportingPeriod));
+        "vlOnPeriod", EptsReportUtils.map(getPatientsUnsuppressedVLDuringInclusion(), mappings));
 
     cd.addSearch(
         "vlBeforePeriod",
@@ -1309,7 +1302,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     cd.addSearch(
         cd4CountComparison.getSearchKey(),
-        EptsReportUtils.map(getPatientsWithCd4Count(cd4CountComparison), reportingPeriod));
+        EptsReportUtils.map(getPatientsWithCd4Count(cd4CountComparison), mappings));
 
     cd.setCompositionString(cd4CountComparison.getCompositionString());
     return cd;

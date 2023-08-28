@@ -54,7 +54,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(
             advanceDiseaseAndTbCascadeDimension.getPatientWithPositiveTbLamAndGradeDimension(),
             reportingPeriod));
-
+    // RF11-Number of clients eligible for CD4 count during inclusion period
     CohortIndicator eligibleCd4Ind =
         eptsGeneralIndicator.getIndicator(
             "eligibleCd4Ind",
