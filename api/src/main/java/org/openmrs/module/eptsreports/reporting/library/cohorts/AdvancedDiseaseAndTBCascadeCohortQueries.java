@@ -59,7 +59,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
    */
   public CohortDefinition getClientsEligibleForCd4() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Clients Eligible For Cd4");
+    cd.setName("clients who are eligible for CD4 count request");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "End Date", Location.class));
@@ -91,7 +91,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
    */
   public CohortDefinition getClientsWithCd4Count() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Clients Eligible For Cd4");
+    cd.setName("clients with a CD4 count");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Facility", Location.class));
@@ -110,6 +110,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   public CohortDefinition getPatientsTransferredOutOrDead() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("clients transferred out and Dead");
     cd.addParameter(new Parameter("location", "Facility", Location.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
 
@@ -135,6 +136,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   public CohortDefinition getClientsWithSevereImmunodepression() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("showing severe immunodepression");
     cd.addParameter(new Parameter("location", "Facility", Location.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -171,6 +173,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   public CohortDefinition getClientsWithSevereImmunodepressionAndTbLamResult() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients With Cd4 count and TB Lam Result ");
     cd.addParameter(new Parameter("location", "Facility", Location.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -198,6 +201,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   public CohortDefinition getClientsWithSevereImmunodepressionAndWithoutTbLamResult() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients With Cd4 count and TB Lam Result");
     cd.addParameter(new Parameter("location", "Facility", Location.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -225,6 +229,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   public CohortDefinition getClientsWithoutSevereImmunodepression() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients With Cd4 count without- severe immunodepression");
     cd.addParameter(new Parameter("location", "Facility", Location.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -263,6 +268,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   public CohortDefinition getClientsWithoutSevereImmunodepressionAndWithTbLamResult() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients With Cd4 count and without immunodepression");
     cd.addParameter(new Parameter("location", "Facility", Location.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -291,6 +297,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   public CohortDefinition getClientsWithoutSevereImmunodepressionAndWithoutTbLamResult() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients With Cd4 count and without immunodepression");
     cd.addParameter(new Parameter("location", "Facility", Location.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -319,6 +326,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   public CohortDefinition getClientsWithoutCd4CountButWithTbLam() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients With Cd4 count and without immunodepression and without TB Lam Result ");
     cd.addParameter(new Parameter("location", "Facility", Location.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -347,6 +355,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   public CohortDefinition getClientsWithAnyTbLam() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Number of clients with TB LAM results by report generation date");
     cd.addParameter(new Parameter("location", "Facility", Location.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
@@ -371,6 +380,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   public CohortDefinition getClientsWithTbLamPositive() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Number of clients with TB LAM Positive results by report generation date");
     cd.addParameter(new Parameter("location", "Facility", Location.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
@@ -397,6 +407,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   public CohortDefinition getClientsWithTbLamNegative() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Number of clients with TB LAM Negative results by report generation date");
     cd.addParameter(new Parameter("location", "Facility", Location.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
@@ -424,6 +435,8 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   public CohortDefinition getClientsWithTbLamPositiveButNotTestedGeneXPert() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "Number of clients with TB LAM Positive results and Not Tested with GeneXpert by report");
     cd.addParameter(new Parameter("location", "Facility", Location.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
@@ -450,6 +463,8 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   public CohortDefinition getClientsWithTbLamPositiveTestedGeneXPert() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "Number of clients with TB LAM Positive results and Tested with GeneXpert by report generation");
     cd.addParameter(new Parameter("location", "Facility", Location.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
@@ -476,6 +491,8 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   public CohortDefinition getClientsWithTbLamPositiveTestedPositiveGeneXPert() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "Number of clients with TB LAM Positive results and Tested Positive For GeneXpert by report");
     cd.addParameter(new Parameter("location", "Facility", Location.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
@@ -498,6 +515,8 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   public CohortDefinition getClientsWithTbLamPositiveOnTbTreatment() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "Number of clients with TB LAM Positive results and on Tb treatment by report generation date");
     cd.addParameter(new Parameter("location", "Facility", Location.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
@@ -510,7 +529,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addSearch("tested", EptsReportUtils.map(tested, mappings));
     cd.addSearch("onTb", EptsReportUtils.map(onTb, mappings));
 
-    cd.setCompositionString("notTested AND tested AND onTb");
+    cd.setCompositionString("(notTested OR tested) AND onTb");
 
     return cd;
   }
@@ -524,6 +543,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   private CohortDefinition getPatientsWithCd4AndAge(
       Cd4CountComparison cd4, Integer minAge, Integer maxAge) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Absolute Cd4");
     cd.addParameter(new Parameter("location", "Facility", Location.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
