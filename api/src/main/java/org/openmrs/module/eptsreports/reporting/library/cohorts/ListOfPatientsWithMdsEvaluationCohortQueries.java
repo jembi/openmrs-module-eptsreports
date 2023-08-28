@@ -601,10 +601,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * <p>Nota 1: A idade será calculada em anos.
    *
-   * <p>Nota 2: A “Data Início TARV” é a data registada na Ficha Resumo (“Data do Início TARV”).
-   *
-   * <p>Nota 3: caso exista mais que uma “Ficha de Resumo” com “Data do Início TARV” diferente, deve
-   * ser considerada a data mais antiga.
+   * <p>Nota 2: A “Data Início TARV” é definida no RF46
    *
    * @return DataDefinition
    */
