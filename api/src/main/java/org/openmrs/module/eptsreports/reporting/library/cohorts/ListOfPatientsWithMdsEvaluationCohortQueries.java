@@ -1034,8 +1034,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * foi efectuado o registo do Pedido de Carga Viral.<br>
    * <br>
    *
-   * <p>Nota 1: A “Data Início TARV” é a data registada na Ficha Resumo (“Data do Início TARV”).
-   * <br>
+   * <p>Nota 1: A “Data Início TARV” é definida no RF46. <br>
    * <br>
    *
    * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
@@ -1043,7 +1042,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {DataDefinition}
    */
-  public DataDefinition getFirstViralLoad() {
+  public DataDefinition getFirstViralLoad(
+      int numberOfYearsStartDateFor12,
+      int numberOfYearsEndDateFor12,
+      int numberOfYearsStartDateFor24,
+      int numberOfYearsEndDateFor24) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Data do pedido da 1a CV");
     sqlPatientDataDefinition.addParameter(
@@ -1063,6 +1066,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
     map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
 
     String query =
         "SELECT p.patient_id, "
@@ -1074,12 +1081,23 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                            ON o.encounter_id = e.encounter_id "
             + "                    INNER JOIN ( "
             + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.art_start AS art_encounter "
+            + "                                  art_patient.first_pickup AS art_encounter "
             + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
             + "                           ) art_patient "
-            + " WHERE  art_patient.patient_id  "
+            + " WHERE  art_patient.first_pickup >= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionStartMonthAndDay
+            + "        ), INTERVAL "
+            + numberOfYearsStartDateFor12
+            + " YEAR) "
+            + " AND  art_patient.first_pickup <= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + "        ) ,INTERVAL  "
+            + numberOfYearsEndDateFor12
+            + " YEAR) "
+            + " AND  art_patient.patient_id  "
             + " NOT IN ( "
             + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
                 inclusionEndMonthAndDay, 1)
@@ -1104,12 +1122,23 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                            ON o.encounter_id = e.encounter_id "
             + "                    INNER JOIN ( "
             + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.art_start AS art_encounter "
+            + "                                  art_patient.first_pickup AS art_encounter "
             + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
             + "                           ) art_patient "
-            + " WHERE  art_patient.patient_id  "
+            + " WHERE  art_patient.first_pickup >= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionStartMonthAndDay
+            + "        ), INTERVAL "
+            + numberOfYearsStartDateFor24
+            + " YEAR) "
+            + " AND  art_patient.first_pickup <= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + "        ) ,INTERVAL  "
+            + numberOfYearsEndDateFor24
+            + " YEAR) "
+            + " AND  art_patient.patient_id  "
             + " NOT IN ( "
             + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
                 inclusionEndMonthAndDay, 2)
