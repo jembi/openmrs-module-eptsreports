@@ -74,6 +74,8 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(eligibleCd4Ind, inclusionPeriod),
         "");
 
+    //Number of clients eligible for CD4 count request who have a CD4 count result during inclusion period (TB_DA_FR18)
+
     CohortIndicator cd4CountInd =
         eptsGeneralIndicator.getIndicator(
             "cd4CountInd",
@@ -93,7 +95,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(cd4CountInd, inclusionPeriod),
         "");
 
-    // Severe Immunosuppression
+    // Number of clients with CD4 count during inclusion period showing severe immunodepression (TB_DA_FR19)
     CohortIndicator severeIndicator =
         eptsGeneralIndicator.getIndicator(
             "severeIndicator",

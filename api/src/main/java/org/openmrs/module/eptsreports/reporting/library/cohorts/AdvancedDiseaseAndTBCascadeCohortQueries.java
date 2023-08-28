@@ -51,6 +51,10 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     this.ageCohortQueries = ageCohortQueries;
   }
 
+  /**
+   * Number of clients who are eligible for CD4 count request during the inclusion period (TB_DA_FR11)
+   * @return CohortDefinition
+   */
   public CohortDefinition getClientsEligibleForCd4() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Clients Eligible For Cd4");
@@ -121,7 +125,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   }
 
   /**
-   * Number of clients with CD count during inclusion period showing severe immunodepression
+   * Number of clients with CD4 count during inclusion period showing severe immunodepression (TB_DA_FR19)
    *
    * @return CohortDefinition
    */
@@ -138,7 +142,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     CohortDefinition cd500AgeBetweenOneAndFour =
         getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo500mm3, 1, 4);
     CohortDefinition cd750AgeUnderYear =
-        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo750mm3, 1, null);
+        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo750mm3, null, 1);
 
     CohortDefinition exclusion = getPatientsTransferredOutOrDead();
 
@@ -1214,7 +1218,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                                     AND e.encounter_type IN ( ${13}, ${51} ) "
             + "                                     AND e.location_id = :location "
             + "                                     AND o.concept_id = ${856} "
-            + "                                     AND Date(e.encounter_datetime) < :endDate "
+            + "                                     AND Date(e.encounter_datetime) <= :endDate "
             + "                   GROUP  BY e.patient_id)vl_inclusion "
             + "               ON vl_inclusion.patient_id = e.patient_id "
             + "WHERE  e.encounter_type IN( ${13}, ${51} ) "
