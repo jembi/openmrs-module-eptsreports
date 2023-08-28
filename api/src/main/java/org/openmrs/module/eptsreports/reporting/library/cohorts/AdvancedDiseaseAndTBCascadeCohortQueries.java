@@ -52,7 +52,9 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   }
 
   /**
-   * Number of clients who are eligible for CD4 count request during the inclusion period (TB_DA_FR11)
+   * Number of clients who are eligible for CD4 count request during the inclusion period
+   * (TB_DA_FR11)
+   *
    * @return CohortDefinition
    */
   public CohortDefinition getClientsEligibleForCd4() {
@@ -125,7 +127,8 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   }
 
   /**
-   * Number of clients with CD4 count during inclusion period showing severe immunodepression (TB_DA_FR19)
+   * Number of clients with CD4 count during inclusion period showing severe immunodepression
+   * (TB_DA_FR19)
    *
    * @return CohortDefinition
    */
@@ -232,7 +235,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     CohortDefinition cd500AgeBetweenOneAndFour =
         getPatientsWithCd4AndAge(Cd4CountComparison.GreaterThanOrEqualTo500mm3, 1, 4);
     CohortDefinition cd750AgeUnderYear =
-        getPatientsWithCd4AndAge(Cd4CountComparison.GreaterThanOrEqualTo750mm3, 1, null);
+        getPatientsWithCd4AndAge(Cd4CountComparison.GreaterThanOrEqualTo750mm3, null, 1);
 
     CohortDefinition exclusion = getPatientsTransferredOutOrDead();
 
@@ -501,12 +504,12 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
 
-    CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
-    CohortDefinition positiveTbLam = getPatientsWithTbLamResult(TbLamResult.POSITIVE);
+    CohortDefinition notTested = getClientsWithTbLamPositiveButNotTestedGeneXPert();
+    CohortDefinition tested = getClientsWithTbLamPositiveTestedPositiveGeneXPert();
     CohortDefinition onTb = getPatientsOnTbTreatment();
 
-    cd.addSearch("anyTbLam", EptsReportUtils.map(anyTbLam, mappings));
-    cd.addSearch("positiveTbLam", EptsReportUtils.map(positiveTbLam, mappings));
+    cd.addSearch("notTested", EptsReportUtils.map(notTested, mappings));
+    cd.addSearch("tested", EptsReportUtils.map(tested, mappings));
     cd.addSearch("onTb", EptsReportUtils.map(onTb, mappings));
 
     cd.setCompositionString("anyTbLam AND positiveTbLam AND onTb");

@@ -74,7 +74,8 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(eligibleCd4Ind, inclusionPeriod),
         "");
 
-    //Number of clients eligible for CD4 count request who have a CD4 count result during inclusion period (TB_DA_FR18)
+    // Number of clients eligible for CD4 count request who have a CD4 count result during inclusion
+    // period (TB_DA_FR18)
 
     CohortIndicator cd4CountInd =
         eptsGeneralIndicator.getIndicator(
@@ -95,7 +96,8 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(cd4CountInd, inclusionPeriod),
         "");
 
-    // Number of clients with CD4 count during inclusion period showing severe immunodepression (TB_DA_FR19)
+    // Number of clients with CD4 count during inclusion period showing severe immunodepression
+    // (TB_DA_FR19)
     CohortIndicator severeIndicator =
         eptsGeneralIndicator.getIndicator(
             "severeIndicator",
@@ -109,6 +111,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(severeIndicator, inclusionPeriod),
         "");
 
+    // Severe immunodepression (TB_DA_FR19)With TB LAM
     CohortIndicator severeTbLam =
         eptsGeneralIndicator.getIndicator(
             "severeTbLamInd",
@@ -128,6 +131,8 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         "ClientsWithSevereImmunodepressionTbLamTotal",
         EptsReportUtils.map(severeTbLam, inclusionPeriod),
         "");
+
+    // Severe immunodepression (TB_DA_FR19) Without TB LAM
 
     CohortIndicator severeWithoutTbLam =
         eptsGeneralIndicator.getIndicator(
@@ -149,6 +154,8 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(severeWithoutTbLam, inclusionPeriod),
         "");
 
+    // Number of clients with CD4 count during inclusion period without severe immunodepression
+    // (TB_DA_FR20)
     CohortIndicator withoutImmunodepression =
         eptsGeneralIndicator.getIndicator(
             "withoutImmunodepression",
@@ -162,6 +169,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(withoutImmunodepression, inclusionPeriod),
         "");
 
+    // without severe immunodepression (TB_DA_FR20) Without TB LAM
     CohortIndicator withoutImmunodepressionWithoutTbLam =
         eptsGeneralIndicator.getIndicator(
             "withoutImmunodepressionWithoutTbLam",
@@ -175,7 +183,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         "ClientsWithoutSevereImmunodepressionAndWithoutTbLam",
         EptsReportUtils.map(withoutImmunodepressionWithoutTbLam, inclusionPeriod),
         "");
-
+    // Without severe immunodepression (TB_DA_FR20) With TB LAM
     CohortIndicator withoutImmunodepressionWithTbLam =
         eptsGeneralIndicator.getIndicator(
             "withoutImmunodepressionWithTbLam",
@@ -196,7 +204,8 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         "ClientsWithSevereImmunodepressionAndWithTbLam",
         EptsReportUtils.map(withoutImmunodepressionWithTbLam, inclusionPeriod),
         dissagregations());
-    // Number of clients with TB LAM results by report generation date
+    // Number of clients without CD4 count but with TB LAM results during inclusion period
+    // (TB_DA_FR21)
 
     CohortIndicator withoutCd4Tblam =
         eptsGeneralIndicator.getIndicator(
@@ -217,7 +226,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         "ClientsWithoutCd4CountWithButWithTbLam",
         EptsReportUtils.map(withoutCd4Tblam, inclusionPeriod),
         dissagregations());
-    // Clients with TbLam
+    // Number of clients with TB LAM results by report generation date (TB_DA_FR22)
     CohortIndicator withTbLam =
         eptsGeneralIndicator.getIndicator(
             "withTbLamInd",
@@ -230,7 +239,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(withTbLam, reportingPeriod),
         "");
 
-    // Clients with positive Tb Lam
+    // TB LAM (TB_DA_FR22) Positive
     CohortIndicator positiveTbLam =
         eptsGeneralIndicator.getIndicator(
             "positiveTbLamInd",
@@ -250,7 +259,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(positiveTbLam, reportingPeriod),
         dissagregations());
 
-    // Clients with negative Tb Lam
+    // TB LAM (TB_DA_FR22) Negative
     CohortIndicator negativeTbLam =
         eptsGeneralIndicator.getIndicator(
             "negativeTbLamInd",
@@ -263,7 +272,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(negativeTbLam, reportingPeriod),
         "");
 
-    // Clients with positive TB Lam but Not tested with GeneXpert
+    // Clients with positive TB LAM but NOT tested by GeneXpert (TB_DA_FR23)
     CohortIndicator positiveTbLamNotGen =
         eptsGeneralIndicator.getIndicator(
             "positiveTbLamNotGenInd",
@@ -278,7 +287,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(positiveTbLamNotGen, reportingPeriod),
         "");
 
-    // Clients with positive Tb Lam also tested with GeneXpert
+    // Clients with positive TB LAM and also tested by GeneXpert (TB_DA_FR24)
     CohortIndicator positiveTbLamAndGen =
         eptsGeneralIndicator.getIndicator(
             "positiveTbLamAndGenInd",
@@ -292,7 +301,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         "ClientsWithPositiveTestedForGenex",
         EptsReportUtils.map(positiveTbLamAndGen, reportingPeriod),
         "");
-    // Clients with positive Tb lam and GeneXpert Positive For TB
+    // Clients with positive TB LAM and GeneXpert positive for TB (TB_DA_FR25)
     CohortIndicator positiveTbLamPositiveGen =
         eptsGeneralIndicator.getIndicator(
             "positiveTbLamPositiveGenInd",
@@ -307,7 +316,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(positiveTbLamPositiveGen, reportingPeriod),
         "");
 
-    // Clients with positive Tb lam and on Tb treatment
+    // Clients with positive TB LAM and on TB treatment by report generation date (TB_DA_FR26)
 
     CohortIndicator positiveTbLamOnTreatmentInd =
         eptsGeneralIndicator.getIndicator(
