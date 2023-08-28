@@ -1445,7 +1445,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
     map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
-    map.put("90", 90); //Should be referenced in the DAH report
+    map.put("90", 90); // Should be referenced in the DAH report
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("6272", hivMetadata.getStateOfStayPriorArtPatientConcept().getConceptId());
     map.put("1705", hivMetadata.getRestartConcept().getConceptId());

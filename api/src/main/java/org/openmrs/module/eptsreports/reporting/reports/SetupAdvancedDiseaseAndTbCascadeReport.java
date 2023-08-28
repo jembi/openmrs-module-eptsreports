@@ -19,7 +19,7 @@ import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
+@Deprecated
 public class SetupAdvancedDiseaseAndTbCascadeReport extends EptsDataExportManager {
 
   @Autowired private GenericCohortQueries genericCohortQueries;
