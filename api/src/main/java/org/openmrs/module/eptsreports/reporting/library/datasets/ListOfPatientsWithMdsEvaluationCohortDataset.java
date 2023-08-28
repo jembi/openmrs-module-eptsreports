@@ -127,7 +127,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B.1 - Data do pedido da 1ª CV - Sheet 1: Column J
     pdd.addColumn(
         "first_cv_date",
-        listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoad(2, 1, 3, 2),
+        listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoad(),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
@@ -295,7 +295,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     //        "evaluationYear=${evaluationYear},location=${location}",
     //        null);
 
-    // C1- Data do pedido da CV de seguimento: (coluna AP)
+    // C1 - Data do pedido da CV de seguimento: (coluna AP)
     pdd.addColumn(
         "cv_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getSecondtViralLoad(),
