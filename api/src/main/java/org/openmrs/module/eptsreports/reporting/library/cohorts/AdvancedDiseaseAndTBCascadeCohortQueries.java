@@ -480,15 +480,13 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
 
-    CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
-    CohortDefinition positiveTbLam = getPatientsWithTbLamResult(TbLamResult.POSITIVE);
+    CohortDefinition positiveTbLam = getClientsWithTbLamPositiveTestedGeneXPert();
     CohortDefinition positiveGen = getPatientsWithPositiveGeneXpertResult();
 
-    cd.addSearch("anyTbLam", EptsReportUtils.map(anyTbLam, mappings));
     cd.addSearch("positiveTbLam", EptsReportUtils.map(positiveTbLam, mappings));
     cd.addSearch("positiveGen", EptsReportUtils.map(positiveGen, mappings));
 
-    cd.setCompositionString("anyTbLam AND positiveTbLam AND positiveGen");
+    cd.setCompositionString("positiveTbLam AND positiveGen");
 
     return cd;
   }
@@ -512,7 +510,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addSearch("tested", EptsReportUtils.map(tested, mappings));
     cd.addSearch("onTb", EptsReportUtils.map(onTb, mappings));
 
-    cd.setCompositionString("anyTbLam AND positiveTbLam AND onTb");
+    cd.setCompositionString("notTested AND tested AND onTb");
 
     return cd;
   }
