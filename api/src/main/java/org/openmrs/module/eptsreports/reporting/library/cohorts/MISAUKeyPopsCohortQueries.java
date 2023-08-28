@@ -156,81 +156,6 @@ public class MISAUKeyPopsCohortQueries {
     return cd;
   }
 
-  /**
-   * <b>Name: Número de adultos na coorte 12 meses - inicio de TARV</b>
-   *
-   * <p><b>Description:</b> Resumo Trimestral A AND age >= 15years
-   * </ul>
-   *
-   * @return {@link CohortDefinition}
-   */
-  public CohortDefinition getPatientsStartedARTInLast12Months() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Number of patients who started ART in last 12 Months");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    CohortDefinition a = resumoTrimestralCohortQueries.getA();
-
-    CohortDefinition b = resumoTrimestralCohortQueries.getB();
-
-    CohortDefinition c = resumoTrimestralCohortQueries.getC();
-
-    cd.addSearch(
-        "A",
-        EptsReportUtils.map(
-            a, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "B",
-        EptsReportUtils.map(
-            b, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "C",
-        EptsReportUtils.map(
-            c, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-
-    cd.setCompositionString("((A OR B) AND NOT C)");
-    return cd;
-  }
-
-  /**
-   * <b>Name: Numero de adultos na coorte 12 meses - Activos em TARV</b>
-   *
-   * <p><b>Description:</b> Resumo Trimestral A OR B NOT C NOT I NOT J NOT L AND Age >=15years
-   * </ul>
-   *
-   * @return {@link CohortDefinition}
-   */
-  public CohortDefinition getPatientsOnARTInLast12Months() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Number of patients who are on ART for the last 12 Months");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    CohortDefinition A = resumoTrimestralCohortQueries.getA();
-    CohortDefinition B = resumoTrimestralCohortQueries.getB();
-    CohortDefinition C = resumoTrimestralCohortQueries.getC();
-    CohortDefinition I = resumoTrimestralCohortQueries.getI();
-    CohortDefinition J = resumoTrimestralCohortQueries.getJ();
-    CohortDefinition L = resumoTrimestralCohortQueries.getL();
-
-    String cohortMappings = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
-
-    cd.addSearch("A", EptsReportUtils.map(A, cohortMappings));
-    cd.addSearch("B", EptsReportUtils.map(B, cohortMappings));
-    cd.addSearch("C", EptsReportUtils.map(C, cohortMappings));
-    cd.addSearch("I", EptsReportUtils.map(I, cohortMappings));
-    cd.addSearch("J", EptsReportUtils.map(J, cohortMappings));
-    cd.addSearch("L", EptsReportUtils.map(L, cohortMappings));
-
-    cd.setCompositionString("(A OR B) AND NOT (C OR I OR J OR L)");
-    return cd;
-  }
-
   // Start of section 2 cohort definitions
 
   /**
@@ -483,6 +408,42 @@ public class MISAUKeyPopsCohortQueries {
             hivCohortQueries.getImprisonmentKeyPopCohort(),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     cd.setCompositionString("MTS AND REC");
+    return cd;
+  }
+
+  /**
+   * <b>Name: Número de adultos na coorte 12 meses - inicio de TARV</b>
+   * <li>Filtrando os utentes incluídos no indicador B1 do relatório “Resumo Mensal de HIV/SIDA” (Nº
+   *     de utentes que iniciaram TARV durante o mês) para o período do relatório correspondente ao
+   *     ano anterior (>= “Data Início Relatório Ano Anterior” e <= “Data Fim de Relatório Ano
+   *     Anterior”)
+   * <li>Excluindo todos os utentes “Transferidos para” outra US até ao fim do período do relatório
+   *
+   * @see ResumoMensalCohortQueries#getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsStartedARTInLast12Months() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Number of patients who started ART in last 12 Months");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition c = resumoTrimestralCohortQueries.getC();
+    CohortDefinition rm =
+        resumoMensalCohortQueries.getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1();
+
+    cd.addSearch(
+        "RM",
+        EptsReportUtils.map(rm, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "TRANSFERREDOUT",
+        EptsReportUtils.map(
+            c, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString("RM AND NOT TRANSFERREDOUT");
+
     return cd;
   }
 }
