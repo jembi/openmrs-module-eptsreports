@@ -1291,6 +1291,100 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   }
 
   /**
+   * <b>RF33 - Data de registo do resultado da CV de Seguimento: (coluna AQ) - Resposta= Data do resultado da 1ª Carga Viral</b>
+   *
+   * <p>O sistema irá determinar a Data do Resultado da CV de seguimento do utente identificando a
+   * data da consulta clínica (Ficha Clínica), após o início TARV (Data Início TARV), na qual foi
+   * efectuado o registo de segundo resultado da Carga Viral. <br>
+   * <br>
+   *
+   * <p>Nota 1: A “Data Início TARV” é definida no RF46. <br>
+   * <br>
+   *
+   * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
+   * na coorte de 24 meses, conforme definido no RF4.
+   *
+   * @return {DataDefinition}
+   */
+  public DataDefinition getSecondViralLoadResultDate() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("C2 - Data de registo do resultado da CV de Seguimento: (coluna AQ)");
+    sqlPatientDataDefinition.addParameter(
+        new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+
+    String query =
+        "SELECT     second_vl.patient_id, "
+            + "           MIN(ee.encounter_datetime) AS second_vl_date  "
+            + "FROM       patient second_vl "
+            + "INNER JOIN encounter ee "
+            + "ON         ee.patient_id = second_vl.patient_id "
+            + "INNER JOIN obs oo "
+            + "ON         oo.encounter_id = ee.encounter_id "
+            + "INNER JOIN ( "
+            + "SELECT     p.patient_id, "
+            + "           MIN(e.encounter_datetime) AS first_vl_date  "
+            + "FROM       patient p "
+            + "INNER JOIN encounter e "
+            + "ON         e.patient_id = p.patient_id "
+            + "INNER JOIN obs o "
+            + "ON         o.encounter_id = e.encounter_id "
+            + "INNER JOIN "
+            + "           ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                     ) art ON art.patient_id = p.patient_id "
+            + "       WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "AND      e.encounter_type = ${6} "
+            + "AND        ( ( "
+            + "                                 o.concept_id= ${856} "
+            + "                         AND     o.value_numeric IS NOT NULL ) "
+            + "           OR         ( "
+            + "                                 o.concept_id = ${1305} "
+            + "                      AND        o.value_coded IS NOT NULL)) "
+            + "AND        e.location_id = :location "
+            + "AND        e.encounter_datetime >= art.art_encounter "
+            + "AND        p.voided = 0 "
+            + "AND        e.voided = 0 "
+            + "AND        o.voided = 0 "
+            + "GROUP BY   p.patient_id ) first_vl "
+            + " ON first_vl.patient_id = second_vl.patient_id "
+            + "WHERE second_vl.voided = 0 "
+            + "AND ee.voided = 0 "
+            + "AND oo.voided = 0 "
+            + "AND ee.encounter_datetime > first_vl.first_vl_date "
+            + "AND      ee.encounter_type = ${6} "
+            + "AND        ee.location_id = :location "
+            + "AND        ( ( "
+            + "                                 oo.concept_id= ${856} "
+            + "                         AND     oo.value_numeric IS NOT NULL ) "
+            + "           OR         ( "
+            + "                                 oo.concept_id = ${1305} "
+            + "                      AND        oo.value_coded IS NOT NULL)) "
+            + "GROUP BY   second_vl.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
    * <b>RF18 - Data do resultado da 1a CV- B.2 (Coluna K)</b>
    *
    * <p>O sistema irá determinar o Resultado da 1ª Carga Viral do utente seleccionando o primeiro
