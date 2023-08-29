@@ -4371,8 +4371,15 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23758", hivMetadata.getTBSymptomsConcept().getConceptId());
 
     String query =
-        " SELECT     p.patient_id, "
-            + "            e.encounter_datetime AS the_date "
+        "SELECT final_query.patient_id, "
+            + "       CASE "
+            + "              WHEN final_query.encounter_date IS NULL THEN 'Não' "
+            + "              WHEN final_query.encounter_date IS NOT NULL THEN 'Sim' "
+            + "              ELSE '' "
+            + "       END "
+            + "FROM   ( "
+            + " SELECT     p.patient_id, "
+            + "            e.encounter_datetime AS encounter_date "
             + " FROM       patient p "
             + " INNER JOIN encounter e "
             + " ON         e.patient_id = p.patient_id "
@@ -4384,7 +4391,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " FROM ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
             + "       ) start  "
-            + " ) art ON art.patient_id = p.patient "
+            + " ) art ON art.patient_id = p.patient_id "
             + " INNER JOIN ( "
             + "                  SELECT     p.patient_id, "
             + "                             MIN(e.encounter_datetime) AS encounter_date "
@@ -4428,9 +4435,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "AND        e.location_id = :location "
             + "AND        e.encounter_datetime >= mds.encounter_date "
             + "AND        e.encounter_datetime <= DATE_ADD( art.art_encounter, INTERVAL 12 MONTH ) "
-            + "AND        o.concept_id = ${23758}"
+            + "AND        o.concept_id = ${23758} "
             + "AND        o.value_coded IN ( ${1065}, ${1066} ) "
-            + "GROUP BY p.patient_id";
+            + "GROUP BY p.patient_id ) AS final_query";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -4498,8 +4505,15 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23758", hivMetadata.getTBSymptomsConcept().getConceptId());
 
     String query =
-        " SELECT     p.patient_id, "
-            + "            e.encounter_datetime AS the_date "
+        "SELECT final_query.patient_id, "
+            + "       CASE "
+            + "              WHEN final_query.encounter_date IS NULL THEN 'Não' "
+            + "              WHEN final_query.encounter_date IS NOT NULL THEN 'Sim' "
+            + "              ELSE '' "
+            + "       END "
+            + "FROM   ( "
+            + " SELECT     p.patient_id, "
+            + "            e.encounter_datetime AS encounter_date "
             + " FROM       patient p "
             + " INNER JOIN encounter e "
             + " ON         e.patient_id = p.patient_id "
@@ -4511,7 +4525,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " FROM ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
             + "       ) start  "
-            + " ) art ON art.patient_id = p.patient "
+            + " ) art ON art.patient_id = p.patient_id "
             + " INNER JOIN ( "
             + "                  SELECT     p.patient_id, "
             + "                             MIN(e.encounter_datetime) AS encounter_date "
@@ -4558,7 +4572,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "AND        e.encounter_datetime <= DATE_ADD( art.art_encounter, INTERVAL 24 MONTH ) "
             + "AND        o.concept_id = ${23758} "
             + "AND        o.value_coded IN ( ${1065}, ${1066} ) "
-            + "GROUP BY p.patient_id";
+            + "GROUP BY p.patient_id) AS final_query";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
