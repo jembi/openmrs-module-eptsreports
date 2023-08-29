@@ -6,6 +6,7 @@ import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.advancedhivillness.ListOfPatientsOnAdvancedHivIllnessQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -26,6 +27,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
   private final CommonMetadata commonMetadata;
 
+  private final TbMetadata tbMetadata;
+
   private final ListOfPatientsOnAdvancedHivIllnessQueries listOfPatientsOnAdvancedHivIllnessQueries;
 
   String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
@@ -34,9 +37,11 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   public ListOfPatientsInAdvancedHivIllnessCohortQueries(
       HivMetadata hivMetadata,
       CommonMetadata commonMetadata,
+      TbMetadata tbMetadata,
       ListOfPatientsOnAdvancedHivIllnessQueries listOfPatientsOnAdvancedHivIllnessQueries) {
     this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
+    this.tbMetadata = tbMetadata;
     this.listOfPatientsOnAdvancedHivIllnessQueries = listOfPatientsOnAdvancedHivIllnessQueries;
   }
 
@@ -45,11 +50,18 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
    * do Modelo de DAH</b>
    * <li>Utentes que iniciaram o seguimento do Modelo de DAH OR
    * <li>Utentes com critério de CD4 para início de seguimento no Modelo de DAH OR
-   * <li>Utentes com critério de Estadiamento para início de seguimento do Modelo dee DAH
+   * <li>Utentes com critério de Estadiamento para início de seguimento do Modelo dee DAH Excluindo
+   *     todos os utentes que:
+   * <li>tenham iniciado um Modelo de DAH antes da data de início do período de avaliação
+   * <li>tenham sido transferidos para outra unidade sanitária até o fim do período de avaliação
    *
-   * @see #getPatientsWhoStartedFollowupOnDAH(boolean) ()
+   * @see #getPatientsWhoStartedFollowupOnDAH(boolean) getPatientsWhoStartedFollowupOnDAH
    * @see #getPatientsWithCD4CriteriaToStartFollowupOnDAH()
+   *     getPatientsWithCD4CriteriaToStartFollowupOnDAH
    * @see #getPatientsWithCriterioEstadiamentoInicioSeguimento()
+   *     getPatientsWithCriterioEstadiamentoInicioSeguimento
+   * @see #getPatientsWhoStartedFollowupOnDAH(boolean) getPatientsWhoStartedFollowupOnDAH
+   * @see #getPatientsTransferredOutByTheEndOfPeriod() getPatientsTransferredOutByTheEndOfPeriod
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsOnFollowupOrWithCriteriaToStartFollowupOfDAH() {
@@ -94,7 +106,9 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
    * <li>Utentes com critério de Estadiamento para início de seguimento do Modelo dee DAH
    *
    * @see #getPatientsWithCD4CriteriaToStartFollowupOnDAH()
+   *     getPatientsWithCD4CriteriaToStartFollowupOnDAH
    * @see #getPatientsWithCriterioEstadiamentoInicioSeguimento()
+   *     getPatientsWithCriterioEstadiamentoInicioSeguimento
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getTotalOfPatientsWithCriteriaToStartFollowupOfDAH() {
@@ -159,9 +173,12 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   /**
    * <b>DAH FR4 - Utentes com critério de CD4 para início de seguimento no Modelo de DAH </b>
    *
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultOverOrEqualTo5years() OR
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBetweenOneAnd5years() OR
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultOverOrEqualTo5years()
+   *     getCd4ResultOverOrEqualTo5years OR
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBetweenOneAnd5years()
+   *     getCd4ResultBetweenOneAnd5years OR
    * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBellowOneYear()
+   *     getCd4ResultBellowOneYear
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithCD4CriteriaToStartFollowupOnDAH() {
@@ -173,28 +190,26 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
     Map<String, Integer> map = getStringIntegerMap();
 
-    EptsQueriesUtil eptsQueriesUtil = new EptsQueriesUtil();
-
     String Cd4ResultOverOrEqualTo5yearsPid =
-        eptsQueriesUtil
+        new EptsQueriesUtil()
             .patientIdQueryBuilder(
                 listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultOverOrEqualTo5years())
             .getQuery();
 
     String getCd4ResultBetweenOneAnd5yearsPid =
-        eptsQueriesUtil
+        new EptsQueriesUtil()
             .patientIdQueryBuilder(
                 listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBetweenOneAnd5years())
             .getQuery();
 
     String getCd4ResultBellowOneYearPid =
-        eptsQueriesUtil
+        new EptsQueriesUtil()
             .patientIdQueryBuilder(
                 listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBellowOneYear())
             .getQuery();
 
     String query =
-        eptsQueriesUtil
+        new EptsQueriesUtil()
             .unionBuilder(Cd4ResultOverOrEqualTo5yearsPid)
             .union(getCd4ResultBetweenOneAnd5yearsPid)
             .union(getCd4ResultBellowOneYearPid)
@@ -227,24 +242,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
     sqlCohortDefinition.addParameters(getCohortParameters());
 
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
-    map.put("5018", hivMetadata.getChronicDiarrheaConcept().getConceptId());
-    map.put("3", hivMetadata.getAnemiaConcept().getConceptId());
-    map.put("5945", hivMetadata.getFeverConcept().getConceptId());
-    map.put("43", hivMetadata.getPneumoniaConcept().getConceptId());
-    map.put("60", hivMetadata.getMeningitisConcept().getConceptId());
-    map.put("126", hivMetadata.getGingivitisConcept().getConceptId());
-    map.put("6783", hivMetadata.getEstomatiteUlcerativaNecrotizanteConcept().getConceptId());
-    map.put("5334", hivMetadata.getCandidiaseOralConcept().getConceptId());
-    map.put("1294", hivMetadata.getCryptococcalMeningitisConcept().getConceptId());
-    map.put("1570", hivMetadata.getCervicalCancerConcept().getConceptId());
-    map.put("5340", hivMetadata.getCandidiaseEsofagicaConcept().getConceptId());
-    map.put("5344", hivMetadata.getHerpesSimplesConcept().getConceptId());
-    map.put("14656", hivMetadata.getCachexiaConcept().getConceptId());
-    map.put("7180", hivMetadata.getToxoplasmoseConcept().getConceptId());
-    map.put("6990", hivMetadata.getHivDiseaseResultingInEncephalopathyConcept().getConceptId());
+    Map<String, Integer> map = getIntegerMapForEstadioQueries();
 
     String query =
         "SELECT p.patient_id "
@@ -254,7 +252,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "  AND e.encounter_type = ${6} "
             + "  AND o.concept_id = ${1406} "
-            + "  AND o.value_coded IN (${3},${43},${126},${60},${1294},${1570},${5018},${5334},${5344},${5340},${5945},${6783},${6990},${7180},${14656}) "
+            + "  AND o.value_coded IN (${3},${42},${43},${60},${126},${507},${1294},${1570},${5018},${5042},${5334},${5344},${5340},${5945},${6783},${6990},${7180},${14656}) "
             + "  AND e.encounter_datetime >= :startDate "
             + "  AND e.encounter_datetime <= :endDate "
             + "  AND e.location_id = :location";
@@ -267,7 +265,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   }
 
   /**
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getArtStartDateQuery()
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getArtStartDateQuery() getArtStartDateQuery
    * @return {@link DataDefinition}
    */
   public DataDefinition getARTStartDate() {
@@ -357,7 +355,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   /**
    * <b> Situação TARV no Início do Seguimento de DAH </b>
    * <li>O registo mais recente de “Situação de TARV” (Novo Inicio, Reinicio, em TARV, pré-TARV), na
-   *     “Ficha de Doença Avançada por HIV”, registada até o fim do período de avaliação.
+   *     “Ficha de Doença Avançada por HIV”, registada durante o período de avaliação.
    *
    * @return {@link DataDefinition}
    */
@@ -365,8 +363,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Situação TARV no Início do Seguimento de DAH");
-    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlPatientDataDefinition.addParameters(getCohortParameters());
 
     Map<String, Integer> map = new HashMap<>();
     map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
@@ -386,16 +383,15 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "                                       INNER JOIN obs o on e.encounter_id = o.encounter_id "
             + "                         WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                           AND e.encounter_type = ${90} "
-            + "                           AND o.concept_id = ${1255} "
-            + "                           AND o.value_coded IN (${1256},${1705},${6275},${6276}) "
+            + "                           AND e.encounter_datetime <= :startDate "
             + "                           AND e.encounter_datetime <= :endDate "
             + "                           AND e.location_id = :location "
-            + "                         GROUP BY p.patient_id)last_situation ON last_situation.patient_id = e.patient_id "
+            + "                         GROUP BY p.patient_id)followup ON followup.patient_id = e.patient_id "
             + "WHERE e.voided = 0 AND o.voided = 0 "
             + "  AND e.encounter_type = ${90} "
             + "  AND o.concept_id = ${1255} "
             + "  AND o.value_coded IN (${1256},${1705},${6275},${6276}) "
-            + "  AND e.encounter_datetime = last_situation.start_date "
+            + "  AND e.encounter_datetime = followup.start_date "
             + "  AND e.location_id = :location "
             + "GROUP BY e.patient_id";
 
@@ -408,8 +404,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
   /**
    * <b>Data de Início de Seguimento de DAH</b>
-   * <li>A data mais recente de “Início de Seguimento no Modelo de Doença Avançada”, registada até o
-   *     fim do período de avaliação, na “Ficha de Doença Avançada por HIV”
+   * <li>A data mais recente de “Início de Seguimento no Modelo de Doença Avançada”, registada
+   *     durante o período de avaliação, na “Ficha de Doença Avançada por HIV”
    *
    * @return {@link DataDefinition}
    */
@@ -417,8 +413,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Data de Início de Seguimento de DAH");
-    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlPatientDataDefinition.addParameters(getCohortParameters());
 
     Map<String, Integer> map = new HashMap<>();
     map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
@@ -429,6 +424,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "    patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "WHERE p.voided = 0 AND e.voided = 0 "
             + "  AND e.encounter_type = ${90} "
+            + "  AND e.encounter_datetime >= :startDate "
             + "  AND e.encounter_datetime <= :endDate "
             + "  AND e.location_id = :location "
             + "GROUP BY p.patient_id";
@@ -440,38 +436,22 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     return sqlPatientDataDefinition;
   }
 
-  /** @return {@link DataDefinition} */
-  public DataDefinition getDateOfEstadioOnPeriod() {
+  /**
+   * <b>Último Registo de Estadiamento Clínico (Data de Registo )</b>
+   *
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getFirstEstadioQuery() getFirstEstadioQuery
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getDateOfEstadioByTheEndOfPeriod() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(" Data de Registo de Estadio");
-    sqlPatientDataDefinition.addParameters(getCohortParameters());
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
-    map.put("1206", hivMetadata.getWho3AdultStageConcept().getConceptId());
-    map.put("1207", hivMetadata.getWho4AdultStageConcept().getConceptId());
-    map.put("5356", hivMetadata.getcurrentWhoHivStageConcept().getConceptId());
+    Map<String, Integer> map = getIntegerMapForEstadioQueries();
 
-    String query =
-        "SELECT p.patient_id, "
-            + "               Min(e.encounter_datetime) AS consultation_date "
-            + "        FROM   patient p "
-            + "               INNER JOIN encounter e "
-            + "                       ON p.patient_id = e.patient_id "
-            + "               INNER JOIN obs o "
-            + "                       ON e.encounter_id = o.encounter_id "
-            + "        WHERE  p.voided = 0 "
-            + "               AND e.voided = 0 "
-            + "               AND o.voided = 0 "
-            + "               AND e.encounter_type IN ( ${6}, ${90} ) "
-            + "               AND o.concept_id = ${5356} "
-            + "               AND o.value_coded IN ( ${1206}, ${1207} ) "
-            + "               AND e.encounter_datetime >= :startDate "
-            + "               AND e.encounter_datetime <= :endDate "
-            + "               AND e.location_id = :location "
-            + "        GROUP  BY p.patient_id";
+    String query = listOfPatientsOnAdvancedHivIllnessQueries.getFirstEstadioQuery();
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
 
@@ -480,47 +460,50 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     return sqlPatientDataDefinition;
   }
 
-  /** @return {@link DataDefinition} */
-  public DataDefinition getResultOfEstadioDuringPeriod() {
+  /**
+   * <b>Estadiamento Clínico</b>
+   * <li>Resposta = Estadio IV, caso exista o registo de infecção representativa de Estadio IV
+   *     registada na Ficha Clinica – Ficha Mestra (DAH_RF28) até o fim do período de avaliação.
+   * <li>Resposta = Estadio III, caso não exista registo de infecção representativa de Estadio IV
+   *     (DAH_RF28) até o fim do período de avaliação e exista registo de infecção representativa de
+   *     Estadio III (DAH_RF27) até o fim do período de avaliação.
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getResultOfEstadioByTheEndOfPeriod() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Infecções Estadio OMS");
-    sqlPatientDataDefinition.addParameters(getCohortParameters());
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
-    map.put("1206", hivMetadata.getWho3AdultStageConcept().getConceptId());
-    map.put("1207", hivMetadata.getWho4AdultStageConcept().getConceptId());
-    map.put("5356", hivMetadata.getcurrentWhoHivStageConcept().getConceptId());
+    Map<String, Integer> map = getIntegerMapForEstadioQueries();
 
     String query =
-        "SELECT e.patient_id, o.value_coded as estadio "
+        "SELECT e.patient_id, 'ESTADIO IV' "
             + "FROM encounter e "
             + "         INNER JOIN obs o on e.encounter_id = o.encounter_id "
             + "         INNER JOIN     ( "
-            + "    SELECT p.patient_id, "
-            + "                        Min(e.encounter_datetime) AS consultation_date "
-            + "                             FROM   patient p "
-            + "                                    INNER JOIN encounter e "
-            + "                                            ON p.patient_id = e.patient_id "
-            + "                                    INNER JOIN obs o "
-            + "                                            ON e.encounter_id = o.encounter_id "
-            + "                             WHERE  p.voided = 0 "
-            + "                                    AND e.voided = 0 "
-            + "                                    AND o.voided = 0 "
-            + "                                    AND e.encounter_type IN ( ${6}, ${90} ) "
-            + "                                    AND o.concept_id = ${5356} "
-            + "                                    AND o.value_coded IN ( ${1206}, ${1207} ) "
-            + "                                    AND e.encounter_datetime >= :startDate "
-            + "                                    AND e.encounter_datetime <= :endDate "
-            + "                                    AND e.location_id = :location "
-            + "                             GROUP  BY p.patient_id "
+            + listOfPatientsOnAdvancedHivIllnessQueries.getFirstEstadioQuery()
             + ")first_consultation ON first_consultation.patient_id = e.patient_id "
             + "WHERE e.voided = 0 AND o.voided = 0 "
-            + "  AND e.encounter_type IN ( ${6}, ${90} ) "
-            + "  AND o.concept_id = ${5356} "
-            + "  AND o.value_coded IN (${1206}, ${1207}) "
+            + "  AND e.encounter_type = ${6} "
+            + "  AND o.concept_id = ${1406} "
+            + "  AND o.value_coded IN (${60},${507},${1294},${1570},${5042},${5334},${5344},${5340},${6990},${7180},${14656}) "
+            + "  AND e.encounter_datetime = first_consultation.consultation_date "
+            + "  AND e.location_id = :location "
+            + "GROUP BY e.patient_id"
+            + " UNION "
+            + " SELECT e.patient_id, 'ESTADIO III' "
+            + "FROM encounter e "
+            + "         INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "         INNER JOIN ( "
+            + listOfPatientsOnAdvancedHivIllnessQueries.getFirstEstadioQuery()
+            + ")first_consultation ON first_consultation.patient_id = e.patient_id "
+            + "WHERE e.voided = 0 AND o.voided = 0 "
+            + "  AND e.encounter_type = ${6} "
+            + "  AND o.concept_id = ${1406} "
+            + "  AND o.value_coded IN (${3},${42},${43},${126},${1570},${5018},${5334},${5945},${6783}) "
             + "  AND e.encounter_datetime = first_consultation.consultation_date "
             + "  AND e.location_id = :location "
             + "GROUP BY e.patient_id";
@@ -535,9 +518,12 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   /**
    * <b> A data do registo do resultado de CD4 (absoluto) durante o período de avaliação </b>
    *
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultOverOrEqualTo5years() OR
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBetweenOneAnd5years() OR
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultOverOrEqualTo5years()
+   *     getCd4ResultOverOrEqualTo5years OR
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBetweenOneAnd5years()
+   *     getCd4ResultBetweenOneAnd5years OR
    * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBellowOneYear()
+   *     getCd4ResultBellowOneYear
    * @return {@link CohortDefinition}
    */
   public DataDefinition getCd4ResultDate() {
@@ -548,10 +534,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
     Map<String, Integer> map = getStringIntegerMap();
 
-    EptsQueriesUtil eptsQueriesUtil = new EptsQueriesUtil();
-
     String query =
-        eptsQueriesUtil
+        new EptsQueriesUtil()
             .unionBuilder(
                 listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultOverOrEqualTo5years())
             .union(listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBetweenOneAnd5years())
@@ -568,9 +552,12 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   /**
    * <b> Resultado de CD4 (absoluto) durante o período de avaliação </b>
    *
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultOverOrEqualTo5years() OR
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBetweenOneAnd5years() OR
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultOverOrEqualTo5years()
+   *     getCd4ResultOverOrEqualTo5years OR
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBetweenOneAnd5years()
+   *     getCd4ResultBetweenOneAnd5years OR
    * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBellowOneYear()
+   *     getCd4ResultBellowOneYear
    * @return {@link CohortDefinition}
    */
   public DataDefinition getCd4Result() {
@@ -581,10 +568,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
     Map<String, Integer> map = getStringIntegerMap();
 
-    EptsQueriesUtil eptsQueriesUtil = new EptsQueriesUtil();
-
     String query =
-        eptsQueriesUtil
+        new EptsQueriesUtil()
             .unionBuilder(listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultOverOrEqualTo5y())
             .union(listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBetweenOneAnd5y())
             .union(listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBellow1y())
@@ -598,102 +583,53 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   }
 
   /**
-   * <b>Data de Registo Mais recente de Estadio OMS - Column O</b>
-   * <li>A data de registo mais recente de “Estadio OMS”, na “Ficha Clínica (Ficha Mestra)”,
-   *     ocorrido até o fim do período de avaliação.
-   *
-   * @return {@link DataDefinition}
-   */
-  public DataDefinition getDateOfMostRecentEstadioByEndOfPeriod() {
-
-    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName(
-        "Data Mais recente de Registo de Estadio ate o fim do periodo");
-    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("1204", hivMetadata.getWhoStageIConcept().getConceptId());
-    map.put("1205", hivMetadata.getWhoStageIIConcept().getConceptId());
-    map.put("1206", hivMetadata.getWho3AdultStageConcept().getConceptId());
-    map.put("1207", hivMetadata.getWho4AdultStageConcept().getConceptId());
-    map.put("5356", hivMetadata.getcurrentWhoHivStageConcept().getConceptId());
-
-    String query =
-        "SELECT p.patient_id, "
-            + "               MAX(e.encounter_datetime) AS consultation_date "
-            + "        FROM   patient p "
-            + "               INNER JOIN encounter e "
-            + "                       ON p.patient_id = e.patient_id "
-            + "               INNER JOIN obs o "
-            + "                       ON e.encounter_id = o.encounter_id "
-            + "        WHERE  p.voided = 0 "
-            + "               AND e.voided = 0 "
-            + "               AND o.voided = 0 "
-            + "               AND e.encounter_type = ${6} "
-            + "               AND o.concept_id = ${5356} "
-            + "               AND o.value_coded IN ( ${1204}, ${1205}, ${1206}, ${1207} ) "
-            + "               AND e.encounter_datetime <= :endDate "
-            + "               AND e.location_id = :location "
-            + "        GROUP  BY p.patient_id";
-
-    StringSubstitutor substitutor = new StringSubstitutor(map);
-
-    sqlPatientDataDefinition.setQuery(substitutor.replace(query));
-
-    return sqlPatientDataDefinition;
-  }
-
-  /**
-   * <b>Estadio OMS no registo mais recente ate o fim do periodo - Column P</b>
-   * <li>O registo mais recente de “Estadio OMS”, na “Ficha Clínica (Ficha Mestra)”, ocorrido até o
+   * <b>Motivo de Mudança de Estadiamento Clínico - 1</b>
+   * <li>Caso exista registo na Ficha Clinica – Ficha Mestra de infecção representativa de Estadio
+   *     IV até o fim do período de avaliação, o sistema irá listar a primeira infecção
+   *     representativa de Estadio IV até o fim do período de avaliação.
+   * <li>Caso não exista registo de infecção representativa na Ficha Clinica – Ficha Mestra de
+   *     Estadio IV até o fim do período de avaliação, e exista o registo de infecção representativa
+   *     de Estadio III, o sistema irá listar a primeira infecção representativa de Estadio IIIaté o
    *     fim do período de avaliação.
    *
+   * @see #getResultOfEstadioByTheEndOfPeriod() getResultOfEstadioByTheEndOfPeriod
    * @return {@link DataDefinition}
    */
-  public DataDefinition getResultOfMostRecentEstadioByEndOfPeriod() {
+  public DataDefinition getReasonToChangeEstadio1() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("Estadio OMS no registo mais recente ate o fim do periodo");
+    sqlPatientDataDefinition.setName("Motivo de Mudança de Estadiamento Clínico - 1");
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("1204", hivMetadata.getWhoStageIConcept().getConceptId());
-    map.put("1205", hivMetadata.getWhoStageIIConcept().getConceptId());
-    map.put("1206", hivMetadata.getWho3AdultStageConcept().getConceptId());
-    map.put("1207", hivMetadata.getWho4AdultStageConcept().getConceptId());
-    map.put("5356", hivMetadata.getcurrentWhoHivStageConcept().getConceptId());
+    Map<String, Integer> map = getIntegerMapForEstadioQueries();
 
     String query =
-        "SELECT e.patient_id, o.value_coded as estadio "
+        " SELECT e.patient_id, o.value_coded AS estadio "
             + "FROM encounter e "
             + "         INNER JOIN obs o on e.encounter_id = o.encounter_id "
             + "         INNER JOIN     ( "
-            + "SELECT p.patient_id, "
-            + "               MAX(e.encounter_datetime) AS consultation_date "
-            + "        FROM   patient p "
-            + "               INNER JOIN encounter e "
-            + "                       ON p.patient_id = e.patient_id "
-            + "               INNER JOIN obs o "
-            + "                       ON e.encounter_id = o.encounter_id "
-            + "        WHERE  p.voided = 0 "
-            + "               AND e.voided = 0 "
-            + "               AND o.voided = 0 "
-            + "               AND e.encounter_type = ${6} "
-            + "               AND o.concept_id = ${5356} "
-            + "               AND o.value_coded IN ( ${1204}, ${1205}, ${1206}, ${1207} ) "
-            + "               AND e.encounter_datetime <= :endDate "
-            + "               AND e.location_id = :location "
-            + "        GROUP  BY p.patient_id "
-            + ")last_consultation ON last_consultation.patient_id = e.patient_id "
+            + listOfPatientsOnAdvancedHivIllnessQueries.getFirstEstadioQuery()
+            + ")first_consultation ON first_consultation.patient_id = e.patient_id "
             + "WHERE e.voided = 0 AND o.voided = 0 "
             + "  AND e.encounter_type = ${6} "
-            + "  AND o.concept_id = ${5356} "
-            + "  AND o.value_coded IN ( ${1204}, ${1205}, ${1206}, ${1207} ) "
-            + "  AND e.encounter_datetime = last_consultation.consultation_date "
+            + "  AND o.concept_id = ${1406} "
+            + "  AND o.value_coded IN (${60},${507},${1294},${1570},${5042},${5334},${5344},${5340},${6990},${7180},${14656}) "
+            + "  AND e.encounter_datetime = first_consultation.consultation_date "
+            + "  AND e.location_id = :location "
+            + "GROUP BY e.patient_id"
+            + " UNION "
+            + " SELECT e.patient_id, o.value_coded AS estadio "
+            + "FROM encounter e "
+            + "         INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "         INNER JOIN ( "
+            + listOfPatientsOnAdvancedHivIllnessQueries.getFirstEstadioQuery()
+            + ")first_consultation ON first_consultation.patient_id = e.patient_id "
+            + "WHERE e.voided = 0 AND o.voided = 0 "
+            + "  AND e.encounter_type = ${6} "
+            + "  AND o.concept_id = ${1406} "
+            + "  AND o.value_coded IN (${3},${42},${43},${126},${1570},${5018},${5334},${5945},${6783}) "
+            + "  AND e.encounter_datetime = first_consultation.consultation_date "
             + "  AND e.location_id = :location "
             + "GROUP BY e.patient_id";
 
@@ -705,95 +641,16 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   }
 
   /**
-   * <b>Motivo de Mudança de Estadiamento Clínico - 1</b>
-   * <li>O primeiro registo de Diagnóstico TB Activo= “S” decorrido ate o fim do período de
-   *     avaliação OR um registo de Infecções Oportunistas na data mais recente do estadiamento
-   *     clínico decorrido no período de avaliação
-   *
-   * @see #getDateOfMostRecentEstadioByEndOfPeriod()
-   * @return {@link DataDefinition}
-   */
-  public DataDefinition getReasonToChangeEstadio1() {
-
-    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("Motivo de Mudança de Estadiamento Clínico - 1");
-    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
-    map.put("1204", hivMetadata.getWhoStageIConcept().getConceptId());
-    map.put("1205", hivMetadata.getWhoStageIIConcept().getConceptId());
-    map.put("1206", hivMetadata.getWho3AdultStageConcept().getConceptId());
-    map.put("1207", hivMetadata.getWho4AdultStageConcept().getConceptId());
-    map.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
-    map.put("5356", hivMetadata.getcurrentWhoHivStageConcept().getConceptId());
-    map.put("23761", hivMetadata.getActiveTBConcept().getConceptId());
-
-    String query =
-        " SELECT tb.patient_id, 'TB' AS motivo_mudanca FROM ( "
-            + "SELECT p.patient_id, "
-            + "               MIN(e.encounter_datetime) AS consultation_date "
-            + "        FROM   patient p "
-            + "               INNER JOIN encounter e "
-            + "                       ON p.patient_id = e.patient_id "
-            + "               INNER JOIN obs o "
-            + "                       ON e.encounter_id = o.encounter_id "
-            + "        WHERE  p.voided = 0 "
-            + "               AND e.voided = 0 "
-            + "               AND o.voided = 0 "
-            + "               AND e.encounter_type = ${6} "
-            + "               AND o.concept_id = ${23761} "
-            + "               AND o.value_coded = ${1065} "
-            + "               AND e.encounter_datetime <= :endDate "
-            + "               AND e.location_id = :location "
-            + "        GROUP  BY p.patient_id "
-            + " ) tb "
-            + " UNION "
-            + "SELECT p.patient_id, 'Infeccoes Oportunistas' AS motivo_mudanca "
-            + "FROM "
-            + "    patient p INNER JOIN encounter e ON p.patient_id= e.patient_id "
-            + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
-            + "              INNER JOIN ( "
-            + "        SELECT p.patient_id, "
-            + "               MAX(e.encounter_datetime) AS consultation_date "
-            + "        FROM   patient p "
-            + "                   INNER JOIN encounter e "
-            + "                              ON p.patient_id = e.patient_id "
-            + "                   INNER JOIN obs o "
-            + "                              ON e.encounter_id = o.encounter_id "
-            + "        WHERE  p.voided = 0 "
-            + "          AND e.voided = 0 "
-            + "          AND o.voided = 0 "
-            + "          AND e.encounter_type = ${6} "
-            + "          AND o.concept_id = ${5356} "
-            + "          AND o.value_coded IN ( ${1204}, ${1205}, ${1206}, ${1207} ) "
-            + "          AND e.encounter_datetime <= :endDate "
-            + "          AND e.location_id = :location "
-            + "        GROUP  BY p.patient_id "
-            + "    ) estadio ON estadio.patient_id = p.patient_id "
-            + "WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
-            + "  AND e.encounter_type = ${6} "
-            + "  AND o.concept_id = ${1406} "
-            + "  AND o.value_coded IS NOT NULL "
-            + "  AND e.encounter_datetime = estadio.consultation_date "
-            + "  AND e.location_id = :location";
-
-    StringSubstitutor substitutor = new StringSubstitutor(map);
-
-    sqlPatientDataDefinition.setQuery(substitutor.replace(query));
-
-    return sqlPatientDataDefinition;
-  }
-
-  /**
    * <b>Motivo de Mudança de Estadiamento Clínico - 2</b>
-   * <li>O segundo registo de Diagnóstico TB Activo= “S” decorrido ate o fim do período de avaliação
-   *     OR um registo de Infecções Oportunistas na data mais recente do estadiamento clínico
-   *     decorrido no período de avaliação
+   * <li>Caso exista registo de infecção representativa de Estadio IV Ficha Clinica – Ficha Mestra
+   *     (DAH_RF28) até o fim do período de avaliação, o sistema irá listar a segunda infecção
+   *     representativa de Estadio IV (DAH_RF28) até o fim do período de avaliação.
+   * <li>Caso não exista registo de infecção na Ficha Clinica – Ficha Mestra representativa de
+   *     Estadio IV (DAH_RF28) até o fim do período de avaliação, e exista o registo de infecção
+   *     representativa de Estadio III (DAH_RF27), o sistema irá listar a segunda infecção
+   *     representativa de Estadio III (DAH_RF27) até o fim do período de avaliação.
    *
-   * @see #getDateOfMostRecentEstadioByEndOfPeriod()
+   * @see #getDateOfEstadioByTheEndOfPeriod() getDateOfEstadioByTheEndOfPeriod
    * @return {@link DataDefinition}
    */
   public DataDefinition getReasonToChangeEstadio2() {
@@ -803,84 +660,45 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
-    map.put("1204", hivMetadata.getWhoStageIConcept().getConceptId());
-    map.put("1205", hivMetadata.getWhoStageIIConcept().getConceptId());
-    map.put("1206", hivMetadata.getWho3AdultStageConcept().getConceptId());
-    map.put("1207", hivMetadata.getWho4AdultStageConcept().getConceptId());
-    map.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
-    map.put("5356", hivMetadata.getcurrentWhoHivStageConcept().getConceptId());
-    map.put("23761", hivMetadata.getActiveTBConcept().getConceptId());
+    Map<String, Integer> map = getIntegerMapForEstadioQueries();
 
     String query =
-        " SELECT tb.patient_id, 'TB' AS motivo_mudanca FROM ( "
-            + " SELECT p.patient_id, "
-            + "               MIN(e.encounter_datetime) AS consultation_date "
-            + "        FROM   patient p "
-            + "               INNER JOIN encounter e "
-            + "                       ON p.patient_id = e.patient_id "
-            + "               INNER JOIN obs o "
-            + "                       ON e.encounter_id = o.encounter_id "
-            + " INNER JOIN ( "
-            + " SELECT p.patient_id, "
-            + "               MIN(e.encounter_datetime) AS consultation_date "
-            + "        FROM   patient p "
-            + "               INNER JOIN encounter e "
-            + "                       ON p.patient_id = e.patient_id "
-            + "               INNER JOIN obs o "
-            + "                       ON e.encounter_id = o.encounter_id "
-            + "        WHERE  p.voided = 0 "
-            + "               AND e.voided = 0 "
-            + "               AND o.voided = 0 "
-            + "               AND e.encounter_type = ${6} "
-            + "               AND o.concept_id = ${23761} "
-            + "               AND o.value_coded = ${1065} "
-            + "               AND e.encounter_datetime <= :endDate "
-            + "               AND e.location_id = :location "
-            + "        GROUP  BY p.patient_id "
-            + " ) first_tb ON first_tb.patient_id = p.patient_id "
-            + "        WHERE  p.voided = 0 "
-            + "               AND e.voided = 0 "
-            + "               AND o.voided = 0 "
-            + "               AND e.encounter_type = ${6} "
-            + "               AND o.concept_id = ${23761} "
-            + "               AND o.value_coded = ${1065} "
-            + "               AND e.encounter_datetime > first_tb.consultation_date "
-            + "               AND e.encounter_datetime <= :endDate "
-            + "               AND e.location_id = :location "
-            + "        GROUP  BY p.patient_id "
-            + " ) tb "
-            + " UNION "
-            + "SELECT p.patient_id, 'Infeccoes Oportunistas' AS motivo_mudanca "
-            + "FROM "
-            + "    patient p INNER JOIN encounter e ON p.patient_id= e.patient_id "
-            + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
-            + "              INNER JOIN ( "
-            + "        SELECT p.patient_id, "
-            + "               MAX(e.encounter_datetime) AS consultation_date "
-            + "        FROM   patient p "
-            + "                   INNER JOIN encounter e "
-            + "                              ON p.patient_id = e.patient_id "
-            + "                   INNER JOIN obs o "
-            + "                              ON e.encounter_id = o.encounter_id "
-            + "        WHERE  p.voided = 0 "
-            + "          AND e.voided = 0 "
-            + "          AND o.voided = 0 "
-            + "          AND e.encounter_type = ${6} "
-            + "          AND o.concept_id = ${5356} "
-            + "          AND o.value_coded IN ( ${1204}, ${1205}, ${1206}, ${1207} ) "
-            + "          AND e.encounter_datetime <= :endDate "
-            + "          AND e.location_id = :location "
-            + "        GROUP  BY p.patient_id "
-            + "    ) estadio ON estadio.patient_id = p.patient_id "
-            + "WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+        " SELECT e.patient_id, "
+            + "(SELECT o.value_coded "
+            + "           FROM obs o WHERE o.encounter_id = first_consultation.encounter_id "
+            + "           AND o.concept_id = 1406 AND o.voided = 0 "
+            + "           LIMIT 1,1 ) AS estadio "
+            + "FROM encounter e "
+            + "         INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "         INNER JOIN     ( "
+            + listOfPatientsOnAdvancedHivIllnessQueries.getFirstEstadioQueryWithEncounterId()
+            + ")first_consultation ON first_consultation.patient_id = e.patient_id "
+            + "WHERE e.voided = 0 AND o.voided = 0 "
             + "  AND e.encounter_type = ${6} "
             + "  AND o.concept_id = ${1406} "
-            + "  AND o.value_coded IS NOT NULL "
-            + "  AND e.encounter_datetime = estadio.consultation_date "
-            + "  AND e.location_id = :location";
+            + "  AND o.value_coded IN (${60},${507},${1294},${1570},${5042},${5334},${5344},${5340},${6990},${7180},${14656}) "
+            + "  AND e.encounter_datetime = first_consultation.consultation_date "
+            + "  AND e.location_id = :location "
+            + " GROUP BY e.patient_id"
+            + " UNION "
+            + " SELECT e.patient_id, "
+            + "(SELECT o.value_coded "
+            + "           FROM obs o WHERE o.encounter_id = first_consultation.encounter_id "
+            + "           AND o.concept_id = 1406 AND o.voided = 0 "
+            + "           AND o.value_coded IN (${3},${42},${43},${126},${1570},${5018},${5334},${5945},${6783}) "
+            + "           LIMIT 1,1 ) AS estadio "
+            + "FROM encounter e "
+            + "         INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "         INNER JOIN ( "
+            + listOfPatientsOnAdvancedHivIllnessQueries.getFirstEstadioQueryWithEncounterId()
+            + ")first_consultation ON first_consultation.patient_id = e.patient_id "
+            + "WHERE e.voided = 0 AND o.voided = 0 "
+            + "  AND e.encounter_type = ${6} "
+            + "  AND o.concept_id = ${1406} "
+            + "  AND o.value_coded IN (${3},${42},${43},${126},${1570},${5018},${5334},${5945},${6783}) "
+            + "  AND e.encounter_datetime = first_consultation.consultation_date "
+            + "  AND e.location_id = :location "
+            + "GROUP BY e.patient_id";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
 
@@ -966,10 +784,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
     Map<String, Integer> map = getStringIntegerMap();
 
-    EptsQueriesUtil eptsQueriesUtil = new EptsQueriesUtil();
-
     String query =
-        eptsQueriesUtil
+        new EptsQueriesUtil()
             .unionBuilder(
                 listOfPatientsOnAdvancedHivIllnessQueries
                     .getPatientsWithCD4AbsoluteResultOnPeriodQuery(true))
@@ -1154,7 +970,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + " AND e.voided = 0 "
             + " AND p.voided = 0 "
             + " AND o.voided = 0 "
-            + " GROUP BY p.patient_id "
+            + " GROUP BY p.patient_id, o.value_numeric "
             + " UNION "
             + " SELECT p.patient_id, o.value_numeric AS viral_load, MAX(e.encounter_datetime) AS most_recent FROM patient p "
             + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
@@ -1169,7 +985,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + " AND e.voided = 0 "
             + " AND p.voided = 0 "
             + " AND o.voided = 0 "
-            + " GROUP BY p.patient_id "
+            + " GROUP BY p.patient_id, o.value_numeric "
             + " ) AS vl_result GROUP BY vl_result.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -1218,7 +1034,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + " AND e.voided = 0 "
             + " AND p.voided = 0 "
             + " AND o.voided = 0 "
-            + " GROUP BY p.patient_id "
+            + " GROUP BY p.patient_id, o.value_numeric "
             + " UNION "
             + " SELECT p.patient_id, o.value_numeric AS viral_load, MAX(e.encounter_datetime) AS most_recent FROM patient p "
             + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
@@ -1233,7 +1049,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + " AND e.voided = 0 "
             + " AND p.voided = 0 "
             + " AND o.voided = 0 "
-            + " GROUP BY p.patient_id "
+            + " GROUP BY p.patient_id, o.value_numeric "
             + " ) AS result_date GROUP BY result_date.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -1291,7 +1107,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
-            + " GROUP BY p.patient_id) exam_result ";
+            + " GROUP BY p.patient_id,o.value_coded) exam_result ";
 
     String query =
         examResult
@@ -1450,11 +1266,19 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
   /**
    * <b> Último Estado de Permanência TARV </b>
-   * <li>Resposta = “Abandono”, os utentes em TARV que abandonaram o tratamento (DAH_RF24)
-   * <li>Resposta = “Óbito”, os utentes em TARV que foram óbito (DAH_RF25)
-   * <li>Resposta = “Suspenso”, os utentes em TARV que suspenderam o tratamento (DAH_RF24)
-   * <li>Resposta = “Activo”, os utentes activos em TARV (DAH_RF26)
+   * <li>Resposta = “Abandono”, os utentes em TARV que abandonaram o tratamento
+   * <li>Resposta = “Óbito”, os utentes em TARV que foram óbito
+   * <li>Resposta = “Suspenso”, os utentes em TARV que suspenderam o tratamento
+   * <li>Resposta = “Activo”, os utentes activos em TARV
    *
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsWhoAbandonedTarvQuery(boolean)
+   *     getPatientsWhoAbandonedTarvQuery
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsWhoDied(boolean) getPatientsWhoDied
+   * @see
+   *     ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsWhoSuspendedTarvOrAreTransferredOut(int,
+   *     int, boolean, boolean) getPatientsWhoSuspendedTarvOrAreTransferredOut
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsActiveOnTarv()
+   *     getPatientsActiveOnTarv
    * @return {@link DataDefinition}
    */
   public DataDefinition getLastStateOfStayOnTarv() {
@@ -1464,7 +1288,6 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
-    //    ADD CONCEPTS HERE
     Map<String, Integer> map = new HashMap<>();
     map.put("1", hivMetadata.getHIVCareProgram().getProgramId());
     map.put("2", hivMetadata.getARTProgram().getProgramId());
@@ -1531,6 +1354,31 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
     map.put("165389", hivMetadata.getCD4LabsetConcept().getConceptId());
+    return map;
+  }
+
+  private Map<String, Integer> getIntegerMapForEstadioQueries() {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
+    map.put("5018", hivMetadata.getChronicDiarrheaConcept().getConceptId());
+    map.put("3", hivMetadata.getAnemiaConcept().getConceptId());
+    map.put("5945", hivMetadata.getFeverConcept().getConceptId());
+    map.put("43", hivMetadata.getPneumoniaConcept().getConceptId());
+    map.put("60", hivMetadata.getMeningitisConcept().getConceptId());
+    map.put("126", hivMetadata.getGingivitisConcept().getConceptId());
+    map.put("6783", hivMetadata.getEstomatiteUlcerativaNecrotizanteConcept().getConceptId());
+    map.put("5334", hivMetadata.getCandidiaseOralConcept().getConceptId());
+    map.put("1294", hivMetadata.getCryptococcalMeningitisConcept().getConceptId());
+    map.put("1570", hivMetadata.getCervicalCancerConcept().getConceptId());
+    map.put("5340", hivMetadata.getCandidiaseEsofagicaConcept().getConceptId());
+    map.put("5344", hivMetadata.getHerpesSimplesConcept().getConceptId());
+    map.put("14656", hivMetadata.getCachexiaConcept().getConceptId());
+    map.put("7180", hivMetadata.getToxoplasmoseConcept().getConceptId());
+    map.put("6990", hivMetadata.getHivDiseaseResultingInEncephalopathyConcept().getConceptId());
+    map.put("507", commonMetadata.getKaposiSarcomaConcept().getConceptId());
+    map.put("5042", tbMetadata.getExtraPulmonaryTbConcept().getConceptId());
+    map.put("42", tbMetadata.getPulmonaryTB().getConceptId());
     return map;
   }
 

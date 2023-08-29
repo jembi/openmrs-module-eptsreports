@@ -275,7 +275,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "             AND o.value_numeric IS NOT NULL "
         + "             AND e.encounter_datetime < last_cd4.most_recent ) "
         + "       AND e.location_id = :location"
-        + "       GROUP BY ps.person_id "
+        + "       GROUP BY ps.person_id, o.value_numeric "
         + " UNION "
         + " SELECT ps.person_id, o.value_numeric, MAX(o.obs_datetime) AS cd4_result "
         + " FROM "
@@ -290,7 +290,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "  AND o.value_numeric IS NOT NULL "
         + "  AND o.obs_datetime < last_cd4.most_recent "
         + "  AND e.location_id = :location "
-        + "       GROUP BY ps.person_id ";
+        + "       GROUP BY ps.person_id, o.value_numeric ";
   }
 
   public String getVLoadResultAndMostRecent() {
@@ -304,7 +304,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + " AND e.voided = 0 "
         + " AND p.voided = 0 "
         + " AND o.voided = 0 "
-        + " GROUP BY p.patient_id "
+        + " GROUP BY p.patient_id, o.value_numeric "
         + " UNION "
         + " SELECT p.patient_id, o.value_numeric AS viral_load, MAX(e.encounter_datetime) AS most_recent FROM patient p "
         + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
@@ -316,9 +316,19 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + " AND e.voided = 0 "
         + " AND p.voided = 0 "
         + " AND o.voided = 0 "
-        + " GROUP BY p.patient_id ";
+        + " GROUP BY p.patient_id, o.value_numeric ";
   }
 
+  /**
+   * <b>Abandonos em Tarv</b>
+   *
+   * @param stateOnProgram State on Program concept
+   * @param stateOnEncounters State on encounter types concept
+   * @param transferredOut transferred out flag to change the exclusion query
+   * @param isForCohortDefinition flag to return result based on the definition (cohort or data
+   *     definition)
+   * @return {@link String}
+   */
   public String getPatientsWhoSuspendedTarvOrAreTransferredOut(
       int stateOnProgram,
       int stateOnEncounters,
@@ -438,11 +448,12 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    *
    *     <p>Excepto os utentes:
    * <li>Transferidos Para Outra US
-   * <li>Suspensos em TARV (DAH_RF23)
-   * <li>Óbitos (DAH_RF25)
+   * <li>Suspensos em TARV
+   * <li>Óbitos
    *
    * @see #getPatientsWhoSuspendedTarvOrAreTransferredOut(int, int, boolean, boolean)
-   * @see #getPatientsWhoDied(boolean)
+   *     getPatientsWhoSuspendedTarvOrAreTransferredOut
+   * @see #getPatientsWhoDied(boolean) getPatientsWhoDied
    * @return {@link String}
    */
   public String getPatientsWhoAbandonedTarvQuery(boolean isForDataDefinition) {
@@ -623,7 +634,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + " GROUP BY mostrecent.patient_id";
 
     return isForDataDefinition
-        ? "  SELECT mostrecent.patient_id, ' Óbito'  ".concat(fromSQL)
+        ? "  SELECT mostrecent.patient_id, 'Óbito'  ".concat(fromSQL)
         : " SELECT mostrecent.patient_id ".concat(fromSQL);
   }
 
@@ -667,6 +678,21 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + " GROUP BY art.patient_id ";
   }
 
+  /**
+   * <b>Utentes Activos em TARV</b>
+   * <li>Iniciaram TARV até o fim do período de avaliação, ou seja, com registo do Início TARV
+   *     Excluindo todos os utentes:
+   * <li>Abandonos em TARV
+   * <li>Transferidos Para Outra US
+   * <li>Suspensos em TARV
+   * <li>Óbitos
+   *
+   * @see #getPatientsWhoAbandonedTarvQuery(boolean) getPatientsWhoAbandonedTarvQuery
+   * @see #getPatientsWhoSuspendedTarvOrAreTransferredOut(int, int, boolean, boolean)
+   *     getPatientsWhoSuspendedTarvOrAreTransferredOut
+   * @see #getPatientsWhoDied(boolean) getPatientsWhoDied
+   * @return {@link String}
+   */
   public String getPatientsActiveOnTarv() {
     return "SELECT  final.patient_id, 'Activo' "
         + "FROM "
@@ -692,5 +718,80 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             .buildQuery()
         + "     ) "
         + "GROUP BY final.patient_id ";
+  }
+
+  /**
+   *
+   * <li>Caso exista registo de infecção representativa de Estadio IV (DAH_RF28) registada na Ficha
+   *     Clinica – Ficha Mestra ocorrido até o fim do período de avaliação, o sistema irá considerar
+   *     como “Data de Registo” a data do primeiro registo de infecção representativa de Estadio IV
+   *     até o fim do período de avaliação. Caso contrário, ou seja, caso não exista registo de
+   *     infecção representativa de Estadio IV, mas exista registo de infecção representativa de
+   *     Estadio III (DAH_RF27) até o fim do período de avaliação, o sistema irá considerar como
+   *     “Data de Registo” a data do primeiro registo de infecção representativa de Estadio III até
+   *     o fim do período de avaliação
+   *
+   * @return {@link String}
+   */
+  public String getFirstEstadioQuery() {
+    return "    SELECT p.patient_id,  "
+        + "                        Min(e.encounter_datetime) AS consultation_date "
+        + "                             FROM   patient p "
+        + "                                    INNER JOIN encounter e "
+        + "                                            ON p.patient_id = e.patient_id "
+        + "                                    INNER JOIN obs o "
+        + "                                            ON e.encounter_id = o.encounter_id "
+        + "                             WHERE  p.voided = 0 "
+        + "                                    AND e.voided = 0 "
+        + "                                    AND o.voided = 0 "
+        + "                                    AND e.encounter_type = ${6}  "
+        + "                                    AND o.concept_id = ${1406} "
+        + "                                    AND o.value_coded IN (${3},${42},${43},${60},${126},${507},${1294}, "
+        + "                                         ${1570},${5018},${5042},${5334},${5344},${5340},${5945},${6783},${6990},${7180},${14656}) "
+        + "                                    AND e.encounter_datetime <= :endDate "
+        + "                                    AND e.location_id = :location "
+        + "                             GROUP  BY p.patient_id ";
+  }
+
+  /**
+   * @see #getFirstEstadioQuery()
+   * @return {@link String}
+   */
+  public String getFirstEstadioQueryWithEncounterId() {
+    return "    SELECT p.patient_id, e.encounter_id, e.encounter_datetime AS consultation_date "
+        + "                             FROM   patient p "
+        + "                                    INNER JOIN encounter e "
+        + "                                            ON p.patient_id = e.patient_id "
+        + "                                    INNER JOIN obs o "
+        + "                                            ON e.encounter_id = o.encounter_id "
+        + "                                    INNER JOIN ( "
+        + "                         SELECT p.patient_id,  "
+        + "                        Min(e.encounter_datetime) AS consultation_date "
+        + "                             FROM   patient p "
+        + "                                    INNER JOIN encounter e "
+        + "                                            ON p.patient_id = e.patient_id "
+        + "                                    INNER JOIN obs o "
+        + "                                            ON e.encounter_id = o.encounter_id "
+        + "                             WHERE  p.voided = 0 "
+        + "                                    AND e.voided = 0 "
+        + "                                    AND o.voided = 0 "
+        + "                                    AND e.encounter_type = ${6}  "
+        + "                                    AND o.concept_id = ${1406} "
+        + "                                    AND o.value_coded IN (${3},${42},${43},${60},${126},${507},${1294}, "
+        + "                                       ${1570},${5018},${5042},${5334},${5344},${5340},${5945},${6783},${6990},${7180},${14656}) "
+        + "                                    AND e.encounter_datetime <= :endDate "
+        + "                                    AND e.location_id = :location "
+        + "                             GROUP  BY p.patient_id "
+        + "                                    ) first_consultation on first_consultation.patient_id = p.patient_id "
+        + "                             WHERE  p.voided = 0 "
+        + "                                    AND e.voided = 0 "
+        + "                                    AND o.voided = 0 "
+        + "                                    AND e.encounter_type = ${6}  "
+        + "                                    AND o.concept_id = ${1406} "
+        + "                                    AND o.value_coded IN (${3},${42},${43},${60},${126},${507},${1294}, "
+        + "                                                     ${1570},${5018},${5042},${5334},${5344},${5340},${5945},${6783},${6990},${7180},${14656}) "
+        + "                                    AND e.encounter_datetime = first_consultation.consultation_date "
+        + "                                    AND e.location_id = :location "
+        + "                             GROUP  BY p.patient_id ";
   }
 }
