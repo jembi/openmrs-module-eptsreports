@@ -1533,7 +1533,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "MI15DEN13",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMI15Den13(),
-                "startDate=${startDate},revisionEndDate=${endDate},location=${location}"));
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI15DEN13.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1542,7 +1542,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "15.13 - % de pacientes elegíveis a MDS, que foram inscritos em MDS",
         EptsReportUtils.map(
             MI15DEN13,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"),
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"),
         "ageByEvaluationEndDate=2+");
 
     CohortIndicator MI15NUM13 =
@@ -1550,7 +1550,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "MI15NUM13",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMI15Nume13(),
-                "startDate=${startDate},revisionEndDate=${endDate},location=${location}"));
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI15NUM13.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1559,7 +1559,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "Numerator:  “# de pacientes elegíveis a MDS ",
         EptsReportUtils.map(
             MI15NUM13,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"),
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"),
         "ageByEvaluationEndDate=2+");
 
     CohortIndicator MI15DEN14 =

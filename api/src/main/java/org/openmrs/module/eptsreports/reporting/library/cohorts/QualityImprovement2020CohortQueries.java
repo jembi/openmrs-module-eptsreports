@@ -8970,6 +8970,7 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Denominator 15 - Pacientes elegíveis a MDS");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "end Date", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -8990,11 +8991,11 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch(
         "A",
         EptsReportUtils.map(
-            Mq15A, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            Mq15A, "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "B1",
         EptsReportUtils.map(
-            Mq15B1, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            Mq15B1, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "C",
@@ -9009,19 +9010,16 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch(
         "F",
         EptsReportUtils.map(
-            Mq15F, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
-    cd.addSearch(
-        "G", EptsReportUtils.map(Mq15G, "endDate=${revisionEndDate},location=${location}"));
+            Mq15F, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch("G", EptsReportUtils.map(Mq15G, "endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "MDS",
         EptsReportUtils.map(
-            alreadyMds, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            alreadyMds, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        "onTB",
-        EptsReportUtils.map(
-            onTB, "startDate=${revisionEndDate},endDate=${revisionEndDate},location=${location}"));
+        "onTB", EptsReportUtils.map(onTB, "endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
         "onSK", EptsReportUtils.map(onSK, "endDate=${revisionEndDate},location=${location}"));
@@ -9108,6 +9106,7 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Numerator MQ 15 - Pacientes elegíveis a MDS");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "end Date", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -9131,12 +9130,11 @@ public class QualityImprovement2020CohortQueries {
         "MQ15Den13",
         EptsReportUtils.map(
             Mi15Den13,
-            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
         "MDS",
-        EptsReportUtils.map(
-            mds, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+        EptsReportUtils.map(mds, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("MQ15Den13 AND MDS");
     return cd;

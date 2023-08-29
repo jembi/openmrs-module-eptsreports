@@ -72,7 +72,6 @@ public class CommonCohortQueries {
   public CohortDefinition getPatientsOnTbTreatment() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("patientsOnTbTreatment");
-    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
