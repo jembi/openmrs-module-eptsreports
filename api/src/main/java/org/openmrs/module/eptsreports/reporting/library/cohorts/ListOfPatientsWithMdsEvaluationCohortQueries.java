@@ -1226,8 +1226,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * qual foi efectuado o registo de resultado da Carga Viral. <br>
    * <br>
    *
-   * <p>Nota 1: A “Data Início TARV” é a data registada na Ficha Resumo (“Data do Início TARV”).
-   * <br>
+   * <p>Nota 1: A “Data Início TARV” é definida no RF46. <br>
    * <br>
    *
    * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
@@ -1247,6 +1246,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
 
     String query =
         "SELECT     p.patient_id, "
@@ -1258,36 +1261,24 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "ON         o.encounter_id = e.encounter_id "
             + "INNER JOIN "
             + "           ( "
-            + "                      SELECT     p.patient_id, "
-            + "                                 Min(o.value_datetime) art_start "
-            + "                      FROM       patient p "
-            + "                      INNER JOIN encounter e "
-            + "                      ON         e.patient_id = p.patient_id "
-            + "                      INNER JOIN obs o "
-            + "                      ON         o.encounter_id = e.encounter_id "
-            + "                      WHERE      e.encounter_type = ${53} "
-            + "                      AND        o.concept_id = ${1190} "
-            + "                      AND        o.value_datetime BETWEEN "
-            + "  CONCAT(:evaluationYear,"
-            + inclusionStartMonthAndDay
-            + "        ) "
-            + "          AND "
-            + "  CONCAT(:evaluationYear,"
-            + inclusionEndMonthAndDay
-            + "        ) "
-            + "                      AND        e.location_id = :location "
-            + "                      AND        p.voided = 0 "
-            + "                      AND        e.voided = 0 "
-            + "                      AND        o.voided = 0 "
-            + "                      GROUP BY   p.patient_id ) art "
-            + "where      e.encounter_type = ${6} "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                     ) art ON art.patient_id = p.patient_id "
+            + "       WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "AND      e.encounter_type = ${6} "
             + "AND        ( ( "
-            + "                                 o.concept_id= ${856} ) "
+            + "                                 o.concept_id= ${856} "
+            + "                         AND     o.value_numeric IS NOT NULL ) "
             + "           OR         ( "
             + "                                 o.concept_id = ${1305} "
             + "                      AND        o.value_coded IS NOT NULL)) "
             + "AND        e.location_id = :location "
-            + "AND        e.encounter_datetime >= art.art_start "
+            + "AND        e.encounter_datetime >= art.art_encounter "
             + "AND        p.voided = 0 "
             + "AND        e.voided = 0 "
             + "AND        o.voided = 0 "
@@ -1308,8 +1299,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * TARV (Data Início TARV). <br>
    * <br>
    *
-   * <p>Nota 1: A “Data Início TARV” é a data registada na Ficha Resumo (“Data do Início TARV”).
-   * <br>
+   * <p>Nota 1: A “Data Início TARV” é definida no RF46. <br>
    * <br>
    *
    * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
@@ -1329,6 +1319,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
 
     String query =
         "SELECT     p.patient_id, "
@@ -1340,31 +1334,19 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "ON         o.encounter_id = e.encounter_id "
             + "INNER JOIN "
             + "           ( "
-            + "                      SELECT     p.patient_id, "
-            + "                                 Min(o.value_datetime) art_start "
-            + "                      FROM       patient p "
-            + "                      INNER JOIN encounter e "
-            + "                      ON         e.patient_id = p.patient_id "
-            + "                      INNER JOIN obs o "
-            + "                      ON         o.encounter_id = e.encounter_id "
-            + "                      WHERE      e.encounter_type = ${53} "
-            + "                      AND        o.concept_id = ${1190} "
-            + "                      AND        o.value_datetime BETWEEN "
-            + "  CONCAT(:evaluationYear,"
-            + inclusionStartMonthAndDay
-            + "        ) "
-            + "          AND "
-            + "  CONCAT(:evaluationYear,"
-            + inclusionEndMonthAndDay
-            + "        ) "
-            + "                      AND        e.location_id = :location "
-            + "                      AND        p.voided = 0 "
-            + "                      AND        e.voided = 0 "
-            + "                      AND        o.voided = 0 "
-            + "                      GROUP BY   p.patient_id ) art "
-            + "where      e.encounter_type = ${6} "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                     ) art ON art.patient_id = p.patient_id "
+            + "       WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "AND      e.encounter_type = ${6} "
             + "AND        ( ( "
-            + "                                 o.concept_id= ${856} ) "
+            + "                                 o.concept_id= ${856} "
+            + "                         AND     o.value_numeric IS NOT NULL ) "
             + "           OR         ( "
             + "                                 o.concept_id = ${1305} "
             + "                      AND        o.value_coded IS NOT NULL)) "
