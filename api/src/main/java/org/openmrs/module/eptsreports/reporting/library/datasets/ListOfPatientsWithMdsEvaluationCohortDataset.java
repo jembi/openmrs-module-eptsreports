@@ -289,11 +289,11 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
 
     // B11 - Rastreado para TB em TODAS as consultas entre a data de inscrição no MDS e 12˚ mês de
     // TARV?: Coluna AH
-    //    pdd.addColumn(
-    //        "tpt_start_date",
-    //        listOfPatientsWithMdsEvaluationCohortQueries.getTptInitiationDate(),
-    //        "evaluationYear=${evaluationYear},location=${location}",
-    //        null);
+    pdd.addColumn(
+        "tb_screening_b",
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionB(3, 9),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
 
     // C1 - Data do pedido da CV de seguimento: (coluna AP)
     pdd.addColumn(
@@ -456,6 +456,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "mds_five_end_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds5EndDate(24),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
+    // C11 - Rastreado para TB em TODAS as consultas entre 12˚ e 24˚ mês de TARV?- C.11 (Coluna BN)
+    pdd.addColumn(
+        "tb_screening_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(3, 9),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
