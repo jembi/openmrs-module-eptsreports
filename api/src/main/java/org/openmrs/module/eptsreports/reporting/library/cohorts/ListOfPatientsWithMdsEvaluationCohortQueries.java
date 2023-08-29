@@ -1291,7 +1291,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   }
 
   /**
-   * <b>RF33 - Data de registo do resultado da CV de Seguimento: (coluna AQ) - Resposta= Data do resultado da 1ª Carga Viral</b>
+   * <b>RF33 - Data de registo do resultado da CV de Seguimento: (coluna AQ) - Resposta= Data do
+   * resultado da 1ª Carga Viral</b>
    *
    * <p>O sistema irá determinar a Data do Resultado da CV de seguimento do utente identificando a
    * data da consulta clínica (Ficha Clínica), após o início TARV (Data Início TARV), na qual foi
@@ -1308,7 +1309,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    */
   public DataDefinition getSecondViralLoadResultDate() {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("C2 - Data de registo do resultado da CV de Seguimento: (coluna AQ)");
+    sqlPatientDataDefinition.setName(
+        "C2 - Data de registo do resultado da CV de Seguimento: (coluna AQ)");
     sqlPatientDataDefinition.addParameter(
         new Parameter("evaluationYear", "evaluationYear", Integer.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
@@ -1375,7 +1377,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "           OR         ( "
             + "                                 oo.concept_id = ${1305} "
             + "                      AND        oo.value_coded IS NOT NULL)) "
-            + "GROUP BY   second_vl.patient_id ";
+            + "GROUP BY   second_vl.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
