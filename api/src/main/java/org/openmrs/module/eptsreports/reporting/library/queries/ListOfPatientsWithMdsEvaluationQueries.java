@@ -2,40 +2,6 @@ package org.openmrs.module.eptsreports.reporting.library.queries;
 
 public class ListOfPatientsWithMdsEvaluationQueries {
 
-  public static String getPatientsInitiatedART12Or24Months(
-      String inclusionStartMonthAndDay,
-      String inclusionEndMonthAndDay,
-      int numberOfYearsStartDate,
-      int numberOfYearsEndDate) {
-    return "SELECT p.patient_id, "
-        + "               Min(o.value_datetime) art_start "
-        + "        FROM   patient p "
-        + "               INNER JOIN encounter e "
-        + "                       ON e.patient_id = p.patient_id "
-        + "               INNER JOIN obs o "
-        + "                       ON o.encounter_id = e.encounter_id "
-        + "        WHERE  e.encounter_type = ${53} "
-        + "               AND o.concept_id = ${1190} "
-        + "               AND e.location_id = :location "
-        + "               AND o.value_datetime BETWEEN DATE_SUB( "
-        + "  CONCAT(:evaluationYear,"
-        + inclusionStartMonthAndDay
-        + "        ) "
-        + "                                            ,INTERVAL "
-        + numberOfYearsStartDate
-        + " YEAR) AND DATE_SUB( "
-        + "  CONCAT(:evaluationYear,"
-        + inclusionEndMonthAndDay
-        + "        ) "
-        + "                   ,INTERVAL "
-        + numberOfYearsEndDate
-        + " YEAR) "
-        + "               AND p.voided = 0 "
-        + "               AND e.voided = 0 "
-        + "               AND o.voided = 0 "
-        + "        GROUP  BY p.patient_id";
-  }
-
   public static String getPatientArtStart(String inclusionEndMonthAndDay) {
     return "SELECT first.patient_id, MIN(first.pickup_date) first_pickup "
         + "       FROM ( "
