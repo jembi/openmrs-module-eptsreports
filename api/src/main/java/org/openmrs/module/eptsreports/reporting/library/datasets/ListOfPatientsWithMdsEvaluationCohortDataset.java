@@ -310,6 +310,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
+    // B17 - N˚ de consultas de APSS/PP entre 6˚ e 12˚ mês de TARV - Coluna AN
+    pdd.addColumn(
+        "apss_pp_consultations_b",
+        listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(6, 12),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
     // C1 - Data do pedido da CV de seguimento: (coluna AP)
     pdd.addColumn(
         "cv_date_c",
@@ -493,6 +500,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "clinical_consultations_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(12, 24),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
+    // C17 - N˚ de consultas de APSS/PP tre 12˚ e 24˚ mês de TARV - Coluna BT
+    pdd.addColumn(
+        "apss_pp_consultations_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(12, 24),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 

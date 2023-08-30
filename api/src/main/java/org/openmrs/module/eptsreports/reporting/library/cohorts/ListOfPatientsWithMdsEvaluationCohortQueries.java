@@ -4923,4 +4923,77 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     return sqlPatientDataDefinition;
   }
+
+  /**
+   * <b>RF228 - Identificação de n˚ de consultas clínicas (Coluna AM)</b><br>
+   * <br>
+   *
+   * <p>O sistema irá determinar o N˚ de consultas de APSS/PP entre 6˚ e 12˚ mês de TARV contando o
+   * número de consultas de APSS/PP realizadas (Ficha APSS/PP) entre o 6º e 12º mês do TARV (Data da
+   * Consulta <= “Data Início TARV” + 6 meses e >= “Data Início TARV” + 12 meses); <br>
+   * <br>
+   *
+   * <p>Nota 1: A “Data Início TARV” é definida no RF46<br>
+   * <br>
+   * <br>
+   *
+   * @return {DataDefinition}
+   */
+  public DataDefinition getNrApssPpConsultations(int minNumberOfMonths, int maxNumberOfMonths) {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("B17- Identificação de n˚ de consultas apss/pp");
+    sqlPatientDataDefinition.addParameter(
+        new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
+    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
+    map.put("6276", hivMetadata.getArtStatus().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("1066", hivMetadata.getNoConcept().getConceptId());
+    map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
+    map.put("165322", hivMetadata.getMdcState().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+
+    String query =
+        "                  SELECT     p.patient_id, "
+            + "                             COUNT(e.encounter_id)  "
+            + "                  FROM       patient p "
+            + "                  INNER JOIN encounter e "
+            + "                  ON         e.patient_id = p.patient_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = p.patient_id "
+            + "                  WHERE      p.voided = 0 "
+            + "                  AND        e.voided = 0 "
+            + "                  AND        e.encounter_type = ${35} "
+            + "                  AND        e.location_id = :location "
+            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
+            + minNumberOfMonths
+            + " MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + maxNumberOfMonths
+            + " MONTH ) "
+            + "                  GROUP BY   p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
 }
