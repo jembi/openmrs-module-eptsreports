@@ -9001,12 +9001,12 @@ public class QualityImprovement2020CohortQueries {
         "C",
         EptsReportUtils.map(
             Mq15C,
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-1m},location=${location}"));
+            "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-2m},location=${location}"));
     cd.addSearch(
         "D",
         EptsReportUtils.map(
             Mq15D,
-            "startDate=${revisionEndDate-19m+1d},endDate=${revisionEndDate-1m},location=${location}"));
+            "startDate=${revisionEndDate-20m+1d},endDate=${revisionEndDate-2m},location=${location}"));
     cd.addSearch(
         "F",
         EptsReportUtils.map(
