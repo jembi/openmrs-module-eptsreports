@@ -4856,9 +4856,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * <b>RF228 - Identificação de n˚ de consultas clínicas (Coluna AM)</b><br>
    * <br>
    *
-   * <p>O sistema irá determinar o N˚ de consultas clínicas entre 12˚ e 24˚ mês de TARV contando o
-   * número de consultas clínicas realizadas (Fichas clínicas) entre o 12º e 24º mês do TARV (Data
-   * da Consulta >= “Data Início TARV” + 12 meses e <= “Data Início TARV” + 24 meses); <br>
+   * <p>O sistema irá determinar o N˚ de consultas clínicas entre 6˚ e 12˚ mês de TARV contando o
+   * número de consultas clínicas realizadas (Fichas clínicas) entre o 6º e 12º mês do TARV (Data da
+   * Consulta <= “Data Início TARV” + 6 meses e >= “Data Início TARV” + 12 meses); <br>
    * <br>
    *
    * <p>Nota 1: A “Data Início TARV” é definida no RF46<br>
