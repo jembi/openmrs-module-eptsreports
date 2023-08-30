@@ -3569,4 +3569,20 @@
 	</messages>
 	<!-- /Internationalization -->
 
+	<globalProperty>
+		<property>eptsreports.bmiConceptUuid</property>
+		<defaultValue>e1da52ba-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			BMI
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.muacConceptUuid</property>
+		<defaultValue>1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</defaultValue>
+		<description>
+			MUAC
+		</description>
+	</globalProperty>
+
 </module>

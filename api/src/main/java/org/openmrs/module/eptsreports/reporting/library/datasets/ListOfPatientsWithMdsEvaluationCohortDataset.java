@@ -295,6 +295,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
+    // B14 - Identificação de registo de PB/IMC em TODAS as consultas desde a inscrição no MDS até
+    // ao 12˚ mês de TARV Coluna AK
+    pdd.addColumn(
+        "pb_imc_b",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPbImcSectionB(3, 9),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
     // C1 - Data do pedido da CV de seguimento: (coluna AP)
     pdd.addColumn(
         "cv_date_c",
@@ -463,6 +471,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "tb_screening_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(3, 9),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
+    // C14 - PB/IMC registado em TODAS as consultas entre o 12˚ a 24º mês de TARV? (coluna BQ) -
+    // Resposta = Sim ou Não ou N/A (RF27)
+    pdd.addColumn(
+        "pb_imc_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPbImcSectionC(3, 9),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 

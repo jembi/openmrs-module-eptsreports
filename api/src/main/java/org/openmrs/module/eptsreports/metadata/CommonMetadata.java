@@ -613,4 +613,40 @@ public class CommonMetadata extends Metadata {
         Context.getAdministrationService().getGlobalProperty("eptsreports.notFoundConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 1342</b>
+   *
+   * <p><b>Name:</b> BODY MASS INDEX
+   *
+   * <p><b>Description: Body Mass Index (BMI) is a relationship between weight and height that is
+   * associated with body fat and health risk. The equation is BMI = body weight in kilograms/height
+   * in meters squared. </b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getBMIConcept() {
+
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.bmiConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 1343</b>
+   *
+   * <p><b>Name:</b> MID-UPPER ARM CIRCUMFERENCE
+   *
+   * <p><b>Description: MUAC is the circumference of the left upper arm, measured at the mid-point
+   * between the tip of the shoulder and the tip of the elbow. MUAC is useful for the assessment of
+   * nutritional status. </b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getMuacConcept() {
+
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.muacConceptUuid");
+    return getConcept(uuid);
+  }
 }
