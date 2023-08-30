@@ -8976,9 +8976,6 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition Mq15A = intensiveMonitoringCohortQueries.getMI15A();
     CohortDefinition Mq15B1 = intensiveMonitoringCohortQueries.getMI15B1();
-    CohortDefinition E1 = intensiveMonitoringCohortQueries.getMI15E(30, 1);
-    CohortDefinition E2 = intensiveMonitoringCohortQueries.getMI15E(60, 31);
-    CohortDefinition E3 = intensiveMonitoringCohortQueries.getMI15E(90, 61);
     CohortDefinition Mq15C = getMQ15CPatientsMarkedAsPregnant();
     CohortDefinition Mq15D = getMQ15DPatientsMarkedAsBreastfeeding();
     CohortDefinition Mq15F = intensiveMonitoringCohortQueries.getMI15F();
@@ -9049,8 +9046,14 @@ public class QualityImprovement2020CohortQueries {
                     hivMetadata.getHepaticSteatosisWithHyperlactataemiaConcept())),
             "onOrAfter=${revisionEndDate-6m},onOrBefore=${revisionEndDate},locationList=${location}"));
 
+    cd.addSearch(
+        "AGE",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnLastClinicalConsultation(2, null),
+            "onOrAfter=${revisionEndDate-2m+1d},onOrBefore=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
+
     cd.setCompositionString(
-        "A AND B1 AND NOT (C OR D OR F OR G OR MDS OR onTB OR adverseReaction OR onSK OR returned)");
+        "A AND B1 AND NOT (C OR D OR F OR G OR MDS OR onTB OR adverseReaction OR onSK OR returned) AND AGE");
 
     return cd;
   }

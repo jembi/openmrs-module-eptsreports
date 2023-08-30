@@ -1543,7 +1543,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI15DEN13,
             "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageByEvaluationEndDate=2+");
+        "");
 
     CohortIndicator MI15NUM13 =
         eptsGeneralIndicator.getIndicator(
