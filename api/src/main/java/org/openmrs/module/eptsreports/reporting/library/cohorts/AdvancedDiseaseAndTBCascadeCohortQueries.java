@@ -1337,7 +1337,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     LessThanOrEqualTo200mm3 {
       @Override
       public String getProposition() {
-        return " o.value_numeric < 200";
+        return "o.value_numeric < 200";
       }
 
       @Override
@@ -1353,7 +1353,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     LessThanOrEqualTo500mm3 {
       @Override
       public String getProposition() {
-        return "o.value_numeric >= 200 AND o.value_numeric < 500";
+        return "o.value_numeric < 500";
       }
 
       @Override
@@ -1369,7 +1369,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     LessThanOrEqualTo750mm3 {
       @Override
       public String getProposition() {
-        return "o.value_numeric >= 500 AND o.value_numeric < 750";
+        return "o.value_numeric < 750";
       }
 
       @Override
@@ -1386,7 +1386,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     GreaterThanOrEqualTo200mm3 {
       @Override
       public String getProposition() {
-        return "o.value_numeric >= 200 AND o.value_numeric < 500";
+        return "o.value_numeric >= 200";
       }
 
       @Override
@@ -1402,7 +1402,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     GreaterThanOrEqualTo500mm3 {
       @Override
       public String getProposition() {
-        return "o.value_numeric >= 500 AND o.value_numeric < 750";
+        return "o.value_numeric >= 500";
       }
 
       @Override
