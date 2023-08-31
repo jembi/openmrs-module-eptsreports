@@ -66,7 +66,7 @@ public class PrepNewQueries {
             + "                         AND o.concept_id = ${165296} "
             + "                         AND o.value_coded = ${1256}"
             + "                         AND e.location_id = :location "
-            + "                         AND o.obs_datetime <= :endDate "
+            + "                         AND o.obs_datetime BETWEEN :startDate AND :endDate "
             + "                       GROUP  BY p.patient_id "
             + "                       UNION "
             + "                       SELECT p.patient_id, "
