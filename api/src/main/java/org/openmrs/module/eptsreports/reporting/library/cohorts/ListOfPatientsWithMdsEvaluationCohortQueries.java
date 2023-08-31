@@ -4936,7 +4936,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {DataDefinition}
    */
-  public DataDefinition getPermanenceEstate(int minNumberOfMonths, int maxNumberOfMonths) {
+  public DataDefinition getPermanenceEstate(int maxNumberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B18 - Estado de permanência no 12˚ mês de TARV");
     sqlPatientDataDefinition.addParameter(
@@ -4947,7 +4947,6 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
-    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
     map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
     map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
     map.put("6276", hivMetadata.getArtStatus().getConceptId());
@@ -4960,14 +4959,18 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("1707", hivMetadata.getAbandonedConcept().getConceptId());
+    map.put("1709", hivMetadata.getSuspendedTreatmentConcept().getConceptId());
+    map.put("6269", hivMetadata.getActiveOnProgramConcept().getConceptId());
 
     String query =
         "SELECT state.patient_id, "
-            + "               state.the_state  "
             + "       CASE "
             + "         WHEN state.the_state IS NOT NULL THEN state.the_state "
-            + "         WHEN state.the_state IS NOT NULL 'N/A' "
-            + "         ELSE '' "
+            + "         ELSE 'N/A' "
             + "       END "
             + "        FROM   ( "
             + "                  SELECT     clinic_state.patient_id, "
@@ -4999,10 +5002,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        o.concept_id = ${6273} "
-            + "                  AND        o.value_coded IS NOT NULL "
-            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
-            + minNumberOfMonths
-            + " MONTH ) "
+            + "                  AND        o.value_coded IN ( ${1366}, ${1706}, ${1707}, ${1709}, ${6269} ) "
+            + "                  AND        e.encounter_datetime >= art.art_encounter "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + maxNumberOfMonths
             + " MONTH ) "
@@ -5014,8 +5015,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        ee.encounter_type = ${6} "
             + "                  AND        ee.location_id = :location "
             + "                  AND        oo.concept_id = ${6273} "
-            + "                  AND        oo.value_coded IS NOT NULL "
-            + "                  GROUP BY   p.patient_id "
+            + "                  AND        oo.value_coded IN ( ${1366}, ${1706}, ${1707}, ${1709}, ${6269} ) "
+            + "                  GROUP BY   clinic_state.patient_id "
             + "UNION "
             + "                  SELECT     resumo_state.patient_id, "
             + "                             oo.value_coded AS the_state "
@@ -5046,10 +5047,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${53} "
             + "                  AND        e.location_id = :location "
             + "                  AND        o.concept_id = ${6272} "
-            + "                  AND        o.value_coded IS NOT NULL "
-            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
-            + minNumberOfMonths
-            + " MONTH ) "
+            + "                  AND        o.value_coded IN ( ${1366}, ${1706}, ${1707}, ${1709}, ${6269} ) "
+            + "                  AND        e.encounter_datetime >= art.art_encounter "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + maxNumberOfMonths
             + " MONTH ) "
@@ -5061,8 +5060,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        ee.encounter_type = ${53} "
             + "                  AND        ee.location_id = :location "
             + "                  AND        oo.concept_id = ${6272} "
-            + "                  AND        oo.value_coded IS NOT NULL "
-            + "                  GROUP BY   p.patient_id "
+            + "                  AND        oo.value_coded IN ( ${1366}, ${1706}, ${1707}, ${1709}, ${6269} ) "
+            + "                  GROUP BY   resumo_state.patient_id "
             + " ) state ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
