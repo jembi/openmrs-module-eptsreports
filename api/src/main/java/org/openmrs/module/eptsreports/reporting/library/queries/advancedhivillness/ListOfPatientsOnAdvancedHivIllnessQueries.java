@@ -354,7 +354,6 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "        AND pg.program_id= ${2}  "
             + "        AND ps.state = "
             + stateOnProgram
-            + "        AND ps.end_date is null "
             + "        AND ps.start_date <= :endDate   "
             + "        AND pg.location_id= :location   "
             + "         GROUP BY p.patient_id  "
@@ -410,6 +409,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
               + "             AND e.encounter_type = ${6}   "
               + "             AND e.location_id = :location  "
               + "             AND e.encounter_datetime > lastest.last_date  "
+              + "             AND e.encounter_datetime <= :endDate  "
               + "                 UNION"
               + "  SELECT p.patient_id"
               + "      FROM   patient p"
@@ -418,9 +418,10 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
               + "     WHERE  p.voided = 0"
               + "            AND e.voided = 0 "
               + "            AND o.voided = 0 "
-              + "            AND e.encounter_type = ${52}   "
-              + "              AND o.concept_id = ${23866}   "
-              + "              AND o.value_datetime > lastest.last_date";
+              + "        AND e.location_id =  :location  "
+              + "            AND e.encounter_type = ${18}   "
+              + "              AND e.encounter_datetime > lastest.last_date   "
+              + "              AND e.encounter_datetime <= :endDate ";
     } else {
       query +=
           "  SELECT p.patient_id"
@@ -430,9 +431,10 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
               + "     WHERE  p.voided = 0"
               + "            AND e.voided = 0 "
               + "            AND o.voided = 0 "
-              + "            AND e.encounter_type = ${52}   "
-              + "              AND o.concept_id = ${23866}   "
-              + "              AND o.value_datetime > lastest.last_date";
+              + "        AND e.location_id =  :location  "
+              + "            AND e.encounter_type = ${18}   "
+              + "              AND  e.encounter_datetime > lastest.last_date   "
+              + "              AND e.encounter_datetime <= :endDate ";
     }
     query +=
         " )  " + " GROUP BY lastest.patient_id )mostrecent " + " GROUP BY mostrecent.patient_id";
