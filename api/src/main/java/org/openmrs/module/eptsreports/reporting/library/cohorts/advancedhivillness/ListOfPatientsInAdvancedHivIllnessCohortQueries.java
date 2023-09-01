@@ -125,7 +125,18 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
         "ESTADIO",
         EptsReportUtils.map(getPatientsWithCriterioEstadiamentoInicioSeguimento(), mappings));
 
-    cd.setCompositionString("CD4 OR ESTADIO");
+    // EXCLUSIONS
+    cd.addSearch(
+        "FOLLOWUPBEFORESTARTDATE",
+        EptsReportUtils.map(getPatientsWhoStartedFollowupOnDAH(false), mappings));
+
+    cd.addSearch(
+        "TRANSFERREDOUT",
+        EptsReportUtils.map(
+            getPatientsTransferredOutByTheEndOfPeriod(),
+            "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("(CD4 OR ESTADIO) AND NOT (FOLLOWUPBEFORESTARTDATE OR TRANSFERREDOUT)");
 
     return cd;
   }
