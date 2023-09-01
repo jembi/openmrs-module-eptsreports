@@ -1156,8 +1156,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
         hivMetadata
             .getTransferredOutToAnotherHealthFacilityWorkflowState()
             .getProgramWorkflowStateId());
-    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
 
     String query =
         listOfPatientsOnAdvancedHivIllnessQueries.getPatientsWhoSuspendedTarvOrAreTransferredOut(
