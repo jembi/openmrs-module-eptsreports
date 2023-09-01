@@ -4936,7 +4936,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {DataDefinition}
    */
-  public DataDefinition getPermanenceEstate(int maxNumberOfMonths) {
+  public DataDefinition getPermanenceEstate(int minNumberOfMonths, int maxNumberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B18 - Estado de permanência no 12˚ mês de TARV");
     sqlPatientDataDefinition.addParameter(
@@ -5003,8 +5003,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.location_id = :location "
             + "                  AND        o.concept_id = ${6273} "
             + "                  AND        o.value_coded IN ( ${1366}, ${1706}, ${1707}, ${1709}, ${6269} ) "
-            + "                  AND        e.encounter_datetime >= art.art_encounter "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + "                  AND        e.encounter_datetime > DATE_ADD( art.art_encounter, INTERVAL "
+            + minNumberOfMonths
+            + " MONTH ) "
+            + "                  AND        e.encounter_datetime < DATE_ADD( art.art_encounter, INTERVAL "
             + maxNumberOfMonths
             + " MONTH ) "
             + "                  GROUP BY   p.patient_id ) clinic "
@@ -5048,8 +5050,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.location_id = :location "
             + "                  AND        o.concept_id = ${6272} "
             + "                  AND        o.value_coded IN ( ${1366}, ${1706}, ${1707}, ${1709}, ${6269} ) "
-            + "                  AND        e.encounter_datetime >= art.art_encounter "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + "                  AND        e.encounter_datetime > DATE_ADD( art.art_encounter, INTERVAL "
+            + minNumberOfMonths
+            + " MONTH ) "
+            + "                  AND        e.encounter_datetime < DATE_ADD( art.art_encounter, INTERVAL "
             + maxNumberOfMonths
             + " MONTH ) "
             + "                  GROUP BY   p.patient_id ) resumo "
