@@ -2234,7 +2234,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition transferOut = getTranferredOutPatients();
 
     CohortDefinition tbDiagOnPeriod = getPatientsWithTBDiagActive();
 
@@ -2435,7 +2435,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition transferOut = getTranferredOutPatients();
 
     CohortDefinition tbProphylaxyOnPeriod = getPatientsWithProphylaxyDuringRevisionPeriod();
 
