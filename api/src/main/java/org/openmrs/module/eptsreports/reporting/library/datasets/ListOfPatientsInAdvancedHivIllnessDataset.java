@@ -261,15 +261,15 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "tblam_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getTbLaboratoryResearchResults(
             Arrays.asList(
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
-                hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId()),
-            Collections.singletonList(tbMetadata.getTestTBLAM().getConceptId()),
+                hivMetadata.getAdultoSeguimentoEncounterType(),
+                hivMetadata.getMisauLaboratorioEncounterType(),
+                hivMetadata.getAdvancedHivIllnessEncounterType()),
+            Collections.singletonList(tbMetadata.getTestTBLAM()),
             Arrays.asList(
-                commonMetadata.getPositive().getConceptId(),
-                commonMetadata.getNegative().getConceptId(),
-                hivMetadata.getNAConcept().getConceptId(),
-                tbMetadata.getIndeterminate().getConceptId()),
+                commonMetadata.getPositive(),
+                commonMetadata.getNegative(),
+                hivMetadata.getNAConcept(),
+                tbMetadata.getIndeterminate()),
             true),
         "endDate=${endDate},location=${location}",
         new TestResultConverter());
@@ -279,15 +279,15 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "tblam_result_date",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getTbLaboratoryResearchResults(
             Arrays.asList(
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
-                hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId()),
-            Collections.singletonList(tbMetadata.getTestTBLAM().getConceptId()),
+                hivMetadata.getAdultoSeguimentoEncounterType(),
+                hivMetadata.getMisauLaboratorioEncounterType(),
+                hivMetadata.getAdvancedHivIllnessEncounterType()),
+            Collections.singletonList(tbMetadata.getTestTBLAM()),
             Arrays.asList(
-                commonMetadata.getPositive().getConceptId(),
-                commonMetadata.getNegative().getConceptId(),
-                hivMetadata.getNAConcept().getConceptId(),
-                tbMetadata.getIndeterminate().getConceptId()),
+                commonMetadata.getPositive(),
+                commonMetadata.getNegative(),
+                hivMetadata.getNAConcept(),
+                tbMetadata.getIndeterminate()),
             false),
         "endDate=${endDate},location=${location}",
         new ForwardSlashDateConverter());
@@ -297,15 +297,15 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "crag_soro_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getTbLaboratoryResearchResults(
             Arrays.asList(
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
-                hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId()),
-            Collections.singletonList(hivMetadata.getCragSoroConcept().getConceptId()),
+                hivMetadata.getAdultoSeguimentoEncounterType(),
+                hivMetadata.getMisauLaboratorioEncounterType(),
+                hivMetadata.getAdvancedHivIllnessEncounterType()),
+            Collections.singletonList(hivMetadata.getCragSoroConcept()),
             Arrays.asList(
-                commonMetadata.getPositive().getConceptId(),
-                commonMetadata.getNegative().getConceptId(),
-                hivMetadata.getNAConcept().getConceptId(),
-                tbMetadata.getIndeterminate().getConceptId()),
+                commonMetadata.getPositive(),
+                commonMetadata.getNegative(),
+                hivMetadata.getNAConcept(),
+                tbMetadata.getIndeterminate()),
             true),
         "endDate=${endDate},location=${location}",
         new TestResultConverter());
@@ -315,15 +315,15 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "crag_soro_result_date",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getTbLaboratoryResearchResults(
             Arrays.asList(
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
-                hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId()),
-            Collections.singletonList(hivMetadata.getCragSoroConcept().getConceptId()),
+                hivMetadata.getAdultoSeguimentoEncounterType(),
+                hivMetadata.getMisauLaboratorioEncounterType(),
+                hivMetadata.getAdvancedHivIllnessEncounterType()),
+            Collections.singletonList(hivMetadata.getCragSoroConcept()),
             Arrays.asList(
-                commonMetadata.getPositive().getConceptId(),
-                commonMetadata.getNegative().getConceptId(),
-                hivMetadata.getNAConcept().getConceptId(),
-                tbMetadata.getIndeterminate().getConceptId()),
+                commonMetadata.getPositive(),
+                commonMetadata.getNegative(),
+                hivMetadata.getNAConcept(),
+                tbMetadata.getIndeterminate()),
             false),
         "endDate=${endDate},location=${location}",
         new ForwardSlashDateConverter());
@@ -333,15 +333,15 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "crag_lrc_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getTbLaboratoryResearchResults(
             Arrays.asList(
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
-                hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId()),
-            Collections.singletonList(hivMetadata.getCragLCRConcept().getConceptId()),
+                hivMetadata.getAdultoSeguimentoEncounterType(),
+                hivMetadata.getMisauLaboratorioEncounterType(),
+                hivMetadata.getAdvancedHivIllnessEncounterType()),
+            Collections.singletonList(hivMetadata.getCragLCRConcept()),
             Arrays.asList(
-                commonMetadata.getPositive().getConceptId(),
-                commonMetadata.getNegative().getConceptId(),
-                hivMetadata.getNAConcept().getConceptId(),
-                tbMetadata.getIndeterminate().getConceptId()),
+                commonMetadata.getPositive(),
+                commonMetadata.getNegative(),
+                hivMetadata.getNAConcept(),
+                tbMetadata.getIndeterminate()),
             true),
         "endDate=${endDate},location=${location}",
         new TestResultConverter());
@@ -351,15 +351,15 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "crag_lrc_result_date",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getTbLaboratoryResearchResults(
             Arrays.asList(
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
-                hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId()),
-            Collections.singletonList(hivMetadata.getCragLCRConcept().getConceptId()),
+                hivMetadata.getAdultoSeguimentoEncounterType(),
+                hivMetadata.getMisauLaboratorioEncounterType(),
+                hivMetadata.getAdvancedHivIllnessEncounterType()),
+            Collections.singletonList(hivMetadata.getCragLCRConcept()),
             Arrays.asList(
-                commonMetadata.getPositive().getConceptId(),
-                commonMetadata.getNegative().getConceptId(),
-                hivMetadata.getNAConcept().getConceptId(),
-                tbMetadata.getIndeterminate().getConceptId()),
+                commonMetadata.getPositive(),
+                commonMetadata.getNegative(),
+                hivMetadata.getNAConcept(),
+                tbMetadata.getIndeterminate()),
             false),
         "endDate=${endDate},location=${location}",
         new ForwardSlashDateConverter());
@@ -369,14 +369,14 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "cacu_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getTbLaboratoryResearchResults(
             Arrays.asList(
-                hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId(),
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getMasterCardEncounterType().getEncounterTypeId()),
-            Collections.singletonList(hivMetadata.getCacuConcept().getConceptId()),
+                hivMetadata.getAdvancedHivIllnessEncounterType(),
+                hivMetadata.getAdultoSeguimentoEncounterType(),
+                hivMetadata.getMasterCardEncounterType()),
+            Collections.singletonList(hivMetadata.getCacuConcept()),
             Arrays.asList(
-                commonMetadata.getPositive().getConceptId(),
-                commonMetadata.getNegative().getConceptId(),
-                hivMetadata.getSuspectedCancerConcept().getConceptId()),
+                commonMetadata.getPositive(),
+                commonMetadata.getNegative(),
+                hivMetadata.getSuspectedCancerConcept()),
             true),
         "endDate=${endDate},location=${location}",
         new TestResultConverter());
@@ -386,14 +386,14 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "cacu_result_date",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getTbLaboratoryResearchResults(
             Arrays.asList(
-                hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId(),
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getMasterCardEncounterType().getEncounterTypeId()),
-            Collections.singletonList(hivMetadata.getCacuConcept().getConceptId()),
+                hivMetadata.getAdvancedHivIllnessEncounterType(),
+                hivMetadata.getAdultoSeguimentoEncounterType(),
+                hivMetadata.getMasterCardEncounterType()),
+            Collections.singletonList(hivMetadata.getCacuConcept()),
             Arrays.asList(
-                commonMetadata.getPositive().getConceptId(),
-                commonMetadata.getNegative().getConceptId(),
-                hivMetadata.getSuspectedCancerConcept().getConceptId()),
+                commonMetadata.getPositive(),
+                commonMetadata.getNegative(),
+                hivMetadata.getSuspectedCancerConcept()),
             false),
         "endDate=${endDate},location=${location}",
         new ForwardSlashDateConverter());

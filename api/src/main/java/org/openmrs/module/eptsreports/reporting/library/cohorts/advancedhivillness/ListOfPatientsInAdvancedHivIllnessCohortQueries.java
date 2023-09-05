@@ -1,8 +1,11 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
+import org.openmrs.Concept;
+import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -1092,9 +1095,9 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
    * @return {@link DataDefinition}
    */
   public DataDefinition getTbLaboratoryResearchResults(
-      List<Integer> encounterTypeList,
-      List<Integer> examConceptList,
-      List<Integer> resultConceptList,
+      List<EncounterType> encounterTypeList,
+      List<Concept> examConceptList,
+      List<Concept> resultConceptList,
       boolean examResult) {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
@@ -1102,10 +1105,21 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
+    List<Integer> encounterTypeIdsList =
+        encounterTypeList.stream()
+            .map(EncounterType::getEncounterTypeId)
+            .collect(Collectors.toList());
+
+    List<Integer> examConceptIdsList =
+        examConceptList.stream().map(Concept::getConceptId).collect(Collectors.toList());
+
+    List<Integer> resultConceptIdsList =
+        resultConceptList.stream().map(Concept::getConceptId).collect(Collectors.toList());
+
     Map<String, String> map = new HashMap<>();
-    map.put("encounterType", StringUtils.join(encounterTypeList, ","));
-    map.put("examConcept", StringUtils.join(examConceptList, ","));
-    map.put("resultConcept", StringUtils.join(resultConceptList, ","));
+    map.put("encounterType", StringUtils.join(encounterTypeIdsList, ","));
+    map.put("examConcept", StringUtils.join(examConceptIdsList, ","));
+    map.put("resultConcept", StringUtils.join(resultConceptIdsList, ","));
 
     String fromSQL =
         "  FROM ( "
