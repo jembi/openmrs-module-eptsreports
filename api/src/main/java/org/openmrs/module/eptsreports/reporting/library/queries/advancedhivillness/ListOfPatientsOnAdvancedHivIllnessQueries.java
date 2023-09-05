@@ -36,12 +36,12 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "       AND o.concept_id = ${1695}  "
             + "       AND o.value_numeric < "
             + valueNumeric
-            + "       AND e.encounter_datetime >= :startDate "
-            + "       AND e.encounter_datetime <= :endDate "
+            + "       AND DATE(e.encounter_datetime) >= :startDate "
+            + "       AND DATE(e.encounter_datetime) <= :endDate "
             + "       AND e.location_id = :location";
 
     return mostRecentDate
-        ? " SELECT ps.person_id, Max(e.encounter_datetime) AS most_recent ".concat(fromSQL)
+        ? " SELECT ps.person_id, Max(DATE(e.encounter_datetime)) AS most_recent ".concat(fromSQL)
         : " SELECT ps.person_id, o.value_numeric AS cd4_result ".concat(fromSQL);
   }
 
@@ -215,13 +215,13 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "                     AND o.concept_id = ${165389} "
             + "                     AND o.value_coded = ${1695} ) ) "
             + "             AND o.value_numeric IS NOT NULL "
-            + "             AND e.encounter_datetime >= :startDate "
-            + "             AND e.encounter_datetime <= :endDate ) "
+            + "             AND DATE(e.encounter_datetime) >= :startDate "
+            + "             AND DATE(e.encounter_datetime) <= :endDate ) "
             + "       AND e.location_id = :location "
             + " GROUP BY ps.person_id ";
 
     return mostRecentDate
-        ? " SELECT ps.person_id, Max(e.encounter_datetime) AS most_recent ".concat(fromSQL)
+        ? " SELECT ps.person_id, Max(DATE(e.encounter_datetime)) AS most_recent ".concat(fromSQL)
         : " SELECT ps.person_id, o.value_numeric AS cd4_result ".concat(fromSQL);
   }
 
@@ -255,7 +255,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
   }
 
   public String getLastCd4OrResultDateBeforeMostRecentCd4() {
-    return " SELECT ps.person_id, o.value_numeric, MAX(e.encounter_datetime) AS second_cd4_result "
+    return " SELECT ps.person_id, o.value_numeric, MAX(DATE(e.encounter_datetime)) AS second_cd4_result "
         + " FROM   person ps "
         + "       INNER JOIN encounter e "
         + "               ON ps.person_id = e.patient_id "
@@ -273,7 +273,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "                     AND o.concept_id = ${165389} "
         + "                     AND o.value_coded = ${1695} ) ) "
         + "             AND o.value_numeric IS NOT NULL "
-        + "             AND e.encounter_datetime < last_cd4.most_recent ) "
+        + "             AND DATE(e.encounter_datetime) < last_cd4.most_recent ) "
         + "       AND e.location_id = :location"
         + "       GROUP BY ps.person_id, o.value_numeric "
         + " UNION "
@@ -306,7 +306,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + " AND o.voided = 0 "
         + " GROUP BY p.patient_id, o.value_numeric "
         + " UNION "
-        + " SELECT p.patient_id, o.value_numeric AS viral_load, MAX(e.encounter_datetime) AS most_recent FROM patient p "
+        + " SELECT p.patient_id, o.value_numeric AS viral_load, MAX(DATE(e.encounter_datetime)) AS most_recent FROM patient p "
         + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
         + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
         + " WHERE e.encounter_type IN(${6},${9},${13},${51}) "
