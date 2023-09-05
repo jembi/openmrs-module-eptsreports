@@ -3504,6 +3504,14 @@
 	</globalProperty>
 
 	<globalProperty>
+		<property>@MODULE_ID@.regArvThirdLineUuid</property>
+		<defaultValue>4281f035-183f-407d-8286-92613f3039c8</defaultValue>
+		<description>
+			UUID for Third ARV Regimen Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
 		<property>@MODULE_ID@.artPickupAccommodationCamp</property>
 		<defaultValue>1f872b4f-68ed-450b-babf-ac568d455cd0</defaultValue>
 		<description>
