@@ -5,28 +5,28 @@ import org.openmrs.module.reporting.data.converter.DataConverter;
 /** Converter to return the Concept Names of expected responses to given concepts */
 public class ObservationToConceptNameConverter implements DataConverter {
 
-  final String newStart = "Novo Inicio";
-  final String restart = "Reinicio";
-  final String inTarv = "Em TARV";
-  final String preTarv = "Pré-TARV";
-  final String chronicDiarrhea = "Diareia Crónica";
-  final String fever = "Febre";
-  final String anemia = "Anemia";
-  final String pneumonia = "Pneumonia";
-  final String sarcomaKaposi = "Sarcoma de Kaposi (SK)";
-  final String meningitis = "Meningite";
-  final String gingivitis = "Gengivite";
-  final String estomatiteUlcerativaNecrotizante = "Estomatite Ulcerativa Necrotizante";
-  final String candidiaseOral = "Candidiase Oral";
-  final String cryptococcalMeningitis = "Meningite Criptocócica (MCC)";
-  final String cervicalCancer = "Cancer Cervical";
-  final String candidiaseEsofagica = "Candidiase Esofágica";
-  final String herpesSimples = "Herpes Simples";
-  final String cachexia = "Cachexia";
-  final String toxoplasmose = "Toxoplasmose";
-  final String hivDiseaseResultingInEncephalopathy = "Doença pelo HIV Resultando em Encefalopatia";
-  final String extraPulmonaryTb = "Tuberculose Expulmonar";
-  final String pulmonaryTb = "Tuberculose Pulmonar";
+  private final String newStart = "Novo Início";
+  private final String restart = "Reinício";
+  private final String inTarv = "Em TARV";
+  private final String preTarv = "Pré-TARV";
+  private final String chronicDiarrhea = "Diareia Crónica";
+  private final String fever = "Febre";
+  private final String anemia = "Anemia";
+  private final String pneumonia = "Pneumonia";
+  private final String sarcomaKaposi = "Sarcoma de Kaposi (SK)";
+  private final String meningitis = "Meningite";
+  private final String gingivitis = "Gengivite";
+  private final String estomatiteUlcerativaNecrotizante = "Estomatite Ulcerativa Necrotizante";
+  private final String candidiaseOral = "Candidiase Oral";
+  private final String cryptococcalMeningitis = "Meningite Criptocócica (MCC)";
+  private final String cervicalCancer = "Cancer Cervical";
+  private final String candidiaseEsofagica = "Candidiase Esofágica";
+  private final String herpesSimples = "Hérpes Simples";
+  private final String cachexia = "Caquexia";
+  private final String toxoplasmose = "Toxoplasmose";
+  private final String hivDiseaseResultingInEncephalopathy = "Doença pelo HIV Resultando em Encefalopatia";
+  private final String extraPulmonaryTb = "Tuberculose Expulmonar";
+  private final String pulmonaryTb = "Tuberculose Pulmonar";
 
   @Override
   public Object convert(Object original) {
@@ -85,12 +85,10 @@ public class ObservationToConceptNameConverter implements DataConverter {
     }
   }
 
-  @Override
   public Class<?> getInputDataType() {
     return null;
   }
 
-  @Override
   public Class<?> getDataType() {
     return null;
   }
