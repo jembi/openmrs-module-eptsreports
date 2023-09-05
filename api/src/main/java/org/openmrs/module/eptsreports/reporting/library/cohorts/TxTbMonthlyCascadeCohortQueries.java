@@ -2,6 +2,7 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
 import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
+import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
@@ -190,7 +191,8 @@ public class TxTbMonthlyCascadeCohortQueries {
     CohortDefinition positiveResult = txtbCohortQueries.positiveResultsReturned();
     CohortDefinition tbLam = getPetientsHaveTBLAM();
     CohortDefinition others = getPatientsInOthersWithoutGenexPert();
-    CohortDefinition genex = getPatientsGeneXpertMtbRif();
+    CohortDefinition genexPositve = getPatientsGeneXpertMtbRif(tbMetadata.getPositiveConcept());
+    CohortDefinition genexNegative = getPatientsGeneXpertMtbRif(tbMetadata.getNegativeConcept());
     CohortDefinition negativeTbTestWithoutExclusions = getPatientsFrom6bWithoutExclusions();
 
     cd.addSearch(
@@ -213,9 +215,14 @@ public class TxTbMonthlyCascadeCohortQueries {
             others, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        SemearTbLamGXPertComposition.MWRD.getKey(),
+        SemearTbLamGXPertComposition.MWRDPositve.getKey(),
         EptsReportUtils.map(
-            genex, "startDate=${startDate},endDate=${endDate},location=${location}"));
+            genexPositve, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        SemearTbLamGXPertComposition.MWRDNegative.getKey(),
+        EptsReportUtils.map(
+            genexNegative, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         SemearTbLamGXPertComposition.SIXA.getKey(),
@@ -1004,7 +1011,7 @@ public class TxTbMonthlyCascadeCohortQueries {
    *
    * @return
    */
-  public CohortDefinition getPatientsGeneXpertMtbRif() {
+  public CohortDefinition getPatientsGeneXpertMtbRif(Concept positiveOrNegativeResult) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("GeneXpert MTB/RIF");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -1021,6 +1028,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     map.put("165189", tbMetadata.getTestXpertMtbUuidConcept().getConceptId());
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
     map.put("1066", hivMetadata.getNoConcept().getConceptId());
+    map.put("positiveOrNegativeResult", positiveOrNegativeResult.getConceptId());
 
     String query =
         "SELECT p.patient_id "
@@ -1083,7 +1091,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND e.encounter_type = ${13} "
             + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${23723} "
-            + "       AND o.value_coded IN ( ${664}, ${703} ) "
+            + "       AND o.value_coded =  ${positiveOrNegativeResult} "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP  BY p.patient_id "
             + "UNION "
@@ -2291,10 +2299,26 @@ public class TxTbMonthlyCascadeCohortQueries {
         return "Select all patients from TX CURR";
       }
     },
-    MWRD {
+    MWRDPositve {
       @Override
       public String getKey() {
-        return "MWRD";
+        return "MWRDPositve";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    MWRDNegative {
+      @Override
+      public String getKey() {
+        return "MWRDNegative";
       }
 
       @Override
@@ -2412,7 +2436,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return MWRD.getKey() + " AND " + FIVE.getKey();
+        return MWRDPositve.getKey() + " AND " + FIVE.getKey();
       }
 
       @Override
@@ -2476,7 +2500,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return MWRD.getKey() + " AND " + SIXA.getKey();
+        return MWRDPositve.getKey() + " AND " + SIXA.getKey();
       }
 
       @Override
@@ -2556,7 +2580,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + " AND NOT "
             + SIXA.getKey()
             + " AND "
-            + MWRD.getKey();
+            + MWRDNegative.getKey();
       }
 
       @Override
@@ -2657,7 +2681,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + " AND NOT "
             + TxTbComposition.NUMERATOR.getKey()
             + " AND "
-            + MWRD.getKey();
+            + MWRDPositve.getKey();
       }
 
       @Override
