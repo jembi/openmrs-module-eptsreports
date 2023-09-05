@@ -7,6 +7,7 @@ import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.advancedhivillness.ListOfPatientsOnAdvancedHivIllnessQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -31,6 +32,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
   private final ListOfPatientsOnAdvancedHivIllnessQueries listOfPatientsOnAdvancedHivIllnessQueries;
 
+  private final ResumoMensalCohortQueries resumoMensalCohortQueries;
+
   private final String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
   @Autowired
@@ -38,11 +41,13 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
       HivMetadata hivMetadata,
       CommonMetadata commonMetadata,
       TbMetadata tbMetadata,
-      ListOfPatientsOnAdvancedHivIllnessQueries listOfPatientsOnAdvancedHivIllnessQueries) {
+      ListOfPatientsOnAdvancedHivIllnessQueries listOfPatientsOnAdvancedHivIllnessQueries,
+      ResumoMensalCohortQueries resumoMensalCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
     this.tbMetadata = tbMetadata;
     this.listOfPatientsOnAdvancedHivIllnessQueries = listOfPatientsOnAdvancedHivIllnessQueries;
+    this.resumoMensalCohortQueries = resumoMensalCohortQueries;
   }
 
   /**
@@ -256,7 +261,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     Map<String, Integer> map = getIntegerMapForEstadioQueries();
 
     String query =
-        "SELECT p.patient_id "
+        "SELECT DISTINCT p.patient_id "
             + "FROM "
             + "    patient p INNER JOIN encounter e ON p.patient_id= e.patient_id "
             + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
@@ -276,7 +281,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   }
 
   /**
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getArtStartDateQuery() getArtStartDateQuery
+   * @see ResumoMensalCohortQueries#getPatientStartedTarvBeforeQuery() getArtStartDateQuery
    * @return {@link DataDefinition}
    */
   public DataDefinition getARTStartDate() {
@@ -293,7 +298,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
 
-    String query = listOfPatientsOnAdvancedHivIllnessQueries.getArtStartDateQuery();
+    String query = resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 

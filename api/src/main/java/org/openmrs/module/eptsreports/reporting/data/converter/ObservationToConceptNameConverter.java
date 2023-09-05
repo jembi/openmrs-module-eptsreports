@@ -24,7 +24,8 @@ public class ObservationToConceptNameConverter implements DataConverter {
   private final String herpesSimples = "Hérpes Simples";
   private final String cachexia = "Caquexia";
   private final String toxoplasmose = "Toxoplasmose";
-  private final String hivDiseaseResultingInEncephalopathy = "Doença pelo HIV Resultando em Encefalopatia";
+  private final String hivDiseaseResultingInEncephalopathy =
+      "Doença pelo HIV Resultando em Encefalopatia";
   private final String extraPulmonaryTb = "Tuberculose Expulmonar";
   private final String pulmonaryTb = "Tuberculose Pulmonar";
 

@@ -1,6 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.library.queries.advancedhivillness;
 
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCohortQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 public class ListOfPatientsOnAdvancedHivIllnessQueries {
 
   @Autowired private HivMetadata hivMetadata;
+  @Autowired private ResumoMensalCohortQueries resumoMensalCohortQueries;
   /**
    *
    * <li>Utentes com registo do resultado de CD4 (absoluto) na “Ficha Clínica – Ficha Mestra” ou
@@ -234,7 +236,8 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * @param mostRecentDateOrCd4Result Flag to return Most Recent date or Cd4 Result
    * @return {@link String}
    */
-  public String getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(boolean mostRecentDateOrCd4Result) {
+  public String getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(
+      boolean mostRecentDateOrCd4Result) {
 
     String fromSQL =
         " FROM "
@@ -642,46 +645,6 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
   }
 
   /**
-   * <b> Data Início TARV (1º levantamento)</b>
-   * <li>1º levantamento de ARVs registado no FILA (“Data de Levantamento”) ou
-   * <li>1º levantamento registado na “Ficha Recepção/ Levantou ARVs?” com “Levantou ARV” = Sim
-   *     (“Data de Levantamento”) sendo a data mais antiga dos critérios acima <= “Data Fim do
-   *     Relatório”
-   *
-   * @return {@link String}
-   */
-  public String getArtStartDateQuery() {
-    return " SELECT art.patient_id, MIN(art.art_date) min_art_date FROM ( "
-        + " SELECT p.patient_id, MIN(e.encounter_datetime) art_date FROM patient p "
-        + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-        + " WHERE e.encounter_type = ${18} "
-        + " AND e.encounter_datetime <= :endDate "
-        + " AND e.voided = 0 "
-        + " AND p.voided = 0 "
-        + " AND e.location_id = :location "
-        + " GROUP BY p.patient_id "
-        + " UNION "
-        + "    SELECT p.patient_id,  MIN(o.value_datetime) AS art_date FROM patient p "
-        + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-        + " INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-        + "                         INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id  "
-        + "                         AND o.person_id = o2.person_id "
-        + " WHERE e.encounter_type = ${52} "
-        + " AND o.concept_id = ${23866} "
-        + "                 AND o.value_datetime <= :endDate "
-        + "                 AND o.voided = 0 "
-        + "                 AND o2.concept_id = ${23865} "
-        + "                 AND o2.value_coded = ${1065} "
-        + "                 AND o2.voided = 0 "
-        + " AND e.voided = 0 "
-        + " AND p.voided = 0 "
-        + " AND e.location_id = :location                 "
-        + " GROUP BY p.patient_id "
-        + " ) art  "
-        + " GROUP BY art.patient_id ";
-  }
-
-  /**
    * <b>Utentes Activos em TARV</b>
    * <li>Iniciaram TARV até o fim do período de avaliação, ou seja, com registo do Início TARV
    *     Excluindo todos os utentes:
@@ -700,7 +663,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
     return "SELECT  final.patient_id, 'Activo' "
         + "FROM "
         + "    ( "
-        + getArtStartDateQuery()
+        + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
         + " ) final "
         + "WHERE final.patient_id NOT IN ("
         + new EptsQueriesUtil()
