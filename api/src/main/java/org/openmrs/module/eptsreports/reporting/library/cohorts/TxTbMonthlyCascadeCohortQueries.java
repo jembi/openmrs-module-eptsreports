@@ -461,7 +461,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     cd.setName("TB LAM");
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition haveTbLamTestResultOrRequestOrResult =
         getPatientsHaveTBLAMTestRequestOrResult();
@@ -476,22 +476,22 @@ public class TxTbMonthlyCascadeCohortQueries {
         "haveTbLamTestResultOrRequestOrResult",
         EptsReportUtils.map(
             haveTbLamTestResultOrRequestOrResult,
-            "startDate=$startDate,endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "dontHaveGENEXPERTOrXpertMTBOrBaciloscopia",
         EptsReportUtils.map(
             dontHaveGENEXPERTOrXpertMTBOrBaciloscopia,
-            "startDate=$startDate,endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "dontHaveApplication4LaboratoryResearch",
         EptsReportUtils.map(
             dontHaveApplication4LaboratoryResearch,
-            "startDate=$startDate,endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "dontHaveGeneXpertWithAnyValueCodedPositive",
         EptsReportUtils.map(
             dontHaveGeneXpertWithAnyValueCodedPositive,
-            "startDate=$startDate,endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
         "haveTbLamTestResultOrRequestOrResult AND NOT (dontHaveGENEXPERTOrXpertMTBOrBaciloscopia AND dontHaveApplication4LaboratoryResearch AND dontHaveGeneXpertWithAnyValueCodedPositive )");
@@ -2342,7 +2342,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     OTHER {
       @Override
       public String getKey() {
-        return "TBLAM";
+        return "OTHER";
       }
 
       @Override
