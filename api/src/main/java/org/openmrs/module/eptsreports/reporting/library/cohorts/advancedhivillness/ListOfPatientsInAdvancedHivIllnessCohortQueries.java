@@ -31,7 +31,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
   private final ListOfPatientsOnAdvancedHivIllnessQueries listOfPatientsOnAdvancedHivIllnessQueries;
 
-  String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+  private final String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
   @Autowired
   public ListOfPatientsInAdvancedHivIllnessCohortQueries(
