@@ -916,59 +916,19 @@ public class EptsCommonDimension {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition PID = hivCohortQueries.getDrugUserKeyPopCohort();
-    CohortDefinition MSM = hivCohortQueries.getMaleHomosexualKeyPopDefinition();
-    CohortDefinition PRI = hivCohortQueries.getImprisonmentKeyPopCohort();
-    CohortDefinition CSW = hivCohortQueries.getFemaleSexWorkersKeyPopCohortDefinition();
-    CohortDefinition MSW = hivCohortQueries.getMaleSexWorkersKeyPopCohortDefinition();
-    CohortDefinition TG = hivCohortQueries.getTransgenderKeyPopCohort();
-    CohortDefinition SW = hivCohortQueries.getSexWorkerKeyPopCohort();
-    CohortDefinition OUT = hivCohortQueries.getOutroKeyPopCohort();
+    CohortDefinition KeyPop = prepCtCohortQueries.getkeypop();
 
     cd.addSearch(
         "TargetGroup",
         EptsReportUtils.map(
             targetGroup, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-    cd.addSearch(
-        "DrugUser",
-        EptsReportUtils.map(
-            PID, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
     cd.addSearch(
-        "Homosexual",
+        "keyPop",
         EptsReportUtils.map(
-            MSM, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-    cd.addSearch(
-        "Prisoner",
-        EptsReportUtils.map(
-            PRI, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-    cd.addSearch(
-        "FemaleSexWorker",
-        EptsReportUtils.map(
-            CSW, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+            KeyPop, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
-    cd.addSearch(
-        "MaleSexWorker",
-        EptsReportUtils.map(
-            MSW, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "Trans",
-        EptsReportUtils.map(
-            TG, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "SexWorker",
-        EptsReportUtils.map(
-            SW, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "Outro",
-        EptsReportUtils.map(
-            OUT, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.setCompositionString(
-        "TargetGroup AND NOT (DrugUser OR Homosexual OR Prisoner OR FemaleSexWorker OR MaleSexWorker OR Trans OR SexWorker OR Outro)");
+    cd.setCompositionString("TargetGroup AND NOT keyPop");
 
     return cd;
   }
