@@ -17,11 +17,11 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    *     CD4” <= “Data Fim Avaliação”) e com resultado CD4 (absoluto) < <b>valueNumeric</b>
    *
    * @param valueNumeric Max value of CD4 result
-   * @param mostRecentDate Flag to return Most Recent date or Cd4 Result
+   * @param mostRecentDateOrCd4Result Flag to return Most Recent date or Cd4 Result
    * @return {@link String}
    */
   public String getPatientsWithCD4AbsoluteResultOnPeriodQuery(
-      int valueNumeric, boolean mostRecentDate) {
+      int valueNumeric, boolean mostRecentDateOrCd4Result) {
 
     String fromSQL =
         " FROM   person ps "
@@ -40,7 +40,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "       AND DATE(e.encounter_datetime) <= :endDate "
             + "       AND e.location_id = :location";
 
-    return mostRecentDate
+    return mostRecentDateOrCd4Result
         ? " SELECT ps.person_id, Max(DATE(e.encounter_datetime)) AS most_recent ".concat(fromSQL)
         : " SELECT ps.person_id, o.value_numeric AS cd4_result ".concat(fromSQL);
   }
@@ -52,11 +52,11 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    *     CD4” <= “Data Fim Avaliação”) e com resultado CD4 (absoluto) < <b>valueNumeric</b>
    *
    * @param valueNumeric Max value of CD4 result
-   * @param mostRecentDate Flag to return Most Recent date or Cd4 Result
+   * @param mostRecentDateOrCd4Result Flag to return Most Recent date or Cd4 Result
    * @return {@link String}
    */
   public String getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(
-      int valueNumeric, boolean mostRecentDate) {
+      int valueNumeric, boolean mostRecentDateOrCd4Result) {
 
     String fromSQL =
         " FROM "
@@ -71,7 +71,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "  AND o.obs_datetime <= :endDate "
             + "  AND e.location_id = :location";
 
-    return mostRecentDate
+    return mostRecentDateOrCd4Result
         ? " SELECT ps.person_id, max(o.obs_datetime) as most_recent ".concat(fromSQL)
         : " SELECT ps.person_id, o.value_numeric AS cd4_result ".concat(fromSQL);
   }
@@ -195,10 +195,10 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    *     período de avaliação (“Data Resultado CD4” >= “Data Início Avaliação” e “Data Resultado
    *     CD4” <= “Data Fim Avaliação”)
    *
-   * @param mostRecentDate Flag to return Most Recent date or Cd4 Result
+   * @param mostRecentDateOrCd4Result Flag to return Most Recent date or Cd4 Result
    * @return {@link String}
    */
-  public String getPatientsWithCD4AbsoluteResultOnPeriodQuery(boolean mostRecentDate) {
+  public String getPatientsWithCD4AbsoluteResultOnPeriodQuery(boolean mostRecentDateOrCd4Result) {
 
     String fromSQL =
         " FROM   person ps "
@@ -220,7 +220,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "       AND e.location_id = :location "
             + " GROUP BY ps.person_id ";
 
-    return mostRecentDate
+    return mostRecentDateOrCd4Result
         ? " SELECT ps.person_id, Max(DATE(e.encounter_datetime)) AS most_recent ".concat(fromSQL)
         : " SELECT ps.person_id, o.value_numeric AS cd4_result ".concat(fromSQL);
   }
@@ -231,10 +231,10 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    *     o período de avaliação (“Data Resultado CD4” >= “Data Início Avaliação” e “Data Resultado
    *     CD4” <= “Data Fim Avaliação”)
    *
-   * @param mostRecentDate Flag to return Most Recent date or Cd4 Result
+   * @param mostRecentDateOrCd4Result Flag to return Most Recent date or Cd4 Result
    * @return {@link String}
    */
-  public String getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(boolean mostRecentDate) {
+  public String getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(boolean mostRecentDateOrCd4Result) {
 
     String fromSQL =
         " FROM "
@@ -249,7 +249,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "  AND e.location_id = :location "
             + " GROUP BY ps.person_id";
 
-    return mostRecentDate
+    return mostRecentDateOrCd4Result
         ? " SELECT ps.person_id, max(o.obs_datetime) as most_recent ".concat(fromSQL)
         : " SELECT ps.person_id, o.value_numeric AS cd4_result ".concat(fromSQL);
   }
