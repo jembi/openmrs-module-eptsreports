@@ -525,7 +525,6 @@ public class TxTbMonthlyCascadeCohortQueries {
     CohortDefinition semear = txtbCohortQueries.getSmearMicroscopyOnly();
     CohortDefinition tbLam = getPetientsHaveTBLAM();
     CohortDefinition mwrdPositive = getPatientsGeneXpertMtbRif(tbMetadata.getPositiveConcept());
-    CohortDefinition mwrdNegative = getPatientsGeneXpertMtbRif(tbMetadata.getNegativeConcept());
 
     cd.addSearch(
         "withoutGeneXpertHaveTbLamOrRequestOnOthers",
@@ -558,17 +557,12 @@ public class TxTbMonthlyCascadeCohortQueries {
             mwrdPositive, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        "mwrdNegative",
-        EptsReportUtils.map(
-            mwrdNegative, "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
         "tblamExclusion",
         EptsReportUtils.map(
             tbLam, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "withoutGeneXpertHaveTbLamOrRequestOnOthers OR dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers AND NOT (semearExclusion OR mwrdPositive OR mwrdNegative OR tblamExclusion)");
+        "withoutGeneXpertHaveTbLamOrRequestOnOthers OR dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers AND NOT (semearExclusion OR mwrdPositive OR tblamExclusion)");
 
     return cd;
   }
