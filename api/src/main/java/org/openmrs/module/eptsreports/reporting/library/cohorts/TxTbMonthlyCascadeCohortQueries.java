@@ -2436,7 +2436,12 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return MWRDPositve.getKey() + " AND " + FIVE.getKey();
+        return " ( "
+            + MWRDPositve.getKey()
+            + " OR  "
+            + MWRDNegative.getKey()
+            + " ) AND "
+            + FIVE.getKey();
       }
 
       @Override
