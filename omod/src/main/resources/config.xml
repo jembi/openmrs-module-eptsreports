@@ -3504,6 +3504,14 @@
 	</globalProperty>
 
 	<globalProperty>
+		<property>@MODULE_ID@.regArvThirdLineUuid</property>
+		<defaultValue>4281f035-183f-407d-8286-92613f3039c8</defaultValue>
+		<description>
+			UUID for Third ARV Regimen Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
 		<property>@MODULE_ID@.artPickupAccommodationCamp</property>
 		<defaultValue>1f872b4f-68ed-450b-babf-ac568d455cd0</defaultValue>
 		<description>
@@ -3520,18 +3528,64 @@
 	</globalProperty>
 
 	<globalProperty>
+<<<<<<< HEAD
 		<property>eptsreports.regime1HPConceptUuid</property>
 		<defaultValue>b7119181-4186-4680-9b9e-8ae01cb40073</defaultValue>
 		<description>
 			UUID for Regime 1HP concept
+=======
+		<property>@MODULE_ID@.positivityLevelConceptUuid</property>
+		<defaultValue>303a4480-f2b3-4192-a446-725a401ebb09</defaultValue>
+		<description>
+			UUID for Positivity Level
+>>>>>>> 2.x_develop
 		</description>
 	</globalProperty>
 
 	<globalProperty>
+<<<<<<< HEAD
 		<property>eptsreports.regimeLFXConceptUuid</property>
 		<defaultValue>c3e11134-fac6-4577-9f99-a3d42cfbc5d1</defaultValue>
 		<description>
 			UUID for Regime LFX concept
+=======
+		<property>@MODULE_ID@.fourPlusConceptUuid</property>
+		<defaultValue>16c13c13-2f85-4492-ae9b-4358b34070e7</defaultValue>
+		<description>
+			UUID for Four Plus
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.threePlusConceptUuid</property>
+		<defaultValue>a4e43a4d-37ea-4767-a700-9fe1d43a8042</defaultValue>
+		<description>
+			UUID for Three Plus
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.twoPlusConceptUuid</property>
+		<defaultValue>79f4bd59-0dbb-41ba-9d78-3efc0b737b75</defaultValue>
+		<description>
+			UUID for Two Plus
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.onePlusConceptUuid</property>
+		<defaultValue>03d4b7c8-c8cd-4f84-be40-67975bd5b667</defaultValue>
+		<description>
+			UUID for One Plus
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.tbLamPositivityLevelConceptUuid</property>
+		<defaultValue>5d11cf23-9c8b-4ee7-a2d4-b81993123d0d</defaultValue>
+		<description>
+			UUID for Tb Lam Positivity Level
+>>>>>>> 2.x_develop
 		</description>
 	</globalProperty>
 

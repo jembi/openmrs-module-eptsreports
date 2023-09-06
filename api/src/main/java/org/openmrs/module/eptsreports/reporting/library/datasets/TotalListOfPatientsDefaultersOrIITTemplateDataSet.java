@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 public class TotalListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
 
   @Autowired ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries;
-
   @Autowired private EptsGeneralIndicator eptsGeneralIndicator;
 
   public DataSetDefinition constructDataSet() {

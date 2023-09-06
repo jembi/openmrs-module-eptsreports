@@ -615,6 +615,7 @@ public class CommonMetadata extends Metadata {
   }
 
   /**
+<<<<<<< HEAD
    * <b>concept_id = 1342</b>
    *
    * <p><b>Name:</b> BODY MASS INDEX
@@ -629,10 +630,55 @@ public class CommonMetadata extends Metadata {
 
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.bmiConceptUuid");
+=======
+   * <b>concept_id = 165185</b>
+   *
+   * <p><b>Name:</b>POSITIVITY LEVEL
+   *
+   * <p><b>Description: POSITIVITY LEVEL Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getPositivityLevelConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.positivityLevelConceptUuid");
     return getConcept(uuid);
   }
 
   /**
+   * <b>concept_id = 165348</b>
+   *
+   * <p><b>Name:</b>4+
+   *
+   * <p><b>Description: 4+ Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getFourPlusConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.fourPlusConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165188</b>
+   *
+   * <p><b>Name:</b>3+
+   *
+   * <p><b>Description: 3+ Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getThreePlusConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.threePlusConceptUuid");
+>>>>>>> 2.x_develop
+    return getConcept(uuid);
+  }
+
+  /**
+<<<<<<< HEAD
    * <b>concept_id = 1343</b>
    *
    * <p><b>Name:</b> MID-UPPER ARM CIRCUMFERENCE
@@ -647,6 +693,34 @@ public class CommonMetadata extends Metadata {
 
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.muacConceptUuid");
+=======
+   * <b>concept_id = 165187</b>
+   *
+   * <p><b>Name:</b>2+
+   *
+   * <p><b>Description: 2+ Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getTwoPlusConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.twoPlusConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165186</b>
+   *
+   * <p><b>Name:</b>1+
+   *
+   * <p><b>Description: 1+ Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getOnePlusConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.onePlusConceptUuid");
+>>>>>>> 2.x_develop
     return getConcept(uuid);
   }
 }

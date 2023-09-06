@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.datasets.LocationDataSetDefinition;
+import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.MISAUKeyPopsDataSetDefinition;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -71,7 +71,7 @@ public class SetupMISAUKeyPopsReport extends EptsDataExportManager {
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.addParameters(mISAUKeyPopsDataSetDefinition.getParameters());
-    rd.addDataSetDefinition("HF", mapStraightThrough(new LocationDataSetDefinition()));
+    rd.addDataSetDefinition("DT", mapStraightThrough(new DatimCodeDatasetDefinition()));
     rd.addDataSetDefinition(
         "R", mapStraightThrough(mISAUKeyPopsDataSetDefinition.constructMISAUKeyPopsDataset()));
     rd.setBaseCohortDefinition(
