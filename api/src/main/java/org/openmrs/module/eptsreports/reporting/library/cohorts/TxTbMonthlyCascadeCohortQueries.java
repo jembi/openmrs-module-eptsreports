@@ -523,9 +523,9 @@ public class TxTbMonthlyCascadeCohortQueries {
         getPatientsDontHaveApplication4LaboratoryResearchOnOnthers();
     CohortDefinition dontHaveGeneXpertOnOnthers = getPatientsDontHaveGeneXpertOnOnthers();
     CohortDefinition semear = txtbCohortQueries.getSmearMicroscopyOnly();
-    CohortDefinition mwrd =
-        get5And6and7(TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition.SIXA_AND_MWRD);
     CohortDefinition tbLam = getPetientsHaveTBLAM();
+    CohortDefinition mwrdPositive = getPatientsGeneXpertMtbRif(tbMetadata.getPositiveConcept());
+    CohortDefinition mwrdNegative = getPatientsGeneXpertMtbRif(tbMetadata.getNegativeConcept());
 
     cd.addSearch(
         "withoutGeneXpertHaveTbLamOrRequestOnOthers",
@@ -553,9 +553,14 @@ public class TxTbMonthlyCascadeCohortQueries {
         EptsReportUtils.map(
             semear, "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
-        "mwrdExclusion",
+        "mwrdPositive",
         EptsReportUtils.map(
-            mwrd, "startDate=${startDate},endDate=${endDate},location=${location}"));
+            mwrdPositive, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "mwrdNegative",
+        EptsReportUtils.map(
+            mwrdNegative, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "tblamExclusion",
@@ -563,7 +568,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             tbLam, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "withoutGeneXpertHaveTbLamOrRequestOnOthers OR dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers AND NOT (semearExclusion OR mwrdExclusion OR tblamExclusion)");
+        "withoutGeneXpertHaveTbLamOrRequestOnOthers OR dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers AND NOT (semearExclusion OR mwrdPositive OR mwrdNegative OR tblamExclusion)");
 
     return cd;
   }
