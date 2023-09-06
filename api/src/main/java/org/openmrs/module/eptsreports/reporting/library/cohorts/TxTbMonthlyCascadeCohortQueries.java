@@ -17,8 +17,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class TxTbMonthlyCascadeCohortQueries {
 
-  @Autowired private IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries;
-
   @Autowired private TxCurrCohortQueries txCurrCohortQueries;
 
   @Autowired private TXTBCohortQueries txtbCohortQueries;
@@ -524,6 +522,10 @@ public class TxTbMonthlyCascadeCohortQueries {
     CohortDefinition dontHaveApplication4LaboratoryResearchOnOnthers =
         getPatientsDontHaveApplication4LaboratoryResearchOnOnthers();
     CohortDefinition dontHaveGeneXpertOnOnthers = getPatientsDontHaveGeneXpertOnOnthers();
+    CohortDefinition semear = txtbCohortQueries.getSmearMicroscopyOnly();
+    CohortDefinition mwrd =
+        get5And6and7(TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition.SIXA_AND_MWRD);
+    CohortDefinition tbLam = getPetientsHaveTBLAM();
 
     cd.addSearch(
         "withoutGeneXpertHaveTbLamOrRequestOnOthers",
@@ -546,8 +548,22 @@ public class TxTbMonthlyCascadeCohortQueries {
             dontHaveGeneXpertOnOnthers,
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
+    cd.addSearch(
+        "semearExclusion",
+        EptsReportUtils.map(
+            semear, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "mwrdExclusion",
+        EptsReportUtils.map(
+            mwrd, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "tblamExclusion",
+        EptsReportUtils.map(
+            tbLam, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
     cd.setCompositionString(
-        "withoutGeneXpertHaveTbLamOrRequestOnOthers OR dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers AND NOT (dontHaveApplication4LaboratoryResearchOnOnthers AND dontHaveGeneXpertOnOnthers)");
+        "withoutGeneXpertHaveTbLamOrRequestOnOthers OR dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers AND NOT (semearExclusion OR mwrdExclusion OR tblamExclusion)");
 
     return cd;
   }
