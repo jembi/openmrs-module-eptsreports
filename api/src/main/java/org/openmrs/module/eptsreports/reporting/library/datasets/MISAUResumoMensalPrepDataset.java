@@ -69,7 +69,7 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
         "TG",
         EptsReportUtils.map(
             eptsCommonDimension.getTargetGroupDimension(),
-            "onOrBefore=${endDate},location=${location}"));
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     // A1
     dsd.addColumn(
         "TTA1",
