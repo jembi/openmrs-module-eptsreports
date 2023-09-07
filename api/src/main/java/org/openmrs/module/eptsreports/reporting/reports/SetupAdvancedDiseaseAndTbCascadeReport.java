@@ -63,7 +63,7 @@ public class SetupAdvancedDiseaseAndTbCascadeReport extends EptsDataExportManage
     reportDefinition.addDataSetDefinition(
         "SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
     reportDefinition.addDataSetDefinition(
-        "ADTBC",
+        "AD",
         Mapped.mapStraightThrough(
             advancedDiseaseAndTbCascadeDataset.constructAdvancedDiseaseAndTbCascadeDataset()));
     reportDefinition.setBaseCohortDefinition(

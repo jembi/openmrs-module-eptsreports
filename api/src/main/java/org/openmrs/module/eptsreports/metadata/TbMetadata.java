@@ -661,4 +661,20 @@ public class TbMetadata extends ProgramsMetadata {
             .getGlobalProperty("eptsreports.notFoundTestResultConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 165349</b>
+   *
+   * <p><b>Name:</b> TB LAM - Positivity Level
+   *
+   * <p><b>Description: TB Lam Positivity Level Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getTbLamPosivityLvelConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.tbLamPositivityLevelConceptUuid");
+    return getConcept(uuid);
+  }
 }
