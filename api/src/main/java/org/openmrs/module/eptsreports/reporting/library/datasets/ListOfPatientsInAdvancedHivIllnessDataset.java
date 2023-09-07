@@ -84,7 +84,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
             new PersonAttributeDataDefinition(contactAttributeType.getName(), contactAttributeType),
             null);
 
-    DataConverter formatter = new ObjectFormatter("{familyName}, {givenName}");
+    DataConverter formatter = new ObjectFormatter("{givenName} {middleName} {familyName} ");
 
     DataDefinition nameDef =
         new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), formatter);
@@ -95,6 +95,8 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         listOfPatientsInAdvancedHivIllnessCohortQueries
             .getPatientsOnFollowupOrWithCriteriaToStartFollowupOfDAH(),
         mappings);
+
+    pdd.addColumn("id", new PersonIdDataDefinition(), "");
 
     // 1- NID sheet 1 - Column A
     pdd.addColumn(
@@ -107,7 +109,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
 
     // 3 - Data Nascimento - Sheet 1: Column C
     pdd.addColumn(
-        "birthdate", new BirthdateDataDefinition(), "", new BirthdateConverter("dd/MM/yyyy"));
+        "birthdate", new BirthdateDataDefinition(), "", new BirthdateConverter("dd-MM-yyyy"));
 
     // 4 - Idade - Sheet 1: Column D
     pdd.addColumn(
