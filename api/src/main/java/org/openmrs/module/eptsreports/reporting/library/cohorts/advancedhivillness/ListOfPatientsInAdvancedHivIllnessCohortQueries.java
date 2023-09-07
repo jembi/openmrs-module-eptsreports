@@ -975,37 +975,10 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
-        " SELECT vl_result.patient_id, vl_result.viral_load FROM ( "
-            + " SELECT p.patient_id, o.value_numeric AS viral_load, MAX(o.obs_datetime) AS most_recent FROM patient p "
-            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "         INNER JOIN ( "
-            + listOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
-            + "         ) last_vl ON last_vl.patient_id = p.patient_id "
-            + " WHERE e.encounter_type = ${53} "
-            + " AND (o.concept_id = ${856} AND o.value_numeric IS NOT NULL) "
-            + " AND o.obs_datetime < last_vl.most_recent "
-            + " AND e.location_id = :location "
-            + " AND e.voided = 0 "
-            + " AND p.voided = 0 "
-            + " AND o.voided = 0 "
-            + " GROUP BY p.patient_id, o.value_numeric "
-            + " UNION "
-            + " SELECT p.patient_id, o.value_numeric AS viral_load, MAX(DATE(e.encounter_datetime)) AS most_recent FROM patient p "
-            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "         INNER JOIN ( "
-            + listOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
-            + "         ) last_vl ON last_vl.patient_id = p.patient_id "
-            + " WHERE e.encounter_type IN(${6},${9},${13},${51}) "
-            + " AND (o.concept_id = ${856} AND o.value_numeric IS NOT NULL) "
-            + " AND DATE(e.encounter_datetime) < last_vl.most_recent "
-            + " AND e.location_id = :location "
-            + " AND e.voided = 0 "
-            + " AND p.voided = 0 "
-            + " AND o.voided = 0 "
-            + " GROUP BY p.patient_id, o.value_numeric "
-            + " ) AS vl_result GROUP BY vl_result.patient_id ";
+        " SELECT second_result.patient_id, MAX(second_result.viral_load) FROM ( "
+            + listOfPatientsOnAdvancedHivIllnessQueries
+                .getSecondVLResultOrResultDateBeforeMostRecent()
+            + " ) AS second_result GROUP BY second_result.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1039,37 +1012,10 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
-        " SELECT result_date.patient_id, MAX(result_date.most_recent) FROM ( "
-            + " SELECT p.patient_id, o.value_numeric AS viral_load, MAX(o.obs_datetime) AS most_recent FROM patient p "
-            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "         INNER JOIN ( "
-            + listOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
-            + "         ) last_vl ON last_vl.patient_id = p.patient_id "
-            + " WHERE e.encounter_type = ${53} "
-            + " AND (o.concept_id = ${856} AND o.value_numeric IS NOT NULL) "
-            + " AND o.obs_datetime < last_vl.most_recent "
-            + " AND e.location_id = :location "
-            + " AND e.voided = 0 "
-            + " AND p.voided = 0 "
-            + " AND o.voided = 0 "
-            + " GROUP BY p.patient_id, o.value_numeric "
-            + " UNION "
-            + " SELECT p.patient_id, o.value_numeric AS viral_load, MAX(DATE(e.encounter_datetime)) AS most_recent FROM patient p "
-            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "         INNER JOIN ( "
-            + listOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
-            + "         ) last_vl ON last_vl.patient_id = p.patient_id "
-            + " WHERE e.encounter_type IN(${6},${9},${13},${51}) "
-            + " AND (o.concept_id = ${856} AND o.value_numeric IS NOT NULL) "
-            + " AND DATE(e.encounter_datetime) < last_vl.most_recent "
-            + " AND e.location_id = :location "
-            + " AND e.voided = 0 "
-            + " AND p.voided = 0 "
-            + " AND o.voided = 0 "
-            + " GROUP BY p.patient_id, o.value_numeric "
-            + " ) AS result_date GROUP BY result_date.patient_id ";
+        " SELECT second_result_date.patient_id, MAX(second_result_date.second_vl) FROM ( "
+            + listOfPatientsOnAdvancedHivIllnessQueries
+                .getSecondVLResultOrResultDateBeforeMostRecent()
+            + " ) AS second_result_date GROUP BY second_result_date.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
