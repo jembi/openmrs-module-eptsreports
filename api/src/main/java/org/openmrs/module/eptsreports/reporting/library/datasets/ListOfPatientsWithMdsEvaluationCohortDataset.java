@@ -77,7 +77,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         null);
 
     // A3- Sexo: (coluna C)
-    pdd.addColumn("gender", new GenderDataDefinition(), "", new MaleFemaleConverter());
+    pdd.addColumn("gender", new GenderDataDefinition(), "", null);
 
     // A4- Idade: (coluna D)
     pdd.addColumn(
