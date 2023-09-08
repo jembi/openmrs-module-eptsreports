@@ -193,8 +193,8 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
   /**
    *
    * <li>Utentes com registo do resultado de CD4 (absoluto) na “Ficha Clínica – Ficha Mestra” ou
-   *     “Ficha e-Lab” ou “Ficha de Laboratório” ou “Ficha de Doença Avançada por HIV”, até o
-   *     fim do período de avaliação (“Data Resultado CD4” <= “Data Fim Avaliação”)
+   *     “Ficha e-Lab” ou “Ficha de Laboratório” ou “Ficha de Doença Avançada por HIV”, até o fim do
+   *     período de avaliação (“Data Resultado CD4” <= “Data Fim Avaliação”)
    *
    * @param mostRecentDateOrCd4Result Flag to return Most Recent date or Cd4 Result
    * @return {@link String}
@@ -227,8 +227,8 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
 
   /**
    *
-   * <li>Utentes com registo do resultado de CD4 (absoluto) na “Ficha Resumo – Ficha Mestra” até
-   *     o fim do período de avaliação ( “Data Resultado CD4” <= “Data Fim Avaliação”)
+   * <li>Utentes com registo do resultado de CD4 (absoluto) na “Ficha Resumo – Ficha Mestra” até o
+   *     fim do período de avaliação ( “Data Resultado CD4” <= “Data Fim Avaliação”)
    *
    * @param mostRecentDateOrCd4Result Flag to return Most Recent date or Cd4 Result
    * @return {@link String}
