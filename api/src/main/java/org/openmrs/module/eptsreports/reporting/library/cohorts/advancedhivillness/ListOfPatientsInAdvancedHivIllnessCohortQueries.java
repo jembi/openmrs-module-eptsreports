@@ -842,9 +842,9 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     Map<String, Integer> map = getStringIntegerMap();
 
     String query =
-        " SELECT result.person_id, result.second_cd4_result FROM ( "
+        " SELECT result.person_id, MAX(result.second_cd4_result) FROM ( "
             + listOfPatientsOnAdvancedHivIllnessQueries.getLastCd4OrResultDateBeforeMostRecentCd4()
-            + " ) result ";
+            + " ) result GROUP BY result.person_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
