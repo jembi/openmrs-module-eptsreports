@@ -615,7 +615,6 @@ public class CommonMetadata extends Metadata {
   }
 
   /**
-<<<<<<< HEAD
    * <b>concept_id = 1342</b>
    *
    * <p><b>Name:</b> BODY MASS INDEX
@@ -627,10 +626,12 @@ public class CommonMetadata extends Metadata {
    * @return {@link Concept}
    */
   public Concept getBMIConcept() {
-
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.bmiConceptUuid");
-=======
+    return getConcept(uuid);
+  }
+
+  /**
    * <b>concept_id = 165185</b>
    *
    * <p><b>Name:</b>POSITIVITY LEVEL
@@ -673,12 +674,10 @@ public class CommonMetadata extends Metadata {
   public Concept getThreePlusConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.threePlusConceptUuid");
->>>>>>> 2.x_develop
     return getConcept(uuid);
   }
 
   /**
-<<<<<<< HEAD
    * <b>concept_id = 1343</b>
    *
    * <p><b>Name:</b> MID-UPPER ARM CIRCUMFERENCE
@@ -690,10 +689,12 @@ public class CommonMetadata extends Metadata {
    * @return {@link Concept}
    */
   public Concept getMuacConcept() {
-
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.muacConceptUuid");
-=======
+    return getConcept(uuid);
+  }
+
+  /**
    * <b>concept_id = 165187</b>
    *
    * <p><b>Name:</b>2+
@@ -720,7 +721,6 @@ public class CommonMetadata extends Metadata {
   public Concept getOnePlusConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.onePlusConceptUuid");
->>>>>>> 2.x_develop
     return getConcept(uuid);
   }
 }

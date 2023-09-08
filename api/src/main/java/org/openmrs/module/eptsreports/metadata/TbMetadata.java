@@ -663,7 +663,6 @@ public class TbMetadata extends ProgramsMetadata {
   }
 
   /**
-<<<<<<< HEAD
    * <b>concept_id = 165305</b>
    *
    * <p><b>Name:</b> 1HP
@@ -690,7 +689,10 @@ public class TbMetadata extends ProgramsMetadata {
   public Concept getLFXConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.regimeLFXConceptUuid");
-=======
+    return getConcept(uuid);
+  }
+
+  /**
    * <b>concept_id = 165349</b>
    *
    * <p><b>Name:</b> TB LAM - Positivity Level
@@ -703,7 +705,6 @@ public class TbMetadata extends ProgramsMetadata {
     String uuid =
         Context.getAdministrationService()
             .getGlobalProperty("eptsreports.tbLamPositivityLevelConceptUuid");
->>>>>>> 2.x_develop
     return getConcept(uuid);
   }
 }
