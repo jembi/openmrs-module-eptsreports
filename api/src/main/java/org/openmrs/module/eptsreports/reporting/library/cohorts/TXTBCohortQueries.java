@@ -1850,6 +1850,44 @@ public class TXTBCohortQueries {
   }
 
   /**
+   * <b>Description:</b> Get patients who have a Basiloscopia And Not GeneXpert Positve registered
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getSmearMicroscopyOnlyPositiveResult() {
+    CohortDefinition cd =
+        getSmearMicroscopyOnlyPositve(
+            hivMetadata.getMisauLaboratorioEncounterType(),
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getApplicationForLaboratoryResearch(),
+            hivMetadata.getResultForBasiloscopia(),
+            commonMetadata.getPositive(),
+            commonMetadata.getNotFoundConcept());
+    return cd;
+  }
+
+  /**
+   * <b>Description:</b> Get patients who have a Basiloscopia And Not GeneXpert Positve registered
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getSmearMicroscopyOnlyNegativeResult() {
+    CohortDefinition cd =
+        getSmearMicroscopyOnlyPositve(
+            hivMetadata.getMisauLaboratorioEncounterType(),
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getApplicationForLaboratoryResearch(),
+            hivMetadata.getResultForBasiloscopia(),
+            commonMetadata.getNegative(),
+            commonMetadata.getNotFoundConcept());
+    return cd;
+  }
+
+  /**
    * <b>Technical Specs</b>
    *
    * <p>Patients Disaggregation – Diagnostic Test
@@ -2218,6 +2256,60 @@ public class TXTBCohortQueries {
             "basiloscopiaLabCohort",
             genericCohortQueries.getPatientsWithObsBetweenDates(
                 laboratory, basiloscopiaExam, Arrays.asList(negative, positive, notFound)));
+    addGeneralParameters(basiloscopiaLabCohort);
+
+    CompositionCohortDefinition definition = new CompositionCohortDefinition();
+    definition.setName("haveBasiloscopia()");
+    addGeneralParameters(definition);
+
+    CohortDefinition applicationForLaboratoryResearchCohort =
+        genericCohortQueries.generalSql(
+            "applicationForLaboratoryResearchCohort",
+            genericCohortQueries.getPatientsWithObsBetweenDates(
+                fichaClinica, applicationForLaboratoryResearch, Arrays.asList(basiloscopiaExam)));
+    addGeneralParameters(applicationForLaboratoryResearchCohort);
+
+    definition.addSearch(
+        "basiloscopiaCohort", EptsReportUtils.map(basiloscopiaCohort, generalParameterMapping));
+    definition.addSearch(
+        "basiloscopiaLabCohort",
+        EptsReportUtils.map(basiloscopiaLabCohort, generalParameterMapping));
+    definition.addSearch(
+        "applicationForLaboratoryResearchCohort",
+        EptsReportUtils.map(applicationForLaboratoryResearchCohort, generalParameterMapping));
+    definition.addSearch("mWRDCohort", EptsReportUtils.map(getmWRD(), generalParameterMapping));
+
+    definition.setCompositionString(
+        "(basiloscopiaCohort OR basiloscopiaLabCohort OR applicationForLaboratoryResearchCohort) NOT mWRDCohort");
+    return definition;
+  }
+
+  /**
+   * Smear Microscopy - Get patients who have a Basiloscopia Positive registered in the laboratory
+   * form encounter type 13 Except patients identified in GeneXpert
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getSmearMicroscopyOnlyPositve(
+      EncounterType laboratory,
+      EncounterType fichaClinica,
+      Concept applicationForLaboratoryResearch,
+      Concept basiloscopiaExam,
+      Concept positive,
+      Concept notFound) {
+
+    CohortDefinition basiloscopiaCohort =
+        genericCohortQueries.generalSql(
+            "basiloscopiaCohort",
+            genericCohortQueries.getPatientsWithObsBetweenDates(
+                fichaClinica, basiloscopiaExam, Arrays.asList(positive, notFound)));
+    addGeneralParameters(basiloscopiaCohort);
+
+    CohortDefinition basiloscopiaLabCohort =
+        genericCohortQueries.generalSql(
+            "basiloscopiaLabCohort",
+            genericCohortQueries.getPatientsWithObsBetweenDates(
+                laboratory, basiloscopiaExam, Arrays.asList(positive, notFound)));
     addGeneralParameters(basiloscopiaLabCohort);
 
     CompositionCohortDefinition definition = new CompositionCohortDefinition();

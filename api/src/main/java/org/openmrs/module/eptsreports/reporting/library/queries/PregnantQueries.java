@@ -84,7 +84,7 @@ public class PregnantQueries {
             + adultSegEncounter
             + ") AND e.encounter_datetime between :startDate AND :endDate AND e.location_id=:location  AND pe.gender='F' GROUP BY p.patient_id "
             + "     UNION "
-            + "     Select p.patient_id,  MAX(e.encounter_datetime) as pregnancy_date "
+            + "     Select p.patient_id,  MAX(o.value_datetime) as pregnancy_date "
             + "     FROM patient p "
             + "     INNER JOIN person pe ON p.patient_id=pe.person_id "
             + "     INNER JOIN encounter e ON p.patient_id=e.patient_id "

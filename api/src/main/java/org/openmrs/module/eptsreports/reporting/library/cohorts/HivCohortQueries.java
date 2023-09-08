@@ -15,6 +15,7 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
 import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.DRUG_USER;
 import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.HOMOSEXUAL;
+import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.OUTRO;
 import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.PRISONER;
 import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.SEX_WORKER;
 import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.TRANSGENDER;
@@ -277,7 +278,7 @@ public class HivCohortQueries {
   public CohortDefinition getMaleHomosexualKeyPopDefinition() {
 
     CompositionCohortDefinition comp = new CompositionCohortDefinition();
-    comp.setName("Only men who have sex with men");
+    comp.setName("Outro");
     comp.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     comp.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     comp.addParameter(new Parameter("location", "location", Location.class));
@@ -332,6 +333,17 @@ public class HivCohortQueries {
     cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addCalculationParameter(TYPE, TRANSGENDER);
+    return cd;
+  }
+
+  public CohortDefinition getOutroKeyPopCohort() {
+    CalculationCohortDefinition cd = new CalculationCohortDefinition();
+    cd.setCalculation(Context.getRegisteredComponents(KeyPopulationCalculation.class).get(0));
+    cd.setName("Outro");
+    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addCalculationParameter(TYPE, OUTRO);
     return cd;
   }
 
@@ -719,7 +731,7 @@ public class HivCohortQueries {
     cd.setCalculation(Context.getRegisteredComponents(TargetGroupCalculation.class).get(0));
     cd.setName("Adolescents and Youth at Risk Target Group");
     cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
-    //    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addCalculationParameter(TIPO, ADOLESCENT_AND_YOUTH);
     return cd;

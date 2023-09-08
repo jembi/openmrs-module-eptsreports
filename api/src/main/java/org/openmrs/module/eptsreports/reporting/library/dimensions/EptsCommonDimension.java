@@ -19,6 +19,7 @@ import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
 import org.openmrs.module.eptsreports.reporting.library.queries.TbPrevQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.InverseCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.indicator.dimension.CohortDefinitionDimension;
@@ -401,6 +402,7 @@ public class EptsCommonDimension {
         hivCohortQueries.getMaleSexWorkersKeyPopCohortDefinition();
     CohortDefinition transgenderKeyPopCohort = hivCohortQueries.getTransgenderKeyPopCohort();
     CohortDefinition sexWorkersKeyPopCohort = hivCohortQueries.getSexWorkerKeyPopCohort();
+    CohortDefinition outroKeyPopCohort = hivCohortQueries.getOutroKeyPopCohort();
     dim.addCohortDefinition("PID", mapStraightThrough(drugUserKeyPopCohort));
     dim.addCohortDefinition("MSM", mapStraightThrough(homosexualKeyPopCohort));
     dim.addCohortDefinition("CSW", mapStraightThrough(femaleSexWorkerKeyPopCohort));
@@ -408,6 +410,7 @@ public class EptsCommonDimension {
     dim.addCohortDefinition("MSW", mapStraightThrough(maleSexWorkerKeyPopCohort));
     dim.addCohortDefinition("TG", mapStraightThrough(transgenderKeyPopCohort));
     dim.addCohortDefinition("SW", mapStraightThrough(sexWorkersKeyPopCohort));
+    dim.addCohortDefinition("OUT", mapStraightThrough(outroKeyPopCohort));
     return dim;
   }
 
@@ -877,17 +880,19 @@ public class EptsCommonDimension {
     dim.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition adolescentsAndYouthTargetGroupCohort =
-        hivCohortQueries.getAdolescentsAndYouthTargetGroupCohort();
+        extractOnlyTargetGroup(hivCohortQueries.getAdolescentsAndYouthTargetGroupCohort());
     CohortDefinition pregnantWomanTargetGroupCohort =
-        hivCohortQueries.getPregnantWomanTargetGroupDefinition();
+        extractOnlyTargetGroup(hivCohortQueries.getPregnantWomanTargetGroupDefinition());
     CohortDefinition breastfeedingWomanTargetGroupCohort =
-        hivCohortQueries.getBreastfeedingWomanTargetGroupDefinition();
-    CohortDefinition militaryTargetGroupCohort = hivCohortQueries.getMilitaryTargetGroupCohort();
-    CohortDefinition minerTargetGroupCohort = hivCohortQueries.getMinerTargetGroupCohort();
+        extractOnlyTargetGroup(hivCohortQueries.getBreastfeedingWomanTargetGroupDefinition());
+    CohortDefinition militaryTargetGroupCohort =
+        extractOnlyTargetGroup(hivCohortQueries.getMilitaryTargetGroupCohort());
+    CohortDefinition minerTargetGroupCohort =
+        extractOnlyTargetGroup(hivCohortQueries.getMinerTargetGroupCohort());
     CohortDefinition truckDriverTargetGroupCohort =
-        hivCohortQueries.getTruckDriverTargetGroupCohort();
+        extractOnlyTargetGroup(hivCohortQueries.getTruckDriverTargetGroupCohort());
     CohortDefinition serodiscordantCouplesTargetGroupCohort =
-        hivCohortQueries.getSerodiscordantCouplesTargetGroupCohort();
+        extractOnlyTargetGroup(hivCohortQueries.getSerodiscordantCouplesTargetGroupCohort());
 
     dim.addCohortDefinition("AYR", mapStraightThrough(adolescentsAndYouthTargetGroupCohort));
     dim.addCohortDefinition("PW", mapStraightThrough(pregnantWomanTargetGroupCohort));
@@ -898,6 +903,34 @@ public class EptsCommonDimension {
     dim.addCohortDefinition("CS", mapStraightThrough(serodiscordantCouplesTargetGroupCohort));
 
     return dim;
+  }
+
+  /**
+   * <b>Description</b> Disaggregation for Patients Marked as Target Group That are not in Key
+   * Population
+   */
+  public CohortDefinition extractOnlyTargetGroup(CohortDefinition targetGroup) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Target Group");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition KeyPop = prepCtCohortQueries.getkeypop();
+
+    cd.addSearch(
+        "TargetGroup",
+        EptsReportUtils.map(
+            targetGroup, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "keyPop",
+        EptsReportUtils.map(
+            KeyPop, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.setCompositionString("TargetGroup AND NOT keyPop");
+
+    return cd;
   }
 
   /**

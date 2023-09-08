@@ -2,6 +2,7 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
 import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
+import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
@@ -15,8 +16,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TxTbMonthlyCascadeCohortQueries {
-
-  @Autowired private IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries;
 
   @Autowired private TxCurrCohortQueries txCurrCohortQueries;
 
@@ -186,12 +185,19 @@ public class TxTbMonthlyCascadeCohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition sent = txtbCohortQueries.specimenSent();
-    CohortDefinition semear = txtbCohortQueries.getSmearMicroscopyOnly();
     CohortDefinition positiveResult = txtbCohortQueries.positiveResultsReturned();
+    CohortDefinition negativeTbTestWithoutExclusions = getPatientsFrom6bWithoutExclusions();
     CohortDefinition tbLam = getPetientsHaveTBLAM();
     CohortDefinition others = getPatientsInOthersWithoutGenexPert();
-    CohortDefinition genex = getPatientsGeneXpertMtbRif();
-    CohortDefinition negativeTbTestWithoutExclusions = getPatientsFrom6bWithoutExclusions();
+    CohortDefinition others6A = getPatientsInOthersWithoutGenexPert6A();
+    CohortDefinition others6B = getPatientsInOthersWithoutGenexPert6B();
+    CohortDefinition semearPositiveResultOnly =
+        txtbCohortQueries.getSmearMicroscopyOnlyPositiveResult();
+    CohortDefinition semearNegativeResultOnly =
+        txtbCohortQueries.getSmearMicroscopyOnlyNegativeResult();
+    CohortDefinition semear = txtbCohortQueries.getSmearMicroscopyOnly();
+    CohortDefinition genexPositve = getPatientsGeneXpertMtbRif(tbMetadata.getPositiveConcept());
+    CohortDefinition genexNegative = getPatientsGeneXpertMtbRif(tbMetadata.getNegativeConcept());
 
     cd.addSearch(
         SemearTbLamGXPertComposition.FIVE.getKey(),
@@ -201,6 +207,18 @@ public class TxTbMonthlyCascadeCohortQueries {
         SemearTbLamGXPertComposition.SEMEAR.getKey(),
         EptsReportUtils.map(
             semear, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        SemearTbLamGXPertComposition.SEMEARPositive.getKey(),
+        EptsReportUtils.map(
+            semearPositiveResultOnly,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        SemearTbLamGXPertComposition.SEMEARNegative.getKey(),
+        EptsReportUtils.map(
+            semearNegativeResultOnly,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         SemearTbLamGXPertComposition.TBLAM.getKey(),
@@ -213,9 +231,24 @@ public class TxTbMonthlyCascadeCohortQueries {
             others, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        SemearTbLamGXPertComposition.MWRD.getKey(),
+        SemearTbLamGXPertComposition.OTHER6A.getKey(),
         EptsReportUtils.map(
-            genex, "startDate=${startDate},endDate=${endDate},location=${location}"));
+            others6A, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        SemearTbLamGXPertComposition.OTHER6B.getKey(),
+        EptsReportUtils.map(
+            others6B, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        SemearTbLamGXPertComposition.MWRDPositve.getKey(),
+        EptsReportUtils.map(
+            genexPositve, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        SemearTbLamGXPertComposition.MWRDNegative.getKey(),
+        EptsReportUtils.map(
+            genexNegative, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         SemearTbLamGXPertComposition.SIXA.getKey(),
@@ -461,7 +494,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     cd.setName("TB LAM");
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition haveTbLamTestResultOrRequestOrResult =
         getPatientsHaveTBLAMTestRequestOrResult();
@@ -476,22 +509,22 @@ public class TxTbMonthlyCascadeCohortQueries {
         "haveTbLamTestResultOrRequestOrResult",
         EptsReportUtils.map(
             haveTbLamTestResultOrRequestOrResult,
-            "startDate=$startDate,endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "dontHaveGENEXPERTOrXpertMTBOrBaciloscopia",
         EptsReportUtils.map(
             dontHaveGENEXPERTOrXpertMTBOrBaciloscopia,
-            "startDate=$startDate,endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "dontHaveApplication4LaboratoryResearch",
         EptsReportUtils.map(
             dontHaveApplication4LaboratoryResearch,
-            "startDate=$startDate,endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "dontHaveGeneXpertWithAnyValueCodedPositive",
         EptsReportUtils.map(
             dontHaveGeneXpertWithAnyValueCodedPositive,
-            "startDate=$startDate,endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
         "haveTbLamTestResultOrRequestOrResult AND NOT (dontHaveGENEXPERTOrXpertMTBOrBaciloscopia AND dontHaveApplication4LaboratoryResearch AND dontHaveGeneXpertWithAnyValueCodedPositive )");
@@ -517,6 +550,10 @@ public class TxTbMonthlyCascadeCohortQueries {
     CohortDefinition dontHaveApplication4LaboratoryResearchOnOnthers =
         getPatientsDontHaveApplication4LaboratoryResearchOnOnthers();
     CohortDefinition dontHaveGeneXpertOnOnthers = getPatientsDontHaveGeneXpertOnOnthers();
+    CohortDefinition semear = txtbCohortQueries.getSmearMicroscopyOnly();
+    CohortDefinition tbLam = getPetientsHaveTBLAM();
+    CohortDefinition mwrdPositive = getPatientsGeneXpertMtbRif(tbMetadata.getPositiveConcept());
+    CohortDefinition mwrdNegative = getPatientsGeneXpertMtbRif(tbMetadata.getNegativeConcept());
 
     cd.addSearch(
         "withoutGeneXpertHaveTbLamOrRequestOnOthers",
@@ -539,8 +576,159 @@ public class TxTbMonthlyCascadeCohortQueries {
             dontHaveGeneXpertOnOnthers,
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
+    cd.addSearch(
+        "semearExclusion",
+        EptsReportUtils.map(
+            semear, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "mwrdPositive",
+        EptsReportUtils.map(
+            mwrdPositive, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "mwrdNegative",
+        EptsReportUtils.map(
+            mwrdNegative, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "tblamExclusion",
+        EptsReportUtils.map(
+            tbLam, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
     cd.setCompositionString(
-        "withoutGeneXpertHaveTbLamOrRequestOnOthers AND NOT (dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers AND dontHaveApplication4LaboratoryResearchOnOnthers AND dontHaveGeneXpertOnOnthers)");
+        "withoutGeneXpertHaveTbLamOrRequestOnOthers OR dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers AND NOT (semearExclusion OR mwrdPositive OR mwrdNegative OR tblamExclusion)");
+
+    return cd;
+  }
+
+  /**
+   * This Cohort Definition implements <b>Other (No GeneXpert) </b> indicators For more details
+   * check the java doc of each method on the composition
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsInOthersWithoutGenexPert6A() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Other (No GeneXpert)");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition withoutGeneXpertHaveTbLamOrRequestOnOthers =
+        getPatientsWithoutGeneXpertHaveTbLamOrRequestOnOthers();
+    CohortDefinition dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers =
+        getPatientsDontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers();
+    CohortDefinition dontHaveApplication4LaboratoryResearchOnOnthers =
+        getPatientsDontHaveApplication4LaboratoryResearchOnOnthers();
+    CohortDefinition dontHaveGeneXpertOnOnthers = getPatientsDontHaveGeneXpertOnOnthers();
+    CohortDefinition semearPositive = txtbCohortQueries.getSmearMicroscopyOnlyPositiveResult();
+    CohortDefinition tbLam = getPetientsHaveTBLAM();
+    CohortDefinition mwrdPositive = getPatientsGeneXpertMtbRif(tbMetadata.getPositiveConcept());
+    CohortDefinition mwrdNegative = getPatientsGeneXpertMtbRif(tbMetadata.getNegativeConcept());
+
+    cd.addSearch(
+        "withoutGeneXpertHaveTbLamOrRequestOnOthers",
+        EptsReportUtils.map(
+            withoutGeneXpertHaveTbLamOrRequestOnOthers,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers",
+        EptsReportUtils.map(
+            dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "dontHaveApplication4LaboratoryResearchOnOnthers",
+        EptsReportUtils.map(
+            dontHaveApplication4LaboratoryResearchOnOnthers,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "dontHaveGeneXpertOnOnthers",
+        EptsReportUtils.map(
+            dontHaveGeneXpertOnOnthers,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "semearPositive",
+        EptsReportUtils.map(
+            semearPositive, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "mwrdPositive",
+        EptsReportUtils.map(
+            mwrdPositive, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "tblamExclusion",
+        EptsReportUtils.map(
+            tbLam, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "withoutGeneXpertHaveTbLamOrRequestOnOthers OR dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers AND NOT (semearPositive OR mwrdPositive OR tblamExclusion)");
+
+    return cd;
+  }
+
+  /**
+   * This Cohort Definition implements <b>Other (No GeneXpert) </b> indicators For more details
+   * check the java doc of each method on the composition
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsInOthersWithoutGenexPert6B() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Other (No GeneXpert)");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition withoutGeneXpertHaveTbLamOrRequestOnOthers =
+        getPatientsWithoutGeneXpertHaveTbLamOrRequestOnOthers();
+    CohortDefinition dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers =
+        getPatientsDontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers();
+    CohortDefinition dontHaveApplication4LaboratoryResearchOnOnthers =
+        getPatientsDontHaveApplication4LaboratoryResearchOnOnthers();
+    CohortDefinition dontHaveGeneXpertOnOnthers = getPatientsDontHaveGeneXpertOnOnthers();
+    CohortDefinition semearNegative = txtbCohortQueries.getSmearMicroscopyOnlyNegativeResult();
+    CohortDefinition tbLam = getPetientsHaveTBLAM();
+    CohortDefinition mwrdNegative = getPatientsGeneXpertMtbRif(tbMetadata.getNegativeConcept());
+
+    cd.addSearch(
+        "withoutGeneXpertHaveTbLamOrRequestOnOthers",
+        EptsReportUtils.map(
+            withoutGeneXpertHaveTbLamOrRequestOnOthers,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers",
+        EptsReportUtils.map(
+            dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "dontHaveApplication4LaboratoryResearchOnOnthers",
+        EptsReportUtils.map(
+            dontHaveApplication4LaboratoryResearchOnOnthers,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "dontHaveGeneXpertOnOnthers",
+        EptsReportUtils.map(
+            dontHaveGeneXpertOnOnthers,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "semearNegative",
+        EptsReportUtils.map(
+            semearNegative, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "mwrdNegative",
+        EptsReportUtils.map(
+            mwrdNegative, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "tblamExclusion",
+        EptsReportUtils.map(
+            tbLam, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "withoutGeneXpertHaveTbLamOrRequestOnOthers OR dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers AND NOT (semearNegative OR mwrdNegative OR tblamExclusion)");
 
     return cd;
   }
@@ -698,7 +886,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND o.voided = 0 "
             + "       AND e.encounter_type = ${6} "
             + "       AND e.location_id = :location "
-            + "       AND o.concept_id IN ( ${23723}, ${23951}, ${23774} ) "
+            + "       AND o.concept_id IN ( ${307}, ${23723}, ${23951}, ${23774} ) "
             + "       AND o.value_coded = ${664} "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP  BY p.patient_id "
@@ -1004,7 +1192,7 @@ public class TxTbMonthlyCascadeCohortQueries {
    *
    * @return
    */
-  public CohortDefinition getPatientsGeneXpertMtbRif() {
+  public CohortDefinition getPatientsGeneXpertMtbRif(Concept positiveOrNegativeResult) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("GeneXpert MTB/RIF");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -1021,6 +1209,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     map.put("165189", tbMetadata.getTestXpertMtbUuidConcept().getConceptId());
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
     map.put("1066", hivMetadata.getNoConcept().getConceptId());
+    map.put("positiveOrNegativeResult", positiveOrNegativeResult.getConceptId());
 
     String query =
         "SELECT p.patient_id "
@@ -1083,7 +1272,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND e.encounter_type = ${13} "
             + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${23723} "
-            + "       AND o.value_coded IN ( ${664}, ${703} ) "
+            + "       AND o.value_coded =  ${positiveOrNegativeResult} "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP  BY p.patient_id "
             + "UNION "
@@ -1469,6 +1658,28 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
             + "       AND e.encounter_type = ${13} "
+            + "       AND e.location_id = :location "
+            + "       AND ( ( o.concept_id = ${23723} "
+            + "               AND o.value_coded IN ( ${703}, ${664} ) ) "
+            + "              OR ( o.concept_id = ${165189} "
+            + "                   AND o.value_coded  IN ( ${1065}, ${1066} ) ) "
+            + "              OR ( o.concept_id = ${307} "
+            + "                   AND o.value_coded  IN ( ${664}, ${703} ) ) "
+            + "              OR ( o.concept_id = ${23951} "
+            + "                   AND o.value_coded  IN ( ${664}, ${703} ) ) ) "
+            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "GROUP  BY p.patient_id "
+            + "UNION "
+            + "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${6} "
             + "       AND e.location_id = :location "
             + "       AND ( ( o.concept_id = ${23723} "
             + "               AND o.value_coded IN ( ${703}, ${664} ) ) "
@@ -2275,6 +2486,39 @@ public class TxTbMonthlyCascadeCohortQueries {
         return "Select all patients from TX CURR";
       }
     },
+
+    SEMEARPositive {
+      @Override
+      public String getKey() {
+        return "SEMEARPositiveOnly";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    SEMEARNegative {
+      @Override
+      public String getKey() {
+        return "SEMEARNegativeOnly";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
     SIXA {
       @Override
       public String getKey() {
@@ -2291,10 +2535,26 @@ public class TxTbMonthlyCascadeCohortQueries {
         return "Select all patients from TX CURR";
       }
     },
-    MWRD {
+    MWRDPositve {
       @Override
       public String getKey() {
-        return "MWRD";
+        return "MWRDPositve";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    MWRDNegative {
+      @Override
+      public String getKey() {
+        return "MWRDNegative";
       }
 
       @Override
@@ -2342,7 +2602,41 @@ public class TxTbMonthlyCascadeCohortQueries {
     OTHER {
       @Override
       public String getKey() {
-        return "TBLAM";
+        return "OTHER";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+
+    OTHER6A {
+      @Override
+      public String getKey() {
+        return "OTHER6A";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+
+    OTHER6B {
+      @Override
+      public String getKey() {
+        return "OTHER6B";
       }
 
       @Override
@@ -2412,7 +2706,12 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return MWRD.getKey() + " AND " + FIVE.getKey();
+        return " ( "
+            + MWRDPositve.getKey()
+            + " OR  "
+            + MWRDNegative.getKey()
+            + " ) AND "
+            + FIVE.getKey();
       }
 
       @Override
@@ -2444,7 +2743,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return OTHER.getKey() + " AND " + SIXA.getKey();
+        return OTHER6A.getKey() + " AND " + SIXA.getKey();
       }
 
       @Override
@@ -2460,7 +2759,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return SEMEAR.getKey() + " AND " + SIXA.getKey();
+        return SEMEARPositive.getKey() + " AND " + SIXA.getKey();
       }
 
       @Override
@@ -2476,7 +2775,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return MWRD.getKey() + " AND " + SIXA.getKey();
+        return MWRDPositve.getKey() + " AND " + SIXA.getKey();
       }
 
       @Override
@@ -2534,7 +2833,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + " AND NOT "
             + SIXA.getKey()
             + " AND "
-            + SEMEAR.getKey();
+            + SEMEARNegative.getKey();
       }
 
       @Override
@@ -2556,7 +2855,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + " AND NOT "
             + SIXA.getKey()
             + " AND "
-            + MWRD.getKey();
+            + MWRDNegative.getKey();
       }
 
       @Override
@@ -2617,7 +2916,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return SIXA.getKey() + " AND NOT " + TxTbComposition.NUMERATOR.getKey();
+        return SIXA.getKey() + " AND " + TxTbComposition.NUMERATOR.getKey();
       }
 
       @Override
@@ -2634,7 +2933,7 @@ public class TxTbMonthlyCascadeCohortQueries {
       @Override
       public String getCompositionString() {
         return SIXA.getKey()
-            + " AND NOT "
+            + " AND "
             + TxTbComposition.NUMERATOR.getKey()
             + " AND "
             + SEMEAR.getKey();
@@ -2654,10 +2953,10 @@ public class TxTbMonthlyCascadeCohortQueries {
       @Override
       public String getCompositionString() {
         return SIXA.getKey()
-            + " AND NOT "
+            + " AND "
             + TxTbComposition.NUMERATOR.getKey()
             + " AND "
-            + MWRD.getKey();
+            + MWRDPositve.getKey();
       }
 
       @Override
@@ -2674,7 +2973,7 @@ public class TxTbMonthlyCascadeCohortQueries {
       @Override
       public String getCompositionString() {
         return SIXA.getKey()
-            + " AND NOT "
+            + " AND "
             + TxTbComposition.NUMERATOR.getKey()
             + " AND "
             + TBLAM.getKey();
@@ -2694,7 +2993,7 @@ public class TxTbMonthlyCascadeCohortQueries {
       @Override
       public String getCompositionString() {
         return SIXA.getKey()
-            + " AND NOT "
+            + " AND "
             + TxTbComposition.NUMERATOR.getKey()
             + " AND "
             + OTHER.getKey();
