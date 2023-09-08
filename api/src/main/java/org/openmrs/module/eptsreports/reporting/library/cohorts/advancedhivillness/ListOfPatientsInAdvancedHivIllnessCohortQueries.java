@@ -327,14 +327,9 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
-    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
-    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
-
     String query =
-        " SELECT pickup.patient_id, MAX(pickup.pickup_date) max_pickup_date FROM ( "
-            + " SELECT p.patient_id, MAX(e.encounter_datetime) pickup_date FROM patient p "
+        " SELECT p.patient_id, MAX(e.encounter_datetime) pickup_date "
+            + " FROM patient p "
             + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + " WHERE e.encounter_type = ${18} "
             + " AND e.encounter_datetime >= :startDate "
@@ -342,27 +337,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + " AND e.voided = 0 "
             + " AND p.voided = 0 "
             + " AND e.location_id = :location "
-            + " GROUP BY p.patient_id "
-            + " UNION "
-            + "    SELECT p.patient_id,  MAX(o.value_datetime) AS pickup_date FROM patient p "
-            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + " INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                         INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id  "
-            + "                         AND o.person_id = o2.person_id "
-            + " WHERE e.encounter_type = ${52} "
-            + " AND o.concept_id = ${23866} "
-            + "                 AND o.value_datetime >= :startDate "
-            + "                 AND o.value_datetime <= :endDate "
-            + "                 AND o.voided = 0 "
-            + "                 AND o2.concept_id = ${23865} "
-            + "                 AND o2.value_coded = ${1065} "
-            + "                 AND o2.voided = 0 "
-            + " AND e.voided = 0 "
-            + " AND p.voided = 0 "
-            + " AND e.location_id = :location                 "
-            + " GROUP BY p.patient_id "
-            + " ) pickup  "
-            + " GROUP BY pickup.patient_id ";
+            + " GROUP BY p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
