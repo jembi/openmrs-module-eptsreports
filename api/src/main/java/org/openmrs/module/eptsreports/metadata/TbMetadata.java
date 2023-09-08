@@ -667,7 +667,7 @@ public class TbMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> 1HP
    *
-   * <p><b>Description: </b>
+   * <p><b>Description: 1HP (Drug) </b>
    *
    * @return {@link Concept}
    */
@@ -682,7 +682,7 @@ public class TbMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> LFX
    *
-   * <p><b>Description: </b>
+   * <p><b>Description: LFX (Drug) </b>
    *
    * @return {@link Concept}
    */

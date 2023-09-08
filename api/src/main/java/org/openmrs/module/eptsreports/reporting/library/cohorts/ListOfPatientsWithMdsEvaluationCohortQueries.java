@@ -4547,8 +4547,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("23758", hivMetadata.getTBSymptomsConcept().getConceptId());
-    map.put("1343", commonMetadata.getMuacConcept().getConceptId());
-    map.put("1342", commonMetadata.getBMIConcept().getConceptId());
+    map.put("1343", commonMetadata.getMidUpperArmCircumferenceConcept().getConceptId());
+    map.put("1342", commonMetadata.getBodyMassIndexConcept().getConceptId());
 
     String query =
         "SELECT final_query.patient_id, "
@@ -4680,8 +4680,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("23758", hivMetadata.getTBSymptomsConcept().getConceptId());
-    map.put("1343", commonMetadata.getMuacConcept().getConceptId());
-    map.put("1342", commonMetadata.getBMIConcept().getConceptId());
+    map.put("1343", commonMetadata.getMidUpperArmCircumferenceConcept().getConceptId());
+    map.put("1342", commonMetadata.getBodyMassIndexConcept().getConceptId());
 
     String query =
         "SELECT final_query.patient_id, "

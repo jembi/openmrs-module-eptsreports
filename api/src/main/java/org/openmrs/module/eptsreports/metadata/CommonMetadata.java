@@ -625,7 +625,7 @@ public class CommonMetadata extends Metadata {
    *
    * @return {@link Concept}
    */
-  public Concept getBMIConcept() {
+  public Concept getBodyMassIndexConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.bmiConceptUuid");
     return getConcept(uuid);
@@ -688,7 +688,7 @@ public class CommonMetadata extends Metadata {
    *
    * @return {@link Concept}
    */
-  public Concept getMuacConcept() {
+  public Concept getMidUpperArmCircumferenceConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.muacConceptUuid");
     return getConcept(uuid);
