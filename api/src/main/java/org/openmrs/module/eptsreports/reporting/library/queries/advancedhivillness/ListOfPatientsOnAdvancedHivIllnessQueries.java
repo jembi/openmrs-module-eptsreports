@@ -193,8 +193,8 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
   /**
    *
    * <li>Utentes com registo do resultado de CD4 (absoluto) na “Ficha Clínica – Ficha Mestra” ou
-   *     “Ficha e-Lab” ou “Ficha de Laboratório” ou “Ficha de Doença Avançada por HIV”, até o
-   *     fim do período de avaliação (“Data Resultado CD4” <= “Data Fim Avaliação”)
+   *     “Ficha e-Lab” ou “Ficha de Laboratório” ou “Ficha de Doença Avançada por HIV”, até o fim do
+   *     período de avaliação (“Data Resultado CD4” <= “Data Fim Avaliação”)
    *
    * @param mostRecentDateOrCd4Result Flag to return Most Recent date or Cd4 Result
    * @return {@link String}
@@ -227,8 +227,8 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
 
   /**
    *
-   * <li>Utentes com registo do resultado de CD4 (absoluto) na “Ficha Resumo – Ficha Mestra” até
-   *     o fim do período de avaliação ( “Data Resultado CD4” <= “Data Fim Avaliação”)
+   * <li>Utentes com registo do resultado de CD4 (absoluto) na “Ficha Resumo – Ficha Mestra” até o
+   *     fim do período de avaliação ( “Data Resultado CD4” <= “Data Fim Avaliação”)
    *
    * @param mostRecentDateOrCd4Result Flag to return Most Recent date or Cd4 Result
    * @return {@link String}
@@ -353,7 +353,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "IF (o.value_numeric IS NOT NULL, o.value_numeric, ( if(o2.value_coded = 165331, (select concat(cn.name, ' ', o2.comments) "
         + "                                                                                                                                      FROM concept_name cn "
         + "                                                                                                                                      where cn.concept_id = o2.value_coded AND locale = 'pt' "
-        + "                                                                                                                                      limit 1 ), (SELECT cn.name FROM concept_name cn where concept_id = o2.value_coded AND locale = 'pt' limit 1)))) AS "
+        + "                                                                                                                                      limit 1 ), (if(e.encounter_type = 51 and o2.value_coded=1306, 'Nivel de Detecção Baixo ', (SELECT cn.name FROM concept_name cn where concept_id = o2.value_coded AND locale = 'pt' limit 1)))) )) AS "
         + "       viral_load "
         + "FROM   patient p "
         + "       INNER JOIN encounter e "
@@ -384,7 +384,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "IF (o.value_numeric IS NOT NULL, o.value_numeric, ( if(o2.value_coded = 165331, (select concat(cn.name, ' ', o2.comments) "
         + "                                                                                                                                      FROM concept_name cn "
         + "                                                                                                                                      where cn.concept_id = o2.value_coded AND locale = 'pt' "
-        + "                                                                                                                                      limit 1 ), (SELECT cn.name FROM concept_name cn where concept_id = o2.value_coded AND locale = 'pt' limit 1)))) AS "
+        + "                                                                                                                                      limit 1 ), (if(e.encounter_type = 51 and o2.value_coded=1306, 'Nivel de Detecção Baixo ', (SELECT cn.name FROM concept_name cn where concept_id = o2.value_coded AND locale = 'pt' limit 1)))) )) AS "
         + "       viral_load "
         + "FROM   patient p "
         + "       INNER JOIN encounter e "
@@ -457,7 +457,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "IF (o.value_numeric IS NOT NULL, o.value_numeric, ( if(o2.value_coded = 165331, (select concat(cn.name, ' ', o2.comments) "
         + "                                                                                                                                      FROM concept_name cn "
         + "                                                                                                                                      where cn.concept_id = o2.value_coded AND locale = 'pt' "
-        + "                                                                                                                                      limit 1 ), (SELECT cn.name FROM concept_name cn where concept_id = o2.value_coded AND locale = 'pt' limit 1)))) AS "
+        + "                                                                                                                                      limit 1 ), (if(e.encounter_type = 51 and o2.value_coded=1306, 'Nivel de Detecção Baixo ', (SELECT cn.name FROM concept_name cn where concept_id = o2.value_coded AND locale = 'pt' limit 1)))) )) AS "
         + "       viral_load "
         + "FROM   patient p "
         + "       INNER JOIN encounter e "
@@ -490,7 +490,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "IF (o.value_numeric IS NOT NULL, o.value_numeric, ( if(o2.value_coded = 165331, (select concat(cn.name, ' ', o2.comments) "
         + "                                                                                                                                      FROM concept_name cn "
         + "                                                                                                                                      where cn.concept_id = o2.value_coded AND locale = 'pt' "
-        + "                                                                                                                                      limit 1 ), (SELECT cn.name FROM concept_name cn where concept_id = o2.value_coded AND locale = 'pt' limit 1)))) AS "
+        + "                                                                                                                                      limit 1 ), (if(e.encounter_type = 51 and o2.value_coded=1306, 'Nivel de Detecção Baixo ', (SELECT cn.name FROM concept_name cn where concept_id = o2.value_coded AND locale = 'pt' limit 1)))) )) AS "
         + "       viral_load "
         + "FROM   patient p "
         + "       INNER JOIN encounter e "
