@@ -19,14 +19,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
-  private final HivMetadata hivMetadata;
-
-  private final TbMetadata tbMetadata;
-
-  private final CommonMetadata commonMetadata;
-
-  String inclusionStartMonthAndDay = "'-12-21'";
-  String inclusionEndMonthAndDay = "'-06-20'";
+  private HivMetadata hivMetadata;
+  private TbMetadata tbMetadata;
+  private CommonMetadata commonMetadata;
+  private String inclusionStartMonthAndDay = "'-12-21'";
+  private String inclusionEndMonthAndDay = "'-06-20'";
 
   @Autowired
   public ListOfPatientsWithMdsEvaluationCohortQueries(
