@@ -836,8 +836,8 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "            AND e.voided = 0 "
             + "            AND o.voided = 0 "
             + "            AND e.encounter_type = ${18}   "
-            + "              AND o.value_datetime > lastest.deceased_date"
-            + "              AND o.value_datetime <= :endDate"
+            + "              AND e.encounter_datetime > lastest.deceased_date"
+            + "              AND e.encounter_datetime <= :endDate"
             + " )  "
             + " GROUP BY lastest.patient_id )mostrecent "
             + " GROUP BY mostrecent.patient_id";
