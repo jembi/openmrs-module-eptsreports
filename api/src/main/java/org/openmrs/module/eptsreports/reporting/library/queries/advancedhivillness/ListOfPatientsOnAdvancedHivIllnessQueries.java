@@ -770,7 +770,6 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "        AND p.voided=0   "
             + "        AND pg.program_id= ${2}  "
             + "        AND ps.state = ${10} "
-            + "        AND ps.end_date is null "
             + "        AND ps.start_date <= :endDate   "
             + "        AND pg.location_id= :location   "
             + "         GROUP BY p.patient_id  "
