@@ -176,7 +176,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
     pdd.addColumn(
         "cd4_result", listOfPatientsInAdvancedHivIllnessCohortQueries.getCd4Result(), mappings);
 
-    // 15 - Data de Registo de Estadio – Sheet 1: Column O
+    //     15 - Data de Registo de Estadio – Sheet 1: Column O
     pdd.addColumn(
         "last_estadio_date",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getDateOfEstadioByTheEndOfPeriod(),
@@ -374,7 +374,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
                 hivMetadata.getAdvancedHivIllnessEncounterType(),
                 hivMetadata.getAdultoSeguimentoEncounterType(),
                 hivMetadata.getMasterCardEncounterType()),
-            Collections.singletonList(hivMetadata.getCacuConcept()),
+            Collections.singletonList(hivMetadata.getResultadoViaConcept()),
             Arrays.asList(
                 commonMetadata.getPositive(),
                 commonMetadata.getNegative(),
@@ -391,7 +391,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
                 hivMetadata.getAdvancedHivIllnessEncounterType(),
                 hivMetadata.getAdultoSeguimentoEncounterType(),
                 hivMetadata.getMasterCardEncounterType()),
-            Collections.singletonList(hivMetadata.getCacuConcept()),
+            Collections.singletonList(hivMetadata.getResultadoViaConcept()),
             Arrays.asList(
                 commonMetadata.getPositive(),
                 commonMetadata.getNegative(),
