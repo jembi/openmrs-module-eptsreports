@@ -418,7 +418,7 @@ public class PrepCtCohortQueries {
 
   public CohortDefinition getExtractOnlyHomosexual() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Target Group");
+    cd.setName("Homosexuals");
     cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -452,5 +452,52 @@ public class PrepCtCohortQueries {
 
     return cd;
   }
+
+
+  public CohortDefinition getExtractOnlyPrisoner() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Prisoners");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition Prisoner = getKeypopulation(hivMetadata.getImprisonmentConcept());
+    CohortDefinition OnDrugs = getKeypopulation(hivMetadata.getDrugUseConcept());
+    CohortDefinition HSM = getKeypopulation(hivMetadata.getHomosexualConcept());
+    CohortDefinition SW = getKeypopulation(hivMetadata.getSexWorkerConcept());
+    CohortDefinition TRANS = getKeypopulation(hivMetadata.getTransGenderConcept());
+
+
+    cd.addSearch(
+            "Recluso",
+            EptsReportUtils.map(
+                    Prisoner, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+            "Homosexual",
+            EptsReportUtils.map(
+                    HSM, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+            "DrugUser",
+            EptsReportUtils.map(
+                    OnDrugs, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+            "SexWorker",
+            EptsReportUtils.map(
+                    SW, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+            "Transgender",
+            EptsReportUtils.map(
+                    TRANS, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+
+    cd.setCompositionString("Recluso AND NOT (Homosexual OR DrugUser OR SexWorker OR Transgender)");
+
+    return cd;
+  }
+
 
 }
