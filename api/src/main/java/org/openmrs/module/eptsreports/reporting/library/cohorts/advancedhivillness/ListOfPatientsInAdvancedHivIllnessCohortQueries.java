@@ -1308,12 +1308,10 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
   /**
    * <b>Get the NID of the patient on Demografic Module</b>
-   * <li>
-   *     Nota: para os utentes com mais de uma informação demográfica
-   *     (NID, Nome, Contacto ou Endereço) e nenhum marcado como preferencial,
-   *     o sistema irá seleccionar a informação mais recente
-   *     (não anulada e disponível) registada no módulo demográfico
-   * </li>
+   * <li>Nota: para os utentes com mais de uma informação demográfica (NID)
+   * e nenhum marcado como preferencial, o sistema irá seleccionar a informação mais
+   *     recente (não anulada e disponível) registada no módulo demográfico
+   *
    * @param identifierType the identifier type id for NID
    * @return {@link DataDefinition}
    */
@@ -1322,10 +1320,15 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     spdd.setName("Get Patient NID");
 
     String sql =
-        " SELECT p.patient_id,pi.identifier  FROM patient p INNER JOIN patient_identifier pi ON p.patient_id=pi.patient_id "
-            + " INNER JOIN patient_identifier_type pit ON pit.patient_identifier_type_id=pi.identifier_type "
-            + " WHERE p.voided=0 AND pi.voided=0 AND pit.retired=0 AND pit.patient_identifier_type_id ="
-            + identifierType;
+            " SELECT p.patient_id,pi.identifier  FROM patient p INNER JOIN patient_identifier pi ON p.patient_id=pi.patient_id "
+                    + " INNER JOIN patient_identifier_type pit ON pit.patient_identifier_type_id=pi.identifier_type "
+                    + " WHERE p.voided=0 AND pi.voided=0 AND pit.retired=0 AND pi.preferred = 1 AND pit.patient_identifier_type_id ="
+                    + identifierType
+                    + " UNION "
+                    + " SELECT p.patient_id,pi.identifier  FROM patient p INNER JOIN patient_identifier pi ON p.patient_id=pi.patient_id "
+                    + " INNER JOIN patient_identifier_type pit ON pit.patient_identifier_type_id=pi.identifier_type "
+                    + " WHERE p.voided=0 AND pi.voided=0 AND pit.retired=0 AND pit.patient_identifier_type_id ="
+                    + identifierType;
 
     spdd.setQuery(sql);
     return spdd;

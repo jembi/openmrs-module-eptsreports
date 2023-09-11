@@ -101,7 +101,8 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
     // 1- NID sheet 1 - Column A
     pdd.addColumn(
         "nid",
-        tptListOfPatientsEligibleDataSet.getNID(identifierType.getPatientIdentifierTypeId()),
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getNID(
+            identifierType.getPatientIdentifierTypeId()),
         "");
 
     // 2 - Name - Sheet 1: Column B
