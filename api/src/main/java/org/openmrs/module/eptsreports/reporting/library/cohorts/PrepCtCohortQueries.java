@@ -649,7 +649,8 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition Serodiscordant = getPatientsOnTargetGroup(hivMetadata.getMinerConcept());
+    CohortDefinition Serodiscordant =
+        getPatientsOnTargetGroup(hivMetadata.getCoupleResultsAreDifferentConcept());
     CohortDefinition Keypop = getkeypop();
 
     cd.addSearch(
@@ -675,7 +676,8 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition Serodiscordant = getPatientsOnTargetGroup(hivMetadata.getMinerConcept());
+    CohortDefinition Serodiscordant =
+        getPatientsOnTargetGroup(hivMetadata.getCoupleResultsAreDifferentConcept());
     CohortDefinition Keypop = getkeypop();
     CohortDefinition TruckDriver = getPatientsOnTargetGroup(hivMetadata.getDriverConcept());
 
@@ -707,7 +709,8 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition Serodiscordant = getPatientsOnTargetGroup(hivMetadata.getMinerConcept());
+    CohortDefinition Serodiscordant =
+        getPatientsOnTargetGroup(hivMetadata.getCoupleResultsAreDifferentConcept());
     CohortDefinition Keypop = getkeypop();
     CohortDefinition TruckDriver = getPatientsOnTargetGroup(hivMetadata.getDriverConcept());
     CohortDefinition Miner = getPatientsOnTargetGroup(hivMetadata.getMinerConcept());
@@ -745,7 +748,8 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition Serodiscordant = getPatientsOnTargetGroup(hivMetadata.getMinerConcept());
+    CohortDefinition Serodiscordant =
+        getPatientsOnTargetGroup(hivMetadata.getCoupleResultsAreDifferentConcept());
     CohortDefinition Keypop = getkeypop();
     CohortDefinition TruckDriver = getPatientsOnTargetGroup(hivMetadata.getDriverConcept());
     CohortDefinition Miner = getPatientsOnTargetGroup(hivMetadata.getMinerConcept());
@@ -790,7 +794,8 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition Serodiscordant = getPatientsOnTargetGroup(hivMetadata.getMinerConcept());
+    CohortDefinition Serodiscordant =
+        getPatientsOnTargetGroup(hivMetadata.getCoupleResultsAreDifferentConcept());
     CohortDefinition Keypop = getkeypop();
     CohortDefinition TruckDriver = getPatientsOnTargetGroup(hivMetadata.getDriverConcept());
     CohortDefinition Miner = getPatientsOnTargetGroup(hivMetadata.getMinerConcept());
@@ -841,7 +846,8 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition Serodiscordant = getPatientsOnTargetGroup(hivMetadata.getMinerConcept());
+    CohortDefinition Serodiscordant =
+        getPatientsOnTargetGroup(hivMetadata.getCoupleResultsAreDifferentConcept());
     CohortDefinition Keypop = getkeypop();
     CohortDefinition TruckDriver = getPatientsOnTargetGroup(hivMetadata.getDriverConcept());
     CohortDefinition Miner = getPatientsOnTargetGroup(hivMetadata.getMinerConcept());
@@ -898,14 +904,16 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition Serodiscordant = getPatientsOnTargetGroup(hivMetadata.getMinerConcept());
+    CohortDefinition Serodiscordant =
+        getPatientsOnTargetGroup(hivMetadata.getCoupleResultsAreDifferentConcept());
     CohortDefinition Keypop = getkeypop();
     CohortDefinition TruckDriver = getPatientsOnTargetGroup(hivMetadata.getDriverConcept());
     CohortDefinition Miner = getPatientsOnTargetGroup(hivMetadata.getMinerConcept());
     CohortDefinition Military = getPatientsOnTargetGroup(hivMetadata.getMilitaryOrPoliceConcept());
     CohortDefinition Breastfeeding = getPatientsOnTargetGroup(hivMetadata.getBreastfeeding());
     CohortDefinition Pregnant = getPatientsOnTargetGroup(hivMetadata.getPregnantConcept());
-    CohortDefinition AYR = getPatientsOnTargetGroup(hivMetadata.getPregnantConcept());
+    CohortDefinition AYR =
+        getPatientsOnTargetGroup(hivMetadata.getAdolescentsAndYouthAtRiskConcept());
 
     cd.addSearch(
         "SerodiscordanteCouple",
