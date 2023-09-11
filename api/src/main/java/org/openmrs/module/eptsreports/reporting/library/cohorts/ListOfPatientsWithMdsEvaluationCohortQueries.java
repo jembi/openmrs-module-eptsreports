@@ -237,19 +237,24 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * <ul>
    *   <li>o registo de “Diagnóstico TB Activa” (resposta = “Sim”) numa Ficha Clínica (“Data
-   *       Consulta”) registada no período de inclusão <br>
-   *   <li>o registo de “Tem Sintomas TB? (resposta = “Sim”) numa Ficha Clínica (“Data Consulta”)
-   *       registada no período de inclusão <br>
+   *       Consulta”) registada em 33 dias do Início TARV, ou seja, entre “Data Início TARV” e “Data
+   *       Início TARV” + 33 dias. <br>
+   *   <li>o registo de “Tem Sintomas TB?” (resposta = “Sim”) numa Ficha Clínica (“Data Consulta”)
+   *       registada em 33 dias do Início TARV, ou seja, entre “Data Início TARV” e “Data Início
+   *       TARV” + 33 dias. <br>
    *   <li>o registo de “Quais Sintomas de TB?” (resposta = “Febre” ou “Emagrecimento” ou "Sudorese
    *       noturna” ou “Tosse com ou sem sangue” ou “Astenia” ou “Contacto recente com TB” numa
-   *       Ficha Clínica (“Data Consulta”) registada no período de inclusão <br>
+   *       Ficha Clínica (“Data Consulta”) registada em 33 dias do Início TARV, ou seja, entre “Data
+   *       Início TARV” e “Data Início TARV” + 33 dias. <br>
    *   <li>o registo de “Tratamento TB” (resposta = “Início”, “Contínua”, “Fim”) na Ficha Clínica
-   *       com “Data de Tratamento” decorrida no período de inclusão <br>
+   *       com “Data de Tratamento” registada em 33 dias do Início TARV, ou seja, entre “Data Início
+   *       TARV” e “Data Início TARV” + 33 dias. <br>
    *   <li>o registo de “TB” nas “Condições médicas Importantes” na Ficha Resumo com “Data”
-   *       decorrida no período de inclusão; <br>
+   *       registada em 33 dias do Início TARV, ou seja, entre “Data Início TARV” e “Data Início
+   *       TARV” + 33 dias. <br>
    * </ul>
    *
-   * <p>Nota 1: A “Data Início TARV” é definida no RF46
+   * <p>Nota 1: A “Data Início TARV” é definida no RF46.
    *
    * @return {DataDefinition}
    */

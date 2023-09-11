@@ -12,6 +12,23 @@ public class ListOfPatientsWithMdsEvaluationQueries {
   private static TbMetadata tbMetadata = new TbMetadata();
   private static CommonMetadata commonMetadata = new CommonMetadata();
 
+  /**
+   * O sistema irá determinar a Data Início TARV do utente da seguinte forma:
+   *
+   * <ul>
+   *   <li>seleccionando, a data mais antiga entre: o 1º levantamento de ARVs registado no FILA
+   *       (“Data de Levantamento”) e <br>
+   *   <li>o 1º levantamento registado na “Ficha Recepção/ Levantou ARVs?” com “Levantou ARV” = Sim
+   *       (“Data de Levantamento”) <br>
+   *       <p>sendo a data mais antiga dos critérios acima<= “Data Fim Inclusão”. <br>
+   *       <p>Data Fim = “20 de Junho” de “Ano de Avaliação” Nota 1: Deve-se confirmar que a data
+   *       início TARV é realmente a primeira ocorrência (data mais antiga) até a “Data Fim”
+   *       Inclusão. Isto irá prevenir situações em que utentes que, por algum motivo, possam ter
+   *       mais do que uma data de início TARV registado no sistema. <br>
+   * </ul>
+   *
+   * @return {String}
+   */
   public static String getPatientArtStart(String inclusionEndMonthAndDay) {
 
     String query =
@@ -67,6 +84,54 @@ public class ListOfPatientsWithMdsEvaluationQueries {
     return stringSubstitutor.replace(query);
   }
 
+  /**
+   * Excluindo :
+   *
+   * <ul>
+   *   <li>Todos os utentes Transferidos De Outra US (RF7)
+   *   <li>Todos os utentes Transferidos Para outra US (RF8)
+   * </ul>
+   *
+   * <br>
+   * <b>Utentes Transferidos de Outra US</b><br>
+   * O sistema irá identificar todos os utentes “Transferidos de” outras US em TARV selecionando os
+   * utentes registados como:
+   *
+   * <ul>
+   *   <li>“Transferido de outra US”, na “Ficha de Resumo”, com opção “TARV” selecionada;
+   * </ul>
+   *
+   * <b>Nota:</b> não há verificação de data de transferência para identificação dos utentes
+   * “Transferido de outra US”<br>
+   * <br>
+   * <b>Utentes Transferidos Para</b><br>
+   * O sistema irá identificar utentes “Transferido Para” outras US em TARV até o fim do período de
+   * inclusão, selecionando os utentes registados com:
+   *
+   * <ul>
+   *   <li>[“Mudança Estado Permanência TARV” (Coluna 21) = “T” (Transferido Para) na “Ficha
+   *       Clínica” com “Data da Consulta Actual” (Coluna 1, durante a qual se fez o registo da
+   *       mudança do estado de permanência TARV) até o fim do período de inclusão ou
+   *   <li>[“Mudança Estado Permanência TARV”] = “Transferido Para”, último estado registado na
+   *       “Ficha Resumo” com “Data da Transferência” ocorrida até o fim do período de inclusão;
+   * </ul>
+   *
+   * <br>
+   * <b>Excluindo os utentes que tenham tido uma consulta clínica (Ficha Clínica) ou Levantamento
+   * (FILA) após a “Data de Transferência” (a data mais recente entre os critérios acima
+   * identificados) e até o fim do período de inclusão.</b><br>
+   * <b>Nota: </b> O fim do período de inclusão deverá ser definido da seguinte forma:
+   *
+   * <ul>
+   *   <li>Utentes que iniciaram TARV na coorte de 12 meses: Data Fim Inclusão = “20 de Junho” de
+   *       “Ano de Avaliação” menos (-) 1 ano.
+   *   <li>Utentes que iniciaram TARV na coorte de 24 meses: Data Fim Inclusão = “20 de Junho” de
+   *       “Ano de Avaliação” menos (-) 2 anos
+   * </ul>
+   *
+   * @param inclusionEndMonthAndDay = '-06-20'
+   * @return String
+   */
   public static String getTranferredPatients(String inclusionEndMonthAndDay) {
 
     String query =
@@ -177,9 +242,10 @@ public class ListOfPatientsWithMdsEvaluationQueries {
 
   /**
    * O registo de “Diagnóstico TB Activa” (resposta = “Sim”) numa Ficha Clínica (“Data Consulta”)
-   * registada no período de inclusão
+   * registada em 33 dias do Início TARV, ou seja, entre “Data Início TARV” e “Data Início TARV” +
+   * 33 dias.
    *
-   * @param inclusionEndMonthAndDay
+   * @param inclusionEndMonthAndDay = '-06-20'
    * @return String
    */
   public static String getTbActive(String inclusionEndMonthAndDay) {
@@ -219,6 +285,14 @@ public class ListOfPatientsWithMdsEvaluationQueries {
     return stringSubstitutor.replace(query);
   }
 
+  /**
+   * O registo de “Diagnóstico TB Activa” (resposta = “Sim”) numa Ficha Clínica (“Data Consulta”)
+   * registada em 33 dias do Início TARV, ou seja, entre “Data Início TARV” e “Data Início TARV” +
+   * 33 dias.
+   *
+   * @param inclusionEndMonthAndDay = '-06-20'
+   * @return String
+   */
   public static String getTBSymptoms(String inclusionEndMonthAndDay) {
 
     String query =
@@ -256,6 +330,15 @@ public class ListOfPatientsWithMdsEvaluationQueries {
     return stringSubstitutor.replace(query);
   }
 
+  /**
+   * O registo de “Quais Sintomas de TB?” (resposta = “Febre” ou “Emagrecimento” ou "Sudorese
+   * noturna” ou “Tosse com ou sem sangue” ou “Astenia” ou “Contacto recente com TB” numa Ficha
+   * Clínica (“Data Consulta”) registada em 33 dias do Início TARV, ou seja, entre “Data Início
+   * TARV” e “Data Início TARV” + 33 dias.
+   *
+   * @param inclusionEndMonthAndDay = '-06-20'
+   * @return String
+   */
   public static String getTBSymptomsTypes(String inclusionEndMonthAndDay) {
     String query =
         " SELECT     p.patient_id, "
@@ -299,6 +382,14 @@ public class ListOfPatientsWithMdsEvaluationQueries {
     return stringSubstitutor.replace(query);
   }
 
+  /**
+   * O registo de “Tratamento TB” (resposta = “Início”, “Contínua”, “Fim”) na Ficha Clínica com
+   * “Data de Tratamento” registada em 33 dias do Início TARV, ou seja, entre “Data Início TARV” e
+   * “Data Início TARV” + 33 dias.
+   *
+   * @param inclusionEndMonthAndDay = '-06-20'
+   * @return String
+   */
   public static String getTbTreatment(String inclusionEndMonthAndDay) {
     String query =
         " SELECT     p.patient_id, "
@@ -337,6 +428,13 @@ public class ListOfPatientsWithMdsEvaluationQueries {
     return stringSubstitutor.replace(query);
   }
 
+  /**
+   * O registo de “TB” nas “Condições médicas Importantes” na Ficha Resumo com “Data” registada em
+   * 33 dias do Início TARV, ou seja, entre “Data Início TARV” e “Data Início TARV” + 33 dias.
+   *
+   * @param inclusionEndMonthAndDay = '-06-20'
+   * @return String
+   */
   public static String getImportantMedicalConditions(String inclusionEndMonthAndDay) {
     String query =
         " SELECT     p.patient_id, "
