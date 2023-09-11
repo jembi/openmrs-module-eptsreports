@@ -61,6 +61,7 @@ public class HivCohortQueries {
   @Autowired private GenericCohortQueries genericCohortQueires;
 
   @Autowired private GenderCohortQueries genderCohortQueries;
+  @Autowired private PrepCtCohortQueries prepCtCohortQueries;
 
   /**
    * Adult and pediatric patients on ART with suppressed viral load results (<1,000 copies/ml)
@@ -361,7 +362,7 @@ public class HivCohortQueries {
     comp.addSearch(
         "2",
         EptsReportUtils.map(
-            getSexWorkerKeyPopCohort(),
+                prepCtCohortQueries.getExtractOnlySexWorker(),
             "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
     comp.addSearch("F", EptsReportUtils.map(genderCohortQueries.femaleCohort(), ""));
     comp.setCompositionString("2 AND F");
@@ -382,7 +383,7 @@ public class HivCohortQueries {
     comp.addSearch(
         "SW",
         EptsReportUtils.map(
-            getSexWorkerKeyPopCohort(),
+                prepCtCohortQueries.getExtractOnlySexWorker(),
             "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
     comp.addSearch("M", EptsReportUtils.map(genderCohortQueries.maleCohort(), ""));
     comp.setCompositionString("SW AND M");

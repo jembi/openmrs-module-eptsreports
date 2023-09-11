@@ -501,7 +501,7 @@ public class PrepCtCohortQueries {
 
   public CohortDefinition getExtractOnlyTransgender() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Prisoners");
+    cd.setName("Transgender");
     cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -530,6 +530,89 @@ public class PrepCtCohortQueries {
 
 
     cd.setCompositionString("Transgender AND NOT (DrugUser OR SexWorker)");
+
+    return cd;
+  }
+
+  public CohortDefinition getExtractOutro() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Outro");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition Prisoner = getKeypopulation(hivMetadata.getImprisonmentConcept());
+    CohortDefinition OnDrugs = getKeypopulation(hivMetadata.getDrugUseConcept());
+    CohortDefinition HSM = getKeypopulation(hivMetadata.getHomosexualConcept());
+    CohortDefinition SW = getKeypopulation(hivMetadata.getSexWorkerConcept());
+    CohortDefinition TRANS = getKeypopulation(hivMetadata.getTransGenderConcept());
+    CohortDefinition OUTRO = getKeypopulation(hivMetadata.getOtherOrNonCodedConcept());
+
+
+    cd.addSearch(
+            "Outro",
+            EptsReportUtils.map(
+                    OUTRO, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+
+    cd.addSearch(
+            "Recluso",
+            EptsReportUtils.map(
+                    Prisoner, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+            "Homosexual",
+            EptsReportUtils.map(
+                    HSM, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+            "DrugUser",
+            EptsReportUtils.map(
+                    OnDrugs, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+            "SexWorker",
+            EptsReportUtils.map(
+                    SW, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+            "Transgender",
+            EptsReportUtils.map(
+                    TRANS, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+
+    cd.setCompositionString("Outro AND NOT (Recluso OR Homosexual OR DrugUser OR SexWorker OR Transgender)");
+
+    return cd;
+  }
+
+
+
+  public CohortDefinition getExtractOnlySexWorker() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Sex Worker");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition OnDrugs = getKeypopulation(hivMetadata.getDrugUseConcept());
+    CohortDefinition SW = getKeypopulation(hivMetadata.getSexWorkerConcept());
+
+
+
+    cd.addSearch(
+            "DrugUser",
+            EptsReportUtils.map(
+                    OnDrugs, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+            "SexWorker",
+            EptsReportUtils.map(
+                    SW, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+
+
+    cd.setCompositionString("SexWorker AND NOT DrugUser");
 
     return cd;
   }
