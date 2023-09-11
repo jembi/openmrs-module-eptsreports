@@ -8,6 +8,7 @@ import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.ListOfPatientsWithMdsEvaluationQueries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.data.DataDefinition;
@@ -266,6 +267,26 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   }
 
   /**
+   * <b> this method will generate one union separeted query based on the given queries</b>
+   *
+   * @return {@link String}
+   */
+  private String getUnionQuery() {
+
+    EptsQueriesUtil queriesUtil = new EptsQueriesUtil();
+
+    return queriesUtil
+        .unionBuilder(ListOfPatientsWithMdsEvaluationQueries.getTbActive(inclusionEndMonthAndDay))
+        .union(ListOfPatientsWithMdsEvaluationQueries.getTBSymptoms(inclusionEndMonthAndDay))
+        .union(ListOfPatientsWithMdsEvaluationQueries.getTBSymptomsTypes(inclusionEndMonthAndDay))
+        .union(ListOfPatientsWithMdsEvaluationQueries.getTbTreatment(inclusionEndMonthAndDay))
+        .union(
+            ListOfPatientsWithMdsEvaluationQueries.getImportantMedicalConditions(
+                inclusionEndMonthAndDay))
+        .buildQuery();
+  }
+
+  /**
    * <b>RF12 - Critérios de Não Elegibilidade ao TPT</b>
    *
    * <p>O sistema irá determinar se o utente não é elegível ao TPT se o utente tiver:
@@ -289,49 +310,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * @return {DataDefinition}
    */
   public DataDefinition getPatientsTptNotEligible() {
-    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("Elegível ao TPT no Início do TARV: (coluna F)");
-    sqlPatientDataDefinition.addParameter(
-        new Parameter("evaluationYear", "evaluationYear", Integer.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
-    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
-    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
-    map.put("6276", hivMetadata.getArtStatus().getConceptId());
-    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
-    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
-    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
-    map.put("23761", hivMetadata.getActiveTBConcept().getConceptId());
-    map.put("23758", hivMetadata.getTBSymptomsConcept().getConceptId());
-    map.put("1766", tbMetadata.getObservationTB().getConceptId());
-    map.put("1763", tbMetadata.getFeverLastingMoraThan3Weeks().getConceptId());
-    map.put("1764", tbMetadata.getWeightLossOfMoreThan3KgInLastMonth().getConceptId());
-    map.put("1762", tbMetadata.getNightsWeatsLastingMoraThan3Weeks().getConceptId());
-    map.put("1760", tbMetadata.getCoughLastingMoraThan3Weeks().getConceptId());
-    map.put("23760", tbMetadata.getAsthenia().getConceptId());
-    map.put("1765", tbMetadata.getCohabitantBeingTreatedForTB().getConceptId());
-    map.put("161", tbMetadata.getLymphadenopathy().getConceptId());
-    map.put("1268", hivMetadata.getTBTreatmentPlanConcept().getConceptId());
-    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
-    map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
-    map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
-    map.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
-    map.put("42", tbMetadata.getPulmonaryTB().getConceptId());
-    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
-    map.put("23954", tbMetadata.get3HPConcept().getConceptId());
-    map.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
-    map.put("165305", tbMetadata.get1HPConcept().getConceptId());
-    map.put("165306", tbMetadata.getLFXConcept().getConceptId());
-    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
-    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
-    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
-    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    SqlPatientDataDefinition dd = new SqlPatientDataDefinition();
+    dd.setName("Elegível ao TPT no Início do TARV: (coluna F)");
+    dd.addParameter(new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    dd.addParameter(new Parameter("location", "location", Location.class));
 
     String sql =
         "SELECT final_query.patient_id, "
@@ -341,143 +323,13 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "         ELSE '' "
             + "       END "
             + "FROM   ( "
-            + "         SELECT     p.patient_id, "
-            + "                    e.encounter_datetime AS encounter_date "
-            + "         FROM       patient p "
-            + "         INNER JOIN encounter e "
-            + "         ON         e.patient_id = p.patient_id "
-            + "         INNER JOIN obs o "
-            + "         ON         o.encounter_id = e.encounter_id "
-            + "         INNER JOIN "
-            + "                    ( "
-            + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.first_pickup AS art_encounter "
-            + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
-            + "                           ) art_patient "
-            + " ) art ON art.patient_id = p.patient_id "
-            + " WHERE  p.voided = 0 "
-            + " AND e.voided = 0 "
-            + " AND o.voided = 0 "
-            + " AND e.encounter_type = ${6} "
-            + " AND e.location_id = :location "
-            + " AND o.concept_id = ${23761} "
-            + " AND o.value_coded = ${1065} "
-            + " AND e.encounter_datetime >= art.art_encounter "
-            + " AND e.encounter_datetime <= DATE_ADD( art.art_encounter, INTERVAL 33 DAY ) "
-            + " GROUP  BY p.patient_id "
-            + " UNION "
-            + "         SELECT     p.patient_id, "
-            + "                    e.encounter_datetime AS encounter_date "
-            + "         FROM       patient p "
-            + "         INNER JOIN encounter e "
-            + "         ON         e.patient_id = p.patient_id "
-            + "         INNER JOIN obs o "
-            + "         ON         o.encounter_id = e.encounter_id "
-            + "         INNER JOIN "
-            + "                    ( "
-            + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.first_pickup AS art_encounter "
-            + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
-            + "                           ) art_patient "
-            + " ) art ON art.patient_id = p.patient_id "
-            + " WHERE  p.voided = 0 "
-            + " AND e.voided = 0 "
-            + " AND o.voided = 0 "
-            + " AND e.encounter_type = ${6} "
-            + " AND e.location_id = :location "
-            + " AND o.concept_id = ${23758} "
-            + " AND o.value_coded = ${1065} "
-            + " AND e.encounter_datetime >= art.art_encounter "
-            + " AND e.encounter_datetime <= DATE_ADD( art.art_encounter, INTERVAL 33 DAY ) "
-            + " GROUP  BY p.patient_id "
-            + " UNION "
-            + "         SELECT     p.patient_id, "
-            + "                    e.encounter_datetime AS encounter_date "
-            + "         FROM       patient p "
-            + "         INNER JOIN encounter e "
-            + "         ON         e.patient_id = p.patient_id "
-            + "         INNER JOIN obs o "
-            + "         ON         o.encounter_id = e.encounter_id "
-            + "         INNER JOIN "
-            + "                    ( "
-            + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.first_pickup AS art_encounter "
-            + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
-            + "                           ) art_patient "
-            + " ) art ON art.patient_id = p.patient_id "
-            + " WHERE  p.voided = 0 "
-            + " AND e.voided = 0 "
-            + " AND o.voided = 0 "
-            + " AND e.encounter_type = ${6} "
-            + " AND e.location_id = :location "
-            + " AND o.concept_id = ${1766} "
-            + " AND o.value_coded IN( ${1763}, ${1764}, ${1762}, ${1760}, "
-            + "                       ${23760}, ${1765}, ${161} ) "
-            + " AND e.encounter_datetime >= art.art_encounter "
-            + " AND e.encounter_datetime <= DATE_ADD( art.art_encounter, INTERVAL 33 DAY ) "
-            + " GROUP  BY p.patient_id "
-            + " UNION "
-            + "         SELECT     p.patient_id, "
-            + "                    o.obs_datetime AS encounter_date "
-            + "         FROM       patient p "
-            + "         INNER JOIN encounter e "
-            + "         ON         e.patient_id = p.patient_id "
-            + "         INNER JOIN obs o "
-            + "         ON         o.encounter_id = e.encounter_id "
-            + "         INNER JOIN "
-            + "                    ( "
-            + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.first_pickup AS art_encounter "
-            + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
-            + "                           ) art_patient "
-            + " ) art ON art.patient_id = p.patient_id "
-            + " WHERE  p.voided = 0 "
-            + " AND e.voided = 0 "
-            + " AND o.voided = 0 "
-            + " AND e.encounter_type = ${6} "
-            + " AND e.location_id = :location "
-            + " AND o.concept_id = ${1268} "
-            + " AND o.value_coded IN ( ${1256}, ${1257}, ${1267} ) "
-            + " AND o.obs_datetime >= art.art_encounter "
-            + " AND o.obs_datetime <= DATE_ADD( art.art_encounter, INTERVAL 33 DAY ) "
-            + " GROUP  BY p.patient_id "
-            + " UNION "
-            + "         SELECT     p.patient_id, "
-            + "                    o.obs_datetime AS encounter_date "
-            + "         FROM       patient p "
-            + "         INNER JOIN encounter e "
-            + "         ON         e.patient_id = p.patient_id "
-            + "         INNER JOIN obs o "
-            + "         ON         o.encounter_id = e.encounter_id "
-            + "         INNER JOIN "
-            + "                    ( "
-            + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.first_pickup AS art_encounter "
-            + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
-            + "                           ) art_patient "
-            + " ) art ON art.patient_id = p.patient_id "
-            + " WHERE  p.voided = 0 "
-            + " AND e.voided = 0 "
-            + " AND o.voided = 0 "
-            + " AND e.encounter_type = ${53} "
-            + " AND e.location_id = :location "
-            + " AND o.concept_id = ${1406} "
-            + " AND o.value_coded = ${42} "
-            + " AND o.obs_datetime >= art.art_encounter "
-            + " AND o.obs_datetime <= DATE_ADD( art.art_encounter, INTERVAL 33 DAY ) "
-            + " GROUP  BY p.patient_id "
-            + "               ) AS final_query "
+            + getUnionQuery()
+            + "       ) AS final_query "
             + "     GROUP BY final_query.patient_id";
 
-    StringSubstitutor substitutor = new StringSubstitutor(map);
+    dd.setQuery(sql);
 
-    sqlPatientDataDefinition.setQuery(substitutor.replace(sql));
-    return sqlPatientDataDefinition;
+    return dd;
   }
 
   /**
