@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
+import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -371,4 +372,85 @@ public class PrepCtCohortQueries {
 
     return cd;
   }
+
+
+  public CohortDefinition getKeypopulation(Concept answer) {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients who are Key population ");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("80", hivMetadata.getPrepInicialEncounterType().getEncounterTypeId());
+    map.put("81", hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23703", hivMetadata.getKeyPopulationConcept().getConceptId());
+    map.put("20454", hivMetadata.getDrugUseConcept().getConceptId());
+    map.put("1901", hivMetadata.getSexWorkerConcept().getConceptId());
+    map.put("165205", hivMetadata.getTransGenderConcept().getConceptId());
+    map.put("1377", hivMetadata.getHomosexualConcept().getConceptId());
+    map.put("20426", hivMetadata.getImprisonmentConcept().getConceptId());
+    map.put("answer", answer.getConceptId());
+
+    String query =
+            " SELECT p.patient_id "
+                    + " FROM   patient p "
+                    + "       INNER JOIN encounter e "
+                    + "               ON e.patient_id = p.patient_id "
+                    + "       INNER JOIN obs o "
+                    + "               ON o.encounter_id = e.encounter_id "
+                    + "WHERE  e.voided = 0 "
+                    + "       AND p.voided = 0 "
+                    + "       AND e.voided = 0 "
+                    + "       AND e.encounter_type IN (${80}, ${81}) "
+                    + "       AND o.concept_id = ${23703} "
+                    + "       AND o.value_coded = ${answer}"
+                    + "       AND e.encounter_datetime BETWEEN :onOrAfter AND :onOrBefore "
+                    + " GROUP  BY p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+
+  public CohortDefinition getExtractOnlyHomosexual() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Target Group");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition OnDrugs = getKeypopulation(hivMetadata.getDrugUseConcept());
+    CohortDefinition HSM = getKeypopulation(hivMetadata.getHomosexualConcept());
+    CohortDefinition SW = getKeypopulation(hivMetadata.getSexWorkerConcept());
+    CohortDefinition TRANS = getKeypopulation(hivMetadata.getTransGenderConcept());
+
+    cd.addSearch(
+            "Homosexual",
+            EptsReportUtils.map(
+                    HSM, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+            "DrugUser",
+            EptsReportUtils.map(
+                    OnDrugs, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+            "SexWorker",
+            EptsReportUtils.map(
+                    SW, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+            "Transgender",
+            EptsReportUtils.map(
+                    TRANS, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.setCompositionString("Homosexual AND NOT (DrugUser OR SexWorker OR Transgender)");
+
+    return cd;
+  }
+
 }

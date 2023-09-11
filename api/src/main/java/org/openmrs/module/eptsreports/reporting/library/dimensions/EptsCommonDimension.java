@@ -15,6 +15,7 @@ import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraig
 
 import java.util.Date;
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
 import org.openmrs.module.eptsreports.reporting.library.queries.TbPrevQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -58,6 +59,8 @@ public class EptsCommonDimension {
 
   private TbPrevQueries tbPrevQueries;
 
+  private HivMetadata hivMetadata;
+
   @Autowired private TxPvlsBySourceLabOrFsrCohortQueries txPvlsBySourceLabOrFsrCohortQueries;
 
   @Autowired
@@ -80,6 +83,7 @@ public class EptsCommonDimension {
       MISAUKeyPopsCohortQueries misauKeyPopsCohortQueries,
       PrepCtCohortQueries prepCtCohortQueries,
       TbPrevQueries tbPrevQueries,
+      HivMetadata hivMetadata,
       TxMlCohortQueries txMlCohortQueries) {
     this.genderCohortQueries = genderCohortQueries;
     this.txNewCohortQueries = txNewCohortQueries;
@@ -95,6 +99,7 @@ public class EptsCommonDimension {
     this.misauKeyPopsCohortQueries = misauKeyPopsCohortQueries;
     this.prepCtCohortQueries = prepCtCohortQueries;
     this.tbPrevQueries = tbPrevQueries;
+    this.hivMetadata = hivMetadata;
   }
 
   /**
@@ -393,8 +398,8 @@ public class EptsCommonDimension {
     dim.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     dim.addParameter(new Parameter("onOrBefore", "orOrBefore", Date.class));
     dim.addParameter(new Parameter("location", "Location", Location.class));
-    CohortDefinition drugUserKeyPopCohort = hivCohortQueries.getDrugUserKeyPopCohort();
-    CohortDefinition homosexualKeyPopCohort = hivCohortQueries.getMaleHomosexualKeyPopDefinition();
+    CohortDefinition drugUserKeyPopCohort = prepCtCohortQueries.getKeypopulation(hivMetadata.getDrugUseConcept());
+    CohortDefinition homosexualKeyPopCohort = prepCtCohortQueries.getExtractOnlyHomosexual();
     CohortDefinition imprisonmentKeyPopCohort = hivCohortQueries.getImprisonmentKeyPopCohort();
     CohortDefinition femaleSexWorkerKeyPopCohort =
         hivCohortQueries.getFemaleSexWorkersKeyPopCohortDefinition();
