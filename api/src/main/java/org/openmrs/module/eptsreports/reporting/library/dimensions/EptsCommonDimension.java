@@ -405,7 +405,7 @@ public class EptsCommonDimension {
         hivCohortQueries.getFemaleSexWorkersKeyPopCohortDefinition();
     CohortDefinition maleSexWorkerKeyPopCohort =
         hivCohortQueries.getMaleSexWorkersKeyPopCohortDefinition();
-    CohortDefinition transgenderKeyPopCohort = hivCohortQueries.getTransgenderKeyPopCohort();
+    CohortDefinition transgenderKeyPopCohort = prepCtCohortQueries.getExtractOnlyTransgender();
     CohortDefinition sexWorkersKeyPopCohort = hivCohortQueries.getSexWorkerKeyPopCohort();
     CohortDefinition outroKeyPopCohort = hivCohortQueries.getOutroKeyPopCohort();
     dim.addCohortDefinition("PID", mapStraightThrough(drugUserKeyPopCohort));

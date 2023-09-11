@@ -499,5 +499,40 @@ public class PrepCtCohortQueries {
     return cd;
   }
 
+  public CohortDefinition getExtractOnlyTransgender() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Prisoners");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition OnDrugs = getKeypopulation(hivMetadata.getDrugUseConcept());
+    CohortDefinition SW = getKeypopulation(hivMetadata.getSexWorkerConcept());
+    CohortDefinition TRANS = getKeypopulation(hivMetadata.getTransGenderConcept());
+
+
+
+    cd.addSearch(
+            "Transgender",
+            EptsReportUtils.map(
+                    TRANS, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+            "DrugUser",
+            EptsReportUtils.map(
+                    OnDrugs, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+            "SexWorker",
+            EptsReportUtils.map(
+                    SW, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+
+
+    cd.setCompositionString("Transgender AND NOT (DrugUser OR SexWorker)");
+
+    return cd;
+  }
+
 
 }
