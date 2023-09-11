@@ -92,8 +92,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " YEAR) "
             + " AND art_patient_12.patient_id "
             + " NOT IN ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
-                inclusionEndMonthAndDay, 1)
+            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(inclusionEndMonthAndDay)
             + " )"
             + " UNION "
             + "     SELECT art_patient_24.patient_id, '24 Meses' AS coort "
@@ -114,8 +113,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " YEAR) "
             + " AND art_patient_24.patient_id "
             + " NOT IN ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
-                inclusionEndMonthAndDay, 2)
+            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(inclusionEndMonthAndDay)
             + " )"
             + " ) art_patient";
 
@@ -184,8 +182,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " YEAR) "
             + " AND art_patient_12.patient_id "
             + " NOT IN ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
-                inclusionEndMonthAndDay, 1)
+            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(inclusionEndMonthAndDay)
             + " )"
             + " UNION "
             + "     SELECT art_patient_24.patient_id, '24 Meses' AS coort "
@@ -206,8 +203,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " YEAR) "
             + " AND art_patient_24.patient_id "
             + " NOT IN ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
-                inclusionEndMonthAndDay, 2)
+            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(inclusionEndMonthAndDay)
             + " )"
             + " ) art_patient";
 

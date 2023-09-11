@@ -67,13 +67,16 @@ public class ListOfPatientsWithMdsEvaluationQueries {
     return stringSubstitutor.replace(query);
   }
 
-  public static String getTranferredPatients(
-      String inclusionEndMonthAndDay, int numberOfYearsEndDate) {
+  public static String getTranferredPatients(String inclusionEndMonthAndDay) {
 
     String query =
         " SELECT patient_id "
             + " FROM ( "
-            + "SELECT p.patient_id "
+            + "SELECT transferred.patient_id, "
+            + "       Max(transferred.last_transfer) last_transfer_date "
+            + "FROM   ( "
+            + "SELECT p.patient_id, "
+            + "       e.encounter_datetime AS last_transfer "
             + "		        FROM   patient p "
             + "		                INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "		                INNER JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -87,8 +90,6 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "		         AND ((o.concept_id = ${1369} AND o.value_coded = ${1065}) "
             + "		               AND (o2.concept_id = ${6300} AND o2.value_coded = ${6276})) "
             + " UNION "
-            + "				SELECT patient_id "
-            + "				FROM ( "
             + "				SELECT p.patient_id, "
             + "                     MAX(e.encounter_datetime) AS last_transfer "
             + "				FROM   patient p "
@@ -101,17 +102,11 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "				AND e.encounter_type = ${6} "
             + "				AND o.concept_id = ${6273} "
             + "				AND o.value_coded = ${1706} "
-            + "				AND e.encounter_datetime <= DATE_SUB( "
-            + "  CONCAT(:evaluationYear,"
+            + "				AND e.encounter_datetime <= CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
-            + "        ) ,INTERVAL "
-            + numberOfYearsEndDate
-            + " YEAR) "
+            + ") "
             + "              GROUP BY p.patient_id "
-            + "    ) transferred_out_clinical "
             + " UNION "
-            + "				SELECT patient_id "
-            + "				FROM ( "
             + "				SELECT p.patient_id, "
             + "				  	   MAX(o.obs_datetime) AS last_transfer "
             + "				FROM   patient p "
@@ -124,18 +119,49 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "					   AND e.encounter_type = ${53} "
             + "                  AND        o.concept_id = ${6272} "
             + "                  AND        o.value_coded = ${1706} "
-            + "                  AND        o.obs_datetime <= DATE_SUB( "
-            + "  CONCAT(:evaluationYear,"
+            + "                  AND        o.obs_datetime <= CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
-            + "        ) ,INTERVAL "
-            + numberOfYearsEndDate
-            + " YEAR) "
+            + ") "
             + "                  GROUP BY   p.patient_id "
-            + "    ) transferred_out_resumo "
-            + " ) transferred ";
+            + " ) transferred "
+            + " GROUP BY transferred.patient_id "
+            + " ) max_transferred "
+            + "WHERE max_transferred.patient_id NOT IN (SELECT p.patient_id "
+            + "                                          FROM   patient p "
+            + "                                                 JOIN encounter e "
+            + "                                                   ON p.patient_id = "
+            + "                                                      e.patient_id "
+            + "                                          WHERE  p.voided = 0 "
+            + "                                                 AND e.voided = 0 "
+            + "                                                 AND e.encounter_type = ${6} "
+            + "                                                 AND e.location_id = :location "
+            + "                                                 AND "
+            + "              e.encounter_datetime > last_transfer_date "
+            + "                                                 AND "
+            + "				 e.encounter_datetime <= CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + ") "
+            + "                                             UNION "
+            + "                                         SELECT p.patient_id "
+            + "                                          FROM   patient p "
+            + "                                                 JOIN encounter e "
+            + "                                                   ON p.patient_id = "
+            + "                                                      e.patient_id "
+            + "                                          WHERE  p.voided = 0 "
+            + "                                                 AND e.voided = 0 "
+            + "                                                 AND e.encounter_type = ${18} "
+            + "                                                 AND e.location_id = :location "
+            + "                                                 AND "
+            + "              e.encounter_datetime > last_transfer_date "
+            + "                                                 AND "
+            + "				 e.encounter_datetime <= CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + ") "
+            + " ) ";
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());

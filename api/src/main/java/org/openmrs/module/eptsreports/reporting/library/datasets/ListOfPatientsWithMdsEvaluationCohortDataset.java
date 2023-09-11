@@ -66,6 +66,9 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     //  SECÇÃO A
     //  INFORMAÇÃO DO PACIENTE
 
+    // Patient_ID
+    pdd.addColumn("pid", new PersonIdDataDefinition(), "");
+
     // A1- Nr. Sequencial: (Coluna A)
     pdd.addColumn("counter", new PersonIdDataDefinition(), "", new ObjectCounterConverter());
 
