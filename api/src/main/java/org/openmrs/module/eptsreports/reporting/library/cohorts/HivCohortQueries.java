@@ -362,7 +362,7 @@ public class HivCohortQueries {
     comp.addSearch(
         "2",
         EptsReportUtils.map(
-                prepCtCohortQueries.getExtractOnlySexWorker(),
+            prepCtCohortQueries.getExtractOnlySexWorker(),
             "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
     comp.addSearch("F", EptsReportUtils.map(genderCohortQueries.femaleCohort(), ""));
     comp.setCompositionString("2 AND F");
@@ -383,7 +383,7 @@ public class HivCohortQueries {
     comp.addSearch(
         "SW",
         EptsReportUtils.map(
-                prepCtCohortQueries.getExtractOnlySexWorker(),
+            prepCtCohortQueries.getExtractOnlySexWorker(),
             "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
     comp.addSearch("M", EptsReportUtils.map(genderCohortQueries.maleCohort(), ""));
     comp.setCompositionString("SW AND M");
