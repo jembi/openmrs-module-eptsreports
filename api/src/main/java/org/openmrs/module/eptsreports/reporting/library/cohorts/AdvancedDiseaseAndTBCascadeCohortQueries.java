@@ -441,7 +441,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
 
-    CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
+    CohortDefinition anyTbLam = getClientsWithAnyTbLam();
     CohortDefinition positiveTbLam = getPatientsWithTbLamResult(TbLamResult.POSITIVE);
     CohortDefinition genXpert = getPatientsWithAnyGeneXpertResult();
 
@@ -469,7 +469,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
 
-    CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
+    CohortDefinition anyTbLam = getClientsWithAnyTbLam();
     CohortDefinition positiveTbLam = getPatientsWithTbLamResult(TbLamResult.POSITIVE);
     CohortDefinition genXpert = getPatientsWithAnyGeneXpertResult();
 
