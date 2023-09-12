@@ -725,8 +725,16 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "       INNER JOIN obs o "
             + "               ON e.encounter_id = o.encounter_id "
             + " INNER JOIN ( "
-            + listOfPatientsOnAdvancedHivIllnessQueries
-                .getPatientsWithCD4AbsoluteResultOnPeriodQuery(true)
+            + " SELECT result.person_id, Max(result.most_recent) AS most_recent FROM ( "
+            + new EptsQueriesUtil()
+                .unionBuilder(
+                    listOfPatientsOnAdvancedHivIllnessQueries
+                        .getPatientsWithCD4AbsoluteResultOnPeriodQuery(true))
+                .union(
+                    listOfPatientsOnAdvancedHivIllnessQueries
+                        .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true))
+                .buildQuery()
+            + " ) result GROUP BY result.person_id "
             + " ) last_cd4 ON last_cd4.person_id = ps.person_id "
             + "WHERE  ps.voided = 0 "
             + "       AND e.voided = 0 "
@@ -745,8 +753,16 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "    person ps INNER JOIN encounter e ON ps.person_id= e.patient_id "
             + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
             + " INNER JOIN ( "
-            + listOfPatientsOnAdvancedHivIllnessQueries
-                .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true)
+            + " SELECT result.person_id, Max(result.most_recent) AS most_recent FROM ( "
+            + new EptsQueriesUtil()
+                .unionBuilder(
+                    listOfPatientsOnAdvancedHivIllnessQueries
+                        .getPatientsWithCD4AbsoluteResultOnPeriodQuery(true))
+                .union(
+                    listOfPatientsOnAdvancedHivIllnessQueries
+                        .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true))
+                .buildQuery()
+            + " ) result GROUP BY result.person_id "
             + " ) last_cd4 ON last_cd4.person_id = ps.person_id "
             + "WHERE ps.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "  AND e.encounter_type = ${53} "
@@ -779,14 +795,16 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     Map<String, Integer> map = getStringIntegerMap();
 
     String query =
-        new EptsQueriesUtil()
-            .unionBuilder(
-                listOfPatientsOnAdvancedHivIllnessQueries
-                    .getPatientsWithCD4AbsoluteResultOnPeriodQuery(true))
-            .union(
-                listOfPatientsOnAdvancedHivIllnessQueries
-                    .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true))
-            .buildQuery();
+        " SELECT result.person_id, Max(result.most_recent) AS most_recent FROM ( "
+            + new EptsQueriesUtil()
+                .unionBuilder(
+                    listOfPatientsOnAdvancedHivIllnessQueries
+                        .getPatientsWithCD4AbsoluteResultOnPeriodQuery(true))
+                .union(
+                    listOfPatientsOnAdvancedHivIllnessQueries
+                        .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true))
+                .buildQuery()
+            + " ) result GROUP BY result.person_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
