@@ -11,6 +11,7 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.ListOfPatientsWithMdsEvaluationQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
+import org.openmrs.module.eptsreports.reporting.utils.queries.UnionBuilder;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
@@ -46,7 +47,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {CohortDefinition}
    */
-  public CohortDefinition getCoort(int numberOfYearsStartDate, int numberOfYearsEndDate) {
+  public CohortDefinition getCoort(
+      int numberOfYearsStartDate, int numberOfYearsEndDate, boolean coortName) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients who initiated the ART between the cohort period");
@@ -54,9 +56,39 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
         new Parameter("evaluationYear", "evaluationYear", Integer.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
-    String query =
-        "SELECT art_patient.patient_id "
-            + "     FROM   ( "
+    String query = getCoort12Or24Query(numberOfYearsStartDate, numberOfYearsEndDate, coortName);
+
+    sqlCohortDefinition.setQuery(query);
+
+    return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getCoort12Or24() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients who initiated the ART between the cohort period");
+    cd.addParameter(new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition twelveMonths = getCoort(2, 1, false);
+    CohortDefinition twentyFourMonths = getCoort(3, 2, false);
+
+    String mapping = "evaluationYear=${evaluationYear},location=${location}";
+
+    cd.addSearch("twelveMonths", map(twelveMonths, mapping));
+    cd.addSearch("twentyFourMonths", map(twentyFourMonths, mapping));
+
+    cd.setCompositionString("twelveMonths OR twentyFourMonths");
+
+    return cd;
+  }
+
+  private String getCoort12Or24Query(
+      int numberOfYearsStartDate, int numberOfYearsEndDate, boolean coortName) {
+
+    String query = new String();
+
+    String fromQuery =
+        "     FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
             + "     ) art_patient "
             + " WHERE  art_patient.first_pickup >= DATE_SUB( "
@@ -73,31 +105,21 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " YEAR) "
             + " AND art_patient.patient_id "
             + " NOT IN ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(inclusionEndMonthAndDay)
+            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
+                inclusionEndMonthAndDay, numberOfYearsEndDate)
             + " )";
 
-    sqlCohortDefinition.setQuery(query);
+    if (coortName && numberOfYearsEndDate == 1) {
+      query = "SELECT art_patient.patient_id, '12 Meses' ".concat(fromQuery);
+    }
+    if (coortName && numberOfYearsEndDate == 2) {
+      query = "SELECT art_patient.patient_id, '24 Meses' ".concat(fromQuery);
+    }
+    if (!coortName) {
+      query = "SELECT art_patient.patient_id ".concat(fromQuery);
+    }
 
-    return sqlCohortDefinition;
-  }
-
-  public CohortDefinition getCoort12Or24() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Patients who initiated the ART between the cohort period");
-    cd.addParameter(new Parameter("evaluationYear", "evaluationYear", Integer.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    CohortDefinition twelveMonths = getCoort(2, 1);
-    CohortDefinition twentyFourMonths = getCoort(3, 2);
-
-    String mapping = "evaluationYear=${evaluationYear},location=${location}";
-
-    cd.addSearch("twelveMonths", map(twelveMonths, mapping));
-    cd.addSearch("twentyFourMonths", map(twentyFourMonths, mapping));
-
-    cd.setCompositionString("twelveMonths OR twentyFourMonths");
-
-    return cd;
+    return query;
   }
 
   /**
@@ -117,34 +139,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
         new Parameter("evaluationYear", "evaluationYear", Integer.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    String query =
-        " SELECT art.patient_id, "
-            + " CASE   "
-            + "         WHEN art.first_pickup >= DATE_SUB( "
-            + "  CONCAT(:evaluationYear,"
-            + inclusionStartMonthAndDay
-            + "        ), INTERVAL 2 YEAR) "
-            + " AND  art.first_pickup <= DATE_SUB( "
-            + "  CONCAT(:evaluationYear,"
-            + inclusionEndMonthAndDay
-            + "        ) ,INTERVAL 1 YEAR) THEN '12 Meses' "
-            + "         WHEN art.first_pickup >= DATE_SUB( "
-            + "  CONCAT(:evaluationYear,"
-            + inclusionStartMonthAndDay
-            + "        ), INTERVAL 3 YEAR) "
-            + " AND  art.first_pickup <= DATE_SUB( "
-            + "  CONCAT(:evaluationYear,"
-            + inclusionEndMonthAndDay
-            + "        ) ,INTERVAL 2 YEAR) THEN '24 Meses' "
-            + "         ELSE '' "
-            + "       END "
-            + "     FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
-            + "     ) art "
-            + " WHERE art.patient_id "
-            + " NOT IN ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(inclusionEndMonthAndDay)
-            + " )";
+    String query12month = getCoort12Or24Query(2, 1, true);
+    String query24month = getCoort12Or24Query(3, 2, true);
+
+    String query = new UnionBuilder(query12month).union(query24month).buildQuery();
 
     sqlPatientDataDefinition.setQuery(query);
 
@@ -435,9 +433,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * CD4 inicial (RF14)
    *
    * <p>O sistema irá determinar a “Data de Registo de Resultado do CD4 Inicial” identificando a
-   * consulta (Ficha Clínica) na qual foi efectuado o registo do resultado do CD4 inicial
-   * (“Investigações - Resultados Laboratoriais") ocorrido entre 0 e 33 dias após o Início TARV
-   * durante o período de inclusão.
+   * primeira ou a segunda consulta (Ficha Clínica) na qual foi efectuado o registo do resultado do
+   * CD4 inicial (“Investigações - Resultados Laboratoriais") ocorrido em 33 dias do Início TARV, ou
+   * seja, entre “Data Início TARV” e “Data Início TARV” + 33 dias.
    *
    * @return {DataDefinition}
    */
