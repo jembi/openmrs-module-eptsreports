@@ -30,7 +30,6 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
 
   private final ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries;
 
-  private final TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet;
   private final ListOfPatientsInAdvancedHivIllnessCohortQueries
       listOfPatientsInAdvancedHivIllnessCohortQueries;
 
@@ -40,14 +39,13 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
 
   private final CommonMetadata commonMetadata;
 
-  private EptsGeneralIndicator eptsGeneralIndicator;
+  private final EptsGeneralIndicator eptsGeneralIndicator;
 
   String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
   @Autowired
   public ListOfPatientsInAdvancedHivIllnessDataset(
       ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries,
-      TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet,
       ListOfPatientsInAdvancedHivIllnessCohortQueries
           listOfPatientsInAdvancedHivIllnessCohortQueries,
       TbMetadata tbMetadata,
@@ -55,7 +53,6 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
       CommonMetadata commonMetadata,
       EptsGeneralIndicator eptsGeneralIndicator) {
     this.listOfPatientsArtCohortCohortQueries = listOfPatientsArtCohortCohortQueries;
-    this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
     this.listOfPatientsInAdvancedHivIllnessCohortQueries =
         listOfPatientsInAdvancedHivIllnessCohortQueries;
     this.tbMetadata = tbMetadata;
