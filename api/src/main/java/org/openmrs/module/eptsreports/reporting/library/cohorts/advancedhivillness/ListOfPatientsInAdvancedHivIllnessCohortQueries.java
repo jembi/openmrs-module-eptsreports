@@ -968,7 +968,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
-        " SELECT second_result.patient_id, MAX(second_result.viral_load) FROM ( "
+        " SELECT second_result.patient_id, second_result.viral_load FROM ( "
             + listOfPatientsOnAdvancedHivIllnessQueries
                 .getSecondVLResultOrResultDateBeforeMostRecent()
             + " ) AS second_result GROUP BY second_result.patient_id ";

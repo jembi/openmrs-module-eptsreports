@@ -363,7 +363,9 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "       INNER JOIN obs o2 "
         + "               ON e.encounter_id = o2.encounter_id "
         + "       INNER JOIN ("
+        + " SELECT result.patient_id, MAX(result.most_recent) as most_recent FROM ( "
         + getLastVlAndResultDateQuery()
+        + "    ) result GROUP BY result.patient_id "
         + ") last_vl "
         + "               ON last_vl.patient_id = p.patient_id "
         + "WHERE  e.encounter_type = ${53} "
@@ -394,7 +396,9 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "       INNER JOIN obs o2 "
         + "               ON e.encounter_id = o2.encounter_id "
         + "       INNER JOIN ("
+        + " SELECT result.patient_id, MAX(result.most_recent) as most_recent FROM ( "
         + getLastVlAndResultDateQuery()
+        + "    ) result GROUP BY result.patient_id "
         + ") last_vl "
         + "               ON last_vl.patient_id = p.patient_id "
         + "WHERE  e.encounter_type IN( ${6}, ${9}, ${13}, ${51} ) "
