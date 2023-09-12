@@ -74,7 +74,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // A2- Coorte: (coluna B)
     pdd.addColumn(
         "coort",
-        listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24Months(2, 1, 3, 2),
+        listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24Months(),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 

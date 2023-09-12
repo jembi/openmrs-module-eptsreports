@@ -109,11 +109,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {DataDefinition}
    */
-  public DataDefinition getCoort12Or24Months(
-      int numberOfYearsStartDateFor12,
-      int numberOfYearsEndDateFor12,
-      int numberOfYearsStartDateFor24,
-      int numberOfYearsEndDateFor24) {
+  public DataDefinition getCoort12Or24Months() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("A.2 - Coorte: – Resposta = 12 meses ou Resposta = 24 meses.");
@@ -123,45 +119,29 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     String query =
         "SELECT art_patient.patient_id, art_patient.coort "
-            + " FROM   ( "
-            + "      SELECT art_patient_12.patient_id, '12 Meses' AS coort "
-            + "     FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
-            + "     ) art_patient_12 "
-            + " WHERE  art_patient_12.first_pickup >= DATE_SUB( "
+            + " CASE   ( "
+            + "         WHEN art.first_pickup >= DATE_SUB( "
             + "  CONCAT(:evaluationYear,"
             + inclusionStartMonthAndDay
-            + "        ), INTERVAL "
-            + numberOfYearsStartDateFor12
-            + " YEAR) "
-            + " AND  art_patient_12.first_pickup <= DATE_SUB( "
+            + "        ), INTERVAL 2 YEAR) "
+            + " AND  art.first_pickup <= DATE_SUB( "
             + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
-            + "        ) ,INTERVAL  "
-            + numberOfYearsEndDateFor12
-            + " YEAR) "
-            + " AND art_patient_12.patient_id "
-            + " NOT IN ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(inclusionEndMonthAndDay)
-            + " )"
-            + " UNION "
-            + "     SELECT art_patient_24.patient_id, '24 Meses' AS coort "
-            + "     FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
-            + "     ) art_patient_24 "
-            + " WHERE  art_patient_24.first_pickup >= DATE_SUB( "
+            + "        ) ,INTERVAL 1 YEAR) THEN '12 Meses' AS coort "
+            + "         WHEN art.first_pickup >= DATE_SUB( "
             + "  CONCAT(:evaluationYear,"
             + inclusionStartMonthAndDay
-            + "        ), INTERVAL "
-            + numberOfYearsStartDateFor24
-            + " YEAR) "
-            + " AND  art_patient_24.first_pickup <= DATE_SUB( "
+            + "        ), INTERVAL 3 YEAR) "
+            + " AND  art.first_pickup <= DATE_SUB( "
             + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
-            + "        ) ,INTERVAL  "
-            + numberOfYearsEndDateFor24
-            + " YEAR) "
-            + " AND art_patient_24.patient_id "
+            + "        ) ,INTERVAL 2 YEAR) THEN '24 Meses' AS coort "
+            + "         ELSE '' "
+            + "       END "
+            + "     FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "     ) art "
+            + " AND art.patient_id "
             + " NOT IN ( "
             + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(inclusionEndMonthAndDay)
             + " )"
