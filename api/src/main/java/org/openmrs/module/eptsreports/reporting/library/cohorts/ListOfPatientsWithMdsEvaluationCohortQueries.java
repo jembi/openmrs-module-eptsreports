@@ -118,8 +118,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     String query =
-        "SELECT art_patient.patient_id, art_patient.coort "
-            + " CASE   ( "
+        " SELECT art.patient_id, "
+            + " CASE   "
             + "         WHEN art.first_pickup >= DATE_SUB( "
             + "  CONCAT(:evaluationYear,"
             + inclusionStartMonthAndDay
@@ -127,7 +127,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " AND  art.first_pickup <= DATE_SUB( "
             + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
-            + "        ) ,INTERVAL 1 YEAR) THEN '12 Meses' AS coort "
+            + "        ) ,INTERVAL 1 YEAR) THEN '12 Meses' "
             + "         WHEN art.first_pickup >= DATE_SUB( "
             + "  CONCAT(:evaluationYear,"
             + inclusionStartMonthAndDay
@@ -135,17 +135,16 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " AND  art.first_pickup <= DATE_SUB( "
             + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
-            + "        ) ,INTERVAL 2 YEAR) THEN '24 Meses' AS coort "
+            + "        ) ,INTERVAL 2 YEAR) THEN '24 Meses' "
             + "         ELSE '' "
             + "       END "
             + "     FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
             + "     ) art "
-            + " AND art.patient_id "
+            + " WHERE art.patient_id "
             + " NOT IN ( "
             + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(inclusionEndMonthAndDay)
-            + " )"
-            + " ) art_patient";
+            + " )";
 
     sqlPatientDataDefinition.setQuery(query);
 
