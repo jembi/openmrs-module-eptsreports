@@ -483,7 +483,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "WHERE e.voided = 0 AND o.voided = 0 "
             + "  AND e.encounter_type = ${6} "
             + "  AND o.concept_id = ${1406} "
-            + "  AND o.value_coded IN (${60},${507},${1294},${1570},${5042},${5334},${5344},${5340},${6990},${7180},${14656}) "
+            + "  AND o.value_coded IN (${507},${1294},${1570},${5042},${5334},${5344},${5340},${6990},${7180},${14656}) "
             + "  AND e.encounter_datetime = first_consultation.consultation_date "
             + "  AND e.location_id = :location "
             + "GROUP BY e.patient_id"
@@ -497,7 +497,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "WHERE e.voided = 0 AND o.voided = 0 "
             + "  AND e.encounter_type = ${6} "
             + "  AND o.concept_id = ${1406} "
-            + "  AND o.value_coded IN (${3},${42},${43},${126},${1570},${5018},${5334},${5945},${6783}) "
+            + "  AND o.value_coded IN (${3},${42},${43},${60},${126},${5018},${5334},${5945},${6783}) "
             + "  AND e.encounter_datetime = first_consultation.consultation_date "
             + "  AND e.location_id = :location "
             + "GROUP BY e.patient_id";
