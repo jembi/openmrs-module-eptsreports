@@ -9,7 +9,7 @@ public class ObservationToConceptNameConverter implements DataConverter {
   private final String restart = "Reinício";
   private final String inTarv = "Em TARV";
   private final String preTarv = "Pré-TARV";
-  private final String chronicDiarrhea = "Diareia Crónica";
+  private final String chronicDiarrhea = "Diarréia Crónica";
   private final String fever = "Febre";
   private final String anemia = "Anemia";
   private final String pneumonia = "Pneumonia";
@@ -26,7 +26,7 @@ public class ObservationToConceptNameConverter implements DataConverter {
   private final String toxoplasmose = "Toxoplasmose";
   private final String hivDiseaseResultingInEncephalopathy =
       "Doença pelo HIV Resultando em Encefalopatia";
-  private final String extraPulmonaryTb = "Tuberculose Expulmonar";
+  private final String extraPulmonaryTb = "Tuberculose Extrapulmonar";
   private final String pulmonaryTb = "Tuberculose Pulmonar";
 
   @Override
