@@ -1,8 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
 import org.openmrs.Location;
@@ -414,7 +414,7 @@ public class PrepCtCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getPatientsOnTargetGroup(Concept answer) {
+  public CohortDefinition getPatientsOnTargetGroup(List<Concept> answers) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patients who are on Target Group ");
     cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
@@ -431,7 +431,9 @@ public class PrepCtCohortQueries {
     map.put("1377", hivMetadata.getHomosexualConcept().getConceptId());
     map.put("20426", hivMetadata.getImprisonmentConcept().getConceptId());
     map.put("165196", hivMetadata.getPrepTargetGroupConcept().getConceptId());
-    map.put("answer", answer.getConceptId());
+    List<Integer> concepts =
+        answers.stream().map(concept -> concept.getConceptId()).collect(Collectors.toList());
+    String answer = StringUtils.join(concepts, ",");
 
     String query =
         " SELECT p.patient_id "
@@ -443,9 +445,11 @@ public class PrepCtCohortQueries {
             + "WHERE  e.voided = 0 "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
-            + "       AND e.encounter_type = 80 "
+            + "       AND e.encounter_type = ${80} "
             + "       AND o.concept_id = ${165196} "
-            + "       AND o.value_coded = ${answer}"
+            + "       AND o.value_coded IN ( "
+            + answer
+            + " ) "
             + "       AND e.encounter_datetime BETWEEN :onOrAfter AND :onOrBefore "
             + " GROUP  BY p.patient_id ";
 
@@ -650,7 +654,7 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition Serodiscordant =
-        getPatientsOnTargetGroup(hivMetadata.getCoupleResultsAreDifferentConcept());
+        getPatientsOnTargetGroup(Arrays.asList(hivMetadata.getCoupleResultsAreDifferentConcept()));
     CohortDefinition Keypop = getkeypop();
 
     cd.addSearch(
@@ -676,13 +680,19 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
+    CohortDefinition TruckDriver =
+        getPatientsOnTargetGroup(Arrays.asList(hivMetadata.getDriverConcept()));
     CohortDefinition Serodiscordant =
-        getPatientsOnTargetGroup(hivMetadata.getCoupleResultsAreDifferentConcept());
+        getPatientsOnTargetGroup(Arrays.asList(hivMetadata.getCoupleResultsAreDifferentConcept()));
     CohortDefinition Keypop = getkeypop();
-    CohortDefinition TruckDriver = getPatientsOnTargetGroup(hivMetadata.getDriverConcept());
 
     cd.addSearch(
-        "SerodiscordanteCouple",
+        "driver",
+        EptsReportUtils.map(
+            TruckDriver, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "serodiscordantCouple",
         EptsReportUtils.map(
             Serodiscordant,
             "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
@@ -692,12 +702,7 @@ public class PrepCtCohortQueries {
         EptsReportUtils.map(
             Keypop, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
-    cd.addSearch(
-        "Driver",
-        EptsReportUtils.map(
-            TruckDriver, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.setCompositionString("Driver AND NOT (SerodiscordanteCouple OR KeyPopulation)");
+    cd.setCompositionString("driver AND NOT (serodiscordantCouple OR KeyPopulation)");
 
     return cd;
   }
@@ -709,34 +714,29 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition Serodiscordant =
-        getPatientsOnTargetGroup(hivMetadata.getCoupleResultsAreDifferentConcept());
+    CohortDefinition miner = getPatientsOnTargetGroup(Arrays.asList(hivMetadata.getMinerConcept()));
+    CohortDefinition exclusion =
+        getPatientsOnTargetGroup(
+            Arrays.asList(
+                hivMetadata.getCoupleResultsAreDifferentConcept(), hivMetadata.getDriverConcept()));
     CohortDefinition Keypop = getkeypop();
-    CohortDefinition TruckDriver = getPatientsOnTargetGroup(hivMetadata.getDriverConcept());
-    CohortDefinition Miner = getPatientsOnTargetGroup(hivMetadata.getMinerConcept());
 
     cd.addSearch(
-        "SerodiscordanteCouple",
+        "miner",
         EptsReportUtils.map(
-            Serodiscordant,
-            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+            miner, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "exclusion",
+        EptsReportUtils.map(
+            exclusion, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
     cd.addSearch(
         "KeyPopulation",
         EptsReportUtils.map(
             Keypop, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
-    cd.addSearch(
-        "Driver",
-        EptsReportUtils.map(
-            TruckDriver, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "Miner",
-        EptsReportUtils.map(
-            Miner, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.setCompositionString("Miner AND NOT (Driver OR SerodiscordanteCouple OR KeyPopulation)");
+    cd.setCompositionString("miner AND NOT (exclusion OR KeyPopulation)");
 
     return cd;
   }
@@ -748,18 +748,20 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition Serodiscordant =
-        getPatientsOnTargetGroup(hivMetadata.getCoupleResultsAreDifferentConcept());
+    CohortDefinition military =
+        getPatientsOnTargetGroup(Arrays.asList(hivMetadata.getMilitaryOrPoliceConcept()));
+    CohortDefinition exclusion =
+        getPatientsOnTargetGroup(
+            Arrays.asList(
+                hivMetadata.getCoupleResultsAreDifferentConcept(),
+                hivMetadata.getDriverConcept(),
+                hivMetadata.getMinerConcept()));
     CohortDefinition Keypop = getkeypop();
-    CohortDefinition TruckDriver = getPatientsOnTargetGroup(hivMetadata.getDriverConcept());
-    CohortDefinition Miner = getPatientsOnTargetGroup(hivMetadata.getMinerConcept());
-    CohortDefinition Military = getPatientsOnTargetGroup(hivMetadata.getMilitaryOrPoliceConcept());
 
     cd.addSearch(
-        "SerodiscordanteCouple",
+        "military",
         EptsReportUtils.map(
-            Serodiscordant,
-            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+            military, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
     cd.addSearch(
         "KeyPopulation",
@@ -767,22 +769,11 @@ public class PrepCtCohortQueries {
             Keypop, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
     cd.addSearch(
-        "Driver",
+        "exclusion",
         EptsReportUtils.map(
-            TruckDriver, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+            exclusion, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
-    cd.addSearch(
-        "Miner",
-        EptsReportUtils.map(
-            Miner, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "Military",
-        EptsReportUtils.map(
-            Military, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.setCompositionString(
-        "Military AND NOT (Miner OR Driver OR SerodiscordanteCouple OR KeyPopulation)");
+    cd.setCompositionString("military AND NOT (exclusion OR KeyPopulation)");
 
     return cd;
   }
@@ -794,19 +785,21 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition Serodiscordant =
-        getPatientsOnTargetGroup(hivMetadata.getCoupleResultsAreDifferentConcept());
+    CohortDefinition breastfeeding =
+        getPatientsOnTargetGroup(Arrays.asList(hivMetadata.getBreastfeeding()));
     CohortDefinition Keypop = getkeypop();
-    CohortDefinition TruckDriver = getPatientsOnTargetGroup(hivMetadata.getDriverConcept());
-    CohortDefinition Miner = getPatientsOnTargetGroup(hivMetadata.getMinerConcept());
-    CohortDefinition Military = getPatientsOnTargetGroup(hivMetadata.getMilitaryOrPoliceConcept());
-    CohortDefinition Breastfeeding = getPatientsOnTargetGroup(hivMetadata.getBreastfeeding());
+    List<Concept> conceptExcluions =
+        Arrays.asList(
+            hivMetadata.getDriverConcept(),
+            hivMetadata.getMinerConcept(),
+            hivMetadata.getMilitaryOrPoliceConcept(),
+            hivMetadata.getCoupleResultsAreDifferentConcept());
+    CohortDefinition exclusion = getPatientsOnTargetGroup(conceptExcluions);
 
     cd.addSearch(
-        "SerodiscordanteCouple",
+        "breastfeedingWoman",
         EptsReportUtils.map(
-            Serodiscordant,
-            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+            breastfeeding, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
     cd.addSearch(
         "KeyPopulation",
@@ -814,27 +807,11 @@ public class PrepCtCohortQueries {
             Keypop, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
     cd.addSearch(
-        "Driver",
+        "exclusion",
         EptsReportUtils.map(
-            TruckDriver, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+            exclusion, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
-    cd.addSearch(
-        "Miner",
-        EptsReportUtils.map(
-            Miner, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "Military",
-        EptsReportUtils.map(
-            Military, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "BreastfeedingWoman",
-        EptsReportUtils.map(
-            Breastfeeding, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.setCompositionString(
-        "BreastfeedingWoman AND NOT (Military OR Miner OR Driver OR SerodiscordanteCouple OR KeyPopulation)");
+    cd.setCompositionString("breastfeedingWoman AND NOT (exclusion OR KeyPopulation)");
 
     return cd;
   }
@@ -846,53 +823,34 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition Serodiscordant =
-        getPatientsOnTargetGroup(hivMetadata.getCoupleResultsAreDifferentConcept());
+    CohortDefinition Pregnant =
+        getPatientsOnTargetGroup(Arrays.asList(hivMetadata.getPregnantConcept()));
     CohortDefinition Keypop = getkeypop();
-    CohortDefinition TruckDriver = getPatientsOnTargetGroup(hivMetadata.getDriverConcept());
-    CohortDefinition Miner = getPatientsOnTargetGroup(hivMetadata.getMinerConcept());
-    CohortDefinition Military = getPatientsOnTargetGroup(hivMetadata.getMilitaryOrPoliceConcept());
-    CohortDefinition Breastfeeding = getPatientsOnTargetGroup(hivMetadata.getBreastfeeding());
-    CohortDefinition Pregnant = getPatientsOnTargetGroup(hivMetadata.getPregnantConcept());
-
-    cd.addSearch(
-        "SerodiscordanteCouple",
-        EptsReportUtils.map(
-            Serodiscordant,
-            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "KeyPopulation",
-        EptsReportUtils.map(
-            Keypop, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "Driver",
-        EptsReportUtils.map(
-            TruckDriver, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "Miner",
-        EptsReportUtils.map(
-            Miner, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "Military",
-        EptsReportUtils.map(
-            Military, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "BreastfeedingWoman",
-        EptsReportUtils.map(
-            Breastfeeding, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+    List<Concept> conceptExcluions =
+        Arrays.asList(
+            hivMetadata.getDriverConcept(),
+            hivMetadata.getMinerConcept(),
+            hivMetadata.getMilitaryOrPoliceConcept(),
+            hivMetadata.getBreastfeeding(),
+            hivMetadata.getCoupleResultsAreDifferentConcept());
+    CohortDefinition exclusion = getPatientsOnTargetGroup(conceptExcluions);
 
     cd.addSearch(
         "PregnantWoman",
         EptsReportUtils.map(
             Pregnant, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
-    cd.setCompositionString(
-        "PregnantWoman AND NOT (BreastfeedingWoman OR Military OR Miner OR Driver OR SerodiscordanteCouple OR KeyPopulation)");
+    cd.addSearch(
+        "Exclusion",
+        EptsReportUtils.map(
+            exclusion, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "KeyPopulation",
+        EptsReportUtils.map(
+            Keypop, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.setCompositionString("PregnantWoman AND NOT (Exclusion OR KeyPopulation)");
 
     return cd;
   }
@@ -904,60 +862,35 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition Serodiscordant =
-        getPatientsOnTargetGroup(hivMetadata.getCoupleResultsAreDifferentConcept());
-    CohortDefinition Keypop = getkeypop();
-    CohortDefinition TruckDriver = getPatientsOnTargetGroup(hivMetadata.getDriverConcept());
-    CohortDefinition Miner = getPatientsOnTargetGroup(hivMetadata.getMinerConcept());
-    CohortDefinition Military = getPatientsOnTargetGroup(hivMetadata.getMilitaryOrPoliceConcept());
-    CohortDefinition Breastfeeding = getPatientsOnTargetGroup(hivMetadata.getBreastfeeding());
-    CohortDefinition Pregnant = getPatientsOnTargetGroup(hivMetadata.getPregnantConcept());
     CohortDefinition AYR =
-        getPatientsOnTargetGroup(hivMetadata.getAdolescentsAndYouthAtRiskConcept());
+        getPatientsOnTargetGroup(Arrays.asList(hivMetadata.getAdolescentsAndYouthAtRiskConcept()));
+    CohortDefinition exclusions =
+        getPatientsOnTargetGroup(
+            Arrays.asList(
+                hivMetadata.getCoupleResultsAreDifferentConcept(),
+                hivMetadata.getDriverConcept(),
+                hivMetadata.getMinerConcept(),
+                hivMetadata.getMilitaryOrPoliceConcept(),
+                hivMetadata.getBreastfeeding(),
+                hivMetadata.getPregnantConcept()));
+    CohortDefinition Keypop = getkeypop();
 
     cd.addSearch(
-        "SerodiscordanteCouple",
+        "adolescentAndYouth",
         EptsReportUtils.map(
-            Serodiscordant,
-            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+            AYR, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "exclusions",
+        EptsReportUtils.map(
+            exclusions, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
     cd.addSearch(
         "KeyPopulation",
         EptsReportUtils.map(
             Keypop, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
-    cd.addSearch(
-        "Driver",
-        EptsReportUtils.map(
-            TruckDriver, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "Miner",
-        EptsReportUtils.map(
-            Miner, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "Military",
-        EptsReportUtils.map(
-            Military, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "BreastfeedingWoman",
-        EptsReportUtils.map(
-            Breastfeeding, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "PregnantWoman",
-        EptsReportUtils.map(
-            Pregnant, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "AdolescentAndYouth",
-        EptsReportUtils.map(
-            AYR, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.setCompositionString(
-        "AdolescentAndYouth AND NOT (PregnantWoman OR BreastfeedingWoman OR Military OR Miner OR Driver OR SerodiscordanteCouple OR KeyPopulation)");
+    cd.setCompositionString("adolescentAndYouth AND NOT (exclusions OR KeyPopulation)");
 
     return cd;
   }
