@@ -100,7 +100,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "tpt_eligible_tarv",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsTptNotEligible(),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new YesOrNoConverter());
 
     // A7- Data de início do TPT: (coluna G)
     pdd.addColumn(

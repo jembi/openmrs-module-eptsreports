@@ -241,17 +241,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     dd.addParameter(new Parameter("evaluationYear", "evaluationYear", Integer.class));
     dd.addParameter(new Parameter("location", "location", Location.class));
 
-    String sql =
-        "SELECT final_query.patient_id, "
-            + "       CASE "
-            + "         WHEN final_query.encounter_date IS NULL THEN 'Sim' "
-            + "         WHEN final_query.encounter_date IS NOT NULL THEN 'Não' "
-            + "         ELSE '' "
-            + "       END "
-            + "FROM   ( "
-            + getUnionQuery()
-            + "       ) AS final_query "
-            + "     GROUP BY final_query.patient_id";
+    String sql = getUnionQuery();
 
     dd.setQuery(sql);
 
