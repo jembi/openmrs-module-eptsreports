@@ -663,6 +663,22 @@ public class TbMetadata extends ProgramsMetadata {
   }
 
   /**
+   * <b>concept_id = 5042</b>
+   *
+   * <p><b>Name:</b> EXTRAPULMONARY TUBERCULOSIS
+   *
+   * <p><b>Description:</b> EXTRAPULMONARY TUBERCULOSIS Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getExtraPulmonaryTbConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.extraPulmonaryTbConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
    * <b>concept_id = 165349</b>
    *
    * <p><b>Name:</b> TB LAM - Positivity Level

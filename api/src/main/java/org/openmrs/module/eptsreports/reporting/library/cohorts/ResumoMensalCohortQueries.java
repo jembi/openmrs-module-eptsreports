@@ -764,7 +764,7 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
-  private String getPatientStartedTarvBeforeQuery() {
+  public String getPatientStartedTarvBeforeQuery() {
 
     return "       SELECT first.patient_id, MIN(first.pickup_date) first_pickup "
         + "       FROM ( "
