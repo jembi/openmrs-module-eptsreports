@@ -5,7 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 
-public class ForwardSlashDateConverter implements DataConverter {
+/** Converter to use dd.MM.yyyy format on dates using Dash(-) separator */
+public class DashDateFormatConverter implements DataConverter {
 
   @Override
   public Object convert(Object obj) {
@@ -28,7 +29,7 @@ public class ForwardSlashDateConverter implements DataConverter {
 
   public static String formatDate(Date date) {
 
-    Format formatter = new SimpleDateFormat("dd/MM/yyyy");
+    Format formatter = new SimpleDateFormat("dd-MM-yyyy");
 
     return formatter.format(date);
   }
