@@ -13,6 +13,7 @@ package org.openmrs.module.eptsreports.reporting.library.dimensions;
 
 import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
+import java.util.Arrays;
 import java.util.Date;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
@@ -403,7 +404,7 @@ public class EptsCommonDimension {
     dim.addParameter(new Parameter("onOrBefore", "orOrBefore", Date.class));
     dim.addParameter(new Parameter("location", "Location", Location.class));
     CohortDefinition drugUserKeyPopCohort =
-        prepCtCohortQueries.getKeypopulation(hivMetadata.getDrugUseConcept());
+        prepCtCohortQueries.getKeypopulation(Arrays.asList(hivMetadata.getDrugUseConcept()));
     CohortDefinition homosexualKeyPopCohort = prepCtCohortQueries.getExtractOnlyHomosexual();
     CohortDefinition imprisonmentKeyPopCohort = prepCtCohortQueries.getExtractOnlyPrisoner();
     CohortDefinition femaleSexWorkerKeyPopCohort =

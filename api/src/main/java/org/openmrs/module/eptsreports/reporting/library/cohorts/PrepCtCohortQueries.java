@@ -373,7 +373,7 @@ public class PrepCtCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getKeypopulation(Concept answer) {
+  public CohortDefinition getKeypopulation(List<Concept> answers) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patients who are Key population ");
     cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
@@ -389,7 +389,9 @@ public class PrepCtCohortQueries {
     map.put("165205", hivMetadata.getTransGenderConcept().getConceptId());
     map.put("1377", hivMetadata.getHomosexualConcept().getConceptId());
     map.put("20426", hivMetadata.getImprisonmentConcept().getConceptId());
-    map.put("answer", answer.getConceptId());
+    List<Integer> concepts =
+        answers.stream().map(concept -> concept.getConceptId()).collect(Collectors.toList());
+    String answer = StringUtils.join(concepts, ",");
 
     String query =
         " SELECT p.patient_id "
@@ -403,7 +405,9 @@ public class PrepCtCohortQueries {
             + "       AND e.voided = 0 "
             + "       AND e.encounter_type IN (${80}, ${81}) "
             + "       AND o.concept_id = ${23703} "
-            + "       AND o.value_coded = ${answer}"
+            + "       AND o.value_coded IN ( "
+            + answer
+            + " ) "
             + "       AND e.encounter_datetime BETWEEN :onOrAfter AND :onOrBefore "
             + " GROUP  BY p.patient_id ";
 
@@ -467,32 +471,25 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition OnDrugs = getKeypopulation(hivMetadata.getDrugUseConcept());
-    CohortDefinition HSM = getKeypopulation(hivMetadata.getHomosexualConcept());
-    CohortDefinition SW = getKeypopulation(hivMetadata.getSexWorkerConcept());
-    CohortDefinition TRANS = getKeypopulation(hivMetadata.getTransGenderConcept());
+    CohortDefinition HSM = getKeypopulation(Arrays.asList(hivMetadata.getHomosexualConcept()));
+    CohortDefinition exclusion =
+        getKeypopulation(
+            Arrays.asList(
+                hivMetadata.getDrugUseConcept(),
+                hivMetadata.getSexWorkerConcept(),
+                hivMetadata.getTransGenderConcept()));
 
     cd.addSearch(
-        "Homosexual",
+        "homosexual",
         EptsReportUtils.map(
             HSM, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
     cd.addSearch(
-        "DrugUser",
+        "exclusion",
         EptsReportUtils.map(
-            OnDrugs, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+            exclusion, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
-    cd.addSearch(
-        "SexWorker",
-        EptsReportUtils.map(
-            SW, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "Transgender",
-        EptsReportUtils.map(
-            TRANS, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.setCompositionString("Homosexual AND NOT (DrugUser OR SexWorker OR Transgender)");
+    cd.setCompositionString("homosexual AND NOT exclusion");
 
     return cd;
   }
@@ -504,38 +501,27 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition Prisoner = getKeypopulation(hivMetadata.getImprisonmentConcept());
-    CohortDefinition OnDrugs = getKeypopulation(hivMetadata.getDrugUseConcept());
-    CohortDefinition HSM = getKeypopulation(hivMetadata.getHomosexualConcept());
-    CohortDefinition SW = getKeypopulation(hivMetadata.getSexWorkerConcept());
-    CohortDefinition TRANS = getKeypopulation(hivMetadata.getTransGenderConcept());
+    CohortDefinition prisoner =
+        getKeypopulation(Arrays.asList(hivMetadata.getImprisonmentConcept()));
+    CohortDefinition exclusion =
+        getKeypopulation(
+            Arrays.asList(
+                hivMetadata.getDrugUseConcept(),
+                hivMetadata.getHomosexualConcept(),
+                hivMetadata.getSexWorkerConcept(),
+                hivMetadata.getTransGenderConcept()));
 
     cd.addSearch(
-        "Recluso",
+        "prisoner",
         EptsReportUtils.map(
-            Prisoner, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+            prisoner, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
     cd.addSearch(
-        "Homosexual",
+        "exclusion",
         EptsReportUtils.map(
-            HSM, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+            exclusion, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
-    cd.addSearch(
-        "DrugUser",
-        EptsReportUtils.map(
-            OnDrugs, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "SexWorker",
-        EptsReportUtils.map(
-            SW, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "Transgender",
-        EptsReportUtils.map(
-            TRANS, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.setCompositionString("Recluso AND NOT (Homosexual OR DrugUser OR SexWorker OR Transgender)");
+    cd.setCompositionString("prisoner AND NOT exclusion");
 
     return cd;
   }
@@ -547,26 +533,22 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition OnDrugs = getKeypopulation(hivMetadata.getDrugUseConcept());
-    CohortDefinition SW = getKeypopulation(hivMetadata.getSexWorkerConcept());
-    CohortDefinition TRANS = getKeypopulation(hivMetadata.getTransGenderConcept());
+    CohortDefinition trans = getKeypopulation(Arrays.asList(hivMetadata.getTransGenderConcept()));
+    CohortDefinition exclusion =
+        getKeypopulation(
+            Arrays.asList(hivMetadata.getDrugUseConcept(), hivMetadata.getSexWorkerConcept()));
 
     cd.addSearch(
-        "Transgender",
+        "transgender",
         EptsReportUtils.map(
-            TRANS, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+            trans, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
     cd.addSearch(
-        "DrugUser",
+        "exclusion",
         EptsReportUtils.map(
-            OnDrugs, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+            exclusion, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
-    cd.addSearch(
-        "SexWorker",
-        EptsReportUtils.map(
-            SW, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.setCompositionString("Transgender AND NOT (DrugUser OR SexWorker)");
+    cd.setCompositionString("transgender AND NOT exclusion");
 
     return cd;
   }
@@ -578,45 +560,28 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition Prisoner = getKeypopulation(hivMetadata.getImprisonmentConcept());
-    CohortDefinition OnDrugs = getKeypopulation(hivMetadata.getDrugUseConcept());
-    CohortDefinition HSM = getKeypopulation(hivMetadata.getHomosexualConcept());
-    CohortDefinition SW = getKeypopulation(hivMetadata.getSexWorkerConcept());
-    CohortDefinition TRANS = getKeypopulation(hivMetadata.getTransGenderConcept());
-    CohortDefinition OUTRO = getKeypopulation(hivMetadata.getOtherOrNonCodedConcept());
+    CohortDefinition outro =
+        getKeypopulation(Arrays.asList(hivMetadata.getOtherOrNonCodedConcept()));
+    CohortDefinition exclusion =
+        getKeypopulation(
+            Arrays.asList(
+                hivMetadata.getImprisonmentConcept(),
+                hivMetadata.getDrugUseConcept(),
+                hivMetadata.getHomosexualConcept(),
+                hivMetadata.getSexWorkerConcept(),
+                hivMetadata.getTransGenderConcept()));
 
     cd.addSearch(
-        "Outro",
+        "outro",
         EptsReportUtils.map(
-            OUTRO, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+            outro, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
     cd.addSearch(
-        "Recluso",
+        "exclusion",
         EptsReportUtils.map(
-            Prisoner, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+            exclusion, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
-    cd.addSearch(
-        "Homosexual",
-        EptsReportUtils.map(
-            HSM, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "DrugUser",
-        EptsReportUtils.map(
-            OnDrugs, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "SexWorker",
-        EptsReportUtils.map(
-            SW, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.addSearch(
-        "Transgender",
-        EptsReportUtils.map(
-            TRANS, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-
-    cd.setCompositionString(
-        "Outro AND NOT (Recluso OR Homosexual OR DrugUser OR SexWorker OR Transgender)");
+    cd.setCompositionString("outro AND NOT exclusion ");
 
     return cd;
   }
@@ -628,20 +593,20 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition OnDrugs = getKeypopulation(hivMetadata.getDrugUseConcept());
-    CohortDefinition SW = getKeypopulation(hivMetadata.getSexWorkerConcept());
+    CohortDefinition SW = getKeypopulation(Arrays.asList(hivMetadata.getSexWorkerConcept()));
+    CohortDefinition onDrugs = getKeypopulation(Arrays.asList(hivMetadata.getDrugUseConcept()));
 
     cd.addSearch(
-        "DrugUser",
+        "drugUser",
         EptsReportUtils.map(
-            OnDrugs, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+            onDrugs, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
     cd.addSearch(
-        "SexWorker",
+        "sexWorker",
         EptsReportUtils.map(
             SW, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
-    cd.setCompositionString("SexWorker AND NOT DrugUser");
+    cd.setCompositionString("sexWorker AND NOT drugUser");
 
     return cd;
   }
