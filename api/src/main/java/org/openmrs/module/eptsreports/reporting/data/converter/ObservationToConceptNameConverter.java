@@ -9,7 +9,7 @@ public class ObservationToConceptNameConverter implements DataConverter {
   private final String restart = "Reinício";
   private final String inTarv = "Em TARV";
   private final String preTarv = "Pré-TARV";
-  private final String chronicDiarrhea = "Diarréia Crónica";
+  private final String chronicDiarrhea = "Diarreia Crónica";
   private final String fever = "Febre";
   private final String anemia = "Anemia";
   private final String pneumonia = "Pneumonia";
