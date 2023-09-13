@@ -3591,6 +3591,199 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.advancedHivIllnessEncounterTypeUuid</property>
+		<defaultValue>5f46b128-67f8-44e7-aec6-3a3df92df160</defaultValue>
+		<description>
+			UUID for Consulta de Doença Avançada por HIV Encounter Type
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.cd4LabsetConceptUuid</property>
+		<defaultValue>68f51951-dedd-4ac4-900c-f243db35ba6c</defaultValue>
+		<description>
+			UUID for CD4 LABSET Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.whoStageIConceptUuid</property>
+		<defaultValue>e1d9055e-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for WHO STAGE 1 ADULT Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.whoStageIIConceptUuid</property>
+		<defaultValue>e1d9066c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for WHO STAGE 2 ADULT Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.naConceptUuid</property>
+		<defaultValue>ab55f038-bc74-4cef-818e-eb509c5ee5b1</defaultValue>
+		<description>
+			UUID for N/A Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.cragSoroConceptUuid</property>
+		<defaultValue>f3883e12-4883-461b-8440-2a02f3312a84</defaultValue>
+		<description>
+			UUID for CRAG Soro Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.cragLRCConceptUuid</property>
+		<defaultValue>67e376f7-19c6-4810-b15b-121339cb21d3</defaultValue>
+		<description>
+			UUID for CRAG LCR Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.cacuConceptUuid</property>
+		<defaultValue>fb867149-04a1-4c6e-8d91-fc4064aef630</defaultValue>
+		<description>
+			UUID for CONVSET Rastreio de CACU (E) Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.chronicDiarrheaConceptUuid</property>
+		<defaultValue>5018AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</defaultValue>
+		<description>
+			UUID for DIARREIA CRÓNICA > 1 MÊS Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.feverConceptUuid</property>
+		<defaultValue>e1eafbce-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for FEVER Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.anemiaConceptUuid</property>
+		<defaultValue>e1cda114-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for ANEMIA Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.pneumoniaConceptUuid</property>
+		<defaultValue>e1cdd490-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for PNEUMONIA Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.meningitisConceptUuid</property>
+		<defaultValue>e1cdea3e-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for MENINGITIS, NOS Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.gingivitisConceptUuid</property>
+		<defaultValue>e1cf5590-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for GINGIVITIS Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.extraPulmonaryTbConceptUuid</property>
+		<defaultValue>e1e2b07c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for EXTRAPULMONARY TUBERCULOSIS Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.estomatiteUlcerativaNecrotizanteConceptUuid</property>
+		<defaultValue>e1e2b07c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for Estomatite ulcerativa necrotizante Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.candidiaseOralConceptUuid</property>
+		<defaultValue>e1e2b07c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for CANDIDIASE ORAL Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.cryptococcalMeningitisConceptUuid</property>
+		<defaultValue>e1e2b07c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for CRYPTOCOCCAL MENINGITIS Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.cervicalCancerConceptUuid</property>
+		<defaultValue>e1e2b07c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for CERVICAL CANCER Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.candidiaseEsofagicaConceptUuid</property>
+		<defaultValue>e1e2b07c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for CANDIDÍASE ESOFÁGICA Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.herpesSimplesConceptUuid</property>
+		<defaultValue>e1e2b07c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for HERPES SIMPLES > 1 MÊS OU VISCERAL Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.cachexiaConceptUuid</property>
+		<defaultValue>e1e2b07c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for Cachexia Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.toxoplasmoseConceptUuid</property>
+		<defaultValue>e1e2b07c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for Toxoplasmose Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.hivDiseaseResultingInEncephalopathyConceptUuid</property>
+		<defaultValue>c03d9343-9082-11e6-a98e-000c29db4475</defaultValue>
+		<description>
+			UUID for Doença pelo HIV resultando em encefalopatia Concept
+		</description>
+	</globalProperty>
+
+
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 
 		<include method="enterForm"/> </create> </allow> <signatures> <![CDATA[ import 

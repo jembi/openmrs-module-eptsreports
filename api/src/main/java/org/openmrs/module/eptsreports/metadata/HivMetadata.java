@@ -5242,4 +5242,357 @@ public class HivMetadata extends ProgramsMetadata {
         Context.getAdministrationService().getGlobalProperty("eptsreports.cryotherapyConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>encounterType_id = 90</b>
+   *
+   * <p><b>Name:</b> S.TARV: DAH
+   *
+   * <p><b>Description:</b> Consulta de Doença Avançada por HIV
+   *
+   * @return {@link EncounterType}
+   */
+  public EncounterType getAdvancedHivIllnessEncounterType() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.advancedHivIllnessEncounterTypeUuid");
+    return getEncounterType(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165389</b>
+   *
+   * <p><b>Name:</b> CD4 LABSET
+   *
+   * <p><b>Description:</b> CD4 LABSET Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCD4LabsetConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.cd4LabsetConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 1204</b>
+   *
+   * <p><b>Name:</b> WHO STAGE 1 ADULT
+   *
+   * <p><b>Description:</b> ESTADIO I OMS, ADULTO Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getWhoStageIConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.whoStageIConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 1205</b>
+   *
+   * <p><b>Name:</b> WHO STAGE 2 ADULT
+   *
+   * <p><b>Description:</b> ESTADIO II OMS, ADULTO Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getWhoStageIIConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.whoStageIIConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 21233</b>
+   *
+   * <p><b>Name:</b> N/A
+   *
+   * <p><b>Description:</b> N/A Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getNAConcept() {
+    String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.naConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 23952</b>
+   *
+   * <p><b>Name:</b> CRAG Soro
+   *
+   * <p><b>Description:</b> CRAG Soro Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCragSoroConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.cragSoroConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165362</b>
+   *
+   * <p><b>Name:</b> CrAg LCR
+   *
+   * <p><b>Description:</b> CrAg LCR Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCragLCRConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.cragLRCConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165404</b>
+   *
+   * <p><b>Name:</b> CONVSET Rastreio de CACU (E)
+   *
+   * <p><b>Description:</b> CONVSET Rastreio de CACU (E) Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCacuConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.cacuConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 5018</b>
+   *
+   * <p><b>Name:</b> DIARREIA CRÓNICA > 1 MÊS
+   *
+   * <p><b>Description:</b> DIARREIA CRÓNICA > 1 MÊS Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getChronicDiarrheaConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.chronicDiarrheaConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 5945</b>
+   *
+   * <p><b>Name:</b> FEVER
+   *
+   * <p><b>Description:</b> FEVER Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getFeverConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.feverConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 3</b>
+   *
+   * <p><b>Name:</b> ANEMIA
+   *
+   * <p><b>Description:</b> ANEMIA Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getAnemiaConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.anemiaConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 43</b>
+   *
+   * <p><b>Name:</b> PNEUMONIA
+   *
+   * <p><b>Description:</b> PNEUMONIA Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getPneumoniaConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.pneumoniaConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 60</b>
+   *
+   * <p><b>Name:</b> MENINGITIS, NOS
+   *
+   * <p><b>Description:</b> MENINGITIS, NOS Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getMeningitisConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.meningitisConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 126</b>
+   *
+   * <p><b>Name:</b> GINGIVITIS
+   *
+   * <p><b>Description:</b> GINGIVITIS Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getGingivitisConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.gingivitisConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 6783</b>
+   *
+   * <p><b>Name:</b> Estomatite ulcerativa necrotizante
+   *
+   * <p><b>Description:</b> Estomatite ulcerativa necrotizante Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getEstomatiteUlcerativaNecrotizanteConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.estomatiteUlcerativaNecrotizanteConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 5334</b>
+   *
+   * <p><b>Name:</b> CANDIDIASE ORAL
+   *
+   * <p><b>Description:</b> CANDIDIASE ORAL Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCandidiaseOralConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.candidiaseOralConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 1294</b>
+   *
+   * <p><b>Name:</b> CRYPTOCOCCAL MENINGITIS
+   *
+   * <p><b>Description:</b> CRYPTOCOCCAL MENINGITIS Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCryptococcalMeningitisConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.cryptococcalMeningitisConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 1570</b>
+   *
+   * <p><b>Name:</b> CERVICAL CANCER
+   *
+   * <p><b>Description:</b> CERVICAL CANCER Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCervicalCancerConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.cervicalCancerConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 5340</b>
+   *
+   * <p><b>Name:</b> CANDIDÍASE ESOFÁGICA
+   *
+   * <p><b>Description:</b> CANDIDÍASE ESOFÁGICA Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCandidiaseEsofagicaConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.candidiaseEsofagicaConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 5344</b>
+   *
+   * <p><b>Name:</b> HERPES SIMPLES > 1 MÊS OU VISCERAL
+   *
+   * <p><b>Description:</b> HERPES SIMPLES > 1 MÊS OU VISCERAL Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getHerpesSimplesConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.herpesSimplesConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 14656</b>
+   *
+   * <p><b>Name:</b> Cachexia
+   *
+   * <p><b>Description:</b> Cachexia Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCachexiaConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.cachexiaConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 7180</b>
+   *
+   * <p><b>Name:</b> Toxoplasmose
+   *
+   * <p><b>Description:</b> Toxoplasmose Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getToxoplasmoseConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.toxoplasmoseConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 6990</b>
+   *
+   * <p><b>Name:</b> Doença pelo HIV resultando em encefalopatia
+   *
+   * <p><b>Description:</b> Doença pelo HIV resultando em encefalopatia Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getHivDiseaseResultingInEncephalopathyConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.hivDiseaseResultingInEncephalopathyConceptUuid");
+    return getConcept(uuid);
+  }
 }
