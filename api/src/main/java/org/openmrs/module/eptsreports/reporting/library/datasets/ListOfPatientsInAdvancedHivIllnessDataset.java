@@ -379,7 +379,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
                 hivMetadata.getSuspectedCancerConcept()),
             true),
         "endDate=${endDate},location=${location}",
-        new TestResultConverter());
+        new ViaResultsConverter());
 
     // 34 - Data do Último Rastreio de CACU – Sheet 1: Column AH
     pdd.addColumn(

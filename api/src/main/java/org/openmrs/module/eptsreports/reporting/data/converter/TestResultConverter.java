@@ -13,9 +13,9 @@ public class TestResultConverter implements DataConverter {
 
     switch (original.toString()) {
       case "703":
-        return "Via Positivo";
+        return "Positivo";
       case "664":
-        return "Via Negativo";
+        return "Negativo";
       case "1065":
         return "Sim";
       case "1066":
