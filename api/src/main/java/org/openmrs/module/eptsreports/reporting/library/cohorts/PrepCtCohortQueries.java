@@ -464,7 +464,7 @@ public class PrepCtCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getExtractOnlyHomosexual() {
+  public CohortDefinition getPatientsWhoAreHomosexual() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Homosexuals");
     cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
@@ -494,7 +494,7 @@ public class PrepCtCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getExtractOnlyPrisoner() {
+  public CohortDefinition getPatientsWhoArePrisoner() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Prisoners");
     cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
@@ -526,7 +526,7 @@ public class PrepCtCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getExtractOnlyTransgender() {
+  public CohortDefinition getPatientsWhoAreTransgender() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Transgender");
     cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
@@ -553,7 +553,7 @@ public class PrepCtCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getExtractOutro() {
+  public CohortDefinition getPatientsWhoAreOutro() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Outro");
     cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
@@ -586,7 +586,7 @@ public class PrepCtCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getExtractOnlySexWorker() {
+  public CohortDefinition getPatientsWhoAreSexWorker() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Sex Worker");
     cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
