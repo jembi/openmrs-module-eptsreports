@@ -295,7 +295,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "tb_screening_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionB(3, 9),
         "evaluationYear=${evaluationYear},location=${location}",
-        new NoOrYesConverter());
+        new NotApplicableIfNullConverter());
 
     // B14 - Identificação de registo de PB/IMC em TODAS as consultas desde a inscrição no MDS até
     // ao 12˚ mês de TARV Coluna AK
