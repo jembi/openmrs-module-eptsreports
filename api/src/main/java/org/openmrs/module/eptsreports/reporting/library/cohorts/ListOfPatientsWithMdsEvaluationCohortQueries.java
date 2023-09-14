@@ -1062,7 +1062,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     String query =
         "SELECT     p.patient_id, "
-            + "           o.value_numeric AS first_vl_result  "
+            + "           IF(o.value_numeric IS NOT NULL, o.value_numeric, o.value_coded) AS first_vl_result  "
             + "FROM       patient p "
             + "INNER JOIN encounter e "
             + "ON         e.patient_id = p.patient_id "

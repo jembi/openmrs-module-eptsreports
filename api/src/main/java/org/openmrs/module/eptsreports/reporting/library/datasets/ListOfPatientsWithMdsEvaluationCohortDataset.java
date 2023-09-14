@@ -93,7 +93,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "art_start",
         listOfPatientsWithMdsEvaluationCohortQueries.getArtStartDate(),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // A6- Elegível ao TPT no Início do TARV: (coluna F)
     pdd.addColumn(
@@ -107,14 +107,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "tpt_start_date",
         listOfPatientsWithMdsEvaluationCohortQueries.getTptInitiationDate(),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // A8- Data de registo do resultado de CD4 inicial: (coluna H)
     pdd.addColumn(
         "cd4_register_date",
         listOfPatientsWithMdsEvaluationCohortQueries.getCd4ResultDate(),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // A9- Resultado do CD4 Inicial: (coluna I)
     pdd.addColumn(
@@ -131,21 +131,21 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "first_cv_date",
         listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoad(),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // B.2 - Data de registo do resultado da 1ª CV - Sheet 1: Column K
     pdd.addColumn(
         "first_cv_result_date",
         listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoadResultDate(),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // B.3 - Resultado da 1ª CV - Sheet 1: Column L
     pdd.addColumn(
         "first_cv_result",
         listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoadResult(),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ViralLoadQualitativeLabelConverter());
 
     // B.4 - Resultado do 2˚ CD4 (2˚ CD4 feito nos 1˚s 12 meses de TARV) - Sheet 1: Column M
     pdd.addColumn(
@@ -182,7 +182,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "mds_date",
         listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(3, 9),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // B10.1 -Tipo de MDS: (MDS1) Coluna S
     pdd.addColumn(
@@ -196,14 +196,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "mds_one_start_date_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds1StartDate(12),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // B10.3 - Data Fim de MDS1: Coluna U
     pdd.addColumn(
         "mds_one_end_date_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds1EndDate(12),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // B10.4 - Tipo de MDS: (MDS2) Coluna V
     pdd.addColumn(
@@ -217,14 +217,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "mds_two_start_date_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds2StartDate(12),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // B10.6 - Data Fim de MDS2: Coluna X
     pdd.addColumn(
         "mds_two_end_date_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds2EndDate(12),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // B10.7 - Tipo de MDS: (MDS3) Coluna Y
     pdd.addColumn(
@@ -238,14 +238,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "mds_three_start_date_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds3StartDate(12),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // B10.9 - Data Fim de MDS3: Coluna AA
     pdd.addColumn(
         "mds_three_end_date_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds3EndDate(12),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // B10.10 - Tipo de MDS: (MDS4) Coluna AB
     pdd.addColumn(
@@ -259,14 +259,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "mds_four_start_date_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds4StartDate(12),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // B10.12 - Data Fim de MDS4: Coluna AD
     pdd.addColumn(
         "mds_four_end_date_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds4EndDate(12),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // B10.13 - Tipo de MDS: (MDS5) Coluna AE
     pdd.addColumn(
@@ -280,14 +280,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "mds_five_start_date_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds5StartDate(12),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // B10.15 - Data Fim de MDS5: Coluna AG
     pdd.addColumn(
         "mds_five_end_date_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds5EndDate(12),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // B11 - Rastreado para TB em TODAS as consultas entre a data de inscrição no MDS e 12˚ mês de
     // TARV?: Coluna AH
@@ -331,14 +331,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "cv_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getSecondViralLoad(),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // C.2 - Data de registo do resultado da CV de Seguimento - Sheet 1: (coluna AQ)
     pdd.addColumn(
         "cv_result_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getSecondViralLoadResultDate(),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // C.3 - Identificação do Resultado da CV de Seguimento - Sheet 1: (coluna AR)
     pdd.addColumn(
@@ -383,7 +383,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "mds_tarv_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(12, 24),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // C10.1 -Tipo de MDS: (MDS1) Coluna AY
     pdd.addColumn(
@@ -397,14 +397,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "mds_one_start_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds1StartDate(24),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // C10.3 - Data Fim de MDS1: Coluna BA
     pdd.addColumn(
         "mds_one_end_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds1EndDate(24),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // C10.4 - Tipo de MDS: (MDS2) Coluna BB
     pdd.addColumn(
@@ -418,14 +418,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "mds_two_start_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds2StartDate(24),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // C10.6 - Data Fim de MDS2: Coluna BD
     pdd.addColumn(
         "mds_two_end_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds2EndDate(24),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // C10.7 - Tipo de MDS: (MDS3) Coluna BE
     pdd.addColumn(
@@ -439,14 +439,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "mds_three_start_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds3StartDate(24),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // C10.9 - Data Fim de MDS3: Coluna BG
     pdd.addColumn(
         "mds_three_end_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds3EndDate(24),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // C10.10 - Tipo de MDS: (MDS4) Coluna BH
     pdd.addColumn(
@@ -460,14 +460,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "mds_four_start_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds4StartDate(24),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // C10.12 - Data Fim de MDS4: Coluna BJ
     pdd.addColumn(
         "mds_four_end_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds4EndDate(24),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // C10.13 - Tipo de MDS: (MDS5) Coluna BK
     pdd.addColumn(
@@ -481,14 +481,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "mds_five_start_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds5StartDate(24),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // C10.15 - Data Fim de MDS5: Coluna BM
     pdd.addColumn(
         "mds_five_end_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds5EndDate(24),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // C11 - Rastreado para TB em TODAS as consultas entre 12˚ e 24˚ mês de TARV?- C.11 (Coluna BN)
     pdd.addColumn(
