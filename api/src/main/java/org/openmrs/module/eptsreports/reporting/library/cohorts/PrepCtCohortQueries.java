@@ -373,7 +373,7 @@ public class PrepCtCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getKeypopulation(List<Concept> answers) {
+  public CohortDefinition getPatientsWhoAreKeypopulation(List<Concept> answers) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patients who are Key population ");
     cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
@@ -471,9 +471,10 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition HSM = getKeypopulation(Arrays.asList(hivMetadata.getHomosexualConcept()));
+    CohortDefinition HSM =
+        getPatientsWhoAreKeypopulation(Arrays.asList(hivMetadata.getHomosexualConcept()));
     CohortDefinition exclusion =
-        getKeypopulation(
+        getPatientsWhoAreKeypopulation(
             Arrays.asList(
                 hivMetadata.getDrugUseConcept(),
                 hivMetadata.getSexWorkerConcept(),
@@ -502,9 +503,9 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition prisoner =
-        getKeypopulation(Arrays.asList(hivMetadata.getImprisonmentConcept()));
+        getPatientsWhoAreKeypopulation(Arrays.asList(hivMetadata.getImprisonmentConcept()));
     CohortDefinition exclusion =
-        getKeypopulation(
+        getPatientsWhoAreKeypopulation(
             Arrays.asList(
                 hivMetadata.getDrugUseConcept(),
                 hivMetadata.getHomosexualConcept(),
@@ -533,9 +534,10 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition trans = getKeypopulation(Arrays.asList(hivMetadata.getTransGenderConcept()));
+    CohortDefinition trans =
+        getPatientsWhoAreKeypopulation(Arrays.asList(hivMetadata.getTransGenderConcept()));
     CohortDefinition exclusion =
-        getKeypopulation(
+        getPatientsWhoAreKeypopulation(
             Arrays.asList(hivMetadata.getDrugUseConcept(), hivMetadata.getSexWorkerConcept()));
 
     cd.addSearch(
@@ -561,9 +563,9 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition outro =
-        getKeypopulation(Arrays.asList(hivMetadata.getOtherOrNonCodedConcept()));
+        getPatientsWhoAreKeypopulation(Arrays.asList(hivMetadata.getOtherOrNonCodedConcept()));
     CohortDefinition exclusion =
-        getKeypopulation(
+        getPatientsWhoAreKeypopulation(
             Arrays.asList(
                 hivMetadata.getImprisonmentConcept(),
                 hivMetadata.getDrugUseConcept(),
@@ -593,8 +595,10 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition SW = getKeypopulation(Arrays.asList(hivMetadata.getSexWorkerConcept()));
-    CohortDefinition onDrugs = getKeypopulation(Arrays.asList(hivMetadata.getDrugUseConcept()));
+    CohortDefinition SW =
+        getPatientsWhoAreKeypopulation(Arrays.asList(hivMetadata.getSexWorkerConcept()));
+    CohortDefinition onDrugs =
+        getPatientsWhoAreKeypopulation(Arrays.asList(hivMetadata.getDrugUseConcept()));
 
     cd.addSearch(
         "drugUser",
