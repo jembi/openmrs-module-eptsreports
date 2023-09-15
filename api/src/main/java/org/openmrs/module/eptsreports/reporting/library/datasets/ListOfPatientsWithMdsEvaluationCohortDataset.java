@@ -159,7 +159,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "good_adherence_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(),
         "evaluationYear=${evaluationYear},location=${location}",
-        new NoOrYesConverter());
+        new EmptyIfNullConverter());
 
     // B6- Esteve grávida ou foi lactante entre 3˚ e 9º mês de TARV?: (coluna M)- Resposta = Sim ou
     // Não (RF22)
