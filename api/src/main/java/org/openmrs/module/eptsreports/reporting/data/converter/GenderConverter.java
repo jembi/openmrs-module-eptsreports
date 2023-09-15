@@ -9,13 +9,15 @@ public class GenderConverter implements DataConverter {
     if (obj == null) {
       return "";
     }
-    return obj.toString();
+    return obj.equals("M") ? "Masculino".toString() : "Feminino".toString();
   }
 
+  @Override
   public Class<?> getInputDataType() {
     return String.class;
   }
 
+  @Override
   public Class<?> getDataType() {
     return String.class;
   }

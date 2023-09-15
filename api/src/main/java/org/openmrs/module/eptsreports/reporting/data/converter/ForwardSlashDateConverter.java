@@ -28,7 +28,7 @@ public class ForwardSlashDateConverter implements DataConverter {
 
   public static String formatDate(Date date) {
 
-    Format formatter = new SimpleDateFormat("dd-MM-yyyy");
+    Format formatter = new SimpleDateFormat("dd/MM/yyyy");
 
     return formatter.format(date);
   }
