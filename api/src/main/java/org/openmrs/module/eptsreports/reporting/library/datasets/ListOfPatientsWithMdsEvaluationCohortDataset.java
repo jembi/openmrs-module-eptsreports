@@ -293,7 +293,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // TARV?: Coluna AH
     pdd.addColumn(
         "tb_screening_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionB(3, 9),
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionB(3, 9, true, true),
         "evaluationYear=${evaluationYear},location=${location}",
         new NotApplicableIfNullConverter());
 
@@ -301,9 +301,9 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // ao 12˚ mês de TARV Coluna AK
     pdd.addColumn(
         "pb_imc_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPbImcSectionB(3, 9),
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionB(3, 9, true, false),
         "evaluationYear=${evaluationYear},location=${location}",
-        new NoOrYesConverter());
+        new NotApplicableIfNullConverter());
 
     // B16 - Identificação de n˚ de consultas clínicas entre 6˚ e 12˚ mês de TARV Coluna AM
     pdd.addColumn(
@@ -493,17 +493,17 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C11 - Rastreado para TB em TODAS as consultas entre 12˚ e 24˚ mês de TARV?- C.11 (Coluna BN)
     pdd.addColumn(
         "tb_screening_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(3, 9),
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionB(3, 9, false, true),
         "evaluationYear=${evaluationYear},location=${location}",
-        new NoOrYesConverter());
+        new NotApplicableIfNullConverter());
 
     // C14 - PB/IMC registado em TODAS as consultas entre o 12˚ a 24º mês de TARV? (coluna BQ) -
     // Resposta = Sim ou Não ou N/A (RF27)
     pdd.addColumn(
         "pb_imc_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPbImcSectionC(3, 9),
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionB(3, 9, false, false),
         "evaluationYear=${evaluationYear},location=${location}",
-        new NoOrYesConverter());
+        new NotApplicableIfNullConverter());
 
     // C16 - Identificação de n˚ de consultas clínicas entre 6˚ e 12˚ mês de TARV Coluna AJ
     pdd.addColumn(
