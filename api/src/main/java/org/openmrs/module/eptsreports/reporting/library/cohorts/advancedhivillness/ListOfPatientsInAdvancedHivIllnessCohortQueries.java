@@ -1210,7 +1210,6 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "               AND p.voided = 0 "
             + "               AND pg.program_id IN ( ${1}, ${2} ) "
             + "               AND ps.state IN ( ${28}, ${29} ) "
-            + "               AND ps.end_date IS NULL "
             + "               AND ps.start_date = pps. transferred_date "
             + "               AND pg.location_id = :location "
             + "        GROUP  BY p.patient_id "
