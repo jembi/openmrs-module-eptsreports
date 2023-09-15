@@ -2792,7 +2792,7 @@ public class QualityImprovement2020CohortQueries {
             commonMetadata.getBreastfeeding().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
 
-    CohortDefinition transfOut = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition transfOut = getTranferredOutPatients();
 
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING2));
 
@@ -4237,7 +4237,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition transferOut = getTranferredOutPatients();
 
     comp.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
 
@@ -4251,7 +4251,10 @@ public class QualityImprovement2020CohortQueries {
             transferredIn,
             "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
-    comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
+    comp.addSearch(
+        "F",
+        EptsReportUtils.map(
+            transferOut, "revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "ADULT",
@@ -4562,7 +4565,7 @@ public class QualityImprovement2020CohortQueries {
             commonMetadata.getBreastfeeding().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
 
-    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition transferOut = getTranferredOutPatients();
 
     cd.addSearch("A", EptsReportUtils.map(startedART, MAPPING2));
 
@@ -4588,7 +4591,10 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
 
-    cd.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
+    cd.addSearch(
+        "F",
+        EptsReportUtils.map(
+            transferOut, "location=${location},revisionEndDate=${revisionEndDate}"));
 
     cd.addSearch(
         "G",
@@ -4711,7 +4717,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition transferOut = getTranferredOutPatients();
 
     CohortDefinition returnedForAnyConsultationOrPickup =
         QualityImprovement2020Queries.getMQ12NumH(
@@ -4773,7 +4779,10 @@ public class QualityImprovement2020CohortQueries {
             transferredIn,
             "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
-    comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
+    comp.addSearch(
+        "F",
+        EptsReportUtils.map(
+            transferOut, "revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "H",
@@ -5505,8 +5514,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch(
         "F",
         EptsReportUtils.map(
-            commonCohortQueries.getTranferredOutPatients(),
-            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+            getTranferredOutPatients(), "revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch("G", EptsReportUtils.map(getMQC13P3NUM_G(), MAPPING));
     cd.addSearch("H", EptsReportUtils.map(getMQC13P3NUM_H(), MAPPING));
