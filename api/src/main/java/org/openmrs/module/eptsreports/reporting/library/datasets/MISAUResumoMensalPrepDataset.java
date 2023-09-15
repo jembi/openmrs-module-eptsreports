@@ -260,23 +260,31 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
     // Maternity
     ColumnParameters tenTo14pregnant =
         new ColumnParameters(
-            "tenTo14pregnant", "10 - 14 Pregnant", "age=10-14|maternity=pregnant", "11");
+            "tenTo14pregnant", "10 - 14 Pregnant", "age=10-14|maternity=pregnant|gender=F", "11");
     ColumnParameters above15pregnant =
-        new ColumnParameters("above15pregnant", "15+ Pregnant", "age=15+|maternity=pregnant", "12");
+        new ColumnParameters(
+            "above15pregnant", "15+ Pregnant", "age=15+|maternity=pregnant|gender=F", "12");
     ColumnParameters totalPregnant =
-        new ColumnParameters("totalPregnant", "Total of Pregnant", "maternity=pregnant", "13");
+        new ColumnParameters(
+            "totalPregnant", "Total of Pregnant", "maternity=pregnant|gender=F", "13");
     ColumnParameters tenTo14breastfeeding =
         new ColumnParameters(
             "tenTo14breastfeeding",
             "10 - 14 Breastfeeding",
-            "age=10-14|maternity=breastfeeding",
+            "age=10-14|maternity=breastfeeding|gender=F",
             "14");
     ColumnParameters above15breastfeeding =
         new ColumnParameters(
-            "above15breastfeeding", "15+ Breastfeeding", "age=15+|maternity=breastfeeding", "15");
+            "above15breastfeeding",
+            "15+ Breastfeeding",
+            "age=15+|maternity=breastfeeding|gender=F",
+            "15");
     ColumnParameters totalBreastfeeding =
         new ColumnParameters(
-            "totalBreastfeeding", "Total of Breastfeeding", "maternity=breastfeeding", "16");
+            "totalBreastfeeding",
+            "Total of Breastfeeding",
+            "maternity=breastfeeding|gender=F",
+            "16");
 
     // Key population
     ColumnParameters pid = new ColumnParameters("pid", "People who inject drugs", "KP=PID", "17");

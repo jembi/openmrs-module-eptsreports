@@ -13,8 +13,11 @@ package org.openmrs.module.eptsreports.reporting.library.dimensions;
 
 import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
+import java.util.Arrays;
 import java.util.Date;
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.metadata.CommonMetadata;
+import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
 import org.openmrs.module.eptsreports.reporting.library.queries.TbPrevQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -58,6 +61,9 @@ public class EptsCommonDimension {
 
   private TbPrevQueries tbPrevQueries;
 
+  private HivMetadata hivMetadata;
+  private CommonMetadata commonMetadata;
+
   @Autowired private TxPvlsBySourceLabOrFsrCohortQueries txPvlsBySourceLabOrFsrCohortQueries;
 
   @Autowired
@@ -80,6 +86,8 @@ public class EptsCommonDimension {
       MISAUKeyPopsCohortQueries misauKeyPopsCohortQueries,
       PrepCtCohortQueries prepCtCohortQueries,
       TbPrevQueries tbPrevQueries,
+      HivMetadata hivMetadata,
+      CommonMetadata commonMetadata,
       TxMlCohortQueries txMlCohortQueries) {
     this.genderCohortQueries = genderCohortQueries;
     this.txNewCohortQueries = txNewCohortQueries;
@@ -95,6 +103,8 @@ public class EptsCommonDimension {
     this.misauKeyPopsCohortQueries = misauKeyPopsCohortQueries;
     this.prepCtCohortQueries = prepCtCohortQueries;
     this.tbPrevQueries = tbPrevQueries;
+    this.hivMetadata = hivMetadata;
+    this.commonMetadata = commonMetadata;
   }
 
   /**
@@ -393,16 +403,18 @@ public class EptsCommonDimension {
     dim.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     dim.addParameter(new Parameter("onOrBefore", "orOrBefore", Date.class));
     dim.addParameter(new Parameter("location", "Location", Location.class));
-    CohortDefinition drugUserKeyPopCohort = hivCohortQueries.getDrugUserKeyPopCohort();
-    CohortDefinition homosexualKeyPopCohort = hivCohortQueries.getMaleHomosexualKeyPopDefinition();
-    CohortDefinition imprisonmentKeyPopCohort = hivCohortQueries.getImprisonmentKeyPopCohort();
+    CohortDefinition drugUserKeyPopCohort =
+        prepCtCohortQueries.getPatientsWhoAreKeypopulation(
+            Arrays.asList(hivMetadata.getDrugUseConcept()));
+    CohortDefinition homosexualKeyPopCohort = prepCtCohortQueries.getPatientsWhoAreHomosexual();
+    CohortDefinition imprisonmentKeyPopCohort = prepCtCohortQueries.getPatientsWhoArePrisoner();
     CohortDefinition femaleSexWorkerKeyPopCohort =
         hivCohortQueries.getFemaleSexWorkersKeyPopCohortDefinition();
     CohortDefinition maleSexWorkerKeyPopCohort =
         hivCohortQueries.getMaleSexWorkersKeyPopCohortDefinition();
-    CohortDefinition transgenderKeyPopCohort = hivCohortQueries.getTransgenderKeyPopCohort();
-    CohortDefinition sexWorkersKeyPopCohort = hivCohortQueries.getSexWorkerKeyPopCohort();
-    CohortDefinition outroKeyPopCohort = hivCohortQueries.getOutroKeyPopCohort();
+    CohortDefinition transgenderKeyPopCohort = prepCtCohortQueries.getPatientsWhoAreTransgender();
+    CohortDefinition sexWorkersKeyPopCohort = prepCtCohortQueries.getPatientsWhoAreSexWorker();
+    CohortDefinition outroKeyPopCohort = prepCtCohortQueries.getPatientsWhoAreOutro();
     dim.addCohortDefinition("PID", mapStraightThrough(drugUserKeyPopCohort));
     dim.addCohortDefinition("MSM", mapStraightThrough(homosexualKeyPopCohort));
     dim.addCohortDefinition("CSW", mapStraightThrough(femaleSexWorkerKeyPopCohort));
@@ -880,19 +892,17 @@ public class EptsCommonDimension {
     dim.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition adolescentsAndYouthTargetGroupCohort =
-        extractOnlyTargetGroup(hivCohortQueries.getAdolescentsAndYouthTargetGroupCohort());
+        prepCtCohortQueries.getPatientsWhoAreAdolescentAndYouth();
     CohortDefinition pregnantWomanTargetGroupCohort =
-        extractOnlyTargetGroup(hivCohortQueries.getPregnantWomanTargetGroupDefinition());
+        prepCtCohortQueries.getPatientsWhoArePregnant();
     CohortDefinition breastfeedingWomanTargetGroupCohort =
-        extractOnlyTargetGroup(hivCohortQueries.getBreastfeedingWomanTargetGroupDefinition());
-    CohortDefinition militaryTargetGroupCohort =
-        extractOnlyTargetGroup(hivCohortQueries.getMilitaryTargetGroupCohort());
-    CohortDefinition minerTargetGroupCohort =
-        extractOnlyTargetGroup(hivCohortQueries.getMinerTargetGroupCohort());
+        prepCtCohortQueries.getPatientsWhoAreBreastfeeding();
+    CohortDefinition militaryTargetGroupCohort = prepCtCohortQueries.getPatientsWhoAreMilitary();
+    CohortDefinition minerTargetGroupCohort = prepCtCohortQueries.getPatientsWhoAreMiners();
     CohortDefinition truckDriverTargetGroupCohort =
-        extractOnlyTargetGroup(hivCohortQueries.getTruckDriverTargetGroupCohort());
+        prepCtCohortQueries.getPatientsWhoAreTruckDrivers();
     CohortDefinition serodiscordantCouplesTargetGroupCohort =
-        extractOnlyTargetGroup(hivCohortQueries.getSerodiscordantCouplesTargetGroupCohort());
+        prepCtCohortQueries.getPatientsWhoAreSerodiscordantCouples();
 
     dim.addCohortDefinition("AYR", mapStraightThrough(adolescentsAndYouthTargetGroupCohort));
     dim.addCohortDefinition("PW", mapStraightThrough(pregnantWomanTargetGroupCohort));

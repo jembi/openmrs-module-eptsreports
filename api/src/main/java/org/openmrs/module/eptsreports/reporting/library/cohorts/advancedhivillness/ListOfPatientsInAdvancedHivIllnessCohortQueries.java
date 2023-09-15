@@ -483,7 +483,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "WHERE e.voided = 0 AND o.voided = 0 "
             + "  AND e.encounter_type = ${6} "
             + "  AND o.concept_id = ${1406} "
-            + "  AND o.value_coded IN (${60},${507},${1294},${1570},${5042},${5334},${5344},${5340},${6990},${7180},${14656}) "
+            + "  AND o.value_coded IN (${507},${1294},${1570},${5042},${5334},${5344},${5340},${6990},${7180},${14656}) "
             + "  AND e.encounter_datetime = first_consultation.consultation_date "
             + "  AND e.location_id = :location "
             + "GROUP BY e.patient_id"
@@ -497,7 +497,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "WHERE e.voided = 0 AND o.voided = 0 "
             + "  AND e.encounter_type = ${6} "
             + "  AND o.concept_id = ${1406} "
-            + "  AND o.value_coded IN (${3},${42},${43},${126},${1570},${5018},${5334},${5945},${6783}) "
+            + "  AND o.value_coded IN (${3},${42},${43},${60},${126},${5018},${5334},${5945},${6783}) "
             + "  AND e.encounter_datetime = first_consultation.consultation_date "
             + "  AND e.location_id = :location "
             + "GROUP BY e.patient_id";
@@ -725,8 +725,16 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "       INNER JOIN obs o "
             + "               ON e.encounter_id = o.encounter_id "
             + " INNER JOIN ( "
-            + listOfPatientsOnAdvancedHivIllnessQueries
-                .getPatientsWithCD4AbsoluteResultOnPeriodQuery(true)
+            + " SELECT result.person_id, Max(result.most_recent) AS most_recent FROM ( "
+            + new EptsQueriesUtil()
+                .unionBuilder(
+                    listOfPatientsOnAdvancedHivIllnessQueries
+                        .getPatientsWithCD4AbsoluteResultOnPeriodQuery(true))
+                .union(
+                    listOfPatientsOnAdvancedHivIllnessQueries
+                        .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true))
+                .buildQuery()
+            + " ) result GROUP BY result.person_id "
             + " ) last_cd4 ON last_cd4.person_id = ps.person_id "
             + "WHERE  ps.voided = 0 "
             + "       AND e.voided = 0 "
@@ -745,8 +753,16 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "    person ps INNER JOIN encounter e ON ps.person_id= e.patient_id "
             + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
             + " INNER JOIN ( "
-            + listOfPatientsOnAdvancedHivIllnessQueries
-                .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true)
+            + " SELECT result.person_id, Max(result.most_recent) AS most_recent FROM ( "
+            + new EptsQueriesUtil()
+                .unionBuilder(
+                    listOfPatientsOnAdvancedHivIllnessQueries
+                        .getPatientsWithCD4AbsoluteResultOnPeriodQuery(true))
+                .union(
+                    listOfPatientsOnAdvancedHivIllnessQueries
+                        .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true))
+                .buildQuery()
+            + " ) result GROUP BY result.person_id "
             + " ) last_cd4 ON last_cd4.person_id = ps.person_id "
             + "WHERE ps.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "  AND e.encounter_type = ${53} "
@@ -779,14 +795,16 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     Map<String, Integer> map = getStringIntegerMap();
 
     String query =
-        new EptsQueriesUtil()
-            .unionBuilder(
-                listOfPatientsOnAdvancedHivIllnessQueries
-                    .getPatientsWithCD4AbsoluteResultOnPeriodQuery(true))
-            .union(
-                listOfPatientsOnAdvancedHivIllnessQueries
-                    .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true))
-            .buildQuery();
+        " SELECT result.person_id, Max(result.most_recent) AS most_recent FROM ( "
+            + new EptsQueriesUtil()
+                .unionBuilder(
+                    listOfPatientsOnAdvancedHivIllnessQueries
+                        .getPatientsWithCD4AbsoluteResultOnPeriodQuery(true))
+                .union(
+                    listOfPatientsOnAdvancedHivIllnessQueries
+                        .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true))
+                .buildQuery()
+            + " ) result GROUP BY result.person_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -950,7 +968,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
-        " SELECT second_result.patient_id, MAX(second_result.viral_load) FROM ( "
+        " SELECT second_result.patient_id, second_result.viral_load FROM ( "
             + listOfPatientsOnAdvancedHivIllnessQueries
                 .getSecondVLResultOrResultDateBeforeMostRecent()
             + " ) AS second_result GROUP BY second_result.patient_id ";
@@ -1324,11 +1342,13 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + " INNER JOIN patient_identifier_type pit ON pit.patient_identifier_type_id=pi.identifier_type "
             + " WHERE p.voided=0 AND pi.voided=0 AND pit.retired=0 AND pi.preferred = 1 AND pit.patient_identifier_type_id ="
             + identifierType
+            + " GROUP BY p.patient_id"
             + " UNION "
             + " SELECT p.patient_id,pi.identifier  FROM patient p INNER JOIN patient_identifier pi ON p.patient_id=pi.patient_id "
             + " INNER JOIN patient_identifier_type pit ON pit.patient_identifier_type_id=pi.identifier_type "
             + " WHERE p.voided=0 AND pi.voided=0 AND pit.retired=0 AND pit.patient_identifier_type_id ="
-            + identifierType;
+            + identifierType
+            + " GROUP BY p.patient_id";
 
     spdd.setQuery(sql);
     return spdd;
