@@ -6,7 +6,7 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 public class SismaCodeDatasetDefinition extends DatimCodeDatasetDefinition {
 
   public SismaCodeDatasetDefinition() {
-    typeId = 1;
+    typeId = 4;
     columnName = "sismaCode";
   }
 }
