@@ -4542,80 +4542,61 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     // Start adding the definitions based on the requirements
-    CohortDefinition startedART = getMOHArtStartDate();
+    CohortDefinition den3 = getMQC12P2DEN(3);
 
-    CohortDefinition b1 = getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsFirstLine_B1();
+    CohortDefinition den4 = getMQC12P2DEN(4);
 
-    CohortDefinition b1E = getPatientsFromFichaClinicaDenominatorB1EOrB2E(true);
+    CohortDefinition den7 = getMQC12P2DEN(7);
 
-    CohortDefinition b2 = getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsSecondLine_B2();
+    CohortDefinition den8 = getMQC12P2DEN(8);
 
-    CohortDefinition b2E = getPatientsFromFichaClinicaDenominatorB1EOrB2E(false);
+    CohortDefinition den11 = getMQC12P2DEN(11);
 
-    CohortDefinition pregnant =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getPregnantConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
-
-    CohortDefinition breastfeeding =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getBreastfeeding().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
-
-    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
-
-    cd.addSearch("A", EptsReportUtils.map(startedART, MAPPING2));
+    CohortDefinition b13 = resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
 
     cd.addSearch(
-        "B1",
+        "DEN3",
         EptsReportUtils.map(
-            b1,
-            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
+            den3,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-        "B1E", EptsReportUtils.map(b1E, "location=${location},revisionEndDate=${revisionEndDate}"));
-
-    cd.addSearch(
-        "B2",
+        "DEN4",
         EptsReportUtils.map(
-            b2,
-            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
+            den4,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-        "B2E", EptsReportUtils.map(b2E, "location=${location},revisionEndDate=${revisionEndDate}"));
-
-    cd.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
-
-    cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
-
-    cd.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
-
-    cd.addSearch(
-        "G",
+        "DEN7",
         EptsReportUtils.map(
-            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(true),
-            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},location=${location}"));
+            den7,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-        "ADULT",
+        "DEN8",
         EptsReportUtils.map(
-            genericCohortQueries.getAgeOnMOHArtStartDate(15, null, false),
-            "onOrAfter=${revisionEndDate-14m},onOrBefore=${revisionEndDate-11m},location=${location}"));
+            den8,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
     cd.addSearch(
-        "CHILDREN",
+        "DEN11",
         EptsReportUtils.map(
-            genericCohortQueries.getAgeOnMOHArtStartDate(0, 14, true),
-            "onOrAfter=${revisionEndDate-14m},onOrBefore=${revisionEndDate-11m},location=${location}"));
+            den11,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "B13", EptsReportUtils.map(b13, "endDate=${revisionEndDate},location=${location}"));
+
     if (flag == 3) {
-      cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR F)) AND G AND ADULT");
+      cd.setCompositionString("DEN3 AND B13");
     } else if (flag == 4) {
-      cd.setCompositionString("(A AND B2 AND NOT (B2E OR C OR D OR F)) AND G AND ADULT");
+      cd.setCompositionString("DEN4 AND B13");
     } else if (flag == 7) {
-      cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR F)) AND G AND CHILDREN");
+      cd.setCompositionString("DEN7 AND B13");
     } else if (flag == 8) {
-      cd.setCompositionString("(A AND B2) AND NOT (B2E OR C OR D OR F) AND G AND CHILDREN");
+      cd.setCompositionString("DEN8 AND B13");
     } else if (flag == 11) {
-      cd.setCompositionString("(A AND B1 AND C) AND NOT (B1E OR D OR F) AND G");
+      cd.setCompositionString("DEN11 AND B13");
     }
 
     return cd;
