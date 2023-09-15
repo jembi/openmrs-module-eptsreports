@@ -8,7 +8,13 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
-import org.openmrs.module.eptsreports.reporting.data.converter.*;
+import org.openmrs.module.eptsreports.reporting.data.converter.DashDateFormatConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.EmptyToNaoAndAnyToSimConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.ObservationToConceptNameConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.TestResultConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.ViaResultsConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsArtCohortCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
@@ -30,7 +36,6 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
 
   private final ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries;
 
-  private final TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet;
   private final ListOfPatientsInAdvancedHivIllnessCohortQueries
       listOfPatientsInAdvancedHivIllnessCohortQueries;
 
@@ -40,14 +45,13 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
 
   private final CommonMetadata commonMetadata;
 
-  private EptsGeneralIndicator eptsGeneralIndicator;
+  private final EptsGeneralIndicator eptsGeneralIndicator;
 
   String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
   @Autowired
   public ListOfPatientsInAdvancedHivIllnessDataset(
       ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries,
-      TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet,
       ListOfPatientsInAdvancedHivIllnessCohortQueries
           listOfPatientsInAdvancedHivIllnessCohortQueries,
       TbMetadata tbMetadata,
@@ -55,7 +59,6 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
       CommonMetadata commonMetadata,
       EptsGeneralIndicator eptsGeneralIndicator) {
     this.listOfPatientsArtCohortCohortQueries = listOfPatientsArtCohortCohortQueries;
-    this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
     this.listOfPatientsInAdvancedHivIllnessCohortQueries =
         listOfPatientsInAdvancedHivIllnessCohortQueries;
     this.tbMetadata = tbMetadata;
@@ -130,14 +133,14 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "art_start",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getARTStartDate(),
         "endDate=${endDate},location=${location}",
-        new ForwardSlashDateConverter());
+        new DashDateFormatConverter());
 
     // 8 - Data de Último Levantamento TARV - Sheet 1: Column H
     pdd.addColumn(
         "last_pickup",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getLastARVPickupDate(),
         mappings,
-        new ForwardSlashDateConverter());
+        new DashDateFormatConverter());
 
     // 9 - Transferido de Outra US- Sheet 1: Column I
     pdd.addColumn(
@@ -164,14 +167,14 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "followup_startdate",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getFollowupStartDateDAH(),
         mappings,
-        new ForwardSlashDateConverter());
+        new DashDateFormatConverter());
 
     // 13 - Data de Registo de CD4 Absoluto – Sheet 1: Column M
     pdd.addColumn(
         "cd4_resultdate",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getCd4ResultDate(),
         mappings,
-        new ForwardSlashDateConverter());
+        new DashDateFormatConverter());
 
     // 14 - Resultado de CD4 – Sheet 1: Column N
     pdd.addColumn(
@@ -182,7 +185,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "last_estadio_date",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getDateOfEstadioByTheEndOfPeriod(),
         "endDate=${endDate},location=${location}",
-        new ForwardSlashDateConverter());
+        new DashDateFormatConverter());
 
     // 16 - Infecções Estadio OMS – Sheet 1: Column P
     pdd.addColumn(
@@ -216,7 +219,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "last_cd4_resultdate",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultDate(),
         mappings,
-        new ForwardSlashDateConverter());
+        new DashDateFormatConverter());
 
     // 21 - Resultado do Penúltimo CD4 – Sheet 1: Column U
     pdd.addColumn(
@@ -229,7 +232,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "second_cd4_resultdate",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultDateBeforeMostRecentCd4(),
         mappings,
-        new ForwardSlashDateConverter());
+        new DashDateFormatConverter());
 
     // 23 - Resultado da Última Carga Viral – Sheet 1: Column W
     pdd.addColumn(
@@ -242,7 +245,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "vl_result_date",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getMostRecentVLResultDate(),
         "endDate=${endDate},location=${location}",
-        new ForwardSlashDateConverter());
+        new DashDateFormatConverter());
 
     // 25 - Resultado da Penúltima Carga Viral – Sheet 1: Column Y
     pdd.addColumn(
@@ -257,7 +260,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         listOfPatientsInAdvancedHivIllnessCohortQueries
             .getLastVLResultDateBeforeMostRecentVLResultDate(),
         "endDate=${endDate},location=${location}",
-        new ForwardSlashDateConverter());
+        new DashDateFormatConverter());
 
     // 27 - Resultado do Última TB-LAM – Sheet 1: Column AA
     pdd.addColumn(
@@ -293,7 +296,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
                 tbMetadata.getIndeterminate()),
             false),
         "endDate=${endDate},location=${location}",
-        new ForwardSlashDateConverter());
+        new DashDateFormatConverter());
 
     // 29 - Resultado do Última CrAG Soro – Sheet 1: Column AC
     pdd.addColumn(
@@ -329,7 +332,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
                 tbMetadata.getIndeterminate()),
             false),
         "endDate=${endDate},location=${location}",
-        new ForwardSlashDateConverter());
+        new DashDateFormatConverter());
 
     // 31 - Resultado do último CrAG LCR – Sheet 1: Column AE
     pdd.addColumn(
@@ -365,7 +368,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
                 tbMetadata.getIndeterminate()),
             false),
         "endDate=${endDate},location=${location}",
-        new ForwardSlashDateConverter());
+        new DashDateFormatConverter());
 
     // 33 - Resultado do Último Rastreio de CACU – Sheet 1: Column AG
     pdd.addColumn(
@@ -382,7 +385,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
                 hivMetadata.getSuspectedCancerConcept()),
             true),
         "endDate=${endDate},location=${location}",
-        new TestResultConverter());
+        new ViaResultsConverter());
 
     // 34 - Data do Último Rastreio de CACU – Sheet 1: Column AH
     pdd.addColumn(
@@ -399,7 +402,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
                 hivMetadata.getSuspectedCancerConcept()),
             false),
         "endDate=${endDate},location=${location}",
-        new ForwardSlashDateConverter());
+        new DashDateFormatConverter());
 
     return pdd;
   }
