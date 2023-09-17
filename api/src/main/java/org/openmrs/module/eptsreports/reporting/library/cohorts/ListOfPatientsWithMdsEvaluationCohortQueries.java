@@ -1424,7 +1424,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {DataDefinition}
    */
-  public DataDefinition getPatientsWithGoodAdhesion() {
+  public DataDefinition getPatientsWithGoodAdhesion(boolean b5Orc5) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "Teve registo de boa adesão em TODAS consultas entre 1˚ e 3˚ mês de TARV?; (coluna N) – Resposta = Sim ou Não");
@@ -1477,10 +1477,17 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                       WHERE  e.voided = 0 "
             + "                         AND o.voided = 0 "
             + "                         AND e.encounter_type = ${35} "
-            + "                         AND e.location_id =:location "
-            + "                         AND e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL 33 DAY) "
-            + "                         AND e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL 3 MONTH) "
-            + "                       GROUP  BY e.patient_id) consultation_tb "
+            + "                         AND e.location_id =:location ";
+
+    query +=
+        b5Orc5
+            ? "                         AND e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL 33 DAY) "
+                + "                         AND e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL 3 MONTH) "
+            : " AND        e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL 12 MONTH) "
+                + " AND        e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL 24 MONTH) ";
+
+    query +=
+        "                       GROUP  BY e.patient_id) consultation_tb "
             + "                      ON consultation_tb.patient_id = p.patient_id "
             + "           INNER JOIN (SELECT e.patient_id, "
             + "                              Count(e.encounter_id) AS nr_consultations "

@@ -157,7 +157,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B5- Teve registo de boa adesão em TODAS consultas entre 1˚ e 3˚ mês de TARV?
     pdd.addColumn(
         "good_adherence_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(true),
         "evaluationYear=${evaluationYear},location=${location}",
         new EmptyIfNullConverter());
 
@@ -357,7 +357,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C5- Teve registo de boa adesão em TODAS consultas entre 12˚ e 24˚ mês de TARV?
     pdd.addColumn(
         "good_adherence_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesionAfterAYearInTarv(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(false),
         "evaluationYear=${evaluationYear},location=${location}",
         new NoOrYesConverter());
 
