@@ -1949,7 +1949,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds1(int numberOfYears) {
+  public DataDefinition getMds1(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Tipo de MDS - (MDS1) Coluna S");
     sqlPatientDataDefinition.addParameter(
@@ -1978,7 +1978,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     String query =
         "                  SELECT     mds1.patient_id, "
-            + "                             MIN(otype1.value_coded) AS first_mds "
+            + "                             otype1.value_coded AS first_mds "
             + "                  FROM       patient mds1 "
             + "                  INNER JOIN encounter enc "
             + "                  ON         enc.patient_id = mds1.patient_id "
@@ -2012,7 +2012,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + numberOfYears
+            + numberOfMonths
             + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
@@ -2027,6 +2027,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND ostate1.voided = 0 "
             + "                  AND        enc.encounter_type = ${6} "
             + "                  AND        enc.location_id = :location "
+            + "                  AND        enc.encounter_datetime = mds_one.encounter_date "
             + "                  AND    (   ( otype1.concept_id = ${165174} "
             + "                               AND otype1.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate1.concept_id = ${165322} "
@@ -2352,7 +2353,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds1EndDate(int numberOfYears) {
+  public DataDefinition getMds1EndDate(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Data Fim de MDS1: Coluna U");
     sqlPatientDataDefinition.addParameter(
@@ -2391,47 +2392,16 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs os "
             + "                  ON         os.encounter_id = ee.encounter_id "
             + "                  INNER JOIN ( "
-            + "                  SELECT     p.patient_id, "
-            + "                             MIN(e.encounter_datetime) AS encounter_date, "
-            + "                             MIN(otype.value_coded) AS mds_one "
-            + "                  FROM       patient p "
-            + "                  INNER JOIN encounter e "
-            + "                  ON         e.patient_id = p.patient_id "
-            + "                  INNER JOIN obs otype "
-            + "                  ON         otype.encounter_id = e.encounter_id "
-            + "                  INNER JOIN obs ostate "
-            + "                  ON         ostate.encounter_id = e.encounter_id "
-            + "                  INNER JOIN ( "
-            + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.first_pickup AS art_encounter "
-            + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
-            + "                           ) art_patient "
-            + "                             ) art "
-            + "                  ON         art.patient_id = p.patient_id "
-            + "                  WHERE      p.voided = 0 "
-            + "                  AND        e.voided = 0 "
-            + "                  AND        otype.voided = 0 "
-            + "                  AND        ostate.voided = 0 "
-            + "                  AND        e.encounter_type = ${6} "
-            + "                  AND        e.location_id = :location "
-            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + numberOfYears
-            + " MONTH ) "
-            + "                  AND    (   ( otype.concept_id = ${165174} "
-            + "                               AND otype.value_coded IS NOT NULL ) "
-            + "                  AND         ( ostate.concept_id = ${165322} "
-            + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
-            + "                  AND  otype.obs_group_id = ostate.obs_group_id "
-            + "                  GROUP BY   p.patient_id ) mds1 "
+            + ListOfPatientsWithMdsEvaluationQueries.getFirstMdsAndDateQuery(
+                numberOfMonths, inclusionEndMonthAndDay)
+            + "                  ) mds1 "
             + "                  ON         mds1.patient_id = mds1_end.patient_id "
             + "                  WHERE      mds1_end.voided = 0 "
             + "                  AND        ot.voided = 0 "
             + "                  AND        os.voided = 0 "
             + "                  AND        ee.encounter_type = ${6} "
             + "                  AND        ee.location_id = :location "
-            + "                  AND        ee.encounter_datetime > mds1.encounter_date "
+            + "                  AND        ee.encounter_datetime > mds1.first_mds "
             + "                  AND    (   ( ot.concept_id = ${165174} "
             + "                               AND ot.value_coded = mds1.mds_one ) "
             + "                  AND         ( os.concept_id = ${165322} "
