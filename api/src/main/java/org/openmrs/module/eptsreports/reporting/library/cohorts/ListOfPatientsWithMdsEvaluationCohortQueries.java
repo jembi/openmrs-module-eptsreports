@@ -1581,7 +1581,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "              WHEN final_query.encounter_date IS NULL THEN 'Não' "
             + "              WHEN final_query.encounter_date IS NOT NULL THEN 'Sim' "
             + "              ELSE '' "
-            + "       end "
+            + "       END AS pregnant_breastfeeding "
             + "FROM   ( "
             + "                  SELECT     p.person_id, "
             + "                             e.encounter_datetime AS encounter_date "
