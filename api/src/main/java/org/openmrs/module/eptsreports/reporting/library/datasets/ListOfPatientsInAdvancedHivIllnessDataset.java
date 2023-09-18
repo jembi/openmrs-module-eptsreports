@@ -232,7 +232,8 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
     pdd.addColumn(
         "vl_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getMostRecentVLResult(),
-        "endDate=${endDate},location=${location}");
+        "endDate=${endDate},location=${location}",
+        new ViralLoadQualitativeLabelConverter());
 
     // 24 - Data da Último Carga Viral – Sheet 1: Column X
     pdd.addColumn(
@@ -246,7 +247,8 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "second_vl_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries
             .getLastVLResultBeforeMostRecentVLResultDate(),
-        "endDate=${endDate},location=${location}");
+        "endDate=${endDate},location=${location}",
+        new ViralLoadQualitativeLabelConverter());
 
     // 26 - Data da Penúltima Carga Viral – Sheet 1: Column Z
     pdd.addColumn(
