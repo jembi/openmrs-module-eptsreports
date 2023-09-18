@@ -1466,8 +1466,6 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "           INNER JOIN (SELECT e.patient_id, "
             + "                              Count(e.encounter_id) AS tb_consultations "
             + "                       FROM   encounter e "
-            + "                                  INNER JOIN obs o "
-            + "                                             ON o.encounter_id = e.encounter_id "
             + "                                  INNER JOIN (SELECT starv.patient_id, "
             + "                                                     starv.first_pickup AS art_encounter "
             + "                                              FROM   ( "
@@ -1475,7 +1473,6 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                                      ) starv) tarv "
             + "                                             ON tarv.patient_id = e.patient_id "
             + "                       WHERE  e.voided = 0 "
-            + "                         AND o.voided = 0 "
             + "                         AND e.encounter_type = ${35} "
             + "                         AND e.location_id =:location ";
 
@@ -1517,6 +1514,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    System.out.println(sqlPatientDataDefinition.getQuery());
 
     return sqlPatientDataDefinition;
   }
