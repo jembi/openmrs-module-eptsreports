@@ -2,6 +2,7 @@ package org.openmrs.module.eptsreports.reporting.data.converter;
 
 import org.openmrs.module.reporting.data.converter.DataConverter;
 
+/** Converter to return outputs for Quantitative and Qualidative Viral load results */
 public class ViralLoadQualitativeLabelConverter implements DataConverter {
 
   @Override
@@ -12,25 +13,25 @@ public class ViralLoadQualitativeLabelConverter implements DataConverter {
 
     switch (obj.toString()) {
       case "23814":
-        return "Indetectável";
+        return "INDETCTÁVEL";
 
       case "1306":
-        return "Nivel baixo de detecção";
+        return "NIVEL BAIXO DE DETECÇÃO";
 
       case "23905":
-        return "Menor que 10 copias/ml";
+        return "MENOR QUE 10 CÓPIAS/ML";
 
       case "23906":
-        return "Menor que 20 copias/ml";
+        return "MENOR QUE 20 CÓPIAS/ML";
 
       case "23907":
-        return "Menor que 40 copias/ml";
+        return "MENOR QUE 40 CÓPIAS/ML";
 
       case "23908":
-        return "Menor que 400 copias/ml";
+        return "MENOR QUE 400 CÓPIAS/ML";
 
       case "23904":
-        return "Menor que 839 copias/ml";
+        return "MENOR QUE 839 CÓPIAS/ML";
 
       default:
         return obj;
