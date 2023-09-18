@@ -1272,6 +1272,7 @@ public class QualityImprovement2020Queries {
             + "AND        e.voided = 0 "
             + "AND        o.voided = 0 "
             + "AND        vl.first_of_all = e.encounter_datetime "
+            + "AND        e.encounter_datetime BETWEEN :startDate and :endDate "
             + "AND        encounter_type = ${6} "
             + "AND        o.concept_id = ${1982} "
             + "AND        o.value_coded = ${1065} "

@@ -1010,4 +1010,74 @@ public class GenericCohortQueries {
 
     return sqlCohortDefinition;
   }
+
+  /**
+   * <b>Idade do Utente na Primeira Consulta</b>
+   *
+   * <p>
+   * <li>Idade = “Data Ultima Consulta” - Data de Nascimento
+   * <li>Nota1: A idade será calculada em anos.
+   * <li>Nota2: “Data ultima Consulta” é a data da ultima consulta clínica do utente, ou seja, o
+   *     ultimo registo, de consulta clínica (Ficha Clínica) decorrido no período de inclusão (“Data
+   *     Início Avaliação” = “Data de Recolha Dados” menos (-) 2 meses mais (+) 1 dia e “Data Fim
+   *     Avaliação” = “Data de Recolha Dados” menos (-) 1 mês.)
+   *
+   * @param minAge Minimum age of a patient based on First Clinical consultation
+   * @param maxAge Maximum age of a patient based on First Clinical consultation
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getAgeOnLastClinicalConsultation(Integer minAge, Integer maxAge) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Age on First Clinical Consultation");
+    sqlCohortDefinition.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("minAge", minAge);
+    map.put("maxAge", maxAge);
+
+    String query =
+        "SELECT p.person_id "
+            + "FROM person p "
+            + "     INNER JOIN ( "
+            + "           SELECT pa.patient_id,  "
+            + "                  MAX(enc.encounter_datetime) AS last_consultation  "
+            + "           FROM   patient pa  "
+            + "                      INNER JOIN encounter enc  "
+            + "                                 ON enc.patient_id =  pa.patient_id  "
+            + "                      INNER JOIN obs  "
+            + "                                 ON obs.encounter_id = enc.encounter_id  "
+            + "           WHERE pa.voided = 0  "
+            + "             AND enc.voided = 0  "
+            + "             AND obs.voided = 0  "
+            + "             AND enc.encounter_type = ${6}  "
+            + "             AND enc.encounter_datetime BETWEEN :onOrAfter AND :onOrBefore "
+            + "             AND enc.location_id = :location  "
+            + "           GROUP  BY pa.patient_id  "
+            + "     ) AS final ON p.person_id = final.patient_id "
+            + " WHERE  final.last_consultation <= :revisionEndDate "
+            + " AND ";
+
+    if (minAge != null && maxAge != null) {
+      query +=
+          "     TIMESTAMPDIFF(YEAR, p.birthdate, final.last_consultation) >= ${minAge}  "
+              + "         AND   "
+              + "   TIMESTAMPDIFF(YEAR, p.birthdate, final.last_consultation) <= ${maxAge} ";
+
+    } else if (minAge == null && maxAge != null) {
+      query += "   TIMESTAMPDIFF(YEAR, p.birthdate, final.last_consultation) <= ${maxAge} ";
+    } else if (minAge != null && maxAge == null) {
+      query += "   TIMESTAMPDIFF(YEAR, p.birthdate, final.last_consultation) >= ${minAge}  ";
+    }
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
 }

@@ -2,21 +2,23 @@ package org.openmrs.module.eptsreports.reporting.data.converter;
 
 import org.openmrs.module.reporting.data.converter.DataConverter;
 
-public class GenderConverter implements DataConverter {
+public class YesOrNoConverter implements DataConverter {
 
   @Override
-  public Object convert(Object obj) {
-    if (obj == null) {
-      return "";
+  public Object convert(Object o) {
+    if (o == null) {
+      return "Sim";
     }
-    return obj.toString();
+    return "Não";
   }
 
+  @Override
   public Class<?> getInputDataType() {
-    return String.class;
+    return null;
   }
 
+  @Override
   public Class<?> getDataType() {
-    return String.class;
+    return null;
   }
 }

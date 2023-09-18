@@ -1,6 +1,10 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
+import java.util.*;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringSubstitutor;
+import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -327,5 +331,536 @@ public class PrepCtCohortQueries {
     definition.addParameter(new Parameter("location", "Location", Location.class));
 
     return definition;
+  }
+
+  public CohortDefinition getkeypop() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients who are Key population ");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("80", hivMetadata.getPrepInicialEncounterType().getEncounterTypeId());
+    map.put("81", hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23703", hivMetadata.getKeyPopulationConcept().getConceptId());
+    map.put("20454", hivMetadata.getDrugUseConcept().getConceptId());
+    map.put("1901", hivMetadata.getSexWorkerConcept().getConceptId());
+    map.put("165205", hivMetadata.getTransGenderConcept().getConceptId());
+    map.put("1377", hivMetadata.getHomosexualConcept().getConceptId());
+    map.put("20426", hivMetadata.getImprisonmentConcept().getConceptId());
+
+    String query =
+        " SELECT p.patient_id "
+            + " FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  e.voided = 0 "
+            + "       AND p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND e.encounter_type IN (${80}, ${81}) "
+            + "       AND o.concept_id = ${23703} "
+            + "       AND o.value_coded IN ( ${20454}, ${1901}, ${165205}, ${1377}, ${20426} ) "
+            + "       AND e.encounter_datetime BETWEEN :onOrAfter AND :onOrBefore "
+            + " GROUP  BY p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWhoAreKeypopulation(List<Concept> answers) {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients who are Key population ");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("80", hivMetadata.getPrepInicialEncounterType().getEncounterTypeId());
+    map.put("81", hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23703", hivMetadata.getKeyPopulationConcept().getConceptId());
+    map.put("20454", hivMetadata.getDrugUseConcept().getConceptId());
+    map.put("1901", hivMetadata.getSexWorkerConcept().getConceptId());
+    map.put("165205", hivMetadata.getTransGenderConcept().getConceptId());
+    map.put("1377", hivMetadata.getHomosexualConcept().getConceptId());
+    map.put("20426", hivMetadata.getImprisonmentConcept().getConceptId());
+    List<Integer> concepts =
+        answers.stream().map(concept -> concept.getConceptId()).collect(Collectors.toList());
+    String answer = StringUtils.join(concepts, ",");
+
+    String query =
+        " SELECT p.patient_id "
+            + " FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  e.voided = 0 "
+            + "       AND p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND e.encounter_type IN (${80}, ${81}) "
+            + "       AND o.concept_id = ${23703} "
+            + "       AND o.value_coded IN ( "
+            + answer
+            + " ) "
+            + "       AND e.encounter_datetime BETWEEN :onOrAfter AND :onOrBefore "
+            + " GROUP  BY p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsOnTargetGroup(List<Concept> answers) {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients who are on Target Group ");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("80", hivMetadata.getPrepInicialEncounterType().getEncounterTypeId());
+    map.put("81", hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23703", hivMetadata.getKeyPopulationConcept().getConceptId());
+    map.put("20454", hivMetadata.getDrugUseConcept().getConceptId());
+    map.put("1901", hivMetadata.getSexWorkerConcept().getConceptId());
+    map.put("165205", hivMetadata.getTransGenderConcept().getConceptId());
+    map.put("1377", hivMetadata.getHomosexualConcept().getConceptId());
+    map.put("20426", hivMetadata.getImprisonmentConcept().getConceptId());
+    map.put("165196", hivMetadata.getPrepTargetGroupConcept().getConceptId());
+    List<Integer> concepts =
+        answers.stream().map(concept -> concept.getConceptId()).collect(Collectors.toList());
+    String answer = StringUtils.join(concepts, ",");
+
+    String query =
+        " SELECT p.patient_id "
+            + " FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  e.voided = 0 "
+            + "       AND p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND e.encounter_type = ${80} "
+            + "       AND o.concept_id = ${165196} "
+            + "       AND o.value_coded IN ( "
+            + answer
+            + " ) "
+            + "       AND e.encounter_datetime BETWEEN :onOrAfter AND :onOrBefore "
+            + " GROUP  BY p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWhoAreHomosexual() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Homosexuals");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition HSM =
+        getPatientsWhoAreKeypopulation(Arrays.asList(hivMetadata.getHomosexualConcept()));
+    CohortDefinition exclusion =
+        getPatientsWhoAreKeypopulation(
+            Arrays.asList(
+                hivMetadata.getDrugUseConcept(),
+                hivMetadata.getSexWorkerConcept(),
+                hivMetadata.getTransGenderConcept()));
+
+    cd.addSearch(
+        "homosexual",
+        EptsReportUtils.map(
+            HSM, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "exclusion",
+        EptsReportUtils.map(
+            exclusion, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.setCompositionString("homosexual AND NOT exclusion");
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWhoArePrisoner() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Prisoners");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition prisoner =
+        getPatientsWhoAreKeypopulation(Arrays.asList(hivMetadata.getImprisonmentConcept()));
+    CohortDefinition exclusion =
+        getPatientsWhoAreKeypopulation(
+            Arrays.asList(
+                hivMetadata.getDrugUseConcept(),
+                hivMetadata.getHomosexualConcept(),
+                hivMetadata.getSexWorkerConcept(),
+                hivMetadata.getTransGenderConcept()));
+
+    cd.addSearch(
+        "prisoner",
+        EptsReportUtils.map(
+            prisoner, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "exclusion",
+        EptsReportUtils.map(
+            exclusion, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.setCompositionString("prisoner AND NOT exclusion");
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWhoAreTransgender() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Transgender");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition trans =
+        getPatientsWhoAreKeypopulation(Arrays.asList(hivMetadata.getTransGenderConcept()));
+    CohortDefinition exclusion =
+        getPatientsWhoAreKeypopulation(
+            Arrays.asList(hivMetadata.getDrugUseConcept(), hivMetadata.getSexWorkerConcept()));
+
+    cd.addSearch(
+        "transgender",
+        EptsReportUtils.map(
+            trans, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "exclusion",
+        EptsReportUtils.map(
+            exclusion, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.setCompositionString("transgender AND NOT exclusion");
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWhoAreOutro() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Outro");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition outro =
+        getPatientsWhoAreKeypopulation(Arrays.asList(hivMetadata.getOtherOrNonCodedConcept()));
+    CohortDefinition exclusion =
+        getPatientsWhoAreKeypopulation(
+            Arrays.asList(
+                hivMetadata.getImprisonmentConcept(),
+                hivMetadata.getDrugUseConcept(),
+                hivMetadata.getHomosexualConcept(),
+                hivMetadata.getSexWorkerConcept(),
+                hivMetadata.getTransGenderConcept()));
+
+    cd.addSearch(
+        "outro",
+        EptsReportUtils.map(
+            outro, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "exclusion",
+        EptsReportUtils.map(
+            exclusion, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.setCompositionString("outro AND NOT exclusion ");
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWhoAreSexWorker() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Sex Worker");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition SW =
+        getPatientsWhoAreKeypopulation(Arrays.asList(hivMetadata.getSexWorkerConcept()));
+    CohortDefinition onDrugs =
+        getPatientsWhoAreKeypopulation(Arrays.asList(hivMetadata.getDrugUseConcept()));
+
+    cd.addSearch(
+        "drugUser",
+        EptsReportUtils.map(
+            onDrugs, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "sexWorker",
+        EptsReportUtils.map(
+            SW, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.setCompositionString("sexWorker AND NOT drugUser");
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWhoAreSerodiscordantCouples() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Serodiscordant Couples");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition Serodiscordant =
+        getPatientsOnTargetGroup(Arrays.asList(hivMetadata.getCoupleResultsAreDifferentConcept()));
+    CohortDefinition Keypop = getkeypop();
+
+    cd.addSearch(
+        "SerodiscordanteCouple",
+        EptsReportUtils.map(
+            Serodiscordant,
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "KeyPopulation",
+        EptsReportUtils.map(
+            Keypop, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.setCompositionString("SerodiscordanteCouple AND NOT KeyPopulation");
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWhoAreTruckDrivers() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Truck Drivers");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition TruckDriver =
+        getPatientsOnTargetGroup(Arrays.asList(hivMetadata.getDriverConcept()));
+    CohortDefinition Serodiscordant =
+        getPatientsOnTargetGroup(Arrays.asList(hivMetadata.getCoupleResultsAreDifferentConcept()));
+    CohortDefinition Keypop = getkeypop();
+
+    cd.addSearch(
+        "driver",
+        EptsReportUtils.map(
+            TruckDriver, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "serodiscordantCouple",
+        EptsReportUtils.map(
+            Serodiscordant,
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "KeyPopulation",
+        EptsReportUtils.map(
+            Keypop, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.setCompositionString("driver AND NOT (serodiscordantCouple OR KeyPopulation)");
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWhoAreMiners() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Miners");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition miner = getPatientsOnTargetGroup(Arrays.asList(hivMetadata.getMinerConcept()));
+    CohortDefinition exclusion =
+        getPatientsOnTargetGroup(
+            Arrays.asList(
+                hivMetadata.getCoupleResultsAreDifferentConcept(), hivMetadata.getDriverConcept()));
+    CohortDefinition Keypop = getkeypop();
+
+    cd.addSearch(
+        "miner",
+        EptsReportUtils.map(
+            miner, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "exclusion",
+        EptsReportUtils.map(
+            exclusion, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "KeyPopulation",
+        EptsReportUtils.map(
+            Keypop, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.setCompositionString("miner AND NOT (exclusion OR KeyPopulation)");
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWhoAreMilitary() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Military");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition military =
+        getPatientsOnTargetGroup(Arrays.asList(hivMetadata.getMilitaryOrPoliceConcept()));
+    CohortDefinition exclusion =
+        getPatientsOnTargetGroup(
+            Arrays.asList(
+                hivMetadata.getCoupleResultsAreDifferentConcept(),
+                hivMetadata.getDriverConcept(),
+                hivMetadata.getMinerConcept()));
+    CohortDefinition Keypop = getkeypop();
+
+    cd.addSearch(
+        "military",
+        EptsReportUtils.map(
+            military, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "KeyPopulation",
+        EptsReportUtils.map(
+            Keypop, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "exclusion",
+        EptsReportUtils.map(
+            exclusion, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.setCompositionString("military AND NOT (exclusion OR KeyPopulation)");
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWhoAreBreastfeeding() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Breastfeeding");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition breastfeeding =
+        getPatientsOnTargetGroup(Arrays.asList(hivMetadata.getBreastfeeding()));
+    CohortDefinition Keypop = getkeypop();
+    List<Concept> conceptExcluions =
+        Arrays.asList(
+            hivMetadata.getDriverConcept(),
+            hivMetadata.getMinerConcept(),
+            hivMetadata.getMilitaryOrPoliceConcept(),
+            hivMetadata.getCoupleResultsAreDifferentConcept());
+    CohortDefinition exclusion = getPatientsOnTargetGroup(conceptExcluions);
+
+    cd.addSearch(
+        "breastfeedingWoman",
+        EptsReportUtils.map(
+            breastfeeding, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "KeyPopulation",
+        EptsReportUtils.map(
+            Keypop, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "exclusion",
+        EptsReportUtils.map(
+            exclusion, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.setCompositionString("breastfeedingWoman AND NOT (exclusion OR KeyPopulation)");
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWhoArePregnant() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Pregnant Woman");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition Pregnant =
+        getPatientsOnTargetGroup(Arrays.asList(hivMetadata.getPregnantConcept()));
+    CohortDefinition Keypop = getkeypop();
+    List<Concept> conceptExcluions =
+        Arrays.asList(
+            hivMetadata.getDriverConcept(),
+            hivMetadata.getMinerConcept(),
+            hivMetadata.getMilitaryOrPoliceConcept(),
+            hivMetadata.getBreastfeeding(),
+            hivMetadata.getCoupleResultsAreDifferentConcept());
+    CohortDefinition exclusion = getPatientsOnTargetGroup(conceptExcluions);
+
+    cd.addSearch(
+        "PregnantWoman",
+        EptsReportUtils.map(
+            Pregnant, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "Exclusion",
+        EptsReportUtils.map(
+            exclusion, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "KeyPopulation",
+        EptsReportUtils.map(
+            Keypop, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.setCompositionString("PregnantWoman AND NOT (Exclusion OR KeyPopulation)");
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWhoAreAdolescentAndYouth() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("adolescents And Youth At Risk");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition AYR =
+        getPatientsOnTargetGroup(Arrays.asList(hivMetadata.getAdolescentsAndYouthAtRiskConcept()));
+    CohortDefinition exclusions =
+        getPatientsOnTargetGroup(
+            Arrays.asList(
+                hivMetadata.getCoupleResultsAreDifferentConcept(),
+                hivMetadata.getDriverConcept(),
+                hivMetadata.getMinerConcept(),
+                hivMetadata.getMilitaryOrPoliceConcept(),
+                hivMetadata.getBreastfeeding(),
+                hivMetadata.getPregnantConcept()));
+    CohortDefinition Keypop = getkeypop();
+
+    cd.addSearch(
+        "adolescentAndYouth",
+        EptsReportUtils.map(
+            AYR, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "exclusions",
+        EptsReportUtils.map(
+            exclusions, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "KeyPopulation",
+        EptsReportUtils.map(
+            Keypop, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.setCompositionString("adolescentAndYouth AND NOT (exclusions OR KeyPopulation)");
+
+    return cd;
   }
 }

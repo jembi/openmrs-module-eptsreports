@@ -47,7 +47,8 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
     HOMOSEXUAL,
     PRISONER,
     SEX_WORKER,
-    TRANSGENDER;
+    TRANSGENDER,
+    OUTRO;
 
     public static KeyPop of(Concept concept) {
       HivMetadata hivMetadata = Context.getRegisteredComponents(HivMetadata.class).get(0);
@@ -61,6 +62,8 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
         return SEX_WORKER;
       } else if (concept.equals(hivMetadata.getTransGenderConcept())) {
         return TRANSGENDER;
+      } else if (concept.equals(hivMetadata.getOtherOrNonCodedConcept())) {
+        return OUTRO;
       }
       return null;
     }
@@ -85,6 +88,8 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
           return SEX_WORKER;
         case "TG":
           return TRANSGENDER;
+        case "OUTRO":
+          return OUTRO;
         default:
       }
       return null;

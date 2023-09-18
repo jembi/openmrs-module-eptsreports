@@ -69,7 +69,7 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
         "TG",
         EptsReportUtils.map(
             eptsCommonDimension.getTargetGroupDimension(),
-            "onOrBefore=${endDate},location=${location}"));
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     // A1
     dsd.addColumn(
         "TTA1",
@@ -119,10 +119,10 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
     // B2
     dsd.addColumn(
         "TTB2",
-        "Total de de Novos Inícios que retornaram a PrEP durante o período de reporte",
+        "Nº de Novos inícios em PrEP que alguma vez estiveram em PrEP durante o período de reporte",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "Total de Novos Inícios que retornaram a PrEP durante o período de reporte",
+                "Nº de Novos inícios em PrEP que alguma vez estiveram em PrEP durante o período de reporte",
                 EptsReportUtils.map(rmprepCohortQueries.getClientsReturnedToPrep(), mappings)),
             mappings),
         "");
@@ -157,30 +157,6 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "Age and Gender",
                 EptsReportUtils.map(rmprepCohortQueries.getClientsWhoReceivedPrep(), mappings)),
-            mappings),
-        getColumnsDisaggregations());
-
-    // D1
-    dsd.addColumn(
-        "TTD1",
-        "Total de Utentes em PrEP por 3 meses consecutivos após terem iniciado a PrEP",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Total de Utentes em PrEP por 3 meses consecutivos após terem iniciado a PrEP",
-                EptsReportUtils.map(
-                    rmprepCohortQueries.getClientsFromB1PreviousPeriod(), mappings)),
-            mappings),
-        "");
-
-    addRow(
-        dsd,
-        "D1",
-        "Age and Gender",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Age and Gender",
-                EptsReportUtils.map(
-                    rmprepCohortQueries.getClientsFromB1PreviousPeriod(), mappings)),
             mappings),
         getColumnsDisaggregations());
 
@@ -284,23 +260,31 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
     // Maternity
     ColumnParameters tenTo14pregnant =
         new ColumnParameters(
-            "tenTo14pregnant", "10 - 14 Pregnant", "age=10-14|maternity=pregnant", "11");
+            "tenTo14pregnant", "10 - 14 Pregnant", "age=10-14|maternity=pregnant|gender=F", "11");
     ColumnParameters above15pregnant =
-        new ColumnParameters("above15pregnant", "15+ Pregnant", "age=15+|maternity=pregnant", "12");
+        new ColumnParameters(
+            "above15pregnant", "15+ Pregnant", "age=15+|maternity=pregnant|gender=F", "12");
     ColumnParameters totalPregnant =
-        new ColumnParameters("totalPregnant", "Total of Pregnant", "maternity=pregnant", "13");
+        new ColumnParameters(
+            "totalPregnant", "Total of Pregnant", "maternity=pregnant|gender=F", "13");
     ColumnParameters tenTo14breastfeeding =
         new ColumnParameters(
             "tenTo14breastfeeding",
             "10 - 14 Breastfeeding",
-            "age=10-14|maternity=breastfeeding",
+            "age=10-14|maternity=breastfeeding|gender=F",
             "14");
     ColumnParameters above15breastfeeding =
         new ColumnParameters(
-            "above15breastfeeding", "15+ Breastfeeding", "age=15+|maternity=breastfeeding", "15");
+            "above15breastfeeding",
+            "15+ Breastfeeding",
+            "age=15+|maternity=breastfeeding|gender=F",
+            "15");
     ColumnParameters totalBreastfeeding =
         new ColumnParameters(
-            "totalBreastfeeding", "Total of Breastfeeding", "maternity=breastfeeding", "16");
+            "totalBreastfeeding",
+            "Total of Breastfeeding",
+            "maternity=breastfeeding|gender=F",
+            "16");
 
     // Key population
     ColumnParameters pid = new ColumnParameters("pid", "People who inject drugs", "KP=PID", "17");
@@ -309,6 +293,7 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
     ColumnParameters pri =
         new ColumnParameters("pri", "People in prison and other closed settings", "KP=PRI", "20");
     ColumnParameters tg = new ColumnParameters("tg", "Transgender", "KP=TG", "22");
+    ColumnParameters outro = new ColumnParameters("outro", "Outro", "KP=OUT", "30");
 
     // Target group
     ColumnParameters ayr =
@@ -340,6 +325,7 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
         above15breastfeeding,
         totalBreastfeeding,
         pid,
+        outro,
         msm,
         sw,
         pri,

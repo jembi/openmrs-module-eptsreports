@@ -1019,8 +1019,7 @@ public class IntensiveMonitoringCohortQueries {
     CohortDefinition abandonedExclusionByTarvRestartDate =
         qualityImprovement2020CohortQueries.getPatientsWhoAbandonedTarvOnArtRestartDate();
 
-    CohortDefinition abandonedExclusionFirstLine =
-        qualityImprovement2020CohortQueries.getPatientsWhoAbandonedTarvOnOnFirstLineDate();
+    CohortDefinition abandonedExclusionFirstLine = getpatientsWhoAbandonedOrRestartedTarv();
 
     CohortDefinition abandonedExclusionSecondLine =
         qualityImprovement2020CohortQueries.getPatientsWhoAbandonedTarvOnOnSecondLineDate();
@@ -1147,7 +1146,7 @@ public class IntensiveMonitoringCohortQueries {
         "ABANDONED1LINE",
         EptsReportUtils.map(
             abandonedExclusionFirstLine,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "ABANDONED2LINE",
@@ -1684,6 +1683,100 @@ public class IntensiveMonitoringCohortQueries {
             + "WHERE timestampdiff(month,tabela.value_datetime,( last_encounter.encounter_datetime "
             + "             ))> "
             + months;
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * <b> RF7.2 EXCLUSION FOR PATIENTS WHO ABANDONED IN THE LAST SIX MONTHS FROM FIRST LINE DATE</b>
+   *
+   * <p>O sistema irá identificar utentes que abandonaram ou reiniciaram o tratamento TARV durante
+   * os últimos 6 meses anteriores a última consulta da seguinte forma:
+   *
+   * <p>incluindo os utentes com registo de “Mudança de Estado de Permanência” = “Abandono” ou
+   * “Reinicio” na Ficha Clínica nos 6 meses anteriores a data da última consulta (“Data Consulta
+   * Abandono/Reinicio” >= “Data Última Consulta” menos 6 meses e <= “Data última Consulta”).
+   *
+   * <p>incluindo os utentes com registo de “Mudança de Estado de Permanência” = “Abandono” ou
+   * “Reinicio” na Ficha Resumo nos 6 meses anteriores a data da última consulta (“Data de Mudança
+   * de Estado Permanência Abandono/Reinicio” ” >= “Data Última Consulta” menos 6 meses e <= “Data
+   * última Consulta”).
+   * <li>Nota: “Data Última Consulta” é a data da última consulta clínica ocorrida durante o período
+   *     de revisão.
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getpatientsWhoAbandonedOrRestartedTarv() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("All patients who abandoned or restarted tarv during the period ");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("1707", hivMetadata.getAbandonedConcept().getConceptId());
+    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
+
+    String query =
+        "SELECT     p.patient_id "
+            + "FROM       patient p "
+            + "INNER JOIN encounter e "
+            + "ON         e.patient_id=p.patient_id "
+            + "INNER JOIN obs o "
+            + "ON         o.encounter_id=e.encounter_id "
+            + "INNER JOIN "
+            + "           ( "
+            + "                    SELECT   e.patient_id, "
+            + "                             Max(e.encounter_datetime) AS last_encounter "
+            + "                    FROM     encounter e "
+            + "                    WHERE    e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                    AND      e.voided=0 "
+            + "                    AND      e.encounter_type = ${6} "
+            + "                    GROUP BY e.patient_id )last_consultation "
+            + "ON         last_consultation.patient_id = p.patient_id "
+            + "WHERE      o.concept_id = ${6273} "
+            + "AND        o.value_coded IN (${1707}, ${1705}) "
+            + "AND        e.encounter_type = ${6} "
+            + "AND        p.voided=0 "
+            + "AND        e.voided=0 "
+            + "AND        o.voided=0 "
+            + "AND        e.location_id = :location "
+            + "AND        e.encounter_datetime BETWEEN date_sub(last_consultation.last_encounter, interval 6 month) AND last_consultation.last_encounter "
+            + "GROUP BY   p.patient_id "
+            + "UNION "
+            + "SELECT     p.patient_id "
+            + "FROM       patient p "
+            + "INNER JOIN encounter e "
+            + "ON         e.patient_id=p.patient_id "
+            + "INNER JOIN obs o "
+            + "ON         o.encounter_id=e.encounter_id "
+            + "INNER JOIN "
+            + "           ( "
+            + "                    SELECT   e.patient_id, "
+            + "                             Max(e.encounter_datetime) AS last_encounter "
+            + "                    FROM     encounter e "
+            + "                    WHERE    e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                    AND      e.voided=0 "
+            + "                    AND      e.encounter_type = ${6} "
+            + "                    GROUP BY e.patient_id )last_consultation "
+            + "ON         last_consultation.patient_id = p.patient_id "
+            + "WHERE      o.concept_id = ${6272} "
+            + "AND        o.value_coded IN (${1707},${1705}) "
+            + "AND        e.encounter_type = ${53} "
+            + "AND        p.voided=0 "
+            + "AND        e.voided=0 "
+            + "AND        o.voided=0 "
+            + "AND        e.location_id = :location "
+            + "AND        o.obs_datetime BETWEEN date_sub(last_consultation.last_encounter, interval 6 month) AND last_consultation.last_encounter "
+            + "GROUP BY   p.patient_id";
+
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     cd.setQuery(stringSubstitutor.replace(query));
