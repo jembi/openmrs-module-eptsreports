@@ -3991,7 +3991,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             : " AND        ( o.concept_id IN ( ${1343}, ${1342} ) "
                 + "    AND        o.value_numeric IS NOT NULL ) ";
     query +=
-        "                      GROUP BY   e.patient_id ) consultation_tb "
+        "         AND        e.encounter_datetime >= mds.encounter_date "
+            + "        AND        e.encounter_datetime <= date_add( tarv.art_encounter, interval 12 month ) "
+            + "GROUP  BY e.patient_id) consultation_tb "
             + "ON         consultation_tb.patient_id = p.patient_id "
             + "INNER JOIN "
             + "           ( "
