@@ -494,7 +494,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
    * @return {@link String}
    */
   public static String getPatientsWhoAbandonedTarvQuery(
-      boolean isForDataDefinition, String inclusionEndMonthAndDay) {
+      boolean isForDataDefinition, String inclusionEndMonthAndDay, int cohortYear) {
     String fromSQL =
         "FROM     ( "
             + "                  SELECT   most_recent.patient_id, "
@@ -513,9 +513,12 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "                                      AND        e.encounter_type = ${18} "
             + "                                      AND        o.concept_id = ${5096} "
             + "                                      AND        o.value_datetime IS NOT NULL "
-            + "            AND o.value_datetime <= CONCAT(:evaluationYear, "
+            + " AND  o.value_datetime >= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
-            + "        ) "
+            + "        ), INTERVAL "
+            + cohortYear
+            + " YEAR) "
             + "                                      AND        e.location_id = :location  "
             + "                                      GROUP BY   p.patient_id "
             + "                                      UNION "
@@ -539,16 +542,22 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "                                      AND        ( "
             + "                                                            o2.concept_id = ${23866} "
             + "                                                 AND        o2.value_datetime IS NOT NULL "
-            + "            AND o2.value_datetime <= CONCAT(:evaluationYear, "
+            + " AND  o2.value_datetime >= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
-            + "        ) "
+            + "        ), INTERVAL "
+            + cohortYear
+            + " YEAR) "
             + " ) "
             + "                                      AND        e.location_id =  :location "
             + "                                      GROUP BY   p.patient_id) most_recent "
             + "                  GROUP BY most_recent.patient_id "
-            + "            HAVING final_encounter_date <= CONCAT(:evaluationYear, "
+            + "            HAVING final_encounter_date <= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
-            + "        ) "
+            + "        ), INTERVAL "
+            + cohortYear
+            + " YEAR) "
             + "        ) final "
             + "WHERE    final.patient_id NOT IN ( "
             + new EptsQueriesUtil()
@@ -560,7 +569,8 @@ public class ListOfPatientsWithMdsEvaluationQueries {
                         hivMetadata.getTransferredOutConcept().getConceptId(),
                         true,
                         true,
-                        inclusionEndMonthAndDay))
+                        inclusionEndMonthAndDay,
+                        cohortYear))
                 .union(
                     getPatientsWhoSuspendedTarvOrAreTransferredOut(
                         hivMetadata
@@ -569,8 +579,9 @@ public class ListOfPatientsWithMdsEvaluationQueries {
                         hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
                         false,
                         true,
-                        inclusionEndMonthAndDay))
-                .union(getPatientsWhoDied(false, inclusionEndMonthAndDay))
+                        inclusionEndMonthAndDay,
+                        cohortYear))
+                .union(getPatientsWhoDied(false, inclusionEndMonthAndDay, cohortYear))
                 .buildQuery()
             + ") "
             + "GROUP BY final.patient_id";
@@ -593,7 +604,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
    * @return {@link String}
    */
   public static String getPatientsWhoDied(
-      boolean isForDataDefinition, String inclusionEndMonthAndDay) {
+      boolean isForDataDefinition, String inclusionEndMonthAndDay, int cohortYear) {
     String fromSQL =
         "FROM ("
             + " SELECT lastest.patient_id ,Max(lastest.deceased_date) as  deceased_date "
@@ -610,9 +621,12 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "        AND p.voided=0   "
             + "        AND pg.program_id= ${2}  "
             + "        AND ps.state = ${10} "
-            + "            AND ps.start_date <= CONCAT(:evaluationYear, "
+            + "            AND ps.start_date <= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
-            + "        ) "
+            + "        ), INTERVAL "
+            + cohortYear
+            + " YEAR) "
             + "        AND pg.location_id= :location   "
             + "         GROUP BY p.patient_id  "
             + "  "
@@ -630,9 +644,12 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "        AND e.encounter_type = ${6}   "
             + "        AND o.concept_id = ${6273}  "
             + "        AND o.value_coded = ${1366} "
-            + "            AND e.encounter_datetime <= CONCAT(:evaluationYear, "
+            + "            AND e.encounter_datetime <= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
-            + "        ) "
+            + "        ), INTERVAL "
+            + cohortYear
+            + " YEAR) "
             + "        AND e.location_id =  :location   "
             + "         GROUP BY p.patient_id  "
             + "  "
@@ -650,9 +667,12 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "        AND e.encounter_type = ${53}  "
             + "        AND o.concept_id = ${6272}  "
             + "        AND o.value_coded = ${1366} "
-            + "            AND o.obs_datetime <= CONCAT(:evaluationYear, "
+            + "            AND o.obs_datetime <= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
-            + "        ) "
+            + "        ), INTERVAL "
+            + cohortYear
+            + " YEAR) "
             + "        AND e.location_id =  :location  "
             + "         GROUP BY p.patient_id  "
             + " UNION "
@@ -660,9 +680,12 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "                FROM   person p "
             + "                WHERE  p.voided = 0"
             + "                   AND p.dead = 1 "
-            + "            AND p.death_date <= CONCAT(:evaluationYear, "
+            + "            AND p.death_date <= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
-            + "        ) "
+            + "        ), INTERVAL "
+            + cohortYear
+            + " YEAR) "
             + ") lastest   "
             + " WHERE lastest.patient_id NOT IN( "
             + " SELECT p.patient_id  "
@@ -674,9 +697,12 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "             AND e.encounter_type = ${6}   "
             + "             AND e.location_id = :location  "
             + "             AND e.encounter_datetime > lastest.deceased_date  "
-            + "            AND e.encounter_datetime <= CONCAT(:evaluationYear, "
+            + "            AND e.encounter_datetime <= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
-            + "        ) "
+            + "        ), INTERVAL "
+            + cohortYear
+            + " YEAR) "
             + "                 UNION"
             + "  SELECT p.patient_id"
             + "      FROM   patient p"
@@ -687,9 +713,12 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "            AND o.voided = 0 "
             + "            AND e.encounter_type = ${18}   "
             + "              AND e.encounter_datetime > lastest.deceased_date"
-            + "            AND e.encounter_datetime <= CONCAT(:evaluationYear, "
+            + "            AND e.encounter_datetime <= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
-            + "        ) "
+            + "        ), INTERVAL "
+            + cohortYear
+            + " YEAR) "
             + " )  "
             + " GROUP BY lastest.patient_id )mostrecent "
             + " GROUP BY mostrecent.patient_id";
@@ -714,7 +743,8 @@ public class ListOfPatientsWithMdsEvaluationQueries {
       int stateOnEncounters,
       boolean transferredOut,
       boolean isForCohortDefinition,
-      String inclusionEndMonthAndDay) {
+      String inclusionEndMonthAndDay,
+      int cohortYear) {
     String query =
         isForCohortDefinition
             ? "  SELECT mostrecent.patient_id "
@@ -735,9 +765,12 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "        AND pg.program_id= ${2}  "
             + "        AND ps.state = "
             + stateOnProgram
-            + "            AND ps.start_date <= CONCAT(:evaluationYear, "
+            + "            AND ps.start_date <= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
-            + "        ) "
+            + "        ), INTERVAL "
+            + cohortYear
+            + " YEAR) "
             + "        AND pg.location_id= :location   "
             + "         GROUP BY p.patient_id  "
             + "  "
@@ -756,9 +789,12 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "        AND o.concept_id = ${6273}  "
             + "        AND o.value_coded = "
             + stateOnEncounters
-            + "            AND e.encounter_datetime <= CONCAT(:evaluationYear, "
+            + "            AND e.encounter_datetime <= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
-            + "        ) "
+            + "        ), INTERVAL "
+            + cohortYear
+            + " YEAR) "
             + "        AND e.location_id =  :location   "
             + "         GROUP BY p.patient_id  "
             + "  "
@@ -777,9 +813,12 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "        AND o.concept_id = ${6272}  "
             + "        AND o.value_coded =  "
             + stateOnEncounters
-            + "            AND o.obs_datetime <= CONCAT(:evaluationYear, "
+            + "            AND o.obs_datetime <= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
-            + "        ) "
+            + "        ), INTERVAL "
+            + cohortYear
+            + " YEAR) "
             + "        AND e.location_id =  :location  "
             + "         GROUP BY p.patient_id  "
             + ") lastest   "
@@ -796,9 +835,12 @@ public class ListOfPatientsWithMdsEvaluationQueries {
               + "             AND e.encounter_type = ${6}   "
               + "             AND e.location_id = :location  "
               + "             AND e.encounter_datetime > lastest.last_date  "
-              + "            AND e.encounter_datetime <= CONCAT(:evaluationYear, "
+              + "            AND e.encounter_datetime <= DATE_SUB( "
+              + "  CONCAT(:evaluationYear,"
               + inclusionEndMonthAndDay
-              + "        ) "
+              + "        ), INTERVAL "
+              + cohortYear
+              + " YEAR) "
               + "                 UNION"
               + "  SELECT p.patient_id"
               + "      FROM   patient p"
@@ -810,9 +852,12 @@ public class ListOfPatientsWithMdsEvaluationQueries {
               + "        AND e.location_id =  :location  "
               + "            AND e.encounter_type = ${18}   "
               + "              AND e.encounter_datetime > lastest.last_date   "
-              + "            AND e.encounter_datetime <= CONCAT(:evaluationYear, "
+              + "            AND e.encounter_datetime <= DATE_SUB( "
+              + "  CONCAT(:evaluationYear,"
               + inclusionEndMonthAndDay
-              + "        ) ";
+              + "        ), INTERVAL "
+              + cohortYear
+              + " YEAR) ";
     } else {
       query +=
           "  SELECT p.patient_id"
@@ -825,9 +870,12 @@ public class ListOfPatientsWithMdsEvaluationQueries {
               + "        AND e.location_id =  :location  "
               + "            AND e.encounter_type = ${18}   "
               + "              AND  e.encounter_datetime > lastest.last_date   "
-              + "            AND e.encounter_datetime <= CONCAT(:evaluationYear, "
+              + "            AND e.encounter_datetime <= DATE_SUB( "
+              + "  CONCAT(:evaluationYear,"
               + inclusionEndMonthAndDay
-              + "        ) ";
+              + "        ), INTERVAL "
+              + cohortYear
+              + " YEAR) ";
     }
     query +=
         " )  " + " GROUP BY lastest.patient_id )mostrecent " + " GROUP BY mostrecent.patient_id";
@@ -845,7 +893,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
    *
    * @return {@link String}
    */
-  public static String getPatientsActiveOnTarv(String inclusionEndMonthAndDay) {
+  public static String getPatientsActiveOnTarv(String inclusionEndMonthAndDay, int cohortYear) {
 
     return "SELECT  final.patient_id, 'Activo' "
         + "FROM "
@@ -856,9 +904,12 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         + "             FROM patient p "
         + "             INNER JOIN encounter e ON e.patient_id = p.patient_id "
         + "             WHERE e.encounter_type = ${18} "
-        + "            AND e.encounter_datetime <= CONCAT(:evaluationYear, "
+        + "            AND e.encounter_datetime <= DATE_SUB( "
+        + "  CONCAT(:evaluationYear,"
         + inclusionEndMonthAndDay
-        + "        ) "
+        + "        ), INTERVAL "
+        + cohortYear
+        + " YEAR) "
         + "                 AND e.voided = 0 "
         + "                 AND p.voided = 0 "
         + "                  AND e.location_id = :location "
@@ -873,9 +924,12 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         + "           AND o.concept_id = ${23865} "
         + "           AND o.value_coded = ${1065} "
         + "           AND o2.concept_id = ${23866} "
-        + "            AND o2.value_datetime <= CONCAT(:evaluationYear, "
+        + "            AND o2.value_datetime <= DATE_SUB( "
+        + "  CONCAT(:evaluationYear,"
         + inclusionEndMonthAndDay
-        + "        ) "
+        + "        ), INTERVAL "
+        + cohortYear
+        + " YEAR) "
         + "           AND o.voided = 0 "
         + "           AND o2.voided = 0 "
         + "           AND e.location_id = :location "
@@ -887,22 +941,25 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         + " ) final "
         + "WHERE final.patient_id NOT IN ("
         + new EptsQueriesUtil()
-            .unionBuilder(getPatientsWhoAbandonedTarvQuery(false, inclusionEndMonthAndDay))
+            .unionBuilder(
+                getPatientsWhoAbandonedTarvQuery(false, inclusionEndMonthAndDay, cohortYear))
             .union(
                 getPatientsWhoSuspendedTarvOrAreTransferredOut(
                     hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId(),
                     hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
                     true,
                     true,
-                    inclusionEndMonthAndDay))
+                    inclusionEndMonthAndDay,
+                    cohortYear))
             .union(
                 getPatientsWhoSuspendedTarvOrAreTransferredOut(
                     hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId(),
                     hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
                     false,
                     true,
-                    inclusionEndMonthAndDay))
-            .union(getPatientsWhoDied(false, inclusionEndMonthAndDay))
+                    inclusionEndMonthAndDay,
+                    cohortYear))
+            .union(getPatientsWhoDied(false, inclusionEndMonthAndDay, cohortYear))
             .buildQuery()
         + "     ) "
         + "GROUP BY final.patient_id ";

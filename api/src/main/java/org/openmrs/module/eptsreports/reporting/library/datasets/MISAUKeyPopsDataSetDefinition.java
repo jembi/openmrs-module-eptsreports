@@ -17,7 +17,9 @@ import java.util.List;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.MISAUKeyPopsCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
+import org.openmrs.module.eptsreports.reporting.library.dimensions.DimensionKeyForAge;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
+import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimensionKey;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
@@ -1354,7 +1356,11 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
 
   private List<ColumnParameters> getColumnsForAdults() {
     ColumnParameters fifteenPlus =
-        new ColumnParameters("fifteenPlus", "15 +", "age=15+", "adultos");
+        new ColumnParameters(
+            "fifteenPlus",
+            "15 +",
+            EptsCommonDimensionKey.of(DimensionKeyForAge.overOrEqualTo15Years).getDimensions(),
+            "adultos");
 
     return Arrays.asList(fifteenPlus);
   }
