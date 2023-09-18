@@ -1522,102 +1522,6 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   }
 
   /**
-   * <b>RF36 - Teve registo de boa adesão em TODAS consultas entre 12˚ e 24˚ mês de TARV?- C5
-   * (coluna AT)</b><br>
-   * <br>
-   *
-   * <p>O sistema irá determinar se o utente “Teve registo de boa adesão em TODAS consultas entre 1˚
-   * e 3˚ mês de TARV?” com as seguintes respostas:
-   *
-   * <p>Resposta= Sim, se o utente teve o registo do campo de "Seguimento da Adesão - Adesão ao
-   * TARV” com resposta = “BOA” em todas as consultas de APSS/PP decorridas entre 12 e 24 meses do
-   * Início TARV (“Data da Consulta APSS/PP” >= “Data Início TARV” + 12 meses e <= “Data Início
-   * TARV” + 24 meses)<br>
-   * <br>
-   *
-   * <p>Resposta= Não, se o utente teve pelo menos um registo no campo de "Seguimento da Adesão -
-   * Adesão ao TARV” com resposta = “RISCO” ou “MÁ” decorrida entre 12 e 24 meses do Início TARV
-   * (“Data da Consulta APSS/PP” >= “Data Início TARV” + 12 meses e <= “Data Início TARV” + 24
-   * meses) <br>
-   * <br>
-   *
-   * <p>Nota 1: Caso o utente não satisfaça o critério definido para resposta = Sim e resposta =
-   * Não, o sistema não irá preencher nenhuma informação. <br>
-   * <br>
-   *
-   * <p>Nota 2: A “Data Início TARV” é definida no RF46. <br>
-   * <br>
-   *
-   * <p>Nota 3: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
-   * na coorte de 24 meses, conforme definido no RF4.
-   *
-   * @return {DataDefinition}
-   */
-  public DataDefinition getPatientsWithGoodAdhesionAfterAYearInTarv() {
-    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName(
-        "Registo de boa adesão em TODAS consultas entre 12˚ e 24˚ mês de TARV");
-    sqlPatientDataDefinition.addParameter(
-        new Parameter("evaluationYear", "evaluationYear", Integer.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
-    Map<String, Integer> map = new HashMap<>();
-    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
-    map.put("6223", hivMetadata.getAdherenceEvaluationConcept().getConceptId());
-    map.put("1383", hivMetadata.getPatientIsDead().getConceptId());
-    map.put("1749", hivMetadata.getArvAdherenceRiskConcept().getConceptId());
-    map.put("1385", hivMetadata.getBadConcept().getConceptId());
-    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
-    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
-    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
-    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
-    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
-    map.put("6276", hivMetadata.getArtStatus().getConceptId());
-    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
-    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
-    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-
-    String query =
-        " SELECT     p.patient_id, "
-            + "      e.encounter_datetime AS encounter_date "
-            + " FROM       patient p "
-            + " INNER JOIN encounter e "
-            + " ON         e.patient_id = p.patient_id "
-            + " INNER JOIN obs o "
-            + " ON         o.encounter_id = e.encounter_id "
-            + " INNER JOIN ( "
-            + "          SELECT art_patient.patient_id, "
-            + "                 art_patient.first_pickup AS art_encounter "
-            + "          FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
-            + "                 ) art_patient "
-            + "             ) art "
-            + "               ON         art.patient_id = p.patient_id "
-            + " WHERE      p.voided = 0 "
-            + " AND        e.voided = 0 "
-            + " AND        o.voided = 0 "
-            + " AND        e.encounter_type = ${35} "
-            + " AND        e.location_id = :location "
-            + " AND        e.encounter_datetime >= DATE_ADD( art.art_encounter, INTERVAL 12 MONTH) "
-            + " AND        e.encounter_datetime <= DATE_ADD( art.art_encounter, INTERVAL 24 MONTH) "
-            + " AND        o.concept_id = ${6223} "
-            + " AND        o.value_coded IN ( ${1383}, "
-            + "                              ${1749}, "
-            + "                              ${1385} ) "
-            + " GROUP BY   p.patient_id";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
-
-    return sqlPatientDataDefinition;
-  }
-
-  /**
    * <b>RF22 - Esteve grávida ou foi lactante entre 3˚ e 9º mês de TARV?- B.6 (Coluna O)</b><br>
    * <br>
    *
@@ -4424,173 +4328,6 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   }
 
   /**
-   * <b>RF30 - Identificação de n˚ de consultas clínicas (Coluna AO)</b><br>
-   * <br>
-   *
-   * <p>O sistema irá determinar o estado de permanência no 12º mês de TARV da seguinte forma: <br>
-   * <br>
-   *
-   * <p>Resposta = “Abandono”, os utentes em TARV que abandonaram o tratamento (RF_49) <br>
-   * <br>
-   *
-   * <p>Resposta = “Óbito”, os utentes em TARV que foram óbito (RF50) <br>
-   * <br>
-   *
-   * <p>Resposta = “Suspenso”, os utentes em TARV que suspenderam o tratamento (RF48) <br>
-   * <br>
-   *
-   * <p>Resposta = “Transferido Para”, os utentes em TARV que suspenderam o tratamento (RF47) <br>
-   * <br>
-   *
-   * <p>Resposta = “Activo”, os utentes activos em TARV (RF51) <br>
-   * <br>
-   *
-   * <p>Nota 1: Em caso de não existência desta informação, o sistema irá listar “N/A”.<br>
-   * <br>
-   * <br>
-   *
-   * @return {DataDefinition}
-   */
-  public DataDefinition getPermanenceEstate(int minNumberOfMonths, int maxNumberOfMonths) {
-    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("B18 - Estado de permanência no 12˚ mês de TARV");
-    sqlPatientDataDefinition.addParameter(
-        new Parameter("evaluationYear", "evaluationYear", Integer.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
-    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
-    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
-    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
-    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
-    map.put("6276", hivMetadata.getArtStatus().getConceptId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
-    map.put("1066", hivMetadata.getNoConcept().getConceptId());
-    map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
-    map.put("165322", hivMetadata.getMdcState().getConceptId());
-    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
-    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
-    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
-    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
-    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
-    map.put("1707", hivMetadata.getAbandonedConcept().getConceptId());
-    map.put("1709", hivMetadata.getSuspendedTreatmentConcept().getConceptId());
-    map.put("6269", hivMetadata.getActiveOnProgramConcept().getConceptId());
-
-    String query =
-        "SELECT state.patient_id, "
-            + "       CASE "
-            + "         WHEN state.the_state IS NOT NULL THEN state.the_state "
-            + "         ELSE 'N/A' "
-            + "       END "
-            + "        FROM   ( "
-            + "                  SELECT     clinic_state.patient_id, "
-            + "                             oo.value_coded AS the_state "
-            + "                  FROM       patient clinic_state "
-            + "                  INNER JOIN encounter ee "
-            + "                  ON         ee.patient_id = clinic_state.patient_id "
-            + "                  INNER JOIN obs oo "
-            + "                  ON         oo.encounter_id = ee.encounter_id "
-            + "                  INNER JOIN ( "
-            + "                  SELECT     p.patient_id, "
-            + "                             MAX(e.encounter_datetime) AS last_encounter  "
-            + "                  FROM       patient p "
-            + "                  INNER JOIN encounter e "
-            + "                  ON         e.patient_id = p.patient_id "
-            + "                  INNER JOIN obs o "
-            + "                  ON         o.encounter_id = e.encounter_id "
-            + "                  INNER JOIN ( "
-            + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.first_pickup AS art_encounter "
-            + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
-            + "                           ) art_patient "
-            + "                             ) art "
-            + "                  ON         art.patient_id = p.patient_id "
-            + "                  WHERE      p.voided = 0 "
-            + "                  AND        e.voided = 0 "
-            + "                  AND        o.voided = 0 "
-            + "                  AND        e.encounter_type = ${6} "
-            + "                  AND        e.location_id = :location "
-            + "                  AND        o.concept_id = ${6273} "
-            + "                  AND        o.value_coded IN ( ${1366}, ${1706}, ${1707}, ${1709}, ${6269} ) "
-            + "                  AND        e.encounter_datetime > DATE_ADD( art.art_encounter, INTERVAL "
-            + minNumberOfMonths
-            + " MONTH ) "
-            + "                  AND        e.encounter_datetime < DATE_ADD( art.art_encounter, INTERVAL "
-            + maxNumberOfMonths
-            + " MONTH ) "
-            + "                  GROUP BY   p.patient_id ) clinic "
-            + "                  ON         clinic.patient_id = clinic_state.patient_id "
-            + "                  WHERE      clinic_state.voided = 0 "
-            + "                  AND        ee.voided = 0 "
-            + "                  AND        oo.voided = 0 "
-            + "                  AND        ee.encounter_type = ${6} "
-            + "                  AND        ee.location_id = :location "
-            + "                  AND        oo.concept_id = ${6273} "
-            + "                  AND        oo.value_coded IN ( ${1366}, ${1706}, ${1707}, ${1709}, ${6269} ) "
-            + "                  GROUP BY   clinic_state.patient_id "
-            + "UNION "
-            + "                  SELECT     resumo_state.patient_id, "
-            + "                             oo.value_coded AS the_state "
-            + "                  FROM       patient resumo_state "
-            + "                  INNER JOIN encounter ee "
-            + "                  ON         ee.patient_id = resumo_state.patient_id "
-            + "                  INNER JOIN obs oo "
-            + "                  ON         oo.encounter_id = ee.encounter_id "
-            + "                  INNER JOIN ( "
-            + "                  SELECT     p.patient_id, "
-            + "                             MAX(o.obs_datetime) AS last_encounter  "
-            + "                  FROM       patient p "
-            + "                  INNER JOIN encounter e "
-            + "                  ON         e.patient_id = p.patient_id "
-            + "                  INNER JOIN obs o "
-            + "                  ON         o.encounter_id = e.encounter_id "
-            + "                  INNER JOIN ( "
-            + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.first_pickup AS art_encounter "
-            + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
-            + "                           ) art_patient "
-            + "                             ) art "
-            + "                  ON         art.patient_id = p.patient_id "
-            + "                  WHERE      p.voided = 0 "
-            + "                  AND        e.voided = 0 "
-            + "                  AND        o.voided = 0 "
-            + "                  AND        e.encounter_type = ${53} "
-            + "                  AND        e.location_id = :location "
-            + "                  AND        o.concept_id = ${6272} "
-            + "                  AND        o.value_coded IN ( ${1366}, ${1706}, ${1707}, ${1709}, ${6269} ) "
-            + "                  AND        e.encounter_datetime > DATE_ADD( art.art_encounter, INTERVAL "
-            + minNumberOfMonths
-            + " MONTH ) "
-            + "                  AND        e.encounter_datetime < DATE_ADD( art.art_encounter, INTERVAL "
-            + maxNumberOfMonths
-            + " MONTH ) "
-            + "                  GROUP BY   p.patient_id ) resumo "
-            + "                  ON         resumo.patient_id = resumo_state.patient_id "
-            + "                  WHERE      resumo_state.voided = 0 "
-            + "                  AND        ee.voided = 0 "
-            + "                  AND        oo.voided = 0 "
-            + "                  AND        ee.encounter_type = ${53} "
-            + "                  AND        ee.location_id = :location "
-            + "                  AND        oo.concept_id = ${6272} "
-            + "                  AND        oo.value_coded IN ( ${1366}, ${1706}, ${1707}, ${1709}, ${6269} ) "
-            + "                  GROUP BY   resumo_state.patient_id "
-            + " ) state ";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
-
-    return sqlPatientDataDefinition;
-  }
-
-  /**
    * <b> Último Estado de Permanência TARV </b>
    * <li>Resposta = “Abandono”, os utentes em TARV que abandonaram o tratamento
    * <li>Resposta = “Óbito”, os utentes em TARV que foram óbito
@@ -4599,7 +4336,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getLastStateOfStayOnTarv() {
+  public DataDefinition getLastStateOfStayOnTarv(int cohortYear) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
 
     sqlPatientDataDefinition.setName("Get the Last State of stay ");
@@ -4644,10 +4381,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
         new EptsQueriesUtil()
             .unionBuilder(
                 ListOfPatientsWithMdsEvaluationQueries.getPatientsWhoAbandonedTarvQuery(
-                    true, inclusionEndMonthAndDay))
+                    true, inclusionEndMonthAndDay, cohortYear))
             .union(
                 ListOfPatientsWithMdsEvaluationQueries.getPatientsWhoDied(
-                    true, inclusionEndMonthAndDay))
+                    true, inclusionEndMonthAndDay, cohortYear))
             .union(
                 ListOfPatientsWithMdsEvaluationQueries
                     .getPatientsWhoSuspendedTarvOrAreTransferredOut(
@@ -4657,10 +4394,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
                         hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
                         false,
                         false,
-                        inclusionEndMonthAndDay))
+                        inclusionEndMonthAndDay,
+                        cohortYear))
             .union(
                 ListOfPatientsWithMdsEvaluationQueries.getPatientsActiveOnTarv(
-                    inclusionEndMonthAndDay))
+                    inclusionEndMonthAndDay, cohortYear))
             .buildQuery();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
