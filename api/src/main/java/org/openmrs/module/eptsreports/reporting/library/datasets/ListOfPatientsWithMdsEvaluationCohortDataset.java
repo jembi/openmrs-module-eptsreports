@@ -167,15 +167,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "pregnant_breastfeeding_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsPregnantBreastfeeding3MonthsTarv(
             3, 9),
-        "evaluationYear=${evaluationYear},location=${location}",
-        new NoOrYesConverter());
+        "evaluationYear=${evaluationYear},location=${location}");
 
     // B8- Teve TB nos 1˚s 12 meses de TARV: (coluna Q) - Resposta = Sim ou Não (RF23)
     pdd.addColumn(
         "tb_tarv_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithTbThirdToNineMonth(3, 9),
-        "evaluationYear=${evaluationYear},location=${location}",
-        new NoOrYesConverter());
+        "evaluationYear=${evaluationYear},location=${location}");
 
     // B9- Data de inscrição no MDS: (coluna R) - Resposta = Data de Inscrição (RF24)
     pdd.addColumn(

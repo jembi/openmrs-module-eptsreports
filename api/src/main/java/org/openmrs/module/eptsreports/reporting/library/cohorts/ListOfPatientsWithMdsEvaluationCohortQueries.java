@@ -1681,22 +1681,24 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
     map.put("1066", hivMetadata.getNoConcept().getConceptId());
     map.put("23761", hivMetadata.getActiveTBConcept().getConceptId());
-    map.put("23758", hivMetadata.getTBSymptomsConcept().getConceptId());
-    map.put("1766", tbMetadata.getObservationTB().getConceptId());
-    map.put("1763", tbMetadata.getFeverLastingMoraThan3Weeks().getConceptId());
-    map.put("1764", tbMetadata.getWeightLossOfMoreThan3KgInLastMonth().getConceptId());
-    map.put("1762", tbMetadata.getNightsWeatsLastingMoraThan3Weeks().getConceptId());
-    map.put("1760", tbMetadata.getCoughLastingMoraThan3Weeks().getConceptId());
-    map.put("23760", tbMetadata.getAsthenia().getConceptId());
-    map.put("1765", tbMetadata.getCohabitantBeingTreatedForTB().getConceptId());
-    map.put("161", tbMetadata.getLymphadenopathy().getConceptId());
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("1268", hivMetadata.getTBTreatmentPlanConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+    map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
 
     String query =
-        " SELECT     p.patient_id, "
+        "SELECT final_query.patient_id, "
+            + "       CASE "
+            + "              WHEN final_query.encounter_date IS NULL THEN 'Não' "
+            + "              WHEN final_query.encounter_date IS NOT NULL THEN 'Sim' "
+            + "              ELSE '' "
+            + "       END AS tb "
+            + "FROM   ( "
+            + " SELECT     p.patient_id, "
             + "      e.encounter_datetime AS encounter_date "
             + " FROM       patient p "
             + "     INNER JOIN encounter e "
@@ -1705,8 +1707,6 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "     ON         o.encounter_id = e.encounter_id "
             + "     INNER JOIN obs o2 "
             + "     ON         o2.encounter_id = e.encounter_id "
-            + "     INNER JOIN obs o3 "
-            + "     ON         o3.encounter_id = e.encounter_id "
             + "     INNER JOIN ( "
             + "              SELECT art_patient.patient_id, "
             + "                     art_patient.first_pickup AS art_encounter "
@@ -1719,7 +1719,6 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " AND        e.voided = 0 "
             + " AND        o.voided = 0 "
             + " AND        o2.voided = 0 "
-            + " AND        o3.voided = 0 "
             + " AND        e.encounter_type = ${6} "
             + " AND        e.location_id = :location "
             + " AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
@@ -1728,16 +1727,12 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + maxNumberOfMonths
             + " MONTH ) "
-            + " AND    (   ( o.concept_id = ${23758} "
+            + " AND    (   ( o.concept_id = ${23761} "
             + "              AND o.value_coded IN ( ${1065} ) ) "
-            + " OR         ( o2.concept_id = ${1766} "
-            + "                AND  o2.value_coded IN ( ${1763}, "
-            + "                                 ${1764}, ${1762}, "
-            + "                                 ${1760}, ${23760}, "
-            + "                                 ${1765}, ${161} ) ) "
-            + " OR        ( o3.concept_id = ${23761} "
-            + "              AND o3.value_coded IN ( ${1065} ) ) ) "
-            + " GROUP BY   p.patient_id";
+            + " OR         ( o2.concept_id = ${1268} "
+            + "                AND  o2.value_coded IN ( ${1256}, "
+            + "                                 ${1257}, ${1267} ) ) ) "
+            + " GROUP BY   p.patient_id ) AS final_query ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
