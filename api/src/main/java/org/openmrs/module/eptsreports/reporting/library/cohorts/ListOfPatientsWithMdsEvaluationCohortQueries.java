@@ -2290,6 +2290,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs os "
             + "                  ON         os.encounter_id = ee.encounter_id "
             + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds1_end.patient_id "
+            + "                  INNER JOIN ( "
             + ListOfPatientsWithMdsEvaluationQueries.getFirstMdsAndDateQuery(
                 numberOfMonths, inclusionEndMonthAndDay)
             + "                  ) mds1 "
@@ -2299,6 +2307,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        os.voided = 0 "
             + "                  AND        ee.encounter_type = ${6} "
             + "                  AND        ee.location_id = :location "
+            + "                  AND        ee.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        ee.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        ee.encounter_datetime > mds1.first_mds "
             + "                  AND    (   ( ot.concept_id = ${165174} "
             + "                               AND ot.value_coded = mds1.mds_one ) "
