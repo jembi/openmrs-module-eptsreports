@@ -4589,4 +4589,84 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     return sqlPatientDataDefinition;
   }
+
+  /**
+   * <b> Último Estado de Permanência TARV </b>
+   * <li>Resposta = “Abandono”, os utentes em TARV que abandonaram o tratamento
+   * <li>Resposta = “Óbito”, os utentes em TARV que foram óbito
+   * <li>Resposta = “Suspenso”, os utentes em TARV que suspenderam o tratamento
+   * <li>Resposta = “Activo”, os utentes activos em TARV
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getLastStateOfStayOnTarv() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+
+    sqlPatientDataDefinition.setName("Get the Last State of stay ");
+    sqlPatientDataDefinition.addParameter(
+        new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("1", hivMetadata.getHIVCareProgram().getProgramId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("10", hivMetadata.getArtDeadWorkflowState().getProgramWorkflowStateId());
+    map.put("8", hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put(
+        "28",
+        hivMetadata
+            .getArtCareTransferredFromOtherHealthFacilityWorkflowState()
+            .getProgramWorkflowStateId());
+    map.put(
+        "29",
+        hivMetadata
+            .getTransferredFromOtherHealthFacilityWorkflowState()
+            .getProgramWorkflowStateId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
+    map.put("6275", hivMetadata.getPreTarvConcept().getConceptId());
+    map.put("6276", hivMetadata.getArtStatus().getConceptId());
+    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("1709", hivMetadata.getSuspendedTreatmentConcept().getConceptId());
+
+    String query =
+        new EptsQueriesUtil()
+            .unionBuilder(
+                ListOfPatientsWithMdsEvaluationQueries.getPatientsWhoAbandonedTarvQuery(
+                    true, inclusionEndMonthAndDay))
+            .union(
+                ListOfPatientsWithMdsEvaluationQueries.getPatientsWhoDied(
+                    true, inclusionEndMonthAndDay))
+            .union(
+                ListOfPatientsWithMdsEvaluationQueries
+                    .getPatientsWhoSuspendedTarvOrAreTransferredOut(
+                        hivMetadata
+                            .getSuspendedTreatmentWorkflowState()
+                            .getProgramWorkflowStateId(),
+                        hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
+                        false,
+                        false,
+                        inclusionEndMonthAndDay))
+            .union(
+                ListOfPatientsWithMdsEvaluationQueries.getPatientsActiveOnTarv(
+                    inclusionEndMonthAndDay))
+            .buildQuery();
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
 }
