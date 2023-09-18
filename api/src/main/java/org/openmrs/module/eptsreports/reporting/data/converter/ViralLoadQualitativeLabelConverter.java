@@ -13,26 +13,19 @@ public class ViralLoadQualitativeLabelConverter implements DataConverter {
 
     switch (obj.toString()) {
       case "23814":
-        return "INDETCTÁVEL";
-
+        return "INDETECTÁVEL";
       case "1306":
         return "NIVEL BAIXO DE DETECÇÃO";
-
       case "23905":
         return "MENOR QUE 10 CÓPIAS/ML";
-
       case "23906":
         return "MENOR QUE 20 CÓPIAS/ML";
-
       case "23907":
         return "MENOR QUE 40 CÓPIAS/ML";
-
       case "23908":
         return "MENOR QUE 400 CÓPIAS/ML";
-
       case "23904":
         return "MENOR QUE 839 CÓPIAS/ML";
-
       default:
         return obj;
     }
