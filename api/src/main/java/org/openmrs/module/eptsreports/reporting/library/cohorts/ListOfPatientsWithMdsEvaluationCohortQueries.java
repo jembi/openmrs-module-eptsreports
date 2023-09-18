@@ -1893,25 +1893,24 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
     map.put("6332", hivMetadata.getBreastfeeding().getConceptId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
-    map.put("1066", hivMetadata.getNoConcept().getConceptId());
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
 
     String query =
-        "SELECT final_query.patient_id, "
+        "SELECT final_query.person_id, "
             + "       CASE "
             + "              WHEN final_query.encounter_date IS NULL THEN 'Não' "
             + "              WHEN final_query.encounter_date IS NOT NULL THEN 'Sim' "
             + "              ELSE '' "
             + "       end "
             + "FROM   ( "
-            + "                  SELECT     p.patient_id, "
+            + "                  SELECT     p.person_id, "
             + "                             e.encounter_datetime AS encounter_date "
-            + "                  FROM       patient p "
+            + "                  FROM       person p "
             + "                  INNER JOIN encounter e "
-            + "                  ON         e.patient_id = p.patient_id "
+            + "                  ON         e.patient_id = p.person_id "
             + "                  INNER JOIN obs o "
             + "                  ON         o.encounter_id = e.encounter_id "
             + "                  INNER JOIN obs o2 "
@@ -1923,26 +1922,24 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
             + "                           ) art_patient "
             + "                             ) art "
-            + "                  ON         art.patient_id = p.patient_id "
+            + "                  ON         art.patient_id = p.person_id "
             + "                  WHERE      p.voided = 0 "
             + "                  AND        e.voided = 0 "
             + "                  AND        o.voided = 0 "
             + "                  AND        o2.voided = 0 "
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
+            + "                  AND        p.gender = 'F' "
+            + "                  AND        Timestampdiff(year, p.birthdate, art.art_encounter) > 9 "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
             + minNumberOfMonths
             + " MONTH ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + maxNumberOfMonths
             + " MONTH ) "
-            + "                  AND        o.concept_id = ${1982} "
-            + "                  AND        o.value_coded IN ( ${1065}, "
-            + "                                               ${1066} ) "
-            + "                  AND        o2.concept_id = ${6332} "
-            + "                  AND        o2.value_coded IN ( ${1065}, "
-            + "                                               ${1066} ) "
-            + "                  GROUP BY   p.patient_id ) AS final_query";
+            + "                  AND       o.concept_id in (${1982}, ${6332}) "
+            + "                  AND       o.value_coded = (${1065}) "
+            + "                  GROUP BY   p.person_id ) AS final_query";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
