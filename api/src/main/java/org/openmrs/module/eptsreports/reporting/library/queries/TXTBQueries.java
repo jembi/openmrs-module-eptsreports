@@ -324,7 +324,6 @@ public class TXTBQueries {
 
     StringSubstitutor sb = new StringSubstitutor(map);
     String rep = sb.replace(query.toString());
-    System.out.println(rep);
     return rep;
   }
 

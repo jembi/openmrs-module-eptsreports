@@ -263,7 +263,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     cd.addSearch(
         TxTbComposition.NUMERATOR.getKey(),
         EptsReportUtils.map(
-            txtbCohortQueries.patientsNewOnARTNumerator(),
+            txtbCohortQueries.patientsPreviouslyOnARTNumerator(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(semearTbLamGXPertComposition.getCompositionString());
@@ -661,8 +661,7 @@ public class TxTbMonthlyCascadeCohortQueries {
         EptsReportUtils.map(
             tbLam, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString(
-        "withoutGeneXpertHaveTbLamOrRequestOnOthers OR dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers AND NOT (semearPositive OR mwrdPositive OR tblamExclusion)");
+    cd.setCompositionString("semearPositive OR mwrdPositive OR tblamExclusion");
 
     return cd;
   }
@@ -2743,7 +2742,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return OTHER6A.getKey() + " AND " + SIXA.getKey();
+        return SIXA.getKey() + " AND NOT " + OTHER6A.getKey();
       }
 
       @Override
