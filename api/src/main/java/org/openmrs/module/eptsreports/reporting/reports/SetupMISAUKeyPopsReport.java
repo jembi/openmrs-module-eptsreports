@@ -92,7 +92,7 @@ public class SetupMISAUKeyPopsReport extends EptsDataExportManager {
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Relatorio_de_Populacao_Chave-v2.xls",
+              "Template_RelatorioTrimestralPopulacaoChave_v2.2.xls",
               "Relatorio de Populacao Chave - MISAU",
               getExcelDesignUuid(),
               null);
