@@ -513,7 +513,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "                                      AND        e.encounter_type = ${18} "
             + "                                      AND        o.concept_id = ${5096} "
             + "                                      AND        o.value_datetime IS NOT NULL "
-            + " AND  o.value_datetime >= DATE_SUB( "
+            + " AND  o.value_datetime <= DATE_SUB( "
             + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
             + "        ), INTERVAL "
@@ -542,7 +542,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "                                      AND        ( "
             + "                                                            o2.concept_id = ${23866} "
             + "                                                 AND        o2.value_datetime IS NOT NULL "
-            + " AND  o2.value_datetime >= DATE_SUB( "
+            + " AND  o2.value_datetime <= DATE_SUB( "
             + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
             + "        ), INTERVAL "

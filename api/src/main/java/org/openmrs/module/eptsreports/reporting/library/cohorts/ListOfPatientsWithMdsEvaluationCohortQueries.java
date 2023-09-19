@@ -793,15 +793,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
-        "                   SELECT p2.patient_id, "
-            + "                          Min(ee2.encounter_datetime) AS encounter_date "
-            + "                   FROM   patient p2 "
-            + "                            INNER JOIN encounter ee2 "
-            + "                              ON ee2.patient_id = p2.patient_id "
-            + "                            INNER JOIN obs oo "
-            + "                              ON oo.encounter_id = ee2.encounter_id "
-            + "                   INNER JOIN ( "
-            + "                   SELECT p.patient_id, "
+        "                   SELECT p.patient_id, "
             + "                          Min(ee.encounter_datetime) AS encounter_date "
             + "                   FROM   patient p "
             + "                            INNER JOIN encounter ee "
@@ -830,9 +822,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "       AND obs.voided = 0 "
             + "       AND enc.encounter_type = ${6} "
             + "       AND enc.location_id = :location "
-            + "       AND obs.concept_id = ${23722} "
-            + "       AND obs.value_coded = ${856} "
-            + "       AND enc.encounter_datetime >= art.art_encounter "
+            + "       AND  ( (obs.concept_id = ${856} AND obs.value_numeric IS NOT NULL)  "
+            + "               OR (obs.concept_id = ${1305}  AND obs.value_coded IS NOT NULL) ) "
+            + "       AND enc.encounter_datetime > art.art_encounter "
             + "       GROUP  BY pa.patient_id) first_encounter "
             + "       ON first_encounter.patient_id = p.patient_id "
             + "       WHERE  p.voided = 0 "
@@ -840,18 +832,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "       AND  o.voided = 0 "
             + "       AND  ee.encounter_type = ${6} "
             + "       AND  ee.encounter_datetime > first_encounter.encounter_date "
-            + "       AND  ( (o.concept_id = ${856} AND o.value_numeric IS NOT NULL)  "
-            + "               OR (o.concept_id = ${1305}  AND o.value_coded IS NOT NULL) ) "
-            + "       GROUP BY p.patient_id) second_encounter "
-            + "               ON ee2.patient_id = second_encounter.patient_id "
-            + "WHERE  p2.voided = 0 "
-            + "       AND  ee2.voided = 0 "
-            + "       AND  oo.voided = 0 "
-            + "       AND ee2.encounter_type = ${6} "
-            + "       AND ee2.location_id = :location "
-            + "       AND  ( (oo.concept_id = ${856} AND oo.value_numeric IS NOT NULL)  "
-            + "               OR (oo.concept_id = ${1305}  AND oo.value_coded IS NOT NULL) ) "
-            + "GROUP  BY p2.patient_id ";
+            + "       AND o.concept_id = ${23722} "
+            + "       AND o.value_coded = ${856} "
+            + "       GROUP BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
