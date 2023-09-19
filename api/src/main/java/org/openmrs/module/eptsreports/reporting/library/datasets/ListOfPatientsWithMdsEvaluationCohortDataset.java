@@ -362,8 +362,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "pregnant_breastfeeding_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsPregnantBreastfeeding3MonthsTarv(
             12, 24),
-        "evaluationYear=${evaluationYear},location=${location}",
-        new NoOrYesConverter());
+        "evaluationYear=${evaluationYear},location=${location}");
 
     // C8 - Teve TB entre 12˚ e 24 ˚ meses de TARV: (coluna AW) - Resposta = Sim ou Não (RF38)
     pdd.addColumn(
