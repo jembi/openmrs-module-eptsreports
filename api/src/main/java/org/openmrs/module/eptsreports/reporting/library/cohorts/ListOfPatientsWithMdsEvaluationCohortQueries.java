@@ -1461,7 +1461,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "           WHEN ( consultation_tb.tb_consultations <> "
             + "                  consultations.nr_consultations ) "
             + "               THEN 'Nao' "
-            + "           end AS good_adhesion "
+            + "          ELSE '' "
+            + "           END AS good_adhesion "
             + "FROM   patient p "
             + "           INNER JOIN (SELECT e.patient_id, "
             + "                              Count(e.encounter_id) AS tb_consultations "
@@ -1500,10 +1501,16 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                       WHERE  e.voided = 0 "
             + "                         AND o.voided = 0 "
             + "                         AND e.encounter_type = ${35} "
-            + "                         AND e.location_id = :location "
-            + "                         AND e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL 33 DAY) "
-            + "                         AND e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL 3 MONTH) "
-            + "                         AND        o.concept_id = ${6223} "
+            + "                         AND e.location_id = :location ";
+    query +=
+        b5Orc5
+            ? "                         AND e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL 33 DAY) "
+                + "                         AND e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL 3 MONTH) "
+            : " AND        e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL 12 MONTH) "
+                + " AND        e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL 24 MONTH) ";
+
+    query +=
+        "                         AND        o.concept_id = ${6223} "
             + "                         AND        o.value_coded IN ( ${1383}, "
             + "                                                       ${1749}, "
             + "                                                       ${1385} ) "

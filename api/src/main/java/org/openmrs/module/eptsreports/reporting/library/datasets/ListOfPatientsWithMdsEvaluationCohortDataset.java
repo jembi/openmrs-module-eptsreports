@@ -158,8 +158,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "good_adherence_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(true),
-        "evaluationYear=${evaluationYear},location=${location}",
-        new EmptyIfNullConverter());
+        "evaluationYear=${evaluationYear},location=${location}");
 
     // B6- Esteve grávida ou foi lactante entre 3˚ e 9º mês de TARV?: (coluna M)- Resposta = Sim ou
     // Não (RF22)
@@ -355,8 +354,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "good_adherence_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(false),
-        "evaluationYear=${evaluationYear},location=${location}",
-        new NoOrYesConverter());
+        "evaluationYear=${evaluationYear},location=${location}");
 
     // C6 - Esteve grávida ou foi lactante entre 12˚ e 24º mês de TARV?: (coluna AU) - Resposta =
     // Sim ou Não (RF37)
