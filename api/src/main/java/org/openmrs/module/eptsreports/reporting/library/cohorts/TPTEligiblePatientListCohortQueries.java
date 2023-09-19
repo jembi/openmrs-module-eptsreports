@@ -1221,7 +1221,6 @@ public class TPTEligiblePatientListCohortQueries {
             + "                        AND ( o2.concept_id = ${165308} "
             + "                                AND o2.value_coded IN ( ${1256}, ${1257} ) )"
             + "                        AND o2.obs_datetime <= :endDate "
-            + "                        GROUP BY ee.patient_id, ee.encounter_id "
             + "                                )consultations "
             + "                                WHERE consultations.patient_id= p.patient_id "
             + "                                AND consultations.obs_datetime > tabela.start_date "
