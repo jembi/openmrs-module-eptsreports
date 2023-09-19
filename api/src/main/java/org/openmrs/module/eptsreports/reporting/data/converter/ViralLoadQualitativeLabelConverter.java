@@ -17,15 +17,15 @@ public class ViralLoadQualitativeLabelConverter implements DataConverter {
       case "1306":
         return "NIVEL BAIXO DE DETECÇÃO";
       case "23905":
-        return "MENOR QUE 10 CÓPIAS/ML";
+        return "MENOR QUE 10 COPIAS/ML";
       case "23906":
-        return "MENOR QUE 20 CÓPIAS/ML";
+        return "MENOR QUE 20 COPIAS/ML";
       case "23907":
-        return "MENOR QUE 40 CÓPIAS/ML";
+        return "MENOR QUE 40 COPIAS/ML";
       case "23908":
-        return "MENOR QUE 400 CÓPIAS/ML";
+        return "MENOR QUE 400 COPIAS/ML";
       case "23904":
-        return "MENOR QUE 839 CÓPIAS/ML";
+        return "MENOR QUE 839 COPIAS/ML";
       default:
         return obj;
     }
