@@ -1522,8 +1522,6 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
-    System.out.println(sqlPatientDataDefinition.getQuery());
-
     return sqlPatientDataDefinition;
   }
 
