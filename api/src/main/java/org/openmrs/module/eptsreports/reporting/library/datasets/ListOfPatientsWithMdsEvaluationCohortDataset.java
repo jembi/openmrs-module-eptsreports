@@ -120,8 +120,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "initial_cd4_result",
         listOfPatientsWithMdsEvaluationCohortQueries.getCd4Result(),
-        "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        "evaluationYear=${evaluationYear},location=${location}");
 
     //  SECÇÃO B
     //  12 MESES DEPOIS DO INÍCIO DO TARV: ELIGIBILIDADE A MDS
@@ -151,8 +150,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "second_cd4_result",
         listOfPatientsWithMdsEvaluationCohortQueries.getSecondCd4Result(),
-        "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        "evaluationYear=${evaluationYear},location=${location}");
 
     // B5- Teve registo de boa adesão em TODAS consultas entre 1˚ e 3˚ mês de TARV?
     pdd.addColumn(
@@ -306,15 +304,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "clinical_consultations_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(6, 12),
-        "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        "evaluationYear=${evaluationYear},location=${location}");
 
     // B17 - N˚ de consultas de APSS/PP entre 6˚ e 12˚ mês de TARV - Coluna AN
     pdd.addColumn(
         "apss_pp_consultations_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(6, 12),
-        "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        "evaluationYear=${evaluationYear},location=${location}");
 
     // B18 - Estado de permanência no 12˚ mês de TARV: (coluna AO)
     pdd.addColumn(
@@ -340,15 +336,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "cv_result_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getSecondViralLoadResult(),
-        "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        "evaluationYear=${evaluationYear},location=${location}");
 
     // C4 - Resultado do CD4 feito entre 12˚ e 24˚ mês de TARV- C.4 (Coluna AS)
     pdd.addColumn(
         "cd4_result_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getCd4ResultSectionC(),
-        "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        "evaluationYear=${evaluationYear},location=${location}");
 
     // C5- Teve registo de boa adesão em TODAS consultas entre 12˚ e 24˚ mês de TARV?
     pdd.addColumn(
@@ -368,8 +362,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "tb_tarv_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithTbThirdToNineMonth(12, 24),
-        "evaluationYear=${evaluationYear},location=${location}",
-        new NoOrYesConverter());
+        "evaluationYear=${evaluationYear},location=${location}");
 
     // C9 - Data de inscrição no MDS entre 12º e 24º mês de TAV: (coluna AX) - Resposta = Data de
     // Inscrição (RF39)
@@ -503,15 +496,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "clinical_consultations_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(12, 24),
-        "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        "evaluationYear=${evaluationYear},location=${location}");
 
     // C17 - N˚ de consultas de APSS/PP tre 12˚ e 24˚ mês de TARV - Coluna BT
     pdd.addColumn(
         "apss_pp_consultations_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(12, 24),
-        "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        "evaluationYear=${evaluationYear},location=${location}");
 
     // C18 - Estado de permanência no 24˚ mês de TARV: (coluna BU)
     pdd.addColumn(
