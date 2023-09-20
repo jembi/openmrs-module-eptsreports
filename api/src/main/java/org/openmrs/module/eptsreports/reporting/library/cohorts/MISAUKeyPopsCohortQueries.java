@@ -452,7 +452,7 @@ public class MISAUKeyPopsCohortQueries {
     cd.addSearch(
         "B1",
         EptsReportUtils.map(
-            B1, "startDate=${startDate-12m},endDate=${endDate-12m-1d},location=${location}"));
+            B1, "startDate=${startDate-12m},endDate=${endDate-12m},location=${location}"));
 
     cd.addSearch("B13", EptsReportUtils.map(B13, "endDate=${endDate},location=${location}"));
 
