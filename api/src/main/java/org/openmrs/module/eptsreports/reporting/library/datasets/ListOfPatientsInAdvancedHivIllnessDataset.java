@@ -8,13 +8,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
-import org.openmrs.module.eptsreports.reporting.data.converter.DashDateFormatConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.EmptyToNaoAndAnyToSimConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.ObservationToConceptNameConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.TestResultConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.ViaResultsConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.*;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsArtCohortCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
@@ -238,7 +232,8 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
     pdd.addColumn(
         "vl_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getMostRecentVLResult(),
-        "endDate=${endDate},location=${location}");
+        "endDate=${endDate},location=${location}",
+        new ViralLoadQualitativeLabelConverter());
 
     // 24 - Data da Último Carga Viral – Sheet 1: Column X
     pdd.addColumn(
@@ -252,7 +247,8 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "second_vl_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries
             .getLastVLResultBeforeMostRecentVLResultDate(),
-        "endDate=${endDate},location=${location}");
+        "endDate=${endDate},location=${location}",
+        new ViralLoadQualitativeLabelConverter());
 
     // 26 - Data da Penúltima Carga Viral – Sheet 1: Column Z
     pdd.addColumn(
