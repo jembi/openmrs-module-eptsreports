@@ -3528,10 +3528,26 @@
 	</globalProperty>
 
 	<globalProperty>
+		<property>eptsreports.regime1HPConceptUuid</property>
+		<defaultValue>b7119181-4186-4680-9b9e-8ae01cb40073</defaultValue>
+		<description>
+			UUID for Regime 1HP concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
 		<property>@MODULE_ID@.positivityLevelConceptUuid</property>
 		<defaultValue>303a4480-f2b3-4192-a446-725a401ebb09</defaultValue>
 		<description>
 			UUID for Positivity Level
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.regimeLFXConceptUuid</property>
+		<defaultValue>c3e11134-fac6-4577-9f99-a3d42cfbc5d1</defaultValue>
+		<description>
+			UUID for Regime LFX concept
 		</description>
 	</globalProperty>
 
@@ -3697,7 +3713,7 @@
 
 	<globalProperty>
 		<property>@MODULE_ID@.estomatiteUlcerativaNecrotizanteConceptUuid</property>
-		<defaultValue>e1e2b07c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<defaultValue>a02a1759-9082-11e6-a98e-000c29db4475</defaultValue>
 		<description>
 			UUID for Estomatite ulcerativa necrotizante Concept
 		</description>
@@ -3705,7 +3721,7 @@
 
 	<globalProperty>
 		<property>@MODULE_ID@.candidiaseOralConceptUuid</property>
-		<defaultValue>e1e2b07c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<defaultValue>e1e5232a-1d5f-11e0-b929-000c29ad1d07</defaultValue>
 		<description>
 			UUID for CANDIDIASE ORAL Concept
 		</description>
@@ -3713,7 +3729,7 @@
 
 	<globalProperty>
 		<property>@MODULE_ID@.cryptococcalMeningitisConceptUuid</property>
-		<defaultValue>e1e2b07c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<defaultValue>e1da1bd8-1d5f-11e0-b929-000c29ad1d07</defaultValue>
 		<description>
 			UUID for CRYPTOCOCCAL MENINGITIS Concept
 		</description>
@@ -3721,7 +3737,7 @@
 
 	<globalProperty>
 		<property>@MODULE_ID@.cervicalCancerConceptUuid</property>
-		<defaultValue>e1e2b07c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<defaultValue>e1dc8ac6-1d5f-11e0-b929-000c29ad1d07</defaultValue>
 		<description>
 			UUID for CERVICAL CANCER Concept
 		</description>
@@ -3729,7 +3745,7 @@
 
 	<globalProperty>
 		<property>@MODULE_ID@.candidiaseEsofagicaConceptUuid</property>
-		<defaultValue>e1e2b07c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<defaultValue>5340AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</defaultValue>
 		<description>
 			UUID for CANDIDÍASE ESOFÁGICA Concept
 		</description>
@@ -3737,7 +3753,7 @@
 
 	<globalProperty>
 		<property>@MODULE_ID@.herpesSimplesConceptUuid</property>
-		<defaultValue>e1e2b07c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<defaultValue>e1e52f28-1d5f-11e0-b929-000c29ad1d07</defaultValue>
 		<description>
 			UUID for HERPES SIMPLES > 1 MÊS OU VISCERAL Concept
 		</description>
@@ -3745,7 +3761,7 @@
 
 	<globalProperty>
 		<property>@MODULE_ID@.cachexiaConceptUuid</property>
-		<defaultValue>e1e2b07c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<defaultValue>61a93abd-9087-11e6-a98e-000c29db4475</defaultValue>
 		<description>
 			UUID for Cachexia Concept
 		</description>
@@ -3753,7 +3769,7 @@
 
 	<globalProperty>
 		<property>@MODULE_ID@.toxoplasmoseConceptUuid</property>
-		<defaultValue>e1e2b07c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<defaultValue>de8f1eeb-9082-11e6-a98e-000c29db4475</defaultValue>
 		<description>
 			UUID for Toxoplasmose Concept
 		</description>
@@ -3801,5 +3817,21 @@
 		<file>messages_pt.properties</file>
 	</messages>
 	<!-- /Internationalization -->
+
+	<globalProperty>
+		<property>eptsreports.bmiConceptUuid</property>
+		<defaultValue>e1da52ba-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			BMI
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.muacConceptUuid</property>
+		<defaultValue>1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</defaultValue>
+		<description>
+			MUAC
+		</description>
+	</globalProperty>
 
 </module>

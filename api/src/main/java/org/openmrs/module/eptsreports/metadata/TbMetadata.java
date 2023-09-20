@@ -663,18 +663,32 @@ public class TbMetadata extends ProgramsMetadata {
   }
 
   /**
-   * <b>concept_id = 5042</b>
+   * <b>concept_id = 165305</b>
    *
-   * <p><b>Name:</b> EXTRAPULMONARY TUBERCULOSIS
+   * <p><b>Name:</b> 1HP
    *
-   * <p><b>Description:</b> EXTRAPULMONARY TUBERCULOSIS Concept
+   * <p><b>Description: 1HP (Drug) </b>
    *
    * @return {@link Concept}
    */
-  public Concept getExtraPulmonaryTbConcept() {
+  public Concept get1HPConcept() {
     String uuid =
-        Context.getAdministrationService()
-            .getGlobalProperty("eptsreports.extraPulmonaryTbConceptUuid");
+        Context.getAdministrationService().getGlobalProperty("eptsreports.regime1HPConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165306</b>
+   *
+   * <p><b>Name:</b> LFX
+   *
+   * <p><b>Description: LFX (Drug) </b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getLFXConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.regimeLFXConceptUuid");
     return getConcept(uuid);
   }
 
@@ -691,6 +705,22 @@ public class TbMetadata extends ProgramsMetadata {
     String uuid =
         Context.getAdministrationService()
             .getGlobalProperty("eptsreports.tbLamPositivityLevelConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 5042</b>
+   *
+   * <p><b>Name:</b> EXTRAPULMONARY TUBERCULOSIS
+   *
+   * <p><b>Description:</b> EXTRAPULMONARY TUBERCULOSIS Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getExtraPulmonaryTbConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.extraPulmonaryTbConceptUuid");
     return getConcept(uuid);
   }
 }

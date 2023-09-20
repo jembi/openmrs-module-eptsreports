@@ -349,7 +349,6 @@ public class CommonCohortQueries {
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
@@ -412,17 +411,13 @@ public class CommonCohortQueries {
             + "                                                 JOIN encounter e "
             + "                                                   ON p.patient_id = "
             + "                                                      e.patient_id "
-            + "                                                 JOIN obs o "
-            + "                                                   ON e.encounter_id = "
-            + "                                                      o.encounter_id "
             + "                                          WHERE  p.voided = 0 "
             + "                                                 AND e.voided = 0 "
-            + "                                                 AND e.encounter_type = ${52} "
+            + "                                                 AND e.encounter_type = ${18} "
             + "                                                 AND e.location_id = :location "
-            + "                                                 AND o.concept_id = ${23866} "
-            + "                                                 AND o.value_datetime > "
+            + "                                                 AND e.encounter_datetime > "
             + "                                                     transferout_date "
-            + "                                                 AND o.value_datetime <= "
+            + "                                                 AND  e.encounter_datetime <= "
             + "                                                     :revisionEndDate)  ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
