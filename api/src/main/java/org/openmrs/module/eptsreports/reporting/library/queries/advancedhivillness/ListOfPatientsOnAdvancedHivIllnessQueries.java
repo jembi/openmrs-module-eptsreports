@@ -590,7 +590,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         "FROM ("
             + " SELECT lastest.patient_id ,Max(lastest.last_date) as  last_date "
             + " FROM (  "
-            + "    SELECT p.patient_id ,ps.start_date AS last_date  "
+            + "    SELECT p.patient_id , MAX(ps.start_date) AS last_date  "
             + "    FROM patient p   "
             + "        INNER JOIN patient_program pg   "
             + "            ON p.patient_id=pg.patient_id   "
