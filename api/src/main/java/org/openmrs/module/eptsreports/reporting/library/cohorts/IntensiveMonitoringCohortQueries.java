@@ -245,35 +245,35 @@ public class IntensiveMonitoringCohortQueries {
         EptsReportUtils.map(rf13, "revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-        "C",
+        "pregnant",
         EptsReportUtils.map(
             pregnant,
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-        "D",
+        "breastfeeding",
         EptsReportUtils.map(
             breastfeeding,
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-        "E",
+        "transferredIn",
         EptsReportUtils.map(
             transferredIn,
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-        "F",
+        "transferredOut",
         EptsReportUtils.map(
-            transferOut,
+            transferredOut,
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     if (den == 2 || den == 4) {
       cd.setCompositionString(
-          "(A AND (B41 OR B42 OR B51 OR B52)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
+          "RF13 AND NOT (pregnant OR breastfeeding OR transferredIn OR transferredOut)");
     } else if (den == 6) {
       cd.setCompositionString(
-          "(A AND (B41 OR B42 OR B51 OR B52) AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
+              "(RF13 AND pregnant) AND NOT (breastfeeding OR transferredIn OR transferredOut)");
     }
     return cd;
   }
