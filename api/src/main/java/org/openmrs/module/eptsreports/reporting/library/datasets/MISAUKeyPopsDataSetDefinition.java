@@ -62,7 +62,6 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
     dataSetDefinition.setName("MISAU Key Population Data Set");
     dataSetDefinition.addParameters(getParameters());
     String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
-
     dataSetDefinition.addDimension(
         "age",
         EptsReportUtils.map(
@@ -108,17 +107,18 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "getPatientsOnARTInLast12MonthsIndicator",
             EptsReportUtils.map(
-                resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13(),
-                "endDate=${endDate},location=${location}"));
+                mISAUKeyPopsCohortQueries.getAdultPatientsCurrentlyOnArtIn12MonthsCohort(),
+                mappings));
 
-    // This returns total adult patients Started ART B1
+    // Número adultos que iniciaram TARV durante o trimestre
     addRow(
         dataSetDefinition,
         "START",
         "Total Started ART",
         EptsReportUtils.map(getPatientsInARTIndicator, mappings),
         getColumnsForAdults());
-    // Numero adultos que iniciaram TARV durante o trimestre PID
+
+    // Pessoas que injectam drogas (PID)
     addRow(
         dataSetDefinition,
         "STARTPID",
@@ -126,7 +126,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(getPatientsInARTIndicator, mappings),
         getColumnForPID());
 
-    // Numero adultos que iniciaram TARV durante o trimestre MSM
+    // Homens que fazem sexo com homens (HSH)
     addRow(
         dataSetDefinition,
         "STARTMSM",
@@ -134,7 +134,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(getPatientsInARTIndicator, mappings),
         getColumnForMSM());
 
-    // Numero adultos que iniciaram TARV durante o trimestre CSW
+    // Trabalhadoras Sexo (MTS)
     addRow(
         dataSetDefinition,
         "STARTCSW",
@@ -142,7 +142,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(getPatientsInARTIndicator, mappings),
         getColumnForCSW());
 
-    // Numero adultos que iniciaram TARV durante o trimestre PRI
+    // Reclusos (Rec)
     addRow(
         dataSetDefinition,
         "STARTPRI",
@@ -150,14 +150,15 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(getPatientsInARTIndicator, mappings),
         getColumnForPRI());
 
-    // This returns total adult patients currently ART B13
+    // Número adultos actualmente em TARV no fim do trimestre
     addRow(
         dataSetDefinition,
         "CURRART",
         "Total Current ART",
         EptsReportUtils.map(getPatientsCurrentlyInARTIndicator, mappings),
         getColumnsForAdults());
-    // currently ART - PID age dissaggregations
+
+    // Pessoas que injectam drogas (PID)
     addRow(
         dataSetDefinition,
         "CURRARTPID",
@@ -195,7 +196,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(getPatientsARTWithViralLoadTestIndicator, mappings),
         getColumnsForAdults());
 
-    // Adults patients with viral load test PID
+    // Pessoas que injectam drogas (PID)
     addRow(
         dataSetDefinition,
         "VLPID",
@@ -232,7 +233,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(getPatientsARTWithVLSuppressionIndicator, mappings),
         getColumnsForAdults());
 
-    // Adult patients with viral load supression - PID
+    // Pessoas que injectam drogas (PID)
     addRow(
         dataSetDefinition,
         "VLSUPPID",
@@ -270,7 +271,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(getPatientsStartedARTInLast12MonthsIndicator, mappings),
         getColumnsForAdults());
 
-    // Adult patients started ART in last 12 Months - PID
+    // Pessoas que injectam drogas (PID)
     addRow(
         dataSetDefinition,
         "START12PID",
@@ -298,7 +299,6 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         "START12: People in prison and other closed settings",
         EptsReportUtils.map(getPatientsStartedARTInLast12MonthsIndicator, mappings),
         getColumnForPRI());
-
     // This returns total adult patients on ART in last 12 Months
     addRow(
         dataSetDefinition,
@@ -307,7 +307,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(getPatientsOnARTInLast12MonthsIndicator, mappings),
         getColumnsForAdults());
 
-    // Adult patients on ART in last 12 Months - PID
+    // Pessoas que injectam drogas (PID)
     addRow(
         dataSetDefinition,
         "ARTLAST12PID",
@@ -564,8 +564,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "VLSPID6MTD",
                 EptsReportUtils.map(
-                    mISAUKeyPopsCohortQueries
-                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mISAUKeyPopsCohortQueries.getActiveAdultPatientOnArtWithVlSuppression(),
                     mappings)),
             mappings),
         getColumnForPID());
@@ -578,8 +577,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "VLSPID6MPIDHSH",
                 EptsReportUtils.map(
-                    mISAUKeyPopsCohortQueries
-                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mISAUKeyPopsCohortQueries.getActiveAdultPatientOnArtWithVlSuppression(),
                     mappings)),
             mappings),
         getPidHshAndAgeColumns());
@@ -592,8 +590,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "VLSPID6MPIDMTS",
                 EptsReportUtils.map(
-                    mISAUKeyPopsCohortQueries
-                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mISAUKeyPopsCohortQueries.getActiveAdultPatientOnArtWithVlSuppression(),
                     mappings)),
             mappings),
         getPidMtsAndAgeColumns());
@@ -606,8 +603,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "VLSPID6MPIDREC",
                 EptsReportUtils.map(
-                    mISAUKeyPopsCohortQueries
-                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mISAUKeyPopsCohortQueries.getActiveAdultPatientOnArtWithVlSuppression(),
                     mappings)),
             mappings),
         getPidRecAndAgeColumns());
@@ -679,7 +675,10 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
                     mappings)),
             mappings),
         "keypop=MSM");
-    // Totals split into ages - Current on ART - HSH
+
+    // Número de População Chave (KP) no Grupo de HSH, actualmente recebendo terapia antirretroviral
+    // (TARV) – Coorte 6 meses
+    // HSH
     addRow(
         dataSetDefinition,
         "CURRARTHSH6MTD",
@@ -693,7 +692,9 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
             mappings),
         getColumnForMSM());
 
-    // Totals split into ages - Start on ART - HSH e PID
+    // Número de População Chave (KP) no Grupo de HSH, actualmente recebendo terapia antirretroviral
+    // (TARV) – Coorte 6 meses
+    // HSH e PID
     addRow(
         dataSetDefinition,
         "CURRARTHSHPID",
@@ -707,7 +708,9 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
             mappings),
         getPidHshAndAgeColumns());
 
-    // Totals split into ages - Current on ART - HSH e REC
+    // Número de População Chave (KP) no Grupo de HSH, actualmente recebendo terapia antirretroviral
+    // (TARV) – Coorte 6 meses
+    // HSH e REC
     addRow(
         dataSetDefinition,
         "CURRARTHSHREC",
@@ -801,8 +804,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "VLSHSH6MTD",
                 EptsReportUtils.map(
-                    mISAUKeyPopsCohortQueries
-                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mISAUKeyPopsCohortQueries.getActiveAdultPatientOnArtWithVlSuppression(),
                     mappings)),
             mappings),
         getColumnForMSM());
@@ -816,8 +818,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "VLSHSHPID",
                 EptsReportUtils.map(
-                    mISAUKeyPopsCohortQueries
-                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mISAUKeyPopsCohortQueries.getActiveAdultPatientOnArtWithVlSuppression(),
                     mappings)),
             mappings),
         getPidHshAndAgeColumns());
@@ -831,8 +832,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "VLsHSHREC",
                 EptsReportUtils.map(
-                    mISAUKeyPopsCohortQueries
-                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mISAUKeyPopsCohortQueries.getActiveAdultPatientOnArtWithVlSuppression(),
                     mappings)),
             mappings),
         getHshRecAndAgeColumns());
@@ -1020,6 +1020,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
                     mappings)),
             mappings),
         "keypop=CSW");
+
     // Totals split into ages - VL results - MTS
     addRow(
         dataSetDefinition,
@@ -1029,8 +1030,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "VLSMTS6MTD",
                 EptsReportUtils.map(
-                    mISAUKeyPopsCohortQueries
-                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mISAUKeyPopsCohortQueries.getActiveAdultPatientOnArtWithVlSuppression(),
                     mappings)),
             mappings),
         getColumnForCSW());
@@ -1044,8 +1044,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "VLSMTSPID6M",
                 EptsReportUtils.map(
-                    mISAUKeyPopsCohortQueries
-                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mISAUKeyPopsCohortQueries.getActiveAdultPatientOnArtWithVlSuppression(),
                     mappings)),
             mappings),
         getPidMtsAndAgeColumns());
@@ -1059,8 +1058,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "VLSMTSREC",
                 EptsReportUtils.map(
-                    mISAUKeyPopsCohortQueries
-                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mISAUKeyPopsCohortQueries.getActiveAdultPatientOnArtWithVlSuppression(),
                     mappings)),
             mappings),
         getMtsRecAndAgeColumns());
@@ -1300,8 +1298,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "VLSEC6MTD",
                 EptsReportUtils.map(
-                    mISAUKeyPopsCohortQueries
-                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mISAUKeyPopsCohortQueries.getActiveAdultPatientOnArtWithVlSuppression(),
                     mappings)),
             mappings),
         getColumnForPRI());
@@ -1315,8 +1312,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "VLSPIDREC6MTD",
                 EptsReportUtils.map(
-                    mISAUKeyPopsCohortQueries
-                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mISAUKeyPopsCohortQueries.getActiveAdultPatientOnArtWithVlSuppression(),
                     mappings)),
             mappings),
         getPidRecAndAgeColumns());
@@ -1330,8 +1326,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "VLSECHSH6MTD",
                 EptsReportUtils.map(
-                    mISAUKeyPopsCohortQueries
-                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mISAUKeyPopsCohortQueries.getActiveAdultPatientOnArtWithVlSuppression(),
                     mappings)),
             mappings),
         getHshRecAndAgeColumns());
@@ -1345,8 +1340,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "VLSRECMTS6MTD",
                 EptsReportUtils.map(
-                    mISAUKeyPopsCohortQueries
-                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mISAUKeyPopsCohortQueries.getActiveAdultPatientOnArtWithVlSuppression(),
                     mappings)),
             mappings),
         getMtsRecAndAgeColumns());

@@ -85,13 +85,11 @@ public class MISAUKeyPopsCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition patientsCurrentlyInART =
-        resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false);
+        resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
 
     cd.addSearch(
         "patientsCurrentlyInART",
-        EptsReportUtils.map(
-            patientsCurrentlyInART,
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(patientsCurrentlyInART, "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("patientsCurrentlyInART");
     return cd;
@@ -176,13 +174,8 @@ public class MISAUKeyPopsCohortQueries {
         "B1SIXMONTHS",
         EptsReportUtils.map(
             getPatientsInART(),
-            "startDate=${startDate-7m},endDate=${startDate-4m},location=${location}"));
-    cd.addSearch(
-        "ADULTS",
-        EptsReportUtils.map(
-            ageCohortQueries.createXtoYAgeCohort("children", 15, null),
-            "effectiveDate=${endDate}"));
-    cd.setCompositionString("B1SIXMONTHS AND ADULTS");
+            "startDate=${startDate-7m},endDate=${startDate-4m-1d},location=${location}"));
+    cd.setCompositionString("B1SIXMONTHS");
     return cd;
   }
 
@@ -200,16 +193,10 @@ public class MISAUKeyPopsCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addSearch(
-        "B1SIXMONTHS",
-        EptsReportUtils.map(
-            getNumberOfAdultsWhoStartedArtInSixMonthsCohort(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
         "B13SIXMONTHS",
         EptsReportUtils.map(
-            getPatientsCurrentlyInART(),
-            "startDate=${startDate-7m},endDate=${endDate},location=${location}"));
-    cd.setCompositionString("B1SIXMONTHS AND B13SIXMONTHS");
+            getPatientsCurrentlyInART(), "endDate=${startDate-4m-1d},location=${location}"));
+    cd.setCompositionString("B13SIXMONTHS");
     return cd;
   }
 
@@ -229,18 +216,16 @@ public class MISAUKeyPopsCohortQueries {
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
-
     cd.addSearch(
-        "B1SIXMONTHS",
+        "ADULTS",
         EptsReportUtils.map(
-            getNumberOfAdultsWhoStartedArtInSixMonthsCohort(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            ageCohortQueries.createXtoYAgeCohort("adults", 15, null), "effectiveDate=${endDate}"));
     cd.addSearch(
         "E2SIXMONTHS",
         EptsReportUtils.map(
             getPatientsARTWithViralLoadTest(),
             "startDate=${startDate-7m},endDate=${endDate},location=${location}"));
-    cd.setCompositionString("B1SIXMONTHS AND E2SIXMONTHS");
+    cd.setCompositionString("E2SIXMONTHS AND ADULTS");
     return cd;
   }
 
@@ -435,7 +420,8 @@ public class MISAUKeyPopsCohortQueries {
 
     cd.addSearch(
         "RM",
-        EptsReportUtils.map(rm, "startDate=${startDate},endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(
+            rm, "startDate=${startDate-12m},endDate=${endDate-12m},location=${location}"));
 
     cd.addSearch(
         "TRANSFERREDOUT",
@@ -444,6 +430,50 @@ public class MISAUKeyPopsCohortQueries {
 
     cd.setCompositionString("RM AND NOT TRANSFERREDOUT");
 
+    return cd;
+  }
+
+  public CohortDefinition getAdultPatientsCurrentlyOnArtIn12MonthsCohort() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Número de adultos na coorte de 12 meses - Activos em TARV");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition B1 =
+        resumoMensalCohortQueries.getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1();
+
+    CohortDefinition B13 = resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
+
+    cd.addSearch(
+        "ADULTS",
+        EptsReportUtils.map(
+            ageCohortQueries.createXtoYAgeCohort("adults", 15, null), "effectiveDate=${endDate}"));
+    cd.addSearch(
+        "B1",
+        EptsReportUtils.map(
+            B1, "startDate=${startDate-12m},endDate=${endDate-12m},location=${location}"));
+
+    cd.addSearch("B13", EptsReportUtils.map(B13, "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("B1 AND B13 AND ADULTS");
+
+    return cd;
+  }
+
+  public CohortDefinition getActiveAdultPatientOnArtWithVlSuppression() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "Number of adult patients currently on  ART in 6 months period with viral load suppression");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addSearch(
+        "E3SIXMONTHS",
+        EptsReportUtils.map(
+            getPatientsARTWithVLSuppression(),
+            "startDate=${startDate-7m},endDate=${endDate},location=${location}"));
+    cd.setCompositionString("E3SIXMONTHS");
     return cd;
   }
 }
