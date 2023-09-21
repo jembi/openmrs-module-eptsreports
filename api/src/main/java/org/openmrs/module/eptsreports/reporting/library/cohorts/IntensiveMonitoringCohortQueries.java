@@ -217,48 +217,8 @@ public class IntensiveMonitoringCohortQueries {
     } else if (den == 6) {
       cd.setName("MI 6 (A AND B4 AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR I OR J)");
     }
-    CohortDefinition startedART = qualityImprovement2020CohortQueries.getMOHArtStartDate();
 
-    CohortDefinition b41 = qualityImprovement2020CohortQueries.getB4And1();
-    CohortDefinition b42 = qualityImprovement2020CohortQueries.getB4And2();
-    CohortDefinition b51 = qualityImprovement2020CohortQueries.getB5And1();
-    CohortDefinition b52 = qualityImprovement2020CohortQueries.getB5And2();
-
-    CohortDefinition tbActive =
-        commonCohortQueries.getMohMQPatientsOnCondition(
-            false,
-            false,
-            "once",
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            hivMetadata.getActiveTBConcept(),
-            Collections.singletonList(hivMetadata.getYesConcept()),
-            null,
-            null);
-
-    CohortDefinition tbSymptoms =
-        commonCohortQueries.getMohMQPatientsOnCondition(
-            false,
-            false,
-            "once",
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            tbMetadata.getHasTbSymptomsConcept(),
-            Collections.singletonList(hivMetadata.getYesConcept()),
-            null,
-            null);
-
-    CohortDefinition tbTreatment =
-        commonCohortQueries.getMohMQPatientsOnCondition(
-            false,
-            false,
-            "once",
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            tbMetadata.getTBTreatmentPlanConcept(),
-            Arrays.asList(
-                tbMetadata.getStartDrugsConcept(),
-                hivMetadata.getContinueRegimenConcept(),
-                hivMetadata.getCompletedConcept()),
-            null,
-            null);
+    CohortDefinition rf13 = getRF13Composition();
 
     CohortDefinition pregnant =
         commonCohortQueries.getMOHPregnantORBreastfeeding(
@@ -278,49 +238,11 @@ public class IntensiveMonitoringCohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
-
-    CohortDefinition tbDiagOnPeriod =
-        qualityImprovement2020CohortQueries.getPatientsWithTBDiagActive();
-
-    CohortDefinition tbDiagOnPeriod3HP =
-        qualityImprovement2020CohortQueries.getPatientsWithTBDiagActive3hp();
-
-    CohortDefinition tbSymptomsOnPeriod =
-        qualityImprovement2020CohortQueries.getPatientsWithTBSymtoms();
-
-    CohortDefinition tbSymptomsOnPeriod3hp =
-        qualityImprovement2020CohortQueries.getPatientsWithTBSymtoms3HP();
-
-    CohortDefinition tbTreatmentOnPeriod =
-        qualityImprovement2020CohortQueries.getPatientsWithTBTreatment();
-
-    CohortDefinition tbTreatmentOnPeriod3hp =
-        qualityImprovement2020CohortQueries.getPatientsWithTBTreatment3HP();
+    CohortDefinition transferredOut = commonCohortQueries.getTranferredOutPatients();
 
     cd.addSearch(
-        "A",
-        EptsReportUtils.map(
-            startedART,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},location=${location}"));
-
-    cd.addSearch(
-        "B1",
-        EptsReportUtils.map(
-            tbActive,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},location=${location}"));
-
-    cd.addSearch(
-        "B2",
-        EptsReportUtils.map(
-            tbSymptoms,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},location=${location}"));
-
-    cd.addSearch(
-        "B3",
-        EptsReportUtils.map(
-            tbTreatment,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},location=${location}"));
+        "RF13",
+        EptsReportUtils.map(rf13, "revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
         "C",
@@ -345,66 +267,6 @@ public class IntensiveMonitoringCohortQueries {
         EptsReportUtils.map(
             transferOut,
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}"));
-
-    cd.addSearch(
-        "H",
-        EptsReportUtils.map(
-            tbDiagOnPeriod,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
-
-    cd.addSearch(
-        "H1",
-        EptsReportUtils.map(
-            tbDiagOnPeriod3HP,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
-
-    cd.addSearch(
-        "I",
-        EptsReportUtils.map(
-            tbSymptomsOnPeriod,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
-
-    cd.addSearch(
-        "I1",
-        EptsReportUtils.map(
-            tbSymptomsOnPeriod3hp,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
-
-    cd.addSearch(
-        "J",
-        EptsReportUtils.map(
-            tbTreatmentOnPeriod,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
-
-    cd.addSearch(
-        "J1",
-        EptsReportUtils.map(
-            tbTreatmentOnPeriod3hp,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
-
-    cd.addSearch(
-        "B41",
-        EptsReportUtils.map(
-            b41,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},location=${location}"));
-
-    cd.addSearch(
-        "B42",
-        EptsReportUtils.map(
-            b42,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},location=${location}"));
-
-    cd.addSearch(
-        "B51",
-        EptsReportUtils.map(
-            b51,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},location=${location}"));
-
-    cd.addSearch(
-        "B52",
-        EptsReportUtils.map(
-            b52,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},location=${location}"));
 
     if (den == 2 || den == 4) {
       cd.setCompositionString(
@@ -3647,6 +3509,150 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${revisionEndDate-14m+1d},endDate=${revisionEndDate-13m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.setCompositionString("denominator AND diagnose");
+
+    return cd;
+  }
+
+  /**
+   * Incluindo todos os utentes iniciaram TARV e TPT – Isoniazida há 7 meses atrás e são elegíveis ao FIM do TPT -
+   * Isoniazida (seguindo os critérios definidos no RF13) e os Iniciaram TARV e TPT- 3HP
+   * há 7 meses e são elegíveis ao FIM TPT – 3HP (seguindo os critérios definidos no RF13.1)
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getRF13Composition() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("adultos HIV+ em TARV elegíveis ao TPT que iniciaram e  completaram TPT");
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    String inclusionPeriodMappings =
+        "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},location=${location}";
+    String exclusionPeriodMappings =
+        "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}";
+
+    // DEFINITIONS FROM RF11.2
+
+    //    INCLUSIONS
+    CohortDefinition startedART = qualityImprovement2020CohortQueries.getMOHArtStartDate();
+
+    //  EXCLUSIONS
+    CohortDefinition tbActiveOnPeriod =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            false,
+            false,
+            "once",
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getActiveTBConcept(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            null,
+            null);
+
+    CohortDefinition tbSymptomsOnPeriod =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            false,
+            false,
+            "once",
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            tbMetadata.getHasTbSymptomsConcept(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            null,
+            null);
+
+    CohortDefinition tbTreatmentOnPeriod =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            false,
+            false,
+            "once",
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            tbMetadata.getTBTreatmentPlanConcept(),
+            Arrays.asList(
+                tbMetadata.getStartDrugsConcept(),
+                hivMetadata.getContinueRegimenConcept(),
+                hivMetadata.getCompletedConcept()),
+            null,
+            null);
+
+    // DEFINITIONS FROM RF12.2
+
+    // INCLUSIONS
+    CohortDefinition startInhFichaClinica = qualityImprovement2020CohortQueries.getB4And1();
+    CohortDefinition startInhFichaResumo = qualityImprovement2020CohortQueries.getB4And2();
+
+    // EXCLUSIONS
+    CohortDefinition tbDiagOnInhPeriod =
+        qualityImprovement2020CohortQueries.getPatientsWithTBDiagActive();
+
+    CohortDefinition tbSymptomsOnInhPeriod =
+        qualityImprovement2020CohortQueries.getPatientsWithTBSymtoms();
+
+    CohortDefinition tbTreatmentOnInhPeriod =
+        qualityImprovement2020CohortQueries.getPatientsWithTBTreatment();
+
+    // DEFINITIONS FROM 13.1
+    // INCLUSIONS
+
+    CohortDefinition start3hpFichaClinica = qualityImprovement2020CohortQueries.getB5And1();
+    CohortDefinition start3hpFichaResumo = qualityImprovement2020CohortQueries.getB5And2();
+
+    //    EXCLUSIONS
+
+    CohortDefinition tbDiagOn3hpPeriod =
+        qualityImprovement2020CohortQueries.getPatientsWithTBDiagActive3hp();
+
+    CohortDefinition tbSymptomsOn3hpPeriod =
+        qualityImprovement2020CohortQueries.getPatientsWithTBSymtoms3HP();
+
+    CohortDefinition tbTreatmentOn3hpPeriod =
+        qualityImprovement2020CohortQueries.getPatientsWithTBTreatment3HP();
+
+    cd.addSearch("startedART", EptsReportUtils.map(startedART, inclusionPeriodMappings));
+    cd.addSearch(
+        "tbActiveOnPeriod", EptsReportUtils.map(tbActiveOnPeriod, inclusionPeriodMappings));
+
+    cd.addSearch(
+        "tbSymptomsOnPeriod", EptsReportUtils.map(tbSymptomsOnPeriod, inclusionPeriodMappings));
+
+    cd.addSearch(
+        "tbTreatmentOnPeriod", EptsReportUtils.map(tbTreatmentOnPeriod, inclusionPeriodMappings));
+
+    cd.addSearch(
+        "startInhFichaResumo", EptsReportUtils.map(startInhFichaResumo, inclusionPeriodMappings));
+
+    cd.addSearch(
+        "startInhFichaClinica", EptsReportUtils.map(startInhFichaClinica, inclusionPeriodMappings));
+
+    cd.addSearch(
+        "tbDiagOnInhPeriod", EptsReportUtils.map(tbDiagOnInhPeriod, exclusionPeriodMappings));
+
+    cd.addSearch(
+        "tbSymptomsOnInhPeriod",
+        EptsReportUtils.map(tbSymptomsOnInhPeriod, exclusionPeriodMappings));
+    cd.addSearch(
+        "tbTreatmentOnInhPeriod",
+        EptsReportUtils.map(tbTreatmentOnInhPeriod, exclusionPeriodMappings));
+
+    cd.addSearch(
+        "start3hpFichaClinica", EptsReportUtils.map(start3hpFichaClinica, inclusionPeriodMappings));
+
+    cd.addSearch(
+        "start3hpFichaResumo", EptsReportUtils.map(start3hpFichaResumo, inclusionPeriodMappings));
+
+    cd.addSearch(
+        "tbDiagOn3hpPeriod", EptsReportUtils.map(tbDiagOn3hpPeriod, exclusionPeriodMappings));
+
+    cd.addSearch(
+        "tbSymptomsOn3hpPeriod",
+        EptsReportUtils.map(tbSymptomsOn3hpPeriod, exclusionPeriodMappings));
+
+    cd.addSearch(
+        "tbTreatmentOn3hpPeriod",
+        EptsReportUtils.map(tbTreatmentOn3hpPeriod, exclusionPeriodMappings));
+
+    cd.setCompositionString(
+        "((startedART AND NOT (tbActiveOnPeriod OR tbSymptomsOnPeriod OR tbTreatmentOnPeriod)) AND (startInhFichaResumo OR startInhFichaClinica OR start3hpFichaClinica OR start3hpFichaResumo) )" +
+                " AND NOT (tbDiagOnInhPeriod OR tbDiagOn3hpPeriod OR tbSymptomsOnInhPeriod OR tbSymptomsOn3hpPeriod OR tbTreatmentOnInhPeriod OR tbTreatmentOn3hpPeriod)");
 
     return cd;
   }
