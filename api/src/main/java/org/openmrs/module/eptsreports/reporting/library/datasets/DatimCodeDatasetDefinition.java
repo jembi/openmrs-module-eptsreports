@@ -1,5 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
+import static org.openmrs.module.reporting.ReportingConstants.LOCATION_PARAMETER;
+
 import java.util.List;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.reporting.dataset.DataSet;
@@ -29,12 +31,14 @@ public class DatimCodeDatasetDefinition extends EvaluatableDataSetDefinition {
         + "       INNER JOIN location_attribute_type lat ON lat.location_attribute_type_id = la.attribute_type_id "
         + "       INNER JOIN location loc ON loc.location_id = la.location_id "
         + " WHERE lat.location_attribute_type_id = "
-        + typeId;
+        + typeId
+        + " AND loc.location_id = :location ";
   }
 
   public DatimCodeDatasetDefinition() {
     this.typeId = 2;
     this.columnName = "datimCode";
+    addParameter(LOCATION_PARAMETER);
   }
 
   @Override
