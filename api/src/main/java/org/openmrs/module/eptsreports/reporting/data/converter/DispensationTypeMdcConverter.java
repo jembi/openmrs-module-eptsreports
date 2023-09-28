@@ -85,6 +85,10 @@ public class DispensationTypeMdcConverter implements DataConverter {
 
       case "165316":
         return "Extensão de Horarário";
+
+      case "23727":
+        return "Paragem Única (PU)";
+
       default:
         return "";
     }

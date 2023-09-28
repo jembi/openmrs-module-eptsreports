@@ -793,15 +793,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
-        "                   SELECT p2.patient_id, "
-            + "                          Min(ee2.encounter_datetime) AS encounter_date "
-            + "                   FROM   patient p2 "
-            + "                            INNER JOIN encounter ee2 "
-            + "                              ON ee2.patient_id = p2.patient_id "
-            + "                            INNER JOIN obs oo "
-            + "                              ON oo.encounter_id = ee2.encounter_id "
-            + "                   INNER JOIN ( "
-            + "                   SELECT p.patient_id, "
+        "                   SELECT p.patient_id, "
             + "                          Min(ee.encounter_datetime) AS encounter_date "
             + "                   FROM   patient p "
             + "                            INNER JOIN encounter ee "
@@ -830,9 +822,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "       AND obs.voided = 0 "
             + "       AND enc.encounter_type = ${6} "
             + "       AND enc.location_id = :location "
-            + "       AND obs.concept_id = ${23722} "
-            + "       AND obs.value_coded = ${856} "
-            + "       AND enc.encounter_datetime >= art.art_encounter "
+            + "       AND  ( (obs.concept_id = ${856} AND obs.value_numeric IS NOT NULL)  "
+            + "               OR (obs.concept_id = ${1305}  AND obs.value_coded IS NOT NULL) ) "
+            + "       AND enc.encounter_datetime > art.art_encounter "
             + "       GROUP  BY pa.patient_id) first_encounter "
             + "       ON first_encounter.patient_id = p.patient_id "
             + "       WHERE  p.voided = 0 "
@@ -840,18 +832,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "       AND  o.voided = 0 "
             + "       AND  ee.encounter_type = ${6} "
             + "       AND  ee.encounter_datetime > first_encounter.encounter_date "
-            + "       AND  ( (o.concept_id = ${856} AND o.value_numeric IS NOT NULL)  "
-            + "               OR (o.concept_id = ${1305}  AND o.value_coded IS NOT NULL) ) "
-            + "       GROUP BY p.patient_id) second_encounter "
-            + "               ON ee2.patient_id = second_encounter.patient_id "
-            + "WHERE  p2.voided = 0 "
-            + "       AND  ee2.voided = 0 "
-            + "       AND  oo.voided = 0 "
-            + "       AND ee2.encounter_type = ${6} "
-            + "       AND ee2.location_id = :location "
-            + "       AND  ( (oo.concept_id = ${856} AND oo.value_numeric IS NOT NULL)  "
-            + "               OR (oo.concept_id = ${1305}  AND oo.value_coded IS NOT NULL) ) "
-            + "GROUP  BY p2.patient_id ";
+            + "       AND o.concept_id = ${23722} "
+            + "       AND o.value_coded = ${856} "
+            + "       GROUP BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1461,13 +1444,12 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "           WHEN ( consultation_tb.tb_consultations <> "
             + "                  consultations.nr_consultations ) "
             + "               THEN 'Nao' "
-            + "           end AS good_adhesion "
+            + "          ELSE '' "
+            + "           END AS good_adhesion "
             + "FROM   patient p "
             + "           INNER JOIN (SELECT e.patient_id, "
             + "                              Count(e.encounter_id) AS tb_consultations "
             + "                       FROM   encounter e "
-            + "                                  INNER JOIN obs o "
-            + "                                             ON o.encounter_id = e.encounter_id "
             + "                                  INNER JOIN (SELECT starv.patient_id, "
             + "                                                     starv.first_pickup AS art_encounter "
             + "                                              FROM   ( "
@@ -1475,7 +1457,6 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                                      ) starv) tarv "
             + "                                             ON tarv.patient_id = e.patient_id "
             + "                       WHERE  e.voided = 0 "
-            + "                         AND o.voided = 0 "
             + "                         AND e.encounter_type = ${35} "
             + "                         AND e.location_id =:location ";
 
@@ -1503,112 +1484,22 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                       WHERE  e.voided = 0 "
             + "                         AND o.voided = 0 "
             + "                         AND e.encounter_type = ${35} "
-            + "                         AND e.location_id = :location "
-            + "                         AND e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL 33 DAY) "
-            + "                         AND e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL 3 MONTH) "
-            + "                         AND        o.concept_id = ${6223} "
+            + "                         AND e.location_id = :location ";
+    query +=
+        b5Orc5
+            ? "                         AND e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL 33 DAY) "
+                + "                         AND e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL 3 MONTH) "
+            : " AND        e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL 12 MONTH) "
+                + " AND        e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL 24 MONTH) ";
+
+    query +=
+        "                         AND        o.concept_id = ${6223} "
             + "                         AND        o.value_coded IN ( ${1383}, "
             + "                                                       ${1749}, "
             + "                                                       ${1385} ) "
             + "                       GROUP  BY e.patient_id) consultations "
             + "                      ON consultations.patient_id = p.patient_id "
             + "WHERE  p.voided = 0";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
-
-    return sqlPatientDataDefinition;
-  }
-
-  /**
-   * <b>RF36 - Teve registo de boa adesão em TODAS consultas entre 12˚ e 24˚ mês de TARV?- C5
-   * (coluna AT)</b><br>
-   * <br>
-   *
-   * <p>O sistema irá determinar se o utente “Teve registo de boa adesão em TODAS consultas entre 1˚
-   * e 3˚ mês de TARV?” com as seguintes respostas:
-   *
-   * <p>Resposta= Sim, se o utente teve o registo do campo de "Seguimento da Adesão - Adesão ao
-   * TARV” com resposta = “BOA” em todas as consultas de APSS/PP decorridas entre 12 e 24 meses do
-   * Início TARV (“Data da Consulta APSS/PP” >= “Data Início TARV” + 12 meses e <= “Data Início
-   * TARV” + 24 meses)<br>
-   * <br>
-   *
-   * <p>Resposta= Não, se o utente teve pelo menos um registo no campo de "Seguimento da Adesão -
-   * Adesão ao TARV” com resposta = “RISCO” ou “MÁ” decorrida entre 12 e 24 meses do Início TARV
-   * (“Data da Consulta APSS/PP” >= “Data Início TARV” + 12 meses e <= “Data Início TARV” + 24
-   * meses) <br>
-   * <br>
-   *
-   * <p>Nota 1: Caso o utente não satisfaça o critério definido para resposta = Sim e resposta =
-   * Não, o sistema não irá preencher nenhuma informação. <br>
-   * <br>
-   *
-   * <p>Nota 2: A “Data Início TARV” é definida no RF46. <br>
-   * <br>
-   *
-   * <p>Nota 3: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
-   * na coorte de 24 meses, conforme definido no RF4.
-   *
-   * @return {DataDefinition}
-   */
-  public DataDefinition getPatientsWithGoodAdhesionAfterAYearInTarv() {
-    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName(
-        "Registo de boa adesão em TODAS consultas entre 12˚ e 24˚ mês de TARV");
-    sqlPatientDataDefinition.addParameter(
-        new Parameter("evaluationYear", "evaluationYear", Integer.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
-    Map<String, Integer> map = new HashMap<>();
-    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
-    map.put("6223", hivMetadata.getAdherenceEvaluationConcept().getConceptId());
-    map.put("1383", hivMetadata.getPatientIsDead().getConceptId());
-    map.put("1749", hivMetadata.getArvAdherenceRiskConcept().getConceptId());
-    map.put("1385", hivMetadata.getBadConcept().getConceptId());
-    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
-    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
-    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
-    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
-    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
-    map.put("6276", hivMetadata.getArtStatus().getConceptId());
-    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
-    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
-    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-
-    String query =
-        " SELECT     p.patient_id, "
-            + "      e.encounter_datetime AS encounter_date "
-            + " FROM       patient p "
-            + " INNER JOIN encounter e "
-            + " ON         e.patient_id = p.patient_id "
-            + " INNER JOIN obs o "
-            + " ON         o.encounter_id = e.encounter_id "
-            + " INNER JOIN ( "
-            + "          SELECT art_patient.patient_id, "
-            + "                 art_patient.first_pickup AS art_encounter "
-            + "          FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
-            + "                 ) art_patient "
-            + "             ) art "
-            + "               ON         art.patient_id = p.patient_id "
-            + " WHERE      p.voided = 0 "
-            + " AND        e.voided = 0 "
-            + " AND        o.voided = 0 "
-            + " AND        e.encounter_type = ${35} "
-            + " AND        e.location_id = :location "
-            + " AND        e.encounter_datetime >= DATE_ADD( art.art_encounter, INTERVAL 12 MONTH) "
-            + " AND        e.encounter_datetime <= DATE_ADD( art.art_encounter, INTERVAL 24 MONTH) "
-            + " AND        o.concept_id = ${6223} "
-            + " AND        o.value_coded IN ( ${1383}, "
-            + "                              ${1749}, "
-            + "                              ${1385} ) "
-            + " GROUP BY   p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1672,42 +1563,47 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
 
     String query =
-        " SELECT     p.patient_id, "
-            + "      e.encounter_datetime AS encounter_date "
-            + " FROM       patient p "
-            + "     INNER JOIN person pe on pe.person_id = p.patient_id "
-            + "     INNER JOIN encounter e "
-            + "     ON         e.patient_id = p.patient_id "
-            + "     INNER JOIN obs o "
-            + "     ON         o.encounter_id = e.encounter_id "
-            + "     INNER JOIN obs o2 "
-            + "     ON         o2.encounter_id = e.encounter_id "
-            + "     INNER JOIN ( "
-            + "                   SELECT art_patient.patient_id, "
-            + "                          art_patient.first_pickup AS art_encounter "
-            + "                   FROM   ( "
+        "SELECT final_query.person_id, "
+            + "       CASE "
+            + "              WHEN final_query.encounter_date IS NULL THEN 'Não' "
+            + "              WHEN final_query.encounter_date IS NOT NULL THEN 'Sim' "
+            + "              ELSE '' "
+            + "       END AS pregnant_breastfeeding "
+            + "FROM   ( "
+            + "                  SELECT     p.person_id, "
+            + "                             e.encounter_datetime AS encounter_date "
+            + "                  FROM       person p "
+            + "                  INNER JOIN encounter e "
+            + "                  ON         e.patient_id = p.person_id "
+            + "                  INNER JOIN obs o "
+            + "                  ON         o.encounter_id = e.encounter_id "
+            + "                  INNER JOIN obs o2 "
+            + "                  ON         o2.encounter_id = e.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
             + "                           ) art_patient "
-            + "                 ) art "
-            + "                  ON         art.patient_id = p.patient_id "
-            + " WHERE      p.voided = 0 "
-            + " AND        pe.gender = 'F'"
-            + " AND        e.voided = 0 "
-            + " AND        o.voided = 0 "
-            + " AND        o2.voided = 0 "
-            + " AND        e.encounter_type = ${6} "
-            + " AND        e.location_id = :location "
-            + " AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
+            + "                             ) art "
+            + "                  ON         art.patient_id = p.person_id "
+            + "                  WHERE      p.voided = 0 "
+            + "                  AND        e.voided = 0 "
+            + "                  AND        o.voided = 0 "
+            + "                  AND        o2.voided = 0 "
+            + "                  AND        e.encounter_type = ${6} "
+            + "                  AND        e.location_id = :location "
+            + "                  AND        p.gender = 'F' "
+            + "                  AND        Timestampdiff(year, p.birthdate, art.art_encounter) > 9 "
+            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
             + minNumberOfMonths
             + " MONTH ) "
-            + " AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + maxNumberOfMonths
             + " MONTH ) "
-            + " AND        o.concept_id = ${1982} "
-            + " AND        o.value_coded = ${1065} "
-            + " AND        o2.concept_id = ${6332} "
-            + " AND        o2.value_coded = ${1065} "
-            + " GROUP BY   p.patient_id";
+            + "                  AND       o.concept_id in (${1982}, ${6332}) "
+            + "                  AND       o.value_coded = (${1065}) "
+            + "                  GROUP BY   p.person_id ) AS final_query";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1773,22 +1669,24 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
     map.put("1066", hivMetadata.getNoConcept().getConceptId());
     map.put("23761", hivMetadata.getActiveTBConcept().getConceptId());
-    map.put("23758", hivMetadata.getTBSymptomsConcept().getConceptId());
-    map.put("1766", tbMetadata.getObservationTB().getConceptId());
-    map.put("1763", tbMetadata.getFeverLastingMoraThan3Weeks().getConceptId());
-    map.put("1764", tbMetadata.getWeightLossOfMoreThan3KgInLastMonth().getConceptId());
-    map.put("1762", tbMetadata.getNightsWeatsLastingMoraThan3Weeks().getConceptId());
-    map.put("1760", tbMetadata.getCoughLastingMoraThan3Weeks().getConceptId());
-    map.put("23760", tbMetadata.getAsthenia().getConceptId());
-    map.put("1765", tbMetadata.getCohabitantBeingTreatedForTB().getConceptId());
-    map.put("161", tbMetadata.getLymphadenopathy().getConceptId());
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("1268", hivMetadata.getTBTreatmentPlanConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+    map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
 
     String query =
-        " SELECT     p.patient_id, "
+        "SELECT final_query.patient_id, "
+            + "       CASE "
+            + "              WHEN final_query.encounter_date IS NULL THEN 'Não' "
+            + "              WHEN final_query.encounter_date IS NOT NULL THEN 'Sim' "
+            + "              ELSE '' "
+            + "       END AS tb "
+            + "FROM   ( "
+            + " SELECT     p.patient_id, "
             + "      e.encounter_datetime AS encounter_date "
             + " FROM       patient p "
             + "     INNER JOIN encounter e "
@@ -1797,8 +1695,6 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "     ON         o.encounter_id = e.encounter_id "
             + "     INNER JOIN obs o2 "
             + "     ON         o2.encounter_id = e.encounter_id "
-            + "     INNER JOIN obs o3 "
-            + "     ON         o3.encounter_id = e.encounter_id "
             + "     INNER JOIN ( "
             + "              SELECT art_patient.patient_id, "
             + "                     art_patient.first_pickup AS art_encounter "
@@ -1811,7 +1707,6 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " AND        e.voided = 0 "
             + " AND        o.voided = 0 "
             + " AND        o2.voided = 0 "
-            + " AND        o3.voided = 0 "
             + " AND        e.encounter_type = ${6} "
             + " AND        e.location_id = :location "
             + " AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
@@ -1820,16 +1715,12 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + maxNumberOfMonths
             + " MONTH ) "
-            + " AND    (   ( o.concept_id = ${23758} "
+            + " AND    (   ( o.concept_id = ${23761} "
             + "              AND o.value_coded IN ( ${1065} ) ) "
-            + " OR         ( o2.concept_id = ${1766} "
-            + "                AND  o2.value_coded IN ( ${1763}, "
-            + "                                 ${1764}, ${1762}, "
-            + "                                 ${1760}, ${23760}, "
-            + "                                 ${1765}, ${161} ) ) "
-            + " OR        ( o3.concept_id = ${23761} "
-            + "              AND o3.value_coded IN ( ${1065} ) ) ) "
-            + " GROUP BY   p.patient_id";
+            + " OR         ( o2.concept_id = ${1268} "
+            + "                AND  o2.value_coded IN ( ${1256}, "
+            + "                                 ${1257}, ${1267} ) ) ) "
+            + " GROUP BY   p.patient_id ) AS final_query ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1944,7 +1835,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds1(int numberOfYears) {
+  public DataDefinition getMds1(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Tipo de MDS - (MDS1) Coluna S");
     sqlPatientDataDefinition.addParameter(
@@ -1973,7 +1864,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     String query =
         "                  SELECT     mds1.patient_id, "
-            + "                             MIN(otype1.value_coded) AS first_mds "
+            + "                             otype1.value_coded AS first_mds "
             + "                  FROM       patient mds1 "
             + "                  INNER JOIN encounter enc "
             + "                  ON         enc.patient_id = mds1.patient_id "
@@ -2007,7 +1898,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + numberOfYears
+            + numberOfMonths
             + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
@@ -2022,6 +1913,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND ostate1.voided = 0 "
             + "                  AND        enc.encounter_type = ${6} "
             + "                  AND        enc.location_id = :location "
+            + "                  AND        enc.encounter_datetime = mds_one.encounter_date "
             + "                  AND    (   ( otype1.concept_id = ${165174} "
             + "                               AND otype1.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate1.concept_id = ${165322} "
@@ -2119,7 +2011,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds2StartDate(int numberOfYears) {
+  public DataDefinition getMds2StartDate(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Data Início de MDS2: Coluna W");
     sqlPatientDataDefinition.addParameter(
@@ -2157,6 +2049,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs ostate2 "
             + "                  ON         ostate2.encounter_id = enc2.encounter_id "
             + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds2.patient_id "
+            + "                  INNER JOIN ( "
             + "                  SELECT     p.patient_id, "
             + "                             MIN(e.encounter_datetime) AS first_mds_date, "
             + "                             MIN(otype.value_coded) AS first_mds "
@@ -2183,7 +2083,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + numberOfYears
+            + numberOfMonths
             + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
@@ -2196,6 +2096,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND enc2.voided = 0 "
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
+            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
             + "                  AND        enc2.encounter_type = ${6} "
             + "                  AND        enc2.location_id = :location "
@@ -2220,7 +2124,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds2EndDate(int numberOfYears) {
+  public DataDefinition getMds2EndDate(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Data Fim de MDS2: Coluna X");
     sqlPatientDataDefinition.addParameter(
@@ -2259,6 +2163,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs os22 "
             + "                  ON         os22.encounter_id = ee22.encounter_id "
             + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds2_end.patient_id "
+            + "                  INNER JOIN ( "
             + "                  SELECT     mds2.patient_id, "
             + "                             MIN(enc2.encounter_datetime) AS second_mds_date, "
             + "                             MIN(otype2.value_coded) AS second_mds "
@@ -2269,6 +2181,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  ON         otype2.encounter_id = enc2.encounter_id "
             + "                  INNER JOIN obs ostate2 "
             + "                  ON         ostate2.encounter_id = enc2.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds2.patient_id "
             + "                  INNER JOIN ( "
             + "                  SELECT     p.patient_id, "
             + "                             MIN(e.encounter_datetime) AS first_mds_date, "
@@ -2296,7 +2216,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + numberOfYears
+            + numberOfMonths
             + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
@@ -2310,6 +2230,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
+            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc2.encounter_type = ${6} "
             + "                  AND        enc2.location_id = :location "
             + "                  AND    (   ( otype2.concept_id = ${165174} "
@@ -2324,6 +2248,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND ot22.voided = 0 "
             + "                  AND os22.voided = 0 "
             + "                  AND ee22.encounter_datetime > mds_2nd.second_mds_date "
+            + "                  AND        ee22.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        ee22.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        ee22.encounter_type = ${6} "
             + "                  AND        ee22.location_id = :location "
             + "                  AND    (   ( ot22.concept_id = ${165174} "
@@ -2347,7 +2275,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds1EndDate(int numberOfYears) {
+  public DataDefinition getMds1EndDate(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Data Fim de MDS1: Coluna U");
     sqlPatientDataDefinition.addParameter(
@@ -2386,47 +2314,28 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs os "
             + "                  ON         os.encounter_id = ee.encounter_id "
             + "                  INNER JOIN ( "
-            + "                  SELECT     p.patient_id, "
-            + "                             MIN(e.encounter_datetime) AS encounter_date, "
-            + "                             MIN(otype.value_coded) AS mds_one "
-            + "                  FROM       patient p "
-            + "                  INNER JOIN encounter e "
-            + "                  ON         e.patient_id = p.patient_id "
-            + "                  INNER JOIN obs otype "
-            + "                  ON         otype.encounter_id = e.encounter_id "
-            + "                  INNER JOIN obs ostate "
-            + "                  ON         ostate.encounter_id = e.encounter_id "
-            + "                  INNER JOIN ( "
             + "                           SELECT art_patient.patient_id, "
             + "                                  art_patient.first_pickup AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
             + "                           ) art_patient "
             + "                             ) art "
-            + "                  ON         art.patient_id = p.patient_id "
-            + "                  WHERE      p.voided = 0 "
-            + "                  AND        e.voided = 0 "
-            + "                  AND        otype.voided = 0 "
-            + "                  AND        ostate.voided = 0 "
-            + "                  AND        e.encounter_type = ${6} "
-            + "                  AND        e.location_id = :location "
-            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + numberOfYears
-            + " MONTH ) "
-            + "                  AND    (   ( otype.concept_id = ${165174} "
-            + "                               AND otype.value_coded IS NOT NULL ) "
-            + "                  AND         ( ostate.concept_id = ${165322} "
-            + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
-            + "                  AND  otype.obs_group_id = ostate.obs_group_id "
-            + "                  GROUP BY   p.patient_id ) mds1 "
+            + "                  ON         art.patient_id = mds1_end.patient_id "
+            + "                  INNER JOIN ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getFirstMdsAndDateQuery(
+                numberOfMonths, inclusionEndMonthAndDay)
+            + "                  ) mds1 "
             + "                  ON         mds1.patient_id = mds1_end.patient_id "
             + "                  WHERE      mds1_end.voided = 0 "
             + "                  AND        ot.voided = 0 "
             + "                  AND        os.voided = 0 "
             + "                  AND        ee.encounter_type = ${6} "
             + "                  AND        ee.location_id = :location "
-            + "                  AND        ee.encounter_datetime > mds1.encounter_date "
+            + "                  AND        ee.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        ee.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
+            + "                  AND        ee.encounter_datetime > mds1.first_mds "
             + "                  AND    (   ( ot.concept_id = ${165174} "
             + "                               AND ot.value_coded = mds1.mds_one ) "
             + "                  AND         ( os.concept_id = ${165322} "
@@ -2448,7 +2357,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds2(int numberOfYears) {
+  public DataDefinition getMds2(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Tipo de MDS: (MDS2) Coluna V");
     sqlPatientDataDefinition.addParameter(
@@ -2486,6 +2395,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs ostate2 "
             + "                  ON         ostate2.encounter_id = enc2.encounter_id "
             + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds2.patient_id "
+            + "                  INNER JOIN ( "
             + "                  SELECT     p.patient_id, "
             + "                             MIN(e.encounter_datetime) AS first_mds_date, "
             + "                             MIN(otype.value_coded) AS first_mds "
@@ -2512,7 +2429,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + numberOfYears
+            + numberOfMonths
             + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
@@ -2526,6 +2443,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
+            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc2.encounter_type = ${6} "
             + "                  AND        enc2.location_id = :location "
             + "                  AND    (   ( otype2.concept_id = ${165174} "
@@ -2549,7 +2470,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds3(int numberOfYears) {
+  public DataDefinition getMds3(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Tipo de MDS: (MDS3) Coluna Y");
     sqlPatientDataDefinition.addParameter(
@@ -2587,6 +2508,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs ostate3 "
             + "                  ON         ostate3.encounter_id = enc3.encounter_id "
             + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds3.patient_id "
+            + "                  INNER JOIN ( "
             + "                  SELECT     mds2.patient_id, "
             + "                             MIN(enc2.encounter_datetime) AS second_mds_date, "
             + "                             MIN(otype2.value_coded) AS second_mds "
@@ -2597,6 +2526,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  ON         otype2.encounter_id = enc2.encounter_id "
             + "                  INNER JOIN obs ostate2 "
             + "                  ON         ostate2.encounter_id = enc2.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds2.patient_id "
             + "                  INNER JOIN ( "
             + "                  SELECT     p.patient_id, "
             + "                             MIN(e.encounter_datetime) AS first_mds_date, "
@@ -2624,7 +2561,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + numberOfYears
+            + numberOfMonths
             + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
@@ -2638,6 +2575,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
+            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc2.encounter_type = ${6} "
             + "                  AND        enc2.location_id = :location "
             + "                  AND    (   ( otype2.concept_id = ${165174} "
@@ -2652,6 +2593,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype3.voided = 0 "
             + "                  AND ostate3.voided = 0 "
             + "                  AND enc3.encounter_datetime > mds_2nd.second_mds_date "
+            + "                  AND        enc3.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc3.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc3.encounter_type = ${6} "
             + "                  AND        enc3.location_id = :location "
             + "                  AND    (   ( otype3.concept_id = ${165174} "
@@ -2675,7 +2620,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds3StartDate(int numberOfYears) {
+  public DataDefinition getMds3StartDate(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Data Início de MDS3: Coluna Z");
     sqlPatientDataDefinition.addParameter(
@@ -2713,6 +2658,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs ostate3 "
             + "                  ON         ostate3.encounter_id = enc3.encounter_id "
             + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds3.patient_id "
+            + "                  INNER JOIN ( "
             + "                  SELECT     mds2.patient_id, "
             + "                             MIN(enc2.encounter_datetime) AS second_mds_date, "
             + "                             MIN(otype2.value_coded) AS second_mds "
@@ -2723,6 +2676,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  ON         otype2.encounter_id = enc2.encounter_id "
             + "                  INNER JOIN obs ostate2 "
             + "                  ON         ostate2.encounter_id = enc2.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds2.patient_id "
             + "                  INNER JOIN ( "
             + "                  SELECT     p.patient_id, "
             + "                             MIN(e.encounter_datetime) AS first_mds_date, "
@@ -2750,7 +2711,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + numberOfYears
+            + numberOfMonths
             + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
@@ -2764,6 +2725,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
+            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc2.encounter_type = ${6} "
             + "                  AND        enc2.location_id = :location "
             + "                  AND    (   ( otype2.concept_id = ${165174} "
@@ -2778,6 +2743,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype3.voided = 0 "
             + "                  AND ostate3.voided = 0 "
             + "                  AND enc3.encounter_datetime > mds_2nd.second_mds_date "
+            + "                  AND        enc3.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc3.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc3.encounter_type = ${6} "
             + "                  AND        enc3.location_id = :location "
             + "                  AND    (   ( otype3.concept_id = ${165174} "
@@ -2801,7 +2770,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds3EndDate(int numberOfYears) {
+  public DataDefinition getMds3EndDate(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Data Fim de MDS3: Coluna AA");
     sqlPatientDataDefinition.addParameter(
@@ -2840,6 +2809,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs os33 "
             + "                  ON         os33.encounter_id = ee33.encounter_id "
             + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds3_end.patient_id "
+            + "                  INNER JOIN ( "
             + "                  SELECT     mds3.patient_id, "
             + "                             MIN(enc3.encounter_datetime) AS third_mds_date, "
             + "                             MIN(otype3.value_coded) AS third_mds "
@@ -2851,6 +2828,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs ostate3 "
             + "                  ON         ostate3.encounter_id = enc3.encounter_id "
             + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds3.patient_id "
+            + "                  INNER JOIN ( "
             + "                  SELECT     mds2.patient_id, "
             + "                             MIN(enc2.encounter_datetime) AS second_mds_date, "
             + "                             MIN(otype2.value_coded) AS second_mds "
@@ -2861,6 +2846,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  ON         otype2.encounter_id = enc2.encounter_id "
             + "                  INNER JOIN obs ostate2 "
             + "                  ON         ostate2.encounter_id = enc2.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds2.patient_id "
             + "                  INNER JOIN ( "
             + "                  SELECT     p.patient_id, "
             + "                             MIN(e.encounter_datetime) AS first_mds_date, "
@@ -2887,7 +2880,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + numberOfYears
+            + numberOfMonths
             + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
@@ -2901,6 +2894,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
+            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc2.encounter_type = ${6} "
             + "                  AND        enc2.location_id = :location "
             + "                  AND    (   ( otype2.concept_id = ${165174} "
@@ -2915,6 +2912,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype3.voided = 0 "
             + "                  AND ostate3.voided = 0 "
             + "                  AND enc3.encounter_datetime > mds_2nd.second_mds_date "
+            + "                  AND        enc3.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc3.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc3.encounter_type = ${6} "
             + "                  AND        enc3.location_id = :location "
             + "                  AND    (   ( otype3.concept_id = ${165174} "
@@ -2929,6 +2930,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND ot33.voided = 0 "
             + "                  AND os33.voided = 0 "
             + "                  AND ee33.encounter_datetime > mds_3rd.third_mds_date "
+            + "                  AND        ee33.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        ee33.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        ee33.encounter_type = ${6} "
             + "                  AND        ee33.location_id = :location "
             + "                  AND    (   ( ot33.concept_id = ${165174} "
@@ -2952,7 +2957,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds4(int numberOfYears) {
+  public DataDefinition getMds4(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Tipo de MDS: (MDS4) Coluna AB");
     sqlPatientDataDefinition.addParameter(
@@ -2990,6 +2995,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs ostate4 "
             + "                  ON         ostate4.encounter_id = enc4.encounter_id "
             + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds4.patient_id "
+            + "                  INNER JOIN ( "
             + "                  SELECT     mds3.patient_id, "
             + "                             MIN(enc3.encounter_datetime) AS third_mds_date, "
             + "                             MIN(otype3.value_coded) AS third_mds "
@@ -3001,6 +3014,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs ostate3 "
             + "                  ON         ostate3.encounter_id = enc3.encounter_id "
             + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds3.patient_id "
+            + "                  INNER JOIN ( "
             + "                  SELECT     mds2.patient_id, "
             + "                             MIN(enc2.encounter_datetime) AS second_mds_date, "
             + "                             MIN(otype2.value_coded) AS second_mds "
@@ -3011,6 +3032,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  ON         otype2.encounter_id = enc2.encounter_id "
             + "                  INNER JOIN obs ostate2 "
             + "                  ON         ostate2.encounter_id = enc2.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds2.patient_id "
             + "                  INNER JOIN ( "
             + "                  SELECT     p.patient_id, "
             + "                             MIN(e.encounter_datetime) AS first_mds_date, "
@@ -3038,7 +3067,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + numberOfYears
+            + numberOfMonths
             + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
@@ -3052,6 +3081,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
+            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc2.encounter_type = ${6} "
             + "                  AND        enc2.location_id = :location "
             + "                  AND    (   ( otype2.concept_id = ${165174} "
@@ -3066,6 +3099,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype3.voided = 0 "
             + "                  AND ostate3.voided = 0 "
             + "                  AND enc3.encounter_datetime > mds_2nd.second_mds_date "
+            + "                  AND        enc3.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc3.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc3.encounter_type = ${6} "
             + "                  AND        enc3.location_id = :location "
             + "                  AND    (   ( otype3.concept_id = ${165174} "
@@ -3080,6 +3117,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype4.voided = 0 "
             + "                  AND ostate4.voided = 0 "
             + "                  AND enc4.encounter_datetime > mds_3rd.third_mds_date "
+            + "                  AND        enc4.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc4.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc4.encounter_type = ${6} "
             + "                  AND        enc4.location_id = :location "
             + "                  AND    (   ( otype4.concept_id = ${165174} "
@@ -3103,7 +3144,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds4StartDate(int numberOfYears) {
+  public DataDefinition getMds4StartDate(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Data Início de MDS4: Coluna AC");
     sqlPatientDataDefinition.addParameter(
@@ -3141,6 +3182,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs ostate4 "
             + "                  ON         ostate4.encounter_id = enc4.encounter_id "
             + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds4.patient_id "
+            + "                  INNER JOIN ( "
             + "                  SELECT     mds3.patient_id, "
             + "                             MIN(enc3.encounter_datetime) AS third_mds_date, "
             + "                             MIN(otype3.value_coded) AS third_mds "
@@ -3152,6 +3201,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs ostate3 "
             + "                  ON         ostate3.encounter_id = enc3.encounter_id "
             + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds3.patient_id "
+            + "                  INNER JOIN ( "
             + "                  SELECT     mds2.patient_id, "
             + "                             MIN(enc2.encounter_datetime) AS second_mds_date, "
             + "                             MIN(otype2.value_coded) AS second_mds "
@@ -3162,6 +3219,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  ON         otype2.encounter_id = enc2.encounter_id "
             + "                  INNER JOIN obs ostate2 "
             + "                  ON         ostate2.encounter_id = enc2.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds2.patient_id "
             + "                  INNER JOIN ( "
             + "                  SELECT     p.patient_id, "
             + "                             MIN(e.encounter_datetime) AS first_mds_date, "
@@ -3189,7 +3254,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + numberOfYears
+            + numberOfMonths
             + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
@@ -3203,6 +3268,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
+            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc2.encounter_type = ${6} "
             + "                  AND        enc2.location_id = :location "
             + "                  AND    (   ( otype2.concept_id = ${165174} "
@@ -3217,6 +3286,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype3.voided = 0 "
             + "                  AND ostate3.voided = 0 "
             + "                  AND enc3.encounter_datetime > mds_2nd.second_mds_date "
+            + "                  AND        enc3.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc3.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc3.encounter_type = ${6} "
             + "                  AND        enc3.location_id = :location "
             + "                  AND    (   ( otype3.concept_id = ${165174} "
@@ -3231,6 +3304,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype4.voided = 0 "
             + "                  AND ostate4.voided = 0 "
             + "                  AND enc4.encounter_datetime > mds_3rd.third_mds_date "
+            + "                  AND        enc4.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc4.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc4.encounter_type = ${6} "
             + "                  AND        enc4.location_id = :location "
             + "                  AND    (   ( otype4.concept_id = ${165174} "
@@ -3254,7 +3331,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds4EndDate(int numberOfYears) {
+  public DataDefinition getMds4EndDate(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Data Fim de MDS4: Coluna AD");
     sqlPatientDataDefinition.addParameter(
@@ -3293,6 +3370,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs os44 "
             + "                  ON         os44.encounter_id = ee44.encounter_id "
             + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds4_end.patient_id "
+            + "                  INNER JOIN ( "
             + "                  SELECT     mds4.patient_id, "
             + "                             MIN(enc4.encounter_datetime) AS fourth_mds_date, "
             + "                             MIN(otype4.value_coded) AS fourth_mds "
@@ -3303,6 +3388,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  ON         otype4.encounter_id = enc4.encounter_id "
             + "                  INNER JOIN obs ostate4 "
             + "                  ON         ostate4.encounter_id = enc4.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds4.patient_id "
             + "                  INNER JOIN ( "
             + "                  SELECT     mds3.patient_id, "
             + "                             MIN(enc3.encounter_datetime) AS third_mds_date, "
@@ -3315,6 +3408,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs ostate3 "
             + "                  ON         ostate3.encounter_id = enc3.encounter_id "
             + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds3.patient_id "
+            + "                  INNER JOIN ( "
             + "                  SELECT     mds2.patient_id, "
             + "                             MIN(enc2.encounter_datetime) AS second_mds_date, "
             + "                             MIN(otype2.value_coded) AS second_mds "
@@ -3325,6 +3426,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  ON         otype2.encounter_id = enc2.encounter_id "
             + "                  INNER JOIN obs ostate2 "
             + "                  ON         ostate2.encounter_id = enc2.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds2.patient_id "
             + "                  INNER JOIN ( "
             + "                  SELECT     p.patient_id, "
             + "                             MIN(e.encounter_datetime) AS first_mds_date, "
@@ -3352,7 +3461,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + numberOfYears
+            + numberOfMonths
             + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
@@ -3366,6 +3475,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
+            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc2.encounter_type = ${6} "
             + "                  AND        enc2.location_id = :location "
             + "                  AND    (   ( otype2.concept_id = ${165174} "
@@ -3380,6 +3493,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype3.voided = 0 "
             + "                  AND ostate3.voided = 0 "
             + "                  AND enc3.encounter_datetime > mds_2nd.second_mds_date "
+            + "                  AND        enc3.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc3.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc3.encounter_type = ${6} "
             + "                  AND        enc3.location_id = :location "
             + "                  AND    (   ( otype3.concept_id = ${165174} "
@@ -3394,6 +3511,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype4.voided = 0 "
             + "                  AND ostate4.voided = 0 "
             + "                  AND enc4.encounter_datetime > mds_3rd.third_mds_date "
+            + "                  AND        enc4.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc4.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc4.encounter_type = ${6} "
             + "                  AND        enc4.location_id = :location "
             + "                  AND    (   ( otype4.concept_id = ${165174} "
@@ -3408,6 +3529,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND ot44.voided = 0 "
             + "                  AND os44.voided = 0 "
             + "                  AND ee44.encounter_datetime > mds_4th.fourth_mds_date "
+            + "                  AND        ee44.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        ee44.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        ee44.encounter_type = ${6} "
             + "                  AND    (   ( ot44.concept_id = ${165174} "
             + "                               AND ot44.value_coded = mds_4th.fourth_mds ) "
@@ -3430,7 +3555,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds5(int numberOfYears) {
+  public DataDefinition getMds5(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Tipo de MDS: (MDS5) Coluna AE");
     sqlPatientDataDefinition.addParameter(
@@ -3468,6 +3593,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs ostate5 "
             + "                  ON         ostate5.encounter_id = enc5.encounter_id "
             + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds5.patient_id "
+            + "                  INNER JOIN ( "
             + "                  SELECT     mds4.patient_id, "
             + "                             MIN(enc4.encounter_datetime) AS fourth_mds_date, "
             + "                             MIN(otype4.value_coded) AS fourth_mds "
@@ -3478,6 +3611,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  ON         otype4.encounter_id = enc4.encounter_id "
             + "                  INNER JOIN obs ostate4 "
             + "                  ON         ostate4.encounter_id = enc4.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds4.patient_id "
             + "                  INNER JOIN ( "
             + "                  SELECT     mds3.patient_id, "
             + "                             MIN(enc3.encounter_datetime) AS third_mds_date, "
@@ -3490,6 +3631,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs ostate3 "
             + "                  ON         ostate3.encounter_id = enc3.encounter_id "
             + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds3.patient_id "
+            + "                  INNER JOIN ( "
             + "                  SELECT     mds2.patient_id, "
             + "                             MIN(enc2.encounter_datetime) AS second_mds_date, "
             + "                             MIN(otype2.value_coded) AS second_mds "
@@ -3500,6 +3649,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  ON         otype2.encounter_id = enc2.encounter_id "
             + "                  INNER JOIN obs ostate2 "
             + "                  ON         ostate2.encounter_id = enc2.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds2.patient_id "
             + "                  INNER JOIN ( "
             + "                  SELECT     p.patient_id, "
             + "                             MIN(e.encounter_datetime) AS first_mds_date, "
@@ -3527,7 +3684,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + numberOfYears
+            + numberOfMonths
             + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
@@ -3541,6 +3698,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
+            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc2.encounter_type = ${6} "
             + "                  AND        enc2.location_id = :location "
             + "                  AND    (   ( otype2.concept_id = ${165174} "
@@ -3555,6 +3716,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype3.voided = 0 "
             + "                  AND ostate3.voided = 0 "
             + "                  AND enc3.encounter_datetime > mds_2nd.second_mds_date "
+            + "                  AND        enc3.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc3.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc3.encounter_type = ${6} "
             + "                  AND        enc3.location_id = :location "
             + "                  AND    (   ( otype3.concept_id = ${165174} "
@@ -3569,6 +3734,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype4.voided = 0 "
             + "                  AND ostate4.voided = 0 "
             + "                  AND enc4.encounter_datetime > mds_3rd.third_mds_date "
+            + "                  AND        enc4.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc4.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc4.encounter_type = ${6} "
             + "                  AND        enc4.location_id = :location "
             + "                  AND    (   ( otype4.concept_id = ${165174} "
@@ -3583,6 +3752,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype5.voided = 0 "
             + "                  AND ostate5.voided = 0 "
             + "                  AND enc5.encounter_datetime > mds_4th.fourth_mds_date "
+            + "                  AND        enc5.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc5.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc5.encounter_type = ${6} "
             + "                  AND        enc5.location_id = :location "
             + "                  AND    (   ( otype5.concept_id = ${165174} "
@@ -3606,7 +3779,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds5StartDate(int numberOfYears) {
+  public DataDefinition getMds5StartDate(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Data Início de MDS5: Coluna AF");
     sqlPatientDataDefinition.addParameter(
@@ -3644,6 +3817,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs ostate5 "
             + "                  ON         ostate5.encounter_id = enc5.encounter_id "
             + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds5.patient_id "
+            + "                  INNER JOIN ( "
             + "                  SELECT     mds4.patient_id, "
             + "                             MIN(enc4.encounter_datetime) AS fourth_mds_date, "
             + "                             MIN(otype4.value_coded) AS fourth_mds "
@@ -3654,6 +3835,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  ON         otype4.encounter_id = enc4.encounter_id "
             + "                  INNER JOIN obs ostate4 "
             + "                  ON         ostate4.encounter_id = enc4.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds4.patient_id "
             + "                  INNER JOIN ( "
             + "                  SELECT     mds3.patient_id, "
             + "                             MIN(enc3.encounter_datetime) AS third_mds_date, "
@@ -3666,6 +3855,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs ostate3 "
             + "                  ON         ostate3.encounter_id = enc3.encounter_id "
             + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds3.patient_id "
+            + "                  INNER JOIN ( "
             + "                  SELECT     mds2.patient_id, "
             + "                             MIN(enc2.encounter_datetime) AS second_mds_date, "
             + "                             MIN(otype2.value_coded) AS second_mds "
@@ -3676,6 +3873,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  ON         otype2.encounter_id = enc2.encounter_id "
             + "                  INNER JOIN obs ostate2 "
             + "                  ON         ostate2.encounter_id = enc2.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds2.patient_id "
             + "                  INNER JOIN ( "
             + "                  SELECT     p.patient_id, "
             + "                             MIN(e.encounter_datetime) AS first_mds_date, "
@@ -3703,7 +3908,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + numberOfYears
+            + numberOfMonths
             + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
@@ -3717,6 +3922,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
+            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc2.encounter_type = ${6} "
             + "                  AND        enc2.location_id = :location "
             + "                  AND    (   ( otype2.concept_id = ${165174} "
@@ -3731,6 +3940,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype3.voided = 0 "
             + "                  AND ostate3.voided = 0 "
             + "                  AND enc3.encounter_datetime > mds_2nd.second_mds_date "
+            + "                  AND        enc3.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc3.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc3.encounter_type = ${6} "
             + "                  AND        enc3.location_id = :location "
             + "                  AND    (   ( otype3.concept_id = ${165174} "
@@ -3745,6 +3958,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype4.voided = 0 "
             + "                  AND ostate4.voided = 0 "
             + "                  AND enc4.encounter_datetime > mds_3rd.third_mds_date "
+            + "                  AND        enc4.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc4.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc4.encounter_type = ${6} "
             + "                  AND        enc4.location_id = :location "
             + "                  AND    (   ( otype4.concept_id = ${165174} "
@@ -3759,6 +3976,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype5.voided = 0 "
             + "                  AND ostate5.voided = 0 "
             + "                  AND enc5.encounter_datetime > mds_4th.fourth_mds_date "
+            + "                  AND        enc5.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc5.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonths
+            + " MONTH ) "
             + "                  AND        enc5.encounter_type = ${6} "
             + "                  AND        enc5.location_id = :location "
             + "                  AND    (   ( otype5.concept_id = ${165174} "
@@ -3782,7 +4003,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds5EndDate(int numberOfYears) {
+  public DataDefinition getMds5EndDate(int numberOfMonthss) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Data Fim de MDS5: Coluna AG");
     sqlPatientDataDefinition.addParameter(
@@ -3821,6 +4042,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs os55 "
             + "                  ON         os55.encounter_id = ee55.encounter_id "
             + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds5_end.patient_id "
+            + "                  INNER JOIN ( "
             + "                  SELECT     mds5.patient_id, "
             + "                             MIN(enc5.encounter_datetime) AS fifth_mds_date, "
             + "                             MIN(otype5.value_coded) AS fifth_mds "
@@ -3831,6 +4060,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  ON         otype5.encounter_id = enc5.encounter_id "
             + "                  INNER JOIN obs ostate5 "
             + "                  ON         ostate5.encounter_id = enc5.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds5.patient_id "
             + "                  INNER JOIN ( "
             + "                  SELECT     mds4.patient_id, "
             + "                             MIN(enc4.encounter_datetime) AS fourth_mds_date, "
@@ -3843,6 +4080,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs ostate4 "
             + "                  ON         ostate4.encounter_id = enc4.encounter_id "
             + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds4.patient_id "
+            + "                  INNER JOIN ( "
             + "                  SELECT     mds3.patient_id, "
             + "                             MIN(enc3.encounter_datetime) AS third_mds_date, "
             + "                             MIN(otype3.value_coded) AS third_mds "
@@ -3854,6 +4099,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  INNER JOIN obs ostate3 "
             + "                  ON         ostate3.encounter_id = enc3.encounter_id "
             + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds3.patient_id "
+            + "                  INNER JOIN ( "
             + "                  SELECT     mds2.patient_id, "
             + "                             MIN(enc2.encounter_datetime) AS second_mds_date, "
             + "                             MIN(otype2.value_coded) AS second_mds "
@@ -3864,6 +4117,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  ON         otype2.encounter_id = enc2.encounter_id "
             + "                  INNER JOIN obs ostate2 "
             + "                  ON         ostate2.encounter_id = enc2.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = mds2.patient_id "
             + "                  INNER JOIN ( "
             + "                  SELECT     p.patient_id, "
             + "                             MIN(e.encounter_datetime) AS first_mds_date, "
@@ -3891,7 +4152,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + numberOfYears
+            + numberOfMonthss
             + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
@@ -3905,6 +4166,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
+            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonthss
+            + " MONTH ) "
             + "                  AND        enc2.encounter_type = ${6} "
             + "                  AND        enc2.location_id = :location "
             + "                  AND    (   ( otype2.concept_id = ${165174} "
@@ -3919,6 +4184,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype3.voided = 0 "
             + "                  AND ostate3.voided = 0 "
             + "                  AND enc3.encounter_datetime > mds_2nd.second_mds_date "
+            + "                  AND        enc3.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc3.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonthss
+            + " MONTH ) "
             + "                  AND        enc3.encounter_type = ${6} "
             + "                  AND        enc3.location_id = :location "
             + "                  AND    (   ( otype3.concept_id = ${165174} "
@@ -3933,6 +4202,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype4.voided = 0 "
             + "                  AND ostate4.voided = 0 "
             + "                  AND enc4.encounter_datetime > mds_3rd.third_mds_date "
+            + "                  AND        enc4.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc4.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonthss
+            + " MONTH ) "
             + "                  AND        enc4.encounter_type = ${6} "
             + "                  AND        enc4.location_id = :location "
             + "                  AND    (   ( otype4.concept_id = ${165174} "
@@ -3947,6 +4220,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype5.voided = 0 "
             + "                  AND ostate5.voided = 0 "
             + "                  AND enc5.encounter_datetime > mds_4th.fourth_mds_date "
+            + "                  AND        enc5.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc5.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonthss
+            + " MONTH ) "
             + "                  AND        enc5.encounter_type = ${6} "
             + "                  AND        enc5.location_id = :location "
             + "                  AND    (   ( otype5.concept_id = ${165174} "
@@ -3961,6 +4238,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND ot55.voided = 0 "
             + "                  AND os55.voided = 0 "
             + "                  AND ee55.encounter_datetime > mds_5th.fifth_mds_date "
+            + "                  AND        ee55.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        ee55.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfMonthss
+            + " MONTH ) "
             + "                  AND        ee55.encounter_type = ${6} "
             + "                  AND        ee55.location_id = :location "
             + "                  AND    (   ( ot55.concept_id = ${165174} "
@@ -4112,7 +4393,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             : " AND        ( o.concept_id IN ( ${1343}, ${1342} ) "
                 + "    AND        o.value_numeric IS NOT NULL ) ";
     query +=
-        "                      GROUP BY   e.patient_id ) consultation_tb "
+        "         AND        e.encounter_datetime >= mds.encounter_date "
+            + "        AND        e.encounter_datetime <= date_add( tarv.art_encounter, interval 12 month ) "
+            + "GROUP  BY e.patient_id) consultation_tb "
             + "ON         consultation_tb.patient_id = p.patient_id "
             + "INNER JOIN "
             + "           ( "
@@ -4424,164 +4707,78 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   }
 
   /**
-   * <b>RF30 - Identificação de n˚ de consultas clínicas (Coluna AO)</b><br>
-   * <br>
+   * <b> Último Estado de Permanência TARV </b>
+   * <li>Resposta = “Abandono”, os utentes em TARV que abandonaram o tratamento
+   * <li>Resposta = “Óbito”, os utentes em TARV que foram óbito
+   * <li>Resposta = “Suspenso”, os utentes em TARV que suspenderam o tratamento
+   * <li>Resposta = “Activo”, os utentes activos em TARV
    *
-   * <p>O sistema irá determinar o estado de permanência no 12º mês de TARV da seguinte forma: <br>
-   * <br>
-   *
-   * <p>Resposta = “Abandono”, os utentes em TARV que abandonaram o tratamento (RF_49) <br>
-   * <br>
-   *
-   * <p>Resposta = “Óbito”, os utentes em TARV que foram óbito (RF50) <br>
-   * <br>
-   *
-   * <p>Resposta = “Suspenso”, os utentes em TARV que suspenderam o tratamento (RF48) <br>
-   * <br>
-   *
-   * <p>Resposta = “Transferido Para”, os utentes em TARV que suspenderam o tratamento (RF47) <br>
-   * <br>
-   *
-   * <p>Resposta = “Activo”, os utentes activos em TARV (RF51) <br>
-   * <br>
-   *
-   * <p>Nota 1: Em caso de não existência desta informação, o sistema irá listar “N/A”.<br>
-   * <br>
-   * <br>
-   *
-   * @return {DataDefinition}
+   * @return {@link DataDefinition}
    */
-  public DataDefinition getPermanenceEstate(int minNumberOfMonths, int maxNumberOfMonths) {
+  public DataDefinition getLastStateOfStayOnTarv(int cohortYear) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("B18 - Estado de permanência no 12˚ mês de TARV");
+
+    sqlPatientDataDefinition.setName("Get the Last State of stay ");
     sqlPatientDataDefinition.addParameter(
         new Parameter("evaluationYear", "evaluationYear", Integer.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
     Map<String, Integer> map = new HashMap<>();
+    map.put("1", hivMetadata.getHIVCareProgram().getProgramId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
-    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
-    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
-    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
-    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
-    map.put("6276", hivMetadata.getArtStatus().getConceptId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
-    map.put("1066", hivMetadata.getNoConcept().getConceptId());
-    map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
-    map.put("165322", hivMetadata.getMdcState().getConceptId());
-    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("10", hivMetadata.getArtDeadWorkflowState().getProgramWorkflowStateId());
+    map.put("8", hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId());
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
-    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put(
+        "28",
+        hivMetadata
+            .getArtCareTransferredFromOtherHealthFacilityWorkflowState()
+            .getProgramWorkflowStateId());
+    map.put(
+        "29",
+        hivMetadata
+            .getTransferredFromOtherHealthFacilityWorkflowState()
+            .getProgramWorkflowStateId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
+    map.put("6275", hivMetadata.getPreTarvConcept().getConceptId());
+    map.put("6276", hivMetadata.getArtStatus().getConceptId());
+    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
     map.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
-    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
-    map.put("1707", hivMetadata.getAbandonedConcept().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("1709", hivMetadata.getSuspendedTreatmentConcept().getConceptId());
-    map.put("6269", hivMetadata.getActiveOnProgramConcept().getConceptId());
 
     String query =
-        "SELECT state.patient_id, "
-            + "       CASE "
-            + "         WHEN state.the_state IS NOT NULL THEN state.the_state "
-            + "         ELSE 'N/A' "
-            + "       END "
-            + "        FROM   ( "
-            + "                  SELECT     clinic_state.patient_id, "
-            + "                             oo.value_coded AS the_state "
-            + "                  FROM       patient clinic_state "
-            + "                  INNER JOIN encounter ee "
-            + "                  ON         ee.patient_id = clinic_state.patient_id "
-            + "                  INNER JOIN obs oo "
-            + "                  ON         oo.encounter_id = ee.encounter_id "
-            + "                  INNER JOIN ( "
-            + "                  SELECT     p.patient_id, "
-            + "                             MAX(e.encounter_datetime) AS last_encounter  "
-            + "                  FROM       patient p "
-            + "                  INNER JOIN encounter e "
-            + "                  ON         e.patient_id = p.patient_id "
-            + "                  INNER JOIN obs o "
-            + "                  ON         o.encounter_id = e.encounter_id "
-            + "                  INNER JOIN ( "
-            + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.first_pickup AS art_encounter "
-            + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
-            + "                           ) art_patient "
-            + "                             ) art "
-            + "                  ON         art.patient_id = p.patient_id "
-            + "                  WHERE      p.voided = 0 "
-            + "                  AND        e.voided = 0 "
-            + "                  AND        o.voided = 0 "
-            + "                  AND        e.encounter_type = ${6} "
-            + "                  AND        e.location_id = :location "
-            + "                  AND        o.concept_id = ${6273} "
-            + "                  AND        o.value_coded IN ( ${1366}, ${1706}, ${1707}, ${1709}, ${6269} ) "
-            + "                  AND        e.encounter_datetime > DATE_ADD( art.art_encounter, INTERVAL "
-            + minNumberOfMonths
-            + " MONTH ) "
-            + "                  AND        e.encounter_datetime < DATE_ADD( art.art_encounter, INTERVAL "
-            + maxNumberOfMonths
-            + " MONTH ) "
-            + "                  GROUP BY   p.patient_id ) clinic "
-            + "                  ON         clinic.patient_id = clinic_state.patient_id "
-            + "                  WHERE      clinic_state.voided = 0 "
-            + "                  AND        ee.voided = 0 "
-            + "                  AND        oo.voided = 0 "
-            + "                  AND        ee.encounter_type = ${6} "
-            + "                  AND        ee.location_id = :location "
-            + "                  AND        oo.concept_id = ${6273} "
-            + "                  AND        oo.value_coded IN ( ${1366}, ${1706}, ${1707}, ${1709}, ${6269} ) "
-            + "                  GROUP BY   clinic_state.patient_id "
-            + "UNION "
-            + "                  SELECT     resumo_state.patient_id, "
-            + "                             oo.value_coded AS the_state "
-            + "                  FROM       patient resumo_state "
-            + "                  INNER JOIN encounter ee "
-            + "                  ON         ee.patient_id = resumo_state.patient_id "
-            + "                  INNER JOIN obs oo "
-            + "                  ON         oo.encounter_id = ee.encounter_id "
-            + "                  INNER JOIN ( "
-            + "                  SELECT     p.patient_id, "
-            + "                             MAX(o.obs_datetime) AS last_encounter  "
-            + "                  FROM       patient p "
-            + "                  INNER JOIN encounter e "
-            + "                  ON         e.patient_id = p.patient_id "
-            + "                  INNER JOIN obs o "
-            + "                  ON         o.encounter_id = e.encounter_id "
-            + "                  INNER JOIN ( "
-            + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.first_pickup AS art_encounter "
-            + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
-            + "                           ) art_patient "
-            + "                             ) art "
-            + "                  ON         art.patient_id = p.patient_id "
-            + "                  WHERE      p.voided = 0 "
-            + "                  AND        e.voided = 0 "
-            + "                  AND        o.voided = 0 "
-            + "                  AND        e.encounter_type = ${53} "
-            + "                  AND        e.location_id = :location "
-            + "                  AND        o.concept_id = ${6272} "
-            + "                  AND        o.value_coded IN ( ${1366}, ${1706}, ${1707}, ${1709}, ${6269} ) "
-            + "                  AND        e.encounter_datetime > DATE_ADD( art.art_encounter, INTERVAL "
-            + minNumberOfMonths
-            + " MONTH ) "
-            + "                  AND        e.encounter_datetime < DATE_ADD( art.art_encounter, INTERVAL "
-            + maxNumberOfMonths
-            + " MONTH ) "
-            + "                  GROUP BY   p.patient_id ) resumo "
-            + "                  ON         resumo.patient_id = resumo_state.patient_id "
-            + "                  WHERE      resumo_state.voided = 0 "
-            + "                  AND        ee.voided = 0 "
-            + "                  AND        oo.voided = 0 "
-            + "                  AND        ee.encounter_type = ${53} "
-            + "                  AND        ee.location_id = :location "
-            + "                  AND        oo.concept_id = ${6272} "
-            + "                  AND        oo.value_coded IN ( ${1366}, ${1706}, ${1707}, ${1709}, ${6269} ) "
-            + "                  GROUP BY   resumo_state.patient_id "
-            + " ) state ";
+        new EptsQueriesUtil()
+            .unionBuilder(
+                ListOfPatientsWithMdsEvaluationQueries.getPatientsWhoAbandonedTarvQuery(
+                    true, inclusionEndMonthAndDay, cohortYear))
+            .union(
+                ListOfPatientsWithMdsEvaluationQueries.getPatientsWhoDied(
+                    true, inclusionEndMonthAndDay, cohortYear))
+            .union(
+                ListOfPatientsWithMdsEvaluationQueries
+                    .getPatientsWhoSuspendedTarvOrAreTransferredOut(
+                        hivMetadata
+                            .getSuspendedTreatmentWorkflowState()
+                            .getProgramWorkflowStateId(),
+                        hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
+                        false,
+                        false,
+                        inclusionEndMonthAndDay,
+                        cohortYear))
+            .union(
+                ListOfPatientsWithMdsEvaluationQueries.getPatientsActiveOnTarv(
+                    inclusionEndMonthAndDay, cohortYear))
+            .buildQuery();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
