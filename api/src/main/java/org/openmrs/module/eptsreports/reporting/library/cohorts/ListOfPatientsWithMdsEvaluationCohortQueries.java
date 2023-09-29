@@ -1045,7 +1045,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     String query =
         "SELECT     p.patient_id, "
-            + "     IF(o.value_numeric IS NOT NULL, o.value_numeric, IF(o.value_coded = 165331, CONCAT('MENOR QUE ',o.comments), o.value_coded)) AS first_vl_result  "
+            + "     IF(MIN(o.value_numeric) IS NOT NULL, MIN(o.value_numeric), IF(MIN(o.value_coded) = 165331, CONCAT('MENOR QUE ',o.comments), MIN(o.value_coded))) AS first_vl_result  "
             + "FROM       patient p "
             + "INNER JOIN encounter e "
             + "ON         e.patient_id = p.patient_id "
@@ -1070,7 +1070,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                 o.concept_id = ${1305} "
             + "                      AND        o.value_coded IS NOT NULL)) "
             + "AND        e.location_id = :location "
-            + "AND        e.encounter_datetime >= art.art_encounter "
+            + "AND        e.encounter_datetime > art.art_encounter "
             + "AND        p.voided = 0 "
             + "AND        e.voided = 0 "
             + "AND        o.voided = 0 "
