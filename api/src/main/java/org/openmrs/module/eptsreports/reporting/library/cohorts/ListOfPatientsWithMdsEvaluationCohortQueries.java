@@ -1117,7 +1117,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     String query =
         "SELECT     second_vl.patient_id, "
-            + "           MIN(oo.value_numeric) AS second_vl_result  "
+            + "          IF(MIN(oo.value_numeric) IS NOT NULL, MIN(oo.value_numeric), IF(MIN(oo.value_coded) = 165331, CONCAT('MENOR QUE ',oo.comments), MIN(oo.value_coded))) AS second_vl_result  "
             + "FROM       patient second_vl "
             + "INNER JOIN encounter ee "
             + "ON         ee.patient_id = second_vl.patient_id "

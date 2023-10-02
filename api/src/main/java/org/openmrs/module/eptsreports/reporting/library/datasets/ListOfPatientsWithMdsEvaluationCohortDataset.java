@@ -336,7 +336,8 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "cv_result_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getSecondViralLoadResult(),
-        "evaluationYear=${evaluationYear},location=${location}");
+        "evaluationYear=${evaluationYear},location=${location}",
+        new ViralLoadQualitativeLabelConverter());
 
     // C4 - Resultado do CD4 feito entre 12˚ e 24˚ mês de TARV- C.4 (Coluna AS)
     pdd.addColumn(
