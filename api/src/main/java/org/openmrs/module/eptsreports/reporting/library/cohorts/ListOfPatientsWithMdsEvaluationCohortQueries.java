@@ -1743,8 +1743,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " AND    (   ( o.concept_id = ${23761} "
             + "              AND o.value_coded IN ( ${1065} ) ) "
             + " OR         ( o2.concept_id = ${1268} "
-            + "                AND  o2.value_coded IN ( ${1256}, "
-            + "                                 ${1257}, ${1267} ) ) ) "
+            + "                AND  o2.value_coded IN ( ${1256}, ${1257} ) ) ) "
             + " GROUP BY   p.patient_id ) AS final_query ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
