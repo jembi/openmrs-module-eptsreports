@@ -1439,13 +1439,12 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
         "SELECT p.patient_id, "
             + "       CASE "
             + "           WHEN ( consultation_tb.tb_consultations = "
-            + "                  consultations.nr_consultations ) "
+            + "                  good_consultations.good_adhesion ) "
             + "               THEN 'Sim' "
-            + "           WHEN ( consultation_tb.tb_consultations <> "
-            + "                  consultations.nr_consultations ) "
+            + "           WHEN ( bad_consultations.bad_adhesion ) "
             + "               THEN 'Nao' "
             + "          ELSE '' "
-            + "           END AS good_adhesion "
+            + "           END AS adhesion "
             + "FROM   patient p "
             + "           INNER JOIN (SELECT e.patient_id, "
             + "                              Count(e.encounter_id) AS tb_consultations "
@@ -1470,8 +1469,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     query +=
         "                       GROUP  BY e.patient_id) consultation_tb "
             + "                      ON consultation_tb.patient_id = p.patient_id "
-            + "           INNER JOIN (SELECT e.patient_id, "
-            + "                              Count(e.encounter_id) AS nr_consultations "
+            + "           LEFT JOIN (SELECT e.patient_id, "
+            + "                              Count(e.encounter_id) AS good_adhesion "
             + "                       FROM   encounter e "
             + "                                  INNER JOIN obs o "
             + "                                             ON o.encounter_id = e.encounter_id "
@@ -1494,11 +1493,37 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     query +=
         "                         AND        o.concept_id = ${6223} "
-            + "                         AND        o.value_coded IN ( ${1383}, "
-            + "                                                       ${1749}, "
+            + "                         AND        o.value_coded IN ( ${1383} ) "
+            + "                       GROUP  BY e.patient_id) good_consultations "
+            + "                      ON good_consultations.patient_id = p.patient_id "
+            + "           LEFT JOIN (SELECT e.patient_id, "
+            + "                              Count(e.encounter_id) AS bad_adhesion "
+            + "                       FROM   encounter e "
+            + "                                  INNER JOIN obs o "
+            + "                                             ON o.encounter_id = e.encounter_id "
+            + "                                  INNER JOIN (SELECT starv.patient_id, "
+            + "                                                     starv.first_pickup AS art_encounter "
+            + "                                              FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                                                      ) starv) tarv "
+            + "                                             ON tarv.patient_id = e.patient_id "
+            + "                       WHERE  e.voided = 0 "
+            + "                         AND o.voided = 0 "
+            + "                         AND e.encounter_type = ${35} "
+            + "                         AND e.location_id = :location ";
+    query +=
+        b5Orc5
+            ? "                         AND e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL 33 DAY) "
+                + "                         AND e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL 3 MONTH) "
+            : " AND        e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL 12 MONTH) "
+                + " AND        e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL 24 MONTH) ";
+
+    query +=
+        "                         AND        o.concept_id = ${6223} "
+            + "                         AND        o.value_coded IN ( ${1749}, "
             + "                                                       ${1385} ) "
-            + "                       GROUP  BY e.patient_id) consultations "
-            + "                      ON consultations.patient_id = p.patient_id "
+            + "                       GROUP  BY e.patient_id) bad_consultations "
+            + "                      ON bad_consultations.patient_id = p.patient_id "
             + "WHERE  p.voided = 0";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
