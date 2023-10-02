@@ -1781,7 +1781,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {DataDefinition}
    */
-  public DataDefinition getMdsDate(int minNumberOfMonths, int maxNumberOfMonths) {
+  public DataDefinition getMdsDate(int minNumberOfMonths, int maxNumberOfMonths, boolean b9Orc9) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "B9- Data de inscrição no MDS: (coluna R) - Resposta = Data de Inscrição (RF24)");
@@ -1803,15 +1803,20 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
     map.put("165322", hivMetadata.getMdcState().getConceptId());
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+    map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
 
-    String query =
-        "                  SELECT     p.patient_id, "
-            + "                             MIN(e.encounter_datetime) AS encounter_date "
-            + "                  FROM       patient p "
+    String query = "                  SELECT     p.patient_id, ";
+    query +=
+        b9Orc9
+            ? "                             MIN(e.encounter_datetime) AS encounter_date "
+            : "                             MAX(e.encounter_datetime) AS encounter_date ";
+    query +=
+        "                  FROM       patient p "
             + "                  INNER JOIN encounter e "
             + "                  ON         e.patient_id = p.patient_id "
             + "                  INNER JOIN obs otype "
@@ -1839,10 +1844,15 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + maxNumberOfMonths
             + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
-            + "                               AND otype.value_coded IS NOT NULL ) "
-            + "                  AND         ( ostate.concept_id = ${165322} "
-            + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
-            + "                  AND  otype.obs_group_id = ostate.obs_group_id "
+            + "                               AND otype.value_coded IS NOT NULL ) ";
+    query +=
+        b9Orc9
+            ? "                  AND         ( ostate.concept_id = ${165322} "
+                + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
+            : "                  AND         ( ostate.concept_id = ${165322} "
+                + "                                 AND  ostate.value_coded IN (${1256}, ${1257}, ${1267}) ) ) ";
+    query +=
+        "                  AND  otype.obs_group_id = ostate.obs_group_id "
             + "                  GROUP BY   p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
