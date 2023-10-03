@@ -482,8 +482,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "tb_screening_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(true),
-        "evaluationYear=${evaluationYear},location=${location}",
-        new NotApplicableIfNullConverter());
+        "evaluationYear=${evaluationYear},location=${location}");
 
     // C14 - PB/IMC registado em TODAS as consultas entre o 12˚ a 24º mês de TARV? (coluna BQ) -
     // Resposta = Sim ou Não ou N/A (RF27)
