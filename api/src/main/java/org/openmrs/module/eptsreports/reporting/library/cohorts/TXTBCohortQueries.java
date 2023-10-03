@@ -2333,7 +2333,7 @@ public class TXTBCohortQueries {
     definition.addSearch("mWRDCohort", EptsReportUtils.map(getmWRD(), generalParameterMapping));
 
     definition.setCompositionString(
-        "(basiloscopiaCohort OR basiloscopiaLabCohort OR applicationForLaboratoryResearchCohort)");
+        "(basiloscopiaCohort OR basiloscopiaLabCohort OR applicationForLaboratoryResearchCohort) AND NOT mWRDCohort");
     return definition;
   }
 
@@ -2454,12 +2454,7 @@ public class TXTBCohortQueries {
                 laboratory, genexpertTest, Arrays.asList(positive)));
     addGeneralParameters(genexpertLabTestCohort);
 
-    CohortDefinition basiloscopiaExamCohort =
-        genericCohortQueries.generalSql(
-            "basiloscopiaExamCohort",
-            genericCohortQueries.getPatientsWithObsBetweenDates(
-                laboratory, basiloscopiaExam, Arrays.asList(positive)));
-    addGeneralParameters(basiloscopiaExamCohort);
+    CohortDefinition basiloscopiaExamCohort = getSmearMicroscopyOnlyPositiveResult();
 
     CohortDefinition tbLamTestCohort =
         genericCohortQueries.generalSql(
