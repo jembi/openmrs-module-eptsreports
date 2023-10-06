@@ -55,7 +55,7 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     dsd.addDimension(
-        "KP", EptsReportUtils.map(eptsCommonDimension.getKeyPopsDimension(), mappingsKp));
+        "KP", EptsReportUtils.map(eptsCommonDimension.getKeyPopsDimensionForPrep(), mappingsKp));
 
     dsd.addDimension("gender", EptsReportUtils.map(eptsCommonDimension.gender(), ""));
 
