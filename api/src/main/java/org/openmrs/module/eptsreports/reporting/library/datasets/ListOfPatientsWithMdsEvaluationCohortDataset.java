@@ -175,7 +175,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B9- Data de inscrição no MDS: (coluna R) - Resposta = Data de Inscrição (RF24)
     pdd.addColumn(
         "mds_date",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(3, 9),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(3, 9, true),
         "evaluationYear=${evaluationYear},location=${location}",
         new GeneralDateConverter());
 
@@ -336,7 +336,8 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "cv_result_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getSecondViralLoadResult(),
-        "evaluationYear=${evaluationYear},location=${location}");
+        "evaluationYear=${evaluationYear},location=${location}",
+        new ViralLoadQualitativeLabelConverter());
 
     // C4 - Resultado do CD4 feito entre 12˚ e 24˚ mês de TARV- C.4 (Coluna AS)
     pdd.addColumn(
@@ -368,7 +369,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // Inscrição (RF39)
     pdd.addColumn(
         "mds_tarv_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(12, 24),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(12, 24, false),
         "evaluationYear=${evaluationYear},location=${location}",
         new GeneralDateConverter());
 
@@ -481,8 +482,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "tb_screening_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(true),
-        "evaluationYear=${evaluationYear},location=${location}",
-        new NotApplicableIfNullConverter());
+        "evaluationYear=${evaluationYear},location=${location}");
 
     // C14 - PB/IMC registado em TODAS as consultas entre o 12˚ a 24º mês de TARV? (coluna BQ) -
     // Resposta = Sim ou Não ou N/A (RF27)

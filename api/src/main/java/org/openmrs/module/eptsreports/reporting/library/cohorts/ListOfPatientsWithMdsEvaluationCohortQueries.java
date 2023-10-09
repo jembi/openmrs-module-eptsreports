@@ -1045,7 +1045,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     String query =
         "SELECT     p.patient_id, "
-            + "     IF(o.value_numeric IS NOT NULL, o.value_numeric, IF(o.value_coded = 165331, CONCAT('MENOR QUE ',o.comments), o.value_coded)) AS first_vl_result  "
+            + "     IF(MIN(o.value_numeric) IS NOT NULL, MIN(o.value_numeric), IF(MIN(o.value_coded) = 165331, CONCAT('MENOR QUE ',o.comments), MIN(o.value_coded))) AS first_vl_result  "
             + "FROM       patient p "
             + "INNER JOIN encounter e "
             + "ON         e.patient_id = p.patient_id "
@@ -1070,7 +1070,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                 o.concept_id = ${1305} "
             + "                      AND        o.value_coded IS NOT NULL)) "
             + "AND        e.location_id = :location "
-            + "AND        e.encounter_datetime >= art.art_encounter "
+            + "AND        e.encounter_datetime > art.art_encounter "
             + "AND        p.voided = 0 "
             + "AND        e.voided = 0 "
             + "AND        o.voided = 0 "
@@ -1117,7 +1117,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     String query =
         "SELECT     second_vl.patient_id, "
-            + "           MIN(oo.value_numeric) AS second_vl_result  "
+            + "          IF(MIN(oo.value_numeric) IS NOT NULL, MIN(oo.value_numeric), IF(MIN(oo.value_coded) = 165331, CONCAT('MENOR QUE ',oo.comments), MIN(oo.value_coded))) AS second_vl_result  "
             + "FROM       patient second_vl "
             + "INNER JOIN encounter ee "
             + "ON         ee.patient_id = second_vl.patient_id "
@@ -1439,13 +1439,12 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
         "SELECT p.patient_id, "
             + "       CASE "
             + "           WHEN ( consultation_tb.tb_consultations = "
-            + "                  consultations.nr_consultations ) "
+            + "                  good_consultations.good_adhesion ) "
             + "               THEN 'Sim' "
-            + "           WHEN ( consultation_tb.tb_consultations <> "
-            + "                  consultations.nr_consultations ) "
+            + "           WHEN ( bad_consultations.bad_adhesion ) "
             + "               THEN 'Nao' "
             + "          ELSE '' "
-            + "           END AS good_adhesion "
+            + "           END AS adhesion "
             + "FROM   patient p "
             + "           INNER JOIN (SELECT e.patient_id, "
             + "                              Count(e.encounter_id) AS tb_consultations "
@@ -1470,8 +1469,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     query +=
         "                       GROUP  BY e.patient_id) consultation_tb "
             + "                      ON consultation_tb.patient_id = p.patient_id "
-            + "           INNER JOIN (SELECT e.patient_id, "
-            + "                              Count(e.encounter_id) AS nr_consultations "
+            + "           LEFT JOIN (SELECT e.patient_id, "
+            + "                              Count(e.encounter_id) AS good_adhesion "
             + "                       FROM   encounter e "
             + "                                  INNER JOIN obs o "
             + "                                             ON o.encounter_id = e.encounter_id "
@@ -1494,11 +1493,37 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     query +=
         "                         AND        o.concept_id = ${6223} "
-            + "                         AND        o.value_coded IN ( ${1383}, "
-            + "                                                       ${1749}, "
+            + "                         AND        o.value_coded IN ( ${1383} ) "
+            + "                       GROUP  BY e.patient_id) good_consultations "
+            + "                      ON good_consultations.patient_id = p.patient_id "
+            + "           LEFT JOIN (SELECT e.patient_id, "
+            + "                              Count(e.encounter_id) AS bad_adhesion "
+            + "                       FROM   encounter e "
+            + "                                  INNER JOIN obs o "
+            + "                                             ON o.encounter_id = e.encounter_id "
+            + "                                  INNER JOIN (SELECT starv.patient_id, "
+            + "                                                     starv.first_pickup AS art_encounter "
+            + "                                              FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "                                                      ) starv) tarv "
+            + "                                             ON tarv.patient_id = e.patient_id "
+            + "                       WHERE  e.voided = 0 "
+            + "                         AND o.voided = 0 "
+            + "                         AND e.encounter_type = ${35} "
+            + "                         AND e.location_id = :location ";
+    query +=
+        b5Orc5
+            ? "                         AND e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL 33 DAY) "
+                + "                         AND e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL 3 MONTH) "
+            : " AND        e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL 12 MONTH) "
+                + " AND        e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL 24 MONTH) ";
+
+    query +=
+        "                         AND        o.concept_id = ${6223} "
+            + "                         AND        o.value_coded IN ( ${1749}, "
             + "                                                       ${1385} ) "
-            + "                       GROUP  BY e.patient_id) consultations "
-            + "                      ON consultations.patient_id = p.patient_id "
+            + "                       GROUP  BY e.patient_id) bad_consultations "
+            + "                      ON bad_consultations.patient_id = p.patient_id "
             + "WHERE  p.voided = 0";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -1718,8 +1743,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " AND    (   ( o.concept_id = ${23761} "
             + "              AND o.value_coded IN ( ${1065} ) ) "
             + " OR         ( o2.concept_id = ${1268} "
-            + "                AND  o2.value_coded IN ( ${1256}, "
-            + "                                 ${1257}, ${1267} ) ) ) "
+            + "                AND  o2.value_coded IN ( ${1256}, ${1257} ) ) ) "
             + " GROUP BY   p.patient_id ) AS final_query ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -1757,7 +1781,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {DataDefinition}
    */
-  public DataDefinition getMdsDate(int minNumberOfMonths, int maxNumberOfMonths) {
+  public DataDefinition getMdsDate(int minNumberOfMonths, int maxNumberOfMonths, boolean b9Orc9) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "B9- Data de inscrição no MDS: (coluna R) - Resposta = Data de Inscrição (RF24)");
@@ -1779,15 +1803,20 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
     map.put("165322", hivMetadata.getMdcState().getConceptId());
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+    map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
 
-    String query =
-        "                  SELECT     p.patient_id, "
-            + "                             MIN(e.encounter_datetime) AS encounter_date "
-            + "                  FROM       patient p "
+    String query = "                  SELECT     p.patient_id, ";
+    query +=
+        b9Orc9
+            ? "                             MIN(e.encounter_datetime) AS encounter_date "
+            : "                             MAX(e.encounter_datetime) AS encounter_date ";
+    query +=
+        "                  FROM       patient p "
             + "                  INNER JOIN encounter e "
             + "                  ON         e.patient_id = p.patient_id "
             + "                  INNER JOIN obs otype "
@@ -1815,10 +1844,15 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + maxNumberOfMonths
             + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
-            + "                               AND otype.value_coded IS NOT NULL ) "
-            + "                  AND         ( ostate.concept_id = ${165322} "
-            + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
-            + "                  AND  otype.obs_group_id = ostate.obs_group_id "
+            + "                               AND otype.value_coded IS NOT NULL ) ";
+    query +=
+        b9Orc9
+            ? "                  AND         ( ostate.concept_id = ${165322} "
+                + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
+            : "                  AND         ( ostate.concept_id = ${165322} "
+                + "                                 AND  ostate.value_coded IN (${1256}, ${1257}, ${1267}) ) ) ";
+    query +=
+        "                  AND  otype.obs_group_id = ostate.obs_group_id "
             + "                  GROUP BY   p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -4501,7 +4535,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "         WHEN ( consultation_tb.tb_consultations <> "
             + "                consultations.nr_consultations ) "
             + "       THEN 'Nao' "
-            + "       end AS tb_screening "
+            + "       ELSE '' "
+            + "       END AS tb_screening "
             + "FROM   patient p "
             + "       INNER JOIN (SELECT e.patient_id, "
             + "                          Count(e.encounter_id) AS tb_consultations "
