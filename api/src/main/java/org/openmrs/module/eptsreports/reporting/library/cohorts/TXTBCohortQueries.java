@@ -1844,8 +1844,7 @@ public class TXTBCohortQueries {
             hivMetadata.getApplicationForLaboratoryResearch(),
             hivMetadata.getResultForBasiloscopia(),
             commonMetadata.getPositive(),
-            commonMetadata.getNegative(),
-            commonMetadata.getNotFoundConcept());
+            commonMetadata.getNegative());
     return cd;
   }
 
@@ -1863,8 +1862,7 @@ public class TXTBCohortQueries {
             hivMetadata.getAdultoSeguimentoEncounterType(),
             hivMetadata.getApplicationForLaboratoryResearch(),
             hivMetadata.getResultForBasiloscopia(),
-            commonMetadata.getPositive(),
-            commonMetadata.getNotFoundConcept());
+            commonMetadata.getPositive());
     return cd;
   }
 
@@ -1882,8 +1880,7 @@ public class TXTBCohortQueries {
             hivMetadata.getAdultoSeguimentoEncounterType(),
             hivMetadata.getApplicationForLaboratoryResearch(),
             hivMetadata.getResultForBasiloscopia(),
-            commonMetadata.getNegative(),
-            commonMetadata.getNotFoundConcept());
+            commonMetadata.getNegative());
     return cd;
   }
 
@@ -2241,21 +2238,20 @@ public class TXTBCohortQueries {
       Concept applicationForLaboratoryResearch,
       Concept basiloscopiaExam,
       Concept positive,
-      Concept negative,
-      Concept notFound) {
+      Concept negative) {
 
     CohortDefinition basiloscopiaCohort =
         genericCohortQueries.generalSql(
             "basiloscopiaCohort",
             genericCohortQueries.getPatientsWithObsBetweenDates(
-                fichaClinica, basiloscopiaExam, Arrays.asList(negative, positive, notFound)));
+                fichaClinica, basiloscopiaExam, Arrays.asList(negative, positive)));
     addGeneralParameters(basiloscopiaCohort);
 
     CohortDefinition basiloscopiaLabCohort =
         genericCohortQueries.generalSql(
             "basiloscopiaLabCohort",
             genericCohortQueries.getPatientsWithObsBetweenDates(
-                laboratory, basiloscopiaExam, Arrays.asList(negative, positive, notFound)));
+                laboratory, basiloscopiaExam, Arrays.asList(negative, positive)));
     addGeneralParameters(basiloscopiaLabCohort);
 
     CompositionCohortDefinition definition = new CompositionCohortDefinition();
@@ -2278,8 +2274,10 @@ public class TXTBCohortQueries {
         "applicationForLaboratoryResearchCohort",
         EptsReportUtils.map(applicationForLaboratoryResearchCohort, generalParameterMapping));
 
+    definition.addSearch("mWRDCohort", EptsReportUtils.map(getmWRD(), generalParameterMapping));
+
     definition.setCompositionString(
-        "basiloscopiaCohort OR basiloscopiaLabCohort OR applicationForLaboratoryResearchCohort");
+        "(basiloscopiaCohort OR basiloscopiaLabCohort OR applicationForLaboratoryResearchCohort) AND NOT mWRDCohort");
     return definition;
   }
 
@@ -2294,21 +2292,20 @@ public class TXTBCohortQueries {
       EncounterType fichaClinica,
       Concept applicationForLaboratoryResearch,
       Concept basiloscopiaExam,
-      Concept positive,
-      Concept notFound) {
+      Concept positive) {
 
     CohortDefinition basiloscopiaCohort =
         genericCohortQueries.generalSql(
             "basiloscopiaCohort",
             genericCohortQueries.getPatientsWithObsBetweenDates(
-                fichaClinica, basiloscopiaExam, Arrays.asList(positive, notFound)));
+                fichaClinica, basiloscopiaExam, Arrays.asList(positive)));
     addGeneralParameters(basiloscopiaCohort);
 
     CohortDefinition basiloscopiaLabCohort =
         genericCohortQueries.generalSql(
             "basiloscopiaLabCohort",
             genericCohortQueries.getPatientsWithObsBetweenDates(
-                laboratory, basiloscopiaExam, Arrays.asList(positive, notFound)));
+                laboratory, basiloscopiaExam, Arrays.asList(positive)));
     addGeneralParameters(basiloscopiaLabCohort);
 
     CompositionCohortDefinition definition = new CompositionCohortDefinition();
