@@ -503,12 +503,6 @@ public class TxTbMonthlyCascadeCohortQueries {
 
     CohortDefinition haveTbLamTestResultOrRequestOrResult =
         getPatientsHaveTBLAMTestRequestOrResult();
-    CohortDefinition dontHaveGENEXPERTOrXpertMTBOrBaciloscopia =
-        getPatientsDontHaveGENEXPERTOrXpertMTBOrBaciloscopia();
-    CohortDefinition dontHaveApplication4LaboratoryResearch =
-        getPatientsDontHaveApplication4LaboratoryResearch();
-    CohortDefinition dontHaveGeneXpertWithAnyValueCodedPositive =
-        getPatientsDontHaveGeneXpertWithAnyValueCodedPositive();
 
     cd.addSearch(
         "haveTbLamTestResultOrRequestOrResult",
@@ -516,23 +510,17 @@ public class TxTbMonthlyCascadeCohortQueries {
             haveTbLamTestResultOrRequestOrResult,
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
-        "dontHaveGENEXPERTOrXpertMTBOrBaciloscopia",
+        "MWRD",
         EptsReportUtils.map(
-            dontHaveGENEXPERTOrXpertMTBOrBaciloscopia,
+            txtbCohortQueries.getmWRD(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
-        "dontHaveApplication4LaboratoryResearch",
+        "Smear",
         EptsReportUtils.map(
-            dontHaveApplication4LaboratoryResearch,
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "dontHaveGeneXpertWithAnyValueCodedPositive",
-        EptsReportUtils.map(
-            dontHaveGeneXpertWithAnyValueCodedPositive,
+            txtbCohortQueries.getSmearMicroscopyOnly(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString(
-        "haveTbLamTestResultOrRequestOrResult AND NOT (dontHaveGENEXPERTOrXpertMTBOrBaciloscopia AND dontHaveApplication4LaboratoryResearch AND dontHaveGeneXpertWithAnyValueCodedPositive )");
+    cd.setCompositionString("haveTbLamTestResultOrRequestOrResult AND NOT (MWRD OR Smear)");
     return cd;
   }
   /**
