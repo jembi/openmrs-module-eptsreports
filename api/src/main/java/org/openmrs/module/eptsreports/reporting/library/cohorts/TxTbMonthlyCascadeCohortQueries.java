@@ -241,6 +241,11 @@ public class TxTbMonthlyCascadeCohortQueries {
             others6B, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
+        SemearTbLamGXPertComposition.MWRD.getKey(),
+        EptsReportUtils.map(
+            txtbCohortQueries.getmWRD(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
         SemearTbLamGXPertComposition.MWRDPositve.getKey(),
         EptsReportUtils.map(
             genexPositve, "startDate=${startDate},endDate=${endDate},location=${location}"));
@@ -2534,6 +2539,22 @@ public class TxTbMonthlyCascadeCohortQueries {
         return "Select all patients from TX CURR";
       }
     },
+    MWRD {
+      @Override
+      public String getKey() {
+        return "MWRD";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
     MWRDPositve {
       @Override
       public String getKey() {
@@ -2705,12 +2726,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return " ( "
-            + MWRDPositve.getKey()
-            + " OR  "
-            + MWRDNegative.getKey()
-            + " ) AND "
-            + FIVE.getKey();
+        return MWRD.getKey() + "  AND " + FIVE.getKey();
       }
 
       @Override

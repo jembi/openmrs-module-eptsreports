@@ -1844,7 +1844,8 @@ public class TXTBCohortQueries {
             hivMetadata.getApplicationForLaboratoryResearch(),
             hivMetadata.getResultForBasiloscopia(),
             commonMetadata.getPositive(),
-            commonMetadata.getNegative());
+            commonMetadata.getNegative(),
+            tbMetadata.getNotFoundTestResultConcept());
     return cd;
   }
 
@@ -2238,13 +2239,14 @@ public class TXTBCohortQueries {
       Concept applicationForLaboratoryResearch,
       Concept basiloscopiaExam,
       Concept positive,
-      Concept negative) {
+      Concept negative,
+      Concept notFoundResult) {
 
     CohortDefinition basiloscopiaCohort =
         genericCohortQueries.generalSql(
             "basiloscopiaCohort",
             genericCohortQueries.getPatientsWithObsBetweenDates(
-                fichaClinica, basiloscopiaExam, Arrays.asList(negative, positive)));
+                fichaClinica, basiloscopiaExam, Arrays.asList(negative, positive, notFoundResult)));
     addGeneralParameters(basiloscopiaCohort);
 
     CohortDefinition basiloscopiaLabCohort =
