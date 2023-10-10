@@ -536,60 +536,30 @@ public class TxTbMonthlyCascadeCohortQueries {
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition withoutGeneXpertHaveTbLamOrRequestOnOthers =
-        getPatientsWithoutGeneXpertHaveTbLamOrRequestOnOthers();
-    CohortDefinition dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers =
-        getPatientsDontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers();
-    CohortDefinition dontHaveApplication4LaboratoryResearchOnOnthers =
-        getPatientsDontHaveApplication4LaboratoryResearchOnOnthers();
-    CohortDefinition dontHaveGeneXpertOnOnthers = getPatientsDontHaveGeneXpertOnOnthers();
+    CohortDefinition others = txtbCohortQueries.specimenSent();
     CohortDefinition semear = txtbCohortQueries.getSmearMicroscopyOnly();
     CohortDefinition tbLam = getPetientsHaveTBLAM();
-    CohortDefinition mwrdPositive = getPatientsGeneXpertMtbRif(tbMetadata.getPositiveConcept());
-    CohortDefinition mwrdNegative = getPatientsGeneXpertMtbRif(tbMetadata.getNegativeConcept());
+    CohortDefinition mWRD = txtbCohortQueries.getmWRD();
 
     cd.addSearch(
-        "withoutGeneXpertHaveTbLamOrRequestOnOthers",
+        "others",
         EptsReportUtils.map(
-            withoutGeneXpertHaveTbLamOrRequestOnOthers,
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            others, "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
-        "dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers",
-        EptsReportUtils.map(
-            dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers,
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "dontHaveApplication4LaboratoryResearchOnOnthers",
-        EptsReportUtils.map(
-            dontHaveApplication4LaboratoryResearchOnOnthers,
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "dontHaveGeneXpertOnOnthers",
-        EptsReportUtils.map(
-            dontHaveGeneXpertOnOnthers,
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "semearExclusion",
+        "semear",
         EptsReportUtils.map(
             semear, "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
-        "mwrdPositive",
-        EptsReportUtils.map(
-            mwrdPositive, "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "mwrdNegative",
-        EptsReportUtils.map(
-            mwrdNegative, "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "tblamExclusion",
+        "tbLam",
         EptsReportUtils.map(
             tbLam, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString(
-        "withoutGeneXpertHaveTbLamOrRequestOnOthers OR dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers AND NOT (semearExclusion OR mwrdPositive OR mwrdNegative OR tblamExclusion)");
+    cd.addSearch(
+        "mWRD",
+        EptsReportUtils.map(
+            mWRD, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("others AND NOT (semear OR mWRD OR tbLam)");
 
     return cd;
   }
