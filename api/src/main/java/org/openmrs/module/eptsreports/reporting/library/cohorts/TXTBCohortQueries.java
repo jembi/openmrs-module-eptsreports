@@ -2255,7 +2255,7 @@ public class TXTBCohortQueries {
         genericCohortQueries.generalSql(
             "basiloscopiaLabCohort",
             genericCohortQueries.getPatientsWithObsBetweenDates(
-                laboratory, basiloscopiaExam, Arrays.asList(negative, positive)));
+                laboratory, basiloscopiaExam, Arrays.asList(negative, positive, notFoundResult)));
     addGeneralParameters(basiloscopiaLabCohort);
 
     CompositionCohortDefinition definition = new CompositionCohortDefinition();
