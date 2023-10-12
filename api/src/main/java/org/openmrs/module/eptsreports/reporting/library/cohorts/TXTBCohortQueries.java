@@ -1959,7 +1959,9 @@ public class TXTBCohortQueries {
             tbMetadata.getTBGenexpertTestConcept(),
             tbMetadata.getTestTBLAM(),
             tbMetadata.getCultureTest(),
-            commonMetadata.getPositive());
+            tbMetadata.getTestXpertMtbUuidConcept(),
+            commonMetadata.getPositive(),
+            commonMetadata.getYesConcept());
     return cd;
   }
 
@@ -2437,7 +2439,9 @@ public class TXTBCohortQueries {
       Concept genexpertTest,
       Concept tbLamTest,
       Concept cultureTest,
-      Concept positive) {
+      Concept mtbTest,
+      Concept positive,
+      Concept yes) {
 
     CohortDefinition genexpertTestCohort =
         genericCohortQueries.generalSql(
@@ -2483,6 +2487,13 @@ public class TXTBCohortQueries {
                 fichaClinica, cultureTest, Arrays.asList(positive)));
     addGeneralParameters(cultureLabTestCohort);
 
+    CohortDefinition mtbTestCohort =
+        genericCohortQueries.generalSql(
+            "mtbTestCohort",
+            TXTBQueries.tbGenexpertTest(
+                laboratory.getEncounterTypeId(), mtbTest.getConceptId(), yes.getConceptId(), null));
+    addGeneralParameters(mtbTestCohort);
+
     CompositionCohortDefinition definition = new CompositionCohortDefinition();
     definition.setName("positiveResultsReturned()");
     addGeneralParameters(definition);
@@ -2503,9 +2514,11 @@ public class TXTBCohortQueries {
         "cultureTestCohort", EptsReportUtils.map(cultureTestCohort, generalParameterMapping));
     definition.addSearch(
         "cultureLabTestCohort", EptsReportUtils.map(cultureLabTestCohort, generalParameterMapping));
+    definition.addSearch(
+        "mtbTestCohort", EptsReportUtils.map(mtbTestCohort, generalParameterMapping));
 
     definition.setCompositionString(
-        "genexpertTestCohort OR genexpertLabTestCohort OR basiloscopiaExamCohort OR tbLamTestCohort OR tbLamLabTestCohort OR cultureTestCohort OR cultureLabTestCohort");
+        "genexpertTestCohort OR genexpertLabTestCohort OR basiloscopiaExamCohort OR tbLamTestCohort OR tbLamLabTestCohort OR cultureTestCohort OR cultureLabTestCohort OR mtbTestCohort");
     return definition;
   }
 
