@@ -818,6 +818,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
     map.put("307", hivMetadata.getResultForBasiloscopia().getConceptId());
     map.put("165189", tbMetadata.getTestXpertMtbUuidConcept().getConceptId());
+    map.put("1066", hivMetadata.getNoConcept().getConceptId());
     map.put("165184", tbMetadata.getNotFoundTestResultConcept().getConceptId());
 
     String query =
@@ -849,9 +850,9 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND e.encounter_type = ${13} "
             + "       AND e.location_id = :location "
             + "       AND ( ( o.concept_id IN ( ${307}, ${23723}, ${23774}, ${23951} ) "
-            + "               AND o.value_coded = ${664} ) "
+            + "               AND o.value_coded IN( ${664}, ${165184} ) "
             + "              OR ( o.concept_id = ${165189} "
-            + "                   AND o.value_coded = ${165184} ) ) "
+            + "                   AND o.value_coded = ${1066} ) ) "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP  BY p.patient_id";
 
