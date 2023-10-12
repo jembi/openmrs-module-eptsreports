@@ -212,10 +212,6 @@ public class TxTbMonthlyCascadeCohortQueries {
     CohortDefinition tbLam = getPetientsHaveTBLAM();
     CohortDefinition others = getPatientsInOthersWithoutGenexPert();
 
-    CohortDefinition semearPositiveResultOnly =
-        txtbCohortQueries.getSmearMicroscopyOnlyPositiveResult();
-    CohortDefinition semearNegativeResultOnly =
-        txtbCohortQueries.getSmearMicroscopyOnlyNegativeResult();
     CohortDefinition semear = txtbCohortQueries.getSmearMicroscopyOnly();
 
     cd.addSearch(
@@ -226,18 +222,6 @@ public class TxTbMonthlyCascadeCohortQueries {
         SemearTbLamGXPertComposition.SEMEAR.getKey(),
         EptsReportUtils.map(
             semear, "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
-        SemearTbLamGXPertComposition.SEMEARPositive.getKey(),
-        EptsReportUtils.map(
-            semearPositiveResultOnly,
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
-        SemearTbLamGXPertComposition.SEMEARNegative.getKey(),
-        EptsReportUtils.map(
-            semearNegativeResultOnly,
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         SemearTbLamGXPertComposition.TBLAM.getKey(),
@@ -834,7 +818,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
     map.put("307", hivMetadata.getResultForBasiloscopia().getConceptId());
     map.put("165189", tbMetadata.getTestXpertMtbUuidConcept().getConceptId());
-    map.put("1066", hivMetadata.getNoConcept().getConceptId());
+    map.put("165184", tbMetadata.getNotFoundTestResultConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id "
@@ -867,7 +851,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND ( ( o.concept_id IN ( ${307}, ${23723}, ${23774}, ${23951} ) "
             + "               AND o.value_coded = ${664} ) "
             + "              OR ( o.concept_id = ${165189} "
-            + "                   AND o.value_coded = ${1066} ) ) "
+            + "                   AND o.value_coded = ${165184} ) ) "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP  BY p.patient_id";
 
@@ -2449,38 +2433,6 @@ public class TxTbMonthlyCascadeCohortQueries {
       }
     },
 
-    SEMEARPositive {
-      @Override
-      public String getKey() {
-        return "SEMEARPositiveOnly";
-      }
-
-      @Override
-      public String getCompositionString() {
-        return getKey();
-      }
-
-      @Override
-      public String getName() {
-        return "Select all patients from TX CURR";
-      }
-    },
-    SEMEARNegative {
-      @Override
-      public String getKey() {
-        return "SEMEARNegativeOnly";
-      }
-
-      @Override
-      public String getCompositionString() {
-        return getKey();
-      }
-
-      @Override
-      public String getName() {
-        return "Select all patients from TX CURR";
-      }
-    },
     SIXA {
       @Override
       public String getKey() {
@@ -2741,7 +2693,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + " AND NOT "
             + SIXA.getKey()
             + " AND "
-            + SEMEARNegative.getKey();
+            + SEMEAR.getKey();
       }
 
       @Override
