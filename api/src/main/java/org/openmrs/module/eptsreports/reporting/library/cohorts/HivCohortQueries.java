@@ -31,10 +31,7 @@ import static org.openmrs.module.eptsreports.reporting.calculation.generic.Targe
 
 import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
-import org.openmrs.EncounterType;
-import org.openmrs.Location;
-import org.openmrs.Program;
-import org.openmrs.ProgramWorkflowState;
+import org.openmrs.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation;
@@ -909,6 +906,164 @@ public class HivCohortQueries {
             + " GROUP BY considered_transferred.patient_id "
             + " ) final "
             + " WHERE  final.max_date  <= :endDate  ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    definition.setQuery(stringSubstitutor.replace(query));
+
+    return definition;
+  }
+
+  /** Enumeration to return the Gender or Gender Composition formats for Key Population */
+  public enum KeyPopulationGenderSelection {
+    MALE {
+      @Override
+      public String getGender() {
+        return " 'M' ";
+      }
+    },
+
+    FEMALE {
+      @Override
+      public String getGender() {
+        return " 'F' ";
+      }
+    },
+
+    ALL {
+      @Override
+      public String getGender() {
+        return MALE.getGender() + "," + FEMALE.getGender();
+      }
+    };
+
+    public abstract String getGender();
+  }
+
+  /**
+   * Method to return the Correspondent value of Key Population Concept on Demographic module
+   *
+   * @param concept Key Population Concept
+   * @return {@link String}
+   */
+  private String getKeyPopulationValueBasedOnConceptForPersonAttribute(Concept concept) {
+
+    Map<Concept, String> map = new HashMap<>();
+    map.put(hivMetadata.getHomosexualConcept(), "'MSM','HSH'");
+    map.put(hivMetadata.getDrugUseConcept(), "'PID'");
+    map.put(hivMetadata.getImprisonmentConcept(), "'PRISONER','RC','REC'");
+    map.put(hivMetadata.getSexWorkerConcept(), "'CSW','TS','MTS','FSW','MSW'");
+    map.put(hivMetadata.getTransGenderConcept(), "'TG'");
+    map.put(hivMetadata.getOtherOrNonCodedConcept(), "'OUTRO'");
+
+    return map.get(concept);
+  }
+
+  public CohortDefinition getKeyPopulationDisag(
+      Concept keyPopConcept, KeyPopulationGenderSelection gender) {
+
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("");
+    definition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    definition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put(
+        "17", hivMetadata.getIdentificadorDefinidoLocalmente01().getPersonAttributeTypeId());
+    valuesMap.put(
+        "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("23703", hivMetadata.getKeyPopulationConcept().getConceptId());
+    valuesMap.put("keypop", keyPopConcept.getConceptId());
+
+    String query =
+        "SELECT p.person_id "
+            + "FROM   person p "
+            + "       LEFT JOIN encounter e "
+            + "              ON e.patient_id = p.person_id "
+            + "       LEFT JOIN obs o "
+            + "              ON o.encounter_id = e.encounter_id "
+            + "       LEFT JOIN person_attribute pa "
+            + "              ON p.person_id = pa.person_id "
+            + "       LEFT JOIN person_attribute_type pat "
+            + "              ON pa.person_attribute_type_id = pat.person_attribute_type_id "
+            + "       INNER JOIN (SELECT last_kp.patient_id, "
+            + "                          Max(last_kp.last_date) AS most_recent "
+            + "                   FROM   (SELECT p.person_id          AS patient_id, "
+            + "                                  Max(pa.date_created) AS last_date "
+            + "                           FROM   person p "
+            + "                                  INNER JOIN person_attribute pa "
+            + "                                          ON p.person_id = pa.person_id "
+            + "                                  INNER JOIN person_attribute_type pat "
+            + "                                          ON pa.person_attribute_type_id = "
+            + "                                             pat.person_attribute_type_id "
+            + "                           WHERE  p.voided = 0 "
+            + "                                  AND pa.person_attribute_type_id = ${17} "
+            + "                                  AND pa.value IN ( 'HSH', 'PID','MTS','REC','MSM','HSH','PRISONER','RC','CSW','TS','MTS','FSW','MSW','HTS') "
+            + "                           GROUP  BY p.person_id "
+            + "                           UNION "
+            + "                           SELECT p.patient_id AS patient_id, "
+            + "                                  Max(e.encounter_datetime) AS last_date "
+            + "                           FROM   patient p "
+            + "                                  INNER JOIN encounter e "
+            + "                                          ON e.patient_id = p.patient_id "
+            + "                                  INNER JOIN obs o "
+            + "                                          ON o.encounter_id = e.encounter_id "
+            + "                           WHERE  e.voided = 0 "
+            + "                                  AND p.voided = 0 "
+            + "                                  AND o.voided = 0 "
+            + "                                  AND e.location_id = :location "
+            + "                                  AND e.encounter_type IN ( ${6}, ${35} ) "
+            + "                                  AND o.concept_id = ${23703} "
+            + "                                  AND o.value_coded IS NOT NULL "
+            + "                                  AND e.encounter_datetime <= :endDate "
+            + "                           GROUP  BY p.patient_id) last_kp "
+            + "                   GROUP  BY last_kp.patient_id) kp_result "
+            + "               ON kp_result.patient_id = p.person_id "
+            + "WHERE  ( e.voided = 0 "
+            + "         AND p.voided = 0 "
+            + "         AND e.location_id = :location "
+            + "         AND o.voided = 0 "
+            + "         AND p.gender IN ( "
+            + gender.getGender()
+            + " ) "
+            + "         AND o.concept_id = ${23703} "
+            + "         AND o.value_coded = ${keypop} "
+            + "         AND e.encounter_datetime = kp_result.most_recent "
+            + "         AND ( ( e.encounter_type = ${6} ) "
+            + "                OR ( e.encounter_type = ${35} "
+            + "                     AND NOT EXISTS(SELECT e2.patient_id "
+            + "                                    FROM   encounter e2 "
+            + "                                           INNER JOIN obs o2 "
+            + "                                                   ON e2.encounter_id = "
+            + "                                                      o2.encounter_id "
+            + "                                    WHERE  e2.encounter_type = ${6} "
+            + "                                           AND o2.concept_id = ${23703} "
+            + "                                           AND o2.value_coded IS NOT NULL "
+            + "                                           AND e2.encounter_datetime = "
+            + "                                               kp_result.most_recent "
+            + "                                           AND e2.patient_id = p.person_id) ) ) "
+            + "       ) "
+            + "        OR ( p.voided = 0 "
+            + "             AND pa.person_attribute_type_id = ${17} "
+            + "         AND p.gender IN ( "
+            + gender.getGender()
+            + " ) "
+            + "             AND pa.value IN ( "
+            + getKeyPopulationValueBasedOnConceptForPersonAttribute(keyPopConcept)
+            + " ) "
+            + "             AND pa.date_created = kp_result.most_recent "
+            + "             AND NOT EXISTS(SELECT e2.patient_id "
+            + "                            FROM   encounter e2 "
+            + "                                   INNER JOIN obs o2 "
+            + "                                           ON e2.encounter_id = o2.encounter_id "
+            + "                            WHERE  e2.encounter_type IN ( ${6}, ${35} ) "
+            + "                                   AND o2.concept_id = ${23703} "
+            + "                                   AND o2.value_coded IS NOT NULL "
+            + "                                   AND e2.encounter_datetime = "
+            + "                                       kp_result.most_recent "
+            + "                                   AND e2.patient_id = p.person_id) ) "
+            + "GROUP  BY p.person_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
