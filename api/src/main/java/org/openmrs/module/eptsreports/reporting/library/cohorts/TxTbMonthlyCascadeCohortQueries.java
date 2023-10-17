@@ -1827,6 +1827,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "                                         AND o.concept_id = ${1190} "
             + "                                         AND e.location_id = :location "
             + "                                         AND o.value_datetime <= :endDate "
+            + "                                         AND o.voided = 0 "
             + "                                         AND e.voided = 0 "
             + "                                         AND p.voided = 0 "
             + "                                  GROUP  BY p.patient_id "
