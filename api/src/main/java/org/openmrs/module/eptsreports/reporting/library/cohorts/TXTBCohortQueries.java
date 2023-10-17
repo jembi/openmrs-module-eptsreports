@@ -2331,10 +2331,9 @@ public class TXTBCohortQueries {
     definition.addSearch(
         "applicationForLaboratoryResearchCohort",
         EptsReportUtils.map(applicationForLaboratoryResearchCohort, generalParameterMapping));
-    definition.addSearch("mWRDCohort", EptsReportUtils.map(getmWRD(), generalParameterMapping));
 
     definition.setCompositionString(
-        "(basiloscopiaCohort OR basiloscopiaLabCohort OR applicationForLaboratoryResearchCohort) AND NOT mWRDCohort");
+        "basiloscopiaCohort OR basiloscopiaLabCohort OR applicationForLaboratoryResearchCohort");
     return definition;
   }
 
