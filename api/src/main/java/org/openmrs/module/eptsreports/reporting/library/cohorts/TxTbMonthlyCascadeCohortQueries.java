@@ -252,7 +252,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     cd.addSearch(
         TxTbComposition.NUMERATOR.getKey(),
         EptsReportUtils.map(
-            txtbCohortQueries.patientsPreviouslyOnARTNumerator(),
+            patientsPreviouslyOnARTNumerator(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(semearTbLamGXPertComposition.getCompositionString());
@@ -325,6 +325,26 @@ public class TxTbMonthlyCascadeCohortQueries {
         EptsReportUtils.map(transferredFromFichaResumo, "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("startedArtLast6Months");
+    return cd;
+  }
+
+  public CohortDefinition patientsPreviouslyOnARTNumerator() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients PreviouslyOnARTNumerator");
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    CohortDefinition NUM = txtbCohortQueries.txTbNumerator();
+
+    cd.addSearch(
+        "TXTB-NUM",
+        EptsReportUtils.map(NUM, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "started-before-start-reporting-period",
+        EptsReportUtils.map(
+            getPatientsOnArtBeforeEndDate(), "endDate=${endDate},location=${location}"));
+    cd.setCompositionString("TXTB-NUM AND started-before-start-reporting-period");
+
     return cd;
   }
   /**
