@@ -432,15 +432,19 @@ public class EptsCommonDimension {
     dim.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     dim.addParameter(new Parameter("onOrBefore", "orOrBefore", Date.class));
     dim.addParameter(new Parameter("location", "Location", Location.class));
-    CohortDefinition drugUserKeyPopCohort = hivCohortQueries.getDrugUserKeyPopCohort();
+    CohortDefinition drugUserKeyPopCohort =
+        hivCohortQueries.getKeyPopulationDisag(
+            hivMetadata.getDrugUseConcept(), HivCohortQueries.KeyPopulationGenderSelection.ALL);
     CohortDefinition homosexualKeyPopCohort = hivCohortQueries.getMaleHomosexualKeyPopDefinition();
-    CohortDefinition imprisonmentKeyPopCohort = hivCohortQueries.getImprisonmentKeyPopCohort();
+    CohortDefinition imprisonmentKeyPopCohort =
+        hivCohortQueries.getImprisonmentKeyPopCohortDefinition();
     CohortDefinition femaleSexWorkerKeyPopCohort =
         hivCohortQueries.getFemaleSexWorkersKeyPopCohortDefinition();
     CohortDefinition maleSexWorkerKeyPopCohort =
         hivCohortQueries.getMaleSexWorkersKeyPopCohortDefinition();
-    CohortDefinition transgenderKeyPopCohort = hivCohortQueries.getTransgenderKeyPopCohort();
-    CohortDefinition sexWorkersKeyPopCohort = hivCohortQueries.getSexWorkerKeyPopCohort();
+    CohortDefinition transgenderKeyPopCohort =
+        hivCohortQueries.getTransgenderKeyPopCohortDefinition();
+    CohortDefinition sexWorkersKeyPopCohort = hivCohortQueries.getSexWorkerKeyPopCohortDefinition();
     dim.addCohortDefinition("PID", mapStraightThrough(drugUserKeyPopCohort));
     dim.addCohortDefinition("MSM", mapStraightThrough(homosexualKeyPopCohort));
     dim.addCohortDefinition("CSW", mapStraightThrough(femaleSexWorkerKeyPopCohort));
