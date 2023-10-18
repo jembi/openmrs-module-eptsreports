@@ -3209,55 +3209,8 @@ public class IntensiveMonitoringCohortQueries {
         break;
     }
 
-    if (flag == 1 || flag == 2) {
-      cd.addSearch(
-          "AGE",
-          EptsReportUtils.map(
-              genericCohortQueries.getAgeOnFirstClinicalConsultation(15, null),
-              "onOrAfter=${revisionEndDate-2m+1d},onOrBefore=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
-    } else if (flag == 3 || flag == 4) {
-      cd.addSearch(
-          "AGE",
-          EptsReportUtils.map(
-              genericCohortQueries.getAgeOnFirstClinicalConsultation(0, 14),
-              "onOrAfter=${revisionEndDate-2m+1d},onOrBefore=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
-    }
-
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    String inclusionPeriodMappings =
-        "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}";
-
-    cd.addSearch(
-        "A",
-        EptsReportUtils.map(
-            qualityImprovement2020CohortQueries.getFirstClinicalConsultationDuringInclusionPeriod(),
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
-    cd.addSearch(
-        "C",
-        EptsReportUtils.map(
-            commonCohortQueries.getMOHPregnantORBreastfeeding(
-                commonMetadata.getPregnantConcept().getConceptId(),
-                hivMetadata.getYesConcept().getConceptId()),
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
-    cd.addSearch(
-        "D",
-        EptsReportUtils.map(
-            commonCohortQueries.getMOHPregnantORBreastfeeding(
-                commonMetadata.getBreastfeeding().getConceptId(),
-                hivMetadata.getYesConcept().getConceptId()),
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
-    cd.addSearch(
-        "E",
-        EptsReportUtils.map(
-            QualityImprovement2020Queries.getTransferredInPatients(
-                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-                hivMetadata.getPatientFoundYesConcept().getConceptId(),
-                hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-                hivMetadata.getArtStatus().getConceptId()),
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
 
     cd.addSearch(
         "requestCd4",
@@ -3271,29 +3224,36 @@ public class IntensiveMonitoringCohortQueries {
         EptsReportUtils.map(
             qualityImprovement2020CohortQueries
                 .getCd4ResultAfterFirstConsultationOnInclusionPeriod(),
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-        "pregnantOnPeriod",
+        "denominatorOne",
         EptsReportUtils.map(
-            qualityImprovement2020CohortQueries.getMOHPregnantORBreastfeedingOnClinicalConsultation(
-                commonMetadata.getPregnantConcept().getConceptId(),
-                hivMetadata.getYesConcept().getConceptId()),
-            "revisionEndDate={revisionEndDate},startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
-    cd.addSearch(
-        "breastfeedingOnPeriod",
-        EptsReportUtils.map(
-            qualityImprovement2020CohortQueries.getMOHPregnantORBreastfeedingOnClinicalConsultation(
-                commonMetadata.getBreastfeeding().getConceptId(),
-                hivMetadata.getYesConcept().getConceptId()),
-            "revisionEndDate={revisionEndDate},startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
+            getMQ9Den(1), "revisionEndDate=${revisionEndDate},location=${location}"));
 
-    if (flag == 1 || flag == 3) {
-      cd.setCompositionString(
-          "((A OR breastfeedingOnPeriod OR D) AND requestCd4) AND NOT (C OR E OR pregnantOnPeriod) AND AGE");
-    } else if (flag == 2 || flag == 4) {
-      cd.setCompositionString(
-          "((A OR breastfeedingOnPeriod OR D) AND resultCd4) AND NOT (C OR E OR pregnantOnPeriod) AND AGE");
+    cd.addSearch(
+        "denominatorTwo",
+        EptsReportUtils.map(
+            getMQ9Den(2), "revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "denominatorThree",
+        EptsReportUtils.map(
+            getMQ9Den(3), "revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "denominatorFour",
+        EptsReportUtils.map(
+            getMQ9Den(4), "revisionEndDate=${revisionEndDate},location=${location}"));
+
+    if (flag == 1) {
+      cd.setCompositionString("denominatorOne AND requestCd4");
+    } else if (flag == 2) {
+      cd.setCompositionString("denominatorTwo AND resultCd4");
+    } else if (flag == 3) {
+      cd.setCompositionString("denominatorThree AND requestCd4");
+    } else if (flag == 4) {
+      cd.setCompositionString("denominatorFour AND resultCd4");
     }
 
     return cd;
