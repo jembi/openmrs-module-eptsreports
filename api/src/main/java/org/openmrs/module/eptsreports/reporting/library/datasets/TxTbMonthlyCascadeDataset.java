@@ -743,7 +743,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
             "SEVENOTHER",
             EptsReportUtils.map(
                 txTbMonthlyCascadeCohortQueries.get5And6and7(
-                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition.SEVEN_AND_TBLAM),
+                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition.SEVEN_AND_OTHER),
                 "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
     cohortIndicatorDefinition.addColumn(
         "SEVENOTHER",
