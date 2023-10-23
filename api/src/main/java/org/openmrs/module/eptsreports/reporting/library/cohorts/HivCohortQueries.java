@@ -254,6 +254,28 @@ public class HivCohortQueries {
   }
 
   /**
+   * Get People who inject drugs (PID)
+   *
+   * @return @{@link CohortDefinition}
+   */
+  public CohortDefinition getDrugUserKeyPopCohort() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("People who inject drugs");
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    cd.addSearch(
+        "PID",
+        EptsReportUtils.map(
+            getKeyPopulationDisag(
+                hivMetadata.getDrugUseConcept(), KeyPopulationGenderSelection.ALL),
+            "endDate=${endDate},location=${location}"));
+    cd.setCompositionString("PID");
+
+    return cd;
+  }
+
+  /**
    * Get male patients who have sex with men
    *
    * @return @{@link CohortDefinition}
@@ -273,23 +295,6 @@ public class HivCohortQueries {
     comp.addSearch("PID", Mapped.mapStraightThrough(getDrugUserKeyPopCohort()));
     comp.setCompositionString("HOMOSEXUAL AND NOT PID");
     return comp;
-  }
-
-  public CohortDefinition getDrugUserKeyPopCohort() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("People who inject drugs");
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
-
-    cd.addSearch(
-        "PID",
-        EptsReportUtils.map(
-            getKeyPopulationDisag(
-                hivMetadata.getDrugUseConcept(), KeyPopulationGenderSelection.ALL),
-            "endDate=${endDate},location=${location}"));
-    cd.setCompositionString("PID");
-
-    return cd;
   }
 
   public CohortDefinition getImprisonmentKeyPopCohort() {
@@ -329,6 +334,7 @@ public class HivCohortQueries {
             getKeyPopulationDisag(
                 hivMetadata.getTransGenderConcept(),
                 HivCohortQueries.KeyPopulationGenderSelection.ALL)));
+
     cd.addSearch("CSW", Mapped.mapStraightThrough(getFemaleSexWorkersKeyPopCohortDefinition()));
 
     cd.addSearch("HOMOSEXUAL", Mapped.mapStraightThrough(getMaleHomosexualKeyPopDefinition()));
@@ -439,29 +445,11 @@ public class HivCohortQueries {
     comp.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     comp.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     comp.addParameter(new Parameter("location", "location", Location.class));
-    comp.addSearch(
-        "SW",
-        EptsReportUtils.map(
-            getKeyPopulationDisag(
-                hivMetadata.getSexWorkerConcept(), KeyPopulationGenderSelection.ALL),
-            "endDate=${onOrBefore},location=${location}"));
+    comp.addSearch("FSW", Mapped.mapStraightThrough(getFemaleSexWorkersKeyPopCohortDefinition()));
 
-    comp.addSearch(
-        "HOMOSEXUAL",
-        EptsReportUtils.map(
-            getKeyPopulationDisag(
-                hivMetadata.getHomosexualConcept(),
-                HivCohortQueries.KeyPopulationGenderSelection.MALE),
-            "endDate=${onOrBefore},location=${location}"));
+    comp.addSearch("MSW", Mapped.mapStraightThrough(getMaleSexWorkersKeyPopCohortDefinition()));
 
-    comp.addSearch(
-        "PID",
-        EptsReportUtils.map(
-            getKeyPopulationDisag(
-                hivMetadata.getDrugUseConcept(), KeyPopulationGenderSelection.ALL),
-            "endDate=${onOrBefore},location=${location}"));
-
-    comp.setCompositionString("SW AND NOT (HOMOSEXUAL OR PID)");
+    comp.setCompositionString("MSW OR FSW");
 
     return comp;
   }
@@ -474,37 +462,20 @@ public class HivCohortQueries {
   public CohortDefinition getMaleSexWorkersKeyPopCohortDefinition() {
     CompositionCohortDefinition comp = new CompositionCohortDefinition();
     comp.setName("Only Male sex workers");
-    comp.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    comp.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    comp.addParameter(new Parameter("endDate", "endDate", Date.class));
     comp.addParameter(new Parameter("location", "location", Location.class));
-    comp.addSearch(
-        "CSW",
-        EptsReportUtils.map(
-            getKeyPopulationDisag(
-                hivMetadata.getSexWorkerConcept(), KeyPopulationGenderSelection.FEMALE),
-            "endDate=${onOrBefore},location=${location}"));
-    comp.addSearch(
-        "HOMOSEXUAL",
-        EptsReportUtils.map(
-            getKeyPopulationDisag(
-                hivMetadata.getHomosexualConcept(),
-                HivCohortQueries.KeyPopulationGenderSelection.MALE),
-            "endDate=${onOrBefore},location=${location}"));
-    comp.addSearch(
-        "PID",
-        EptsReportUtils.map(
-            getKeyPopulationDisag(
-                hivMetadata.getDrugUseConcept(), KeyPopulationGenderSelection.ALL),
-            "endDate=${onOrBefore},location=${location}"));
+
+    comp.addSearch("HOMOSEXUAL", Mapped.mapStraightThrough(getMaleHomosexualKeyPopDefinition()));
+
+    comp.addSearch("PID", Mapped.mapStraightThrough(getDrugUserKeyPopCohort()));
 
     comp.addSearch(
         "MSW",
-        EptsReportUtils.map(
+        Mapped.mapStraightThrough(
             getKeyPopulationDisag(
-                hivMetadata.getSexWorkerConcept(), KeyPopulationGenderSelection.MALE),
-            "endDate=${onOrBefore},location=${location}"));
+                hivMetadata.getSexWorkerConcept(), KeyPopulationGenderSelection.MALE)));
 
-    comp.setCompositionString("MSW AND NOT (CSW OR HOMOSEXUAL OR PID)");
+    comp.setCompositionString("MSW AND NOT (HOMOSEXUAL OR PID)");
     return comp;
   }
 
