@@ -268,14 +268,12 @@ public class HivCohortQueries {
     comp.addParameter(new Parameter("location", "location", Location.class));
     comp.addSearch(
         "HOMOSEXUAL",
-        EptsReportUtils.map(
-            getKeyPopulationDisag(
+        Mapped.mapStraightThrough(getKeyPopulationDisag(
                 hivMetadata.getHomosexualConcept(),
-                HivCohortQueries.KeyPopulationGenderSelection.MALE),
-            "endDate=${endDate},location=${location}"));
+                HivCohortQueries.KeyPopulationGenderSelection.MALE)));
     comp.addSearch(
         "PID",
-        EptsReportUtils.map(getDrugUserKeyPopCohort(), "endDate=${endDate},location=${location}"));
+        Mapped.mapStraightThrough(getDrugUserKeyPopCohort()));
     comp.setCompositionString("HOMOSEXUAL AND NOT PID");
     return comp;
   }
@@ -309,7 +307,7 @@ public class HivCohortQueries {
 
     cd.addSearch(
         "PID",
-        EptsReportUtils.map(getDrugUserKeyPopCohort(), "endDate=${endDate},location=${location}"));
+       Mapped.mapStraightThrough(getDrugUserKeyPopCohort()));
 
     cd.addSearch(
         "REC",
