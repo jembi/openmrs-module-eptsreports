@@ -275,9 +275,8 @@ public class HivCohortQueries {
   public CohortDefinition getMaleHomosexualKeyPopDefinition() {
 
     CompositionCohortDefinition comp = new CompositionCohortDefinition();
-    comp.setName("Outro");
-    comp.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    comp.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    comp.setName("Homosexual Key Pop");
+    comp.addParameter(new Parameter("endDate", "end Date", Date.class));
     comp.addParameter(new Parameter("location", "location", Location.class));
     comp.addSearch(
         "HOMOSEXUAL",
@@ -285,12 +284,12 @@ public class HivCohortQueries {
             getKeyPopulationDisag(
                 hivMetadata.getHomosexualConcept(),
                 HivCohortQueries.KeyPopulationGenderSelection.MALE),
-            "endDate=${onOrBefore},location=${location}"));
+            "endDate=${endDate},location=${location}"));
     comp.addSearch(
         "PID",
         EptsReportUtils.map(
                 getDrugUserKeyPopCohort(),
-            "endDate=${onOrBefore},location=${location}"));
+            "endDate=${endDate},location=${location}"));
     comp.setCompositionString("HOMOSEXUAL AND NOT PID");
     return comp;
   }
