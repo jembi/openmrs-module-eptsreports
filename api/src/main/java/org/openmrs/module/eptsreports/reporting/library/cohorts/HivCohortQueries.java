@@ -998,6 +998,7 @@ public class HivCohortQueries {
     valuesMap.put(
         "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("23703", hivMetadata.getKeyPopulationConcept().getConceptId());
+    valuesMap.put("5622", hivMetadata.getOtherOrNonCodedConcept().getConceptId());
     valuesMap.put("keypop", keyPopConcept.getConceptId());
 
     String query =
@@ -1039,7 +1040,7 @@ public class HivCohortQueries {
             + "                                  AND e.location_id = :location "
             + "                                  AND e.encounter_type IN ( ${6}, ${35} ) "
             + "                                  AND o.concept_id = ${23703} "
-            + "                                  AND o.value_coded IS NOT NULL "
+            + "                                  AND o.value_coded <> ${5622}  "
             + "                                  AND e.encounter_datetime <= :endDate "
             + "                           GROUP  BY p.patient_id) last_kp "
             + "                   GROUP  BY last_kp.patient_id) kp_result "
@@ -1063,7 +1064,7 @@ public class HivCohortQueries {
             + "                                                      o2.encounter_id "
             + "                                    WHERE  e2.encounter_type = ${6} "
             + "                                           AND o2.concept_id = ${23703} "
-            + "                                           AND o2.value_coded IS NOT NULL "
+            + "                                           AND o2.value_coded <> ${5622} "
             + "                                           AND e2.encounter_datetime = "
             + "                                               kp_result.most_recent "
             + "                                           AND e2.patient_id = p.person_id) ) ) "
@@ -1083,7 +1084,7 @@ public class HivCohortQueries {
             + "                                           ON e2.encounter_id = o2.encounter_id "
             + "                            WHERE  e2.encounter_type IN ( ${6}, ${35} ) "
             + "                                   AND o2.concept_id = ${23703} "
-            + "                                   AND o2.value_coded IS NOT NULL "
+            + "                                   AND o2.value_coded <> ${5622} "
             + "                                   AND e2.encounter_datetime = "
             + "                                       kp_result.most_recent "
             + "                                   AND e2.patient_id = p.person_id) ) "
