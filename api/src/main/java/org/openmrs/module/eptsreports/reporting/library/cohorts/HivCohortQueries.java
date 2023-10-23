@@ -256,16 +256,7 @@ public class HivCohortQueries {
         artProgram.getProgramId(), state.getProgramWorkflowStateId());
   }
 
-  public CohortDefinition getHomosexualKeyPopCohort() {
-    CalculationCohortDefinition cd = new CalculationCohortDefinition();
-    cd.setCalculation(Context.getRegisteredComponents(KeyPopulationCalculation.class).get(0));
-    cd.setName("Men who have sex with men");
-    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
-    cd.addCalculationParameter(TYPE, HOMOSEXUAL);
-    return cd;
-  }
+
 
   /**
    * Get male patients who have sex with men
