@@ -35,7 +35,7 @@ public class HivCohortQueriesTest extends DefinitionsTest {
 
   @Test
   public void getSexWorkerKeyPopCohortShouldReturn() throws EvaluationException {
-    CohortDefinition cohort = hivCohortQueries.getSexWorkerKeyPopCohort();
+    CohortDefinition cohort = hivCohortQueries.getSexWorkerKeyPopCohortDefinition();
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohort);
 
     assertEquals(1, evaluatedCohort.size());
