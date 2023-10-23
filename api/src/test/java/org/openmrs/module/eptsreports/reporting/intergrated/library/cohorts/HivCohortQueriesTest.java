@@ -24,8 +24,6 @@ public class HivCohortQueriesTest extends DefinitionsTest {
     executeDataSet("hivCohortQueriesTest.xml");
   }
 
-
-
   @Test
   public void getDrugUserKeyPopCohortShouldReturn() throws EvaluationException {
     CohortDefinition cohort = hivCohortQueries.getDrugUserKeyPopCohort();

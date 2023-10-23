@@ -436,8 +436,7 @@ public class EptsCommonDimension {
         hivCohortQueries.getKeyPopulationDisag(
             hivMetadata.getDrugUseConcept(), HivCohortQueries.KeyPopulationGenderSelection.ALL);
     CohortDefinition homosexualKeyPopCohort = hivCohortQueries.getMaleHomosexualKeyPopDefinition();
-    CohortDefinition imprisonmentKeyPopCohort =
-        hivCohortQueries.getImprisonmentKeyPopCohortDefinition();
+    CohortDefinition imprisonmentKeyPopCohort = hivCohortQueries.getImprisonmentKeyPopCohort();
     CohortDefinition femaleSexWorkerKeyPopCohort =
         hivCohortQueries.getFemaleSexWorkersKeyPopCohortDefinition();
     CohortDefinition maleSexWorkerKeyPopCohort =
