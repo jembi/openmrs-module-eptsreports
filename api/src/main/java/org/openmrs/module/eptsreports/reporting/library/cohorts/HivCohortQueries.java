@@ -13,8 +13,6 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.OUTRO;
-import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.TYPE;
 import static org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation.TIPO;
 import static org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation.TargetGroup.ADOLESCENT_AND_YOUTH;
 import static org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation.TargetGroup.BREASTFEEDING;
@@ -29,7 +27,6 @@ import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
-import org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.library.queries.ResumoMensalQueries;
@@ -303,7 +300,7 @@ public class HivCohortQueries {
 
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
-    cd.addSearch("CSW", Mapped.mapStraightThrough(getFemaleSexWorkersKeyPopCohortDefinition()));
+    cd.addSearch("SW", Mapped.mapStraightThrough(getSexWorkerKeyPopCohortDefinition()));
 
     cd.addSearch("HOMOSEXUAL", Mapped.mapStraightThrough(getMaleHomosexualKeyPopDefinition()));
 
@@ -316,12 +313,12 @@ public class HivCohortQueries {
                 hivMetadata.getImprisonmentConcept(),
                 HivCohortQueries.KeyPopulationGenderSelection.ALL)));
 
-    cd.setCompositionString("REC AND NOT (CSW OR HOMOSEXUAL OR PID)");
+    cd.setCompositionString("REC AND NOT (SW OR HOMOSEXUAL OR PID)");
 
     return cd;
   }
 
-  public CohortDefinition getTransgenderKeyPopCohort() {
+  public CohortDefinition getTransgenderKeyPopCohortDefinition() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("People in prison and other closed settings");
 
@@ -335,7 +332,7 @@ public class HivCohortQueries {
                 hivMetadata.getTransGenderConcept(),
                 HivCohortQueries.KeyPopulationGenderSelection.ALL)));
 
-    cd.addSearch("CSW", Mapped.mapStraightThrough(getFemaleSexWorkersKeyPopCohortDefinition()));
+    cd.addSearch("SW", Mapped.mapStraightThrough(getSexWorkerKeyPopCohortDefinition()));
 
     cd.addSearch("HOMOSEXUAL", Mapped.mapStraightThrough(getMaleHomosexualKeyPopDefinition()));
 
@@ -343,19 +340,8 @@ public class HivCohortQueries {
 
     cd.addSearch("REC", Mapped.mapStraightThrough(getImprisonmentKeyPopCohort()));
 
-    cd.setCompositionString("TRANSGENDER AND NOT (REC OR CSW OR HOMOSEXUAL OR PID)");
+    cd.setCompositionString("TRANSGENDER AND NOT (REC OR SW OR HOMOSEXUAL OR PID)");
 
-    return cd;
-  }
-
-  public CohortDefinition getOutroKeyPopCohort() {
-    CalculationCohortDefinition cd = new CalculationCohortDefinition();
-    cd.setCalculation(Context.getRegisteredComponents(KeyPopulationCalculation.class).get(0));
-    cd.setName("Outro");
-    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
-    cd.addCalculationParameter(TYPE, OUTRO);
     return cd;
   }
 
@@ -382,59 +368,6 @@ public class HivCohortQueries {
   }
 
   /**
-   * Get Transgender Patients
-   *
-   * @return @{@link CohortDefinition}
-   */
-  public CohortDefinition getTransgenderKeyPopCohortDefinition() {
-    CompositionCohortDefinition comp = new CompositionCohortDefinition();
-    comp.setName("Get Patients marked as Transgender Key Population ");
-    comp.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    comp.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
-    comp.addParameter(new Parameter("location", "location", Location.class));
-    comp.addSearch(
-        "SW",
-        EptsReportUtils.map(
-            getKeyPopulationDisag(
-                hivMetadata.getSexWorkerConcept(), KeyPopulationGenderSelection.ALL),
-            "endDate=${onOrBefore},location=${location}"));
-
-    comp.addSearch(
-        "HOMOSEXUAL",
-        EptsReportUtils.map(
-            getKeyPopulationDisag(
-                hivMetadata.getHomosexualConcept(),
-                HivCohortQueries.KeyPopulationGenderSelection.MALE),
-            "endDate=${onOrBefore},location=${location}"));
-
-    comp.addSearch(
-        "PID",
-        EptsReportUtils.map(
-            getKeyPopulationDisag(
-                hivMetadata.getDrugUseConcept(), KeyPopulationGenderSelection.ALL),
-            "endDate=${onOrBefore},location=${location}"));
-
-    comp.addSearch(
-        "REC",
-        EptsReportUtils.map(
-            getKeyPopulationDisag(
-                hivMetadata.getImprisonmentConcept(),
-                HivCohortQueries.KeyPopulationGenderSelection.ALL),
-            "endDate=${onOrBefore},location=${location}"));
-
-    comp.addSearch(
-        "TG",
-        EptsReportUtils.map(
-            getKeyPopulationDisag(
-                hivMetadata.getTransGenderConcept(), KeyPopulationGenderSelection.ALL),
-            "endDate=${onOrBefore},location=${location}"));
-
-    comp.setCompositionString("TG AND NOT (SW OR HOMOSEXUAL OR PID OR REC)");
-
-    return comp;
-  }
-
-  /**
    * Get All patients who are sex workers (male and female)
    *
    * @return @{@link CohortDefinition}
@@ -442,8 +375,7 @@ public class HivCohortQueries {
   public CohortDefinition getSexWorkerKeyPopCohortDefinition() {
     CompositionCohortDefinition comp = new CompositionCohortDefinition();
     comp.setName("Get Patients marked as Sex Workers (male and female) Key Population ");
-    comp.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    comp.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    comp.addParameter(new Parameter("endDate", "endDate", Date.class));
     comp.addParameter(new Parameter("location", "location", Location.class));
     comp.addSearch("FSW", Mapped.mapStraightThrough(getFemaleSexWorkersKeyPopCohortDefinition()));
 
