@@ -13,7 +13,6 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.DRUG_USER;
 import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.HOMOSEXUAL;
 import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.OUTRO;
 import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.PRISONER;
@@ -290,21 +289,26 @@ public class HivCohortQueries {
     comp.addSearch(
         "PID",
         EptsReportUtils.map(
-            getKeyPopulationDisag(
-                hivMetadata.getDrugUseConcept(), KeyPopulationGenderSelection.ALL),
+                getDrugUserKeyPopCohort(),
             "endDate=${onOrBefore},location=${location}"));
     comp.setCompositionString("HOMOSEXUAL AND NOT PID");
     return comp;
   }
 
   public CohortDefinition getDrugUserKeyPopCohort() {
-    CalculationCohortDefinition cd = new CalculationCohortDefinition();
-    cd.setCalculation(Context.getRegisteredComponents(KeyPopulationCalculation.class).get(0));
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("People who inject drugs");
-    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
-    cd.addCalculationParameter(TYPE, DRUG_USER);
+
+    cd.addSearch(
+        "PID",
+        EptsReportUtils.map(
+            getKeyPopulationDisag(
+                hivMetadata.getDrugUseConcept(), KeyPopulationGenderSelection.ALL),
+            "endDate=${endDate},location=${location}"));
+    cd.setCompositionString("PID");
+
     return cd;
   }
 
@@ -395,14 +399,13 @@ public class HivCohortQueries {
     comp.addSearch(
         "CSW",
         EptsReportUtils.map(
-                getFemaleSexWorkersKeyPopCohortDefinition(),
+            getFemaleSexWorkersKeyPopCohortDefinition(),
             "endDate=${onOrBefore},location=${location}"));
 
     comp.addSearch(
         "HOMOSEXUAL",
         EptsReportUtils.map(
-                getMaleHomosexualKeyPopDefinition(),
-            "endDate=${onOrBefore},location=${location}"));
+            getMaleHomosexualKeyPopDefinition(), "endDate=${onOrBefore},location=${location}"));
 
     comp.addSearch(
         "PID",
