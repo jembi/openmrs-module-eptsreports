@@ -137,32 +137,43 @@ public class ViralLoadQueries {
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
-    String query =
-        "SELECT p.patient_id, DATE(e.encounter_datetime) vl_date FROM  patient p"
-            + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
-            + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
-            + " WHERE p.voided=0 "
-            + " AND e.voided=0 "
-            + " AND o.voided=0 "
-            + " AND e.encounter_type IN ("
-            + StringUtils.join(notEncounter53, ",")
-            + ") "
-            + " AND ((o.concept_id=${856} AND o.value_numeric IS NOT NULL) OR (o.concept_id=${1305} AND o.value_coded IS NOT NULL)) "
-            + " AND DATE(e.encounter_datetime) BETWEEN date_add(date_add(:endDate, interval -12 MONTH), interval 1 day) AND :endDate AND "
-            + " e.location_id=:location "
-            + " UNION "
-            + " SELECT p.patient_id, DATE(o.obs_datetime) vl_date FROM  patient p "
-            + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
-            + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
-            + " WHERE p.voided=0 "
-            + " AND e.voided=0 "
-            + " AND o.voided=0 "
-            + " AND e.encounter_type IN ("
-            + StringUtils.join(encounter53, ",")
-            + ") "
-            + " AND ((o.concept_id=${856} AND o.value_numeric IS NOT NULL) OR (o.concept_id=${1305} AND o.value_coded IS NOT NULL)) "
-            + "AND DATE(o.obs_datetime) BETWEEN date_add(date_add(:endDate, interval -12 MONTH), interval 1 day) AND :endDate "
-            + " AND e.location_id=:location ";
+    String query = ""; // Declare the query variable here
+
+    if (!encounter53.isEmpty()) {
+      // If encounter53 is not empty, execute this SQL query with UNION
+      query =
+          " SELECT p.patient_id, DATE(o.obs_datetime) vl_date FROM  patient p "
+              + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
+              + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
+              + " WHERE p.voided=0 "
+              + " AND e.voided=0 "
+              + " AND o.voided=0 "
+              + " AND e.encounter_type IN ("
+              + StringUtils.join(encounter53, ",")
+              + ")"
+              + " AND ((o.concept_id=${856} AND o.value_numeric IS NOT NULL) OR (o.concept_id=${1305} AND o.value_coded IS NOT NULL)) "
+              + "AND DATE(o.obs_datetime) BETWEEN date_add(date_add(:endDate, interval -12 MONTH), interval 1 day) AND :endDate "
+              + " AND e.location_id=:location ";
+    }
+    if (!notEncounter53.isEmpty() && !encounter53.isEmpty()) {
+      query += " UNION ";
+    }
+    if (!notEncounter53.isEmpty()) {
+      // If encounter53 is empty, execute this SQL query without UNION
+      query +=
+          " SELECT p.patient_id, DATE(e.encounter_datetime) vl_date FROM  patient p"
+              + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
+              + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
+              + " WHERE p.voided=0 "
+              + " AND e.voided=0 "
+              + " AND o.voided=0 "
+              + " AND e.encounter_type IN ("
+              + StringUtils.join(notEncounter53, ",")
+              + ")"
+              + " AND ((o.concept_id=${856} AND o.value_numeric IS NOT NULL) OR (o.concept_id=${1305} AND o.value_coded IS NOT NULL)) "
+              + " AND DATE(e.encounter_datetime) BETWEEN date_add(date_add(:endDate, interval -12 MONTH), interval 1 day) AND :endDate AND "
+              + " e.location_id=:location ";
+    }
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
