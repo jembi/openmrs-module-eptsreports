@@ -13,13 +13,6 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.DRUG_USER;
-import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.HOMOSEXUAL;
-import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.OUTRO;
-import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.PRISONER;
-import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.SEX_WORKER;
-import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.TRANSGENDER;
-import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.TYPE;
 import static org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation.TIPO;
 import static org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation.TargetGroup.ADOLESCENT_AND_YOUTH;
 import static org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation.TargetGroup.BREASTFEEDING;
@@ -31,13 +24,9 @@ import static org.openmrs.module.eptsreports.reporting.calculation.generic.Targe
 
 import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
-import org.openmrs.EncounterType;
-import org.openmrs.Location;
-import org.openmrs.Program;
-import org.openmrs.ProgramWorkflowState;
+import org.openmrs.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
-import org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.library.queries.ResumoMensalQueries;
@@ -48,6 +37,7 @@ import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.definition.library.DocumentedDefinition;
+import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -260,14 +250,25 @@ public class HivCohortQueries {
         artProgram.getProgramId(), state.getProgramWorkflowStateId());
   }
 
-  public CohortDefinition getHomosexualKeyPopCohort() {
-    CalculationCohortDefinition cd = new CalculationCohortDefinition();
-    cd.setCalculation(Context.getRegisteredComponents(KeyPopulationCalculation.class).get(0));
-    cd.setName("Men who have sex with men");
-    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+  /**
+   * Get People who inject drugs (PID)
+   *
+   * @return @{@link CohortDefinition}
+   */
+  public CohortDefinition getDrugUserKeyPopCohort() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("People who inject drugs");
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
-    cd.addCalculationParameter(TYPE, HOMOSEXUAL);
+
+    cd.addSearch(
+        "PID",
+        EptsReportUtils.map(
+            getKeyPopulationDisag(
+                hivMetadata.getDrugUseConcept(), KeyPopulationGenderSelection.ALL),
+            "endDate=${endDate},location=${location}"));
+    cd.setCompositionString("PID");
+
     return cd;
   }
 
@@ -279,72 +280,68 @@ public class HivCohortQueries {
   public CohortDefinition getMaleHomosexualKeyPopDefinition() {
 
     CompositionCohortDefinition comp = new CompositionCohortDefinition();
-    comp.setName("Outro");
-    comp.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    comp.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    comp.setName("Homosexual Key Pop");
+    comp.addParameter(new Parameter("endDate", "end Date", Date.class));
     comp.addParameter(new Parameter("location", "location", Location.class));
     comp.addSearch(
-        "1",
-        EptsReportUtils.map(
-            getHomosexualKeyPopCohort(),
-            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-    comp.addSearch("M", EptsReportUtils.map(genderCohortQueries.maleCohort(), ""));
-    comp.setCompositionString("1 AND M");
+        "HOMOSEXUAL",
+        Mapped.mapStraightThrough(
+            getKeyPopulationDisag(
+                hivMetadata.getHomosexualConcept(),
+                HivCohortQueries.KeyPopulationGenderSelection.MALE)));
+    comp.addSearch("PID", Mapped.mapStraightThrough(getDrugUserKeyPopCohort()));
+    comp.setCompositionString("HOMOSEXUAL AND NOT PID");
     return comp;
   }
 
-  public CohortDefinition getDrugUserKeyPopCohort() {
-    CalculationCohortDefinition cd = new CalculationCohortDefinition();
-    cd.setCalculation(Context.getRegisteredComponents(KeyPopulationCalculation.class).get(0));
-    cd.setName("People who inject drugs");
-    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
-    cd.addCalculationParameter(TYPE, DRUG_USER);
-    return cd;
-  }
-
   public CohortDefinition getImprisonmentKeyPopCohort() {
-    CalculationCohortDefinition cd = new CalculationCohortDefinition();
-    cd.setCalculation(Context.getRegisteredComponents(KeyPopulationCalculation.class).get(0));
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("People in prison and other closed settings");
-    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
-    cd.addCalculationParameter(TYPE, PRISONER);
+    cd.addSearch("SW", Mapped.mapStraightThrough(getSexWorkerKeyPopCohortDefinition()));
+
+    cd.addSearch("HOMOSEXUAL", Mapped.mapStraightThrough(getMaleHomosexualKeyPopDefinition()));
+
+    cd.addSearch("PID", Mapped.mapStraightThrough(getDrugUserKeyPopCohort()));
+
+    cd.addSearch(
+        "REC",
+        Mapped.mapStraightThrough(
+            getKeyPopulationDisag(
+                hivMetadata.getImprisonmentConcept(),
+                HivCohortQueries.KeyPopulationGenderSelection.ALL)));
+
+    cd.setCompositionString("REC AND NOT (SW OR HOMOSEXUAL OR PID)");
+
     return cd;
   }
 
-  public CohortDefinition getSexWorkerKeyPopCohort() {
-    CalculationCohortDefinition cd = new CalculationCohortDefinition();
-    cd.setCalculation(Context.getRegisteredComponents(KeyPopulationCalculation.class).get(0));
-    cd.setName("Sex workers");
-    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
-    cd.addCalculationParameter(TYPE, SEX_WORKER);
-    return cd;
-  }
+  public CohortDefinition getTransgenderKeyPopCohortDefinition() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("People in prison and other closed settings");
 
-  public CohortDefinition getTransgenderKeyPopCohort() {
-    CalculationCohortDefinition cd = new CalculationCohortDefinition();
-    cd.setCalculation(Context.getRegisteredComponents(KeyPopulationCalculation.class).get(0));
-    cd.setName("People who are marked as Transgender");
-    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
-    cd.addCalculationParameter(TYPE, TRANSGENDER);
-    return cd;
-  }
 
-  public CohortDefinition getOutroKeyPopCohort() {
-    CalculationCohortDefinition cd = new CalculationCohortDefinition();
-    cd.setCalculation(Context.getRegisteredComponents(KeyPopulationCalculation.class).get(0));
-    cd.setName("Outro");
-    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
-    cd.addCalculationParameter(TYPE, OUTRO);
+    cd.addSearch(
+        "TRANSGENDER",
+        Mapped.mapStraightThrough(
+            getKeyPopulationDisag(
+                hivMetadata.getTransGenderConcept(),
+                HivCohortQueries.KeyPopulationGenderSelection.ALL)));
+
+    cd.addSearch("SW", Mapped.mapStraightThrough(getSexWorkerKeyPopCohortDefinition()));
+
+    cd.addSearch("HOMOSEXUAL", Mapped.mapStraightThrough(getMaleHomosexualKeyPopDefinition()));
+
+    cd.addSearch("PID", Mapped.mapStraightThrough(getDrugUserKeyPopCohort()));
+
+    cd.addSearch("REC", Mapped.mapStraightThrough(getImprisonmentKeyPopCohort()));
+
+    cd.setCompositionString("TRANSGENDER AND NOT (REC OR SW OR HOMOSEXUAL OR PID)");
+
     return cd;
   }
 
@@ -355,17 +352,37 @@ public class HivCohortQueries {
    */
   public CohortDefinition getFemaleSexWorkersKeyPopCohortDefinition() {
     CompositionCohortDefinition comp = new CompositionCohortDefinition();
-    comp.setName("Only female sext workers");
-    comp.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    comp.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    comp.setName("Only female sex workers");
+    comp.addParameter(new Parameter("endDate", "endDate", Date.class));
     comp.addParameter(new Parameter("location", "location", Location.class));
     comp.addSearch(
-        "2",
-        EptsReportUtils.map(
-            getSexWorkerKeyPopCohort(),
-            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-    comp.addSearch("F", EptsReportUtils.map(genderCohortQueries.femaleCohort(), ""));
-    comp.setCompositionString("2 AND F");
+        "CSW",
+        Mapped.mapStraightThrough(
+            getKeyPopulationDisag(
+                hivMetadata.getSexWorkerConcept(), KeyPopulationGenderSelection.FEMALE)));
+
+    comp.addSearch("PID", Mapped.mapStraightThrough(getDrugUserKeyPopCohort()));
+
+    comp.setCompositionString("CSW AND NOT PID");
+    return comp;
+  }
+
+  /**
+   * Get All patients who are sex workers (male and female)
+   *
+   * @return @{@link CohortDefinition}
+   */
+  public CohortDefinition getSexWorkerKeyPopCohortDefinition() {
+    CompositionCohortDefinition comp = new CompositionCohortDefinition();
+    comp.setName("Get Patients marked as Sex Workers (male and female) Key Population ");
+    comp.addParameter(new Parameter("endDate", "endDate", Date.class));
+    comp.addParameter(new Parameter("location", "location", Location.class));
+    comp.addSearch("FSW", Mapped.mapStraightThrough(getFemaleSexWorkersKeyPopCohortDefinition()));
+
+    comp.addSearch("MSW", Mapped.mapStraightThrough(getMaleSexWorkersKeyPopCohortDefinition()));
+
+    comp.setCompositionString("MSW OR FSW");
+
     return comp;
   }
 
@@ -377,16 +394,20 @@ public class HivCohortQueries {
   public CohortDefinition getMaleSexWorkersKeyPopCohortDefinition() {
     CompositionCohortDefinition comp = new CompositionCohortDefinition();
     comp.setName("Only Male sex workers");
-    comp.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    comp.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    comp.addParameter(new Parameter("endDate", "endDate", Date.class));
     comp.addParameter(new Parameter("location", "location", Location.class));
+
+    comp.addSearch("HOMOSEXUAL", Mapped.mapStraightThrough(getMaleHomosexualKeyPopDefinition()));
+
+    comp.addSearch("PID", Mapped.mapStraightThrough(getDrugUserKeyPopCohort()));
+
     comp.addSearch(
-        "SW",
-        EptsReportUtils.map(
-            getSexWorkerKeyPopCohort(),
-            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-    comp.addSearch("M", EptsReportUtils.map(genderCohortQueries.maleCohort(), ""));
-    comp.setCompositionString("SW AND M");
+        "MSW",
+        Mapped.mapStraightThrough(
+            getKeyPopulationDisag(
+                hivMetadata.getSexWorkerConcept(), KeyPopulationGenderSelection.MALE)));
+
+    comp.setCompositionString("MSW AND NOT (HOMOSEXUAL OR PID)");
     return comp;
   }
 
@@ -909,6 +930,165 @@ public class HivCohortQueries {
             + " GROUP BY considered_transferred.patient_id "
             + " ) final "
             + " WHERE  final.max_date  <= :endDate  ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    definition.setQuery(stringSubstitutor.replace(query));
+
+    return definition;
+  }
+
+  /** Enumeration to return the Gender or Gender Composition formats for Key Population */
+  public enum KeyPopulationGenderSelection {
+    MALE {
+      @Override
+      public String getGender() {
+        return " 'M' ";
+      }
+    },
+
+    FEMALE {
+      @Override
+      public String getGender() {
+        return " 'F' ";
+      }
+    },
+
+    ALL {
+      @Override
+      public String getGender() {
+        return MALE.getGender() + "," + FEMALE.getGender();
+      }
+    };
+
+    public abstract String getGender();
+  }
+
+  /**
+   * Method to return the Correspondent value of Key Population Concept on Demographic module
+   *
+   * @param concept Key Population Concept
+   * @return {@link String}
+   */
+  private String getKeyPopulationValueBasedOnConceptForPersonAttribute(Concept concept) {
+
+    Map<Concept, String> map = new HashMap<>();
+    map.put(hivMetadata.getHomosexualConcept(), "'MSM','HSH'");
+    map.put(hivMetadata.getDrugUseConcept(), "'PID'");
+    map.put(hivMetadata.getImprisonmentConcept(), "'PRISONER','RC','REC'");
+    map.put(hivMetadata.getSexWorkerConcept(), "'CSW','TS','MTS','FSW','MSW'");
+    map.put(hivMetadata.getTransGenderConcept(), "'TG'");
+    map.put(hivMetadata.getOtherOrNonCodedConcept(), "'OUTRO'");
+
+    return map.get(concept);
+  }
+
+  public CohortDefinition getKeyPopulationDisag(
+      Concept keyPopConcept, KeyPopulationGenderSelection gender) {
+
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("Get all Patients Marked as Key Population");
+    definition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    definition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put(
+        "17", hivMetadata.getIdentificadorDefinidoLocalmente01().getPersonAttributeTypeId());
+    valuesMap.put(
+        "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("23703", hivMetadata.getKeyPopulationConcept().getConceptId());
+    valuesMap.put("5622", hivMetadata.getOtherOrNonCodedConcept().getConceptId());
+    valuesMap.put("keypop", keyPopConcept.getConceptId());
+
+    String query =
+        "SELECT p.person_id "
+            + "FROM   person p "
+            + "       LEFT JOIN encounter e "
+            + "              ON e.patient_id = p.person_id "
+            + "       LEFT JOIN obs o "
+            + "              ON o.encounter_id = e.encounter_id "
+            + "       LEFT JOIN person_attribute pa "
+            + "              ON p.person_id = pa.person_id "
+            + "       LEFT JOIN person_attribute_type pat "
+            + "              ON pa.person_attribute_type_id = pat.person_attribute_type_id "
+            + "       INNER JOIN (SELECT last_kp.patient_id, "
+            + "                          Max(last_kp.last_date) AS most_recent "
+            + "                   FROM   (SELECT p.person_id          AS patient_id, "
+            + "                                  Max(pa.date_created) AS last_date "
+            + "                           FROM   person p "
+            + "                                  INNER JOIN person_attribute pa "
+            + "                                          ON p.person_id = pa.person_id "
+            + "                                  INNER JOIN person_attribute_type pat "
+            + "                                          ON pa.person_attribute_type_id = "
+            + "                                             pat.person_attribute_type_id "
+            + "                           WHERE  p.voided = 0 "
+            + "                                  AND pa.person_attribute_type_id = ${17} "
+            + "                                  AND pa.value IN ( 'HSH', 'PID','MTS','REC','MSM','HSH','PRISONER','RC','CSW','TS','MTS','FSW','MSW','HTS') "
+            + "                           GROUP  BY p.person_id "
+            + "                           UNION "
+            + "                           SELECT p.patient_id AS patient_id, "
+            + "                                  Max(e.encounter_datetime) AS last_date "
+            + "                           FROM   patient p "
+            + "                                  INNER JOIN encounter e "
+            + "                                          ON e.patient_id = p.patient_id "
+            + "                                  INNER JOIN obs o "
+            + "                                          ON o.encounter_id = e.encounter_id "
+            + "                           WHERE  e.voided = 0 "
+            + "                                  AND p.voided = 0 "
+            + "                                  AND o.voided = 0 "
+            + "                                  AND e.location_id = :location "
+            + "                                  AND e.encounter_type IN ( ${6}, ${35} ) "
+            + "                                  AND o.concept_id = ${23703} "
+            + "                                  AND o.value_coded <> ${5622}  "
+            + "                                  AND e.encounter_datetime <= :endDate "
+            + "                           GROUP  BY p.patient_id) last_kp "
+            + "                   GROUP  BY last_kp.patient_id) kp_result "
+            + "               ON kp_result.patient_id = p.person_id "
+            + "WHERE  ( e.voided = 0 "
+            + "         AND p.voided = 0 "
+            + "         AND e.location_id = :location "
+            + "         AND o.voided = 0 "
+            + "         AND p.gender IN ( "
+            + gender.getGender()
+            + " ) "
+            + "         AND o.concept_id = ${23703} "
+            + "         AND o.value_coded = ${keypop} "
+            + "         AND e.encounter_datetime = kp_result.most_recent "
+            + "         AND ( ( e.encounter_type = ${6} ) "
+            + "                OR ( e.encounter_type = ${35} "
+            + "                     AND NOT EXISTS(SELECT e2.patient_id "
+            + "                                    FROM   encounter e2 "
+            + "                                           INNER JOIN obs o2 "
+            + "                                                   ON e2.encounter_id = "
+            + "                                                      o2.encounter_id "
+            + "                                    WHERE  e2.encounter_type = ${6} "
+            + "                                           AND o2.concept_id = ${23703} "
+            + "                                           AND o2.value_coded <> ${5622} "
+            + "                                           AND e2.encounter_datetime = "
+            + "                                               kp_result.most_recent "
+            + "                                           AND e2.patient_id = p.person_id) ) ) "
+            + "       ) "
+            + "        OR ( p.voided = 0 "
+            + "             AND pa.person_attribute_type_id = ${17} "
+            + "         AND p.gender IN ( "
+            + gender.getGender()
+            + " ) "
+            + "             AND pa.value IN ( "
+            + getKeyPopulationValueBasedOnConceptForPersonAttribute(keyPopConcept)
+            + " ) "
+            + "             AND pa.date_created = kp_result.most_recent "
+            + "             AND NOT EXISTS(SELECT e2.patient_id "
+            + "                            FROM   encounter e2 "
+            + "                                   INNER JOIN obs o2 "
+            + "                                           ON e2.encounter_id = o2.encounter_id "
+            + "                            WHERE  e2.encounter_type IN ( ${6}, ${35} ) "
+            + "                                   AND o2.concept_id = ${23703} "
+            + "                                   AND o2.value_coded <> ${5622} "
+            + "                                   AND e2.encounter_datetime = "
+            + "                                       kp_result.most_recent "
+            + "                                   AND e2.patient_id = p.person_id) ) "
+            + "GROUP  BY p.person_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 

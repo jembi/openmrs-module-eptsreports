@@ -11,6 +11,7 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.dimensions;
 
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.map;
 import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
 import java.util.Arrays;
@@ -408,18 +409,12 @@ public class EptsCommonDimension {
             Arrays.asList(hivMetadata.getDrugUseConcept()));
     CohortDefinition homosexualKeyPopCohort = prepCtCohortQueries.getPatientsWhoAreHomosexual();
     CohortDefinition imprisonmentKeyPopCohort = prepCtCohortQueries.getPatientsWhoArePrisoner();
-    CohortDefinition femaleSexWorkerKeyPopCohort =
-        hivCohortQueries.getFemaleSexWorkersKeyPopCohortDefinition();
-    CohortDefinition maleSexWorkerKeyPopCohort =
-        hivCohortQueries.getMaleSexWorkersKeyPopCohortDefinition();
     CohortDefinition transgenderKeyPopCohort = prepCtCohortQueries.getPatientsWhoAreTransgender();
     CohortDefinition sexWorkersKeyPopCohort = prepCtCohortQueries.getPatientsWhoAreSexWorker();
     CohortDefinition outroKeyPopCohort = prepCtCohortQueries.getPatientsWhoAreOutro();
     dim.addCohortDefinition("PID", mapStraightThrough(drugUserKeyPopCohort));
     dim.addCohortDefinition("MSM", mapStraightThrough(homosexualKeyPopCohort));
-    dim.addCohortDefinition("CSW", mapStraightThrough(femaleSexWorkerKeyPopCohort));
     dim.addCohortDefinition("PRI", mapStraightThrough(imprisonmentKeyPopCohort));
-    dim.addCohortDefinition("MSW", mapStraightThrough(maleSexWorkerKeyPopCohort));
     dim.addCohortDefinition("TG", mapStraightThrough(transgenderKeyPopCohort));
     dim.addCohortDefinition("SW", mapStraightThrough(sexWorkersKeyPopCohort));
     dim.addCohortDefinition("OUT", mapStraightThrough(outroKeyPopCohort));
@@ -432,6 +427,7 @@ public class EptsCommonDimension {
     dim.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     dim.addParameter(new Parameter("onOrBefore", "orOrBefore", Date.class));
     dim.addParameter(new Parameter("location", "Location", Location.class));
+    String mappings = "endDate=${onOrBefore},location=${location}";
     CohortDefinition drugUserKeyPopCohort = hivCohortQueries.getDrugUserKeyPopCohort();
     CohortDefinition homosexualKeyPopCohort = hivCohortQueries.getMaleHomosexualKeyPopDefinition();
     CohortDefinition imprisonmentKeyPopCohort = hivCohortQueries.getImprisonmentKeyPopCohort();
@@ -439,15 +435,16 @@ public class EptsCommonDimension {
         hivCohortQueries.getFemaleSexWorkersKeyPopCohortDefinition();
     CohortDefinition maleSexWorkerKeyPopCohort =
         hivCohortQueries.getMaleSexWorkersKeyPopCohortDefinition();
-    CohortDefinition transgenderKeyPopCohort = hivCohortQueries.getTransgenderKeyPopCohort();
-    CohortDefinition sexWorkersKeyPopCohort = hivCohortQueries.getSexWorkerKeyPopCohort();
-    dim.addCohortDefinition("PID", mapStraightThrough(drugUserKeyPopCohort));
-    dim.addCohortDefinition("MSM", mapStraightThrough(homosexualKeyPopCohort));
-    dim.addCohortDefinition("CSW", mapStraightThrough(femaleSexWorkerKeyPopCohort));
-    dim.addCohortDefinition("PRI", mapStraightThrough(imprisonmentKeyPopCohort));
-    dim.addCohortDefinition("MSW", mapStraightThrough(maleSexWorkerKeyPopCohort));
-    dim.addCohortDefinition("TG", mapStraightThrough(transgenderKeyPopCohort));
-    dim.addCohortDefinition("SW", mapStraightThrough(sexWorkersKeyPopCohort));
+    CohortDefinition transgenderKeyPopCohort =
+        hivCohortQueries.getTransgenderKeyPopCohortDefinition();
+    CohortDefinition sexWorkersKeyPopCohort = hivCohortQueries.getSexWorkerKeyPopCohortDefinition();
+    dim.addCohortDefinition("PID", map(drugUserKeyPopCohort, mappings));
+    dim.addCohortDefinition("MSM", map(homosexualKeyPopCohort, mappings));
+    dim.addCohortDefinition("CSW", map(femaleSexWorkerKeyPopCohort, mappings));
+    dim.addCohortDefinition("PRI", map(imprisonmentKeyPopCohort, mappings));
+    dim.addCohortDefinition("MSW", map(maleSexWorkerKeyPopCohort, mappings));
+    dim.addCohortDefinition("TG", map(transgenderKeyPopCohort, mappings));
+    dim.addCohortDefinition("SW", map(sexWorkersKeyPopCohort, mappings));
     return dim;
   }
 
