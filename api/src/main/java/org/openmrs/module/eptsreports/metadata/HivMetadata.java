@@ -3157,7 +3157,7 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * <b>person_attribute_type_id = 24 </b>
+   * <b>person_attribute_type_id = 17 </b>
    *
    * <p><b>Name:</b> Identificador definido localmente 01
    *

@@ -277,13 +277,12 @@ public class MISAUKeyPopsCohortQueries {
     cd.addSearch(
         "PID",
         EptsReportUtils.map(
-            hivCohortQueries.getDrugUserKeyPopCohort(),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            hivCohortQueries.getDrugUserKeyPopCohort(), "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "HSH",
         EptsReportUtils.map(
             hivCohortQueries.getMaleHomosexualKeyPopDefinition(),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
     cd.setCompositionString("PID AND HSH");
     return cd;
   }
@@ -304,13 +303,12 @@ public class MISAUKeyPopsCohortQueries {
     cd.addSearch(
         "PID",
         EptsReportUtils.map(
-            hivCohortQueries.getDrugUserKeyPopCohort(),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            hivCohortQueries.getDrugUserKeyPopCohort(), "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "MTS",
         EptsReportUtils.map(
             hivCohortQueries.getFemaleSexWorkersKeyPopCohortDefinition(),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
     cd.setCompositionString("PID AND MTS");
     return cd;
   }
@@ -331,13 +329,12 @@ public class MISAUKeyPopsCohortQueries {
     cd.addSearch(
         "PID",
         EptsReportUtils.map(
-            hivCohortQueries.getDrugUserKeyPopCohort(),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            hivCohortQueries.getDrugUserKeyPopCohort(), "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "REC",
         EptsReportUtils.map(
             hivCohortQueries.getImprisonmentKeyPopCohort(),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
     cd.setCompositionString("PID AND REC");
     return cd;
   }
@@ -359,12 +356,12 @@ public class MISAUKeyPopsCohortQueries {
         "HSH",
         EptsReportUtils.map(
             hivCohortQueries.getMaleHomosexualKeyPopDefinition(),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "REC",
         EptsReportUtils.map(
             hivCohortQueries.getImprisonmentKeyPopCohort(),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
     cd.setCompositionString("HSH AND REC");
     return cd;
   }
@@ -386,12 +383,12 @@ public class MISAUKeyPopsCohortQueries {
         "MTS",
         EptsReportUtils.map(
             hivCohortQueries.getFemaleSexWorkersKeyPopCohortDefinition(),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "REC",
         EptsReportUtils.map(
             hivCohortQueries.getImprisonmentKeyPopCohort(),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
     cd.setCompositionString("MTS AND REC");
     return cd;
   }
