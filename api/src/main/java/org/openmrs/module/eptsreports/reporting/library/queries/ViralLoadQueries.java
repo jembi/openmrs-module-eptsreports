@@ -137,10 +137,9 @@ public class ViralLoadQueries {
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
-    String query = ""; // Declare the query variable here
+    String query = "";
 
     if (!encounter53.isEmpty()) {
-      // If encounter53 is not empty, execute this SQL query with UNION
       query =
           " SELECT p.patient_id, DATE(o.obs_datetime) vl_date FROM  patient p "
               + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
@@ -159,7 +158,6 @@ public class ViralLoadQueries {
       query += " UNION ";
     }
     if (!notEncounter53.isEmpty()) {
-      // If encounter53 is empty, execute this SQL query without UNION
       query +=
           " SELECT p.patient_id, DATE(e.encounter_datetime) vl_date FROM  patient p"
               + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
