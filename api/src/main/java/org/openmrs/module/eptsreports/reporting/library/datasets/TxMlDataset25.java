@@ -74,6 +74,20 @@ public class TxMlDataset25 extends BaseDataSet {
             mappings),
         getColumnsForAgeAndGenderAndKeyPop());
 
+    // Totals Missed appointment and dead
+    dsd.addColumn(
+        "M33",
+        "Dead",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "dead",
+                EptsReportUtils.map(
+                    txMlCohortQueries
+                        .getPatientsWhoMissedNextAppointmentAndDiedDuringReportingPeriod(),
+                    mappings)),
+            mappings),
+        "");
+
     // Missed appointment and dead
     addRow(
         dsd,
