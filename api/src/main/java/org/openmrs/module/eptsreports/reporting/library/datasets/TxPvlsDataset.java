@@ -81,34 +81,22 @@ public class TxPvlsDataset extends BaseDataSet {
             mappings),
         "");
 
-    // Get patients with viral load and on routine
+    // Get patients with viral load sex and age
     addRow(
         dsd,
-        "DR",
-        "Patients Denominator on Routine",
+        "DSA",
+        "Patients with Viral Load on Denominator Sex/Age",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "viral load results on routine adults and children",
+                "viral load results adults and children",
                 EptsReportUtils.map(
-                    txPvls.getPatientsWithViralLoadResultsAndOnRoutine(), mappings)),
-            mappings),
-        getAdultChildrenColumns());
-    // Get patients with viral load and on target
-    addRow(
-        dsd,
-        "DT",
-        "Patients Denominator on Target",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "viral load results on target adults and children",
-                EptsReportUtils.map(txPvls.getPatientsWithViralLoadResultsAndOnTarget(), mappings)),
+                    txPvls.getPatientsWithViralLoadResultsAndOnArtForMoreThan3Months(), mappings)),
             mappings),
         getAdultChildrenColumns());
 
     // Breastfeeding & Pregnant
     // Breastfeeding and on ART for more than 3 months and have VL results
-    addRow(
-        dsd,
+    dsd.addColumn(
         "B",
         "Breast feeding, have vl results and on ART more than 3 months Denominator",
         EptsReportUtils.map(
@@ -117,11 +105,10 @@ public class TxPvlsDataset extends BaseDataSet {
                 EptsReportUtils.map(
                     txPvls.getBreastfeedingWomenWhoHaveViralLoadResults(), mappings)),
             mappings),
-        getRoutineTargetedColumns());
+        "");
 
     // Pregnant women on ART for more than 3 months and have VL results
-    addRow(
-        dsd,
+    dsd.addColumn(
         "P",
         "Pregnant, have vl results and on ART more than 3 months Denominator",
         EptsReportUtils.map(
@@ -129,9 +116,9 @@ public class TxPvlsDataset extends BaseDataSet {
                 "Pregnant, have vl results and on ART more than 3 months Denominator",
                 EptsReportUtils.map(txPvls.getPregnantWomenWithViralLoadResults(), mappings)),
             mappings),
-        getRoutineTargetedColumns());
+        "");
 
-    // Routine for Adults & Children denominator KP
+    // Denominator Key Population
     addRow(
         dsd,
         "KPD",
@@ -142,7 +129,7 @@ public class TxPvlsDataset extends BaseDataSet {
                 EptsReportUtils.map(
                     txPvls.getPatientsWithViralLoadResultsAndOnArtForMoreThan3Months(), mappings)),
             mappings),
-        getKpRoutineTargetedColumns());
+        getKpColumns());
   }
 
   private void addNumeratorColumns(CohortIndicatorDataSetDefinition dsd, String mappings) {
@@ -162,8 +149,7 @@ public class TxPvlsDataset extends BaseDataSet {
 
     // Breastfeeding & Pregnant
     // Breastfeeding
-    addRow(
-        dsd,
+    dsd.addColumn(
         "BN",
         "Breast feeding, have vl suppression and on ART more than 3 months numerator",
         EptsReportUtils.map(
@@ -172,10 +158,10 @@ public class TxPvlsDataset extends BaseDataSet {
                 EptsReportUtils.map(
                     txPvls.getBreastfeedingWomenWhoHaveViralSuppression(), mappings)),
             mappings),
-        getRoutineTargetedColumns());
+        "");
+
     // Pregnant
-    addRow(
-        dsd,
+    dsd.addColumn(
         "PN",
         "Pregnant patients, have vl suppression and on ART more than 3 months numerator",
         EptsReportUtils.map(
@@ -183,44 +169,35 @@ public class TxPvlsDataset extends BaseDataSet {
                 "Pregnant patients, have vl suppression and on ART more than 3 months numerator",
                 EptsReportUtils.map(txPvls.getPregnantWomenWithViralLoadSuppression(), mappings)),
             mappings),
-        getRoutineTargetedColumns());
+        "");
 
-    // Adults & children on Routine
+    // Patient Sex and Age Numerator
     addRow(
         dsd,
-        "NR",
-        "Adult and children with viral load suppression, have more than 3 months on ART and on routine",
+        "NSA",
+        "Adult and children with viral load suppression, have more than 3 months on ART",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "Adult and children with viral load suppression, have more than 3 months on ART and on routine",
-                EptsReportUtils.map(txPvls.getPatientWithViralSuppressionAndOnRoutine(), mappings)),
-            mappings),
-        getAdultChildrenColumns());
-    // Adults and children on Target
-    addRow(
-        dsd,
-        "NT",
-        "Adult and children with viral load suppression, have more than 3 months on ART and on target",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Adult and children with viral load suppression, have more than 3 months on ART and on target",
-                EptsReportUtils.map(txPvls.getPatientWithViralSuppressionAndOnTarget(), mappings)),
-            mappings),
-        getAdultChildrenColumns());
-
-    // Routine for Adults & Children Numerator KP
-    addRow(
-        dsd,
-        "KPN",
-        "Key population patients and are on routine and target Numerator",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Key population patients and are on routine and target Numerator",
+                "Adult and children with viral load suppression, have more than 3 months on ART",
                 EptsReportUtils.map(
                     txPvls.getPatientsWithViralLoadSuppressionWhoAreOnArtMoreThan3Months(),
                     mappings)),
             mappings),
-        getKpRoutineTargetedColumns());
+        getAdultChildrenColumns());
+
+    // Numerator Key Population
+    addRow(
+        dsd,
+        "KPN",
+        "Key population patients Numerator",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Key population patients Numerator",
+                EptsReportUtils.map(
+                    txPvls.getPatientsWithViralLoadSuppressionWhoAreOnArtMoreThan3Months(),
+                    mappings)),
+            mappings),
+        getKpColumns());
   }
 
   private List<ColumnParameters> getAdultChildrenColumns() {
@@ -335,23 +312,19 @@ public class TxPvlsDataset extends BaseDataSet {
     return Arrays.asList(routine, target);
   }
 
-  private List<ColumnParameters> getKpRoutineTargetedColumns() {
+  private List<ColumnParameters> getKpColumns() {
     // PID
-    ColumnParameters piwdR = new ColumnParameters("piwdR", "PIWD-R", "KP=PID|rt=VLR", "01");
-    ColumnParameters piwdT = new ColumnParameters("piwdT", "PIWD-T", "KP=PID|rt=VLT", "02");
+    ColumnParameters pwid = new ColumnParameters("pwid", "PWID", "KP=PID", "01");
 
     // MSM
-    ColumnParameters msnR = new ColumnParameters("msnR", "MSN-R", "KP=MSM|rt=VLR", "04");
-    ColumnParameters msnT = new ColumnParameters("msnT", "MSN-T", "KP=MSM|rt=VLT", "05");
+    ColumnParameters msm = new ColumnParameters("msm", "MSM", "KP=MSM", "02");
 
     // CSW
-    ColumnParameters cswR = new ColumnParameters("cswR", "CSW-R", "KP=CSW|rt=VLR", "07");
-    ColumnParameters cswT = new ColumnParameters("cswT", "CSW-T", "KP=CSW|rt=VLT", "08");
+    ColumnParameters csw = new ColumnParameters("csw", "CSW", "KP=CSW", "03");
 
     // PRI
-    ColumnParameters priR = new ColumnParameters("priR", "PRI-R", "KP=PRI|rt=VLR", "10");
-    ColumnParameters priT = new ColumnParameters("priT", "PRI-T", "KP=PRI|rt=VLT", "11");
+    ColumnParameters pri = new ColumnParameters("pri", "PRI", "KP=PRI", "04");
 
-    return Arrays.asList(piwdR, piwdT, msnR, msnT, cswR, cswT, priR, priT);
+    return Arrays.asList(pwid, msm, csw, pri);
   }
 }
