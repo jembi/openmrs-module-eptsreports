@@ -71,7 +71,7 @@ public class TxPvlsDataset extends BaseDataSet {
     // Denominator -------------------------------------------------------------
     // Totals
     dsd.addColumn(
-        "0D",
+        "VLD",
         "Total patients with Viral load - Denominator",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -81,7 +81,7 @@ public class TxPvlsDataset extends BaseDataSet {
             mappings),
         "");
 
-    // Get patients with viral load sex and age
+    // Get Adult and children patients with viral load
     addRow(
         dsd,
         "DSA",
@@ -97,7 +97,7 @@ public class TxPvlsDataset extends BaseDataSet {
     // Breastfeeding & Pregnant
     // Breastfeeding and on ART for more than 3 months and have VL results
     dsd.addColumn(
-        "B",
+        "Breastfeeding",
         "Breast feeding, have vl results and on ART more than 3 months Denominator",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -109,7 +109,7 @@ public class TxPvlsDataset extends BaseDataSet {
 
     // Pregnant women on ART for more than 3 months and have VL results
     dsd.addColumn(
-        "P",
+        "Pregnant",
         "Pregnant, have vl results and on ART more than 3 months Denominator",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -119,85 +119,89 @@ public class TxPvlsDataset extends BaseDataSet {
         "");
 
     // Denominator Key Population
-    addRow(
-        dsd,
-        "KPD",
-        "Key population patients and are on routine and target Denominator",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Key population patients and are on routine and target Denominator",
-                EptsReportUtils.map(
-                    txPvls.getPatientsWithViralLoadResultsAndOnArtForMoreThan3Months(), mappings)),
-            mappings),
-        getKpColumns());
+    //    addRow(
+    //        dsd,
+    //        "KPD",
+    //        "Key population patients and are on routine and target Denominator",
+    //        EptsReportUtils.map(
+    //            eptsGeneralIndicator.getIndicator(
+    //                "Key population patients and are on routine and target Denominator",
+    //                EptsReportUtils.map(
+    //                    txPvls.getPatientsWithViralLoadResultsAndOnArtForMoreThan3Months(),
+    // mappings)),
+    //            mappings),
+    //        getKpColumns());
   }
 
   private void addNumeratorColumns(CohortIndicatorDataSetDefinition dsd, String mappings) {
     // Numerator ------------------------------------------------------------
     // Totals
-    dsd.addColumn(
-        "0N",
-        "Total patients with suppressed Viral load - Numerator",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "suppressed viral load",
-                EptsReportUtils.map(
-                    txPvls.getPatientsWithViralLoadSuppressionWhoAreOnArtMoreThan3Months(),
-                    mappings)),
-            mappings),
-        "");
-
-    // Breastfeeding & Pregnant
-    // Breastfeeding
-    dsd.addColumn(
-        "BN",
-        "Breast feeding, have vl suppression and on ART more than 3 months numerator",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Breast feeding, have vl suppression and on ART more than 3 months numerator",
-                EptsReportUtils.map(
-                    txPvls.getBreastfeedingWomenWhoHaveViralSuppression(), mappings)),
-            mappings),
-        "");
-
-    // Pregnant
-    dsd.addColumn(
-        "PN",
-        "Pregnant patients, have vl suppression and on ART more than 3 months numerator",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Pregnant patients, have vl suppression and on ART more than 3 months numerator",
-                EptsReportUtils.map(txPvls.getPregnantWomenWithViralLoadSuppression(), mappings)),
-            mappings),
-        "");
-
-    // Patient Sex and Age Numerator
-    addRow(
-        dsd,
-        "NSA",
-        "Adult and children with viral load suppression, have more than 3 months on ART",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Adult and children with viral load suppression, have more than 3 months on ART",
-                EptsReportUtils.map(
-                    txPvls.getPatientsWithViralLoadSuppressionWhoAreOnArtMoreThan3Months(),
-                    mappings)),
-            mappings),
-        getAdultChildrenColumns());
-
-    // Numerator Key Population
-    addRow(
-        dsd,
-        "KPN",
-        "Key population patients Numerator",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Key population patients Numerator",
-                EptsReportUtils.map(
-                    txPvls.getPatientsWithViralLoadSuppressionWhoAreOnArtMoreThan3Months(),
-                    mappings)),
-            mappings),
-        getKpColumns());
+    //    dsd.addColumn(
+    //        "0N",
+    //        "Total patients with suppressed Viral load - Numerator",
+    //        EptsReportUtils.map(
+    //            eptsGeneralIndicator.getIndicator(
+    //                "suppressed viral load",
+    //                EptsReportUtils.map(
+    //                    txPvls.getPatientsWithViralLoadSuppressionWhoAreOnArtMoreThan3Months(),
+    //                    mappings)),
+    //            mappings),
+    //        "");
+    //
+    //    // Breastfeeding & Pregnant
+    //    // Breastfeeding
+    //    dsd.addColumn(
+    //        "BN",
+    //        "Breast feeding, have vl suppression and on ART more than 3 months numerator",
+    //        EptsReportUtils.map(
+    //            eptsGeneralIndicator.getIndicator(
+    //                "Breast feeding, have vl suppression and on ART more than 3 months numerator",
+    //                EptsReportUtils.map(
+    //                    txPvls.getBreastfeedingWomenWhoHaveViralSuppression(), mappings)),
+    //            mappings),
+    //        "");
+    //
+    //    // Pregnant
+    //    dsd.addColumn(
+    //        "PN",
+    //        "Pregnant patients, have vl suppression and on ART more than 3 months numerator",
+    //        EptsReportUtils.map(
+    //            eptsGeneralIndicator.getIndicator(
+    //                "Pregnant patients, have vl suppression and on ART more than 3 months
+    // numerator",
+    //                EptsReportUtils.map(txPvls.getPregnantWomenWithViralLoadSuppression(),
+    // mappings)),
+    //            mappings),
+    //        "");
+    //
+    //    // Patient Sex and Age Numerator
+    //    addRow(
+    //        dsd,
+    //        "NSA",
+    //        "Adult and children with viral load suppression, have more than 3 months on ART",
+    //        EptsReportUtils.map(
+    //            eptsGeneralIndicator.getIndicator(
+    //                "Adult and children with viral load suppression, have more than 3 months on
+    // ART",
+    //                EptsReportUtils.map(
+    //                    txPvls.getPatientsWithViralLoadSuppressionWhoAreOnArtMoreThan3Months(),
+    //                    mappings)),
+    //            mappings),
+    //        getAdultChildrenColumns());
+    //
+    //    // Numerator Key Population
+    //    addRow(
+    //        dsd,
+    //        "KPN",
+    //        "Key population patients Numerator",
+    //        EptsReportUtils.map(
+    //            eptsGeneralIndicator.getIndicator(
+    //                "Key population patients Numerator",
+    //                EptsReportUtils.map(
+    //                    txPvls.getPatientsWithViralLoadSuppressionWhoAreOnArtMoreThan3Months(),
+    //                    mappings)),
+    //            mappings),
+    //        getKpColumns());
   }
 
   private List<ColumnParameters> getAdultChildrenColumns() {
