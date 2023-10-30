@@ -136,7 +136,7 @@ public class TxPvlsDataset extends BaseDataSet {
     // Numerator ------------------------------------------------------------
     // Totals
     dsd.addColumn(
-        "0N",
+        "VLN",
         "Total patients with suppressed Viral load - Numerator",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
