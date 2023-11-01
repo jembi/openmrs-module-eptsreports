@@ -984,20 +984,20 @@ public class HivCohortQueries {
     return map.get(concept);
   }
 
-  private String getApplicableKeyPopFor(KeyPopulationGenderSelection gender) {
+  private String getApplicableKeyPopopulationsFor(KeyPopulationGenderSelection gender) {
 
-    List<Integer> keyPops =
-        Arrays.asList(
-            hivMetadata.getDrugUseConcept().getConceptId(),
-            hivMetadata.getImprisonmentConcept().getConceptId(),
-            hivMetadata.getTransGenderConcept().getConceptId(),
-            hivMetadata.getSexWorkerConcept().getConceptId());
+    List<Integer> keyPops = new ArrayList<>();
+    keyPops.add(hivMetadata.getDrugUseConcept().getConceptId());
+    keyPops.add(hivMetadata.getImprisonmentConcept().getConceptId());
+    keyPops.add(  hivMetadata.getTransGenderConcept().getConceptId());
+    keyPops.add( hivMetadata.getSexWorkerConcept().getConceptId());
+
     if (gender == KeyPopulationGenderSelection.MALE || gender == KeyPopulationGenderSelection.ALL) {
 
       keyPops.add(hivMetadata.getHomosexualConcept().getConceptId());
     }
 
-    return StringUtils.join(",");
+    return StringUtils.join(keyPops,",");
   }
 
   public CohortDefinition getKeyPopulationDisag(
@@ -1040,6 +1040,7 @@ public class HivCohortQueries {
             + "                                          ON pa.person_attribute_type_id = "
             + "                                             pat.person_attribute_type_id "
             + "                           WHERE  p.voided = 0 "
+            + "                           WHERE  pa.voided = 0 "
             + "                                  AND pa.person_attribute_type_id = ${17} "
             + "                                  AND pa.value IN ( 'HSH', 'PID','MTS','REC','MSM','HSH','PRISONER','RC','CSW','TS','MTS','FSW','MSW','HTS') "
             + "                           GROUP  BY p.person_id "
@@ -1047,17 +1048,15 @@ public class HivCohortQueries {
             + "                           SELECT p.patient_id AS patient_id, "
             + "                                  Max(e.encounter_datetime) AS last_date "
             + "                           FROM   patient p "
-            + "                                  INNER JOIN encounter e "
-            + "                                          ON e.patient_id = p.patient_id "
-            + "                                  INNER JOIN obs o "
-            + "                                          ON o.encounter_id = e.encounter_id "
+            + "                                  INNER JOIN encounter e  ON e.patient_id = p.patient_id "
+            + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "                           WHERE  e.voided = 0 "
             + "                                  AND p.voided = 0 "
             + "                                  AND o.voided = 0 "
             + "                                  AND e.location_id = :location "
             + "                                  AND e.encounter_type IN ( ${6}, ${35} ) "
             + "                                  AND o.concept_id = ${23703} "
-            + "                                  AND o.value_coded <> ${5622}  "
+            + "                                  AND o.value_coded IN(  "+ getApplicableKeyPopopulationsFor(gender)+ " )  "
             + "                                  AND e.encounter_datetime <= :endDate "
             + "                           GROUP  BY p.patient_id) last_kp "
             + "                   GROUP  BY last_kp.patient_id) kp_result "
@@ -1081,7 +1080,7 @@ public class HivCohortQueries {
             + "                                                      o2.encounter_id "
             + "                                    WHERE  e2.encounter_type = ${6} "
             + "                                           AND o2.concept_id = ${23703} "
-            + "                                           AND o2.value_coded <> ${5622} "
+            + "                                           AND o2.value_coded IN( " + getApplicableKeyPopopulationsFor(gender)+ ")  "
             + "                                           AND e2.encounter_datetime = "
             + "                                               kp_result.most_recent "
             + "                                           AND e2.patient_id = p.person_id) ) ) "
@@ -1101,14 +1100,14 @@ public class HivCohortQueries {
             + "                                           ON e2.encounter_id = o2.encounter_id "
             + "                            WHERE  e2.encounter_type IN ( ${6}, ${35} ) "
             + "                                   AND o2.concept_id = ${23703} "
-            + "                                   AND o2.value_coded <> ${5622} "
+            + "                                   AND o2.value_coded IN( " + getApplicableKeyPopopulationsFor(gender)+ " )  "
             + "                                   AND e2.encounter_datetime = "
             + "                                       kp_result.most_recent "
             + "                                   AND e2.patient_id = p.person_id) ) "
             + "GROUP  BY p.person_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-
+    System.out.println(stringSubstitutor.replace(query));
     definition.setQuery(stringSubstitutor.replace(query));
 
     return definition;
