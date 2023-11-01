@@ -23,6 +23,7 @@ import static org.openmrs.module.eptsreports.reporting.calculation.generic.Targe
 import static org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation.TargetGroup.TRUCK_DRIVER;
 
 import java.util.*;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.*;
 import org.openmrs.api.context.Context;
@@ -981,6 +982,22 @@ public class HivCohortQueries {
     map.put(hivMetadata.getOtherOrNonCodedConcept(), "'OUTRO'");
 
     return map.get(concept);
+  }
+
+  private String getApplicableKeyPopFor(KeyPopulationGenderSelection gender) {
+
+    List<Integer> keyPops =
+        Arrays.asList(
+            hivMetadata.getDrugUseConcept().getConceptId(),
+            hivMetadata.getImprisonmentConcept().getConceptId(),
+            hivMetadata.getTransGenderConcept().getConceptId(),
+            hivMetadata.getSexWorkerConcept().getConceptId());
+    if (gender == KeyPopulationGenderSelection.MALE || gender == KeyPopulationGenderSelection.ALL) {
+
+      keyPops.add(hivMetadata.getHomosexualConcept().getConceptId());
+    }
+
+    return StringUtils.join(",");
   }
 
   public CohortDefinition getKeyPopulationDisag(
