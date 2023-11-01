@@ -989,15 +989,15 @@ public class HivCohortQueries {
     List<Integer> keyPops = new ArrayList<>();
     keyPops.add(hivMetadata.getDrugUseConcept().getConceptId());
     keyPops.add(hivMetadata.getImprisonmentConcept().getConceptId());
-    keyPops.add(  hivMetadata.getTransGenderConcept().getConceptId());
-    keyPops.add( hivMetadata.getSexWorkerConcept().getConceptId());
+    keyPops.add(hivMetadata.getTransGenderConcept().getConceptId());
+    keyPops.add(hivMetadata.getSexWorkerConcept().getConceptId());
 
     if (gender == KeyPopulationGenderSelection.MALE || gender == KeyPopulationGenderSelection.ALL) {
 
       keyPops.add(hivMetadata.getHomosexualConcept().getConceptId());
     }
 
-    return StringUtils.join(keyPops,",");
+    return StringUtils.join(keyPops, ",");
   }
 
   public CohortDefinition getKeyPopulationDisag(
@@ -1040,7 +1040,7 @@ public class HivCohortQueries {
             + "                                          ON pa.person_attribute_type_id = "
             + "                                             pat.person_attribute_type_id "
             + "                           WHERE  p.voided = 0 "
-            + "                           WHERE  pa.voided = 0 "
+            + "                                  AND  pa.voided = 0 "
             + "                                  AND pa.person_attribute_type_id = ${17} "
             + "                                  AND pa.value IN ( 'HSH', 'PID','MTS','REC','MSM','HSH','PRISONER','RC','CSW','TS','MTS','FSW','MSW','HTS') "
             + "                           GROUP  BY p.person_id "
@@ -1056,7 +1056,9 @@ public class HivCohortQueries {
             + "                                  AND e.location_id = :location "
             + "                                  AND e.encounter_type IN ( ${6}, ${35} ) "
             + "                                  AND o.concept_id = ${23703} "
-            + "                                  AND o.value_coded IN(  "+ getApplicableKeyPopopulationsFor(gender)+ " )  "
+            + "                                  AND o.value_coded IN(  "
+            + getApplicableKeyPopopulationsFor(gender)
+            + " )  "
             + "                                  AND e.encounter_datetime <= :endDate "
             + "                           GROUP  BY p.patient_id) last_kp "
             + "                   GROUP  BY last_kp.patient_id) kp_result "
@@ -1080,7 +1082,9 @@ public class HivCohortQueries {
             + "                                                      o2.encounter_id "
             + "                                    WHERE  e2.encounter_type = ${6} "
             + "                                           AND o2.concept_id = ${23703} "
-            + "                                           AND o2.value_coded IN( " + getApplicableKeyPopopulationsFor(gender)+ ")  "
+            + "                                           AND o2.value_coded IN( "
+            + getApplicableKeyPopopulationsFor(gender)
+            + ")  "
             + "                                           AND e2.encounter_datetime = "
             + "                                               kp_result.most_recent "
             + "                                           AND e2.patient_id = p.person_id) ) ) "
@@ -1100,7 +1104,9 @@ public class HivCohortQueries {
             + "                                           ON e2.encounter_id = o2.encounter_id "
             + "                            WHERE  e2.encounter_type IN ( ${6}, ${35} ) "
             + "                                   AND o2.concept_id = ${23703} "
-            + "                                   AND o2.value_coded IN( " + getApplicableKeyPopopulationsFor(gender)+ " )  "
+            + "                                   AND o2.value_coded IN( "
+            + getApplicableKeyPopopulationsFor(gender)
+            + " )  "
             + "                                   AND e2.encounter_datetime = "
             + "                                       kp_result.most_recent "
             + "                                   AND e2.patient_id = p.person_id) ) "
