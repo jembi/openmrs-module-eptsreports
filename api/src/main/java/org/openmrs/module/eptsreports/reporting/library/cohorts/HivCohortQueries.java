@@ -1113,7 +1113,6 @@ public class HivCohortQueries {
             + "GROUP  BY p.person_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-    System.out.println(stringSubstitutor.replace(query));
     definition.setQuery(stringSubstitutor.replace(query));
 
     return definition;
