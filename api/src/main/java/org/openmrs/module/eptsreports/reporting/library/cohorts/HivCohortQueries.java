@@ -990,11 +990,16 @@ public class HivCohortQueries {
     keyPops.add(hivMetadata.getDrugUseConcept().getConceptId());
     keyPops.add(hivMetadata.getImprisonmentConcept().getConceptId());
     keyPops.add(hivMetadata.getTransGenderConcept().getConceptId());
-    keyPops.add(hivMetadata.getSexWorkerConcept().getConceptId());
 
     if (gender == KeyPopulationGenderSelection.MALE || gender == KeyPopulationGenderSelection.ALL) {
 
       keyPops.add(hivMetadata.getHomosexualConcept().getConceptId());
+    }
+
+    if (gender == KeyPopulationGenderSelection.FEMALE
+        || gender == KeyPopulationGenderSelection.ALL) {
+
+      keyPops.add(hivMetadata.getSexWorkerConcept().getConceptId());
     }
 
     return StringUtils.join(keyPops, ",");
@@ -1042,7 +1047,7 @@ public class HivCohortQueries {
             + "                           WHERE  p.voided = 0 "
             + "                                  AND  pa.voided = 0 "
             + "                                  AND pa.person_attribute_type_id = ${17} "
-            + "                                  AND pa.value IN ( 'HSH', 'PID','MTS','REC','MSM','HSH','PRISONER','RC','CSW','TS','MTS','FSW','MSW','HTS') "
+            + "                                  AND pa.value IN ( 'HSH', 'PID','MTS','REC','MSM','PRISONER','RC','CSW','TS','FSW','MSW','HTS') "
             + "                           GROUP  BY p.person_id "
             + "                           UNION "
             + "                           SELECT p.patient_id AS patient_id, "
