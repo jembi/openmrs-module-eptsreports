@@ -13,11 +13,11 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
 import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
@@ -226,7 +226,7 @@ public class TxNewCohortQueries {
     txNewComposition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     txNewComposition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition startedART = genericCohorts.getStartedArtOnPeriod(false, true);
+    CohortDefinition startedART = getPatientsStartedArtOnFilaOrArvPickupDuringThePeriod();
     CohortDefinition transferredIn =
         resumoMensalCohortQueries
             .getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2E();
@@ -236,5 +236,49 @@ public class TxNewCohortQueries {
 
     txNewComposition.setCompositionString("startedART NOT transferredIn");
     return txNewComposition;
+  }
+
+  /**
+   * <b>NEW_FR4: Patients who initiated ART during the reporting period</b>
+   *
+   * <p>All patients whose earliest ART start date (NEW_FR4.1) falls on or after (>=) 21 December
+   * 2023.
+   *
+   * <p>AND whose first ever drug pick-up date between the following sources falls during the
+   * reporting period:
+   *
+   * <ul>
+   *   <li>Drug pick-up date registered on (FILA)
+   *   <li>Drug pick-up date registered on (Recepção Levantou ARV) – Master Card
+   * </ul>
+   *
+   * <p>AND excluding patients with an earliest ART start date from pick-up and clinical sources
+   * (NEW_FR4.1) that falls before (<) 21 December 2023.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsStartedArtOnFilaOrArvPickupDuringThePeriod() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Number of patientes who initiated TARV - Fila and ARV Pickup");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+
+    String query =
+        "       SELECT patient_id "
+            + " FROM ( "
+            + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
+            + "       ) start "
+            + " WHERE start.first_pickup >= '2023-12-21' ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    cd.setQuery(sb.replace(query));
+    return cd;
   }
 }

@@ -52,6 +52,7 @@ public class TxNewDataset extends BaseDataSet {
 
     CohortDefinition patientEnrolledInART =
         txNewCohortQueries.getTxNewCompositionCohort("patientEnrolledInART");
+
     CohortIndicator patientEnrolledInHIVStartedARTIndicator =
         eptsGeneralIndicator.getIndicator(
             "patientNewlyEnrolledInHIVIndicator",
