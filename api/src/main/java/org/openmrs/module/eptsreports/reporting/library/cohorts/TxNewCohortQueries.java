@@ -286,6 +286,30 @@ public class TxNewCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>Patients with an absolute CD4 result <200/mm3 registered in the following sources:</b>
+   *
+   * <ul>
+   *   <li>CD4 absolute value at ART initiation marked on Ficha Resumo OR
+   *   <li>Last CD4 absolute value marked on Ficha Resumo OR
+   *   <li>CD4 absolute result marked in the Investigações - Resultados Laboratoriais section on
+   *       Ficha Clínica OR
+   *   <li>CD4 absolute result registered on the Lab Form OR
+   *   <li>CD4 absolute result registered on the e-Lab Form
+   * </ul>
+   *
+   * <p>The system will consider the oldest CD4 result date falling between patient ART Start Date -
+   * 90 days and ART Start Date + 28 days from the different sources listed above for the evaluation
+   * of the result (< 200).
+   *
+   * <p><b>Notes: </b>For the CD4 at ART initiation registered on Ficha Resumo, the “ART Start Date”
+   * that is registered on the same Ficha Resumo will be considered as the CD4 result date. For
+   * clients who have CD4 results ≥200/mm3 and <200/mm3 on the same, oldest date, the CD4 result
+   * <200/mm3 will be prioritized.
+   *
+   * @param cd4CountComparison
+   * @return
+   */
   public CohortDefinition getCd4Result(
       AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison cd4CountComparison) {
 
@@ -295,11 +319,11 @@ public class TxNewCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
-        map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-        map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-        map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
-        map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
-        map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
     map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
@@ -358,8 +382,7 @@ public class TxNewCohortQueries {
             + "       AND o.voided = 0 "
             + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${1695} "
-            + "       AND  "
-                .concat(cd4CountComparison.getProposition())
+            + "       AND  ".concat(cd4CountComparison.getProposition())
             + "       AND ( ( Date(e.encounter_datetime) BETWEEN DATE_SUB(art.first_pickup, "
             + "                                                  INTERVAL 90 day) "
             + "                                          AND DATE_ADD(art.first_pickup, INTERVAL 28 day) "
@@ -374,11 +397,10 @@ public class TxNewCohortQueries {
 
     cd.setQuery(sb.replace(query));
 
-    System.out.println(sb.replace(query));
-
     return cd;
   }
 
+  /** <b> Patient Disaggregation- CD4 result <200/mm3 </b> */
   public CohortDefinition getCd4ResultLessThan200() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -389,7 +411,7 @@ public class TxNewCohortQueries {
 
     String mapping1 = "endDate=${endDate},location=${location}";
 
-    CohortDefinition txnew = getPatientsStartedArtOnFilaOrArvPickupDuringThePeriod();
+    CohortDefinition txnew = getTxNewCompositionCohort("patientEnrolledInART");
 
     CohortDefinition cd200AgeFiveOrOver =
         getCd4Result(
@@ -403,6 +425,7 @@ public class TxNewCohortQueries {
     return cd;
   }
 
+  /** <b>Patient Disaggregation- CD4 result ≥200/mm3 </b> */
   public CohortDefinition cd4ResultGreaterThan200() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -413,7 +436,7 @@ public class TxNewCohortQueries {
 
     String mapping1 = "endDate=${endDate},location=${location}";
 
-    CohortDefinition txnew = getPatientsStartedArtOnFilaOrArvPickupDuringThePeriod();
+    CohortDefinition txnew = getTxNewCompositionCohort("patientEnrolledInART");
 
     CohortDefinition cd200AgeFiveOrOver =
         getCd4Result(
@@ -428,6 +451,7 @@ public class TxNewCohortQueries {
     return cd;
   }
 
+  /** <b>Patient Disaggregation- Unknown CD4</b> */
   public CohortDefinition unknownCd4Result() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -437,7 +461,7 @@ public class TxNewCohortQueries {
 
     String mapping1 = "endDate=${endDate},location=${location}";
 
-    CohortDefinition txnew = getPatientsStartedArtOnFilaOrArvPickupDuringThePeriod();
+    CohortDefinition txnew = getTxNewCompositionCohort("patientEnrolledInART");
 
     CohortDefinition cd4Under200 =
         getCd4Result(

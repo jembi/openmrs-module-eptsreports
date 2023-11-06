@@ -75,12 +75,37 @@ public class TxNewDataset extends BaseDataSet {
         EptsReportUtils.map(patientEnrolledInHIVStartedARTIndicator, mappings),
         "");
 
-//        addRow(
-//                dataSetDefinition,
-//                "severeTbLam",
-//                "ClientsWithSevereImmunodepressionAndTbLam",
-//                EptsReportUtils.map(severeTbLam, inclusionPeriod),
-//                dissagregations());
+    addRow(
+        dataSetDefinition,
+        "under200M",
+        "Cd4 result under than 200 Male",
+        EptsReportUtils.map(
+            (CohortIndicator) txNewCohortQueries.getCd4ResultLessThan200(), mappings),
+        getMaleColumns());
+
+    addRow(
+        dataSetDefinition,
+        "under200F",
+        "Cd4 result under than 200 Female",
+        EptsReportUtils.map(
+            (CohortIndicator) txNewCohortQueries.getCd4ResultLessThan200(), mappings),
+        getFemaleColumns());
+
+    addRow(
+        dataSetDefinition,
+        "above200M",
+        "Cd4 result greater than 200 Male",
+        EptsReportUtils.map(
+            (CohortIndicator) txNewCohortQueries.cd4ResultGreaterThan200(), mappings),
+        getMaleColumns());
+
+    addRow(
+        dataSetDefinition,
+        "above200F",
+        "Cd4 result greater than 200 Female",
+        EptsReportUtils.map(
+            (CohortIndicator) txNewCohortQueries.cd4ResultGreaterThan200(), mappings),
+        getFemaleColumns());
 
     dataSetDefinition.addColumn(
         "ANC",
