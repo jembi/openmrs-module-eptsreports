@@ -21,6 +21,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
   private HivMetadata hivMetadata;
   private TbMetadata tbMetadata;
+  public Cd4CountComparison cd4CountComparison;
   private TXTBCohortQueries txtbCohortQueries;
   private ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries;
   private TxNewCohortQueries txNewCohortQueries;

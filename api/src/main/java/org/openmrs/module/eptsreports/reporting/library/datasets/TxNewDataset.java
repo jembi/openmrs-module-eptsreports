@@ -74,6 +74,14 @@ public class TxNewDataset extends BaseDataSet {
         "TX_NEW: New on ART",
         EptsReportUtils.map(patientEnrolledInHIVStartedARTIndicator, mappings),
         "");
+
+//        addRow(
+//                dataSetDefinition,
+//                "severeTbLam",
+//                "ClientsWithSevereImmunodepressionAndTbLam",
+//                EptsReportUtils.map(severeTbLam, inclusionPeriod),
+//                dissagregations());
+
     dataSetDefinition.addColumn(
         "ANC",
         "TX_NEW: Breastfeeding Started ART",
