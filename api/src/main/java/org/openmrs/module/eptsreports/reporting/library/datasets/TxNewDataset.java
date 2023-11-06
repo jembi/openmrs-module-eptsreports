@@ -107,6 +107,20 @@ public class TxNewDataset extends BaseDataSet {
             (CohortIndicator) txNewCohortQueries.cd4ResultGreaterThan200(), mappings),
         getFemaleColumns());
 
+    addRow(
+        dataSetDefinition,
+        "cd4UnknownM",
+        "Unknown Cd4 result - Male",
+        EptsReportUtils.map((CohortIndicator) txNewCohortQueries.unknownCd4Result(), mappings),
+        getMaleColumns());
+
+    addRow(
+        dataSetDefinition,
+        "cd4UnknownF",
+        "Unknown Cd4 result - Female",
+        EptsReportUtils.map((CohortIndicator) txNewCohortQueries.unknownCd4Result(), mappings),
+        getFemaleColumns());
+
     dataSetDefinition.addColumn(
         "ANC",
         "TX_NEW: Breastfeeding Started ART",
