@@ -243,6 +243,73 @@ public class TxNewCohortQueries {
   }
 
   /**
+   * All patients whose earliest ART start date (NEW_FR4.1) falls on or after (>=) 21 December 2023.
+   *
+   * <p>AND whose first ever drug pick-up date between the following sources falls during the
+   * reporting period:
+   *
+   * <ul>
+   *   <li>Drug pick-up date registered on (FILA)
+   *   <li>Drug pick-up date registered on (Recepção Levantou ARV) – Master Card
+   * </ul>
+   *
+   * @return String
+   */
+  public String getPatientsArtStartOnFilaOrArvPickup() {
+
+    return "       SELECT first.patient_id, MIN(first.pickup_date) first_pickup "
+        + "       FROM ( "
+        + "             SELECT p.patient_id, MIN(e.encounter_datetime) AS pickup_date "
+        + "                FROM patient p "
+        + "             INNER JOIN encounter e ON e.patient_id = p.patient_id "
+        + "             INNER JOIN ( "
+        + "                   SELECT p.patient_id, MIN(e.encounter_datetime) AS pickup_date "
+        + "                   FROM patient p "
+        + "                   INNER JOIN encounter e ON e.patient_id = p.patient_id "
+        + "                 WHERE e.encounter_type = ${18} "
+        + "                    AND e.voided = 0 "
+        + "                    AND p.voided = 0 "
+        + "                    AND e.location_id = :location "
+        + "                 GROUP BY p.patient_id "
+        + "                        ) first_ever ON first_ever.patient_id = p.patient_id "
+        + "             WHERE p.voided = 0  "
+        + "               AND e.voided = 0 "
+        + "               AND e.encounter_type = ${18} "
+        + "               AND e.location_id = :location "
+        + "               AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+        + "       GROUP BY p.patient_id "
+        + "       UNION "
+        + "       SELECT p.patient_id, MIN(o.value_datetime) AS pickup_date "
+        + "       FROM patient p "
+        + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
+        + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "       INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id  "
+        + " INNER JOIN ( "
+        + "       SELECT p.patient_id, MIN(o.value_datetime) AS pickup_date "
+        + "       FROM patient p "
+        + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
+        + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "       WHERE e.encounter_type = ${52} "
+        + "           AND o.concept_id = ${23866} "
+        + "           AND o.voided = 0 "
+        + "           AND e.location_id = :location "
+        + "           AND e.voided = 0 "
+        + "           AND p.voided = 0 "
+        + "       GROUP BY p.patient_id "
+        + " ) first_ever_pickup ON first_ever_pickup.patient_id = p.patient_id  "
+        + "       WHERE e.encounter_type = ${52} "
+        + "           AND o.concept_id = ${23866} "
+        + "           AND o.value_datetime BETWEEN :startDate AND :endDate "
+        + "           AND o.voided = 0 "
+        + "           AND e.location_id = :location "
+        + "           AND e.voided = 0 "
+        + "           AND p.voided = 0 "
+        + "       GROUP BY p.patient_id "
+        + "        ) first "
+        + "     GROUP BY first.patient_id ";
+  }
+
+  /**
    * <b>NEW_FR4: Patients who initiated ART during the reporting period</b>
    *
    * <p>All patients whose earliest ART start date (NEW_FR4.1) falls on or after (>=) 21 December
@@ -264,6 +331,7 @@ public class TxNewCohortQueries {
   public CohortDefinition getPatientsStartedArtOnFilaOrArvPickupDuringThePeriod() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Number of patientes who initiated TARV - Fila and ARV Pickup");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -277,7 +345,7 @@ public class TxNewCohortQueries {
     String query =
         "       SELECT patient_id "
             + " FROM ( "
-            + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
+            + getPatientsArtStartOnFilaOrArvPickup()
             + "       ) start "
             + " WHERE start.first_pickup >= '2023-12-21' ";
 
@@ -315,6 +383,7 @@ public class TxNewCohortQueries {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Number of patientes who initiated TARV - Fila and ARV Pickup");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -342,7 +411,7 @@ public class TxNewCohortQueries {
             + "       SELECT start.patient_id, "
             + "              start.first_pickup AS first_pickup "
             + "             FROM ( "
-            + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
+            + getPatientsArtStartOnFilaOrArvPickup()
             + "       ) start "
             + " WHERE start.first_pickup >= '2023-12-21' "
             + "       ) art"
@@ -411,12 +480,12 @@ public class TxNewCohortQueries {
 
     CohortDefinition txnew = getTxNewCompositionCohort("patientEnrolledInART");
 
-    CohortDefinition cd200AgeFiveOrOver =
+    CohortDefinition cd4Under200 =
         getCd4Result(
             AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3);
 
     cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping1));
-    cd.addSearch("cd4Under200", EptsReportUtils.map(cd200AgeFiveOrOver, mapping1));
+    cd.addSearch("cd4Under200", EptsReportUtils.map(cd4Under200, mapping1));
 
     cd.setCompositionString("txnew AND cd4Under200 ");
 
@@ -436,13 +505,13 @@ public class TxNewCohortQueries {
 
     CohortDefinition txnew = getTxNewCompositionCohort("patientEnrolledInART");
 
-    CohortDefinition cd200AgeFiveOrOver =
+    CohortDefinition cd4Above200 =
         getCd4Result(
             AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.GreaterThanOrEqualTo200mm3);
 
     cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping1));
 
-    cd.addSearch("cd4Above200", EptsReportUtils.map(cd200AgeFiveOrOver, mapping1));
+    cd.addSearch("cd4Above200", EptsReportUtils.map(cd4Above200, mapping1));
 
     cd.setCompositionString("txnew AND cd4Above200");
 
