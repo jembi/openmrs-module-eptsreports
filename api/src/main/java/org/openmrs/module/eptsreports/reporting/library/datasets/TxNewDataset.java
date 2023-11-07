@@ -80,7 +80,10 @@ public class TxNewDataset extends BaseDataSet {
         "under200M",
         "Cd4 result under than 200 Male",
         EptsReportUtils.map(
-            (CohortIndicator) txNewCohortQueries.getCd4ResultLessThan200(), mappings),
+            eptsGeneralIndicator.getIndicator(
+                "Cd4 result under than 200 Male",
+                EptsReportUtils.map(txNewCohortQueries.getCd4ResultLessThan200(), mappings)),
+            mappings),
         getMaleColumns());
 
     addRow(
@@ -88,7 +91,10 @@ public class TxNewDataset extends BaseDataSet {
         "under200F",
         "Cd4 result under than 200 Female",
         EptsReportUtils.map(
-            (CohortIndicator) txNewCohortQueries.getCd4ResultLessThan200(), mappings),
+            eptsGeneralIndicator.getIndicator(
+                "Cd4 result under than 200 Female",
+                EptsReportUtils.map(txNewCohortQueries.getCd4ResultLessThan200(), mappings)),
+            mappings),
         getFemaleColumns());
 
     addRow(
@@ -96,7 +102,10 @@ public class TxNewDataset extends BaseDataSet {
         "above200M",
         "Cd4 result greater than 200 Male",
         EptsReportUtils.map(
-            (CohortIndicator) txNewCohortQueries.cd4ResultGreaterThan200(), mappings),
+            eptsGeneralIndicator.getIndicator(
+                "Cd4 result greater than 200 Male",
+                EptsReportUtils.map(txNewCohortQueries.cd4ResultGreaterThan200(), mappings)),
+            mappings),
         getMaleColumns());
 
     addRow(
@@ -104,21 +113,32 @@ public class TxNewDataset extends BaseDataSet {
         "above200F",
         "Cd4 result greater than 200 Female",
         EptsReportUtils.map(
-            (CohortIndicator) txNewCohortQueries.cd4ResultGreaterThan200(), mappings),
+            eptsGeneralIndicator.getIndicator(
+                "Cd4 result greater than 200 Female",
+                EptsReportUtils.map(txNewCohortQueries.cd4ResultGreaterThan200(), mappings)),
+            mappings),
         getFemaleColumns());
 
     addRow(
         dataSetDefinition,
         "cd4UnknownM",
         "Unknown Cd4 result - Male",
-        EptsReportUtils.map((CohortIndicator) txNewCohortQueries.unknownCd4Result(), mappings),
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Unknown Cd4 result - Male",
+                EptsReportUtils.map(txNewCohortQueries.unknownCd4Result(), mappings)),
+            mappings),
         getMaleColumns());
 
     addRow(
         dataSetDefinition,
         "cd4UnknownF",
         "Unknown Cd4 result - Female",
-        EptsReportUtils.map((CohortIndicator) txNewCohortQueries.unknownCd4Result(), mappings),
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Unknown Cd4 result - Female",
+                EptsReportUtils.map(txNewCohortQueries.unknownCd4Result(), mappings)),
+            mappings),
         getFemaleColumns());
 
     dataSetDefinition.addColumn(
