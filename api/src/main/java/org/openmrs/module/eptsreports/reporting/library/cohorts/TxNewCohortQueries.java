@@ -220,7 +220,6 @@ public class TxNewCohortQueries {
   /**
    * <b>Description:</b> Patients who started ART on Period
    *
-   * @param
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getTxNewCompositionCohort(String cohortName) {
@@ -376,7 +375,6 @@ public class TxNewCohortQueries {
    * <200/mm3 will be prioritized.
    *
    * @param cd4CountComparison
-   * @return
    */
   public CohortDefinition getCd4Result(
       AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison cd4CountComparison) {
@@ -473,10 +471,14 @@ public class TxNewCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("CD4 Result");
     cd.addParameter(new Parameter("location", "Facility", Location.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
 
-    String mapping1 = "endDate=${endDate},location=${location}";
+    String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
     CohortDefinition txnew = getTxNewCompositionCohort("patientEnrolledInART");
 
@@ -484,7 +486,7 @@ public class TxNewCohortQueries {
         getCd4Result(
             AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3);
 
-    cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping1));
+    cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping2));
     cd.addSearch("cd4Under200", EptsReportUtils.map(cd4Under200, mapping1));
 
     cd.setCompositionString("txnew AND cd4Under200 ");
@@ -498,10 +500,14 @@ public class TxNewCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("CD4 Result");
     cd.addParameter(new Parameter("location", "Facility", Location.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
 
-    String mapping1 = "endDate=${endDate},location=${location}";
+    String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
     CohortDefinition txnew = getTxNewCompositionCohort("patientEnrolledInART");
 
@@ -509,7 +515,7 @@ public class TxNewCohortQueries {
         getCd4Result(
             AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.GreaterThanOrEqualTo200mm3);
 
-    cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping1));
+    cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping2));
 
     cd.addSearch("cd4Above200", EptsReportUtils.map(cd4Above200, mapping1));
 
@@ -524,9 +530,14 @@ public class TxNewCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("CD4 Result");
     cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
 
-    String mapping1 = "endDate=${endDate},location=${location}";
+    String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
     CohortDefinition txnew = getTxNewCompositionCohort("patientEnrolledInART");
 
@@ -538,7 +549,7 @@ public class TxNewCohortQueries {
         getCd4Result(
             AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.GreaterThanOrEqualTo200mm3);
 
-    cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping1));
+    cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping2));
     cd.addSearch("cd4Under200", EptsReportUtils.map(cd4Under200, mapping1));
     cd.addSearch("cd4Above200", EptsReportUtils.map(cd4Above200, mapping1));
 
