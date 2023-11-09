@@ -335,18 +335,184 @@ public class TxNewCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("1255", hivMetadata.getARVPlanConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+
+    String query =
+        " SELECT new_art.patient_id "
+            + " FROM ( "
+            + " SELECT patient_id "
+            + " FROM ( "
+            + getPatientsStartedArtClinicalAndPickUp()
+            + "       ) start "
+            + " WHERE start.min_art_date >= '2023-12-21' "
+            + " UNION "
+            + " SELECT patient_id "
+            + " FROM ( "
+            + getPatientsArtStartOnFilaOrArvPickup()
+            + "       ) start "
+            + " WHERE start.first_pickup >= '2023-12-21' "
+            + " ) new_art";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    cd.setQuery(sb.replace(query));
+    return cd;
+  }
+
+  /**
+   * <b>NEW_FR4.1: Patient’s earliest ART start date from pick-up and clinical sources </b>
+   *
+   * <p>The system will identify the patient ART start date by selecting the earliest date from the
+   * following sources:
+   *
+   * <ul>
+   *   <li>First ever drug pick up date registered on (FILA)
+   *   <li>Drug initiation date (ARV PLAN = START DRUGS) during the pharmacy or clinical visits
+   *       First start drugs date set in in clinical tools (Ficha de Seguimento Adulto and Ficha de
+   *       Seguimento Pediatria) or Ficha Resumo - Master Card.
+   *   <li>Date of enrollment in ART Program
+   *   <li>First ever drug pick-up date registered on (Recepção Levantou ARV) – Master Card
+   * </ul>
+   *
+   * <p><b>Note: </b>Ensure that the ART start date is truly the first occurrence ever for the
+   * patient. This is particularly important for patients that have different ART start dates
+   * registered in the system.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public String getPatientsStartedArtClinicalAndPickUp() {
+    return "SELECT art.patient_id, "
+        + "       Min(art.art_date) min_art_date "
+        + "FROM   (SELECT p.patient_id, "
+        + "               Min(e.encounter_datetime) art_date "
+        + "        FROM   patient p "
+        + "               INNER JOIN encounter e "
+        + "                       ON e.patient_id = p.patient_id "
+        + "        WHERE  e.encounter_type = ${18} "
+        + "               AND e.encounter_datetime <= :endDate "
+        + "               AND e.voided = 0 "
+        + "               AND p.voided = 0 "
+        + "               AND e.location_id = :location "
+        + "        GROUP  BY p.patient_id "
+        + "        UNION "
+        + "        SELECT p.patient_id, "
+        + "               Min(e.encounter_datetime) art_date "
+        + "        FROM   patient p "
+        + "               INNER JOIN encounter e "
+        + "                       ON p.patient_id = e.patient_id "
+        + "               INNER JOIN obs o "
+        + "                       ON e.encounter_id = o.encounter_id "
+        + "        WHERE  p.voided = 0 "
+        + "               AND e.voided = 0 "
+        + "               AND o.voided = 0 "
+        + "               AND e.encounter_type IN ( ${6}, ${9}, ${18} ) "
+        + "               AND o.concept_id = ${1255} "
+        + "               AND o.value_coded = ${1256} "
+        + "               AND e.encounter_datetime <= :endDate "
+        + "               AND e.location_id = :location "
+        + "        GROUP  BY p.patient_id "
+        + "        UNION "
+        + "        SELECT p.patient_id, "
+        + "               Min(o.value_datetime) min_date "
+        + "        FROM   patient p "
+        + "               INNER JOIN encounter e "
+        + "                       ON e.patient_id = p.patient_id "
+        + "               INNER JOIN obs o "
+        + "                       ON o.encounter_id = e.encounter_id "
+        + "        WHERE  e.encounter_type IN( ${6}, ${9}, ${18}, ${53} ) "
+        + "               AND o.concept_id = ${1190} "
+        + "               AND e.location_id = :location "
+        + "               AND o.value_datetime <= :endDate "
+        + "               AND e.voided = 0 "
+        + "               AND p.voided = 0 "
+        + "        GROUP  BY p.patient_id "
+        + "        UNION "
+        + "        SELECT p.patient_id, "
+        + "               ps.start_date AS art_date "
+        + "        FROM   patient p "
+        + "               INNER JOIN patient_program pg "
+        + "                       ON p.patient_id = pg.patient_id "
+        + "               INNER JOIN patient_state ps "
+        + "                       ON pg.patient_program_id = ps.patient_program_id "
+        + "        WHERE  pg.location_id = :location "
+        + "               AND pg.program_id = ${2} "
+        + "               AND ps.start_date <= :endDate "
+        + "        UNION "
+        + "        SELECT p.patient_id, "
+        + "               Min(o.value_datetime) AS art_date "
+        + "        FROM   patient p "
+        + "               INNER JOIN encounter e "
+        + "                       ON e.patient_id = p.patient_id "
+        + "               INNER JOIN obs o "
+        + "                       ON o.encounter_id = e.encounter_id "
+        + "        WHERE  e.encounter_type = ${52} "
+        + "               AND o.concept_id = ${23866} "
+        + "               AND o.value_datetime <= :endDate "
+        + "               AND o.voided = 0 "
+        + "               AND e.location_id = :location "
+        + "               AND e.voided = 0 "
+        + "               AND p.voided = 0 "
+        + "        GROUP  BY p.patient_id) art "
+        + "GROUP  BY art.patient_id";
+  }
+
+  /**
+   * <b>NEW_FR4.1: Patient’s earliest ART start date from pick-up and clinical sources </b>
+   *
+   * <p>The system will identify the patient ART start date by selecting the earliest date from the
+   * following sources:
+   *
+   * <ul>
+   *   <li>First ever drug pick up date registered on (FILA)
+   *   <li>Drug initiation date (ARV PLAN = START DRUGS) during the pharmacy or clinical visits
+   *       First start drugs date set in in clinical tools (Ficha de Seguimento Adulto and Ficha de
+   *       Seguimento Pediatria) or Ficha Resumo - Master Card.
+   *   <li>Date of enrollment in ART Program
+   *   <li>First ever drug pick-up date registered on (Recepção Levantou ARV) – Master Card
+   * </ul>
+   *
+   * <p><b>Note: </b>Ensure that the ART start date is truly the first occurrence ever for the
+   * patient. This is particularly important for patients that have different ART start dates
+   * registered in the system.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsStartedArtClinicalAndPickUpSources() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patient’s earliest ART start date from pick-up and clinical sources");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("1255", hivMetadata.getARVPlanConcept().getConceptId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
 
     String query =
         "       SELECT patient_id "
             + " FROM ( "
-            + getPatientsArtStartOnFilaOrArvPickup()
+            + getPatientsStartedArtClinicalAndPickUp()
             + "       ) start "
-            + " WHERE start.first_pickup >= '2023-12-21' ";
+            + " WHERE start.min_art_date <= '2023-12-21' ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     cd.setQuery(sb.replace(query));
