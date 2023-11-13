@@ -290,20 +290,6 @@ public class TxNewCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
-    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
-    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
-    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
-    map.put("1255", hivMetadata.getARVPlanConcept().getConceptId());
-    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
-    map.put("2", hivMetadata.getARTProgram().getProgramId());
-
     CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
 
     String query =
@@ -311,10 +297,10 @@ public class TxNewCohortQueries {
             + " FROM ( "
             + commonQueries.getARTStartDate(true)
             + "       ) start "
-            + " WHERE start.first_pickup <= '2023-12-21' ";
+            + " WHERE start.first_pickup <= '2023-12-21' "
+            + " AND start.first_pickup BETWEEN :startDate AND :endDate ";
 
-    StringSubstitutor sb = new StringSubstitutor(map);
-    cd.setQuery(sb.replace(query));
+    cd.setQuery(query);
     return cd;
   }
 
@@ -343,20 +329,6 @@ public class TxNewCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
-    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
-    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
-    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
-    map.put("1255", hivMetadata.getARVPlanConcept().getConceptId());
-    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
-    map.put("2", hivMetadata.getARTProgram().getProgramId());
-
     CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
 
     String query =
@@ -364,10 +336,10 @@ public class TxNewCohortQueries {
             + " FROM ( "
             + commonQueries.getARTStartDate(true)
             + "       ) start "
-            + " WHERE start.first_pickup >= '2023-12-21' ";
+            + " WHERE start.first_pickup >= '2023-12-21' "
+            + " AND start.first_pickup BETWEEN :startDate AND :endDate ";
 
-    StringSubstitutor sb = new StringSubstitutor(map);
-    cd.setQuery(sb.replace(query));
+    cd.setQuery(query);
     return cd;
   }
 
