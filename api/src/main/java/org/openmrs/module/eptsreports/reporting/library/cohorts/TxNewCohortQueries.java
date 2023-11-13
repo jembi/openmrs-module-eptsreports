@@ -260,11 +260,6 @@ public class TxNewCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    Map<String, Integer> map = new HashMap<>();
-    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
-
     CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
 
     String query =
@@ -272,10 +267,9 @@ public class TxNewCohortQueries {
             + " FROM ( "
             + commonQueries.getFirstDrugPickup()
             + "       ) start "
-            + " WHERE start.first_pickup >= '2023-12-21' ";
+            + " WHERE start.first_pickup_ever >= '2023-12-21' ";
 
-    StringSubstitutor sb = new StringSubstitutor(map);
-    cd.setQuery(sb.replace(query));
+    cd.setQuery(query);
     return cd;
   }
 
@@ -372,17 +366,20 @@ public class TxNewCohortQueries {
     String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
 
     CohortDefinition earliestArtStartDateBeforePeriod = getPatientsArtStartDateBeforePeriod();
-    CohortDefinition earliestArtStartDate = getPatientsArtStartDate();
-    CohortDefinition firstDrugPickUp = getPatientsFirstDrugPickup();
+    CohortDefinition earliestArtStartDateAfterPeriod = getPatientsArtStartDate();
+    CohortDefinition firstDrugPickUpAfterPeriod = getPatientsFirstDrugPickup();
 
     cd.addSearch(
         "earliestArtStartDateBeforePeriod",
         EptsReportUtils.map(earliestArtStartDateBeforePeriod, mapping1));
-    cd.addSearch("earliestArtStartDate", EptsReportUtils.map(earliestArtStartDate, mapping1));
-    cd.addSearch("firstDrugPickUp", EptsReportUtils.map(firstDrugPickUp, mapping1));
+    cd.addSearch(
+        "earliestArtStartDateAfterPeriod",
+        EptsReportUtils.map(earliestArtStartDateAfterPeriod, mapping1));
+    cd.addSearch(
+        "firstDrugPickUpAfterPeriod", EptsReportUtils.map(firstDrugPickUpAfterPeriod, mapping1));
 
     cd.setCompositionString(
-        "(earliestArtStartDate AND firstDrugPickUp) AND NOT earliestArtStartDateBeforePeriod");
+        "(earliestArtStartDateAfterPeriod AND firstDrugPickUpAfterPeriod) AND NOT earliestArtStartDateBeforePeriod");
     return cd;
   }
 

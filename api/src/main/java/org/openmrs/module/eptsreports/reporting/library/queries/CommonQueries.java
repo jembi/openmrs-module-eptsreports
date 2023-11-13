@@ -901,67 +901,58 @@ public class CommonQueries {
    *
    * @return String
    */
-  public String getFirstDrugPickup() {
+  public String getFirstDrugPickupEver(
+      int aRVPharmaciaEncounterType,
+      int masterCardDrugPickupEncounterType,
+      int artDatePickupMasterCard) {
 
-    return "SELECT first.patient_id, "
-        + "       first.first_pickup "
-        + "FROM   (SELECT p.patient_id, "
-        + "               first_ever.pickup_date AS first_pickup "
-        + "        FROM   patient p "
-        + "               INNER JOIN encounter e "
-        + "                       ON e.patient_id = p.patient_id "
-        + "               INNER JOIN (SELECT p.patient_id, "
-        + "                                  Min(e.encounter_datetime) AS pickup_date "
-        + "                           FROM   patient p "
-        + "                                  INNER JOIN encounter e "
-        + "                                          ON e.patient_id = p.patient_id "
-        + "                           WHERE  e.encounter_type = ${18} "
-        + "                                  AND e.voided = 0 "
-        + "                                  AND p.voided = 0 "
-        + "                                  AND e.location_id = :location "
-        + "                                  AND e.encounter_datetime <= :endDate "
-        + "                           GROUP  BY p.patient_id) first_ever "
-        + "                       ON first_ever.patient_id = p.patient_id "
-        + "        WHERE  p.voided = 0 "
-        + "               AND e.voided = 0 "
-        + "               AND e.encounter_type = ${18} "
-        + "               AND e.location_id = :location "
-        + "               AND e.encounter_datetime BETWEEN :startDate AND :endDate "
-        + "        GROUP  BY p.patient_id "
-        + "        UNION "
-        + "        SELECT p.patient_id, "
-        + "               first_ever_pickup.pickup_date AS first_pickup "
-        + "        FROM   patient p "
-        + "               INNER JOIN encounter e "
-        + "                       ON e.patient_id = p.patient_id "
-        + "               INNER JOIN obs o "
-        + "                       ON o.encounter_id = e.encounter_id "
-        + "               INNER JOIN obs o2 "
-        + "                       ON o2.encounter_id = e.encounter_id "
-        + "               INNER JOIN (SELECT p.patient_id, "
-        + "                                  Min(o.value_datetime) AS pickup_date "
-        + "                           FROM   patient p "
-        + "                                  INNER JOIN encounter e "
-        + "                                          ON e.patient_id = p.patient_id "
-        + "                                  INNER JOIN obs o "
-        + "                                          ON o.encounter_id = e.encounter_id "
-        + "                           WHERE  e.encounter_type = ${52} "
-        + "                                  AND o.concept_id = ${23866} "
-        + "                                  AND e.location_id = :location "
-        + "                                  AND e.encounter_datetime <= :endDate "
-        + "                                  AND p.voided = 0 "
-        + "                                  AND e.voided = 0 "
-        + "                                  AND o.voided = 0 "
-        + "                           GROUP  BY p.patient_id) first_ever_pickup "
-        + "                       ON first_ever_pickup.patient_id = p.patient_id "
-        + "        WHERE  e.encounter_type = ${52} "
-        + "               AND o.concept_id = ${23866} "
-        + "               AND o.value_datetime BETWEEN :startDate AND :endDate "
-        + "               AND e.location_id = :location "
-        + "               AND p.voided = 0 "
-        + "               AND e.voided = 0 "
-        + "               AND o.voided = 0 "
-        + "        GROUP  BY p.patient_id) first "
-        + "GROUP  BY first.patient_id ";
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("18", aRVPharmaciaEncounterType);
+    valuesMap.put("52", masterCardDrugPickupEncounterType);
+    valuesMap.put("23866", artDatePickupMasterCard);
+
+    String sql =
+        "SELECT first.patient_id, "
+            + "               Min(first.pickup_date) AS first_pickup_ever "
+            + "        FROM   (SELECT p.patient_id, "
+            + "                       Min(e.encounter_datetime) AS pickup_date "
+            + "                FROM   patient p "
+            + "                       INNER JOIN encounter e "
+            + "                               ON e.patient_id = p.patient_id "
+            + "                WHERE  e.encounter_type = ${18} "
+            + "                       AND e.voided = 0 "
+            + "                       AND p.voided = 0 "
+            + "                       AND e.location_id = :location "
+            + "                       AND e.encounter_datetime <= :endDate "
+            + "                GROUP  BY p.patient_id "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       Min(o.value_datetime) AS pickup_date "
+            + "                FROM   patient p "
+            + "                       INNER JOIN encounter e "
+            + "                               ON e.patient_id = p.patient_id "
+            + "                       INNER JOIN obs o "
+            + "                               ON o.encounter_id = e.encounter_id "
+            + "                WHERE  e.encounter_type = ${52} "
+            + "                       AND o.concept_id = ${23866} "
+            + "                       AND e.location_id = :location "
+            + "                       AND o.value_datetime <= :endDate "
+            + "                       AND p.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND o.voided = 0 "
+            + "                GROUP  BY p.patient_id) first "
+            + "        GROUP  BY first.patient_id "
+            + "        HAVING first_pickup_ever BETWEEN :startDate AND :endDate ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    return stringSubstitutor.replace(sql);
+  }
+
+  public String getFirstDrugPickup() {
+    return getFirstDrugPickupEver(
+        hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
+        hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
+        hivMetadata.getArtDatePickupMasterCard().getConceptId());
   }
 }
