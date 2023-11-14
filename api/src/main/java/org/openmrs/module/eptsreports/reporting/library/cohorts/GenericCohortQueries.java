@@ -41,10 +41,7 @@ import org.openmrs.module.eptsreports.reporting.calculation.generic.StartedArtBe
 import org.openmrs.module.eptsreports.reporting.calculation.generic.StartedArtBeforeDateForTxTbCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.StartedArtOnPeriodCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
-import org.openmrs.module.eptsreports.reporting.library.queries.BaseQueries;
-import org.openmrs.module.eptsreports.reporting.library.queries.PrepCtQueries;
-import org.openmrs.module.eptsreports.reporting.library.queries.PrepNewQueries;
-import org.openmrs.module.eptsreports.reporting.library.queries.ViralLoadQueries;
+import org.openmrs.module.eptsreports.reporting.library.queries.*;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.AgeCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition;
@@ -71,6 +68,8 @@ public class GenericCohortQueries {
   @Autowired private TxCurrCohortQueries txCurrCohortQueries;
 
   @Autowired private CommonMetadata commonMetadata;
+
+  @Autowired private CommonQueries commonQueries;
 
   /**
    * Generic Coded Observation cohort
@@ -450,6 +449,41 @@ public class GenericCohortQueries {
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
     return sqlCohortDefinition;
   }
+
+  public CohortDefinition getAgeOnArtStartDate(
+          Integer minAge, Integer maxAge) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Age on MOH ART start date");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+    Map<String, Integer> map = new HashMap<>();
+    map.put("minAge", minAge);
+    map.put("maxAge", maxAge);
+    String query =
+            "SELECT p.person_id "
+                    + "FROM person p "
+                    + "     INNER JOIN ( "
+                    + commonQueries.getARTStartDate(true)
+                    + "           ) AS A1 ON p.person_id = A1.patient_id "
+                    + "WHERE A1.first_pickup >= :startDate "
+                    + "  AND A1.first_pickup <= :endDate "
+                    + "  AND ";
+    if (minAge != null && maxAge != null) {
+      query +=
+              "     TIMESTAMPDIFF(YEAR, p.birthdate, A1.first_pickup) >= ${minAge}  "
+                      + "         AND   "
+                      + "   TIMESTAMPDIFF(YEAR, p.birthdate, A1.first_pickup) <= ${maxAge}; ";
+    } else if (minAge == null && maxAge != null) {
+      query += "   TIMESTAMPDIFF(YEAR, p.birthdate, A1.first_pickup) <= ${maxAge}; ";
+    } else if (minAge != null && maxAge == null) {
+      query += "   TIMESTAMPDIFF(YEAR, p.birthdate, A1.first_pickup) >= ${minAge};  ";
+    }
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlCohortDefinition;
+  }
+
   /**
    * Age should be calculated In Months on Patient ART Start Date (Check Section A for the algorithm
    * to define this date).
