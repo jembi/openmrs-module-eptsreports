@@ -275,8 +275,10 @@ public class TxNewCohortQueries {
   }
 
   /**
-   * excluding patients with an earliest ART start date from pick-up and clinical sources
-   * (NEW_FR4.1) that falls before (<) 21 December 2023.
+   * All patients whose earliest ART start date from pick-up and clinical sources (NEW_FR4.1) falls
+   * before (<) 21 December 2023 and this date is during the reporting period. (This criterion will
+   * allow for patients who started prior to 21-Dec-23 to be included as TX_NEW in reporting periods
+   * prior to 21-Dec-23.)
    */
   public CohortDefinition getPatientsArtStartDateBeforePeriod() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
