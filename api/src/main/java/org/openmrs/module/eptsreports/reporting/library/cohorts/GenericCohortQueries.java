@@ -452,7 +452,7 @@ public class GenericCohortQueries {
 
   public CohortDefinition getAgeOnArtStartDate(Integer minAge, Integer maxAge) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Age on MOH ART start date");
+    sqlCohortDefinition.setName("Age on ART start date");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
