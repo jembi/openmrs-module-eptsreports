@@ -13,8 +13,6 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
-
 import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.EncounterType;
@@ -227,11 +225,12 @@ public class TxNewCohortQueries {
   public CohortDefinition getTxNewCompositionCohort(String cohortName) {
     CompositionCohortDefinition txNewComposition = new CompositionCohortDefinition();
     txNewComposition.setName(cohortName);
-    txNewComposition.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    txNewComposition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    txNewComposition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    txNewComposition.addParameter(new Parameter("endDate", "End Date", Date.class));
     txNewComposition.addParameter(new Parameter("location", "location", Location.class));
 
     String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
     CohortDefinition startedART = getPatientsStartedArtDuringReportingPeriod();
     CohortDefinition transferredIn =
@@ -239,7 +238,9 @@ public class TxNewCohortQueries {
             .getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2E();
 
     txNewComposition.getSearches().put("startedART", EptsReportUtils.map(startedART, mapping1));
-    txNewComposition.getSearches().put("transferredIn", mapStraightThrough(transferredIn));
+    txNewComposition
+        .getSearches()
+        .put("transferredIn", EptsReportUtils.map(transferredIn, mapping2));
 
     txNewComposition.setCompositionString("startedART NOT transferredIn");
     return txNewComposition;

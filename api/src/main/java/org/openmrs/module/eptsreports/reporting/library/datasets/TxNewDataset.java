@@ -58,7 +58,7 @@ public class TxNewDataset extends BaseDataSet {
             "patientNewlyEnrolledInHIVIndicator",
             EptsReportUtils.map(
                 patientEnrolledInART,
-                "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+                "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addDimension(
         "maternity", EptsReportUtils.map(eptsCommonDimension.maternityDimension(), mappings));
