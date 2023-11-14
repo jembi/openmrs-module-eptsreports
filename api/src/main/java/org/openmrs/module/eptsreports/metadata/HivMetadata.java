@@ -5595,4 +5595,19 @@ public class HivMetadata extends ProgramsMetadata {
             .getGlobalProperty("eptsreports.hivDiseaseResultingInEncephalopathyConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 23896</b>
+   *
+   * <p><b>Name:</b> ART Initiation CD4
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getArtInitiationCd4Concept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.artInitiationCd4");
+    return getConcept(uuid);
+  }
 }

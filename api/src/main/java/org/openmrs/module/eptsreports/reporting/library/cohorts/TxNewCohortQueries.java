@@ -13,17 +13,19 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
 import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.BreastfeedingQueries;
+import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.PregnantQueries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -45,6 +47,9 @@ public class TxNewCohortQueries {
   @Autowired private GenericCohortQueries genericCohorts;
 
   @Autowired private ResumoMensalCohortQueries resumoMensalCohortQueries;
+
+  @Autowired
+  private AdvancedDiseaseAndTBCascadeCohortQueries advancedDiseaseAndTBCascadeCohortQueries;
 
   /**
    * <b>Description:</b> Patients with updated date of departure in the ART Service
@@ -216,7 +221,6 @@ public class TxNewCohortQueries {
   /**
    * <b>Description:</b> Patients who started ART on Period
    *
-   * @param
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getTxNewCompositionCohort(String cohortName) {
@@ -226,7 +230,7 @@ public class TxNewCohortQueries {
     txNewComposition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     txNewComposition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition startedART = genericCohorts.getStartedArtOnPeriod(false, true);
+    CohortDefinition startedART = getPatientsStartedArtOnFilaOrArvPickupDuringThePeriod();
     CohortDefinition transferredIn =
         resumoMensalCohortQueries
             .getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2E();
@@ -236,5 +240,351 @@ public class TxNewCohortQueries {
 
     txNewComposition.setCompositionString("startedART NOT transferredIn");
     return txNewComposition;
+  }
+
+  /**
+   * AND whose first ever drug pick-up date between the following sources falls during the reporting
+   * period:
+   *
+   * <ul>
+   *   <li>Drug pick-up date registered on (FILA)
+   *   <li>Drug pick-up date registered on (Recepção Levantou ARV) – Master Card
+   * </ul>
+   *
+   * @return String
+   */
+  public CohortDefinition getPatientsFirstDrugPickup() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patient’s first ever drug pick-up");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
+
+    String query =
+        "       SELECT patient_id "
+            + " FROM ( "
+            + commonQueries.getFirstDrugPickup()
+            + "       ) start "
+            + " WHERE start.first_pickup_ever >= '2023-12-21' ";
+
+    cd.setQuery(query);
+    return cd;
+  }
+
+  /**
+   * excluding patients with an earliest ART start date from pick-up and clinical sources
+   * (NEW_FR4.1) that falls before (<) 21 December 2023.
+   */
+  public CohortDefinition getPatientsArtStartDateBeforePeriod() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patient’s earliest ART start date from pick-up and clinical sources");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
+
+    String query =
+        "       SELECT patient_id "
+            + " FROM ( "
+            + commonQueries.getARTStartDate(true)
+            + "       ) start "
+            + " WHERE start.first_pickup <= '2023-12-21' "
+            + " AND start.first_pickup BETWEEN :startDate AND :endDate ";
+
+    cd.setQuery(query);
+    return cd;
+  }
+
+  /**
+   * All patients whose earliest ART start date (NEW_FR4.1) falls on or after (>=) 21 December
+   *
+   * <p>2023.
+   *
+   * <p>The system will identify the patient ART start date by selecting the earliest date from the
+   * following sources:
+   *
+   * <p>First ever drug pick up date registered on (FILA) Drug initiation date (ARV PLAN = START
+   * DRUGS) during the pharmacy or clinical visits First start drugs date set in in clinical tools
+   * (Ficha de Seguimento Adulto and Ficha de Seguimento Pediatria) or Ficha Resumo - Master Card.
+   * Date of enrollment in ART Program First ever drug pick-up date registered on (Recepção Levantou
+   * ARV) – Master Card
+   *
+   * <p>Note: Ensure that the ART start date is truly the first occurrence ever for the patient.
+   * This is particularly important for patients that have different ART start dates registered in
+   * the system.
+   */
+  public CohortDefinition getPatientsArtStartDate() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patient’s earliest ART start date from pick-up and clinical sources");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
+
+    String query =
+        "       SELECT patient_id "
+            + " FROM ( "
+            + commonQueries.getARTStartDate(true)
+            + "       ) start "
+            + " WHERE start.first_pickup >= '2023-12-21' "
+            + " AND start.first_pickup BETWEEN :startDate AND :endDate ";
+
+    cd.setQuery(query);
+    return cd;
+  }
+
+  /**
+   * <b>NEW_FR4: Patients who initiated ART during the reporting period</b>
+   *
+   * <p>All patients whose earliest ART start date (NEW_FR4.1) falls on or after (>=) 21 December
+   * 2023.
+   *
+   * <p>AND whose first ever drug pick-up date between the following sources falls during the
+   * reporting period:
+   *
+   * <ul>
+   *   <li>Drug pick-up date registered on (FILA)
+   *   <li>Drug pick-up date registered on (Recepção Levantou ARV) – Master Card
+   * </ul>
+   *
+   * <p>AND excluding patients with an earliest ART start date from pick-up and clinical sources
+   * (NEW_FR4.1) that falls before (<) 21 December 2023.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsStartedArtOnFilaOrArvPickupDuringThePeriod() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients who initiated ART during the reporting period");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
+
+    CohortDefinition earliestArtStartDateBeforePeriod = getPatientsArtStartDateBeforePeriod();
+    CohortDefinition earliestArtStartDateAfterPeriod = getPatientsArtStartDate();
+    CohortDefinition firstDrugPickUpAfterPeriod = getPatientsFirstDrugPickup();
+
+    cd.addSearch(
+        "earliestArtStartDateBeforePeriod",
+        EptsReportUtils.map(earliestArtStartDateBeforePeriod, mapping1));
+    cd.addSearch(
+        "earliestArtStartDateAfterPeriod",
+        EptsReportUtils.map(earliestArtStartDateAfterPeriod, mapping1));
+    cd.addSearch(
+        "firstDrugPickUpAfterPeriod", EptsReportUtils.map(firstDrugPickUpAfterPeriod, mapping1));
+
+    cd.setCompositionString(
+        "(earliestArtStartDateAfterPeriod AND firstDrugPickUpAfterPeriod) AND NOT earliestArtStartDateBeforePeriod");
+    return cd;
+  }
+
+  /**
+   * <b>Patients with an absolute CD4 result <200/mm3 registered in the following sources:</b>
+   *
+   * <ul>
+   *   <li>CD4 absolute value at ART initiation marked on Ficha Resumo OR
+   *   <li>Last CD4 absolute value marked on Ficha Resumo OR
+   *   <li>CD4 absolute result marked in the Investigações - Resultados Laboratoriais section on
+   *       Ficha Clínica OR
+   *   <li>CD4 absolute result registered on the Lab Form OR
+   *   <li>CD4 absolute result registered on the e-Lab Form
+   * </ul>
+   *
+   * <p>The system will consider the oldest CD4 result date falling between patient ART Start Date -
+   * 90 days and ART Start Date + 28 days from the different sources listed above for the evaluation
+   * of the result (< 200).
+   *
+   * <p><b>Notes: </b>For the CD4 at ART initiation registered on Ficha Resumo, the “ART Start Date”
+   * that is registered on the same Ficha Resumo will be considered as the CD4 result date. For
+   * clients who have CD4 results ≥200/mm3 and <200/mm3 on the same, oldest date, the CD4 result
+   * <200/mm3 will be prioritized.
+   *
+   * @param cd4CountComparison
+   */
+  public CohortDefinition getCd4Result(
+      AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison cd4CountComparison) {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Number of patientes who initiated TARV - Fila and ARV Pickup");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("23896", hivMetadata.getArtInitiationCd4Concept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN ( "
+            + "       SELECT start.patient_id, "
+            + "              start.first_pickup AS first_pickup "
+            + "             FROM ( "
+            + getPatientsFirstDrugPickup()
+            + "       ) start "
+            + " WHERE start.first_pickup >= '2023-12-21' "
+            + "       ) art"
+            + "               ON art.patient_id = p.patient_id "
+            + "       INNER JOIN (SELECT oldest_cd4.patient_id, "
+            + "                          Min(cd4_date) oldest_date "
+            + "                   FROM   (SELECT e.patient_id, "
+            + "                                  Date(e.encounter_datetime) cd4_date "
+            + "                           FROM   encounter e "
+            + "                                  INNER JOIN obs o "
+            + "                                          ON o.encounter_id = e.encounter_id "
+            + "                           WHERE  e.encounter_type IN ( ${6}, ${13}, ${51} ) "
+            + "                                  AND e.location_id = :location "
+            + "                                  AND Date(e.encounter_datetime) <= :endDate "
+            + "                                  AND o.concept_id = ${1695} "
+            + "                                  AND e.voided = 0 "
+            + "                                  AND o.voided = 0 "
+            + "                           UNION "
+            + "                           SELECT e.patient_id, "
+            + "                                  o.obs_datetime AS cd4_date "
+            + "                           FROM   encounter e "
+            + "                                  INNER JOIN obs o "
+            + "                                          ON o.encounter_id = e.encounter_id "
+            + "                           WHERE  e.encounter_type = ${53} "
+            + "                                  AND e.location_id = :location "
+            + "                                  AND e.voided = 0 "
+            + "                                  AND o.voided = 0 "
+            + "                                  AND o.concept_id = ${1695} "
+            + "                                   OR o.concept_id = ${23896} "
+            + "                                  AND o.obs_datetime <= :endDate) oldest_cd4 "
+            + "                   GROUP  BY oldest_cd4.patient_id) cd4 "
+            + "               ON cd4.patient_id = p.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${1695} "
+            + "       AND  ".concat(cd4CountComparison.getProposition())
+            + "       AND ( ( Date(e.encounter_datetime) BETWEEN DATE_SUB(art.first_pickup, "
+            + "                                                  INTERVAL 90 day) "
+            + "                                          AND DATE_ADD(art.first_pickup, INTERVAL 28 day) "
+            + "               AND e.encounter_type IN ( ${6}, ${13}, ${51} ) ) "
+            + "              OR ( Date(o.obs_datetime) BETWEEN Date_sub(art.first_pickup, "
+            + "                                                INTERVAL 90 day) "
+            + "                                        AND Date_add(art.first_pickup, INTERVAL 28 day) "
+            + "                   AND e.encounter_type = ${53} ) ) "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  /** <b> Patient Disaggregation- CD4 result <200/mm3 </b> */
+  public CohortDefinition getCd4ResultLessThan200() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("CD4 Result");
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
+
+    CohortDefinition txnew = getTxNewCompositionCohort("patientEnrolledInART");
+
+    CohortDefinition cd4Under200 =
+        getCd4Result(
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3);
+
+    cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping2));
+    cd.addSearch("cd4Under200", EptsReportUtils.map(cd4Under200, mapping1));
+
+    cd.setCompositionString("txnew AND cd4Under200 ");
+
+    return cd;
+  }
+
+  /** <b>Patient Disaggregation- CD4 result ≥200/mm3 </b> */
+  public CohortDefinition cd4ResultGreaterThan200() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("CD4 Result");
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
+
+    CohortDefinition txnew = getTxNewCompositionCohort("patientEnrolledInART");
+
+    CohortDefinition cd4Above200 =
+        getCd4Result(
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.GreaterThanOrEqualTo200mm3);
+
+    cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping2));
+
+    cd.addSearch("cd4Above200", EptsReportUtils.map(cd4Above200, mapping1));
+
+    cd.setCompositionString("txnew AND cd4Above200");
+
+    return cd;
+  }
+
+  /** <b>Patient Disaggregation- Unknown CD4</b> */
+  public CohortDefinition unknownCd4Result() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("CD4 Result");
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
+
+    CohortDefinition txnew = getTxNewCompositionCohort("patientEnrolledInART");
+
+    CohortDefinition cd4Under200 =
+        getCd4Result(
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3);
+
+    CohortDefinition cd4Above200 =
+        getCd4Result(
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.GreaterThanOrEqualTo200mm3);
+
+    cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping2));
+    cd.addSearch("cd4Under200", EptsReportUtils.map(cd4Under200, mapping1));
+    cd.addSearch("cd4Above200", EptsReportUtils.map(cd4Above200, mapping1));
+
+    cd.setCompositionString("txnew AND NOT (cd4Under200 OR cd4Above200)");
+
+    return cd;
   }
 }

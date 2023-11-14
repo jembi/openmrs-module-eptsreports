@@ -28,7 +28,7 @@ import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Deprecated
-public class SetupMERQuarterly26 extends EptsDataExportManager {
+public class SetupMERQuarterly27 extends EptsDataExportManager {
 
   private TxPvlsDataset txPvlsDataset;
 
@@ -51,7 +51,7 @@ public class SetupMERQuarterly26 extends EptsDataExportManager {
   private PrepCtDataset prepCtDataset;
 
   @Autowired
-  public SetupMERQuarterly26(
+  public SetupMERQuarterly27(
       TxPvlsDataset txPvlsDataset,
       TxNewDataset txNewDataset,
       TxCurrDataset txCurrDataset,

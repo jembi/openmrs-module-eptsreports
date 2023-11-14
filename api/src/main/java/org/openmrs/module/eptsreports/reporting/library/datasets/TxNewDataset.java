@@ -52,6 +52,7 @@ public class TxNewDataset extends BaseDataSet {
 
     CohortDefinition patientEnrolledInART =
         txNewCohortQueries.getTxNewCompositionCohort("patientEnrolledInART");
+
     CohortIndicator patientEnrolledInHIVStartedARTIndicator =
         eptsGeneralIndicator.getIndicator(
             "patientNewlyEnrolledInHIVIndicator",
@@ -73,6 +74,73 @@ public class TxNewDataset extends BaseDataSet {
         "TX_NEW: New on ART",
         EptsReportUtils.map(patientEnrolledInHIVStartedARTIndicator, mappings),
         "");
+
+    addRow(
+        dataSetDefinition,
+        "under200M",
+        "Cd4 result under than 200 Male",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Cd4 result under than 200 Male",
+                EptsReportUtils.map(txNewCohortQueries.getCd4ResultLessThan200(), mappings)),
+            mappings),
+        getMaleColumns());
+
+    addRow(
+        dataSetDefinition,
+        "under200F",
+        "Cd4 result under than 200 Female",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Cd4 result under than 200 Female",
+                EptsReportUtils.map(txNewCohortQueries.getCd4ResultLessThan200(), mappings)),
+            mappings),
+        getFemaleColumns());
+
+    addRow(
+        dataSetDefinition,
+        "above200M",
+        "Cd4 result greater than 200 Male",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Cd4 result greater than 200 Male",
+                EptsReportUtils.map(txNewCohortQueries.cd4ResultGreaterThan200(), mappings)),
+            mappings),
+        getMaleColumns());
+
+    addRow(
+        dataSetDefinition,
+        "above200F",
+        "Cd4 result greater than 200 Female",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Cd4 result greater than 200 Female",
+                EptsReportUtils.map(txNewCohortQueries.cd4ResultGreaterThan200(), mappings)),
+            mappings),
+        getFemaleColumns());
+
+    addRow(
+        dataSetDefinition,
+        "cd4UnknownM",
+        "Unknown Cd4 result - Male",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Unknown Cd4 result - Male",
+                EptsReportUtils.map(txNewCohortQueries.unknownCd4Result(), mappings)),
+            mappings),
+        getMaleColumns());
+
+    addRow(
+        dataSetDefinition,
+        "cd4UnknownF",
+        "Unknown Cd4 result - Female",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Unknown Cd4 result - Female",
+                EptsReportUtils.map(txNewCohortQueries.unknownCd4Result(), mappings)),
+            mappings),
+        getFemaleColumns());
+
     dataSetDefinition.addColumn(
         "ANC",
         "TX_NEW: Breastfeeding Started ART",
