@@ -231,12 +231,14 @@ public class TxNewCohortQueries {
     txNewComposition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     txNewComposition.addParameter(new Parameter("location", "location", Location.class));
 
+    String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
+
     CohortDefinition startedART = getPatientsStartedArtDuringReportingPeriod();
     CohortDefinition transferredIn =
         resumoMensalCohortQueries
             .getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2E();
 
-    txNewComposition.getSearches().put("startedART", mapStraightThrough(startedART));
+    txNewComposition.getSearches().put("startedART", EptsReportUtils.map(startedART, mapping1));
     txNewComposition.getSearches().put("transferredIn", mapStraightThrough(transferredIn));
 
     txNewComposition.setCompositionString("startedART NOT transferredIn");
