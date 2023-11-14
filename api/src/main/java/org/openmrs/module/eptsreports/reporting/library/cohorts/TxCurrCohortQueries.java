@@ -24,6 +24,7 @@ import org.openmrs.module.eptsreports.reporting.calculation.txcurr.ThreeToFiveMo
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.TXCurrQueries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -242,10 +243,26 @@ public class TxCurrCohortQueries {
                 getTransferredOutOnProgramEnrollment(),
                 "onOrBefore=${onOrBefore},location=${location}"));
 
+    txCurrComposition
+        .getSearches()
+        .put(
+            "startedArtBeforeDecember2023",
+            EptsReportUtils.map(
+                getPatientsWhoEverInitiatedTreatmentBeforeDecember2023(),
+                "endDate=${onOrBefore},location=${location}"));
+
+    txCurrComposition
+        .getSearches()
+        .put(
+            "startedArtAfterDecember2023",
+            EptsReportUtils.map(
+                getPatientsWhoStartedArtAfterDecember2023AndHasDrugPickupByReportEndDate(),
+                "endDate=${onOrBefore},location=${location}"));
+
     String compositionString;
     if (currentSpec) {
       compositionString =
-          "(1 OR 2 OR 3 OR 4 OR 5) AND NOT ((6 OR 7 OR 8 OR 9 OR 11 OR ((10 OR 15 OR transferredOutProgram) AND mostRecentSchedule)) AND NOT 12) AND NOT (13 OR 14)";
+          "(startedArtBeforeDecember2023 OR startedArtAfterDecember2023) AND NOT ((6 OR 7 OR 8 OR 9 OR 11 OR ((10 OR 15 OR transferredOutProgram) AND mostRecentSchedule)) AND NOT 12) AND NOT (13 OR 14)";
     } else {
       compositionString = "(111 OR 2 OR 3 OR 4) AND (NOT (555 OR (666 AND (NOT (777 OR 888)))))";
     }
@@ -255,28 +272,116 @@ public class TxCurrCohortQueries {
   }
 
   /**
-   * <p>
-   *     All patients whose earliest ART start date from pick-up and clinical sources (CURR_FR4.1)
-   *     falls before (<) 21 December 2023 and this date falls by the end of the reporting period.
-   * </p>
+   * All patients whose earliest ART start date from pick-up and clinical sources (CURR_FR4.1) falls
+   * before (<) 21 December 2023 and this date falls by the end of the reporting period.
+   *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsWhoEverInitiatedTreatmentBeforeDecember2023(){
+  public CohortDefinition getPatientsWhoEverInitiatedTreatmentBeforeDecember2023() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients With Art Start Date Before December 21st 2023");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Facility", Location.class));
 
     String query =
-            "       SELECT start_art.patient_id "
-                    + " FROM ( "
-                    + commonQueries.getARTStartDate(true)
-                    + "       ) start_art "
-                    + " WHERE start_art.first_pickup >= "
-                    + oldArtStartPeriod ;
+        "       SELECT start_art.patient_id "
+            + " FROM ( "
+            + commonQueries.getARTStartDate(true)
+            + "       ) start_art "
+            + " WHERE start_art.first_pickup < "
+            + oldArtStartPeriod;
 
     sqlCohortDefinition.setQuery(query);
     return sqlCohortDefinition;
+  }
+
+  /**
+   * All patients whose earliest ART start date from pick-up and clinical sources (CURR_FR4.1) falls
+   * before (<) 21 December 2023 and this date falls by the end of the reporting period.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoEverInitiatedTreatmentAfterDecember2023() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients With Art Start Date After December 21st 2023");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Facility", Location.class));
+
+    String query =
+        "       SELECT start_art.patient_id "
+            + " FROM ( "
+            + commonQueries.getARTStartDate(true)
+            + "       ) start_art "
+            + " WHERE start_art.first_pickup >= "
+            + oldArtStartPeriod;
+
+    sqlCohortDefinition.setQuery(query);
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * Patients whose first ever drug pick-up date between the following sources falls by the end of
+   * the reporting endDate
+   * <li>Drug pick-up date registered on (FILA)
+   * <li>Drug pick-up date registered on (Recepção Levantou ARV) – Master Card
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsFirstDrugPickupEver() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients First Drug Pick-up Date Ever ");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Facility", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    valuesMap.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    valuesMap.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+
+    String query =
+        new EptsQueriesUtil()
+            .patientIdQueryBuilder(CommonQueries.getFirstDrugPickOnFilaOrRecepcaoLevantouQuery())
+            .getQuery();
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * All patients whose earliest ART start date (CURR_FR4.1) falls on or after (>=) 21 December 2023
+   * AND
+   *
+   * <p>whose first ever drug pick-up date between the following sources falls by the end of the
+   * reporting period:
+   * <li>Drug pick-up date registered on (FILA)
+   * <li>Drug pick-up date registered on (Recepção Levantou ARV) – Master Card
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition
+      getPatientsWhoStartedArtAfterDecember2023AndHasDrugPickupByReportEndDate() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.setName("Patient Who Ever Started Art");
+
+    cd.addSearch(
+        "startedAfterDecember2023",
+        EptsReportUtils.map(
+            getPatientsWhoEverInitiatedTreatmentAfterDecember2023(),
+            "endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "drugPickupEver",
+        EptsReportUtils.map(
+            getPatientsFirstDrugPickupEver(), "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("startedAfterDecember2023 AND drugPickupEver");
+    return cd;
   }
 
   @DocumentedDefinition("TX_CURR base cohort")
