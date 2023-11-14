@@ -536,7 +536,6 @@ public class TxNewCohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
-    String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
     CohortDefinition txnew = getTxNewCompositionCohort("patientEnrolledInART");
 
@@ -544,7 +543,7 @@ public class TxNewCohortQueries {
         getCd4Result(
             AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3);
 
-    cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping2));
+    cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping1));
     cd.addSearch("cd4Under200", EptsReportUtils.map(cd4Under200, mapping1));
 
     cd.setCompositionString("txnew AND cd4Under200");
@@ -562,7 +561,6 @@ public class TxNewCohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
-    String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
     CohortDefinition txnew = getTxNewCompositionCohort("patientEnrolledInART");
 
@@ -578,7 +576,7 @@ public class TxNewCohortQueries {
             5,
             null);
 
-    cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping2));
+    cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping1));
 
     cd.addSearch("cd4Above200AndAge", EptsReportUtils.map(cd4Above200AndAge, mapping1));
 
@@ -599,7 +597,6 @@ public class TxNewCohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
-    String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
     CohortDefinition txnew = getTxNewCompositionCohort("patientEnrolledInART");
 
@@ -615,7 +612,7 @@ public class TxNewCohortQueries {
             5,
             null);
 
-    cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping2));
+    cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping1));
     cd.addSearch("cd4Under200AndAge", EptsReportUtils.map(cd4Under200AndAge, mapping1));
     cd.addSearch("cd4Above200AndAge", EptsReportUtils.map(cd4Above200AndAge, mapping1));
 
