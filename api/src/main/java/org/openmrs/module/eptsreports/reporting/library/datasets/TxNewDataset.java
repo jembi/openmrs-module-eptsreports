@@ -82,7 +82,8 @@ public class TxNewDataset extends BaseDataSet {
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
                 "Cd4 result under than 200 Male",
-                EptsReportUtils.map(txNewCohortQueries.getCd4ResultLessThan200(), mappings)),
+                EptsReportUtils.map(
+                    txNewCohortQueries.getPatientWithCd4ResultLessThan200(), mappings)),
             mappings),
         getMaleColumns());
 
@@ -93,7 +94,8 @@ public class TxNewDataset extends BaseDataSet {
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
                 "Cd4 result under than 200 Female",
-                EptsReportUtils.map(txNewCohortQueries.getCd4ResultLessThan200(), mappings)),
+                EptsReportUtils.map(
+                    txNewCohortQueries.getPatientWithCd4ResultLessThan200(), mappings)),
             mappings),
         getFemaleColumns());
 
@@ -104,7 +106,8 @@ public class TxNewDataset extends BaseDataSet {
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
                 "Cd4 result greater than 200 Male",
-                EptsReportUtils.map(txNewCohortQueries.cd4ResultGreaterThan200(), mappings)),
+                EptsReportUtils.map(
+                    txNewCohortQueries.getPatientWithcd4ResultGreaterThan200(), mappings)),
             mappings),
         getMaleColumns());
 
@@ -115,7 +118,8 @@ public class TxNewDataset extends BaseDataSet {
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
                 "Cd4 result greater than 200 Female",
-                EptsReportUtils.map(txNewCohortQueries.cd4ResultGreaterThan200(), mappings)),
+                EptsReportUtils.map(
+                    txNewCohortQueries.getPatientWithcd4ResultGreaterThan200(), mappings)),
             mappings),
         getFemaleColumns());
 
@@ -126,7 +130,7 @@ public class TxNewDataset extends BaseDataSet {
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
                 "Unknown Cd4 result - Male",
-                EptsReportUtils.map(txNewCohortQueries.unknownCd4Result(), mappings)),
+                EptsReportUtils.map(txNewCohortQueries.getPatientWithUnknownCd4Result(), mappings)),
             mappings),
         getMaleColumns());
 
@@ -137,7 +141,7 @@ public class TxNewDataset extends BaseDataSet {
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
                 "Unknown Cd4 result - Female",
-                EptsReportUtils.map(txNewCohortQueries.unknownCd4Result(), mappings)),
+                EptsReportUtils.map(txNewCohortQueries.getPatientWithUnknownCd4Result(), mappings)),
             mappings),
         getFemaleColumns());
 
