@@ -450,8 +450,7 @@ public class GenericCohortQueries {
     return sqlCohortDefinition;
   }
 
-  public CohortDefinition getAgeOnArtStartDate(
-          Integer minAge, Integer maxAge) {
+  public CohortDefinition getAgeOnArtStartDate(Integer minAge, Integer maxAge) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Age on MOH ART start date");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -461,19 +460,19 @@ public class GenericCohortQueries {
     map.put("minAge", minAge);
     map.put("maxAge", maxAge);
     String query =
-            "SELECT p.person_id "
-                    + "FROM person p "
-                    + "     INNER JOIN ( "
-                    + commonQueries.getARTStartDate(true)
-                    + "           ) AS A1 ON p.person_id = A1.patient_id "
-                    + "WHERE A1.first_pickup >= :startDate "
-                    + "  AND A1.first_pickup <= :endDate "
-                    + "  AND ";
+        "SELECT p.person_id "
+            + "FROM person p "
+            + "     INNER JOIN ( "
+            + commonQueries.getARTStartDate(true)
+            + "           ) AS A1 ON p.person_id = A1.patient_id "
+            + "WHERE A1.first_pickup >= :startDate "
+            + "  AND A1.first_pickup <= :endDate "
+            + "  AND ";
     if (minAge != null && maxAge != null) {
       query +=
-              "     TIMESTAMPDIFF(YEAR, p.birthdate, A1.first_pickup) >= ${minAge}  "
-                      + "         AND   "
-                      + "   TIMESTAMPDIFF(YEAR, p.birthdate, A1.first_pickup) <= ${maxAge}; ";
+          "     TIMESTAMPDIFF(YEAR, p.birthdate, A1.first_pickup) >= ${minAge}  "
+              + "         AND   "
+              + "   TIMESTAMPDIFF(YEAR, p.birthdate, A1.first_pickup) <= ${maxAge}; ";
     } else if (minAge == null && maxAge != null) {
       query += "   TIMESTAMPDIFF(YEAR, p.birthdate, A1.first_pickup) <= ${maxAge}; ";
     } else if (minAge != null && maxAge == null) {
