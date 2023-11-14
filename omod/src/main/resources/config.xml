@@ -3834,4 +3834,13 @@
 		</description>
 	</globalProperty>
 
+	<!-- ART INITIANTION CD4 -->
+	<globalProperty>
+		<property>eptsreports.artInitiationCd4</property>
+		<defaultValue>596e9d7c-1a17-4177-b4fb-76341dbee9dd</defaultValue>
+		<description>
+			UUID for the  CD4 ABSOLUTE OBS concept
+		</description>
+	</globalProperty>
+
 </module>
