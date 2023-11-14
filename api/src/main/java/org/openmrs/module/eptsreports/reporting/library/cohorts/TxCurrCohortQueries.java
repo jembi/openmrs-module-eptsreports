@@ -22,6 +22,7 @@ import org.openmrs.module.eptsreports.reporting.calculation.txcurr.LessThan3Mont
 import org.openmrs.module.eptsreports.reporting.calculation.txcurr.SixMonthsAndAboveOnArvDispensationCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.txcurr.ThreeToFiveMonthsOnArtDispensationCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
+import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.TXCurrQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -41,6 +42,8 @@ public class TxCurrCohortQueries {
 
   private static final int CURRENT_SPEC_ABANDONMENT_DAYS = 31;
 
+  private final String oldArtStartPeriod = " '2023-12-21' ";
+
   @Autowired private HivMetadata hivMetadata;
 
   @Autowired private CommonMetadata commonMetadata;
@@ -48,6 +51,8 @@ public class TxCurrCohortQueries {
   @Autowired private HivCohortQueries hivCohortQueries;
 
   @Autowired private GenericCohortQueries genericCohortQueries;
+
+  @Autowired private CommonQueries commonQueries;
 
   /**
    * @param cohortName Cohort name
@@ -247,6 +252,31 @@ public class TxCurrCohortQueries {
 
     txCurrComposition.setCompositionString(compositionString);
     return txCurrComposition;
+  }
+
+  /**
+   * <p>
+   *     All patients whose earliest ART start date from pick-up and clinical sources (CURR_FR4.1)
+   *     falls before (<) 21 December 2023 and this date falls by the end of the reporting period.
+   * </p>
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoEverInitiatedTreatmentBeforeDecember2023(){
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients With Art Start Date Before December 21st 2023");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Facility", Location.class));
+
+    String query =
+            "       SELECT start_art.patient_id "
+                    + " FROM ( "
+                    + commonQueries.getARTStartDate(true)
+                    + "       ) start_art "
+                    + " WHERE start_art.first_pickup >= "
+                    + oldArtStartPeriod ;
+
+    sqlCohortDefinition.setQuery(query);
+    return sqlCohortDefinition;
   }
 
   @DocumentedDefinition("TX_CURR base cohort")
