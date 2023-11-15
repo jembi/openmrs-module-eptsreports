@@ -60,15 +60,15 @@ public class PrepNewDataset extends BaseDataSet {
         "maternity", EptsReportUtils.map(eptsCommonDimension.maternityDimension(), mappings));
 
     dsd.addColumn(
-            "Oral",
-            "Oral",
-            EptsReportUtils.map(
-                    eptsGeneralIndicator.getIndicator(
-                            "Oral: Clients Who Newly Initiated PrEP",
-                            EptsReportUtils.map(
-                                    prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
-                    mappings),
-            "");
+        "ORAL",
+        "Oral",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Oral: Clients Who Newly Initiated PrEP",
+                EptsReportUtils.map(
+                    prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
+            mappings),
+        "");
 
     dsd.addColumn(
         "TOTAL",
