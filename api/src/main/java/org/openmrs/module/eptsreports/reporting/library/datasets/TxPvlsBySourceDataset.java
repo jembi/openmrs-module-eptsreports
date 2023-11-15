@@ -333,7 +333,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
     //  Clinical Numerator Gender And Age
     addRow(
         dsd,
-        "NLF",
+        "NC",
         "Patients Gender and Age with suppressed Viral load based on Clinical Forms - Numerator",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
