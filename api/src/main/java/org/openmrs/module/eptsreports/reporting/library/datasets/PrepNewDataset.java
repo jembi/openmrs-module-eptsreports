@@ -56,6 +56,8 @@ public class PrepNewDataset extends BaseDataSet {
         EptsReportUtils.map(
             eptsCommonDimension.getPatientAgeBasedOnPrepStartDate(),
             "endDate=${endDate},location=${location}"));
+    dsd.addDimension(
+        "maternity", EptsReportUtils.map(eptsCommonDimension.maternityDimension(), mappings));
 
     dsd.addColumn(
         "TOTAL",
