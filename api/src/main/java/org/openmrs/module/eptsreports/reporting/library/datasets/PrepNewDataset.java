@@ -261,6 +261,10 @@ public class PrepNewDataset extends BaseDataSet {
         new ColumnParameters("pri", "People in prison and other closed settings", "KP=PRI", "24");
     ColumnParameters msw = new ColumnParameters("msw", "Male sex workers", "KP=MSW", "25");
     ColumnParameters tg = new ColumnParameters("tg", "Transgender", "KP=TG", "26");
+    ColumnParameters breastfeeding =
+        new ColumnParameters("breastfeeding", "Breastfeeding", "maternity=breastfeeding", "27");
+    ColumnParameters pregnant =
+        new ColumnParameters("pregnant", "Pregnant", "maternity=pregnant", "28");
 
     return Arrays.asList(
         fifteenTo19M,
@@ -288,6 +292,8 @@ public class PrepNewDataset extends BaseDataSet {
         csw,
         pri,
         msw,
-        tg);
+        tg,
+        breastfeeding,
+        pregnant);
   }
 }
