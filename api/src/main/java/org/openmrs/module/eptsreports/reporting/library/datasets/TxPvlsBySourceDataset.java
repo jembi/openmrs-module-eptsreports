@@ -116,7 +116,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
         "Patients with Viral load gender and Age - Denominator based on Lab or FSR",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "viral load results on routine adults and children based on Lab or FSR",
+                "viral load results for adults and children based on Lab or FSR",
                 EptsReportUtils.map(
                     txPvlsBySourceLabOrFsrCohortQueries
                         .getPatientsViralLoadWithin12MonthsForLabAndFsrDenominatorAndOnArtForMoreThan3Months(),
@@ -154,10 +154,10 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
     addRow(
         dsd,
         "KPD",
-        "Key population patients and are on routine and target Denominator with Lab or FSR",
+        "Key population patients Denominator with Lab or FSR",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "Key population patients and are on routine and target Denominator with Lab or FSR",
+                "Key population patients Denominator with Lab or FSR",
                 EptsReportUtils.map(
                     txPvlsBySourceLabOrFsrCohortQueries
                         .getPatientsViralLoadWithin12MonthsForLabAndFsrDenominatorAndOnArtForMoreThan3Months(),
@@ -224,14 +224,14 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
             mappings),
         "");
 
-    // Routine for Adults & Children Numerator KP
+    // Adults & Children Numerator KP
     addRow(
         dsd,
         "KPN",
-        "Key population patients and are on routine and target Numerator based on Lab or FSR",
+        "Key population patients Numerator based on Lab or FSR",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "Key population patients and are on routine and target Numerator based on Lab or FSR",
+                "Key population patients Numerator based on Lab or FSR",
                 EptsReportUtils.map(
                     txPvlsBySourceLabOrFsrCohortQueries
                         .getPatientsWithViralLoadSuppressionForLabAndFsrNumeratorWhoAreOnArtMoreThan3Months(),
@@ -374,7 +374,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
             mappings),
         "");
 
-    // Routine for Adults & Children Numerator KP
+    // Adults & Children Numerator KP
     addRow(
         dsd,
         "NKPC",
