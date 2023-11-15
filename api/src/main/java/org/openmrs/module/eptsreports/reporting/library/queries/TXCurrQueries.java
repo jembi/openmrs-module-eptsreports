@@ -382,7 +382,6 @@ public class TXCurrQueries {
       int returnVisitDateForArvDrugConcept,
       int ARVPharmaciaEncounterType,
       int returnVisitDateConcept,
-      int adultoSeguimentoEncounterType,
       int aRVPediatriaSeguimentoEncounterType,
       int artDatePickup,
       int msterCardDrugPickupEncounterType,
@@ -392,7 +391,6 @@ public class TXCurrQueries {
     map.put("returnVisitDateForArvDrugConcept", returnVisitDateForArvDrugConcept);
     map.put("ARVPharmaciaEncounterType", ARVPharmaciaEncounterType);
     map.put("returnVisitDateConcept", returnVisitDateConcept);
-    map.put("adultoSeguimentoEncounterType", adultoSeguimentoEncounterType);
     map.put("aRVPediatriaSeguimentoEncounterType", aRVPediatriaSeguimentoEncounterType);
     map.put("artDatePickup", artDatePickup);
     map.put("msterCardDrugPickupEncounterType", msterCardDrugPickupEncounterType);
@@ -435,14 +433,14 @@ public class TXCurrQueries {
             + "                                    ON enc.patient_id = pa.patient_id "
             + "								WHERE  pa.voided = 0 "
             + "                                AND enc.voided = 0 "
-            + "                                AND enc.encounter_type IN ( ${adultoSeguimentoEncounterType},${aRVPediatriaSeguimentoEncounterType} ) "
+            + "                                AND enc.encounter_type = ${aRVPediatriaSeguimentoEncounterType}  "
             + "                                AND enc.location_id = :location "
             + "                                AND enc.encounter_datetime <= :onOrBefore "
             + "							GROUP  BY pa.patient_id) ficha "
             + "                        INNER JOIN encounter e on "
             + "                            e.patient_id = ficha.patient_id and "
             + "                            e.encounter_datetime = ficha.encounter_datetime and "
-            + "                            e.encounter_type IN (${adultoSeguimentoEncounterType},${aRVPediatriaSeguimentoEncounterType}) and "
+            + "                            e.encounter_type = ${aRVPediatriaSeguimentoEncounterType} and "
             + "                            e.location_id = :location and "
             + "                            e.voided = 0 "
             + "                        INNER JOIN obs o on "

@@ -743,21 +743,16 @@ public class TxCurrCohortQueries {
    *
    * <blockquote>
    *
-   * <b>13 –</b> All patients having the most recent date between last scheduled drug pickup date
-   * <b>(concept_id 5096 = RETURN VISIT DATE FOR ARV DRUG)</b>
+   * <b>Patients who experienced Interruption in Treatment (IIT)</b>
    *
-   * <p>Or last scheduled consultation date (Ficha Seguimento or Ficha Clínica <b>(concept_id =
-   * 1410)</b>)
-   *
-   * <p>Or 30 days after last ART Pickup date (<b>(concept_id = 23866)</b> – Recepção – Levantou
-   * ARV).
-   *
-   * <p>And adding {@code numDays} days and this date being less than reporting end Date. (For more
-   * clarifications refer to scenario Table 1)
+   * <p>
+   *     All patients with the most recent date between next scheduled drug pickup date (FILA)
+   *      and 30 days after last ART pickup date (Ficha Recepção – Levantou ARVs) and adding 28 days
+   *      and this date being less than reporting end date </p>
    *
    * </blockquote>
    *
-   * @param numDays
+   * @param numDays number of days to add
    * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(value = "patientHavingLastScheduledDrugPickupDate")
@@ -772,7 +767,6 @@ public class TxCurrCohortQueries {
             hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId(),
             hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
             commonMetadata.getReturnVisitDateConcept().getConceptId(),
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getArtDatePickupMasterCard().getConceptId(),
             hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
