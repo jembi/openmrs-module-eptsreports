@@ -51,6 +51,7 @@ public class TxNewCohortQueries {
   @Autowired
   private AdvancedDiseaseAndTBCascadeCohortQueries advancedDiseaseAndTBCascadeCohortQueries;
 
+  @Autowired private AgeCohortQueries ageCohortQueries;
   /**
    * <b>Description:</b> Patients with updated date of departure in the ART Service
    *
@@ -226,17 +227,22 @@ public class TxNewCohortQueries {
   public CohortDefinition getTxNewCompositionCohort(String cohortName) {
     CompositionCohortDefinition txNewComposition = new CompositionCohortDefinition();
     txNewComposition.setName(cohortName);
-    txNewComposition.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    txNewComposition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    txNewComposition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    txNewComposition.addParameter(new Parameter("endDate", "End Date", Date.class));
     txNewComposition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition startedART = getPatientsStartedArtOnFilaOrArvPickupDuringThePeriod();
+    String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
+
+    CohortDefinition startedART = getPatientsStartedArtDuringReportingPeriod();
     CohortDefinition transferredIn =
         resumoMensalCohortQueries
             .getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2E();
 
-    txNewComposition.getSearches().put("startedART", mapStraightThrough(startedART));
-    txNewComposition.getSearches().put("transferredIn", mapStraightThrough(transferredIn));
+    txNewComposition.getSearches().put("startedART", EptsReportUtils.map(startedART, mapping1));
+    txNewComposition
+        .getSearches()
+        .put("transferredIn", EptsReportUtils.map(transferredIn, mapping2));
 
     txNewComposition.setCompositionString("startedART NOT transferredIn");
     return txNewComposition;
@@ -274,8 +280,10 @@ public class TxNewCohortQueries {
   }
 
   /**
-   * excluding patients with an earliest ART start date from pick-up and clinical sources
-   * (NEW_FR4.1) that falls before (<) 21 December 2023.
+   * All patients whose earliest ART start date from pick-up and clinical sources (NEW_FR4.1) falls
+   * before (<) 21 December 2023 and this date is during the reporting period. (This criterion will
+   * allow for patients who started prior to 21-Dec-23 to be included as TX_NEW in reporting periods
+   * prior to 21-Dec-23.)
    */
   public CohortDefinition getPatientsArtStartDateBeforePeriod() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -291,7 +299,7 @@ public class TxNewCohortQueries {
             + " FROM ( "
             + commonQueries.getARTStartDate(true)
             + "       ) start "
-            + " WHERE start.first_pickup <= '2023-12-21' "
+            + " WHERE start.first_pickup < '2023-12-21' "
             + " AND start.first_pickup BETWEEN :startDate AND :endDate ";
 
     cd.setQuery(query);
@@ -356,7 +364,7 @@ public class TxNewCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsStartedArtOnFilaOrArvPickupDuringThePeriod() {
+  public CohortDefinition getPatientsStartedArtDuringReportingPeriod() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Patients who initiated ART during the reporting period");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -379,7 +387,31 @@ public class TxNewCohortQueries {
         "firstDrugPickUpAfterPeriod", EptsReportUtils.map(firstDrugPickUpAfterPeriod, mapping1));
 
     cd.setCompositionString(
-        "(earliestArtStartDateAfterPeriod AND firstDrugPickUpAfterPeriod) AND NOT earliestArtStartDateBeforePeriod");
+        "earliestArtStartDateBeforePeriod OR (earliestArtStartDateAfterPeriod AND firstDrugPickUpAfterPeriod)");
+    return cd;
+  }
+
+  private CohortDefinition getPatientsWithCd4AndAge(
+      AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison cd4,
+      Integer minAge,
+      Integer maxAge) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Cd4 And Age");
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+    String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
+
+    CohortDefinition getCd4Result = getCd4Result(cd4);
+    CohortDefinition age = ageCohortQueries.createXtoYAgeCohort("Age", minAge, maxAge);
+
+    cd.addSearch("getCd4Result", EptsReportUtils.map(getCd4Result, mapping1));
+
+    cd.addSearch("age", EptsReportUtils.map(age, "effectiveDate=${endDate}"));
+
+    cd.setCompositionString("getCd4Result AND age");
+
     return cd;
   }
 
@@ -428,6 +460,8 @@ public class TxNewCohortQueries {
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
     map.put("23896", hivMetadata.getArtInitiationCd4Concept().getConceptId());
 
+    CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
+
     String query =
         "SELECT p.patient_id "
             + "FROM   patient p "
@@ -439,9 +473,8 @@ public class TxNewCohortQueries {
             + "       SELECT start.patient_id, "
             + "              start.first_pickup AS first_pickup "
             + "             FROM ( "
-            + getPatientsFirstDrugPickup()
+            + commonQueries.getARTStartDate(true)
             + "       ) start "
-            + " WHERE start.first_pickup >= '2023-12-21' "
             + "       ) art"
             + "               ON art.patient_id = p.patient_id "
             + "       INNER JOIN (SELECT oldest_cd4.patient_id, "
@@ -496,19 +529,15 @@ public class TxNewCohortQueries {
   }
 
   /** <b> Patient Disaggregation- CD4 result <200/mm3 </b> */
-  public CohortDefinition getCd4ResultLessThan200() {
+  public CohortDefinition getPatientWithCd4ResultLessThan200() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("CD4 Result");
-    cd.addParameter(new Parameter("location", "Facility", Location.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
-    String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
     CohortDefinition txnew = getTxNewCompositionCohort("patientEnrolledInART");
 
@@ -516,74 +545,80 @@ public class TxNewCohortQueries {
         getCd4Result(
             AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3);
 
-    cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping2));
+    cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping1));
     cd.addSearch("cd4Under200", EptsReportUtils.map(cd4Under200, mapping1));
 
-    cd.setCompositionString("txnew AND cd4Under200 ");
+    cd.setCompositionString("txnew AND cd4Under200");
 
     return cd;
   }
 
   /** <b>Patient Disaggregation- CD4 result ≥200/mm3 </b> */
-  public CohortDefinition cd4ResultGreaterThan200() {
+  public CohortDefinition getPatientWithcd4ResultGreaterThan200() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("CD4 Result");
-    cd.addParameter(new Parameter("location", "Facility", Location.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
-    String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
     CohortDefinition txnew = getTxNewCompositionCohort("patientEnrolledInART");
 
-    CohortDefinition cd4Above200 =
-        getCd4Result(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.GreaterThanOrEqualTo200mm3);
+    CohortDefinition cd4Above200AndAge =
+        getPatientsWithCd4AndAge(
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.GreaterThanOrEqualTo200mm3,
+            5,
+            null);
 
-    cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping2));
+    CohortDefinition cd4Under200AndAge =
+        getPatientsWithCd4AndAge(
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
+            5,
+            null);
 
-    cd.addSearch("cd4Above200", EptsReportUtils.map(cd4Above200, mapping1));
+    cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping1));
 
-    cd.setCompositionString("txnew AND cd4Above200");
+    cd.addSearch("cd4Above200AndAge", EptsReportUtils.map(cd4Above200AndAge, mapping1));
+
+    cd.addSearch("cd4Under200AndAge", EptsReportUtils.map(cd4Under200AndAge, mapping1));
+
+    cd.setCompositionString("(txnew AND cd4Above200AndAge) AND NOT cd4Under200AndAge");
 
     return cd;
   }
 
   /** <b>Patient Disaggregation- Unknown CD4</b> */
-  public CohortDefinition unknownCd4Result() {
+  public CohortDefinition getPatientWithUnknownCd4Result() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("CD4 Result");
-    cd.addParameter(new Parameter("location", "Facility", Location.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
-    String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
     CohortDefinition txnew = getTxNewCompositionCohort("patientEnrolledInART");
 
-    CohortDefinition cd4Under200 =
-        getCd4Result(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3);
+    CohortDefinition cd4Under200AndAge =
+        getPatientsWithCd4AndAge(
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
+            5,
+            null);
 
-    CohortDefinition cd4Above200 =
-        getCd4Result(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.GreaterThanOrEqualTo200mm3);
+    CohortDefinition cd4Above200AndAge =
+        getPatientsWithCd4AndAge(
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.GreaterThanOrEqualTo200mm3,
+            5,
+            null);
 
-    cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping2));
-    cd.addSearch("cd4Under200", EptsReportUtils.map(cd4Under200, mapping1));
-    cd.addSearch("cd4Above200", EptsReportUtils.map(cd4Above200, mapping1));
+    cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping1));
+    cd.addSearch("cd4Under200AndAge", EptsReportUtils.map(cd4Under200AndAge, mapping1));
+    cd.addSearch("cd4Above200AndAge", EptsReportUtils.map(cd4Above200AndAge, mapping1));
 
-    cd.setCompositionString("txnew AND NOT (cd4Under200 OR cd4Above200)");
+    cd.setCompositionString("txnew AND NOT (cd4Under200AndAge OR cd4Above200AndAge)");
 
     return cd;
   }
