@@ -1641,7 +1641,7 @@ public class TxCurrCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition monthlyDispensationComposition() {
+  public CohortDefinition lessThan3MonthsDispensationComposition() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Get patients with Monthly ARV Dispensation");
     cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
@@ -1649,14 +1649,14 @@ public class TxCurrCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition quarterlyDispensation = getPatientsWithQuarterlyTypeOfDispensation();
-    CohortDefinition monthlyDispensation = getPatientsWithLessThan3MonthlyTypeOfDispensation();
     CohortDefinition semiAnnualDispensation = getPatientsWithSemiAnnualTypeOfDispensation();
+    CohortDefinition txcurr = getTxCurrCompositionCohort("compositionCohort", true);
 
     cd.addSearch("quarterly", Mapped.mapStraightThrough(quarterlyDispensation));
-    cd.addSearch("monthly", Mapped.mapStraightThrough(monthlyDispensation));
     cd.addSearch("semiAnnual", Mapped.mapStraightThrough(semiAnnualDispensation));
+    cd.addSearch("txcurr", Mapped.mapStraightThrough(txcurr));
 
-    cd.setCompositionString("monthly AND NOT (quarterly OR semiAnnual)");
+    cd.setCompositionString("txcurr AND NOT (quarterly OR semiAnnual)");
     return cd;
   }
 
