@@ -389,7 +389,7 @@ public class TxNewCohortQueries {
     return cd;
   }
 
-  private CohortDefinition getPatientsWithCd4AndAge(
+  public CohortDefinition getPatientsWithCd4AndAge(
       AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison cd4,
       Integer minAge,
       Integer maxAge) {
@@ -526,11 +526,48 @@ public class TxNewCohortQueries {
     return cd;
   }
 
-  /** <b> Patient Disaggregation- CD4 result <200/mm3 </b> */
+  /**
+   * <b>Patient Disaggregation- CD4 result <200/mm3 </b>
+   *
+   * <p>The system will identify patients who are included in the TX_NEW numerator (NEW_FR4) for the
+   * absolute CD4 <200/mm3 disaggregation as follows:
+   *
+   * <ul>
+   *   <li>Patients with an absolute CD4 result <200/mm3 registered in the following sources:
+   * </ul>
+   *
+   * <ul>
+   *   <li>CD4 absolute value at ART initiation marked on Ficha Resumo OR
+   *   <li>Last CD4 absolute value marked on Ficha Resumo OR
+   *   <li>CD4 absolute result marked in the Investigações - Resultados Laboratoriais section on
+   *       Ficha Clínica OR
+   *   <li>CD4 absolute result registered on the Lab Form OR
+   *   <li>CD4 absolute result registered on the e-Lab Form
+   * </ul>
+   *
+   * <p>AND
+   *
+   * <ul>
+   *   <li>Excluding patients <5 years of age (NEW_FR9).
+   * </ul>
+   *
+   * <p>The system will consider the oldest CD4 result date falling between patient ART Start Date -
+   * 90 days and ART Start Date + 28 days from the different sources listed above for the evaluation
+   * of the result (< 200). <br>
+   *
+   * <p><b>Notes:</b>
+   *
+   * <ul>
+   *   <li>For the CD4 at ART initiation registered on Ficha Resumo, the “ART Start Date” that is
+   *       registered on the same Ficha Resumo will be considered as the CD4 result date.
+   *   <li>For clients who have CD4 results ≥200/mm3 and <200/mm3 on the same, oldest date, the CD4
+   *       result <200/mm3 will be prioritized.
+   * </ul>
+   */
   public CohortDefinition getPatientWithCd4ResultLessThan200() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("CD4 Result");
+    cd.setName("Patients with CD4 Result Less than 200");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -540,8 +577,10 @@ public class TxNewCohortQueries {
     CohortDefinition txnew = getTxNewCompositionCohort("patientEnrolledInART");
 
     CohortDefinition cd4Under200 =
-        getCd4Result(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3);
+        getPatientsWithCd4AndAge(
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
+            5,
+            null);
 
     cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping1));
     cd.addSearch("cd4Under200", EptsReportUtils.map(cd4Under200, mapping1));
@@ -551,11 +590,48 @@ public class TxNewCohortQueries {
     return cd;
   }
 
-  /** <b>Patient Disaggregation- CD4 result ≥200/mm3 </b> */
+  /**
+   * <b>Patient Disaggregation- CD4 result ≥200/mm3 </b>
+   *
+   * <p>The system will identify patients who are included in the TX_NEW numerator (NEW_FR4) for the
+   * absolute CD4 ≥200/mm3 disaggregation as follows:
+   *
+   * <ul>
+   *   <li>Patients with an absolute CD4 result <200/mm3 registered in the following sources:
+   * </ul>
+   *
+   * <ul>
+   *   <li>CD4 absolute value at ART initiation marked on Ficha Resumo OR
+   *   <li>Last CD4 absolute value marked on Ficha Resumo OR
+   *   <li>CD4 absolute result marked in the Investigações - Resultados Laboratoriais section on
+   *       Ficha Clínica OR
+   *   <li>CD4 absolute result registered on the Lab Form OR
+   *   <li>CD4 absolute result registered on the e-Lab Form
+   * </ul>
+   *
+   * <p>AND
+   *
+   * <ul>
+   *   <li>Excluding patients <5 years of age (NEW_FR9).
+   * </ul>
+   *
+   * <p>The system will consider the oldest CD4 result date falling between patient ART Start Date -
+   * 90 days and ART Start Date + 28 days from the different sources listed above for the evaluation
+   * of the result (< 200). <br>
+   *
+   * <p><b>Notes:</b>
+   *
+   * <ul>
+   *   <li>For the CD4 at ART initiation registered on Ficha Resumo, the “ART Start Date” that is
+   *       registered on the same Ficha Resumo will be considered as the CD4 result date.
+   *   <li>For clients who have CD4 results ≥200/mm3 and <200/mm3 on the same, oldest date, the CD4
+   *       result <200/mm3 will be prioritized.
+   * </ul>
+   */
   public CohortDefinition getPatientWithcd4ResultGreaterThan200() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("CD4 Result");
+    cd.setName("Patients with CD4 Result Above");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -587,11 +663,23 @@ public class TxNewCohortQueries {
     return cd;
   }
 
-  /** <b>Patient Disaggregation- Unknown CD4</b> */
+  /**
+   * <b>Patient Disaggregation- Unknown CD4</b>
+   *
+   * <p>The system will identify patients with unknown CD4 as follows:
+   *
+   * <ul>
+   *   <li>All patients in TX_NEW (NEW_FR4) that are not included in the CD4 result <200/mm3
+   *       (NEW_FR6) nor the CD4 result ≥200/mm3 (NEW_FR7) disaggregates.
+   * </ul>
+   *
+   * <p><b>Note:</b> All children <5 years of age that are included in the TX_NEW numerator will be
+   * included in the “Unknown CD4” disaggregate.
+   */
   public CohortDefinition getPatientWithUnknownCd4Result() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("CD4 Result");
+    cd.setName("Patients with Unknown CD4 Result");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));

@@ -48,6 +48,8 @@ public class TxRttCohortQueries {
 
   private CommonMetadata commonMetadata;
 
+  private TxNewCohortQueries txNewCohortQueries;
+
   private final String DEFAULT_MAPPING =
       "startDate=${startDate},endDate=${endDate},location=${location}";
 
@@ -59,7 +61,8 @@ public class TxRttCohortQueries {
       CommonCohortQueries commonCohortQueries,
       ResumoMensalCohortQueries resumoMensalCohortQueries,
       HivCohortQueries hivCohortQueries,
-      CommonMetadata commonMetadata) {
+      CommonMetadata commonMetadata,
+      TxNewCohortQueries txNewCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.genericCohortQueries = genericCohortQueries;
     this.txCurrCohortQueries = txCurrCohortQueries;
@@ -67,6 +70,7 @@ public class TxRttCohortQueries {
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
     this.hivCohortQueries = hivCohortQueries;
     this.commonMetadata = commonMetadata;
+    this.txNewCohortQueries = txNewCohortQueries;
   }
 
   /**
@@ -600,6 +604,32 @@ public class TxRttCohortQueries {
 
     cd.setCompositionString(
         "initiatedPreviousPeriod AND returned AND txcurr AND (LTFU AND NOT (transferredOut OR transferredIn)) AND AAB");
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientWithCd4ResultLessThan200() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients with CD4 Result Less than 200");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
+
+    CohortDefinition txRtt = getRTTComposition();
+
+    CohortDefinition cd4Under200 =
+        txNewCohortQueries.getPatientsWithCd4AndAge(
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
+            5,
+            null);
+
+    cd.addSearch("txRtt", EptsReportUtils.map(txRtt, mapping1));
+    cd.addSearch("cd4Under200", EptsReportUtils.map(cd4Under200, mapping1));
+
+    cd.setCompositionString("txRtt AND cd4Under200");
 
     return cd;
   }
