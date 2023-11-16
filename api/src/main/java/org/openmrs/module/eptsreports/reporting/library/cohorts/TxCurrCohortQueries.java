@@ -120,13 +120,6 @@ public class TxCurrCohortQueries {
             EptsReportUtils.map(
                 getPatientsWhoLeftARTProgramBeforeOrOnEndDate(),
                 "onOrBefore=${onOrBefore},location=${location}"));
-    txCurrComposition
-        .getSearches()
-        .put(
-            "5",
-            EptsReportUtils.map(
-                getPatientsWhoHavePickedUpDrugsMasterCardByEndReporingPeriod(),
-                "onOrBefore=${onOrBefore},location=${location}"));
     // section 2
     txCurrComposition
         .getSearches()
