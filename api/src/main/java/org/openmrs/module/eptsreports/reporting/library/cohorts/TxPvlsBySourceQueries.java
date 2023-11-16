@@ -52,7 +52,8 @@ public class TxPvlsBySourceQueries {
     map.put("51", String.valueOf(fsrEncounter));
     map.put("856", String.valueOf(vlConceptQuestion));
     map.put("1305", String.valueOf(vlQualitativeConceptQuestion));
-    String query = ""
+    String query =
+        ""
             + "SELECT p.patient_id "
             + "FROM   patient p "
             + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
@@ -161,7 +162,7 @@ public class TxPvlsBySourceQueries {
     map.put("856", String.valueOf(vlConceptQuestion));
     map.put("1305", String.valueOf(vlQualitativeConceptQuestion));
     String query =
-    "SELECT p.patient_id "
+        "SELECT p.patient_id "
             + "FROM   patient p "
             + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
