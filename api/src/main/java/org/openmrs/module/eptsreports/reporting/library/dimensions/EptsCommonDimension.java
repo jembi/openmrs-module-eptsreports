@@ -65,6 +65,8 @@ public class EptsCommonDimension {
   private HivMetadata hivMetadata;
   private CommonMetadata commonMetadata;
 
+  private PrepNewCohortQueries prepNewCohortQueries;
+
   @Autowired private TxPvlsBySourceLabOrFsrCohortQueries txPvlsBySourceLabOrFsrCohortQueries;
 
   @Autowired
@@ -89,7 +91,8 @@ public class EptsCommonDimension {
       TbPrevQueries tbPrevQueries,
       HivMetadata hivMetadata,
       CommonMetadata commonMetadata,
-      TxMlCohortQueries txMlCohortQueries) {
+      TxMlCohortQueries txMlCohortQueries,
+      PrepNewCohortQueries prepNewCohortQueries) {
     this.genderCohortQueries = genderCohortQueries;
     this.txNewCohortQueries = txNewCohortQueries;
     this.genericCohortQueries = genericCohortQueries;
@@ -106,6 +109,7 @@ public class EptsCommonDimension {
     this.tbPrevQueries = tbPrevQueries;
     this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
+    this.prepNewCohortQueries = prepNewCohortQueries;
   }
 
   /**
@@ -990,6 +994,26 @@ public class EptsCommonDimension {
         txPvlsBySourceLabOrFsrCohortQueries.getPatientsOnTargetByFsr();
     dim.addCohortDefinition("VLR", mapStraightThrough(routineViralLoadCohort));
     dim.addCohortDefinition("VLT", mapStraightThrough(targetedViralLoadCohort));
+    return dim;
+  }
+
+  public CohortDefinitionDimension getPregnantAndBreastfeedingPatientsBasedOnPrepNew() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.addParameter(new Parameter("startDate", "startDate", Date.class));
+    dim.addParameter(new Parameter("endDate", "endDate", Date.class));
+    dim.addParameter(new Parameter("location", "location", Location.class));
+    dim.setName("Patients Pregnant or Breastfeeding based on Prep New");
+
+    dim.addCohortDefinition(
+        "pregnant",
+        EptsReportUtils.map(
+            prepNewCohortQueries.getPregnantPatientsBasedOnPrepNew(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    //    dim.addCohortDefinition(
+    //        "breastfeeding",
+    //        EptsReportUtils.map(
+    //            prepNewCohortQueries.getPregnantPatientsBasedOnPrepNew(),
+    //            "startDate=${startDate},endDate=${endDate},location=${location}"));
     return dim;
   }
 }

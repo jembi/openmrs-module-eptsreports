@@ -2,6 +2,7 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
 import java.util.Date;
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.PrepNewQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -17,9 +18,12 @@ public class PrepNewCohortQueries {
 
   private HivMetadata hivMetadata;
 
+  private CommonMetadata commonMetadata;
+
   @Autowired
-  public PrepNewCohortQueries(HivMetadata hivMetadata) {
+  public PrepNewCohortQueries(HivMetadata hivMetadata, CommonMetadata commonMetadata) {
     this.hivMetadata = hivMetadata;
+    this.commonMetadata = commonMetadata;
   }
 
   public CohortDefinition getClientsWhoNewlyInitiatedPrep() {
@@ -101,6 +105,32 @@ public class PrepNewCohortQueries {
             hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
             hivMetadata.getReferalTypeConcept().getConceptId(),
             hivMetadata.getTransferredFromOtherFacilityConcept().getConceptId());
+
+    sqlCohortDefinition.setQuery(query);
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * Get Pregnant Patients Based on Prep New
+   *
+   * @return
+   */
+  public CohortDefinition getPregnantPatientsBasedOnPrepNew() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Clients who are Pregnant In Prep New");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    String query =
+        PrepNewQueries.pregnantPatientsBasedOnPrepNew(
+            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
+            hivMetadata.getInitialStatusPrepUserConcept().getConceptId(),
+            hivMetadata.getPrepTargetGroupConcept().getConceptId(),
+            hivMetadata.getStartDrugs().getConceptId(),
+            hivMetadata.getPregnantConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId(),
+            commonMetadata.getBreastfeeding().getConceptId());
 
     sqlCohortDefinition.setQuery(query);
     return sqlCohortDefinition;
