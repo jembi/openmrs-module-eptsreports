@@ -59,7 +59,7 @@ public class PrepNewDataset extends BaseDataSet {
     dsd.addDimension(
         "maternity",
         EptsReportUtils.map(
-            eptsCommonDimension.getPregnantAndBreastfeedingPatientsBasedOnPrep(), mappings));
+            eptsCommonDimension.getPregnantAndBreastfeedingPatientsBasedOnPrepNew(), mappings));
 
     dsd.addColumn(
         "ORAL",

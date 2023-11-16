@@ -359,6 +359,7 @@ public class PrepNewQueries {
       int prepIncialEncounterType,
       int initialStatusOfPrEPUserConceptId,
       int prepTargetGroupConceptId,
+      int startDrugsConceptId,
       int pregnantConceptId,
       int yesConceptId,
       int breastfeedingConceptId) {
@@ -366,6 +367,7 @@ public class PrepNewQueries {
     map.put("80", prepIncialEncounterType);
     map.put("165296", initialStatusOfPrEPUserConceptId);
     map.put("165196", prepTargetGroupConceptId);
+    map.put("1256", startDrugsConceptId);
     map.put("1982", pregnantConceptId);
     map.put("1065", yesConceptId);
     map.put("6332", breastfeedingConceptId);

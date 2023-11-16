@@ -153,6 +153,7 @@ public class PrepNewCohortQueries {
             hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
             hivMetadata.getInitialStatusPrepUserConcept().getConceptId(),
             hivMetadata.getPrepTargetGroupConcept().getConceptId(),
+            hivMetadata.getStartDrugs().getConceptId(),
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getBreastfeeding().getConceptId());
