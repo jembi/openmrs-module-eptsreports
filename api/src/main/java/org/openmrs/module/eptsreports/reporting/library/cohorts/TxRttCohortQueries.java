@@ -22,6 +22,7 @@ import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.TxRttQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -50,6 +51,8 @@ public class TxRttCohortQueries {
 
   private TxNewCohortQueries txNewCohortQueries;
 
+  private AgeCohortQueries ageCohortQueries;
+
   private final String DEFAULT_MAPPING =
       "startDate=${startDate},endDate=${endDate},location=${location}";
 
@@ -62,7 +65,8 @@ public class TxRttCohortQueries {
       ResumoMensalCohortQueries resumoMensalCohortQueries,
       HivCohortQueries hivCohortQueries,
       CommonMetadata commonMetadata,
-      TxNewCohortQueries txNewCohortQueries) {
+      TxNewCohortQueries txNewCohortQueries,
+      AgeCohortQueries ageCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.genericCohortQueries = genericCohortQueries;
     this.txCurrCohortQueries = txCurrCohortQueries;
@@ -71,6 +75,7 @@ public class TxRttCohortQueries {
     this.hivCohortQueries = hivCohortQueries;
     this.commonMetadata = commonMetadata;
     this.txNewCohortQueries = txNewCohortQueries;
+    this.ageCohortQueries = ageCohortQueries;
   }
 
   /**
@@ -608,6 +613,129 @@ public class TxRttCohortQueries {
     return cd;
   }
 
+  /**
+   * Absolute CD4 Count
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getCd4Result(
+      AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison cd4CountComparison) {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients with CD4 Result");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("23896", hivMetadata.getArtInitiationCd4Concept().getConceptId());
+
+    CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN ( "
+            + "       SELECT start.patient_id, "
+            + "              start.first_pickup_ever AS earliest_pickup "
+            + "             FROM ( "
+            + commonQueries.getFirstDrugPickup()
+            + "       ) start "
+            + "       ) art"
+            + "               ON art.patient_id = p.patient_id "
+            + "       INNER JOIN (SELECT oldest_cd4.patient_id, "
+            + "                          Min(cd4_date) oldest_date "
+            + "                   FROM   (SELECT e.patient_id, "
+            + "                                  Date(e.encounter_datetime) cd4_date "
+            + "                           FROM   encounter e "
+            + "                                  INNER JOIN obs o "
+            + "                                          ON o.encounter_id = e.encounter_id "
+            + "                           WHERE  e.encounter_type IN ( ${6}, ${13}, ${51} ) "
+            + "                                  AND e.location_id = :location "
+            + "                                  AND Date(e.encounter_datetime) <= :endDate "
+            + "                                  AND o.concept_id = ${1695} "
+            + "                                  AND e.voided = 0 "
+            + "                                  AND o.voided = 0 "
+            + "                           UNION "
+            + "                           SELECT e.patient_id, "
+            + "                                  o.obs_datetime AS cd4_date "
+            + "                           FROM   encounter e "
+            + "                                  INNER JOIN obs o "
+            + "                                          ON o.encounter_id = e.encounter_id "
+            + "                           WHERE  e.encounter_type = ${53} "
+            + "                                  AND e.location_id = :location "
+            + "                                  AND e.voided = 0 "
+            + "                                  AND o.voided = 0 "
+            + "                                  AND o.concept_id = ${1695} "
+            + "                                   OR o.concept_id = ${23896} "
+            + "                                  AND o.obs_datetime <= :endDate) oldest_cd4 "
+            + "                   GROUP  BY oldest_cd4.patient_id) cd4 "
+            + "               ON cd4.patient_id = p.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${1695} "
+            + "       AND  ".concat(cd4CountComparison.getProposition())
+            + "       AND ( ( Date(e.encounter_datetime) BETWEEN DATE_SUB(art.earliest_pickup, "
+            + "                                                  INTERVAL 30 day) "
+            + "                                          AND DATE_ADD(art.earliest_pickup, INTERVAL 28 day) "
+            + "               AND e.encounter_type IN ( ${6}, ${13}, ${51} ) ) "
+            + "              OR ( Date(o.obs_datetime) BETWEEN Date_sub(art.earliest_pickup, "
+            + "                                                INTERVAL 30 day) "
+            + "                                        AND Date_add(art.earliest_pickup, INTERVAL 28 day) "
+            + "                   AND e.encounter_type = ${53} ) ) "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * @param cd4 - Absolute CD4 result
+   * @param minAge minimum age of patient base on effective date
+   * @param maxAge maximum age of patent base on effective date
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsWithCd4AndAge(
+          AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison cd4,
+          Integer minAge,
+          Integer maxAge) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Cd4 And Age");
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+    CohortDefinition getCd4Result = getCd4Result(cd4);
+    CohortDefinition age = ageCohortQueries.createXtoYAgeCohort("Age", minAge, maxAge);
+
+    cd.addSearch("getCd4Result", EptsReportUtils.map(getCd4Result, DEFAULT_MAPPING));
+
+    cd.addSearch("age", EptsReportUtils.map(age, "effectiveDate=${endDate}"));
+
+    cd.setCompositionString("getCd4Result AND age");
+
+    return cd;
+  }
+
   public CohortDefinition getPatientWithCd4ResultLessThan200() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -616,18 +744,16 @@ public class TxRttCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
-    String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
-
     CohortDefinition txRtt = getRTTComposition();
 
     CohortDefinition cd4Under200 =
-        txNewCohortQueries.getPatientsWithCd4AndAge(
+        getPatientsWithCd4AndAge(
             AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
             5,
             null);
 
-    cd.addSearch("txRtt", EptsReportUtils.map(txRtt, mapping1));
-    cd.addSearch("cd4Under200", EptsReportUtils.map(cd4Under200, mapping1));
+    cd.addSearch("txRtt", EptsReportUtils.map(txRtt, DEFAULT_MAPPING));
+    cd.addSearch("cd4Under200", EptsReportUtils.map(cd4Under200, DEFAULT_MAPPING));
 
     cd.setCompositionString("txRtt AND cd4Under200");
 
