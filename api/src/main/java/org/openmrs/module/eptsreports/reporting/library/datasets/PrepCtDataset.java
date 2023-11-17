@@ -60,6 +60,15 @@ public class PrepCtDataset extends BaseDataSet {
         "results", EptsReportUtils.map(eptsCommonDimension.getPatientTestResultsPrep(), mappings));
 
     dsd.addColumn(
+        "ORAL",
+        "Oral",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Oral", EptsReportUtils.map(prepCtCohortQueries.getPREPCTNumerator(), mappings)),
+            mappings),
+        "");
+
+    dsd.addColumn(
         "TOTAL-CT",
         "Total PrEP CT Numerator",
         EptsReportUtils.map(

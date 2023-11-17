@@ -951,6 +951,7 @@ public class GenericCohortQueries {
             hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
             hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getCurrentStateOfTheWomanUuidConcept().getConceptId(),
+            hivMetadata.getPrepTargetGroupConcept().getConceptId(),
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getPatientFoundYesConcept().getConceptId(),
             commonMetadata.getBreastfeeding().getConceptId()));
@@ -968,6 +969,7 @@ public class GenericCohortQueries {
             hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
             hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getCurrentStateOfTheWomanUuidConcept().getConceptId(),
+            hivMetadata.getPrepTargetGroupConcept().getConceptId(),
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getPatientFoundYesConcept().getConceptId(),
             commonMetadata.getBreastfeeding().getConceptId()));

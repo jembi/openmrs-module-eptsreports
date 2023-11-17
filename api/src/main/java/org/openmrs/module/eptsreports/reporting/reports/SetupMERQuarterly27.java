@@ -128,8 +128,8 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
         "PREP", Mapped.mapStraightThrough(prepNewDataset.constructPrepNewDataset()));
     //    rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new
     // DatimCodeDatasetDefinition()));
-    //    rd.addDataSetDefinition(
-    //        "PREPNUM", Mapped.mapStraightThrough(prepCtDataset.constructPrepCtDataset()));
+    rd.addDataSetDefinition(
+        "PREPNUM", Mapped.mapStraightThrough(prepCtDataset.constructPrepCtDataset()));
 
     // add a base cohort here to help in calculations running
     rd.setBaseCohortDefinition(

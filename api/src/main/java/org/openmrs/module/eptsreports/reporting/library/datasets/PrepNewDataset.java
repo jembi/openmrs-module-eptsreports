@@ -66,7 +66,7 @@ public class PrepNewDataset extends BaseDataSet {
         "Oral",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "Oral: Clients Who Newly Initiated PrEP",
+                "Oral",
                 EptsReportUtils.map(
                     prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
             mappings),
