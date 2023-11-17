@@ -55,6 +55,8 @@ public class TxCurrCohortQueries {
 
   @Autowired private CommonQueries commonQueries;
 
+  @Autowired private TxTbMonthlyCascadeCohortQueries txTbMonthlyCascadeCohortQueries;
+
   /**
    * @param cohortName Cohort name
    * @param currentSpec - true for is current and false the opposit
@@ -203,10 +205,18 @@ public class TxCurrCohortQueries {
                 getPatientsWhoStartedArtAfterDecember2023AndHasDrugPickupByReportEndDate(),
                 "endDate=${onOrBefore},location=${location}"));
 
+    txCurrComposition
+        .getSearches()
+        .put(
+            "transferredIn",
+            EptsReportUtils.map(
+                getPatientsWhoAreTransferredIn(), "endDate=${onOrBefore},location=${location}"));
+
     String compositionString;
     if (currentSpec) {
       compositionString =
-          "(startedArtBeforeDecember2023 OR startedArtAfterDecember2023) AND NOT (suspended OR died OR (transferredOut AND mostRecentSchedule) OR 13 OR 14) ";
+          "(startedArtBeforeDecember2023 OR startedArtAfterDecember2023 OR transferredIn) AND NOT (suspended OR died OR (transferredOut AND mostRecentSchedule) OR 13 OR 14) ";
+
     } else {
       compositionString = "(111 OR 2 OR 3 OR 4) AND (NOT (555 OR (666 AND (NOT (777 OR 888)))))";
     }
@@ -261,6 +271,29 @@ public class TxCurrCohortQueries {
 
     sqlCohortDefinition.setQuery(query);
     return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getPatientsWhoAreTransferredIn() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.setName("Patient Who Ever Started Art");
+
+    cd.addSearch(
+        "transferredInProgram",
+        EptsReportUtils.map(
+            txTbMonthlyCascadeCohortQueries.getPatientsTransferredInFromProgram(),
+            "endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "transferredInFichaResumo",
+        EptsReportUtils.map(
+            txTbMonthlyCascadeCohortQueries.getPatientsTransferredInFromFichaResumo(),
+            "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("transferredInProgram OR transferredInFichaResumo");
+    return cd;
   }
 
   /**
