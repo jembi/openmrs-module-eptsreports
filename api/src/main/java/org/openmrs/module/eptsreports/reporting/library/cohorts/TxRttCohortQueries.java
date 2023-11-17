@@ -53,6 +53,8 @@ public class TxRttCohortQueries {
 
   private AgeCohortQueries ageCohortQueries;
 
+  private CommonQueries commonQueries;
+
   private final String DEFAULT_MAPPING =
       "startDate=${startDate},endDate=${endDate},location=${location}";
 
@@ -66,7 +68,8 @@ public class TxRttCohortQueries {
       HivCohortQueries hivCohortQueries,
       CommonMetadata commonMetadata,
       TxNewCohortQueries txNewCohortQueries,
-      AgeCohortQueries ageCohortQueries) {
+      AgeCohortQueries ageCohortQueries,
+      CommonQueries commonQueries) {
     this.hivMetadata = hivMetadata;
     this.genericCohortQueries = genericCohortQueries;
     this.txCurrCohortQueries = txCurrCohortQueries;
@@ -76,6 +79,7 @@ public class TxRttCohortQueries {
     this.commonMetadata = commonMetadata;
     this.txNewCohortQueries = txNewCohortQueries;
     this.ageCohortQueries = ageCohortQueries;
+    this.commonQueries = commonQueries;
   }
 
   /**
@@ -106,25 +110,22 @@ public class TxRttCohortQueries {
   }
 
   /**
-   * The TX _RTT indicator reports the number of ART patients with no clinical contact (or ARV drug
-   * pick-up) for greater than 28 days since their last expected contact (who experienced an
-   * interruption in Treatment – IIT) during any previous reporting period, who successfully
-   * restarted ARVs within the reporting period and remained on treatment until the end of reporting
-   * period.
+   * The system will generate the TX_RTT indicator numerator as the number of patients (adults and
+   * children) who ever initiated ART by the end of the previous reporting period (TX_RTT_FR4) and
+   * who:
    *
    * <ul>
-   *   <li>Select all patients patients who initiated ART by end of previous reporting period
-   *       (startDate -1 day) following the criterias defined in the common queries:
-   *   <li>Filter all patients who experienced IIT by end of previous reporting period (startDate -1
-   *       day) following the criterias defined in the common queries:
-   *       <ul>
-   *         <li>And Exclude all IIT patients who are transferred out by previous reporting period,
-   *             following the criterias defined in the common queries:
-   *       </ul>
-   *   <li>Filter all patients who returned to the treatment during the reporting period following
-   *       the criterias below: {@link
-   *       TxRttCohortQueries#getPatientsReturnedTreatmentDuringReportingPeriod() }
-   *   <li>Filter all patients who remained on TX CURR by the end of the reporting period.
+   *   <li><b>1)</b> experienced IIT by end of previous reporting period (TX_RTT_FR5) and
+   *   <li><b>2)</b> returned to ARV treatment during the reporting period (TX_RTT_FR6) and
+   *   <li><b>3)</b> remained on treatment (TX CURR) by end of reporting period,
+   *   <li><b>4)</b> with the specified disaggregation (TX_RTT_FR3).
+   * </ul>
+   *
+   * <p>The system will exclude:
+   *
+   * <ul>
+   *   <li>Patients who were Transferred-In (TRF IN) during the reporting period. (For more details
+   *       refer to the TRF_IN Requirements document.)
    * </ul>
    *
    * @return CohortDefinition
@@ -137,9 +138,7 @@ public class TxRttCohortQueries {
 
     cd.addSearch(
         "initiatedPreviousPeriod",
-        EptsReportUtils.map(
-            genericCohortQueries.getStartedArtBeforeDate(false),
-            "onOrBefore=${startDate-1d},location=${location}"));
+        EptsReportUtils.map(getPatientsWhoEverInitiatedTreatment(), DEFAULT_MAPPING));
 
     cd.addSearch(
         "LTFU",
@@ -614,6 +613,141 @@ public class TxRttCohortQueries {
   }
 
   /**
+   * All patients whose earliest ART start date from pick-up and clinical sources (NEW_FR4.1) falls
+   * before (<) 21 December 2023 and this date falls by the end of the previous reporting period.
+   * (This criterion will identify patients who started ART prior to 21-Dec-23 according the
+   * previous TX_NEW requirements definition, and therefore should be included as TX_NEW in
+   * reporting periods prior to 21-Dec-23.)
+   */
+  public CohortDefinition getPatientsArtStartDateBeforePeriod() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("All patients whose earliest ART start date from pick-up and clinical sources");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
+
+    String query =
+        "       SELECT patient_id "
+            + " FROM ( "
+            + commonQueries.getARTStartDate(true)
+            + "       ) start "
+            + " WHERE start.first_pickup < '2023-12-21' "
+            + " AND start.first_pickup < :startDate ";
+
+    cd.setQuery(query);
+    return cd;
+  }
+
+  /**
+   * All patients whose earliest ART start date (NEW_FR4.1) falls on or after (>=) 21 December 2023.
+   */
+  public CohortDefinition getPatientsArtStartDateAfterPeriod() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("All patients whose earliest ART start date from pick-up and clinical sources");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
+
+    String query =
+        "       SELECT patient_id "
+            + " FROM ( "
+            + commonQueries.getARTStartDate(true)
+            + "       ) start "
+            + " WHERE start.first_pickup >= '2023-12-21' "
+            + " AND start.first_pickup < :startDate";
+
+    cd.setQuery(query);
+    return cd;
+  }
+
+  /**
+   * Patients whose first ever drug pick-up date between the following sources falls during the
+   * reporting period:
+   *
+   * <ul>
+   *   <li>Drug pick-up date registered on (FILA)
+   *   <li>Drug pick-up date registered on (Recepção Levantou ARV) – Master Card
+   * </ul>
+   *
+   * @return String
+   */
+  public CohortDefinition getPatientsFirstDrugPickup() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patient’s earliest drug pick-up");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    String query =
+        "       SELECT patient_id "
+            + " FROM ( "
+            + commonQueries.getFirstDrugPickup()
+            + "       ) start "
+            + " WHERE start.first_pickup_ever >= '2023-12-21' ";
+
+    cd.setQuery(query);
+    return cd;
+  }
+
+  /**
+   * <b>NEW_FR4: Patients who initiated ART during the reporting period</b>
+   *
+   * <ul>
+   *   <li>All patients whose earliest ART start date from pick-up and clinical sources
+   *       (TX_RTT_FR4.1) falls before (<) 21 December 2023 and this date falls by the end of the
+   *       previous reporting period. (This criterion will identify patients who started ART prior
+   *       to 21-Dec-23 according the previous TX_NEW requirements definition, and therefore should
+   *       be included as TX_NEW in reporting periods prior to 21-Dec-23.)
+   *   <li>All patients whose earliest ART start date (TX_RTT_FR4.1) falls on or after (>=) 21
+   *       December 2023.
+   *       <p><b>AND</b> whose first ever drug pick-up date between the following sources falls by
+   *       the end of the previous reporting period:
+   * </ul>
+   *
+   * <ul>
+   *   <li>Drug pick-up date registered on (FILA)
+   *   <li>Drug pick-up date registered on (Recepção Levantou ARV) – Master Card
+   * </ul>
+   *
+   * <p>AND excluding patients with an earliest ART start date from pick-up and clinical sources
+   * (TX_RTT_FR4.1) that falls before (<) 21 December 2023.
+   *
+   * <p><b>Note:</b> Ensure that the drug pick-up is the patient’s first ever pick-up at the health
+   * facility.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoEverInitiatedTreatment() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients who initiated ART during the reporting period");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition earliestArtStartDateBeforePeriod = getPatientsArtStartDateBeforePeriod();
+    CohortDefinition earliestArtStartDateAfterPeriod = getPatientsArtStartDateAfterPeriod();
+    CohortDefinition firstDrugPickUpAfterPeriod = getPatientsFirstDrugPickup();
+
+    cd.addSearch(
+        "earliestArtStartDateBeforePeriod",
+        EptsReportUtils.map(earliestArtStartDateBeforePeriod, DEFAULT_MAPPING));
+    cd.addSearch(
+        "earliestArtStartDateAfterPeriod",
+        EptsReportUtils.map(earliestArtStartDateAfterPeriod, DEFAULT_MAPPING));
+    cd.addSearch(
+        "firstDrugPickUpAfterPeriod",
+        EptsReportUtils.map(firstDrugPickUpAfterPeriod, DEFAULT_MAPPING));
+
+    cd.setCompositionString(
+        "earliestArtStartDateBeforePeriod OR (earliestArtStartDateAfterPeriod AND firstDrugPickUpAfterPeriod)");
+    return cd;
+  }
+
+  /**
    * Absolute CD4 Count
    *
    * @return CohortDefinition
@@ -639,8 +773,6 @@ public class TxRttCohortQueries {
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
     map.put("23896", hivMetadata.getArtInitiationCd4Concept().getConceptId());
-
-    CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
 
     String query =
         "SELECT p.patient_id "
@@ -715,9 +847,9 @@ public class TxRttCohortQueries {
    * @return CohortDefinition
    */
   public CohortDefinition getPatientsWithCd4AndAge(
-          AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison cd4,
-          Integer minAge,
-          Integer maxAge) {
+      AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison cd4,
+      Integer minAge,
+      Integer maxAge) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Cd4 And Age");
     cd.addParameter(new Parameter("location", "Location", Location.class));
