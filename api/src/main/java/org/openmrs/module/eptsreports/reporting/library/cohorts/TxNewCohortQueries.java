@@ -468,10 +468,9 @@ public class TxNewCohortQueries {
             + "       INNER JOIN (SELECT e.patient_id,MIN(e.encounter_datetime) cd4_date "
             + "                   FROM   encounter e "
             + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                          INNER JOIN (SELECT start.patient_id,start.first_pickup first_pickup "
-            + "                                      FROM   ( "
+            + "                          INNER JOIN ( "
             + commonQueries.getARTStartDate(true)
-            + "    ) start) art "
+            + "                 ) art "
             + "  ON art.patient_id = e.patient_id "
             + "  INNER JOIN (SELECT e.patient_id,e.encounter_datetime cd4_date "
             + "            FROM   encounter e "
@@ -509,7 +508,7 @@ public class TxNewCohortQueries {
             + "       AND e.location_id = :location "
             + "       AND  ".concat(cd4CountComparison.getProposition())
             + "       AND ( ( DATE(e.encounter_datetime) = min_cd4.cd4_date AND e.encounter_type IN ( ${6}, ${13}, ${51} ) AND o.concept_id = ${1695}  ) "
-            + "              OR ( DATE(o.obs_datetime) = min_cd4.cd4_date AND e.encounter_type = ${53} AND o,concept_id IN (${1695},${23896})  ) "
+            + "              OR ( DATE(o.obs_datetime) = min_cd4.cd4_date AND e.encounter_type = ${53} AND o.concept_id IN (${1695},${23896})  ) "
             + "             ) "
             + "GROUP  BY p.patient_id";
 
