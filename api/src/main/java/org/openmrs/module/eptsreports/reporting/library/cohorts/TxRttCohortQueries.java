@@ -55,6 +55,8 @@ public class TxRttCohortQueries {
 
   private CommonQueries commonQueries;
 
+  private final String artStartPeriod = " '2023-12-21' ";
+
   private final String DEFAULT_MAPPING =
       "startDate=${startDate},endDate=${endDate},location=${location}";
 
@@ -633,7 +635,8 @@ public class TxRttCohortQueries {
             + " FROM ( "
             + commonQueries.getARTStartDate(true)
             + "       ) start "
-            + " WHERE start.first_pickup < '2023-12-21' "
+            + " WHERE start.first_pickup < "
+            + artStartPeriod
             + " AND start.first_pickup < :startDate ";
 
     cd.setQuery(query);
@@ -657,7 +660,8 @@ public class TxRttCohortQueries {
             + " FROM ( "
             + commonQueries.getARTStartDate(true)
             + "       ) start "
-            + " WHERE start.first_pickup >= '2023-12-21' "
+            + " WHERE start.first_pickup >= "
+            + artStartPeriod
             + " AND start.first_pickup < :startDate";
 
     cd.setQuery(query);
@@ -687,7 +691,8 @@ public class TxRttCohortQueries {
             + " FROM ( "
             + commonQueries.getFirstDrugPickup()
             + "       ) start "
-            + " WHERE start.first_pickup_ever >= '2023-12-21' ";
+            + " WHERE start.first_pickup_ever >= "
+            + artStartPeriod;
 
     cd.setQuery(query);
     return cd;
@@ -784,8 +789,8 @@ public class TxRttCohortQueries {
             + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "                          INNER JOIN ( "
             + commonQueries.getFirstDrugPickup()
-            + "                 ) restarted_art "
-            + "  ON restarted_art.patient_id = e.patient_id "
+            + "                 ) returned "
+            + "  ON returned.patient_id = e.patient_id "
             + "  INNER JOIN (SELECT e.patient_id,e.encounter_datetime cd4_date "
             + "            FROM   encounter e "
             + "            INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -811,9 +816,9 @@ public class TxRttCohortQueries {
             + "   AND e.location_id = :location "
             + "   AND o.concept_id = ${1695} "
             + "   AND o.value_numeric IS NOT NULL "
-            + "   AND ( ( DATE(e.encounter_datetime) BETWEEN DATE_SUB(restarted_art.first_pickup_ever, INTERVAL 30 day) AND DATE_ADD(restarted_art.first_pickup_ever, INTERVAL 28 day) "
+            + "   AND ( ( DATE(e.encounter_datetime) BETWEEN DATE_SUB(returned.first_pickup_ever, INTERVAL 30 day) AND DATE_ADD(returned.first_pickup_ever, INTERVAL 28 day) "
             + "             AND e.encounter_type IN ( ${6}, ${13}, ${51} ) ) "
-            + "          OR ( DATE(o.obs_datetime) BETWEEN DATE_SUB(restarted_art.first_pickup_ever, INTERVAL 30 day) AND DATE_ADD(restarted_art.first_pickup_ever, INTERVAL 28 day) "
+            + "          OR ( DATE(o.obs_datetime) BETWEEN DATE_SUB(returned.first_pickup_ever, INTERVAL 30 day) AND DATE_ADD(returned.first_pickup_ever, INTERVAL 28 day) "
             + "   AND e.encounter_type = ${53} ) ) "
             + "   GROUP  BY e.patient_id) min_cd4 ON min_cd4.patient_id = p.patient_id "
             + " WHERE  p.voided = 0 "
