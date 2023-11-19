@@ -26,9 +26,8 @@ import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
+@Deprecated
 public class SetupMERQuarterly27 extends EptsDataExportManager {
 
   private TxPvlsDataset txPvlsDataset;
@@ -110,24 +109,20 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.setParameters(txPvlsDataset.getParameters());
-    //    rd.addDataSetDefinition("N",
-    // Mapped.mapStraightThrough(txNewDataset.constructTxNewDataset()));
-    //    rd.addDataSetDefinition(
-    //        "C", Mapped.mapStraightThrough(txCurrDataset.constructTxCurrDataset(true)));
-    //    rd.addDataSetDefinition("P",
-    // Mapped.mapStraightThrough(txPvlsDataset.constructTxPvlsDatset()));
-    //    rd.addDataSetDefinition(
-    //        "TXML", Mapped.mapStraightThrough(txMlDataset25.constructtxMlDataset()));
-    //    rd.addDataSetDefinition("R",
-    // Mapped.mapStraightThrough(txRttDataset.constructTxRttDataset()));
-    //    rd.addDataSetDefinition(
-    //        "T", Mapped.mapStraightThrough(transferredInDataset.constructTransferInDataset()));
-    //    rd.addDataSetDefinition(
-    //        "PL", Mapped.mapStraightThrough(txRTTPLHIVDateset.constructTxRTTPLHIVDateset()));
-    //    rd.addDataSetDefinition(
-    //        "PREP", Mapped.mapStraightThrough(prepNewDataset.constructPrepNewDataset()));
-    //    rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new
-    // DatimCodeDatasetDefinition()));
+    rd.addDataSetDefinition("N", Mapped.mapStraightThrough(txNewDataset.constructTxNewDataset()));
+    rd.addDataSetDefinition(
+        "C", Mapped.mapStraightThrough(txCurrDataset.constructTxCurrDataset(true)));
+    rd.addDataSetDefinition("P", Mapped.mapStraightThrough(txPvlsDataset.constructTxPvlsDatset()));
+    rd.addDataSetDefinition(
+        "TXML", Mapped.mapStraightThrough(txMlDataset25.constructtxMlDataset()));
+    rd.addDataSetDefinition("R", Mapped.mapStraightThrough(txRttDataset.constructTxRttDataset()));
+    rd.addDataSetDefinition(
+        "T", Mapped.mapStraightThrough(transferredInDataset.constructTransferInDataset()));
+    rd.addDataSetDefinition(
+        "PL", Mapped.mapStraightThrough(txRTTPLHIVDateset.constructTxRTTPLHIVDateset()));
+    rd.addDataSetDefinition(
+        "PREP", Mapped.mapStraightThrough(prepNewDataset.constructPrepNewDataset()));
+    rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
     rd.addDataSetDefinition(
         "PREPNUM", Mapped.mapStraightThrough(prepCtDataset.constructPrepCtDataset()));
 
