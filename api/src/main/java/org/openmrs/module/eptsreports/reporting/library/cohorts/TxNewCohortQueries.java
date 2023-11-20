@@ -498,7 +498,7 @@ public class TxNewCohortQueries {
             + "   AND e.location_id = :location "
             + "   AND o.value_numeric IS NOT NULL "
             + "   AND ( ( DATE(e.encounter_datetime) BETWEEN DATE_SUB(art.first_pickup, INTERVAL 90 day) AND DATE_ADD(art.first_pickup, INTERVAL 28 day) "
-            + "             AND e.encounter_type IN ( ${6}, ${13}, ${51} AND o.concept_id = ${1695} ) ) "
+            + "             AND e.encounter_type IN ( ${6}, ${13}, ${51}) AND o.concept_id = ${1695}  ) "
             + "          OR ( DATE(o.obs_datetime) BETWEEN DATE_SUB(art.first_pickup, INTERVAL 90 day) AND DATE_ADD(art.first_pickup, INTERVAL 28 day) "
             + "   AND e.encounter_type = ${53} AND o.concept_id IN (${1695},${23896}) ) ) "
             + "   GROUP  BY e.patient_id) min_cd4 ON min_cd4.patient_id = p.patient_id "
