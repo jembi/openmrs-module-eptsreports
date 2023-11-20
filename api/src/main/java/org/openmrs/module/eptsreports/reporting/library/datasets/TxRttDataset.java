@@ -131,7 +131,7 @@ public class TxRttDataset extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "Unknown Cd4 result - Female",
                 EptsReportUtils.map(
-                    txRttCohortQueries.getPatientsNotEligibleForCd4AndAge(5, null), mappings)),
+                    txRttCohortQueries.getPatientsWhoAreNotEligibleForCd4(), mappings)),
             mappings),
         dissagChildrenAndAdultsAndKeyPop());
 

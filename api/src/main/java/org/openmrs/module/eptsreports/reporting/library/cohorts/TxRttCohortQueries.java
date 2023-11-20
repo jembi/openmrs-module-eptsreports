@@ -875,6 +875,24 @@ public class TxRttCohortQueries {
     return cd;
   }
 
+  public CohortDefinition getPatientsWhoAreNotEligibleForCd4() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Not Eligible for CD4");
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+    CohortDefinition txRtt = getRTTComposition();
+    CohortDefinition notEligibleCd4 = getPatientsNotEligibleForCd4AndAge(5, null);
+
+    cd.addSearch("txRtt", EptsReportUtils.map(txRtt, DEFAULT_MAPPING));
+    cd.addSearch("notEligibleCd4", EptsReportUtils.map(notEligibleCd4, DEFAULT_MAPPING));
+
+    cd.setCompositionString("txRtt AND notEligibleCd4");
+
+    return cd;
+  }
+
   /**
    * <b>TX_RTT_FR8 - Patient Disaggregation- CD4 result <200/mm3 </b>
    *
