@@ -866,6 +866,42 @@ public class TxRttCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>TX_RTT_FR8 - Patient Disaggregation- CD4 result <200/mm3 </b>
+   *
+   * <p>The system will identify patients who are included in the TX_RTT numerator (TX_RTT_FR2) for
+   * the absolute CD4 <200/mm3 disaggregation as follows:
+   *
+   * <ul>
+   *   <li>Patients with an absolute CD4 result <200/mm3 registered in the following sources:
+   * </ul>
+   *
+   * <ul>
+   *   <li>Last CD4 absolute value marked on Ficha Resumo OR
+   *   <li>CD4 absolute result marked in the Investigações - Resultados Laboratoriais section on
+   *       Ficha Clínica OR
+   *   <li>CD4 absolute result registered on the Lab Form OR
+   *   <li>CD4 absolute result registered on the e-Lab Form
+   * </ul>
+   *
+   * <p>AND
+   *
+   * <ul>
+   *   <li>Excluding patients <5 years of age (TX_RTT_FR12).
+   *   <li>Excluding Patients Not Eligible for CD4 (TX_RTT_FR11).
+   * </ul>
+   *
+   * <p>The system will consider the oldest CD4 result date falling between patient ART Restart Date
+   * (TX_RTT_FR6) - 30 days and ART Restart Date (TX_RTT_FR6) + 28 days from the different sources
+   * listed above for the evaluation of the result (< 200). <br>
+   *
+   * <p><b>Notes:</b>
+   *
+   * <ul>
+   *   <li>For clients who have CD4 results ≥200/mm3 and <200/mm3 on the same, oldest date, the CD4
+   *       result <200/mm3 will be prioritized.
+   * </ul>
+   */
   public CohortDefinition getPatientWithCd4ResultLessThan200() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -876,20 +912,63 @@ public class TxRttCohortQueries {
 
     CohortDefinition txRtt = getRTTComposition();
 
-    CohortDefinition cd4Under200 =
+    CohortDefinition cd4Under200AndAge =
         getPatientsWithCd4AndAge(
             AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
             5,
             null);
 
-    cd.addSearch("txRtt", EptsReportUtils.map(txRtt, DEFAULT_MAPPING));
-    cd.addSearch("cd4Under200", EptsReportUtils.map(cd4Under200, DEFAULT_MAPPING));
+    CohortDefinition cd4Above200AndAge =
+        getPatientsWithCd4AndAge(
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.GreaterThanOrEqualTo200mm3,
+            5,
+            null);
 
-    cd.setCompositionString("txRtt AND cd4Under200");
+    cd.addSearch("txRtt", EptsReportUtils.map(txRtt, DEFAULT_MAPPING));
+    cd.addSearch("cd4Under200AndAge", EptsReportUtils.map(cd4Under200AndAge, DEFAULT_MAPPING));
+    cd.addSearch("cd4Above200AndAge", EptsReportUtils.map(cd4Above200AndAge, DEFAULT_MAPPING));
+
+    cd.setCompositionString("(txRtt AND cd4Under200AndAge) AND NOT cd4Above200AndAge");
 
     return cd;
   }
 
+  /**
+   * <b>TX_RTT_FR9 - Patient Disaggregation- CD4 result ≥200/mm3</b>
+   *
+   * <p>The system will identify patients who are included in the TX_RTT numerator (TX_RTT_FR2) for
+   * the absolute CD4 ≥200/mm3 disaggregation as follows:
+   *
+   * <ul>
+   *   <li>Patients with an absolute CD4 result ≥200/mm3 registered in the following sources:
+   * </ul>
+   *
+   * <ul>
+   *   <li>Last CD4 absolute value marked on Ficha Resumo OR
+   *   <li>CD4 absolute result marked in the Investigações - Resultados Laboratoriais section on
+   *       Ficha Clínica OR
+   *   <li>CD4 absolute result registered on the Lab Form OR
+   *   <li>CD4 absolute result registered on the e-Lab Form
+   * </ul>
+   *
+   * <p>AND
+   *
+   * <ul>
+   *   <li>Excluding patients <5 years of age (TX_RTT_FR12).
+   *   <li>Excluding patients Not Eligible for CD4 (TX_RTT_FR11).
+   * </ul>
+   *
+   * <p>The system will consider the oldest CD4 result date falling between patient ART Restart Date
+   * (TX_RTT_FR6) - 30 days and ART Restart Date (TX_RTT_FR6) + 28 days from the different sources
+   * listed above for the evaluation of the result (≥200).
+   *
+   * <p><b>Notes:</b>
+   *
+   * <ul>
+   *   <li>For clients who have CD4 results ≥200/mm3 and <200/mm3 on the same, oldest date, the CD4
+   *       result <200/mm3 will be prioritized.
+   * </ul>
+   */
   public CohortDefinition getPatientWithcd4ResultGreaterThan200() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -923,6 +1002,20 @@ public class TxRttCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>TX_RTT_FR10 - Patient Disaggregation- Unknown CD4</b>
+   *
+   * <p>The system will identify patients with unknown CD4 as follows:
+   *
+   * <ul>
+   *   <li>All patients in TX_RTT (TX_RTT_FR2) that are not included in the CD4 result <200/mm3
+   *       (TX_RTT_FR8), the CD4 result ≥200/mm3 (TX_RTT_FR9) nor the Not Eligible for CD4
+   *       (TX_RTT_FR11) disaggregates.
+   * </ul>
+   *
+   * <p><b>Note:</b> All children <5 years of age that are included in the TX_RTT numerator will be
+   * included in the “Unknown CD4” disaggregate.
+   */
   public CohortDefinition getPatientWithUnknownCd4Result() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
