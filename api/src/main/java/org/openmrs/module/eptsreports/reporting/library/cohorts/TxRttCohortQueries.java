@@ -889,4 +889,68 @@ public class TxRttCohortQueries {
 
     return cd;
   }
+
+  public CohortDefinition getPatientWithcd4ResultGreaterThan200() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients with CD4 Result Above 200");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition txRtt = getRTTComposition();
+
+    CohortDefinition cd4Above200AndAge =
+        getPatientsWithCd4AndAge(
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.GreaterThanOrEqualTo200mm3,
+            5,
+            null);
+
+    CohortDefinition cd4Under200AndAge =
+        getPatientsWithCd4AndAge(
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
+            5,
+            null);
+
+    cd.addSearch("txRtt", EptsReportUtils.map(txRtt, DEFAULT_MAPPING));
+
+    cd.addSearch("cd4Above200AndAge", EptsReportUtils.map(cd4Above200AndAge, DEFAULT_MAPPING));
+
+    cd.addSearch("cd4Under200AndAge", EptsReportUtils.map(cd4Under200AndAge, DEFAULT_MAPPING));
+
+    cd.setCompositionString("(txRtt AND cd4Above200AndAge) AND NOT cd4Under200AndAge");
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientWithUnknownCd4Result() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients with Unknown CD4 Result");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition txRtt = getRTTComposition();
+
+    CohortDefinition cd4Under200AndAge =
+        getPatientsWithCd4AndAge(
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
+            5,
+            null);
+
+    CohortDefinition cd4Above200AndAge =
+        getPatientsWithCd4AndAge(
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.GreaterThanOrEqualTo200mm3,
+            5,
+            null);
+
+    cd.addSearch("txRtt", EptsReportUtils.map(txRtt, DEFAULT_MAPPING));
+    cd.addSearch("cd4Under200AndAge", EptsReportUtils.map(cd4Under200AndAge, DEFAULT_MAPPING));
+    cd.addSearch("cd4Above200AndAge", EptsReportUtils.map(cd4Above200AndAge, DEFAULT_MAPPING));
+
+    cd.setCompositionString("txRtt AND NOT (cd4Under200AndAge OR cd4Above200AndAge)");
+
+    return cd;
+  }
 }
