@@ -20,7 +20,6 @@ import java.util.Properties;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.*;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
-import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.report.ReportDesign;
@@ -126,15 +125,14 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
     //        "PL", Mapped.mapStraightThrough(txRTTPLHIVDateset.constructTxRTTPLHIVDateset()));
     rd.addDataSetDefinition(
         "PREP", Mapped.mapStraightThrough(prepNewDataset.constructPrepNewDataset()));
-    //    rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new
-    // DatimCodeDatasetDefinition()));
-    rd.addDataSetDefinition(
-        "PREPNUM", Mapped.mapStraightThrough(prepCtDataset.constructPrepCtDataset()));
+    rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
+//    rd.addDataSetDefinition(
+//        "PREPNUM", Mapped.mapStraightThrough(prepCtDataset.constructPrepCtDataset()));
 
     // add a base cohort here to help in calculations running
-//    rd.setBaseCohortDefinition(
-//        EptsReportUtils.map(
-//            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
+    //    rd.setBaseCohortDefinition(
+    //        EptsReportUtils.map(
+    //            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
     return rd;
   }

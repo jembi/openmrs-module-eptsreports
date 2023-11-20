@@ -130,7 +130,8 @@ public class PrepNewCohortQueries {
             hivMetadata.getStartDrugs().getConceptId(),
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
-            commonMetadata.getBreastfeeding().getConceptId());
+            commonMetadata.getBreastfeeding().getConceptId(),
+            hivMetadata.getPrepStartDateConcept().getConceptId());
 
     sqlCohortDefinition.setQuery(query);
     return sqlCohortDefinition;
@@ -156,7 +157,8 @@ public class PrepNewCohortQueries {
             hivMetadata.getStartDrugs().getConceptId(),
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
-            commonMetadata.getBreastfeeding().getConceptId());
+            commonMetadata.getBreastfeeding().getConceptId(),
+            hivMetadata.getPrepStartDateConcept().getConceptId());
 
     sqlCohortDefinition.setQuery(query);
     return sqlCohortDefinition;
