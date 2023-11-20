@@ -3,6 +3,8 @@ package org.openmrs.module.eptsreports.reporting.library.queries;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
+import org.openmrs.Concept;
+import org.openmrs.EncounterType;
 
 public class TxMlQueries {
 
@@ -861,92 +863,63 @@ public class TxMlQueries {
    *
    * @return {@link String}
    */
-  public static String getPatientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup(
-      int adultoSeguimentoEncounterType,
-      int ARVPediatriaSeguimentoEncounterType,
-      int aRVPharmaciaEncounterType,
-      int masterCardDrugPickupEncounterType,
-      int returnVisitDateConcept,
-      int returnVisitDateForArvDrugConcept,
-      int getArtDatePickupMasterCard) {
+  public static String getPatientWithoutScheduledDrugPickupDateMasterCardAndArtPickupQuery(
+      EncounterType aRVPharmaciaEncounterType,
+      EncounterType masterCardDrugPickupEncounterType,
+      Concept returnVisitDateForArvDrugConcept,
+      Concept artDatePickup) {
     Map<String, Integer> map = new HashMap<>();
-    map.put("adultoSeguimentoEncounterType", adultoSeguimentoEncounterType);
-    map.put("ARVPediatriaSeguimentoEncounterType", ARVPediatriaSeguimentoEncounterType);
-    map.put("aRVPharmaciaEncounterType", aRVPharmaciaEncounterType);
-    map.put("masterCardDrugPickupEncounterType", masterCardDrugPickupEncounterType);
-    map.put("returnVisitDateConcept", returnVisitDateConcept);
-    map.put("returnVisitDateForArvDrugConcept", returnVisitDateForArvDrugConcept);
-    map.put("getArtDatePickupMasterCard", getArtDatePickupMasterCard);
+    map.put("18", aRVPharmaciaEncounterType.getEncounterTypeId());
+    map.put("5096", returnVisitDateForArvDrugConcept.getConceptId());
+    map.put("52", masterCardDrugPickupEncounterType.getEncounterTypeId());
+    map.put("23866", artDatePickup.getConceptId());
 
     String query =
-        " SELECT ps.patient_id "
-            + "   FROM (   "
-            + "         SELECT pm.patient_id "
-            + "         FROM"
-            + "          (SELECT p.patient_id AS patient_id"
-            + "       FROM patient p "
-            + "       WHERE  p.voided = 0 "
-            + "           AND p.patient_id NOT IN "
-            + "               ("
-            + "               SELECT patient_id "
-            + "                   FROM encounter e"
-            + "						INNER JOIN obs o ON o.encounter_id=e.encounter_id "
-            + "                   WHERE  e.encounter_type = ${masterCardDrugPickupEncounterType}  "
-            + "                       AND e.location_id = :location "
-            + "                       AND e.voided = 0"
-            + "						  AND o.voided = 0"
-            + "						  AND o.value_datetime >= :onOrAfter  "
-            + "						  AND o.value_datetime <= :onOrBefore  "
-            + "						  AND o.concept_id = ${getArtDatePickupMasterCard})) pm "
-            + "       INNER JOIN ( "
-            + "       Select ficha.patient_id "
-            + "       from ( "
-            + "           SELECT q1.patient_id "
-            + "           from "
-            + "               ( "
-            + "               SELECT p.patient_id, "
-            + "                   Max(e.encounter_datetime) as max_enc_datetime, Max(e.encounter_id) AS encounter_id "
-            + "               FROM patient p "
-            + "                   INNER JOIN encounter e "
-            + "                   ON e.patient_id = p.patient_id "
-            + "                   INNER JOIN obs o "
-            + "                   ON o.encounter_id = e.encounter_id "
-            + "               WHERE  p.voided = 0 "
-            + "                   AND e.voided = 0 "
-            + "                   AND o.voided = 0 "
-            + "                   AND e.encounter_type IN (${adultoSeguimentoEncounterType},${ARVPediatriaSeguimentoEncounterType}) "
-            + "                   AND e.encounter_datetime >= :onOrAfter "
-            + "                   AND e.encounter_datetime <= :onOrBefore "
-            + "                   AND e.location_id = :location "
-            + "               GROUP  BY p.patient_id ) q1 "
-            + "               left join obs o2 on o2.encounter_id=q1.encounter_id and "
-            + "                   o2.concept_id = ${returnVisitDateConcept} and o2.voided=0 "
-            + "               where  o2.obs_id  is null) ficha "
-            + "           INNER JOIN ( "
-            + "               SELECT q2.patient_id "
-            + "               from ( "
-            + "                   SELECT p.patient_id, "
-            + "                       Max(e.encounter_datetime) as max_enc_datetime, Max(e.encounter_id) AS encounter_id "
-            + "                   FROM patient p "
-            + "                       INNER JOIN encounter e "
-            + "                       ON e.patient_id = p.patient_id "
-            + "                       INNER JOIN obs o "
-            + "                       ON o.encounter_id = e.encounter_id "
-            + "                   WHERE  p.voided = 0 "
-            + "                       AND e.voided = 0 "
-            + "                       AND o.voided = 0 "
-            + "                       AND e.encounter_type IN (${aRVPharmaciaEncounterType}) "
-            + "                       AND e.encounter_datetime >= :onOrAfter "
-            + "                       And e.encounter_datetime <= :onOrBefore "
-            + "                       AND e.location_id = :location "
-            + "                   GROUP  BY p.patient_id  "
-            + "               )q2 "
-            + "               left join obs o1 on o1.encounter_id=q2.encounter_id and "
-            + "                       o1.concept_id = ${returnVisitDateForArvDrugConcept} and o1.voided=0 "
-            + "               where  o1.obs_id is null "
-            + "           ) fila ON ficha.patient_id=fila.patient_id ) filaficha on filaficha.patient_id=pm.patient_id "
-            + "       )ps "
-            + "       GROUP  BY ps.patient_id";
+        "SELECT pat.patient_id "
+            + "FROM   patient pat "
+            + "WHERE  pat.voided=0 "
+            + "    AND    pat.patient_id NOT IN( "
+            + "        SELECT fn.patient_id "
+            + "        FROM  ( "
+            + "            SELECT     qc.patient_id "
+            + "            FROM ( "
+            + "                SELECT     pat.patient_id, max(e.encounter_datetime) AS encounter_datetime "
+            + "                FROM       patient pat "
+            + "                    INNER JOIN encounter e ON         pat.patient_id = e.patient_id "
+            + "                WHERE      e.encounter_datetime <= :endDate "
+            + "                    AND        pat.voided = 0 "
+            + "                    AND        e.voided = 0 "
+            + "                    AND        e.location_id = :location "
+            + "                    AND        e.encounter_type IN(${18}) "
+            + "                GROUP BY   pat.patient_id "
+            + "              )qc "
+            + "                INNER JOIN encounter e1 ON  qc.patient_id = e1.patient_id "
+            + "                INNER JOIN obs o1 ON         e1.encounter_id = o1.encounter_id "
+            + "            WHERE      qc.encounter_datetime = e1.encounter_datetime "
+            + "                AND        e1.encounter_datetime >= :startDate "
+            + "                AND        e1.encounter_datetime < :endDate "
+            + "                AND        e1.voided = 0 "
+            + "                AND        e1.encounter_type IN(${18}) "
+            + "                AND        e1.location_id = :location "
+            + "                AND        o1.value_datetime IS NOT NULL "
+            + "                AND        o1.voided = 0 "
+            + "                AND        o1.concept_id IN(${5096}) "
+            + "                AND        o1.location_id = :location "
+            + "            UNION "
+            + "            SELECT     pa.patient_id FROM       patient pa "
+            + "                INNER JOIN encounter en ON         pa.patient_id = en.patient_id "
+            + "                INNER JOIN obs ob ON         en.encounter_id = ob.encounter_id "
+            + "            WHERE      pa.voided=0 "
+            + "                AND        en.voided = 0 "
+            + "                AND        ob.voided = 0 "
+            + "                AND        en.location_id = :location "
+            + "                AND        en.encounter_type = ${52} "
+            + "                AND        ob.concept_id     = ${23866} "
+            + "                AND        ob.value_datetime IS NOT NULL "
+            + "            AND        ob.value_datetime >= :startDate "
+            + "            AND        ob.value_datetime < :endDate "
+            + " ) fn  )  ";
+
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     return stringSubstitutor.replace(query);
   }
@@ -982,5 +955,82 @@ public class TxMlQueries {
             + "       ) last_state";
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     return stringSubstitutor.replace(query);
+  }
+
+  /**
+   *
+   *
+   * <h4>Number of patients having last scheduled Drug pickup date</h4>
+   *
+   * @return {@link String}
+   */
+  public static String getPatientHavingLastScheduledDrugPickupDateQuery(
+      Concept returnVisitDateForArvDrugConcept,
+      EncounterType ARVPharmaciaEncounterType,
+      Concept returnVisitDateConcept,
+      Concept artDatePickup,
+      EncounterType masterCardDrugPickupEncounterType,
+      int numDays) {
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("returnVisitDateForArvDrugConcept", returnVisitDateForArvDrugConcept.getConceptId());
+    map.put("ARVPharmaciaEncounterType", ARVPharmaciaEncounterType.getEncounterTypeId());
+    map.put("returnVisitDateConcept", returnVisitDateConcept.getConceptId());
+    map.put("artDatePickup", artDatePickup.getConceptId());
+    map.put(
+        "masterCardDrugPickupEncounterType",
+        masterCardDrugPickupEncounterType.getEncounterTypeId());
+    map.put("numDays", numDays);
+
+    String query =
+        "SELECT final.patient_id "
+            + "            from( "
+            + "                SELECT "
+            + "                    most_recent.patient_id, Date_add(Max(most_recent.value_datetime), interval ${numDays} day) final_encounter_date "
+            + "                FROM   (SELECT fila.patient_id, o.value_datetime from ( "
+            + "                            SELECT pa.patient_id, "
+            + "                                Max(enc.encounter_datetime)  encounter_datetime "
+            + "                            FROM   patient pa "
+            + "                                inner join encounter enc "
+            + "                                    ON enc.patient_id =  pa.patient_id "
+            + "                            WHERE  pa.voided = 0 "
+            + "                                AND enc.voided = 0 "
+            + "								AND enc.encounter_type = ${ARVPharmaciaEncounterType} "
+            + "                                AND enc.location_id = :location "
+            + "                                AND enc.encounter_datetime <= :endDate "
+            + "                            GROUP  BY pa.patient_id) fila "
+            + "                        INNER JOIN encounter e on "
+            + "                            e.patient_id = fila.patient_id and "
+            + "                            e.encounter_datetime = fila.encounter_datetime and "
+            + "                            e.encounter_type =  ${ARVPharmaciaEncounterType} and "
+            + "                            e.location_id = :location and "
+            + "                            e.voided = 0 and "
+            + "                            e.encounter_datetime <= :endDate "
+            + "					INNER JOIN obs o on "
+            + "                            o.encounter_id = e.encounter_id and "
+            + "                            o.concept_id = ${returnVisitDateForArvDrugConcept} and "
+            + "                            o.voided = 0 "
+            + "                        UNION "
+            + "                        SELECT pa.patient_id, "
+            + "                            Date_add(Max(obs.value_datetime), interval 30 day) value_datetime "
+            + "                        FROM   patient pa "
+            + "                            inner join encounter enc "
+            + "                                ON enc.patient_id = pa.patient_id "
+            + "                            inner join obs obs "
+            + "                                ON obs.encounter_id = enc.encounter_id "
+            + "                        WHERE  pa.voided = 0 "
+            + "                            AND enc.voided = 0 "
+            + "                            AND obs.voided = 0 "
+            + "                            AND obs.concept_id = ${artDatePickup} "
+            + "                            AND obs.value_datetime IS NOT NULL "
+            + "                            AND enc.encounter_type = ${masterCardDrugPickupEncounterType}  "
+            + "                            AND enc.location_id = :location "
+            + "                            AND obs.value_datetime <= :endDate "
+            + "                       GROUP  BY pa.patient_id "
+            + "                   ) most_recent "
+            + "               GROUP BY most_recent.patient_id "
+            + "               HAVING final_encounter_date >= :startDate AND final_encounter_date < :endDate "
+            + "            ) final ";
+    return new StringSubstitutor(map).replace(query);
   }
 }
