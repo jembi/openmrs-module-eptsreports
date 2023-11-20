@@ -466,7 +466,7 @@ public class TxNewCohortQueries {
             + "FROM   patient p "
             + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "       INNER JOIN (SELECT e.patient_id,MIN(cd.cd4_date) cd4_date "
+            + "       INNER JOIN (SELECT e.patient_id,MIN(cd4.cd4_date) cd4_date "
             + "                   FROM   encounter e "
             + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "                          INNER JOIN ( "
