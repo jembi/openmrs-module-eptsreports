@@ -469,13 +469,8 @@ public class TxRttCohortQueries {
         TxRttQueries.getTreatmentInterruptionOfXDaysBeforeReturningToTreatmentQuery(
             hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId(),
             hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
-            commonMetadata.getReturnVisitDateConcept().getConceptId(),
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getArtDatePickupMasterCard().getConceptId(),
             hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
-            hivMetadata.getArtPickupConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId(),
             minDays,
             maxDays));
 
@@ -509,51 +504,20 @@ public class TxRttCohortQueries {
    */
   public CohortDefinition treatmentInterruptionOfXDays(Integer minDays, Integer maxDays) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Duration of treatment interruption before returning to treatment");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
-    cd.addSearch(
-        "initiatedPreviousPeriod",
-        EptsReportUtils.map(
-            genericCohortQueries.getStartedArtBeforeDate(false),
-            "onOrBefore=${startDate-1d},location=${location}"));
-
-    cd.addSearch(
-        "LTFU",
-        EptsReportUtils.map(
-            getITTOrLTFUPatients(28), "onOrBefore=${startDate-1d},location=${location}"));
-
-    cd.addSearch(
-        "returned",
-        EptsReportUtils.map(getPatientsReturnedTreatmentDuringReportingPeriod(), DEFAULT_MAPPING));
-
-    cd.addSearch(
-        "txcurr",
-        EptsReportUtils.map(
-            txCurrCohortQueries.getTxCurrCompositionCohort("txcurr", true),
-            "onOrBefore=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "transferredOut",
-        EptsReportUtils.map(
-            commonCohortQueries.getMohTransferredOutPatientsByEndOfPeriod(),
-            "onOrBefore=${startDate-1d},location=${location}"));
-
-    cd.addSearch(
-        "transferredIn",
-        EptsReportUtils.map(
-            this.getTransferredInPatients(),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    cd.addSearch("txRtt", EptsReportUtils.map(getRTTComposition(), DEFAULT_MAPPING));
 
     cd.addSearch(
         "AAB",
         EptsReportUtils.map(
             getTreatmentInterruptionOfXDaysBeforeReturningToTreatment(minDays, maxDays),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            DEFAULT_MAPPING));
 
-    cd.setCompositionString(
-        "initiatedPreviousPeriod AND returned AND txcurr AND (LTFU AND NOT (transferredOut OR transferredIn)) AND AAB");
+    cd.setCompositionString("txRtt AND AAB");
 
     return cd;
   }
