@@ -318,12 +318,8 @@ public class TxRttCohortQueries {
     definition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-
-    map.put("1410", hivMetadata.getReturnVisitDateConcept().getConceptId());
     map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
 
@@ -332,57 +328,6 @@ public class TxRttCohortQueries {
             + " FROM( "
             + " select totaltotal.patient_id "
             + " from ( "
-            + "        SELECT total.patient_id FROM "
-            + "            ("
-            + "                SELECT     pat1.patient_id, Max(enc1.encounter_datetime) AS encounter_datetime"
-            + "                FROM  patient pat1 "
-            + "                    INNER JOIN encounter enc1 "
-            + "                        ON         pat1.patient_id=enc1.patient_id "
-            + "                    "
-            + "                WHERE enc1.encounter_datetime<=:onOrBefore"
-            + "                    AND pat1.voided=0 "
-            + "                    AND enc1.voided=0 "
-            + "                    AND enc1.location_id=:location "
-            + "                    AND enc1.encounter_type IN (${6},${9})"
-            + "                GROUP BY   pat1.patient_id"
-            + "            ) AS total"
-            + "            LEFT JOIN"
-            + "                    ("
-            + "                        SELECT p.patient_id "
-            + "                        FROM patient p"
-            + "                            INNER JOIN encounter e"
-            + "                                ON e.patient_id =p.patient_id"
-            + "                            INNER JOIN obs o"
-            + "                                ON o.encounter_id =e.encounter_id"
-            + "                        WHERE"
-            + "                            p.voided = 0"
-            + "                            AND e.voided = 0"
-            + "                            AND o.voided = 0"
-            + "                            AND e.encounter_type IN (${6},${9})"
-            + "                            AND encounter_datetime<=:onOrBefore"
-            + "                            AND e.location_id=:location "
-            + "                            AND o.concept_id = ${1410} "
-            + "                        UNION"
-            + "                        SELECT p.patient_id "
-            + "                        FROM patient p"
-            + "                            INNER JOIN encounter e"
-            + "                                ON e.patient_id =p.patient_id"
-            + "                            INNER JOIN obs o"
-            + "                                ON o.encounter_id =e.encounter_id"
-            + "                        WHERE"
-            + "                            p.voided = 0"
-            + "                            AND e.voided = 0"
-            + "                            AND o.voided = 0"
-            + "                            AND e.encounter_type IN (${6},${9})"
-            + "                            AND encounter_datetime<=:onOrBefore"
-            + "                            AND e.location_id=:location "
-            + "                            AND o.concept_id = ${1410}"
-            + "                            AND o.value_datetime IS NOT NULL"
-            + "                    ) right1"
-            + "            ON total.patient_id = right1.patient_id  "
-            + "        WHERE "
-            + "            right1.patient_id IS NULL"
-            + "        UNION"
             + "        SELECT total.patient_id FROM"
             + "            ("
             + "                SELECT     pat1.patient_id, Max(enc1.encounter_datetime) AS encounter_datetime"
