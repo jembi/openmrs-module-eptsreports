@@ -12186,7 +12186,7 @@ public class QualityImprovement2020CohortQueries {
             + "                ON     e.patient_id = p.person_id "
             + "                JOIN   obs o "
             + "                ON     o.encounter_id = e.encounter_id "
-            + "                AND    encounter_type = ${6} "
+            + "                WHERE    encounter_type = ${6} "
             + "                AND    o.concept_id = ${question} "
             + "                AND    o.value_coded = ${answer} "
             + "                AND    e.location_id = :location "
