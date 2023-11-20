@@ -539,6 +539,7 @@ public class PrepCtQueries {
       int prepIncialEncounterType,
       int prepSeguimentoEncounterType,
       int currentStateOfTheWomanConceptId,
+      int prepTargetGroupConceptId,
       int pregnantConceptId,
       int yesConceptId,
       int breastfeedingConceptId) {
@@ -546,6 +547,7 @@ public class PrepCtQueries {
     map.put("80", prepIncialEncounterType);
     map.put("81", prepSeguimentoEncounterType);
     map.put("165223", currentStateOfTheWomanConceptId);
+    map.put("165196", prepTargetGroupConceptId);
     map.put("1982", pregnantConceptId);
     map.put("1065", yesConceptId);
     map.put("6332", breastfeedingConceptId);
@@ -561,7 +563,7 @@ public class PrepCtQueries {
             + "AND o.voided = 0 "
             + "AND e.location_id = :location "
             + "AND e.encounter_type IN (${81},${80}) "
-            + "AND o.concept_id IN (${165223},${1982}) "
+            + "AND o.concept_id IN (${165223},${1982},${165196}) "
             + "AND o.value_coded IN (${1982},${1065}) "
             + "AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP BY p.patient_id "
@@ -575,7 +577,7 @@ public class PrepCtQueries {
             + "   AND o.voided = 0 "
             + "   AND e.location_id = :location "
             + "   AND e.encounter_type IN (${81},${80}) "
-            + "   AND o.concept_id IN(${165223},${6332}) "
+            + "   AND o.concept_id IN(${165223},${6332},${165196}) "
             + "   AND o.value_coded IN(${6332},${1065}) "
             + "   AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "   GROUP BY p.patient_id "
@@ -606,6 +608,7 @@ public class PrepCtQueries {
       int prepIncialEncounterType,
       int prepSeguimentoEncounterType,
       int currentStateOfTheWomanConceptId,
+      int prepTargetGroupConceptId,
       int pregnantConceptId,
       int yesConceptId,
       int breastfeedingConceptId) {
@@ -613,6 +616,7 @@ public class PrepCtQueries {
     map.put("80", prepIncialEncounterType);
     map.put("81", prepSeguimentoEncounterType);
     map.put("165223", currentStateOfTheWomanConceptId);
+    map.put("165196", prepTargetGroupConceptId);
     map.put("1982", pregnantConceptId);
     map.put("1065", yesConceptId);
     map.put("6332", breastfeedingConceptId);
@@ -628,7 +632,7 @@ public class PrepCtQueries {
             + "   AND o.voided = 0 "
             + "   AND e.location_id = :location "
             + "   AND e.encounter_type IN (${81},${80}) "
-            + "   AND o.concept_id IN(${165223},${6332}) "
+            + "   AND o.concept_id IN(${165223},${6332},${165196}) "
             + "   AND o.value_coded IN(${6332},${1065}) "
             + "   AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "   GROUP BY p.patient_id "
@@ -643,7 +647,7 @@ public class PrepCtQueries {
             + "AND o.voided = 0 "
             + "AND e.location_id = :location "
             + "AND e.encounter_type IN (${81},${80}) "
-            + "AND o.concept_id IN (${165223},${1982}) "
+            + "AND o.concept_id IN (${165223},${1982},${165196}) "
             + "AND o.value_coded IN (${1982},${1065}) "
             + "AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP BY p.patient_id "
