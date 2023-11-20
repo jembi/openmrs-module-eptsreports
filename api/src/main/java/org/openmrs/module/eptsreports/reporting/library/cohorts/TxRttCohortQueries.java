@@ -770,8 +770,6 @@ public class TxRttCohortQueries {
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
-    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
     map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
@@ -867,6 +865,107 @@ public class TxRttCohortQueries {
   }
 
   /**
+   * <b>TX_RTT_FR11 - Patient Disaggregation- Not Eligible for CD4</b>
+   *
+   * <p>The system will identify patients who are included in the TX_RTT numerator (TX_RTT_FR2) for
+   * the Not Eligible for CD4 disaggregation as follows:
+   *
+   * <ul>
+   *   <li>Patients whose difference between the patient ART Restart date (TX_RTT_FR6) and the most
+   *       recent date (by end of previous reporting period) between last scheduled drug pickup date
+   *       (FILA) and last ART pickup date (Recepção – Levantou ARV) + 30 days is less than 60 days.
+   * </ul>
+   */
+  public CohortDefinition getPatientsNotEligibleForCd4() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients Not Eligible for CD4");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+
+    String query =
+        "SELECT final.patient_id "
+            + "FROM   (SELECT most_recent.patient_id, "
+            + "               Date_add(Max(most_recent.value_datetime), INTERVAL 60 day) "
+            + "                      final_encounter_date "
+            + "        FROM   (SELECT p.patient_id, "
+            + "                       Max(o.value_datetime) value_datetime "
+            + "                FROM   patient p "
+            + "                       INNER JOIN encounter e "
+            + "                               ON e.patient_id = p.patient_id "
+            + "                       INNER JOIN obs o "
+            + "                               ON o.encounter_id = e.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND o.voided = 0 "
+            + "                       AND e.encounter_type = ${18} "
+            + "                       AND o.concept_id = ${5096} "
+            + "                       AND o.value_datetime IS NOT NULL "
+            + "                       AND o.value_datetime < :startDate "
+            + "                       AND e.location_id = :location "
+            + "                GROUP  BY p.patient_id "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       Date_add(Max(o.value_datetime), INTERVAL 30 day) "
+            + "                       value_datetime "
+            + "                FROM   patient p "
+            + "                       INNER JOIN encounter e "
+            + "                               ON e.patient_id = p.patient_id "
+            + "                       INNER JOIN obs o "
+            + "                               ON o.encounter_id = e.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND o.voided = 0 "
+            + "                       AND e.encounter_type = ${52} "
+            + "                       AND o.concept_id = ${23866} "
+            + "                       AND o.value_datetime IS NOT NULL "
+            + "                       AND o.value_datetime < :startDate "
+            + "                       AND e.location_id = :location "
+            + "                GROUP  BY p.patient_id) most_recent "
+            + "        GROUP  BY most_recent.patient_id) final "
+            + "GROUP  BY final.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * @param minAge minimum age of patient base on effective date
+   * @param maxAge maximum age of patent base on effective date
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsNotEligibleForCd4AndAge(Integer minAge, Integer maxAge) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Cd4 And Age");
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+    CohortDefinition getPatientsNotEligibleForCd4 = getPatientsNotEligibleForCd4();
+    CohortDefinition age = ageCohortQueries.createXtoYAgeCohort("Age", minAge, maxAge);
+
+    cd.addSearch(
+        "getPatientsNotEligibleForCd4",
+        EptsReportUtils.map(
+            getPatientsNotEligibleForCd4, "startDate=${startDate},location=${location}"));
+
+    cd.addSearch("age", EptsReportUtils.map(age, "effectiveDate=${endDate}"));
+
+    cd.setCompositionString("getPatientsNotEligibleForCd4 AND age");
+
+    return cd;
+  }
+
+  /**
    * <b>TX_RTT_FR8 - Patient Disaggregation- CD4 result <200/mm3 </b>
    *
    * <p>The system will identify patients who are included in the TX_RTT numerator (TX_RTT_FR2) for
@@ -924,11 +1023,18 @@ public class TxRttCohortQueries {
             5,
             null);
 
+    CohortDefinition notEligibleForCd4AndAge = getPatientsNotEligibleForCd4AndAge(5, null);
+
     cd.addSearch("txRtt", EptsReportUtils.map(txRtt, DEFAULT_MAPPING));
     cd.addSearch("cd4Under200AndAge", EptsReportUtils.map(cd4Under200AndAge, DEFAULT_MAPPING));
     cd.addSearch("cd4Above200AndAge", EptsReportUtils.map(cd4Above200AndAge, DEFAULT_MAPPING));
+    cd.addSearch(
+        "notEligibleForCd4AndAge",
+        EptsReportUtils.map(
+            notEligibleForCd4AndAge, "startDate=${startDate},location=${location}"));
 
-    cd.setCompositionString("(txRtt AND cd4Under200AndAge) AND NOT cd4Above200AndAge");
+    cd.setCompositionString(
+        "(txRtt AND cd4Under200AndAge) AND NOT (cd4Above200AndAge OR notEligibleForCd4AndAge)");
 
     return cd;
   }
@@ -991,13 +1097,20 @@ public class TxRttCohortQueries {
             5,
             null);
 
+    CohortDefinition notEligibleForCd4AndAge = getPatientsNotEligibleForCd4AndAge(5, null);
+
     cd.addSearch("txRtt", EptsReportUtils.map(txRtt, DEFAULT_MAPPING));
 
     cd.addSearch("cd4Above200AndAge", EptsReportUtils.map(cd4Above200AndAge, DEFAULT_MAPPING));
 
     cd.addSearch("cd4Under200AndAge", EptsReportUtils.map(cd4Under200AndAge, DEFAULT_MAPPING));
+    cd.addSearch(
+        "notEligibleForCd4AndAge",
+        EptsReportUtils.map(
+            notEligibleForCd4AndAge, "startDate=${startDate},location=${location}"));
 
-    cd.setCompositionString("(txRtt AND cd4Above200AndAge) AND NOT cd4Under200AndAge");
+    cd.setCompositionString(
+        "(txRtt AND cd4Above200AndAge) AND NOT (cd4Under200AndAge OR notEligibleForCd4AndAge)");
 
     return cd;
   }
@@ -1038,11 +1151,18 @@ public class TxRttCohortQueries {
             5,
             null);
 
+    CohortDefinition notEligibleForCd4AndAge = getPatientsNotEligibleForCd4AndAge(5, null);
+
     cd.addSearch("txRtt", EptsReportUtils.map(txRtt, DEFAULT_MAPPING));
     cd.addSearch("cd4Under200AndAge", EptsReportUtils.map(cd4Under200AndAge, DEFAULT_MAPPING));
     cd.addSearch("cd4Above200AndAge", EptsReportUtils.map(cd4Above200AndAge, DEFAULT_MAPPING));
+    cd.addSearch(
+        "notEligibleForCd4AndAge",
+        EptsReportUtils.map(
+            notEligibleForCd4AndAge, "startDate=${startDate},location=${location}"));
 
-    cd.setCompositionString("txRtt AND NOT (cd4Under200AndAge OR cd4Above200AndAge)");
+    cd.setCompositionString(
+        "txRtt AND NOT (cd4Under200AndAge OR cd4Above200AndAge OR notEligibleForCd4AndAge)");
 
     return cd;
   }
