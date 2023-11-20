@@ -69,6 +69,15 @@ public class PrepCtDataset extends BaseDataSet {
             mappings),
         "");
 
+    dsd.addColumn(
+        "ORAL",
+        "Oral",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Oral", EptsReportUtils.map(prepCtCohortQueries.getPREPCTNumerator(), mappings)),
+            mappings),
+        "");
+
     addRow(
         dsd,
         "PREPCT",

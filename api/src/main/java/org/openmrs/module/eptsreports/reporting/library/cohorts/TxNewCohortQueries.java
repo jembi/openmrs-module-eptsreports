@@ -13,6 +13,9 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
+
 import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.EncounterType;
@@ -45,11 +48,10 @@ public class TxNewCohortQueries {
 
   @Autowired private ResumoMensalCohortQueries resumoMensalCohortQueries;
 
-  @Autowired private AgeCohortQueries ageCohortQueries;
-
   @Autowired
   private AdvancedDiseaseAndTBCascadeCohortQueries advancedDiseaseAndTBCascadeCohortQueries;
 
+  @Autowired private AgeCohortQueries ageCohortQueries;
   /**
    * <b>Description:</b> Patients with updated date of departure in the ART Service
    *
@@ -463,64 +465,56 @@ public class TxNewCohortQueries {
     String query =
         "SELECT p.patient_id "
             + "FROM   patient p "
-            + "       INNER JOIN encounter e "
-            + "               ON p.patient_id = e.patient_id "
-            + "       INNER JOIN obs o "
-            + "               ON o.encounter_id = e.encounter_id "
-            + "       INNER JOIN ( "
-            + "       SELECT start.patient_id, "
-            + "              start.first_pickup AS first_pickup "
-            + "             FROM ( "
+            + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN (SELECT e.patient_id,MIN(e.encounter_datetime) cd4_date "
+            + "                   FROM   encounter e "
+            + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                          INNER JOIN ( "
             + commonQueries.getARTStartDate(true)
-            + "       ) start "
-            + "       ) art"
-            + "               ON art.patient_id = p.patient_id "
-            + "       INNER JOIN (SELECT oldest_cd4.patient_id, "
-            + "                          Min(cd4_date) oldest_date "
-            + "                   FROM   (SELECT e.patient_id, "
-            + "                                  Date(e.encounter_datetime) cd4_date "
-            + "                           FROM   encounter e "
-            + "                                  INNER JOIN obs o "
-            + "                                          ON o.encounter_id = e.encounter_id "
-            + "                           WHERE  e.encounter_type IN ( ${6}, ${13}, ${51} ) "
-            + "                                  AND e.location_id = :location "
-            + "                                  AND Date(e.encounter_datetime) <= :endDate "
-            + "                                  AND o.concept_id = ${1695} "
-            + "                                  AND e.voided = 0 "
-            + "                                  AND o.voided = 0 "
-            + "                           UNION "
-            + "                           SELECT e.patient_id, "
-            + "                                  o.obs_datetime AS cd4_date "
-            + "                           FROM   encounter e "
-            + "                                  INNER JOIN obs o "
-            + "                                          ON o.encounter_id = e.encounter_id "
-            + "                           WHERE  e.encounter_type = ${53} "
-            + "                                  AND e.location_id = :location "
-            + "                                  AND e.voided = 0 "
-            + "                                  AND o.voided = 0 "
-            + "                                  AND o.concept_id = ${1695} "
-            + "                                   OR o.concept_id = ${23896} "
-            + "                                  AND o.obs_datetime <= :endDate) oldest_cd4 "
-            + "                   GROUP  BY oldest_cd4.patient_id) cd4 "
-            + "               ON cd4.patient_id = p.patient_id "
-            + "WHERE  p.voided = 0 "
+            + "                 ) art "
+            + "  ON art.patient_id = e.patient_id "
+            + "  INNER JOIN (SELECT e.patient_id,e.encounter_datetime cd4_date "
+            + "            FROM   encounter e "
+            + "            INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "            WHERE  e.encounter_type IN ( ${6}, ${13}, ${51} ) "
+            + "            AND e.location_id = :location "
+            + "            AND DATE(e.encounter_datetime) <= :endDate "
+            + "            AND o.concept_id = ${1695} "
+            + "            AND e.voided = 0 "
+            + "            AND o.voided = 0 "
+            + "            UNION "
+            + "            SELECT e.patient_id,o.obs_datetime AS cd4_date "
+            + "            FROM   encounter e "
+            + "            INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "            WHERE  e.encounter_type = ${53} "
+            + "            AND e.location_id = :location "
+            + "            AND e.voided = 0 "
+            + "            AND o.voided = 0 "
+            + "            AND o.concept_id IN ( ${1695},${23896} ) "
+            + "            AND o.obs_datetime <= :endDate"
+            + "     ) cd4 ON cd4.patient_id = e.patient_id "
+            + "   WHERE  e.voided = 0 "
+            + "   AND o.voided = 0 "
+            + "   AND e.location_id = :location "
+            + "   AND o.concept_id = ${1695} "
+            + "   AND o.value_numeric IS NOT NULL "
+            + "   AND ( ( DATE(e.encounter_datetime) BETWEEN DATE_SUB(art.first_pickup, INTERVAL 90 day) AND DATE_ADD(art.first_pickup, INTERVAL 28 day) "
+            + "             AND e.encounter_type IN ( ${6}, ${13}, ${51} ) ) "
+            + "          OR ( DATE(o.obs_datetime) BETWEEN DATE_SUB(art.first_pickup, INTERVAL 90 day) AND DATE_ADD(art.first_pickup, INTERVAL 28 day) "
+            + "   AND e.encounter_type = ${53} ) ) "
+            + "   GROUP  BY e.patient_id) min_cd4 ON min_cd4.patient_id = p.patient_id "
+            + " WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
             + "       AND e.location_id = :location "
-            + "       AND o.concept_id = ${1695} "
             + "       AND  ".concat(cd4CountComparison.getProposition())
-            + "       AND ( ( Date(e.encounter_datetime) BETWEEN DATE_SUB(art.first_pickup, "
-            + "                                                  INTERVAL 90 day) "
-            + "                                          AND DATE_ADD(art.first_pickup, INTERVAL 28 day) "
-            + "               AND e.encounter_type IN ( ${6}, ${13}, ${51} ) ) "
-            + "              OR ( Date(o.obs_datetime) BETWEEN Date_sub(art.first_pickup, "
-            + "                                                INTERVAL 90 day) "
-            + "                                        AND Date_add(art.first_pickup, INTERVAL 28 day) "
-            + "                   AND e.encounter_type = ${53} ) ) "
+            + "       AND ( ( DATE(e.encounter_datetime) = min_cd4.cd4_date AND e.encounter_type IN ( ${6}, ${13}, ${51} ) AND o.concept_id = ${1695}  ) "
+            + "              OR ( DATE(o.obs_datetime) = min_cd4.cd4_date AND e.encounter_type = ${53} AND o.concept_id IN (${1695},${23896})  ) "
+            + "             ) "
             + "GROUP  BY p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
-
     cd.setQuery(sb.replace(query));
 
     return cd;
