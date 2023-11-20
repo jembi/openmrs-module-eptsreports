@@ -22,7 +22,9 @@ import org.openmrs.module.eptsreports.reporting.calculation.txcurr.LessThan3Mont
 import org.openmrs.module.eptsreports.reporting.calculation.txcurr.SixMonthsAndAboveOnArvDispensationCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.txcurr.ThreeToFiveMonthsOnArtDispensationCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
+import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.TXCurrQueries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -41,6 +43,8 @@ public class TxCurrCohortQueries {
 
   private static final int CURRENT_SPEC_ABANDONMENT_DAYS = 31;
 
+  private final String oldArtStartPeriod = " '2023-12-21' ";
+
   @Autowired private HivMetadata hivMetadata;
 
   @Autowired private CommonMetadata commonMetadata;
@@ -48,6 +52,10 @@ public class TxCurrCohortQueries {
   @Autowired private HivCohortQueries hivCohortQueries;
 
   @Autowired private GenericCohortQueries genericCohortQueries;
+
+  @Autowired private CommonQueries commonQueries;
+
+  @Autowired private TxTbMonthlyCascadeCohortQueries txTbMonthlyCascadeCohortQueries;
 
   /**
    * @param cohortName Cohort name
@@ -75,13 +83,6 @@ public class TxCurrCohortQueries {
             "111",
             EptsReportUtils.map(
                 inARTProgramAtEndDate, "onOrBefore=${onOrBefore},locations=${location}"));
-    txCurrComposition
-        .getSearches()
-        .put(
-            "1",
-            EptsReportUtils.map(
-                getPatientWithSTARTDRUGSObsBeforeOrOnEndDate(),
-                "onOrBefore=${onOrBefore},location=${location}"));
 
     txCurrComposition
         .getSearches()
@@ -114,13 +115,6 @@ public class TxCurrCohortQueries {
             EptsReportUtils.map(
                 getPatientsWhoLeftARTProgramBeforeOrOnEndDate(),
                 "onOrBefore=${onOrBefore},location=${location}"));
-    txCurrComposition
-        .getSearches()
-        .put(
-            "5",
-            EptsReportUtils.map(
-                getPatientsWhoHavePickedUpDrugsMasterCardByEndReporingPeriod(),
-                "onOrBefore=${onOrBefore},location=${location}"));
     // section 2
     txCurrComposition
         .getSearches()
@@ -134,9 +128,9 @@ public class TxCurrCohortQueries {
     txCurrComposition
         .getSearches()
         .put(
-            "6",
+            "suspended",
             EptsReportUtils.map(
-                getPatientsSuspendedOrDeadOnProgramEnrollment(),
+                getPatientsWhoStoppedOrSuspendedTreatment(),
                 "onOrBefore=${onOrBefore},location=${location}"));
     txCurrComposition
         .getSearches()
@@ -150,9 +144,9 @@ public class TxCurrCohortQueries {
     txCurrComposition
         .getSearches()
         .put(
-            "7",
+            "died",
             EptsReportUtils.map(
-                getDeadPatientsInDemographiscByReportingEndDate(), "onOrBefore=${onOrBefore}"));
+                getPatientsWhoAreDead(), "onOrBefore=${onOrBefore},location=${location}"));
     txCurrComposition
         .getSearches()
         .put(
@@ -162,41 +156,15 @@ public class TxCurrCohortQueries {
                 String.format(
                     "onOrBefore=${onOrBefore},location=${location},abandonmentDays=%s",
                     abandonmentDays)));
+
     txCurrComposition
         .getSearches()
         .put(
-            "8",
+            "transferredOut",
             EptsReportUtils.map(
-                getPatientDeathRegisteredInLastHomeVisitCardByReportingEndDate(),
+                getPatientsWhoAreTransferredOutToAnotherHf(),
                 "onOrBefore=${onOrBefore},location=${location}"));
-    txCurrComposition
-        .getSearches()
-        .put(
-            "9",
-            EptsReportUtils.map(
-                getDeadPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate(),
-                "onOrBefore=${onOrBefore},location=${location}"));
-    txCurrComposition
-        .getSearches()
-        .put(
-            "10",
-            EptsReportUtils.map(
-                getTransferredOutPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate(),
-                "onOrBefore=${onOrBefore},location=${location}"));
-    txCurrComposition
-        .getSearches()
-        .put(
-            "11",
-            EptsReportUtils.map(
-                getPatientSuspendedInFichaResumeAndClinicaOfMasterCardByReportEndDate(),
-                "onOrBefore=${onOrBefore},location=${location}"));
-    txCurrComposition
-        .getSearches()
-        .put(
-            "12",
-            EptsReportUtils.map(
-                getPatientWhoAfterMostRecentDateHaveDrugPickupOrConsultationComposition(),
-                "onOrBefore=${onOrBefore},location=${location}"));
+
     // section 3
     txCurrComposition
         .getSearches()
@@ -216,14 +184,6 @@ public class TxCurrCohortQueries {
     txCurrComposition
         .getSearches()
         .put(
-            "15",
-            EptsReportUtils.map(
-                getPatientsTransferedOutInLastHomeVisitCard(),
-                "onOrBefore=${onOrBefore},location=${location}"));
-
-    txCurrComposition
-        .getSearches()
-        .put(
             "mostRecentSchedule",
             EptsReportUtils.map(
                 getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(),
@@ -232,21 +192,173 @@ public class TxCurrCohortQueries {
     txCurrComposition
         .getSearches()
         .put(
-            "transferredOutProgram",
+            "startedArtBeforeDecember2023",
             EptsReportUtils.map(
-                getTransferredOutOnProgramEnrollment(),
-                "onOrBefore=${onOrBefore},location=${location}"));
+                getPatientsWhoEverInitiatedTreatmentBeforeDecember2023(),
+                "endDate=${onOrBefore},location=${location}"));
+
+    txCurrComposition
+        .getSearches()
+        .put(
+            "startedArtAfterDecember2023",
+            EptsReportUtils.map(
+                getPatientsWhoStartedArtAfterDecember2023AndHasDrugPickupByReportEndDate(),
+                "endDate=${onOrBefore},location=${location}"));
+
+    txCurrComposition
+        .getSearches()
+        .put(
+            "transferredIn",
+            EptsReportUtils.map(
+                getPatientsWhoAreTransferredIn(), "endDate=${onOrBefore},location=${location}"));
 
     String compositionString;
     if (currentSpec) {
       compositionString =
-          "(1 OR 2 OR 3 OR 4 OR 5) AND NOT ((6 OR 7 OR 8 OR 9 OR 11 OR ((10 OR 15 OR transferredOutProgram) AND mostRecentSchedule)) AND NOT 12) AND NOT (13 OR 14)";
+          "(startedArtBeforeDecember2023 OR startedArtAfterDecember2023 OR transferredIn) AND NOT (suspended OR died OR (transferredOut AND mostRecentSchedule) OR 13 OR 14) ";
+
     } else {
       compositionString = "(111 OR 2 OR 3 OR 4) AND (NOT (555 OR (666 AND (NOT (777 OR 888)))))";
     }
 
     txCurrComposition.setCompositionString(compositionString);
     return txCurrComposition;
+  }
+
+  /**
+   * All patients whose earliest ART start date from pick-up and clinical sources (CURR_FR4.1) falls
+   * before (<) 21 December 2023 and this date falls by the end of the reporting period.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoEverInitiatedTreatmentBeforeDecember2023() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients With Art Start Date Before December 21st 2023");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Facility", Location.class));
+
+    String query =
+        "       SELECT start_art.patient_id "
+            + " FROM ( "
+            + commonQueries.getARTStartDate(true)
+            + "       ) start_art "
+            + " WHERE start_art.first_pickup < "
+            + oldArtStartPeriod;
+
+    sqlCohortDefinition.setQuery(query);
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * All patients whose earliest ART start date from pick-up and clinical sources (CURR_FR4.1) falls
+   * before (<) 21 December 2023 and this date falls by the end of the reporting period.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoEverInitiatedTreatmentAfterDecember2023() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients With Art Start Date After December 21st 2023");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Facility", Location.class));
+
+    String query =
+        "       SELECT start_art.patient_id "
+            + " FROM ( "
+            + commonQueries.getARTStartDate(true)
+            + "       ) start_art "
+            + " WHERE start_art.first_pickup >= "
+            + oldArtStartPeriod;
+
+    sqlCohortDefinition.setQuery(query);
+    return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getPatientsWhoAreTransferredIn() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.setName("Patient Who Ever Started Art");
+
+    cd.addSearch(
+        "transferredInProgram",
+        EptsReportUtils.map(
+            txTbMonthlyCascadeCohortQueries.getPatientsTransferredInFromProgram(),
+            "endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "transferredInFichaResumo",
+        EptsReportUtils.map(
+            txTbMonthlyCascadeCohortQueries.getPatientsTransferredInFromFichaResumo(),
+            "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("transferredInProgram OR transferredInFichaResumo");
+    return cd;
+  }
+
+  /**
+   * Patients whose first ever drug pick-up date between the following sources falls by the end of
+   * the reporting endDate
+   * <li>Drug pick-up date registered on (FILA)
+   * <li>Drug pick-up date registered on (Recepção Levantou ARV) – Master Card
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsFirstDrugPickupEver() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients First Drug Pick-up Date Ever ");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Facility", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    valuesMap.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    valuesMap.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+
+    String query =
+        new EptsQueriesUtil()
+            .patientIdQueryBuilder(CommonQueries.getFirstDrugPickOnFilaOrRecepcaoLevantouQuery())
+            .getQuery();
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * All patients whose earliest ART start date (CURR_FR4.1) falls on or after (>=) 21 December 2023
+   * AND
+   *
+   * <p>whose first ever drug pick-up date between the following sources falls by the end of the
+   * reporting period:
+   * <li>Drug pick-up date registered on (FILA)
+   * <li>Drug pick-up date registered on (Recepção Levantou ARV) – Master Card
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition
+      getPatientsWhoStartedArtAfterDecember2023AndHasDrugPickupByReportEndDate() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.setName("Patient Who Ever Started Art");
+
+    cd.addSearch(
+        "startedAfterDecember2023",
+        EptsReportUtils.map(
+            getPatientsWhoEverInitiatedTreatmentAfterDecember2023(),
+            "endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "drugPickupEver",
+        EptsReportUtils.map(
+            getPatientsFirstDrugPickupEver(), "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("startedAfterDecember2023 AND drugPickupEver");
+    return cd;
   }
 
   @DocumentedDefinition("TX_CURR base cohort")
@@ -608,21 +720,15 @@ public class TxCurrCohortQueries {
    *
    * <blockquote>
    *
-   * <b>13 –</b> All patients having the most recent date between last scheduled drug pickup date
-   * <b>(concept_id 5096 = RETURN VISIT DATE FOR ARV DRUG)</b>
+   * <b>Patients who experienced Interruption in Treatment (IIT)</b>
    *
-   * <p>Or last scheduled consultation date (Ficha Seguimento or Ficha Clínica <b>(concept_id =
-   * 1410)</b>)
-   *
-   * <p>Or 30 days after last ART Pickup date (<b>(concept_id = 23866)</b> – Recepção – Levantou
-   * ARV).
-   *
-   * <p>And adding {@code numDays} days and this date being less than reporting end Date. (For more
-   * clarifications refer to scenario Table 1)
+   * <p>All patients with the most recent date between next scheduled drug pickup date (FILA) and 30
+   * days after last ART pickup date (Ficha Recepção – Levantou ARVs) and adding 28 days and this
+   * date being less than reporting end date
    *
    * </blockquote>
    *
-   * @param numDays
+   * @param numDays number of days to add
    * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(value = "patientHavingLastScheduledDrugPickupDate")
@@ -637,7 +743,6 @@ public class TxCurrCohortQueries {
             hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId(),
             hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
             commonMetadata.getReturnVisitDateConcept().getConceptId(),
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getArtDatePickupMasterCard().getConceptId(),
             hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
@@ -875,6 +980,131 @@ public class TxCurrCohortQueries {
     definition.addParameter(new Parameter("location", "location", Location.class));
 
     return definition;
+  }
+
+  /**
+   * <b>Patients who Stopped/Suspended the treatment</b>
+   * <li>Patients enrolled on ART Program (Service TARV – Tratamento) with the following last state:
+   *     Suspension or;
+   * <li>Patients whose most recently informed “Mudança no Estado de Permanência TARV” is “Suspenso”
+   *     on Ficha Resumo or Ficha Clinica – Mastercard.
+   *
+   *     <p><b>Note:</b>
+   *
+   *     <p>Patients who are “marked” as suspended who have an ARV pick-up registered in FILA after
+   *     the date the patient was “marked” as suspended will be evaluated for IIT definition
+   *     (CURR_FR5) or active status if above conditions are not met.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoStoppedOrSuspendedTreatment() {
+    SqlCohortDefinition defintion = new SqlCohortDefinition();
+
+    defintion.setName("Patients who Stopped/Suspended the treatment");
+    defintion.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    defintion.addParameter(new Parameter("location", "location", Location.class));
+
+    defintion.setQuery(
+        TXCurrQueries.getPatientsWhoStoppedOrSuspendedTreatmentQuery(
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getMasterCardEncounterType(),
+            hivMetadata.getARTProgram(),
+            hivMetadata.getSuspendedTreatmentWorkflowState(),
+            hivMetadata.getStateOfStayOfPreArtPatient(),
+            hivMetadata.getSuspendedTreatmentConcept(),
+            hivMetadata.getStateOfStayOfArtPatient(),
+            hivMetadata.getARVPharmaciaEncounterType()));
+
+    return defintion;
+  }
+
+  /**
+   * <b>Patients who are dead</b>
+   * <li>Patients enrolled on ART Program (Service TARV – Tratamento) with the following last state:
+   *     “Died” or
+   * <li>Patients whose most recently informed “Mudança no Estado de Permanência TARV” is Died on
+   *     Ficha Resumo or Ficha Clinica – Mastercard or
+   * <li>Patients who have been marked as dead as the reason for which the patient was not found at
+   *     home during t he visit (Motivo de não encontrar o Paciente) on the last Home Visit Card by
+   *     reporting end date. Use the “data da visita” when the patient was marked dead on the last
+   *     Home Visit Card as the reference date or
+   * <li>Patients who have been marked dead in the demographic section <b>Note:</b>
+   *
+   *     <p>Patients who are “marked” as dead who have an ARV pick-up registered in FILA or have a
+   *     clinical consultation (Ficha Clínica) after the date the patient was “marked” as dead will
+   *     be evaluated for IIT definition (CURR_FR5) or active status if above conditions are not
+   *     met.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoAreDead() {
+    SqlCohortDefinition defintion = new SqlCohortDefinition();
+
+    defintion.setName("Patients who are dead");
+    defintion.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    defintion.addParameter(new Parameter("location", "location", Location.class));
+
+    defintion.setQuery(
+        TXCurrQueries.getPatientsWhoAreDeadQuery(
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getARVPharmaciaEncounterType(),
+            hivMetadata.getMasterCardEncounterType(),
+            hivMetadata.getArtDeadWorkflowState(),
+            hivMetadata.getBuscaActivaEncounterType(),
+            hivMetadata.getReasonPatientNotFound(),
+            hivMetadata.getReasonPatientNotFoundByActivist2ndVisitConcept(),
+            hivMetadata.getReasonPatientNotFoundByActivist3rdVisitConcept(),
+            hivMetadata.getPatientHasDiedConcept(),
+            hivMetadata.getStateOfStayOfPreArtPatient(),
+            hivMetadata.getARTProgram(),
+            hivMetadata.getStateOfStayOfArtPatient()));
+
+    return defintion;
+  }
+
+  /**
+   * <b>Patients who are Transferred Out to another HF</b>
+   * <li>Patients enrolled on ART Program (Service TARV- Tratamento) with the following last state:
+   *     “Transferred Out” or
+   * <li>Patients whose most recently informed “Mudança no Estado de Permanência TARV” is
+   *     Transferred Out on Ficha Clinica ou Ficha Resumo – Master Card.
+   * <li>Patients who have REASON PATIENT MISSED VISIT (MOTIVOS DA FALTA) as “Transferido para outra
+   *     US” or “Auto-transferência” marked in the last Home Visit Card by reporting end date. Use
+   *     the “data da visita” when the patient reason was marked on the Home Visit Card as the
+   *     reference date
+   * <li>The system will consider patient as transferred out as above defined only if the most
+   *     recent date between (next scheduled ART pick-up on FILA + 1 day) and (the most recent ART
+   *     pickup date on Ficha Recepção – Levantou ARVs + 31 days) falls by the end of the reporting
+   *     period <b>Note:</b>
+   *
+   *     <p>Patients who are “marked” as transferred out who have an ARV pick-up registered in FILA
+   *     after the date the patient was “marked” as transferred out will be evaluated for IIT
+   *     definition (CURR_FR5).
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoAreTransferredOutToAnotherHf() {
+    SqlCohortDefinition defintion = new SqlCohortDefinition();
+
+    defintion.setName("Patients who are Transferred Out to another HF");
+    defintion.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    defintion.addParameter(new Parameter("location", "location", Location.class));
+
+    defintion.setQuery(
+        TXCurrQueries.getPatientsWhoAreTransferredOutToAnotherHfQuery(
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getARVPharmaciaEncounterType(),
+            hivMetadata.getMasterCardEncounterType(),
+            hivMetadata.getTransferredOutToAnotherHealthFacilityWorkflowState(),
+            hivMetadata.getBuscaActivaEncounterType(),
+            hivMetadata.getStateOfStayOfPreArtPatient(),
+            hivMetadata.getTransferredOutConcept(),
+            hivMetadata.getARTProgram(),
+            hivMetadata.getDefaultingMotiveConcept(),
+            hivMetadata.getAutoTransferConcept(),
+            hivMetadata.getStateOfStayOfArtPatient()));
+
+    return defintion;
   }
 
   /**
@@ -1430,7 +1660,7 @@ public class TxCurrCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition monthlyDispensationComposition() {
+  public CohortDefinition lessThan3MonthsDispensationComposition() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Get patients with Monthly ARV Dispensation");
     cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
@@ -1438,14 +1668,14 @@ public class TxCurrCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition quarterlyDispensation = getPatientsWithQuarterlyTypeOfDispensation();
-    CohortDefinition monthlyDispensation = getPatientsWithLessThan3MonthlyTypeOfDispensation();
     CohortDefinition semiAnnualDispensation = getPatientsWithSemiAnnualTypeOfDispensation();
+    CohortDefinition txcurr = getTxCurrCompositionCohort("compositionCohort", true);
 
     cd.addSearch("quarterly", Mapped.mapStraightThrough(quarterlyDispensation));
-    cd.addSearch("monthly", Mapped.mapStraightThrough(monthlyDispensation));
     cd.addSearch("semiAnnual", Mapped.mapStraightThrough(semiAnnualDispensation));
+    cd.addSearch("txcurr", Mapped.mapStraightThrough(txcurr));
 
-    cd.setCompositionString("monthly AND NOT (quarterly OR semiAnnual)");
+    cd.setCompositionString("txcurr AND NOT (quarterly OR semiAnnual)");
     return cd;
   }
 
