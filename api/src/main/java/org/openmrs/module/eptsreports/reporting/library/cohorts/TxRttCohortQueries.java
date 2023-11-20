@@ -686,7 +686,6 @@ public class TxRttCohortQueries {
     map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
-    map.put("23896", hivMetadata.getArtInitiationCd4Concept().getConceptId());
 
     String query =
         "SELECT p.patient_id "
@@ -717,7 +716,7 @@ public class TxRttCohortQueries {
             + "            AND e.location_id = :location "
             + "            AND e.voided = 0 "
             + "            AND o.voided = 0 "
-            + "            AND o.concept_id IN ( ${1695},${23896} ) "
+            + "            AND o.concept_id IN ( ${1695} ) "
             + "            AND o.obs_datetime <= :endDate"
             + "     ) cd4 ON cd4.patient_id = e.patient_id "
             + "   WHERE  e.voided = 0 "
@@ -736,7 +735,7 @@ public class TxRttCohortQueries {
             + "       AND e.location_id = :location "
             + "       AND  ".concat(cd4CountComparison.getProposition())
             + "       AND ( ( DATE(e.encounter_datetime) = min_cd4.cd4_date AND e.encounter_type IN ( ${6}, ${13}, ${51} ) AND o.concept_id = ${1695}  ) "
-            + "              OR ( DATE(o.obs_datetime) = min_cd4.cd4_date AND e.encounter_type = ${53} AND o.concept_id IN (${1695},${23896})  ) "
+            + "              OR ( DATE(o.obs_datetime) = min_cd4.cd4_date AND e.encounter_type = ${53} AND o.concept_id IN (${1695})  ) "
             + "             ) "
             + "GROUP  BY p.patient_id";
 
