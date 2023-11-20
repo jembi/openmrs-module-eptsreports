@@ -914,39 +914,45 @@ public class CommonQueries {
     String sql =
         "SELECT first.patient_id, "
             + "               Min(first.pickup_date) AS first_pickup_ever "
-            + "        FROM   (SELECT p.patient_id, "
-            + "                       Min(e.encounter_datetime) AS pickup_date "
-            + "                FROM   patient p "
-            + "                       INNER JOIN encounter e "
-            + "                               ON e.patient_id = p.patient_id "
-            + "                WHERE  e.encounter_type = ${18} "
-            + "                       AND e.voided = 0 "
-            + "                       AND p.voided = 0 "
-            + "                       AND e.location_id = :location "
-            + "                       AND e.encounter_datetime <= :endDate "
-            + "                GROUP  BY p.patient_id "
-            + "                UNION "
-            + "                SELECT p.patient_id, "
-            + "                       Min(o.value_datetime) AS pickup_date "
-            + "                FROM   patient p "
-            + "                       INNER JOIN encounter e "
-            + "                               ON e.patient_id = p.patient_id "
-            + "                       INNER JOIN obs o "
-            + "                               ON o.encounter_id = e.encounter_id "
-            + "                WHERE  e.encounter_type = ${52} "
-            + "                       AND o.concept_id = ${23866} "
-            + "                       AND e.location_id = :location "
-            + "                       AND o.value_datetime <= :endDate "
-            + "                       AND p.voided = 0 "
-            + "                       AND e.voided = 0 "
-            + "                       AND o.voided = 0 "
-            + "                GROUP  BY p.patient_id) first "
+            + "        FROM   ("
+            + getFirstDrugPickOnFilaOrRecepcaoLevantouQuery()
+            + ") first "
             + "        GROUP  BY first.patient_id "
             + "        HAVING first_pickup_ever BETWEEN :startDate AND :endDate ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
     return stringSubstitutor.replace(sql);
+  }
+
+  public static String getFirstDrugPickOnFilaOrRecepcaoLevantouQuery() {
+    return "SELECT p.patient_id, "
+        + "                       Min(e.encounter_datetime) AS pickup_date "
+        + "                FROM   patient p "
+        + "                       INNER JOIN encounter e "
+        + "                               ON e.patient_id = p.patient_id "
+        + "                WHERE  e.encounter_type = ${18} "
+        + "                       AND e.voided = 0 "
+        + "                       AND p.voided = 0 "
+        + "                       AND e.location_id = :location "
+        + "                       AND e.encounter_datetime <= :endDate "
+        + "                GROUP  BY p.patient_id "
+        + "                UNION "
+        + "                SELECT p.patient_id, "
+        + "                       Min(o.value_datetime) AS pickup_date "
+        + "                FROM   patient p "
+        + "                       INNER JOIN encounter e "
+        + "                               ON e.patient_id = p.patient_id "
+        + "                       INNER JOIN obs o "
+        + "                               ON o.encounter_id = e.encounter_id "
+        + "                WHERE  e.encounter_type = ${52} "
+        + "                       AND o.concept_id = ${23866} "
+        + "                       AND e.location_id = :location "
+        + "                       AND o.value_datetime <= :endDate "
+        + "                       AND p.voided = 0 "
+        + "                       AND e.voided = 0 "
+        + "                       AND o.voided = 0 "
+        + "                GROUP  BY p.patient_id";
   }
 
   public String getFirstDrugPickup() {

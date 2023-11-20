@@ -13,6 +13,9 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
+
 import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.EncounterType;
@@ -45,11 +48,10 @@ public class TxNewCohortQueries {
 
   @Autowired private ResumoMensalCohortQueries resumoMensalCohortQueries;
 
-  @Autowired private AgeCohortQueries ageCohortQueries;
-
   @Autowired
   private AdvancedDiseaseAndTBCascadeCohortQueries advancedDiseaseAndTBCascadeCohortQueries;
 
+  @Autowired private AgeCohortQueries ageCohortQueries;
   /**
    * <b>Description:</b> Patients with updated date of departure in the ART Service
    *
