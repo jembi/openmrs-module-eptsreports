@@ -20,6 +20,7 @@ import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionC
 import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
+import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
@@ -56,6 +57,18 @@ public class TxRttDataset extends BaseDataSet {
   public DataSetDefinition constructTxRttDataset() {
 
     CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
+    dsd.setName("TX_RTT Data Set");
+    dsd.addParameters(getParameters());
+
+    CohortDefinition patientReturnedToTreatment = txRttCohortQueries.getRTTComposition();
+
+    CohortIndicator patientsThatReturnedToTreatment =
+        eptsGeneralIndicator.getIndicator(
+            "",
+            EptsReportUtils.map(
+                patientReturnedToTreatment,
+                "startDate=${startDate},endDate=${endDate},location=${location}"));
+
     String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
     dsd.addDimension("gender", EptsReportUtils.map(eptsCommonDimension.gender(), ""));
     dsd.addDimension(
@@ -68,17 +81,83 @@ public class TxRttDataset extends BaseDataSet {
             eptsCommonDimension.getKeyPopsDimension(),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     dsd.setName("R");
-    dsd.addParameters(getParameters());
-    addRow(
-        dsd,
+
+    dsd.addColumn(
         "RTT",
         "Patients who missed appointment but later showed up for a visit",
+        EptsReportUtils.map(patientsThatReturnedToTreatment, mappings),
+        "");
+
+    addRow(
+        dsd,
+        "under200",
+        "Cd4 result under than 200",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "Patients who missed appointment but later showed up for a visit",
-                EptsReportUtils.map(txRttCohortQueries.getRTTComposition(), mappings)),
+                "Cd4 result under than 200",
+                EptsReportUtils.map(
+                    txRttCohortQueries.getPatientWithCd4ResultLessThan200(), mappings)),
             mappings),
         dissagChildrenAndAdultsAndKeyPop());
+
+    addRow(
+        dsd,
+        "above200",
+        "Cd4 result greater than 200",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Cd4 result greater than 200",
+                EptsReportUtils.map(
+                    txRttCohortQueries.getPatientWithcd4ResultGreaterThan200(), mappings)),
+            mappings),
+        dissagChildrenAndAdultsAndKeyPop());
+
+    addRow(
+        dsd,
+        "cd4Unknown",
+        "Unknown Cd4 result",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Unknown Cd4 result",
+                EptsReportUtils.map(txRttCohortQueries.getPatientWithUnknownCd4Result(), mappings)),
+            mappings),
+        dissagChildrenAndAdultsAndKeyPop());
+
+    addRow(
+        dsd,
+        "notEligibleCd4",
+        "Not Eligible for Cd4",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Unknown Cd4 result - Female",
+                EptsReportUtils.map(
+                    txRttCohortQueries.getPatientsNotEligibleForCd4AndAge(5, null), mappings)),
+            mappings),
+        dissagChildrenAndAdultsAndKeyPop());
+
+    dsd.addColumn(
+        "PID",
+        "TX_RTT: People who inject drugs",
+        EptsReportUtils.map(patientsThatReturnedToTreatment, mappings),
+        "KP=PID");
+
+    dsd.addColumn(
+        "MSM",
+        "TX_RTT: Men who have sex with men",
+        EptsReportUtils.map(patientsThatReturnedToTreatment, mappings),
+        "KP=MSM");
+
+    dsd.addColumn(
+        "CSW",
+        "TX_RTT: Female sex workers",
+        EptsReportUtils.map(patientsThatReturnedToTreatment, mappings),
+        "KP=CSW");
+
+    dsd.addColumn(
+        "PRI",
+        "TX_RTT: People in prison and other closed settings",
+        EptsReportUtils.map(patientsThatReturnedToTreatment, mappings),
+        "KP=PRI");
 
     CohortIndicator RTT90 =
         eptsGeneralIndicator.getIndicator(
