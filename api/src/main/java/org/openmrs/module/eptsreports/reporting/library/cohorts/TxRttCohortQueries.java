@@ -148,8 +148,7 @@ public class TxRttCohortQueries {
             getITTOrLTFUPatients(28), "onOrBefore=${startDate-1d},location=${location}"));
 
     cd.addSearch(
-        "returned",
-        EptsReportUtils.map(getPatientsReturnedTreatmentDuringReportingPeriod(), DEFAULT_MAPPING));
+        "returned", EptsReportUtils.map(getPatientsArtStartDateAfterPeriod(true), DEFAULT_MAPPING));
 
     cd.addSearch(
         "txcurr",
@@ -646,7 +645,7 @@ public class TxRttCohortQueries {
   /**
    * All patients whose earliest ART start date (NEW_FR4.1) falls on or after (>=) 21 December 2023.
    */
-  public CohortDefinition getPatientsArtStartDateAfterPeriod() {
+  public CohortDefinition getPatientsArtStartDateAfterPeriod(boolean duringReportingPeriod) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("All patients whose earliest ART start date from pick-up and clinical sources");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -659,10 +658,13 @@ public class TxRttCohortQueries {
         "       SELECT patient_id "
             + " FROM ( "
             + commonQueries.getARTStartDate(true)
-            + "       ) start "
-            + " WHERE start.first_pickup >= "
-            + artStartPeriod
-            + " AND start.first_pickup < :startDate";
+            + "       ) start ";
+    query +=
+        duringReportingPeriod
+            ? "WHERE start.first_pickup >= :startDate " + "AND start.first_pickup <= :endDate "
+            : " WHERE start.first_pickup >= "
+                + artStartPeriod
+                + " AND start.first_pickup < :startDate";
 
     cd.setQuery(query);
     return cd;
@@ -734,7 +736,7 @@ public class TxRttCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition earliestArtStartDateBeforePeriod = getPatientsArtStartDateBeforePeriod();
-    CohortDefinition earliestArtStartDateAfterPeriod = getPatientsArtStartDateAfterPeriod();
+    CohortDefinition earliestArtStartDateAfterPeriod = getPatientsArtStartDateAfterPeriod(false);
     CohortDefinition firstDrugPickUpAfterPeriod = getPatientsFirstDrugPickup();
 
     cd.addSearch(
