@@ -87,7 +87,7 @@ public class TxMlCohortQueries {
     String mappings = "onOrBefore=${endDate},location=${location}";
     String mappings2 = "startDate=${startDate},endDate=${endDate},location=${location}";
     String previousPeriodMappings =
-        "startDate=${startDate-3m},endDate=${startDate-1d},reportEndDate=${endDate},location=${location}";
+        "startDate=${startDate-3m},endDate=${startDate-1d},location=${location}";
 
     CohortDefinition dead = txCurrCohortQueries.getPatientsWhoAreDead();
 
@@ -95,7 +95,7 @@ public class TxMlCohortQueries {
         "transferredOutPreviousPeriod",
         EptsReportUtils.map(transferredOut, previousPeriodMappings));
 
-    cd.addSearch("transferredOutReportingPeriod", EptsReportUtils.map(transferredOut, mappings));
+    cd.addSearch("transferredOutReportingPeriod", EptsReportUtils.map(transferredOut, mappings2));
 
     cd.addSearch(
         "deadPreviousPeriod",
