@@ -168,9 +168,7 @@ public class TxRttCohortQueries {
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "(initiatedPreviousPeriod AND (LTFU AND NOT transferredOut) AND txcurr) AND NOT transferredIn");
-    //        "(initiatedPreviousPeriod AND (LTFU AND NOT transferredOut) AND returned AND txcurr)
-    // AND NOT transferredIn");
+        "(initiatedPreviousPeriod AND (LTFU AND NOT transferredOut) AND returned AND txcurr) AND NOT transferredIn");
 
     return cd;
   }
