@@ -147,8 +147,7 @@ public class TxRttCohortQueries {
         EptsReportUtils.map(
             getITTOrLTFUPatients(28), "onOrBefore=${startDate-1d},location=${location}"));
 
-    cd.addSearch(
-        "returned", EptsReportUtils.map(getPatientsFirstDrugPickup(true), DEFAULT_MAPPING));
+    cd.addSearch("returned", EptsReportUtils.map(getPatientsReturnedTreatment(), DEFAULT_MAPPING));
 
     cd.addSearch(
         "txcurr",
@@ -587,7 +586,7 @@ public class TxRttCohortQueries {
    *
    * @return String
    */
-  public CohortDefinition getPatientsFirstDrugPickup(boolean duringReportingPeriod) {
+  public CohortDefinition getPatientsFirstDrugPickup() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patient’s earliest drug pick-up");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -598,12 +597,44 @@ public class TxRttCohortQueries {
         "       SELECT patient_id "
             + " FROM ( "
             + commonQueries.getFirstDrugPickup()
+            + "       ) start "
+            + " WHERE start.first_pickup_ever >= "
+            + artStartPeriod;
+
+    cd.setQuery(query);
+    return cd;
+  }
+
+  /**
+   * <b>Patients who Returned to Treatment </b>
+   *
+   * <p>The system will identify patients who returned to treatment within the reporting period as
+   * follows:
+   *
+   * <ul>
+   *   <li>All patients who have at least one drug pick-up registered in FILA during the reporting
+   *       period or
+   *   <li>All patients who have at least one drug pick-up registered in Recepção Levantou ARV –
+   *       Master Card during the reporting period.
+   * </ul>
+   *
+   * <p><b>Note:</b>The system will consider the earliest date between FILA and Ficha Recepção
+   * Levantou ARVs during the reporting period as the patient’s <b>ART Restart Date;</b>
+   *
+   * @return String
+   */
+  public CohortDefinition getPatientsReturnedTreatment() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patient’s Returned treatment");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    String query =
+        "       SELECT patient_id "
+            + " FROM ( "
+            + commonQueries.getFirstDrugPickup()
             + "       ) start ";
-    query +=
-        duringReportingPeriod
-            ? "WHERE start.first_pickup_ever >= :startDate "
-                + "AND start.first_pickup_ever <= :endDate "
-            : " WHERE start.first_pickup_ever >= " + artStartPeriod;
 
     cd.setQuery(query);
     return cd;
@@ -646,7 +677,7 @@ public class TxRttCohortQueries {
 
     CohortDefinition earliestArtStartDateBeforePeriod = getPatientsArtStartDateBeforePeriod();
     CohortDefinition earliestArtStartDateAfterPeriod = getPatientsArtStartDateAfterPeriod();
-    CohortDefinition firstDrugPickUpAfterPeriod = getPatientsFirstDrugPickup(false);
+    CohortDefinition firstDrugPickUpAfterPeriod = getPatientsFirstDrugPickup();
 
     cd.addSearch(
         "earliestArtStartDateBeforePeriod",
