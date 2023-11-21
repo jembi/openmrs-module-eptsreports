@@ -147,7 +147,9 @@ public class TxRttCohortQueries {
         EptsReportUtils.map(
             getITTOrLTFUPatients(28), "onOrBefore=${startDate-1d},location=${location}"));
 
-    cd.addSearch("returned", EptsReportUtils.map(getPatientsReturnedTreatment(), DEFAULT_MAPPING));
+    cd.addSearch(
+        "returned",
+        EptsReportUtils.map(getPatientsReturnedTreatmentDuringReportingPeriod(), DEFAULT_MAPPING));
 
     cd.addSearch(
         "txcurr",
@@ -197,12 +199,6 @@ public class TxRttCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition ficha =
-        getPatientsWithFilaOrFichaOrMasterCardPickup(
-            Arrays.asList(
-                hivMetadata.getAdultoSeguimentoEncounterType(),
-                hivMetadata.getPediatriaSeguimentoEncounterType()));
-
     CohortDefinition fila =
         getPatientsWithFilaOrFichaOrMasterCardPickup(
             Arrays.asList(hivMetadata.getARVPharmaciaEncounterType()));
@@ -214,13 +210,11 @@ public class TxRttCohortQueries {
             hivMetadata.getYesConcept(),
             hivMetadata.getArtDatePickupMasterCard());
 
-    cd.addSearch("ficha", EptsReportUtils.map(ficha, DEFAULT_MAPPING));
-
     cd.addSearch("fila", EptsReportUtils.map(fila, DEFAULT_MAPPING));
 
     cd.addSearch("drugPickUp", EptsReportUtils.map(drugPickUp, DEFAULT_MAPPING));
 
-    cd.setCompositionString("ficha OR fila OR drugPickUp");
+    cd.setCompositionString("fila OR drugPickUp");
 
     return cd;
   }
@@ -600,41 +594,6 @@ public class TxRttCohortQueries {
             + "       ) start "
             + " WHERE start.first_pickup_ever >= "
             + artStartPeriod;
-
-    cd.setQuery(query);
-    return cd;
-  }
-
-  /**
-   * <b>Patients who Returned to Treatment </b>
-   *
-   * <p>The system will identify patients who returned to treatment within the reporting period as
-   * follows:
-   *
-   * <ul>
-   *   <li>All patients who have at least one drug pick-up registered in FILA during the reporting
-   *       period or
-   *   <li>All patients who have at least one drug pick-up registered in Recepção Levantou ARV –
-   *       Master Card during the reporting period.
-   * </ul>
-   *
-   * <p><b>Note:</b>The system will consider the earliest date between FILA and Ficha Recepção
-   * Levantou ARVs during the reporting period as the patient’s <b>ART Restart Date;</b>
-   *
-   * @return String
-   */
-  public CohortDefinition getPatientsReturnedTreatment() {
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patient’s Returned treatment");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    String query =
-        "       SELECT patient_id "
-            + " FROM ( "
-            + commonQueries.getFirstDrugPickup()
-            + "       ) start ";
 
     cd.setQuery(query);
     return cd;
