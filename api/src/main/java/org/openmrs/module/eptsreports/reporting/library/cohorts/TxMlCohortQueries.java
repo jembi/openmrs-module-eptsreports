@@ -59,8 +59,33 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Patients started ART and missed Next Appointment or Next Drug Pickup (A and
-   * B)
+   * <b>Indicator numerator </b>
+   *
+   * <p> From all patients who ever initiated ART (TX_ML_FR4) by end of reporting period:</p>
+   *
+   * <blockquote>
+   *  <p>All patients whose earliest ART start date from pick-up and clinical sources (CURR_FR4.1)
+   * falls before (<) 21 December 2023 and this date falls by the end of the reporting period.
+   *  OR
+   *  <p>All patients whose earliest ART start date (CURR_FR4.1) falls on or after (>=) 21 December 2023 AND
+   * whose first ever drug pick-up date between the following sources falls by the end of the reporting period:
+   * </blockquote>
+   *
+   * <li>Include patients marked as “died” (using all the criteria defined in TX_ML_FR5) by end of reporting period;</li>
+   *
+   * <li>Include patients marked as “suspended” (using all the criteria defined in TX_ML_FR46) by end of reporting period</li>
+   *
+   * <li>Include patients marked as “transferred-out” (using all the criteria defined in TX_ML_FR7)
+   * by end of reporting period who have the last scheduled pick-up marked on FILA + 1 day
+   * falling by end of reporting period.</li>
+   *
+   * <li>Include patients with Interruption In Treatment (IIT) during the reporting period
+   * (using all the criteria defined in TX_ML_FR8)</li><br>
+   *
+   * <b>The system will exclude the following patients:</b>
+   * <li>All patients who were transferred-out (using all defined criteria on TX_ML_FR7) by end of previous reporting period</li>
+   * <li>All patient who are dead (TX_ML_FR5) by end of previous reporting period</li>
+   * <li>All patients who stopped/suspended treatment (TX_ML_FR6) by end of previous reporting period</li>
    *
    * @return {@link CohortDefinition}
    */
@@ -137,6 +162,9 @@ public class TxMlCohortQueries {
    * <li>All patients who do not have the next scheduled drug pick up date on their last drug
    *     pick-up (FILA) that occurred during the reporting period nor any ART pickup date registered
    *     on Ficha Recepção – Levantou ARVs or FILA during the reporting period
+   *     <li>
+   *         The system will exclude: All patients who are dead (TX_ML_FR5) or transferred out (TX_ML_FR7).
+   *     </li>
    *
    * @return {@link CohortDefinition}
    */
@@ -223,23 +251,13 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * <b>Description:</b> All patients who do not have the next scheduled drug pick up date (Fila)
-   * and ART Pickup date (Recepção – Levantou ARV) (C).
-   *
-   * <p><b>Technical Specs</b>
-   *
-   * <blockquote>
-   *
-   * <ul>
-   *   <li><b>ii.</b> Next Drugs Pick Up Appointment <b>(concept_id = 5096)</b> ->
-   *       <b>encounterType_id = 18</b>
-   * </ul>
-   *
-   * <p><b>b.</b> And none ART Pickup MasterCard date <b>(concept_id = 23866)</b> within reporting
-   * period from <b>encounterType_id = 52</b>.
-   *
-   * </blockquote>
-   *
+   * <b>Patients experienced Interruption in Treatment (IIT)</b>
+   * <li>
+   *     All patients who do not have the next scheduled drug pick up date on their
+   *     last drug pick-up (FILA) that occurred during the reporting period nor any
+   *     ART pickup date registered on Ficha Recepção – Levantou ARVs or FILA during
+   *     the reporting period.
+   * </li>
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup() {
@@ -260,6 +278,17 @@ public class TxMlCohortQueries {
     return definition;
   }
 
+  /**
+   * <b>Patients experienced Interruption in Treatment (IIT)</b>
+   * <li>
+   *     All patients with the most recent date between next scheduled
+   *     drug pickup date (FILA) and 30 days after last ART pickup date
+   *     (Ficha Recepção – Levantou ARVs) and adding 28 days and this
+   *     date >=report start date and < reporting end date
+   * </li>
+   * @param numDays number of days to add
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientHavingLastScheduledDrugPickupDate(int numDays) {
     SqlCohortDefinition definition = new SqlCohortDefinition();
     definition.setName("patientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup");
@@ -1613,12 +1642,13 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * <b>Description:</b> “Interruption In Treatment for >6 months” will have the following
-   * combination:
+   * <b>On Treatment for >=6 months when experienced IIT</b>
    *
-   * <ul>
-   *   <li>((A OR B) AND C3) AND NOT Dead AND NOT Transferred-Out AND NOT Refused
-   * </ul>
+   * <li>
+   *    All patients who have been on treatment for greater or equal than 180
+   *    days since the date initiated ARV treatment (TX_ML_FR4)  to the date
+   *    of their last scheduled ARV pick-up
+   * </li>
    *
    * @return {@link CohortDefinition}
    */
@@ -1658,15 +1688,19 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * <b>Description:</b> “Interruption In Treatment for <3 months” will have the following
-   * combination: ((A OR B) AND C1) AND NOT DEAD AND NOT TRANSFERRED OUT AND NOT REFUSED
+   * <b>On Treatment for <3 months when experienced IIT</b>
+   * <li>
+   *     All patients who have been on treatment for less than 90 days since
+   *     the date initiated ARV treatment  (TX_ML_FR4) to the date of their
+   *     last scheduled ARV pick-up
+   * </li>
    *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsIITLessThan90DaysComposition() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    cd.setName("Get patients who are Lost To Follow Up Composition");
+    cd.setName("On Treatment for >=6 months when experienced IIT");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -1702,12 +1736,12 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * <b>Description:</b> “Interruption In Treatment between 3-5 months” will have the following
-   * combination:
-   *
-   * <ul>
-   *   <li>((A OR B) AND C2) AND NOT Dead AND NOT Transferred-Out AND NOT Refused
-   * </ul>
+   * <b>On Treatment for 3-5 months when experienced IIT</b>
+   * <li>
+   *     All patients who have been on treatment for greater or equal than
+   *     90 days and less than 180 days since the date initiated ARV treatment
+   *     (TX_ML_FR4) to the date of their last scheduled ARV pick-up
+   * </li>
    *
    * @return {@link CohortDefinition}
    */
@@ -1760,7 +1794,7 @@ public class TxMlCohortQueries {
   public CohortDefinition getPatientsWithIITComposition() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    cd.setName("Get All patients who are Lost To Follow Up Composition");
+    cd.setName("Patients experienced Interruption in Treatment (IIT)");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));

@@ -861,8 +861,12 @@ public class TxMlQueries {
   }
 
   /**
-   * <b>Description:</b> Number of patients without scheduled Drug pickup date and ART Pickup
-   *
+   * <li>
+   *     All patients who do not have the next scheduled drug pick up date on their
+   *     last drug pick-up (FILA) that occurred during the reporting period nor any
+   *     ART pickup date registered on Ficha Recepção – Levantou ARVs or FILA during
+   *     the reporting period.
+   * </li>
    * @return {@link String}
    */
   public static String getPatientWithoutScheduledDrugPickupDateMasterCardAndArtPickupQuery(
@@ -960,10 +964,12 @@ public class TxMlQueries {
   }
 
   /**
-   *
-   *
-   * <h4>Number of patients having last scheduled Drug pickup date</h4>
-   *
+   * <li>
+   *     All patients with the most recent date between next scheduled
+   *     drug pickup date (FILA) and 30 days after last ART pickup date
+   *     (Ficha Recepção – Levantou ARVs) and adding 28 days and this
+   *     date >=report start date and < reporting end date
+   * </li>
    * @return {@link String}
    */
   public static String getPatientHavingLastScheduledDrugPickupDateQuery(
