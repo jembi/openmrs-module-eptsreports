@@ -429,7 +429,7 @@ public class TXCurrQueries {
             + "                            o.concept_id = ${returnVisitDateForArvDrugConcept} and "
             + "                            o.voided = 0 "
             + "                        UNION "
-                 + "                        SELECT pa.patient_id, "
+            + "                        SELECT pa.patient_id, "
             + "                            Date_add(Max(obs.value_datetime), interval 30 day) value_datetime "
             + "                        FROM   patient pa "
             + "                            inner join encounter enc "
@@ -822,9 +822,7 @@ public class TXCurrQueries {
             + "GROUP BY died.patient_id "
             + " ) most_recent "
             + "	GROUP BY most_recent.patient_id) dead "
-
             + "        WHERE "
-
             + "    NOT EXISTS ( "
             + "        SELECT  e.patient_id "
             + "        FROM    encounter e "
