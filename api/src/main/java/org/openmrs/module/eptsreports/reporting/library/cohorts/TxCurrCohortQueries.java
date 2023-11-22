@@ -57,6 +57,8 @@ public class TxCurrCohortQueries {
 
   @Autowired private TxTbMonthlyCascadeCohortQueries txTbMonthlyCascadeCohortQueries;
 
+  @Autowired private ResumoMensalCohortQueries resumoMensalCohortQueries;
+
   /**
    * @param cohortName Cohort name
    * @param currentSpec - true for is current and false the opposit
@@ -172,7 +174,13 @@ public class TxCurrCohortQueries {
             "13",
             EptsReportUtils.map(
                 getPatientHavingLastScheduledDrugPickupDateDaysBeforeEndDate(28),
-                "onOrBefore=${onOrBefore},location=${location}"));
+                "onOrBefore=${onOrBefore},location=${location}")); txCurrComposition
+        .getSearches()
+        .put(
+            "withoutPickup",
+            EptsReportUtils.map(
+                    resumoMensalCohortQueries.getNumberOfPatientsWhoAbandonedArtWithoutPickup(),
+                "endDate=${onOrBefore},location=${location}"));
     txCurrComposition
         .getSearches()
         .put(
@@ -215,7 +223,7 @@ public class TxCurrCohortQueries {
     String compositionString;
     if (currentSpec) {
       compositionString =
-          "(startedArtBeforeDecember2023 OR startedArtAfterDecember2023 OR transferredIn) AND NOT (suspended OR died OR (transferredOut AND mostRecentSchedule) OR 13 OR 14) ";
+          "(startedArtBeforeDecember2023 OR startedArtAfterDecember2023 OR transferredIn) AND NOT (suspended OR died OR (transferredOut AND mostRecentSchedule) OR 13 OR 14 OR withoutPickup) ";
 
     } else {
       compositionString = "(111 OR 2 OR 3 OR 4) AND (NOT (555 OR (666 AND (NOT (777 OR 888)))))";
