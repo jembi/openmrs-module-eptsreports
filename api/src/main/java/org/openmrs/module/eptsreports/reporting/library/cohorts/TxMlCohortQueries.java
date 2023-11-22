@@ -10,6 +10,7 @@ import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.txml.StartedArtOnLastClinicalContactCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
+import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.TXCurrQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.TxMlQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -1350,6 +1351,51 @@ public class TxMlCohortQueries {
   }
 
   /**
+   * <b>Disaggregation: Patient IIT Breakdown</b>
+   * <li>
+   *     On Treatment for <3 months when experienced IIT
+   * All patients who have been on treatment for less than 90 days since the date
+   * initiated ARV treatment  (TX_ML_FR4) to the date of their last scheduled ARV pick-up
+   * </li>
+   * <li>
+   *    On Treatment for 3-5 months when experienced IIT
+   * All patients who have been on treatment for greater or equal than 90 days and less
+   * than 180 days since the date initiated ARV treatment (TX_ML_FR4) to the date of
+   * their last scheduled ARV pick-up
+   * </li>
+   * <li>
+   *    On Treatment for >=6 months when experienced IIT
+   * All patients who have been on treatment for greater or equal than 180 days since
+   * the date initiated ARV treatment (TX_ML_FR4)  to the date of their last scheduled ARV pick-up
+   * </li>
+   *
+   * @see CommonQueries#getARTStartDate(boolean)
+   * @param minDays minimum of days of interruption
+   * @param maxDays maximum of days of interruption
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getTreatmentInterruptionOfXDaysBeforeReturningToTreatment(
+      Integer minDays, Integer maxDays) {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+
+    definition.setName("Disaggregation: Patient IIT Breakdown");
+
+    definition.setQuery(
+        TxMlQueries.getTreatmentInterruptionOfXDaysBeforeReturningToTreatmentQuery(
+            hivMetadata.getARVPharmaciaEncounterType(),
+            hivMetadata.getReturnVisitDateForArvDrugConcept(),
+            hivMetadata.getMasterCardDrugPickupEncounterType(),
+            hivMetadata.getArtDatePickupMasterCard(),
+            minDays,
+            maxDays));
+
+    definition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    definition.addParameter(new Parameter("location", "location", Location.class));
+
+    return definition;
+  }
+
+  /**
    * <b>Technical Specs</b>
    *
    * <blockquote>
@@ -1591,10 +1637,10 @@ public class TxMlCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        "C3",
+        "moreThan180Days",
         EptsReportUtils.map(
-            getPatientsOnARTForLessOrMoreThan180Days(3),
-            "onOrBefore=${endDate},location=${location}"));
+            getTreatmentInterruptionOfXDaysBeforeReturningToTreatment(180, null),
+            "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "dead",
         EptsReportUtils.map(
@@ -1606,7 +1652,8 @@ public class TxMlCohortQueries {
             getPatientsWhoMissedNextAppointmentAndTransferredOut(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(missedAppointment AND C3) AND NOT dead AND NOT transferredOut");
+    cd.setCompositionString(
+        "(missedAppointment AND moreThan180Days) AND NOT (dead OR transferredOut)");
     return cd;
   }
 
@@ -1631,22 +1678,25 @@ public class TxMlCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        "C1",
+        "lessThan90days",
         EptsReportUtils.map(
-            getPatientsOnARTForLessOrMoreThan180Days(1),
-            "onOrBefore=${endDate},location=${location}"));
+            getTreatmentInterruptionOfXDaysBeforeReturningToTreatment(null, 90),
+            "endDate=${endDate},location=${location}"));
+
     cd.addSearch(
         "dead",
         EptsReportUtils.map(
-            getPatientsWhoMissedNextAppointmentAndDiedDuringReportingPeriod(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            txCurrCohortQueries.getPatientsWhoAreDead(),
+            "onOrBefore=${endDate},location=${location}"));
+
     cd.addSearch(
         "transferredOut",
         EptsReportUtils.map(
             getPatientsWhoMissedNextAppointmentAndTransferredOut(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(missedAppointment AND C1) AND NOT dead AND NOT transferredOut");
+    cd.setCompositionString(
+        "(missedAppointment AND lessThan90days) AND NOT (dead OR transferredOut)");
 
     return cd;
   }
@@ -1676,22 +1726,25 @@ public class TxMlCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        "C2",
+        "greaterThan90AndLessThan180days",
         EptsReportUtils.map(
-            getPatientsOnARTForLessOrMoreThan180Days(2),
-            "onOrBefore=${endDate},location=${location}"));
+            getTreatmentInterruptionOfXDaysBeforeReturningToTreatment(90, 180),
+            "endDate=${endDate},location=${location}"));
+
     cd.addSearch(
         "dead",
         EptsReportUtils.map(
             getPatientsWhoMissedNextAppointmentAndDiedDuringReportingPeriod(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
+
     cd.addSearch(
         "transferredOut",
         EptsReportUtils.map(
             getPatientsWhoMissedNextAppointmentAndTransferredOut(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(missedAppointment AND C2) AND NOT dead AND NOT transferredOut");
+    cd.setCompositionString(
+        "(missedAppointment AND greaterThan90AndLessThan180days) AND NOT (dead OR transferredOut)");
     return cd;
   }
 
@@ -1719,21 +1772,21 @@ public class TxMlCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        "C1",
+        "lessThan90days",
         EptsReportUtils.map(
-            getPatientsOnARTForLessOrMoreThan180Days(1),
-            "onOrBefore=${endDate},location=${location}"));
+            getPatientsIITLessThan90DaysComposition(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
-        "C2",
+        "moreThan180Days",
         EptsReportUtils.map(
-            getPatientsOnARTForLessOrMoreThan180Days(2),
-            "onOrBefore=${endDate},location=${location}"));
+            getPatientsIITMoreThan180DaysComposition(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        "C3",
+        "greaterThan90AndLessThan180days",
         EptsReportUtils.map(
-            getPatientsOnARTForLessOrMoreThan180Days(3),
-            "onOrBefore=${endDate},location=${location}"));
+            getPatientsIITBetween90DaysAnd180DaysComposition(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "dead",
         EptsReportUtils.map(
@@ -1745,7 +1798,7 @@ public class TxMlCohortQueries {
             getPatientsWhoMissedNextAppointmentAndTransferredOut(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.setCompositionString(
-        "(missedAppointment AND (C1 OR C2 OR C3)) AND NOT dead AND NOT transferredOut");
+        "(missedAppointment AND (lessThan90days OR moreThan180Days OR greaterThan90AndLessThan180days)) AND NOT (dead OR transferredOut)");
     return cd;
   }
 
