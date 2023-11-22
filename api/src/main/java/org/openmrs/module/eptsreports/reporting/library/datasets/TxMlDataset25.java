@@ -2,7 +2,6 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 
 import java.util.Arrays;
 import java.util.List;
-
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TxCurrCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TxMlCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
@@ -86,9 +85,10 @@ public class TxMlDataset25 extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "dead",
                 EptsReportUtils.map(
-                        txCurrCohortQueries.getPatientsWhoAreDead(),
-                    "onOrBefore=${endDate},location=${location}")),
-            "onOrBefore=${endDate},location=${location}"),
+                    txMlCohortQueries
+                        .getPatientsWhoMissedNextAppointmentAndDiedDuringReportingPeriod(),
+                    mappings)),
+            mappings),
         "");
 
     // Missed appointment and dead
@@ -100,9 +100,10 @@ public class TxMlDataset25 extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "dead",
                 EptsReportUtils.map(
-                    txCurrCohortQueries.getPatientsWhoAreDead(),
-                    "onOrBefore=${endDate},location=${location}")),
-            "onOrBefore=${endDate},location=${location}"),
+                    txMlCohortQueries
+                        .getPatientsWhoMissedNextAppointmentAndDiedDuringReportingPeriod(),
+                    mappings)),
+            mappings),
         getColumnsForAgeAndGenderAndKeyPop());
     // LTFU Less Than 90 days
     addRow(
