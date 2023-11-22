@@ -14,7 +14,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
 import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
-import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
 import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
@@ -467,14 +466,14 @@ public class TxNewCohortQueries {
             + "FROM   patient p "
             + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "       INNER JOIN (SELECT e.patient_id,MIN(e.encounter_datetime) cd4_date "
+            + "       INNER JOIN (SELECT e.patient_id,MIN(DATE(cd4.cd4_date)) cd4_date "
             + "                   FROM   encounter e "
             + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "                          INNER JOIN ( "
             + commonQueries.getARTStartDate(true)
             + "                 ) art "
             + "  ON art.patient_id = e.patient_id "
-            + "  INNER JOIN (SELECT e.patient_id,e.encounter_datetime cd4_date "
+            + "  INNER JOIN (SELECT e.patient_id,DATE(e.encounter_datetime) cd4_date "
             + "            FROM   encounter e "
             + "            INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "            WHERE  e.encounter_type IN ( ${6}, ${13}, ${51} ) "
@@ -484,7 +483,7 @@ public class TxNewCohortQueries {
             + "            AND e.voided = 0 "
             + "            AND o.voided = 0 "
             + "            UNION "
-            + "            SELECT e.patient_id,o.obs_datetime AS cd4_date "
+            + "            SELECT e.patient_id,DATE(o.obs_datetime) AS cd4_date "
             + "            FROM   encounter e "
             + "            INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "            WHERE  e.encounter_type = ${53} "
@@ -497,12 +496,11 @@ public class TxNewCohortQueries {
             + "   WHERE  e.voided = 0 "
             + "   AND o.voided = 0 "
             + "   AND e.location_id = :location "
-            + "   AND o.concept_id = ${1695} "
             + "   AND o.value_numeric IS NOT NULL "
             + "   AND ( ( DATE(e.encounter_datetime) BETWEEN DATE_SUB(art.first_pickup, INTERVAL 90 day) AND DATE_ADD(art.first_pickup, INTERVAL 28 day) "
-            + "             AND e.encounter_type IN ( ${6}, ${13}, ${51} ) ) "
+            + "             AND e.encounter_type IN ( ${6}, ${13}, ${51}) AND o.concept_id = ${1695}  ) "
             + "          OR ( DATE(o.obs_datetime) BETWEEN DATE_SUB(art.first_pickup, INTERVAL 90 day) AND DATE_ADD(art.first_pickup, INTERVAL 28 day) "
-            + "   AND e.encounter_type = ${53} ) ) "
+            + "   AND e.encounter_type = ${53} AND o.concept_id IN (${1695},${23896}) ) ) "
             + "   GROUP  BY e.patient_id) min_cd4 ON min_cd4.patient_id = p.patient_id "
             + " WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
