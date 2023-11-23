@@ -47,9 +47,6 @@ public class TxNewCohortQueries {
 
   @Autowired private ResumoMensalCohortQueries resumoMensalCohortQueries;
 
-  @Autowired
-  private AdvancedDiseaseAndTBCascadeCohortQueries advancedDiseaseAndTBCascadeCohortQueries;
-
   @Autowired private AgeCohortQueries ageCohortQueries;
   /**
    * <b>Description:</b> Patients with updated date of departure in the ART Service
