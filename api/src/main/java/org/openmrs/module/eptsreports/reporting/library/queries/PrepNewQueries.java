@@ -284,7 +284,7 @@ public class PrepNewQueries {
    * @param prepStartDateConceptId
    * @return
    */
-  public static String pregnantPatientsBasedOnPrepNew(
+  public static String pregnantPatientsBasedOnPrepNewA(
       int prepIncialEncounterType,
       int initialStatusOfPrEPUserConceptId,
       int prepTargetGroupConceptId,
@@ -295,7 +295,7 @@ public class PrepNewQueries {
       int prepStartDateConceptId) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Get Clients who are pregnant Based on PrEP New");
+    sqlCohortDefinition.setName("Get Clients who are pregnant Based on PrEP New A");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
@@ -310,134 +310,31 @@ public class PrepNewQueries {
     map.put("6332", breastfeedingConceptId);
     map.put("165211", prepStartDateConceptId);
 
-    String query =
-        "SELECT "
-            + "    pregnant.patient_id "
-            + "FROM "
-            + "    ( "
-            + "        SELECT "
-            + "            p.patient_id, "
-            + "            MAX(e.encounter_datetime) pregnancy_date "
-            + "        FROM "
-            + "            patient p "
-            + "            INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "            INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "            INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
-            + "            INNER JOIN ( "
-            + "                SELECT "
-            + "                    p.patient_id, "
-            + "                    MIN(e.encounter_datetime) minPrepDate "
-            + "                FROM "
-            + "                    patient p "
-            + "                    INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                WHERE "
-            + "                    p.voided = 0 "
-            + "                    AND e.location_id = :location "
-            + "                    AND e.encounter_type IN (${80}) "
-            + "                    AND e.encounter_datetime <= :endDate "
-            + "                GROUP BY "
-            + "                    p.patient_id "
-            + "            ) first ON first.patient_id = p.patient_id "
-            + " INNER JOIN person pe ON p.patient_id=pe.person_id "
-            + "        WHERE "
-            + "            p.voided = 0 "
-            + "            AND e.voided = 0 "
-            + "            AND o.voided = 0 "
-            + "            AND o2.voided = 0 "
-            + "            AND pe.gender = 'F' "
-            + "            AND e.location_id = :location "
-            + "            AND e.encounter_type = ${80} "
-            + "            AND ( "
-            + "                ( "
-            + "                    ( "
-            + "                        ( "
-            + "                            o.concept_id = ${1982} "
-            + "                            AND o.value_coded = ${1065} "
-            + "                        ) "
-            + "                        OR ( "
-            + "                            o.concept_id = ${165196} "
-            + "                            AND o.value_coded = ${1982} "
-            + "                        ) "
-            + "                    ) "
-            + "                    AND ( "
-            + "                        ( "
-            + "                            o2.concept_id = ${165211} "
-            + "                            AND o2.value_datetime BETWEEN :startDate "
-            + "                            AND :endDate "
-            + "                        ) "
-            + "                        OR ( "
-            + "                            ( "
-            + "                                o.concept_id = ${165296} "
-            + "                                AND o.value_coded = ${1256} "
-            + "                            ) "
-            + "                            AND o2.concept_id = ${165211} "
-            + "                            AND o2.value_datetime BETWEEN :startDate "
-            + "                            AND :endDate "
-            + "                        ) "
-            + "                    ) "
-            + "                ) "
-            + "            ) "
-            + "        GROUP BY "
-            + "            p.patient_id "
-            + "    ) pregnant "
-            + "    LEFT JOIN ( "
-            + "        SELECT "
-            + "            p.patient_id, "
-            + "            MAX(e.encounter_datetime) breastfeed_date "
-            + "        FROM "
-            + "            patient p "
-            + "            INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "            INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "            INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
-            + "            INNER JOIN ( "
-            + "                SELECT "
-            + "                    p.patient_id, "
-            + "                    MIN(e.encounter_datetime) minPrepDate "
-            + "                FROM "
-            + "                    patient p "
-            + "                    INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                WHERE "
-            + "                    p.voided = 0 "
-            + "                    AND e.location_id = :location "
-            + "                    AND e.encounter_type IN (${80}) "
-            + "                    AND e.encounter_datetime <= :endDate "
-            + "                GROUP BY "
-            + "                    p.patient_id "
-            + "            ) first ON first.patient_id = p.patient_id "
-            + " INNER JOIN person pe ON p.patient_id=pe.person_id "
-            + "        WHERE "
-            + "            p.voided = 0 "
-            + "            AND e.voided = 0 "
-            + "            AND o.voided = 0 "
-            + "            AND o2.voided = 0 "
-            + "            AND pe.gender = 'F' "
-            + "            AND e.location_id = :location "
-            + "            AND e.encounter_type = ${80} "
-            + "            AND ( "
-            + "                ( "
-            + "                    ( "
-            + "                        o.concept_id = ${6332} "
-            + "                        AND o.value_coded = ${1065} "
-            + "                    ) "
-            + "                    OR ( "
-            + "                        o.concept_id = ${165196} "
-            + "                        AND o.value_coded = ${6332} "
-            + "                    ) "
-            + "                ) "
-            + "                AND o2.concept_id = ${165211} "
-            + "                AND o2.value_datetime BETWEEN :startDate "
-            + "                AND :endDate "
-            + "            ) "
-            + "        GROUP BY "
-            + "            p.patient_id "
-            + "    ) AS breastfeeding ON breastfeeding.patient_id = pregnant.patient_id "
-            + "WHERE "
-            + "    pregnant.pregnancy_date >= breastfeeding.breastfeed_date "
-            + "    OR breastfeeding.breastfeed_date IS NULL "
-            + "GROUP BY "
-            + "    pregnant.patient_id";
+    String query = "";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    return stringSubstitutor.replace(query);
+  }
+
+  public static String pregnantPatientsBasedOnPrepNewB() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Get Clients who are pregnant Based on PrEP New");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    //    map.put("80", prepIncialEncounterType);
+    //    map.put("165296", initialStatusOfPrEPUserConceptId);
+    //    map.put("165196", prepTargetGroupConceptId);
+    //    map.put("1256", startDrugsConceptId);
+    //    map.put("1982", pregnantConceptId);
+    //    map.put("1065", yesConceptId);
+    //    map.put("6332", breastfeedingConceptId);
+    //    map.put("165211", prepStartDateConceptId);
+
+    String query = "";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -459,7 +356,7 @@ public class PrepNewQueries {
    * @param prepStartDateConceptId
    * @return
    */
-  public static String breastfeedingPatientsBasedOnPrepNew(
+  public static String breastfeedingPatientsBasedOnPrepNewA(
       int prepIncialEncounterType,
       int initialStatusOfPrEPUserConceptId,
       int prepTargetGroupConceptId,
@@ -486,133 +383,39 @@ public class PrepNewQueries {
     map.put("165211", prepStartDateConceptId);
 
     String query =
-        "SELECT "
-            + "    breastfeeding.patient_id "
-            + "FROM "
-            + "    ( "
-            + "        SELECT "
-            + "            p.patient_id, "
-            + "            MAX(e.encounter_datetime) breastfeed_date "
-            + "        FROM "
-            + "            patient p "
-            + "            INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "            INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "            INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
-            + "            INNER JOIN ( "
-            + "                SELECT "
-            + "                    p.patient_id, "
-            + "                    MIN(e.encounter_datetime) minPrepDate "
-            + "                FROM "
-            + "                    patient p "
-            + "                    INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                WHERE "
-            + "                    p.voided = 0 "
-            + "                    AND e.location_id = :location "
-            + "                    AND e.encounter_type IN (${80}) "
-            + "                    AND e.encounter_datetime <= :endDate "
-            + "                GROUP BY "
-            + "                    p.patient_id "
-            + "            ) first ON first.patient_id = p.patient_id "
-            + " INNER JOIN person pe ON p.patient_id=pe.person_id "
-            + "        WHERE "
-            + "            p.voided = 0 "
-            + "            AND e.voided = 0 "
-            + "            AND o.voided = 0 "
-            + "            AND o2.voided = 0 "
-            + "            AND pe.gender = 'F' "
-            + "            AND e.location_id = :location "
-            + "            AND e.encounter_type = ${80} "
-            + "            AND ( "
-            + "                ( "
-            + "                    ( "
-            + "                        o.concept_id = ${6332} "
-            + "                        AND o.value_coded = ${1065} "
-            + "                    ) "
-            + "                    OR ( "
-            + "                        o.concept_id = ${165196} "
-            + "                        AND o.value_coded = ${6332} "
-            + "                    ) "
-            + "                ) "
-            + "                AND o2.concept_id = ${165211} "
-            + "                AND o2.value_datetime BETWEEN :startDate "
-            + "                AND :endDate "
-            + "            ) "
-            + "        GROUP BY "
-            + "            p.patient_id "
-            + "    ) breastfeeding "
-            + "    LEFT JOIN ( "
-            + "        SELECT "
-            + "            p.patient_id, "
-            + "            MAX(e.encounter_datetime) pregnancy_date "
-            + "        FROM "
-            + "            patient p "
-            + "            INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "            INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "            INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
-            + "            INNER JOIN ( "
-            + "                SELECT "
-            + "                    p.patient_id, "
-            + "                    MIN(e.encounter_datetime) minPrepDate "
-            + "                FROM "
-            + "                    patient p "
-            + "                    INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                WHERE "
-            + "                    p.voided = 0 "
-            + "                    AND e.location_id = :location "
-            + "                    AND e.encounter_type IN (${80}) "
-            + "                    AND e.encounter_datetime <= :endDate "
-            + "                GROUP BY "
-            + "                    p.patient_id "
-            + "            ) first ON first.patient_id = p.patient_id "
-            + " INNER JOIN person pe ON p.patient_id=pe.person_id "
-            + "        WHERE "
-            + "            p.voided = 0 "
-            + "            AND e.voided = 0 "
-            + "            AND o.voided = 0 "
-            + "            AND o2.voided = 0 "
-            + "            AND pe.gender = 'F' "
-            + "            AND e.location_id = :location "
-            + "            AND e.encounter_type = ${80} "
-            + "            AND ( "
-            + "                ( "
-            + "                    ( "
-            + "                        ( "
-            + "                            o.concept_id = ${1982} "
-            + "                            AND o.value_coded = ${1065} "
-            + "                        ) "
-            + "                        OR ( "
-            + "                            o.concept_id = ${165196} "
-            + "                            AND o.value_coded = ${1982} "
-            + "                        ) "
-            + "                    ) "
-            + "                    AND ( "
-            + "                        ( "
-            + "                            o2.concept_id = ${165211} "
-            + "                            AND o2.value_datetime BETWEEN :startDate "
-            + "                            AND :endDate "
-            + "                        ) "
-            + "                        OR ( "
-            + "                            ( "
-            + "                                o.concept_id = ${165296} "
-            + "                                AND o.value_coded = ${1256} "
-            + "                            ) "
-            + "                            AND o2.concept_id = ${165211} "
-            + "                            AND o2.value_datetime BETWEEN :startDate "
-            + "                            AND :endDate "
-            + "                        ) "
-            + "                    ) "
-            + "                ) "
-            + "            ) "
-            + "        GROUP BY "
-            + "            p.patient_id "
-            + "    ) AS pregnant ON breastfeeding.patient_id = pregnant.patient_id "
-            + "WHERE "
-            + "    breastfeeding.breastfeed_date > pregnant.pregnancy_date "
-            + "    OR pregnant.pregnancy_date IS NULL "
-            + "GROUP BY "
-            + "    breastfeeding.patient_id";
+        "";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    return stringSubstitutor.replace(query);
+  }
+
+  public static String breastfeedingPatientsBasedOnPrepNewB(
+      int prepIncialEncounterType,
+      int initialStatusOfPrEPUserConceptId,
+      int prepTargetGroupConceptId,
+      int startDrugsConceptId,
+      int pregnantConceptId,
+      int yesConceptId,
+      int breastfeedingConceptId,
+      int prepStartDateConceptId) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Get Clients who are Breastfeeding Based on PrEP New");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    //  map.put("80", prepIncialEncounterType);
+    //  map.put("165296", initialStatusOfPrEPUserConceptId);
+    //  map.put("165196", prepTargetGroupConceptId);
+    //  map.put("1256", startDrugsConceptId);
+    //  map.put("1982", pregnantConceptId);
+    //  map.put("1065", yesConceptId);
+    //  map.put("6332", breastfeedingConceptId);
+    //  map.put("165211", prepStartDateConceptId);
+
+    String query = "";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
