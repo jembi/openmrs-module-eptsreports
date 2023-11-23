@@ -861,12 +861,11 @@ public class TxMlQueries {
   }
 
   /**
-   * <li>
-   *     All patients who do not have the next scheduled drug pick up date on their
-   *     last drug pick-up (FILA) that occurred during the reporting period nor any
-   *     ART pickup date registered on Ficha Recepção – Levantou ARVs or FILA during
-   *     the reporting period.
-   * </li>
+   *
+   * <li>All patients who do not have the next scheduled drug pick up date on their last drug
+   *     pick-up (FILA) that occurred during the reporting period nor any ART pickup date registered
+   *     on Ficha Recepção – Levantou ARVs or FILA during the reporting period.
+   *
    * @return {@link String}
    */
   public static String getPatientWithoutScheduledDrugPickupDateMasterCardAndArtPickupQuery(
@@ -964,12 +963,11 @@ public class TxMlQueries {
   }
 
   /**
-   * <li>
-   *     All patients with the most recent date between next scheduled
-   *     drug pickup date (FILA) and 30 days after last ART pickup date
-   *     (Ficha Recepção – Levantou ARVs) and adding 28 days and this
-   *     date >=report start date and < reporting end date
-   * </li>
+   *
+   * <li>All patients with the most recent date between next scheduled drug pickup date (FILA) and
+   *     30 days after last ART pickup date (Ficha Recepção – Levantou ARVs) and adding 28 days and
+   *     this date >=report start date and < reporting end date
+   *
    * @return {@link String}
    */
   public static String getPatientHavingLastScheduledDrugPickupDateQuery(
@@ -1043,23 +1041,18 @@ public class TxMlQueries {
   }
 
   /**
-   * <li>
-   *     On Treatment for <3 months when experienced IIT
-   * All patients who have been on treatment for less than 90 days since the date
-   * initiated ARV treatment  (TX_ML_FR4) to the date of their last scheduled ARV pick-up
-   * </li>
-   * <li>
-   *    On Treatment for 3-5 months when experienced IIT
-   * All patients who have been on treatment for greater or equal than 90 days and less
-   * than 180 days since the date initiated ARV treatment (TX_ML_FR4) to the date of
-   * their last scheduled ARV pick-up
-   * </li>
-   * <li>
-   *    On Treatment for >=6 months when experienced IIT
-   * All patients who have been on treatment for greater or equal than 180 days since
-   * the date initiated ARV treatment (TX_ML_FR4)  to the date of their last scheduled ARV pick-up
-   * </li>
-   * @see CommonQueries#getARTStartDate(boolean) 
+   *
+   * <li>On Treatment for <3 months when experienced IIT All patients who have been on treatment for
+   *     less than 90 days since the date initiated ARV treatment (TX_ML_FR4) to the date of their
+   *     last scheduled ARV pick-up
+   * <li>On Treatment for 3-5 months when experienced IIT All patients who have been on treatment
+   *     for greater or equal than 90 days and less than 180 days since the date initiated ARV
+   *     treatment (TX_ML_FR4) to the date of their last scheduled ARV pick-up
+   * <li>On Treatment for >=6 months when experienced IIT All patients who have been on treatment
+   *     for greater or equal than 180 days since the date initiated ARV treatment (TX_ML_FR4) to
+   *     the date of their last scheduled ARV pick-up
+   *
+   * @see CommonQueries#getARTStartDate(boolean)
    * @param aRVPharmaciaEncounterType Arv Pharmacia EncounterType
    * @param returnVisitDateForArvDrugConcept Return Visit Date Concept
    * @param masterCardDrugPickupEncounterType Recepcao Levantou ARV EncounterType
