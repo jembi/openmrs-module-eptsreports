@@ -82,7 +82,7 @@ public class SetupQualityImprovementReport20 extends EptsDataExportManager {
           createXlsReportDesign(
               reportDefinition,
               "Template_MQ_2023.xls",
-              "Melhoria de Qualidade - 2022",
+              "Melhoria de Qualidade - 2023",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
