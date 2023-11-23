@@ -60,6 +60,9 @@ public class TxRttCohortQueries {
   private final String DEFAULT_MAPPING =
       "startDate=${startDate},endDate=${endDate},location=${location}";
 
+  private final String previousReportingPeriod =
+      "startDate=${startDate},endDate=${startDate},location=${location}";
+
   @Autowired
   public TxRttCohortQueries(
       HivMetadata hivMetadata,
@@ -140,7 +143,7 @@ public class TxRttCohortQueries {
 
     cd.addSearch(
         "initiatedPreviousPeriod",
-        EptsReportUtils.map(getPatientsWhoEverInitiatedTreatment(), DEFAULT_MAPPING));
+        EptsReportUtils.map(getPatientsWhoEverInitiatedTreatment(), previousReportingPeriod));
 
     cd.addSearch(
         "LTFU",
@@ -640,13 +643,13 @@ public class TxRttCohortQueries {
 
     cd.addSearch(
         "earliestArtStartDateBeforePeriod",
-        EptsReportUtils.map(earliestArtStartDateBeforePeriod, DEFAULT_MAPPING));
+        EptsReportUtils.map(earliestArtStartDateBeforePeriod, previousReportingPeriod));
     cd.addSearch(
         "earliestArtStartDateAfterPeriod",
-        EptsReportUtils.map(earliestArtStartDateAfterPeriod, DEFAULT_MAPPING));
+        EptsReportUtils.map(earliestArtStartDateAfterPeriod, previousReportingPeriod));
     cd.addSearch(
         "firstDrugPickUpAfterPeriod",
-        EptsReportUtils.map(firstDrugPickUpAfterPeriod, DEFAULT_MAPPING));
+        EptsReportUtils.map(firstDrugPickUpAfterPeriod, previousReportingPeriod));
 
     cd.setCompositionString(
         "earliestArtStartDateBeforePeriod OR (earliestArtStartDateAfterPeriod AND firstDrugPickUpAfterPeriod)");
