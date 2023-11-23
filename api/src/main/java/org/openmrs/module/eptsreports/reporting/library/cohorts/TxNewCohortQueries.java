@@ -455,6 +455,7 @@ public class TxNewCohortQueries {
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
     map.put("23896", hivMetadata.getArtInitiationCd4Concept().getConceptId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
 
     CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
 
@@ -463,9 +464,11 @@ public class TxNewCohortQueries {
             + "FROM   patient p "
             + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
             + "       INNER JOIN (SELECT e.patient_id,MIN(DATE(cd4.cd4_date)) cd4_date "
             + "                   FROM   encounter e "
             + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                          INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
             + "                          INNER JOIN ( "
             + commonQueries.getARTStartDate(true)
             + "                 ) art "
@@ -487,8 +490,21 @@ public class TxNewCohortQueries {
             + "            AND e.location_id = :location "
             + "            AND e.voided = 0 "
             + "            AND o.voided = 0 "
-            + "            AND o.concept_id IN ( ${1695},${23896} ) "
+            + "            AND o.concept_id = ${1695} "
             + "            AND o.obs_datetime <= :endDate"
+            + "            UNION "
+            + "            SELECT e.patient_id,DATE(o2.value_datetime) AS cd4_date "
+            + "            FROM   encounter e "
+            + "            INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "            INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "            WHERE  e.encounter_type = ${53} "
+            + "            AND e.location_id = :location "
+            + "            AND e.voided = 0 "
+            + "            AND o.voided = 0 "
+            + "            AND o2.voided = 0 "
+            + "            AND o.concept_id = ${23896} "
+            + "            AND o2.concept_id = ${1190} "
+            + "            AND o2.value_datetime <= :endDate"
             + "     ) cd4 ON cd4.patient_id = e.patient_id "
             + "   WHERE  e.voided = 0 "
             + "   AND o.voided = 0 "
@@ -496,8 +512,10 @@ public class TxNewCohortQueries {
             + "   AND o.value_numeric IS NOT NULL "
             + "   AND ( ( DATE(e.encounter_datetime) BETWEEN DATE_SUB(art.first_pickup, INTERVAL 90 day) AND DATE_ADD(art.first_pickup, INTERVAL 28 day) "
             + "             AND e.encounter_type IN ( ${6}, ${13}, ${51}) AND o.concept_id = ${1695}  ) "
-            + "          OR ( DATE(o.obs_datetime) BETWEEN DATE_SUB(art.first_pickup, INTERVAL 90 day) AND DATE_ADD(art.first_pickup, INTERVAL 28 day) "
-            + "   AND e.encounter_type = ${53} AND o.concept_id IN (${1695},${23896}) ) ) "
+            + "          OR (   ( DATE(o.obs_datetime) BETWEEN DATE_SUB(art.first_pickup, INTERVAL 90 day) AND DATE_ADD(art.first_pickup, INTERVAL 28 day) AND e.encounter_type = ${53} AND o.concept_id = ${1695} ) "
+            + "            OR ( DATE(o2.value_datetime) BETWEEN DATE_SUB(art.first_pickup, INTERVAL 90 day) AND DATE_ADD(art.first_pickup, INTERVAL 28 day) AND e.encounter_type = ${53} AND o.concept_id = ${23896} AND o2.concept_id = ${1190} AND o2.voided = 0) "
+            + "          ) "
+            + ") "
             + "   GROUP  BY e.patient_id) min_cd4 ON min_cd4.patient_id = p.patient_id "
             + " WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
@@ -505,7 +523,9 @@ public class TxNewCohortQueries {
             + "       AND e.location_id = :location "
             + "       AND  ".concat(cd4CountComparison.getProposition())
             + "       AND ( ( DATE(e.encounter_datetime) = min_cd4.cd4_date AND e.encounter_type IN ( ${6}, ${13}, ${51} ) AND o.concept_id = ${1695}  ) "
-            + "              OR ( DATE(o.obs_datetime) = min_cd4.cd4_date AND e.encounter_type = ${53} AND o.concept_id IN (${1695},${23896})  ) "
+            + "              OR ( ( DATE(o.obs_datetime) = min_cd4.cd4_date AND e.encounter_type = ${53} AND o.concept_id = ${1695} )  "
+            + "                OR ( DATE(o2.value_datetime) = min_cd4.cd4_date AND e.encounter_type = ${53} AND o.concept_id = ${23896} AND o2.concept_id = ${1190} AND o2.voided = 0 )"
+            + "               ) "
             + "             ) "
             + "GROUP  BY p.patient_id";
 
