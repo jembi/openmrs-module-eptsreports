@@ -897,7 +897,7 @@ public class TxRttCohortQueries {
    */
   public CohortDefinition getPatientsNotEligibleForCd4AndAge(Integer minAge, Integer maxAge) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Cd4 And Age");
+    cd.setName("Not Eligible For CD4 And Age");
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
@@ -995,12 +995,14 @@ public class TxRttCohortQueries {
     CohortDefinition notEligibleForCd4AndAge = getPatientsNotEligibleForCd4AndAge(5, null);
 
     cd.addSearch("txRtt", EptsReportUtils.map(txRtt, DEFAULT_MAPPING));
-    cd.addSearch("cd4Under200AndAge", EptsReportUtils.map(cd4Under200AndAge, DEFAULT_MAPPING));
-    cd.addSearch("cd4Above200AndAge", EptsReportUtils.map(cd4Above200AndAge, DEFAULT_MAPPING));
     cd.addSearch(
-        "notEligibleForCd4AndAge",
-        EptsReportUtils.map(
-            notEligibleForCd4AndAge, "startDate=${startDate},location=${location}"));
+        "cd4Under200AndAge",
+        EptsReportUtils.map(cd4Under200AndAge, "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "cd4Above200AndAge",
+        EptsReportUtils.map(cd4Above200AndAge, "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "notEligibleForCd4AndAge", EptsReportUtils.map(notEligibleForCd4AndAge, DEFAULT_MAPPING));
 
     cd.setCompositionString(
         "(txRtt AND cd4Under200AndAge) AND NOT (cd4Above200AndAge OR notEligibleForCd4AndAge)");
@@ -1070,13 +1072,15 @@ public class TxRttCohortQueries {
 
     cd.addSearch("txRtt", EptsReportUtils.map(txRtt, DEFAULT_MAPPING));
 
-    cd.addSearch("cd4Above200AndAge", EptsReportUtils.map(cd4Above200AndAge, DEFAULT_MAPPING));
-
-    cd.addSearch("cd4Under200AndAge", EptsReportUtils.map(cd4Under200AndAge, DEFAULT_MAPPING));
     cd.addSearch(
-        "notEligibleForCd4AndAge",
-        EptsReportUtils.map(
-            notEligibleForCd4AndAge, "startDate=${startDate},location=${location}"));
+        "cd4Above200AndAge",
+        EptsReportUtils.map(cd4Above200AndAge, "endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "cd4Under200AndAge",
+        EptsReportUtils.map(cd4Under200AndAge, "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "notEligibleForCd4AndAge", EptsReportUtils.map(notEligibleForCd4AndAge, DEFAULT_MAPPING));
 
     cd.setCompositionString(
         "(txRtt AND cd4Above200AndAge) AND NOT (cd4Under200AndAge OR notEligibleForCd4AndAge)");
@@ -1123,12 +1127,14 @@ public class TxRttCohortQueries {
     CohortDefinition notEligibleForCd4AndAge = getPatientsNotEligibleForCd4AndAge(5, null);
 
     cd.addSearch("txRtt", EptsReportUtils.map(txRtt, DEFAULT_MAPPING));
-    cd.addSearch("cd4Under200AndAge", EptsReportUtils.map(cd4Under200AndAge, DEFAULT_MAPPING));
-    cd.addSearch("cd4Above200AndAge", EptsReportUtils.map(cd4Above200AndAge, DEFAULT_MAPPING));
     cd.addSearch(
-        "notEligibleForCd4AndAge",
-        EptsReportUtils.map(
-            notEligibleForCd4AndAge, "startDate=${startDate},location=${location}"));
+        "cd4Under200AndAge",
+        EptsReportUtils.map(cd4Under200AndAge, "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "cd4Above200AndAge",
+        EptsReportUtils.map(cd4Above200AndAge, "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "notEligibleForCd4AndAge", EptsReportUtils.map(notEligibleForCd4AndAge, DEFAULT_MAPPING));
 
     cd.setCompositionString(
         "txRtt AND NOT (cd4Under200AndAge OR cd4Above200AndAge OR notEligibleForCd4AndAge)");
