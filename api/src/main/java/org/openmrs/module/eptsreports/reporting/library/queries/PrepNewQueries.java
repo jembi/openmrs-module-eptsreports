@@ -284,7 +284,7 @@ public class PrepNewQueries {
    * @param prepStartDateConceptId
    * @return
    */
-  public static String pregnantPatientsBasedOnPrepNewA(
+  public static String pregnantPatientsBasedOnPrepNew(
       int prepIncialEncounterType,
       int initialStatusOfPrEPUserConceptId,
       int prepTargetGroupConceptId,
@@ -302,39 +302,93 @@ public class PrepNewQueries {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("80", prepIncialEncounterType);
-    map.put("165296", initialStatusOfPrEPUserConceptId);
-    map.put("165196", prepTargetGroupConceptId);
-    map.put("1256", startDrugsConceptId);
     map.put("1982", pregnantConceptId);
     map.put("1065", yesConceptId);
-    map.put("6332", breastfeedingConceptId);
     map.put("165211", prepStartDateConceptId);
+    map.put("165296", initialStatusOfPrEPUserConceptId);
+    map.put("1256", startDrugsConceptId);
+    map.put("165196", prepTargetGroupConceptId);
+    map.put("6332", breastfeedingConceptId);
 
-    String query = "";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    return stringSubstitutor.replace(query);
-  }
-
-  public static String pregnantPatientsBasedOnPrepNewB() {
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Get Clients who are pregnant Based on PrEP New");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    //    map.put("80", prepIncialEncounterType);
-    //    map.put("165296", initialStatusOfPrEPUserConceptId);
-    //    map.put("165196", prepTargetGroupConceptId);
-    //    map.put("1256", startDrugsConceptId);
-    //    map.put("1982", pregnantConceptId);
-    //    map.put("1065", yesConceptId);
-    //    map.put("6332", breastfeedingConceptId);
-    //    map.put("165211", prepStartDateConceptId);
-
-    String query = "";
+    String query =
+        "SELECT p.patient_id FROM patient p  "
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id  "
+            + "INNER JOIN obs o ON o.encounter_id  = e.encounter_id  "
+            + "INNER JOIN person pe ON pe.person_id=p.patient_id "
+            + "INNER JOIN  "
+            + "( "
+            + " SELECT p.patient_id, MIN(e.encounter_datetime) pregnant_date "
+            + " FROM patient p  "
+            + " INNER JOIN encounter e ON e.patient_id = p.patient_id  "
+            + " INNER JOIN obs o ON o.encounter_id  = e.encounter_id  "
+            + " INNER JOIN obs o2 ON o2.encounter_id  = e.encounter_id  "
+            + " WHERE p.voided  = 0  "
+            + " AND e.voided = 0  "
+            + " AND o.voided = 0  "
+            + " AND e.location_id = :location "
+            + " AND e.encounter_type = ${80} "
+            + " AND ( "
+            + "  ( "
+            + "   ( "
+            + "    (o.concept_id = ${1982} AND o.value_coded = ${1065} ) "
+            + "    AND (o2.concept_id = ${165211} AND o2.value_datetime BETWEEN :startDate AND :endDate) "
+            + "   ) "
+            + "   OR "
+            + "   ( "
+            + "    (o.concept_id = ${1982} AND o.value_coded = ${1065} ) "
+            + "    AND ( ( o2.concept_id = ${165296} AND o2.value_coded = ${1256} ) AND o2.obs_datetime BETWEEN :startDate AND :endDate ) "
+            + "   ) "
+            + "   OR "
+            + "   ( "
+            + "    (o.concept_id = ${165196} AND o.value_coded = ${1982} ) "
+            + "    AND (o2.concept_id = ${165211} AND o2.value_datetime BETWEEN :startDate AND :endDate) "
+            + "   ) "
+            + "   OR "
+            + "   ( "
+            + "    (o.concept_id = ${165196} AND o.value_coded = ${1982} ) "
+            + "    AND ( ( o2.concept_id = ${165296} AND o2.value_coded = ${1256} ) AND o2.obs_datetime BETWEEN :startDate AND :endDate ) "
+            + "   ) "
+            + "  ) "
+            + "  OR "
+            + "  ( "
+            + "   ( "
+            + "    (o.concept_id = ${6332} AND o.value_coded = ${1065} ) "
+            + "    AND (o2.concept_id = ${165211} AND o2.value_datetime BETWEEN :startDate AND :endDate) "
+            + "   ) "
+            + "   OR "
+            + "   ( "
+            + "    (o.concept_id = ${6332} AND o.value_coded = ${1065} ) "
+            + "    AND ( ( o2.concept_id = ${165296} AND o2.value_coded = ${1256} ) AND o2.obs_datetime BETWEEN :startDate AND :endDate ) "
+            + "   ) "
+            + "   OR "
+            + "   ( "
+            + "    (o.concept_id = ${165196} AND o.value_coded = ${6332} ) "
+            + "    AND (o2.concept_id = 165211 AND o2.value_datetime BETWEEN :startDate AND :endDate) "
+            + "   ) "
+            + "   OR "
+            + "   ( "
+            + "    (o.concept_id = ${165196} AND o.value_coded = ${6332} ) "
+            + "    AND ( ( o2.concept_id = ${165296} AND o2.value_coded = ${1256} ) AND o2.obs_datetime BETWEEN :startDate AND :endDate ) "
+            + "   ) "
+            + "  ) "
+            + " ) "
+            + " GROUP BY p.patient_id  "
+            + ") pregnant "
+            + "ON p.patient_id = pregnant.patient_id "
+            + "WHERE p.voided  = 0  "
+            + "AND e.voided = 0  "
+            + "AND o.voided = 0  "
+            + "AND pe.voided = 0  "
+            + "AND e.location_id = :location "
+            + "AND e.encounter_type = ${80} "
+            + "AND pe.gender = 'F' "
+            + "AND ( "
+            + " (o.concept_id = ${1982} AND o.value_coded = ${1065} ) "
+            + "    OR "
+            + "    (o.concept_id = ${165196} AND o.value_coded = ${1982} ) "
+            + ") "
+            + "AND e.encounter_datetime = pregnant.pregnant_date "
+            + "GROUP BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -356,7 +410,7 @@ public class PrepNewQueries {
    * @param prepStartDateConceptId
    * @return
    */
-  public static String breastfeedingPatientsBasedOnPrepNewA(
+  public static String breastfeedingPatientsBasedOnPrepNew(
       int prepIncialEncounterType,
       int initialStatusOfPrEPUserConceptId,
       int prepTargetGroupConceptId,
@@ -374,48 +428,109 @@ public class PrepNewQueries {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("80", prepIncialEncounterType);
-    map.put("165296", initialStatusOfPrEPUserConceptId);
-    map.put("165196", prepTargetGroupConceptId);
-    map.put("1256", startDrugsConceptId);
     map.put("1982", pregnantConceptId);
     map.put("1065", yesConceptId);
-    map.put("6332", breastfeedingConceptId);
     map.put("165211", prepStartDateConceptId);
+    map.put("165296", initialStatusOfPrEPUserConceptId);
+    map.put("1256", startDrugsConceptId);
+    map.put("165196", prepTargetGroupConceptId);
+    map.put("6332", breastfeedingConceptId);
 
     String query =
-        "";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    return stringSubstitutor.replace(query);
-  }
-
-  public static String breastfeedingPatientsBasedOnPrepNewB(
-      int prepIncialEncounterType,
-      int initialStatusOfPrEPUserConceptId,
-      int prepTargetGroupConceptId,
-      int startDrugsConceptId,
-      int pregnantConceptId,
-      int yesConceptId,
-      int breastfeedingConceptId,
-      int prepStartDateConceptId) {
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Get Clients who are Breastfeeding Based on PrEP New");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    //  map.put("80", prepIncialEncounterType);
-    //  map.put("165296", initialStatusOfPrEPUserConceptId);
-    //  map.put("165196", prepTargetGroupConceptId);
-    //  map.put("1256", startDrugsConceptId);
-    //  map.put("1982", pregnantConceptId);
-    //  map.put("1065", yesConceptId);
-    //  map.put("6332", breastfeedingConceptId);
-    //  map.put("165211", prepStartDateConceptId);
-
-    String query = "";
+        "SELECT p.patient_id FROM patient p "
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "INNER JOIN obs o ON o.encounter_id  = e.encounter_id "
+            + "INNER JOIN person pe ON pe.person_id=p.patient_id "
+            + "INNER JOIN "
+            + "("
+            + " SELECT p.patient_id, MIN(e.encounter_datetime) breastfeeding_date"
+            + " FROM patient p "
+            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + " INNER JOIN obs o ON o.encounter_id  = e.encounter_id "
+            + " INNER JOIN obs o2 ON o2.encounter_id  = e.encounter_id "
+            + " WHERE p.voided  = 0 "
+            + " AND e.voided = 0 "
+            + " AND o.voided = 0 "
+            + " AND e.location_id = :location "
+            + " AND e.encounter_type = ${80} "
+            + " AND ( "
+            + "  ( "
+            + "   ( "
+            + "    (o.concept_id = ${1982} AND o.value_coded = ${1065} ) "
+            + "    AND (o2.concept_id = ${165211} AND o2.value_datetime BETWEEN :startDate AND :endDate) "
+            + "   ) "
+            + "   OR "
+            + "   ( "
+            + "    (o.concept_id = ${1982} AND o.value_coded = ${1065} ) "
+            + "    AND ( ( o2.concept_id = ${165296} AND o2.value_coded = ${1256} ) AND o2.obs_datetime BETWEEN :startDate AND :endDate ) "
+            + "   ) "
+            + "   OR "
+            + "   ( "
+            + "    (o.concept_id = ${165196} AND o.value_coded = ${1982} ) "
+            + "    AND (o2.concept_id = ${165211} AND o2.value_datetime BETWEEN :startDate AND :endDate) "
+            + "   ) "
+            + "   OR "
+            + "   ( "
+            + "    (o.concept_id = ${165196} AND o.value_coded = ${1982} )"
+            + "    AND ( ( o2.concept_id = ${165296} AND o2.value_coded = ${1256} ) AND o2.obs_datetime BETWEEN :startDate AND :endDate ) "
+            + "   ) "
+            + "  ) "
+            + "  OR "
+            + "  ( "
+            + "   ( "
+            + "    (o.concept_id = ${6332} AND o.value_coded = ${1065} ) "
+            + "    AND (o2.concept_id = ${165211} AND o2.value_datetime BETWEEN :startDate AND :endDate) "
+            + "   ) "
+            + "   OR "
+            + "   ( "
+            + "    (o.concept_id = ${6332} AND o.value_coded = ${1065} )"
+            + "    AND ( ( o2.concept_id = ${165296} AND o2.value_coded = ${1256} ) AND o2.obs_datetime BETWEEN :startDate AND :endDate ) "
+            + "   ) "
+            + "   OR "
+            + "   ( "
+            + "    (o.concept_id = ${165196} AND o.value_coded = ${6332} ) "
+            + "    AND (o2.concept_id = ${165211} AND o2.value_datetime BETWEEN :startDate AND :endDate) "
+            + "   ) "
+            + "   OR "
+            + "   ( "
+            + "    (o.concept_id = ${165196} AND o.value_coded = ${6332} ) "
+            + "    AND ( ( o2.concept_id = ${165296} AND o2.value_coded = ${1256} ) AND o2.obs_datetime BETWEEN :startDate AND :endDate ) "
+            + "   ) "
+            + "  ) "
+            + " ) "
+            + " GROUP BY p.patient_id  "
+            + ") breastfeeding "
+            + "ON p.patient_id = breastfeeding.patient_id "
+            + "WHERE p.voided  = 0  "
+            + "AND e.voided = 0  "
+            + "AND o.voided = 0  "
+            + "AND pe.voided = 0  "
+            + "AND e.location_id = :location "
+            + "AND e.encounter_type = ${80} "
+            + "AND pe.gender = 'F' "
+            + "AND ( "
+            + " (o.concept_id = ${1982} AND o.value_coded = ${1065} ) "
+            + "    OR "
+            + "    (o.concept_id = ${165196} AND o.value_coded = ${1982} ) "
+            + ") "
+            + "AND e.encounter_datetime = breastfeeding.breastfeeding_date "
+            + "AND p.patient_id NOT IN ( "
+            + " SELECT p.patient_id FROM patient p  "
+            + "  INNER JOIN encounter e ON e.patient_id = p.patient_id  "
+            + "  INNER JOIN obs o ON o.encounter_id  = e.encounter_id "
+            + "    WHERE p.voided  = 0  "
+            + "  AND e.voided = 0  "
+            + "  AND o.voided = 0  "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ${80} "
+            + "  AND ( "
+            + "   (o.concept_id = ${1982} AND o.value_coded = ${1065} ) "
+            + "   OR "
+            + "   (o.concept_id = ${165196} AND o.value_coded = ${1982} ) "
+            + "  ) "
+            + "        AND e.encounter_datetime = breastfeeding.breastfeeding_date "
+            + ") "
+            + "GROUP BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 

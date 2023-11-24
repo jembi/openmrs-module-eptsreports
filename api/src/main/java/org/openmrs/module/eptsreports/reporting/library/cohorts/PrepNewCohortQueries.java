@@ -115,72 +115,26 @@ public class PrepNewCohortQueries {
    *
    * @return
    */
-  public CohortDefinition getPregnantPatientsBasedOnPrepNewA() {
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Clients who are Pregnant In Prep New A");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
-
-    String query =
-        PrepNewQueries.pregnantPatientsBasedOnPrepNewA(
-            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
-            hivMetadata.getInitialStatusPrepUserConcept().getConceptId(),
-            hivMetadata.getPrepTargetGroupConcept().getConceptId(),
-            hivMetadata.getStartDrugs().getConceptId(),
-            commonMetadata.getPregnantConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId(),
-            commonMetadata.getBreastfeeding().getConceptId(),
-            hivMetadata.getPrepStartDateConcept().getConceptId());
-
-    sqlCohortDefinition.setQuery(query);
-    return sqlCohortDefinition;
-  }
-
-  public CohortDefinition getPregnantPatientsBasedOnPrepNewB() {
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Clients who are Pregnant In Prep New B");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
-
-    String query =
-        PrepNewQueries.pregnantPatientsBasedOnPrepNewA(
-            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
-            hivMetadata.getInitialStatusPrepUserConcept().getConceptId(),
-            hivMetadata.getPrepTargetGroupConcept().getConceptId(),
-            hivMetadata.getStartDrugs().getConceptId(),
-            commonMetadata.getPregnantConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId(),
-            commonMetadata.getBreastfeeding().getConceptId(),
-            hivMetadata.getPrepStartDateConcept().getConceptId());
-
-    sqlCohortDefinition.setQuery(query);
-    return sqlCohortDefinition;
-  }
-
   public CohortDefinition getPregnantPatientsBasedOnPrepNew() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Clients who are Pregnant In Prep New");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Clients who are Pregnant In Prep New");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
-    cd.addSearch(
-        "A",
-        EptsReportUtils.map(
-            getPregnantPatientsBasedOnPrepNewA(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    String query =
+        PrepNewQueries.pregnantPatientsBasedOnPrepNew(
+            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
+            hivMetadata.getInitialStatusPrepUserConcept().getConceptId(),
+            hivMetadata.getPrepTargetGroupConcept().getConceptId(),
+            hivMetadata.getStartDrugs().getConceptId(),
+            commonMetadata.getPregnantConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId(),
+            commonMetadata.getBreastfeeding().getConceptId(),
+            hivMetadata.getPrepStartDateConcept().getConceptId());
 
-    cd.addSearch(
-        "B",
-        EptsReportUtils.map(
-            getPregnantPatientsBasedOnPrepNewB(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.setCompositionString("A OR B");
-
-    return cd;
+    sqlCohortDefinition.setQuery(query);
+    return sqlCohortDefinition;
   }
 
   /**
@@ -188,71 +142,25 @@ public class PrepNewCohortQueries {
    *
    * @return
    */
-  public CohortDefinition getBreastfeedingPatientsBasedOnPrepNewA() {
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Clients who are Breastfeeding In Prep New A");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
-
-    String query =
-        PrepNewQueries.breastfeedingPatientsBasedOnPrepNewA(
-            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
-            hivMetadata.getInitialStatusPrepUserConcept().getConceptId(),
-            hivMetadata.getPrepTargetGroupConcept().getConceptId(),
-            hivMetadata.getStartDrugs().getConceptId(),
-            commonMetadata.getPregnantConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId(),
-            commonMetadata.getBreastfeeding().getConceptId(),
-            hivMetadata.getPrepStartDateConcept().getConceptId());
-
-    sqlCohortDefinition.setQuery(query);
-    return sqlCohortDefinition;
-  }
-
-  public CohortDefinition getBreastfeedingPatientsBasedOnPrepNewB() {
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Clients who are Breastfeeding In Prep New B");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
-
-    String query =
-        PrepNewQueries.breastfeedingPatientsBasedOnPrepNewA(
-            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
-            hivMetadata.getInitialStatusPrepUserConcept().getConceptId(),
-            hivMetadata.getPrepTargetGroupConcept().getConceptId(),
-            hivMetadata.getStartDrugs().getConceptId(),
-            commonMetadata.getPregnantConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId(),
-            commonMetadata.getBreastfeeding().getConceptId(),
-            hivMetadata.getPrepStartDateConcept().getConceptId());
-
-    sqlCohortDefinition.setQuery(query);
-    return sqlCohortDefinition;
-  }
-
   public CohortDefinition getBreastfeedingPatientsBasedOnPrepNew() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Clients who are Breastfeeding In Prep New");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Clients who are Breastfeeding In Prep New");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
-    cd.addSearch(
-        "A",
-        EptsReportUtils.map(
-            getBreastfeedingPatientsBasedOnPrepNewA(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    String query =
+        PrepNewQueries.breastfeedingPatientsBasedOnPrepNew(
+            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
+            hivMetadata.getInitialStatusPrepUserConcept().getConceptId(),
+            hivMetadata.getPrepTargetGroupConcept().getConceptId(),
+            hivMetadata.getStartDrugs().getConceptId(),
+            commonMetadata.getPregnantConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId(),
+            commonMetadata.getBreastfeeding().getConceptId(),
+            hivMetadata.getPrepStartDateConcept().getConceptId());
 
-    cd.addSearch(
-        "B",
-        EptsReportUtils.map(
-            getBreastfeedingPatientsBasedOnPrepNewB(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.setCompositionString("A OR B");
-
-    return cd;
+    sqlCohortDefinition.setQuery(query);
+    return sqlCohortDefinition;
   }
 }
