@@ -1,5 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.reports;
 
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
@@ -9,10 +11,10 @@ import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.LocationDataSetDefinition;
+import org.openmrs.module.eptsreports.reporting.library.datasets.resumo.ResumoMensalDAHDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
-import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
@@ -22,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class SetupResumoMensalDAHReport extends EptsDataExportManager {
 
   private GenericCohortQueries genericCohortQueries;
+  private ResumoMensalDAHDatasetDefinition resumoMensalDAHDatasetDefinition;
 
   @Autowired
   public SetupResumoMensalDAHReport(GenericCohortQueries genericCohortQueries) {
@@ -63,8 +66,12 @@ public class SetupResumoMensalDAHReport extends EptsDataExportManager {
     rd.setUuid(getUuid());
     rd.addParameters(getParameters());
 
-    rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
-    rd.addDataSetDefinition("HF", Mapped.mapStraightThrough(new LocationDataSetDefinition()));
+    rd.addDataSetDefinition(
+        "DAH",
+        mapStraightThrough(resumoMensalDAHDatasetDefinition.constructResumoMensalDAHDataset()));
+
+    rd.addDataSetDefinition("DT", mapStraightThrough(new DatimCodeDatasetDefinition()));
+    rd.addDataSetDefinition("HF", mapStraightThrough(new LocationDataSetDefinition()));
 
     // Report Base Cohort
     rd.setBaseCohortDefinition(
@@ -81,7 +88,7 @@ public class SetupResumoMensalDAHReport extends EptsDataExportManager {
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-                  "Resumo_Mensal_DAH_v2.0.1.xls",
+              "Resumo_Mensal_DAH_v2.0.1.xls",
               "Resumo Mensal de DAH",
               getExcelDesignUuid(),
               null);
