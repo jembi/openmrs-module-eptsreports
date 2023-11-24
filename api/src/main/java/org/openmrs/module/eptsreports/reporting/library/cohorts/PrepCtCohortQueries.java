@@ -333,6 +333,55 @@ public class PrepCtCohortQueries {
     return definition;
   }
 
+  public CohortDefinition getOtherTestResultsA() {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("Patients with Other test Results Part 1 Prep A");
+
+    definition.setQuery(
+        PrepCtQueries.getOtherTestResultsA(
+            hivMetadata.getHivRapidTest1QualitativeConcept().getConceptId(),
+            commonMetadata.getIndeterminate().getConceptId(),
+            hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId()));
+
+    definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    definition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    definition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return definition;
+  }
+
+  public CohortDefinition getOtherTestResultsB1() {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("Patients with Other test Results Part 1 Prep B1");
+
+    definition.setQuery(
+        PrepCtQueries.getOtherTestResultsB1(
+            hivMetadata.getHivRapidTest1QualitativeConcept().getConceptId(),
+            hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId()));
+
+    definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    definition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    definition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return definition;
+  }
+
+  public CohortDefinition getOtherTestResultsB2() {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("Patients with Other test Results Part 1 Prep B2");
+
+    definition.setQuery(
+        PrepCtQueries.getOtherTestResultsB2(
+            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
+            hivMetadata.getDateOfHivTestWithNegativeResultsPrepUuidConcept().getConceptId()));
+
+    definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    definition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    definition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return definition;
+  }
+
   public CohortDefinition getkeypop() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patients who are Key population ");
@@ -860,6 +909,46 @@ public class PrepCtCohortQueries {
             Keypop, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
     cd.setCompositionString("adolescentAndYouth AND NOT (exclusions OR KeyPopulation)");
+
+    return cd;
+  }
+
+  /**
+   * <b>Description:</b> Other Test Results: Clients with the field “Resultado do Teste” with value
+   * “Indeterminado” on the “Ficha de Consulta de Seguimento PrEP” registered during the reporting
+   * period OR Clients without the field “Resultado do Teste” marked with any value on the “Ficha de
+   * Consulta de Seguimento PrEP” registered during the reporting period AND without “Data do teste
+   * HIV com resultado Negativo no Inicio da PrEP” filled on the “Ficha de Consulta Inicial PrEP”
+   * registered during the reporting period;
+   *
+   * @return
+   */
+  public CohortDefinition otherTestResultsComposition() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Other Test Results Composition");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(
+            getOtherTestResultsA(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "B",
+        EptsReportUtils.map(
+            getOtherTestResultsB1(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "C",
+        EptsReportUtils.map(
+            getOtherTestResultsB2(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("A OR (B AND C)");
 
     return cd;
   }
