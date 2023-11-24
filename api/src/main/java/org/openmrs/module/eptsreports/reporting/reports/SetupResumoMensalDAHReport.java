@@ -27,8 +27,11 @@ public class SetupResumoMensalDAHReport extends EptsDataExportManager {
   private ResumoMensalDAHDatasetDefinition resumoMensalDAHDatasetDefinition;
 
   @Autowired
-  public SetupResumoMensalDAHReport(GenericCohortQueries genericCohortQueries) {
+  public SetupResumoMensalDAHReport(
+      GenericCohortQueries genericCohortQueries,
+      ResumoMensalDAHDatasetDefinition resumoMensalDAHDatasetDefinition) {
     this.genericCohortQueries = genericCohortQueries;
+    this.resumoMensalDAHDatasetDefinition = resumoMensalDAHDatasetDefinition;
   }
 
   @Override
