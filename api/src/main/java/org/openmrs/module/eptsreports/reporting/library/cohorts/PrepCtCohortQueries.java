@@ -72,8 +72,13 @@ public class PrepCtCohortQueries {
         EptsReportUtils.map(
             prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "E",
+        EptsReportUtils.map(
+            getClientsWithAtleastOneFollowupVisitDuringReportingPeriodPrep(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(A or B or C or D or E) AND NOT F");
+    cd.setCompositionString("(A or (B AND E) or C or D or E) AND NOT F");
 
     return cd;
   }
@@ -333,6 +338,13 @@ public class PrepCtCohortQueries {
     return definition;
   }
 
+  /**
+   * <b>Description:</b> Other Test Results: Clients with the field “Resultado do Teste” (concept id
+   * 1040) with value “Indeterminado” (concept id 1138) on Ficha de Consulta de Seguimento PrEP
+   * (encounter type 81) registered during the reporting period;
+   *
+   * @return
+   */
   public CohortDefinition getOtherTestResultsA() {
     SqlCohortDefinition definition = new SqlCohortDefinition();
     definition.setName("Patients with Other test Results Part 1 Prep A");
@@ -350,6 +362,13 @@ public class PrepCtCohortQueries {
     return definition;
   }
 
+  /**
+   * <b>Description:</b> Other Test Results: Clients without the field “Resultado do Teste” marked
+   * with any value on the “Ficha de Consulta de Seguimento PrEP” registered during the reporting
+   * period
+   *
+   * @return
+   */
   public CohortDefinition getOtherTestResultsB1() {
     SqlCohortDefinition definition = new SqlCohortDefinition();
     definition.setName("Patients with Other test Results Part 1 Prep B1");
@@ -366,6 +385,13 @@ public class PrepCtCohortQueries {
     return definition;
   }
 
+  /**
+   * <b>Description:</b> Other Test Results: Clients without “Data do teste HIV com resultado
+   * Negativo no Inicio da PrEP” filled on the “Ficha de Consulta Inicial PrEP” registered during
+   * the reporting period;
+   *
+   * @return
+   */
   public CohortDefinition getOtherTestResultsB2() {
     SqlCohortDefinition definition = new SqlCohortDefinition();
     definition.setName("Patients with Other test Results Part 1 Prep B2");
@@ -951,5 +977,21 @@ public class PrepCtCohortQueries {
     cd.setCompositionString("A OR (B AND C)");
 
     return cd;
+  }
+
+  /** @return */
+  public CohortDefinition getClientsWithAtleastOneFollowupVisitDuringReportingPeriodPrep() {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("Patients With Atleast One Followup Visit During Reporting Period Prep");
+
+    definition.setQuery(
+        PrepCtQueries.clientsWithAtleastOneFollowupVisitDuringReportingPeriodPrep(
+            hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId()));
+
+    definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    definition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    definition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return definition;
   }
 }
