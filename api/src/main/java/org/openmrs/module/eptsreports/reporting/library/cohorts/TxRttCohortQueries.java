@@ -672,7 +672,6 @@ public class TxRttCohortQueries {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patients with CD4 Result");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -695,7 +694,12 @@ public class TxRttCohortQueries {
             + "                   FROM   encounter e "
             + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "                          INNER JOIN ( "
-            + commonQueries.getFirstDrugPickup()
+            + "        SELECT first.patient_id, "
+            + "               Min(first.pickup_date) AS first_pickup_ever "
+            + "        FROM   ("
+            + CommonQueries.getFirstDrugPickOnFilaOrRecepcaoLevantouQuery()
+            + "        ) first "
+            + "          GROUP  BY first.patient_id "
             + "                 ) returned "
             + "  ON returned.patient_id = e.patient_id "
             + "  INNER JOIN (SELECT e.patient_id, DATE(e.encounter_datetime) cd4_date "
@@ -757,13 +761,14 @@ public class TxRttCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Cd4 And Age");
     cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
 
     CohortDefinition getCd4Result = getCd4Result(cd4);
     CohortDefinition age = ageCohortQueries.createXtoYAgeCohort("Age", minAge, maxAge);
 
-    cd.addSearch("getCd4Result", EptsReportUtils.map(getCd4Result, DEFAULT_MAPPING));
+    cd.addSearch(
+        "getCd4Result",
+        EptsReportUtils.map(getCd4Result, "endDate=${endDate},location=${location}"));
 
     cd.addSearch("age", EptsReportUtils.map(age, "effectiveDate=${endDate}"));
 
@@ -850,7 +855,6 @@ public class TxRttCohortQueries {
             + "                                  AND o.voided = 0 "
             + "                                  AND e.encounter_type = ${18} "
             + "                                  AND o.concept_id = ${5096} "
-            + "                                  AND o.value_datetime IS NOT NULL "
             + "                                  AND o.value_datetime < :startDate "
             + "                                  AND e.location_id = :location "
             + "                           GROUP  BY p.patient_id "
@@ -869,7 +873,6 @@ public class TxRttCohortQueries {
             + "                                  AND o.voided = 0 "
             + "                                  AND e.encounter_type = ${52} "
             + "                                  AND o.concept_id = ${23866} "
-            + "                                  AND o.value_datetime IS NOT NULL "
             + "                                  AND o.value_datetime < :startDate "
             + "                                  AND e.location_id = :location "
             + "                           GROUP  BY p.patient_id) most_recent "
@@ -877,8 +880,8 @@ public class TxRttCohortQueries {
             + "                  most_recent_of_previous_period "
             + "               ON most_recent_of_previous_period.patient_id = p.patient_id "
             + "WHERE p.voided = 0 "
-            + "AND  Timestampdiff(DAY, restarted.pick_up_date, "
-            + "              most_recent_of_previous_period.final_encounter_date) < 60";
+            + "AND  TIMESTAMPDIFF(DAY, most_recent_of_previous_period.final_encounter_date, "
+            + "               restarted.pick_up_date) < 60";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
