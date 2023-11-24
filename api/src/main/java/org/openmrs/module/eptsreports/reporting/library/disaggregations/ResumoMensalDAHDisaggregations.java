@@ -15,12 +15,12 @@ public class ResumoMensalDAHDisaggregations {
     BaseDataSet.ColumnParameters tenTo14Female =
         new BaseDataSet.ColumnParameters(
             "tenTo14Female", "10 to 14 years female", "gender=F|age=10-14", "02");
-    BaseDataSet.ColumnParameters fifteenTo19Female =
-        new BaseDataSet.ColumnParameters(
-            "fifteenTo19Female", "15 to 19 years female", "gender=F|age=15-19", "03");
     BaseDataSet.ColumnParameters fifteenTo19Male =
         new BaseDataSet.ColumnParameters(
-            "fifteenTo19Male", "15 to 19 years male", "gender=M|age=15-19", "04");
+            "fifteenTo19Male", "15 to 19 years male", "gender=M|age=15-19", "03");
+    BaseDataSet.ColumnParameters fifteenTo19Female =
+        new BaseDataSet.ColumnParameters(
+            "fifteenTo19Female", "15 to 19 years female", "gender=F|age=15-19", "04");
     BaseDataSet.ColumnParameters above20YearsM =
         new BaseDataSet.ColumnParameters(
             "above20YearsF", "Above 20 years male patients", "gender=M|age=20+", "05");
