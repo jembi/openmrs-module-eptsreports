@@ -750,7 +750,6 @@ public class TxCurrCohortQueries {
             hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId(),
             hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
             commonMetadata.getReturnVisitDateConcept().getConceptId(),
-            hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getArtDatePickupMasterCard().getConceptId(),
             hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
             numDays));
@@ -771,9 +770,6 @@ public class TxCurrCohortQueries {
    * <b>14 –</b> All patients who do not have the next scheduled drug pick update <b>(concept_id
    * 5096 = RETURN VISIT DATE FOR ARV DRUG)</b>
    *
-   * <p>And next scheduled consultation date (Ficha de Seguimento or Ficha Clinica – Master Card
-   * <b>(concept_id = 1410)</b>)
-   *
    * <p>And ART Pickup date (<b>(concept_id = 23866)</b> – Recepção – Levantou ARV).
    *
    * </blockquote>
@@ -787,11 +783,8 @@ public class TxCurrCohortQueries {
 
     definition.setQuery(
         TXCurrQueries.getPatientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup(
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
             hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
-            hivMetadata.getReturnVisitDateConcept().getConceptId(),
             hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId(),
             hivMetadata.getArtDatePickupMasterCard().getConceptId()));
 

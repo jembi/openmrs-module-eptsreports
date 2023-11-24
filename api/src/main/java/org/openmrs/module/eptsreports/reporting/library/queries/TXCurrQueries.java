@@ -386,7 +386,6 @@ public class TXCurrQueries {
       int returnVisitDateForArvDrugConcept,
       int ARVPharmaciaEncounterType,
       int returnVisitDateConcept,
-      int aRVPediatriaSeguimentoEncounterType,
       int artDatePickup,
       int msterCardDrugPickupEncounterType,
       int numDays) {
@@ -395,7 +394,6 @@ public class TXCurrQueries {
     map.put("returnVisitDateForArvDrugConcept", returnVisitDateForArvDrugConcept);
     map.put("ARVPharmaciaEncounterType", ARVPharmaciaEncounterType);
     map.put("returnVisitDateConcept", returnVisitDateConcept);
-    map.put("aRVPediatriaSeguimentoEncounterType", aRVPediatriaSeguimentoEncounterType);
     map.put("artDatePickup", artDatePickup);
     map.put("msterCardDrugPickupEncounterType", msterCardDrugPickupEncounterType);
     map.put("numDays", numDays);
@@ -461,18 +459,12 @@ public class TXCurrQueries {
    * @return {@link String}
    */
   public static String getPatientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup(
-      int adultoSeguimentoEncounterType,
-      int ARVPediatriaSeguimentoEncounterType,
       int aRVPharmaciaEncounterType,
       int masterCardDrugPickupEncounterType,
-      int returnVisitDateConcept,
       int returnVisitDateForArvDrugConcept,
       int artDatePickup) {
     Map<String, Integer> map = new HashMap<>();
-    map.put("6", adultoSeguimentoEncounterType);
-    map.put("9", ARVPediatriaSeguimentoEncounterType);
     map.put("18", aRVPharmaciaEncounterType);
-    map.put("1410", returnVisitDateConcept);
     map.put("5096", returnVisitDateForArvDrugConcept);
     map.put("52", masterCardDrugPickupEncounterType);
     map.put("23866", artDatePickup);
@@ -484,30 +476,6 @@ public class TXCurrQueries {
             + "    AND    pat.patient_id NOT IN( "
             + "        SELECT fn.patient_id "
             + "        FROM  ( "
-            + "            SELECT     qa.patient_id "
-            + "            FROM ( "
-            + "                SELECT pat.patient_id,Max(e.encounter_datetime) AS encounter_datetime "
-            + "                FROM  patient pat "
-            + "                    INNER JOIN encounter e ON  pat.patient_id = e.patient_id "
-            + "                WHERE      e.encounter_datetime <= :onOrBefore "
-            + "                    AND        pat.voided = 0 "
-            + "                    AND        e.voided = 0 "
-            + "                    AND        e.location_id = :location "
-            + "                    AND        e.encounter_type IN(${6},${9}) "
-            + "                GROUP BY   pat.patient_id "
-            + "                ) qa "
-            + "                INNER JOIN encounter e1 ON qa.patient_id = e1.patient_id "
-            + "                INNER JOIN obs o1 ON e1.encounter_id = o1.encounter_id "
-            + "            WHERE      qa.encounter_datetime=e1.encounter_datetime "
-            + "                AND        e1.encounter_datetime <= :onOrBefore "
-            + "                AND        e1.voided = 0 "
-            + "                AND        e1.encounter_type IN(${6},${9}) "
-            + "                AND        e1.location_id = :location "
-            + "                AND        o1.value_datetime IS NOT NULL "
-            + "                AND        o1.voided = 0 "
-            + "                AND        o1.concept_id IN(${1410}) "
-            + "                AND        o1.location_id = :location "
-            + "            UNION "
             + "            SELECT     qc.patient_id "
             + "            FROM ( "
             + "                SELECT     pat.patient_id, max(e.encounter_datetime) AS encounter_datetime "
