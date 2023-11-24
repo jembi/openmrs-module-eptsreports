@@ -400,12 +400,12 @@ public class TxNewCohortQueries {
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
 
-    String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
-
     CohortDefinition getCd4Result = getCd4Result(cd4);
     CohortDefinition age = ageCohortQueries.createXtoYAgeCohort("Age", minAge, maxAge);
 
-    cd.addSearch("getCd4Result", EptsReportUtils.map(getCd4Result, mapping1));
+    cd.addSearch(
+        "getCd4Result",
+        EptsReportUtils.map(getCd4Result, "endDate=${endDate},location=${location}"));
 
     cd.addSearch("age", EptsReportUtils.map(age, "effectiveDate=${endDate}"));
 
@@ -442,7 +442,6 @@ public class TxNewCohortQueries {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Number of patientes who initiated TARV - Fila and ARV Pickup");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -576,7 +575,8 @@ public class TxNewCohortQueries {
             null);
 
     cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping1));
-    cd.addSearch("cd4Under200", EptsReportUtils.map(cd4Under200, mapping1));
+    cd.addSearch(
+        "cd4Under200", EptsReportUtils.map(cd4Under200, "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("txnew AND cd4Under200");
 
@@ -647,9 +647,13 @@ public class TxNewCohortQueries {
 
     cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping1));
 
-    cd.addSearch("cd4Above200AndAge", EptsReportUtils.map(cd4Above200AndAge, mapping1));
+    cd.addSearch(
+        "cd4Above200AndAge",
+        EptsReportUtils.map(cd4Above200AndAge, "endDate=${endDate},location=${location}"));
 
-    cd.addSearch("cd4Under200AndAge", EptsReportUtils.map(cd4Under200AndAge, mapping1));
+    cd.addSearch(
+        "cd4Under200AndAge",
+        EptsReportUtils.map(cd4Under200AndAge, "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("(txnew AND cd4Above200AndAge) AND NOT cd4Under200AndAge");
 
@@ -694,8 +698,12 @@ public class TxNewCohortQueries {
             null);
 
     cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping1));
-    cd.addSearch("cd4Under200AndAge", EptsReportUtils.map(cd4Under200AndAge, mapping1));
-    cd.addSearch("cd4Above200AndAge", EptsReportUtils.map(cd4Above200AndAge, mapping1));
+    cd.addSearch(
+        "cd4Under200AndAge",
+        EptsReportUtils.map(cd4Under200AndAge, "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "cd4Above200AndAge",
+        EptsReportUtils.map(cd4Above200AndAge, "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("txnew AND NOT (cd4Under200AndAge OR cd4Above200AndAge)");
 
