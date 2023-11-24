@@ -5610,4 +5610,36 @@ public class HivMetadata extends ProgramsMetadata {
         Context.getAdministrationService().getGlobalProperty("eptsreports.artInitiationCd4");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 1708</b>
+   *
+   * <p><b>Name:</b> EXIT FROM ARV TREATMENT
+   *
+   * <p><b>Description: EXIT FROM ARV TREATMENT Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getExitFromArvTreatmentConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.exitFromArvTreatmentUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165386</b>
+   *
+   * <p><b>Name:</b> EXIT DATE
+   *
+   * <p><b>Description: EXIT DATE Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getExitDateFromArvTreatmentConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.exitDateFromArvTreatmentUuid");
+    return getConcept(uuid);
+  }
 }
