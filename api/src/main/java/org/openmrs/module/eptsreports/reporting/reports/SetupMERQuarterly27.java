@@ -126,7 +126,7 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
     rd.addDataSetDefinition(
         "PREPNUM", Mapped.mapStraightThrough(prepCtDataset.constructPrepCtDataset()));
 
-    //         add a base cohort here to help in calculations running
+    // add a base cohort here to help in calculations running
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));

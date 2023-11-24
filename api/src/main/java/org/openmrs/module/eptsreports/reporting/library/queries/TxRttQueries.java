@@ -216,13 +216,8 @@ public class TxRttQueries {
   public static String getTreatmentInterruptionOfXDaysBeforeReturningToTreatmentQuery(
       int returnVisitDateForArvDrugConcept,
       int aRVPharmaciaEncounterType,
-      int returnVisitDateConcept,
-      int adultoSeguimentoEncounterType,
-      int pediatriaSeguimentoEncounterType,
       int artDatePickupMasterCard,
       int masterCardDrugPickupEncounterType,
-      int artPickupConcept,
-      int yesConcept,
       Integer minDays,
       Integer maxDays) {
     String query =
@@ -257,30 +252,6 @@ public class TxRttQueries {
             + "                                    o.concept_id = ${returnVisitDateForArvDrugConcept} and "
             + "                                    o.voided = 0 "
             + "                        UNION "
-            + "                        SELECT ficha.patient_id, o.value_datetime "
-            + "                        FROM ( "
-            + "                                 SELECT pa.patient_id, "
-            + "                                        Max(enc.encounter_datetime) encounter_datetime "
-            + "                                 FROM patient pa "
-            + "                                          inner join encounter enc "
-            + "                                                     ON enc.patient_id = pa.patient_id "
-            + "                                 WHERE pa.voided = 0 "
-            + "                                   AND enc.voided = 0 "
-            + "                                   AND enc.encounter_type IN (${adultoSeguimentoEncounterType}, ${pediatriaSeguimentoEncounterType}) "
-            + "                                   AND enc.location_id = :location "
-            + "                                   AND enc.encounter_datetime <= DATE_ADD(:startDate, interval -1 DAY) "
-            + "                                 GROUP BY pa.patient_id) ficha "
-            + "                                 INNER JOIN encounter e on "
-            + "                                    e.patient_id = ficha.patient_id and "
-            + "                                    e.encounter_datetime = ficha.encounter_datetime and "
-            + "                                    e.encounter_type IN (${adultoSeguimentoEncounterType}, ${pediatriaSeguimentoEncounterType}) and "
-            + "                                    e.location_id = :location and "
-            + "                                    e.voided = 0 "
-            + "                                 INNER JOIN obs o on "
-            + "                                    o.encounter_id = e.encounter_id and "
-            + "                                    o.concept_id = ${returnVisitDateConcept} and "
-            + "                                    o.voided = 0 "
-            + "                        UNION "
             + "                        SELECT pa.patient_id, "
             + "                               Date_add(Max(obs.value_datetime), interval 30 day) value_datetime "
             + "                        FROM patient pa "
@@ -304,33 +275,17 @@ public class TxRttQueries {
             + "        INNER JOIN ( "
             + "             SELECT patient_id, MIN(earliest_date) as final_earliest_date "
             + "             FROM ( "
-            + "                      SELECT p.patient_id, MIN(o2.value_datetime) as earliest_date "
+            + "                      SELECT p.patient_id, MIN(o.value_datetime) as earliest_date "
             + "                      FROM patient p "
             + "                               INNER JOIN encounter e "
             + "                                          on e.patient_id = p.patient_id "
-            + "                               INNER JOIN obs o1 "
-            + "                                          on e.encounter_id = o1.encounter_id "
-            + "                               INNER JOIN obs o2 "
-            + "                                          on e.encounter_id = o2.encounter_id "
+            + "                               INNER JOIN obs o "
+            + "                                          on e.encounter_id = o.encounter_id "
             + "                      WHERE p.voided = 0 "
             + "                        AND e.voided = 0 "
             + "                        AND e.encounter_type = ${masterCardDrugPickupEncounterType} "
-            + "                        AND o1.voided = 0 "
-            + "                        AND o2.voided = 0 "
-            + "                        AND (o1.concept_id = ${artPickupConcept} AND o1.value_coded = ${yesConcept}) "
-            + "                        AND (o2.concept_id = ${artDatePickupMasterCard} AND o2.value_datetime BETWEEN :startDate AND :endDate) "
-            + "                        AND e.location_id = :location "
-            + "                      GROUP BY p.patient_id "
-            + "                      UNION "
-            + "                      SELECT p.patient_id, MIN(e.encounter_datetime) as earliest_date "
-            + "                      FROM patient p "
-            + "                               INNER JOIN encounter e "
-            + "                                          on e.patient_id = p.patient_id "
-            + "                      WHERE p.voided = 0 "
-            + "                        AND e.voided = 0 "
-            + "                        AND e.encounter_type IN (${adultoSeguimentoEncounterType}, ${pediatriaSeguimentoEncounterType}) "
-            + "                        AND e.encounter_datetime "
-            + "                          BETWEEN :startDate AND :endDate "
+            + "                        AND o.voided = 0 "
+            + "                        AND (o.concept_id = ${artDatePickupMasterCard} AND o.value_datetime BETWEEN :startDate AND :endDate) "
             + "                        AND e.location_id = :location "
             + "                      GROUP BY p.patient_id "
             + "                      UNION "
@@ -364,13 +319,8 @@ public class TxRttQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("returnVisitDateForArvDrugConcept", returnVisitDateForArvDrugConcept);
     map.put("aRVPharmaciaEncounterType", aRVPharmaciaEncounterType);
-    map.put("returnVisitDateConcept", returnVisitDateConcept);
-    map.put("adultoSeguimentoEncounterType", adultoSeguimentoEncounterType);
-    map.put("pediatriaSeguimentoEncounterType", pediatriaSeguimentoEncounterType);
     map.put("artDatePickupMasterCard", artDatePickupMasterCard);
     map.put("masterCardDrugPickupEncounterType", masterCardDrugPickupEncounterType);
-    map.put("artPickupConcept", artPickupConcept);
-    map.put("yesConcept", yesConcept);
     map.put("minDays", minDays);
     map.put("maxDays", maxDays);
 

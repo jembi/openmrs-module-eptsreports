@@ -7965,6 +7965,17 @@ public class QualityImprovement2020CohortQueries {
         return "MQ Cat 14 - A and A2";
       }
     },
+    A_NOT_A1A2 {
+      @Override
+      public String getCompositionString() {
+        return "A AND NOT (A1 OR A2)";
+      }
+
+      @Override
+      public String getDescription() {
+        return "MQ Cat 14 Denominator - VL Patients that are not Pregnant or Breastfeeding";
+      }
+    },
     B {
       @Override
       public String getCompositionString() {
@@ -7996,6 +8007,17 @@ public class QualityImprovement2020CohortQueries {
       @Override
       public String getDescription() {
         return "MQ Cat 14 - B AND B2";
+      }
+    },
+    B_NOT_B1B2 {
+      @Override
+      public String getCompositionString() {
+        return "B AND NOT (B1 OR B2)";
+      }
+
+      @Override
+      public String getDescription() {
+        return "MQ Cat 14 Numerator - VL Patients that are not Pregnant or Breastfeeding";
       }
     };
 
@@ -12186,7 +12208,7 @@ public class QualityImprovement2020CohortQueries {
             + "                ON     e.patient_id = p.person_id "
             + "                JOIN   obs o "
             + "                ON     o.encounter_id = e.encounter_id "
-            + "                AND    encounter_type = ${6} "
+            + "                WHERE    encounter_type = ${6} "
             + "                AND    o.concept_id = ${question} "
             + "                AND    o.value_coded = ${answer} "
             + "                AND    e.location_id = :location "
