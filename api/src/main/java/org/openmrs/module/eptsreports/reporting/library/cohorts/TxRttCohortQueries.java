@@ -60,8 +60,7 @@ public class TxRttCohortQueries {
   private final String DEFAULT_MAPPING =
       "startDate=${startDate},endDate=${endDate},location=${location}";
 
-  private final String previousReportingPeriod =
-      "startDate=${startDate},endDate=${startDate},location=${location}";
+  private final String previousReportingPeriod = "endDate=${endDate},location=${location}";
 
   @Autowired
   public TxRttCohortQueries(
@@ -143,7 +142,9 @@ public class TxRttCohortQueries {
 
     cd.addSearch(
         "initiatedPreviousPeriod",
-        EptsReportUtils.map(getPatientsWhoEverInitiatedTreatment(), previousReportingPeriod));
+        EptsReportUtils.map(
+            getPatientsWhoEverInitiatedTreatment(),
+            "endDate=${startDate-1d},location=${location}"));
 
     cd.addSearch(
         "LTFU",
@@ -528,11 +529,8 @@ public class TxRttCohortQueries {
   public CohortDefinition getPatientsArtStartDateBeforePeriod() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("All patients whose earliest ART start date from pick-up and clinical sources");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
 
     String query =
         "       SELECT patient_id "
@@ -541,7 +539,7 @@ public class TxRttCohortQueries {
             + "       ) start "
             + " WHERE start.first_pickup < "
             + artStartPeriod
-            + " AND start.first_pickup < :startDate ";
+            + " AND start.first_pickup <= :endDate ";
 
     cd.setQuery(query);
     return cd;
@@ -553,11 +551,8 @@ public class TxRttCohortQueries {
   public CohortDefinition getPatientsArtStartDateAfterPeriod() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("All patients whose earliest ART start date from pick-up and clinical sources");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
 
     String query =
         "       SELECT patient_id "
@@ -566,7 +561,7 @@ public class TxRttCohortQueries {
             + "       ) start "
             + " WHERE start.first_pickup >= "
             + artStartPeriod
-            + " AND start.first_pickup < :startDate";
+            + " AND start.first_pickup <= :endDate";
 
     cd.setQuery(query);
     return cd;
@@ -586,19 +581,31 @@ public class TxRttCohortQueries {
   public CohortDefinition getPatientsFirstDrugPickup() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patient’s earliest drug pick-up");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
 
     String query =
         "       SELECT patient_id "
             + " FROM ( "
-            + commonQueries.getFirstDrugPickup()
-            + "       ) start "
+            + "        SELECT first.patient_id, "
+            + "               Min(first.pickup_date) AS first_pickup_ever "
+            + "        FROM   ("
+            + CommonQueries.getFirstDrugPickOnFilaOrRecepcaoLevantouQuery()
+            + "        ) first "
+            + "          GROUP  BY first.patient_id "
+            + "      ) start "
             + " WHERE start.first_pickup_ever >= "
             + artStartPeriod;
 
-    cd.setQuery(query);
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
     return cd;
   }
 
@@ -633,7 +640,6 @@ public class TxRttCohortQueries {
   public CohortDefinition getPatientsWhoEverInitiatedTreatment() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Patients who initiated ART during the reporting period");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
