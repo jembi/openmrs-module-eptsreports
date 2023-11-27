@@ -485,11 +485,11 @@ public class EptsCommonDimension {
     dim.addCohortDefinition(
         "<3m",
         EptsReportUtils.map(
-            less3m, "onOrAfter={onOrAfter},onOrBefore=${onOrBefore},location=${locationList}"));
+            less3m, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${locationList}"));
     dim.addCohortDefinition(
         "3-5m",
         EptsReportUtils.map(
-            threeTo5m, "onOrAfter={onOrAfter},onOrBefore=${onOrBefore},location=${locationList}"));
+            threeTo5m, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${locationList}"));
     dim.addCohortDefinition(
         ">6m",
         EptsReportUtils.map(
