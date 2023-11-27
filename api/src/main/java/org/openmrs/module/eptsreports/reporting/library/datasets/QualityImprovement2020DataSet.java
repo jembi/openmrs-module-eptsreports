@@ -2405,7 +2405,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ14DEN1",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.A),
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.A_NOT_A1A2),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
@@ -2420,7 +2420,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ14DEN2",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.A),
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.A_NOT_A1A2),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
@@ -2436,7 +2436,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ14DEN3",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.A),
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.A_NOT_A1A2),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
@@ -2452,7 +2452,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ14DEN4",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.A),
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.A_NOT_A1A2),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
@@ -2468,7 +2468,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ14DEN5",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.A),
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.A_NOT_A1A2),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
@@ -2484,12 +2484,12 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ14DEN6",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.A),
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.A_NOT_A1A2),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
         "MQ14DEN6",
-        "14.6. % de utentes (10 - 14 anos) em TARV com supressão viral (CV<1000 Cps/ml",
+        "14.6. % de utentes (>= 20 anos) em TARV com supressão viral (CV<1000 Cps/ml",
         EptsReportUtils.map(
             MQ14DEN6, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
         "ageByEndDateRevision=20+");
@@ -2531,7 +2531,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ14NUM1",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14NUM(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.B),
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.B_NOT_B1B2),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
@@ -2546,7 +2546,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ14NUM2",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14NUM(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.B),
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.B_NOT_B1B2),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
@@ -2562,7 +2562,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ14NUM3",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14NUM(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.B),
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.B_NOT_B1B2),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
@@ -2578,7 +2578,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ14NUM4",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14NUM(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.B),
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.B_NOT_B1B2),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
@@ -2594,7 +2594,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ14NUM5",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14NUM(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.B),
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.B_NOT_B1B2),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
@@ -2610,12 +2610,12 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ14NUM6",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14NUM(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.B),
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.B_NOT_B1B2),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
         "MQ14NUM6",
-        "14.6. % de utentes (10 - 14 anos) em TARV com supressão viral (CV<1000 Cps/ml",
+        "14.6. % de utentes (>= 20 anos) em TARV com supressão viral (CV<1000 Cps/ml",
         EptsReportUtils.map(
             MQ14NUM6, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
         "ageByEndDateRevision=20+");

@@ -1,7 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.reports;
 
-import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
@@ -9,10 +7,11 @@ import java.util.List;
 import java.util.Properties;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.LocationDataSetDefinition;
-import org.openmrs.module.eptsreports.reporting.library.datasets.QualityImprovement2020DataSet;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
+import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
@@ -20,25 +19,29 @@ import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Deprecated
-public class SetupQualityImprovementReport20 extends EptsDataExportManager {
+public class SetupResumoMensalDAHReport extends EptsDataExportManager {
 
-  @Autowired protected GenericCohortQueries genericCohortQueries;
+  private GenericCohortQueries genericCohortQueries;
 
-  @Autowired private QualityImprovement2020DataSet initQltyImpDataSet;
+  @Autowired
+  public SetupResumoMensalDAHReport(GenericCohortQueries genericCohortQueries) {
+    this.genericCohortQueries = genericCohortQueries;
+  }
 
   @Override
   public String getUuid() {
-    return "4189bd32-2d53-11eb-ae90-1b0972e81813";
+    return "369d817e-89df-11ee-9998-d387830ce643";
   }
 
   @Override
   public String getName() {
-    return "Melhoria de Qualidade - 2023";
+    return "Resumo Mensal de DAH";
   }
 
   @Override
   public String getDescription() {
-    return "Este relatório apresenta os indicadores de melhoria de qualidade da Unidade Sanitária para o Programa do HIV/SIDA.";
+    return "Este relatório apresenta os dados do Resumo Mensal da Unidade Sanitária "
+        + "para a Doença Avançada por HIV, provenientes da ferramenta Ficha de DAH e Ficha Mestra no sistema.";
   }
 
   @Override
@@ -48,30 +51,27 @@ public class SetupQualityImprovementReport20 extends EptsDataExportManager {
 
   @Override
   public String getExcelDesignUuid() {
-    return "4e1a8b58-2d53-11eb-95bd-b7f44112e9ef";
+    return "a288d9c4-89df-11ee-b960-272d3d62348d";
   }
 
   @Override
   public ReportDefinition constructReportDefinition() {
-    ReportDefinition reportDefinition = new ReportDefinition();
-    reportDefinition.setUuid(getUuid());
-    reportDefinition.setName(getName());
-    reportDefinition.setDescription(getDescription());
-    reportDefinition.setParameters(getParameters());
-    reportDefinition.addDataSetDefinition(
-        "ALL",
-        Mapped.mapStraightThrough(initQltyImpDataSet.constructQualityImprovement2020DataSet()));
 
-    reportDefinition.addDataSetDefinition(
-        "HF", mapStraightThrough(new LocationDataSetDefinition()));
+    ReportDefinition rd = new ReportDefinition();
+    rd.setName(getName());
+    rd.setDescription(getDescription());
+    rd.setUuid(getUuid());
+    rd.addParameters(getParameters());
 
-    // add a base cohort here to help in calculations running
-    reportDefinition.setBaseCohortDefinition(
+    rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
+    rd.addDataSetDefinition("HF", Mapped.mapStraightThrough(new LocationDataSetDefinition()));
+
+    // Report Base Cohort
+    rd.setBaseCohortDefinition(
         EptsReportUtils.map(
-            genericCohortQueries.getBaseCohort(),
-            "endDate=${revisionEndDate},location=${location}"));
+            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
-    return reportDefinition;
+    return rd;
   }
 
   @Override
@@ -81,15 +81,15 @@ public class SetupQualityImprovementReport20 extends EptsDataExportManager {
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Template_MQ_2023.xls",
-              "Melhoria de Qualidade - 2023",
+                  "Resumo_Mensal_DAH_v2.0.1.xls",
+              "Resumo Mensal de DAH",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new ReportingException(e.toString());
     }
 
     return Arrays.asList(reportDesign);
@@ -98,9 +98,8 @@ public class SetupQualityImprovementReport20 extends EptsDataExportManager {
   @Override
   public List<Parameter> getParameters() {
     return Arrays.asList(
-        new Parameter("startDate", "Data Inicial Inclusão", Date.class),
-        new Parameter("endDate", "Data Final Inclusão", Date.class),
-        new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+        new Parameter("startDate", "Data Início", Date.class),
+        new Parameter("endDate", "Data Fim", Date.class),
         new Parameter("location", "Unidade Sanitária", Location.class));
   }
 }
