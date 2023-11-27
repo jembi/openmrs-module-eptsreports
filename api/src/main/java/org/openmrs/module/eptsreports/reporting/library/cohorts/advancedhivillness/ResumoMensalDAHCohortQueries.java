@@ -338,6 +338,58 @@ public class ResumoMensalDAHCohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * <b>Relatório – Indicador 4 – Saídas do seguimento de DAH</b>
+   * <li>Com registo de pelo menos um motivo (Óbito/ Abandono/ Transferido Para) e “Data de Saída de
+   *     TARV na US” (secção J), na Ficha de DAH, ocorrida durante o período (“Data de Saída de TARV
+   *     na US” >= “Data Início” e <= “Data Fim”) ou
+   * <li>Com registo de “Data de Saída” (secção I), registada na Ficha de DAH e ocorrida durante o
+   *     período (>= “Data Início” e <= “Data Fim”)
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoLeftFollowupOnDAHByDuringMonth() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Indicador 4 – Saídas do seguimento de DAH");
+    sqlCohortDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    map.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("1707", hivMetadata.getAbandonedConcept().getConceptId());
+    map.put("1708", hivMetadata.getExitFromArvTreatmentConcept().getConceptId());
+    map.put("165386", hivMetadata.getExitDateFromArvTreatmentConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM "
+            + "    patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.encounter_type = ${90} "
+            + "  AND ( "
+            + "        (o.concept_id = ${1708} "
+            + "            AND o.value_coded IN (${1366},${1706},${1707}) "
+            + "            AND o.obs_datetime >= :startDate "
+            + "            AND o.obs_datetime <= :endDate) "
+            + "        OR  (o.concept_id = ${165386} "
+            + "        AND o.value_datetime >= :startDate "
+            + "        AND o.value_datetime <= :endDate) "
+            + "    ) "
+            + "  AND e.location_id = :location "
+            + "GROUP BY p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(substitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
   private List<Parameter> getCohortParameters() {
     return Arrays.asList(
         ReportingConstants.START_DATE_PARAMETER,
