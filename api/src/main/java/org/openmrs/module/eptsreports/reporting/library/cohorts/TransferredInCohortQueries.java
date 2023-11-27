@@ -91,23 +91,23 @@ public class TransferredInCohortQueries {
     CohortDefinition homeVisitTrfOut =
         txCurrCohortQueries.getPatientsTransferedOutInLastHomeVisitCard();
 
-    CohortDefinition clinicalVisit =
+    CohortDefinition drugPickUp =
         txRttCohortQueries.getPatientsReturnedTreatmentDuringReportingPeriod();
 
     String mappingsTrfIn = "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}";
     String mappingsCurr = "onOrBefore=${onOrBefore-3m},location=${location}";
     String mappingsTrfOut = "startDate=${onOrAfter},location=${location}";
     String mappingsHomeVisitTrfOut = "onOrBefore=${onOrAfter-1d},location=${location}";
-    String mappingsClinicalVisit =
+    String mappingsPickUplVisit =
         "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}";
 
     cd.addSearch("transferredIn", EptsReportUtils.map(transferredIn, mappingsTrfIn));
     cd.addSearch("txCurr", EptsReportUtils.map(txCurr, mappingsCurr));
     cd.addSearch("transferredOut", EptsReportUtils.map(transferredOut, mappingsTrfOut));
     cd.addSearch("homeVisitTrfOut", EptsReportUtils.map(homeVisitTrfOut, mappingsHomeVisitTrfOut));
-    cd.addSearch("clinicalVisit", EptsReportUtils.map(clinicalVisit, mappingsClinicalVisit));
+    cd.addSearch("drugPickUp", EptsReportUtils.map(drugPickUp, mappingsPickUplVisit));
 
-    cd.setCompositionString("(transferredIn OR transferredOut) AND NOT txCurr");
+    cd.setCompositionString("(transferredIn OR transferredOut) AND drugPickUp AND NOT txCurr");
 
     return cd;
   }
