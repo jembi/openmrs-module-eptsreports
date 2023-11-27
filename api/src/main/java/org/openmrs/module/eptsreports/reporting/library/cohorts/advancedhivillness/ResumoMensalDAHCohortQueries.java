@@ -1,6 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness;
 
 import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
 import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
@@ -214,6 +215,53 @@ public class ResumoMensalDAHCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("onDAHDuringPeriod AND (onArt OR B12)");
+    return cd;
+  }
+
+  /**
+   * <b>Relatório- Indicador 5 Utentes em DAH até o fim do mês</b>
+   *
+   * <li>Fórmula Matemática = Indicador 0 (RF6) + Indicador 1 (RF7)
+   * + Indicador 2 (RF8) + Indicador 3 (RF9) – Indicador 4 (RF10)</li>
+   *
+   * @see #getPatientsWhoStartedFollowupOnDAHComposition
+   * @see #getPatientsWhoAreNewInArtAndStartedFollowupDuringTheMonthComposition
+   * @see #getPatientsWhoRestartedArtAndStartedFollowupDuringTheMonthComposition
+   * @see #getPatientsWhoAreInTarvAndStartedFollowupDuringTheMonthComposition
+   * @see #getPatientsWhoLeftFollowupOnDAHByDuringMonth
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getTotalOfPatientsWhoAreInFollowupDAHByTheEndOfMonthComposition(){
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Indicador 5 Utentes em DAH até o fim do mês");
+    cd.addParameters(getCohortParameters());
+
+    cd.addSearch(
+            "INDICATOR0",
+            mapStraightThrough(
+                    getPatientsWhoStartedFollowupOnDAHComposition()));
+    cd.addSearch(
+            "INDICATOR1",
+            mapStraightThrough(
+                    getPatientsWhoAreNewInArtAndStartedFollowupDuringTheMonthComposition()));
+
+    cd.addSearch(
+            "INDICATOR2",
+            mapStraightThrough(
+                    getPatientsWhoRestartedArtAndStartedFollowupDuringTheMonthComposition()));
+
+    cd.addSearch(
+            "INDICATOR3",
+            mapStraightThrough(
+                    getPatientsWhoAreInTarvAndStartedFollowupDuringTheMonthComposition()));
+    cd.addSearch(
+            "INDICATOR4",
+            mapStraightThrough(
+                    getPatientsWhoLeftFollowupOnDAHByDuringMonth()));
+
+    cd.setCompositionString("(INDICATOR0 OR INDICATOR1 OR INDICATOR2 OR INDICATOR3) AND NOT INDICATOR4 ");
+
     return cd;
   }
 
