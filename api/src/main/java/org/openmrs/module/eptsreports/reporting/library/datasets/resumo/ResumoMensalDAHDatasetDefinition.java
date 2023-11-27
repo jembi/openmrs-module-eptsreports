@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
 
   private final EptsGeneralIndicator eptsGeneralIndicator;
-  private EptsCommonDimension eptsCommonDimension;
+  private final EptsCommonDimension eptsCommonDimension;
   private final ResumoMensalDAHCohortQueries resumoMensalDAHCohortQueries;
   private final ResumoMensalDAHDisaggregations resumoMensalDAHDisaggregations;
 
@@ -95,6 +95,20 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         getPatientsWhoRestartedArtAndStartedFollowupDuringTheMonth(),
         resumoMensalDAHDisaggregations.getColumnDisaggregations());
 
+    // INDICATOR 3
+    dd.addColumn(
+        "TOTALI3",
+        "Indicador 3 – Activos em TARV e Início DAH",
+        getPatientsWhoAreInTarvAndStartedFollowupDuringTheMonth(),
+        "");
+
+    addRow(
+        dd,
+        "I3",
+        "Indicador 3 – Activos em TARV e Início DAH",
+        getPatientsWhoAreInTarvAndStartedFollowupDuringTheMonth(),
+        resumoMensalDAHDisaggregations.getColumnDisaggregations());
+
     return dd;
   }
 
@@ -122,5 +136,14 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
             mapStraightThrough(
                 resumoMensalDAHCohortQueries
                     .getPatientsWhoRestartedArtAndStartedFollowupDuringTheMonthComposition())));
+  }
+
+  private Mapped<CohortIndicator> getPatientsWhoAreInTarvAndStartedFollowupDuringTheMonth() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Relatório-Indicador 3 – Activos em TARV e Início DAH",
+            mapStraightThrough(
+                resumoMensalDAHCohortQueries
+                    .getPatientsWhoAreInTarvAndStartedFollowupDuringTheMonthComposition())));
   }
 }

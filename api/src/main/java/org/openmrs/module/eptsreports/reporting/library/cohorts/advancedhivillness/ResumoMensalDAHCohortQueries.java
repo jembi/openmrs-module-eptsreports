@@ -172,6 +172,52 @@ public class ResumoMensalDAHCohortQueries {
   }
 
   /**
+   * <b>Relatório-Indicador 3 – Activos em TARV e Início DAH</b>
+   * <li>Com registo de “Data de Início no Modelo de DAH”, na Ficha de DAH, ocorrida durante o
+   *     período (“Data de Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”)
+   *
+   *     <p>Filtrando todos os utentes
+   * <li>Registados como “Em TARV" no campo “Situação do TARV no início do seguimento” (Secção A) da
+   *     Ficha de DAH que tem o registo de “Data de Início no Modelo de DAH” ocorrida durante o
+   *     período (“Data de Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”)
+   * <li>Caso não exista o registo da “Situação do TARV no Início do Seguimento” na Ficha de DAH que
+   *     tem o registo de “Data de Início no Modelo de DAH” ocorrida durante o período (“Data de
+   *     Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”), considerar os utentes incluídos
+   *     no indicador B12 - Nº de utentes activos em TARV até o fim do mês anterior, do relatório
+   *     “Resumo Mensal de HIV/SIDA”
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoAreInTarvAndStartedFollowupDuringTheMonthComposition() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Relatório-Indicador 3 – Activos em TARV e Início DAH");
+    cd.addParameters(getCohortParameters());
+
+    cd.addSearch(
+        "onDAHDuringPeriod",
+        map(
+            listOfPatientsInAdvancedHivIllnessCohortQueries.getPatientsWhoStartedFollowupOnDAH(
+                true),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "onArt",
+        map(
+            getPatientsArtSituationOnDAH(hivMetadata.getArtStatus()),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "B12",
+        map(
+            resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfPreviousMonthB12(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("onDAHDuringPeriod AND (onArt OR B12)");
+    return cd;
+  }
+
+  /**
    *
    * <li>Com registo de pelo menos um motivo (Óbito/ Abandono/ Transferido Para) e “Data de Saída de
    *     TARV na US” (secção J), na Ficha de DAH, ocorrida após a data mais recente da “Data de
