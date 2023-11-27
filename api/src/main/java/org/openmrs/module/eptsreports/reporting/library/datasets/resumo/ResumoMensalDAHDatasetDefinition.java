@@ -70,15 +70,29 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
     // INDICATOR 1
     dd.addColumn(
         "TOTALI1",
-        "Relatórios: Indicador 1 - Inícios TARV e Início DAH",
+        "Indicador 1 - Inícios TARV e Início DAH",
         getPatientsWhoAreNewInArtAndStartedFollowupDuringTheMonth(),
         "");
 
     addRow(
         dd,
         "I1",
-        "Relatórios: Indicador 1 - Inícios TARV e Início DAH",
+        "Indicador 1 - Inícios TARV e Início DAH",
         getPatientsWhoAreNewInArtAndStartedFollowupDuringTheMonth(),
+        resumoMensalDAHDisaggregations.getColumnDisaggregations());
+
+    // INDICATOR 2
+    dd.addColumn(
+        "TOTALI2",
+        "Indicador 2 - Reinícios TARV e Início DAH",
+        getPatientsWhoRestartedArtAndStartedFollowupDuringTheMonth(),
+        "");
+
+    addRow(
+        dd,
+        "I2",
+        "Indicador 2 - Reinícios TARV e Início DAH",
+        getPatientsWhoRestartedArtAndStartedFollowupDuringTheMonth(),
         resumoMensalDAHDisaggregations.getColumnDisaggregations());
 
     return dd;
@@ -99,5 +113,14 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
             mapStraightThrough(
                 resumoMensalDAHCohortQueries
                     .getPatientsWhoAreNewInArtAndStartedFollowupDuringTheMonthComposition())));
+  }
+
+  private Mapped<CohortIndicator> getPatientsWhoRestartedArtAndStartedFollowupDuringTheMonth() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Relatório-Indicador 2 - Reinícios TARV e Início DAH",
+            mapStraightThrough(
+                resumoMensalDAHCohortQueries
+                    .getPatientsWhoRestartedArtAndStartedFollowupDuringTheMonthComposition())));
   }
 }

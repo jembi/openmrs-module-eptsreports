@@ -4,6 +4,7 @@ import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map
 
 import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
+import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCohortQueries;
@@ -105,12 +106,12 @@ public class ResumoMensalDAHCohortQueries {
         map(
             listOfPatientsInAdvancedHivIllnessCohortQueries.getPatientsWhoStartedFollowupOnDAH(
                 true),
-            "startDate=${startDate-1d},endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "newOnArt",
         map(
-            getPatientsWhoAreNewOnArt(),
+            getPatientsArtSituationOnDAH(hivMetadata.getStartDrugs()),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
@@ -121,6 +122,52 @@ public class ResumoMensalDAHCohortQueries {
             "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("onDAHDuringPeriod AND (newOnArt OR B1)");
+    return cd;
+  }
+
+  /**
+   * <b>Relatório-Indicador 2 - Reinícios TARV e Início DAH</b>
+   * <li>Com registo de “Data de Início no Modelo de DAH”, na Ficha de DAH, ocorrida durante o
+   *     período (“Data de Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”)
+   *
+   *     <p>Filtrando todos os utentes
+   * <li>Registados como “Reinício" no campo “Situação do TARV no início do seguimento” (Secção A)
+   *     da Ficha de DAH que tem o registo de “Data de Início no Modelo de DAH” ocorrida durante o
+   *     período (“Data de Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”)
+   * <li>Caso não exista o registo da “Situação do TARV no Início do Seguimento” na Ficha de DAH que
+   *     tem o registo de “Data de Início no Modelo de DAH” ocorrida durante o período (“Data de
+   *     Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”), considerar os utentes incluídos
+   *     no indicador B3-Nº de reinícios TARV durante o mês, do relatório “Resumo Mensal de
+   *     HIV/SIDA” durante o período compreendido entre “Data Início” menos (–) 2 meses e “Data Fim”
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoRestartedArtAndStartedFollowupDuringTheMonthComposition() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Relatório-Indicador 2 - Reinícios TARV e Início DAH");
+    cd.addParameters(getCohortParameters());
+
+    cd.addSearch(
+        "onDAHDuringPeriod",
+        map(
+            listOfPatientsInAdvancedHivIllnessCohortQueries.getPatientsWhoStartedFollowupOnDAH(
+                true),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "restartedArt",
+        map(
+            getPatientsArtSituationOnDAH(hivMetadata.getRestartConcept()),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "B3",
+        map(
+            resumoMensalCohortQueries.getPatientsRestartedTarvtB3(),
+            "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("onDAHDuringPeriod AND (restartedArt OR B3)");
     return cd;
   }
 
@@ -201,7 +248,7 @@ public class ResumoMensalDAHCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsWhoAreNewOnArt() {
+  public CohortDefinition getPatientsArtSituationOnDAH(Concept artSituaationConcept) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
@@ -211,7 +258,7 @@ public class ResumoMensalDAHCohortQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
     map.put("1255", hivMetadata.getARVPlanConcept().getConceptId());
-    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("artSituationConcept", artSituaationConcept.getConceptId());
 
     String query =
         "SELECT p.patient_id "
@@ -235,7 +282,7 @@ public class ResumoMensalDAHCohortQueries {
             + "  AND o.voided = 0 "
             + "  AND e.encounter_type = ${90} "
             + "  AND o.concept_id = ${1255} "
-            + "  AND o.value_coded = ${1256} "
+            + "  AND o.value_coded = ${artSituationConcept} "
             + "  AND e.encounter_datetime = last_dah.last_date "
             + "  AND e.location_id = :location "
             + "GROUP BY p.patient_id";
