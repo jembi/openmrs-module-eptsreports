@@ -107,7 +107,7 @@ public class TransferredInCohortQueries {
     cd.addSearch("homeVisitTrfOut", EptsReportUtils.map(homeVisitTrfOut, mappingsHomeVisitTrfOut));
     cd.addSearch("clinicalVisit", EptsReportUtils.map(clinicalVisit, mappingsClinicalVisit));
 
-    cd.setCompositionString("(transferredIn OR transferredOut) AND clinicalVisit AND NOT txCurr");
+    cd.setCompositionString("(transferredIn OR transferredOut) AND NOT txCurr");
 
     return cd;
   }
@@ -201,7 +201,6 @@ public class TransferredInCohortQueries {
     sqlCohortDefinition.setName(
         "Patient Transferred Out With No Drug Pick After The Transferred out Date ");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -350,9 +349,7 @@ public class TransferredInCohortQueries {
             + "                                                                         ON         e.patient_id=p.patient_id "
             + "                                                                         WHERE      p.voided = 0 "
             + "                                                                         AND        e.voided = 0 "
-            + "                                                                         AND        e.encounter_type IN (${adultoSeguimentoEncounterType}, "
-            + "                                                       ${pediatriaSeguimentoEncounterType}, "
-            + "                                                       ${pharmaciaEncounterType}) "
+            + "                                                                         AND        e.encounter_type IN (${pharmaciaEncounterType}) "
             + "                                                       AND        e.encounter_datetime > last_date "
             + "                                                       AND        e.encounter_datetime < :startDate "
             + "                                                       AND        e.location_id = :location "
