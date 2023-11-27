@@ -408,6 +408,29 @@ public class PrepCtCohortQueries {
     return definition;
   }
 
+  /**
+   * <b>Description:</b> Other Test Results: Clients without “Data do teste HIV com resultado
+   * Negativo no Inicio da PrEP” registered on the “Ficha de Consulta Inicial PrEP” and that falls
+   * during the reporting Period.(C)
+   *
+   * @return
+   */
+  public CohortDefinition getOtherTestResultsC() {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("Patients with Other test Results Part 1 Prep C");
+
+    definition.setQuery(
+        PrepCtQueries.getOtherTestResultsC(
+            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
+            hivMetadata.getDateOfHivTestWithNegativeResultsPrepUuidConcept().getConceptId()));
+
+    definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    definition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    definition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return definition;
+  }
+
   public CohortDefinition getkeypop() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patients who are Key population ");
@@ -974,7 +997,13 @@ public class PrepCtCohortQueries {
             getOtherTestResultsB2(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("A OR (B AND C)");
+    cd.addSearch(
+        "D",
+        EptsReportUtils.map(
+            getOtherTestResultsC(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("A OR (B AND (C OR D))");
 
     return cd;
   }

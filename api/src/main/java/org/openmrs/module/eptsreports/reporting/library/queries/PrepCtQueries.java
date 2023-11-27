@@ -625,6 +625,59 @@ public class PrepCtQueries {
   }
 
   /**
+   * <b>Description:</b> Other Test Results: Clients without “Data do teste HIV com resultado
+   * Negativo no Inicio da PrEP” registered on the “Ficha de Consulta Inicial PrEP” and that falls
+   * during the reporting Period.(D) valudatime < startDate
+   *
+   * @param prepIncialEncounterType
+   * @param dateOfHivTestWithNegativeResultsPrepConceptId
+   * @return
+   */
+  public static String getOtherTestResultsC(
+      int prepIncialEncounterType, int dateOfHivTestWithNegativeResultsPrepConceptId) {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("80", prepIncialEncounterType);
+    map.put("165293", dateOfHivTestWithNegativeResultsPrepConceptId);
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs ob "
+            + "               ON ob.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND ob.voided = 0 "
+            + "       AND ob.value_datetime IS NOT NULL "
+            + "       AND ob.value_datetime < :startDate "
+            + "       AND e.encounter_type = ${80} "
+            + "       AND e.location_id = :location "
+            + "       AND p.patient_id NOT IN (SELECT pa.patient_id "
+            + "                                FROM   patient pa "
+            + "                                       INNER JOIN encounter en "
+            + "                                               ON en.patient_id = pa.patient_id "
+            + "                                       INNER JOIN obs ob "
+            + "                                               ON "
+            + "                                       ob.encounter_id = en.encounter_id "
+            + "                                WHERE  pa.voided = 0 "
+            + "                                       AND en.voided = 0 "
+            + "                                       AND ob.voided = 0 "
+            + "                                       AND ob.concept_id = ${165293} "
+            + "                                       AND ob.value_datetime IS NOT NULL "
+            + "                                       AND en.location_id = :location "
+            + "                                       AND en.encounter_type = ${80} "
+            + "                                       AND en.encounter_datetime >= :startDate "
+            + "                                       AND en.encounter_datetime <= :endDate "
+            + "                                GROUP  BY pa.patient_id) "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    return stringSubstitutor.replace(query);
+  }
+
+  /**
    * <b>Description:</b> For clients with birth date information registered in the system the age of
    * the client will be calculated at the end date of the reporting period (reporting end date minus
    * birthdate / 365. Clients without birth date information should be considered in unknown age
