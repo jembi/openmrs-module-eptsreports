@@ -123,20 +123,6 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         getPatientsWhoLeftFollowupOnDAHByDuringMonth(),
         resumoMensalDAHDisaggregations.getColumnDisaggregations());
 
-    //INDICATOR 5
-    dd.addColumn(
-            "TOTALI5",
-            "Indicador 5 Utentes em DAH até o fim do mês",
-            getTotalOfPatientsWhoAreInFollowupDAHByTheEndOfMonth(),
-            "");
-
-    addRow(
-            dd,
-            "I5",
-            "Indicador 5 Utentes em DAH até o fim do mês",
-            getTotalOfPatientsWhoAreInFollowupDAHByTheEndOfMonth(),
-            resumoMensalDAHDisaggregations.getColumnDisaggregations());
-
     return dd;
   }
 
@@ -181,12 +167,5 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
             "Relatório – Indicador 4 – Saídas do seguimento de DAH",
             mapStraightThrough(
                 resumoMensalDAHCohortQueries.getPatientsWhoLeftFollowupOnDAHByDuringMonth())));
-  }
-  private Mapped<CohortIndicator> getTotalOfPatientsWhoAreInFollowupDAHByTheEndOfMonth() {
-    return mapStraightThrough(
-        eptsGeneralIndicator.getIndicator(
-            "Relatório- Indicador 5 Utentes em DAH até o fim do mês",
-            mapStraightThrough(
-                resumoMensalDAHCohortQueries.getTotalOfPatientsWhoAreInFollowupDAHByTheEndOfMonthComposition())));
   }
 }
