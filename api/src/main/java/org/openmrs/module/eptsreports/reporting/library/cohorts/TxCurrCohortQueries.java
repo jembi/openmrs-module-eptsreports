@@ -1393,6 +1393,7 @@ public class TxCurrCohortQueries {
             + "WHERE "
             + "    DATE(e.encounter_datetime) <= :onOrBefore "
             + "    AND e.voided = 0 "
+            + "    AND e.location_id = :location "
             + "    AND p.voided = 0 "
             + "    AND o.voided = 0 "
             + "    AND oo.voided = 0 "
