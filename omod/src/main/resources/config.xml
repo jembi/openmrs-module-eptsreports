@@ -3799,6 +3799,14 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.cragSoroLabsetUuid</property>
+		<defaultValue>23f463dd-a146-4097-ada9-a18ecc535f59</defaultValue>
+		<description>
+			UUID for CrAg Soro / LCR LABSET Concept
+		</description>
+	</globalProperty>
+
 
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 

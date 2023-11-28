@@ -336,7 +336,8 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "tbLamResults",
         mapStraightThrough(
-            getPatientsWithPositiveOrNegativeTBLAMResults(
+            getPatientsWithPositiveOrNegativeTestResults(
+                Collections.singletonList(tbMetadata.getTestTBLAM()),
                 Arrays.asList(hivMetadata.getPositive(), hivMetadata.getNegative()))));
 
     cd.setCompositionString("haveCd4Results AND tbLamResults");
@@ -368,10 +369,51 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "tbLamPositive",
         mapStraightThrough(
-            getPatientsWithPositiveOrNegativeTBLAMResults(
+            getPatientsWithPositiveOrNegativeTestResults(
+                Collections.singletonList(tbMetadata.getTestTBLAM()),
                 Collections.singletonList(hivMetadata.getPositive()))));
 
     cd.setCompositionString("tbLamResults AND tbLamPositive");
+    return cd;
+  }
+
+  /**
+   * <b> Relatório – Indicador 13 CD4 Baixo e Resultado de CrAg Sérico</b>
+   * <li>Incluindo todos os utentes com resultado de CD4 baixo durante o período compreendido entre
+   *     “Data Início” menos (-) 1 mês e “Data Fim” (seguindo os critérios definidos no Indicador 10
+   *     – RF16 com período diferente)
+   *
+   *     <p>Filtrando os utentes
+   * <li>que tiveram registo de "CrAg Soro” na secção B (Exames Laboratoriais à entrada e de
+   *     seguimento) da FDAH e “Data de CrAg Soro” ocorrida durante o período (>= “Data Início” e <=
+   *     “Data Fim”) e com resposta igual a “Pos”, “Neg” ou
+   * <li>que tiveram registo de "CrAg – Resultados Laboratoriais” (Coluna 16) na “Ficha Clínica” e
+   *     “Data de Consulta” ocorrida durante o período (>= “Data Início” e <= “Data Fim”) e com
+   *     resultado igual a “Positivo” ou “Negativo”.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithLowCd4AndCragResults() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Relatório – Indicador 13 CD4 Baixo e Resultado de CrAg Sérico");
+    cd.addParameters(getCohortParameters());
+
+    cd.addSearch(
+        "haveCd4Results",
+        map(
+            getPatientsWhoHaveCd4Results(),
+            "startDate=${startDate-1m},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "cragResults",
+        mapStraightThrough(
+            getPatientsWithPositiveOrNegativeTestResults(
+                Arrays.asList(
+                    hivMetadata.getCragSoroLabsetConcept(), hivMetadata.getCragSoroConcept()),
+                Arrays.asList(hivMetadata.getPositive(), hivMetadata.getNegative()))));
+
+    cd.setCompositionString("haveCd4Results AND cragResults");
     return cd;
   }
 
@@ -742,14 +784,18 @@ public class ResumoMensalDAHCohortQueries {
    *     Fim) e resultado igual a “Positivo” ou “Negativo”.
    *
    * @param resultConceptList List of result concepts to be checked
+   * @param examConceptList List of result exams to be checked
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsWithPositiveOrNegativeTBLAMResults(
-      List<Concept> resultConceptList) {
+  public CohortDefinition getPatientsWithPositiveOrNegativeTestResults(
+      List<Concept> examConceptList, List<Concept> resultConceptList) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Utentes que tiveram resultado de TBLAM");
     sqlCohortDefinition.addParameters(getCohortParameters());
+
+    List<Integer> examConceptIdsList =
+        examConceptList.stream().map(Concept::getConceptId).collect(Collectors.toList());
 
     List<Integer> resultConceptIdsList =
         resultConceptList.stream().map(Concept::getConceptId).collect(Collectors.toList());
@@ -760,7 +806,7 @@ public class ResumoMensalDAHCohortQueries {
     map.put(
         "90",
         String.valueOf(hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId()));
-    map.put("23951", String.valueOf(tbMetadata.getTestTBLAM().getConceptId()));
+    map.put("examConcept", StringUtils.join(examConceptIdsList, ","));
     map.put("resultConcept", StringUtils.join(resultConceptIdsList, ","));
 
     String query =
@@ -773,7 +819,7 @@ public class ResumoMensalDAHCohortQueries {
             + "  AND o.voided = 0 "
             + "  AND e.location_id = :location "
             + "  AND e.encounter_type IN (${90},${6}) "
-            + "  AND o.concept_id = ${23951} "
+            + "  AND o.concept_id IN ( ${examConcept} ) "
             + "  AND o.value_coded IN (${resultConcept}) "
             + "  AND ( "
             + "        ( o.obs_datetime >= :startDate "

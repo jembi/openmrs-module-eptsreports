@@ -5642,4 +5642,19 @@ public class HivMetadata extends ProgramsMetadata {
             .getGlobalProperty("eptsreports.exitDateFromArvTreatmentUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 165390</b>
+   *
+   * <p><b>Name:</b> CrAg Soro / LCR LABSET
+   *
+   * <p><b>Description: CrAg Soro / LCR LABSET Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCragSoroLabsetConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.cragSoroLabsetUuid");
+    return getConcept(uuid);
+  }
 }
