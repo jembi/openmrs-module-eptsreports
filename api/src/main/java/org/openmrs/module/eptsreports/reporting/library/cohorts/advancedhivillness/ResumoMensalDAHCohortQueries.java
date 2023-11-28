@@ -418,6 +418,40 @@ public class ResumoMensalDAHCohortQueries {
   }
 
   /**
+   * <b>Indicador 14 CD4 Baixo e Resultado de CrAg Sérico Positivo</b>
+   * <li>Incluindo todos os utentes do indicador 13 – RF19
+   *
+   *     <p>Filtrando os utentes
+   * <li>que tiveram registo de "CrAg Soro” registada na secção B (Exames Laboratoriais à entrada e
+   *     de seguimento) da FDAH e “Data de CrAg Soro” ocorrida durante o período (>= “Data Início” e
+   *     <= “Data Fim”) com resposta igual “Pos”, ou
+   * <li>que tiveram registo de "CrAg – Resultados Laboratoriais” (Coluna 16) na “Ficha Clínica” e
+   *     “Data de Consulta” ocorrida durante o período (>= “Data Início” e <= “Data Fim”) com
+   *     resultado igual a “Positivo”
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithLowCd4AndPositiveCragResults() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Indicador 14 CD4 Baixo e Resultado de CrAg Sérico Positivo");
+    cd.addParameters(getCohortParameters());
+
+    cd.addSearch("cragResults", mapStraightThrough(getPatientsWithLowCd4AndCragResults()));
+
+    cd.addSearch(
+        "cragPositive",
+        mapStraightThrough(
+            getPatientsWithPositiveOrNegativeTestResults(
+                Arrays.asList(
+                    hivMetadata.getCragSoroLabsetConcept(), hivMetadata.getCragSoroConcept()),
+                Collections.singletonList(hivMetadata.getPositive()))));
+
+    cd.setCompositionString("cragResults AND cragPositive");
+    return cd;
+  }
+
+  /**
    *
    * <li>Com registo de pelo menos um motivo (Óbito/ Abandono/ Transferido Para) e “Data de Saída de
    *     TARV na US” (secção J), na Ficha de DAH, ocorrida após a data mais recente da “Data de

@@ -235,6 +235,21 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         resumoMensalDAHDisaggregations.getColumnDisaggregations() // TO BE DEFINED
         );
 
+    // INDICATOR 14
+    dd.addColumn(
+        "TOTALI14",
+        "Indicador 14 CD4 Baixo e Resultado de CrAg Sérico Positivo",
+        getPatientsWithLowCd4AndPositiveCragResults(),
+        "");
+
+    addRow(
+        dd,
+        "I14",
+        "Indicador 14 CD4 Baixo e Resultado de CrAg Sérico Positivo",
+        getPatientsWithLowCd4AndPositiveCragResults(),
+        resumoMensalDAHDisaggregations.getColumnDisaggregations() // TO BE DEFINED
+        );
+
     return dd;
   }
 
@@ -342,5 +357,13 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
             "Relatório – Indicador 13 CD4 Baixo e Resultado de CrAg Sérico",
             mapStraightThrough(
                 resumoMensalDAHCohortQueries.getPatientsWithLowCd4AndCragResults())));
+  }
+
+  private Mapped<CohortIndicator> getPatientsWithLowCd4AndPositiveCragResults() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Relatório – Indicador 14 CD4 Baixo e Resultado de CrAg Sérico Positivo",
+            mapStraightThrough(
+                resumoMensalDAHCohortQueries.getPatientsWithLowCd4AndPositiveCragResults())));
   }
 }
