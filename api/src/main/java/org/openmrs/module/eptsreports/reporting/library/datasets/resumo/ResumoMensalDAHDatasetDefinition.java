@@ -162,25 +162,35 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         resumoMensalDAHDisaggregations.getColumnDisaggregations());
 
     // INDICATOR 8
-    dd.addColumn(
-        "TOTALI8", "Relatório- Indicador 8 – Pedido de CD4", getPatientsWhoHaveCd4Request(), "");
+    dd.addColumn("TOTALI8", "Indicador 8 – Pedido de CD4", getPatientsWhoHaveCd4Request(), "");
 
     addRow(
         dd,
         "I8",
-        "Relatório- Indicador 8 – Pedido de CD4",
+        "Indicador 8 – Pedido de CD4",
         getPatientsWhoHaveCd4Request(),
         resumoMensalDAHDisaggregations.getColumnDisaggregations()); // TO BE DEFINED
 
     // INDICATOR 9
-    dd.addColumn(
-        "TOTALI9", "Relatório- Indicador 9 – Resultado de CD4", getPatientsWhoHaveCd4Results(), "");
+    dd.addColumn("TOTALI9", "Indicador 9 – Resultado de CD4", getPatientsWhoHaveCd4Results(), "");
 
     addRow(
         dd,
         "I9",
-        "Relatório- Indicador 9 – Resultado de CD4",
+        "Indicador 9 – Resultado de CD4",
         getPatientsWhoHaveCd4Results(),
+        resumoMensalDAHDisaggregations.getColumnDisaggregations() // TO BE DEFINED
+        );
+
+    // INDICATOR 10
+    dd.addColumn(
+        "TOTALI10", "Indicador 10 - Resultado de CD4 baixo", getPatientsWithLowCd4Results(), "");
+
+    addRow(
+        dd,
+        "I10",
+        "Indicador 10 - Resultado de CD4 baixo",
+        getPatientsWithLowCd4Results(),
         resumoMensalDAHDisaggregations.getColumnDisaggregations() // TO BE DEFINED
         );
 
@@ -261,5 +271,12 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "Relatório- Indicador 9 – Resultado de CD4",
             mapStraightThrough(resumoMensalDAHCohortQueries.getPatientsWhoHaveCd4Results())));
+  }
+
+  private Mapped<CohortIndicator> getPatientsWithLowCd4Results() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Relatório – Indicador 10 Resultado de CD4 baixo",
+            mapStraightThrough(resumoMensalDAHCohortQueries.getPatientsWithLowCd4Results())));
   }
 }

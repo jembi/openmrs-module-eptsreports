@@ -1,6 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness;
 
 import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
 import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
@@ -8,6 +9,8 @@ import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.queries.resumo.ResumoMensalDAHQueries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -258,6 +261,39 @@ public class ResumoMensalDAHCohortQueries {
             "onOrAfter=${startDate},onOrBefore=${startDate-6m-1d},locationList=${location}"));
 
     cd.setCompositionString("onDAHDuringPeriod AND (diedAfterStartDah OR B8)");
+    return cd;
+  }
+
+  /**
+   * <b>Relatório – Indicador 10 Resultado de CD4 baixo</b>
+   *
+   * <p>Incluindo todos os utentes
+   * <li>que tiveram registo do “Resultado de CD4” secção B (Exames Laboratoriais à entrada e de
+   *     seguimento) na Ficha de DAH, com respectiva “Data de CD4” ocorrida durante o período (>=
+   *     “Data Início” e <= “Data Fim”) ou
+   * <li>com registo de "CD4 – Resultados Laboratoriais” (Coluna 16) na “Ficha Clínica” com “Data de
+   *     Consulta” ocorrida durante o período (>= “Data Início” e <= “Data Fim”)
+   *
+   *     <p>Filtrando os utentes com o respectivo “Resultado de CD4” (identificado nos critérios
+   *     acima definidos) de acordo com a seguinte definição:
+   * <li>< 750 para os utentes com idade < 1 ano
+   * <li>< 500 para os utentes com idade entre 1 a 4anos
+   * <li><200 para os utentes com idade >= 5 anos
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithLowCd4Results() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Relatório – Indicador 10 Resultado de CD4 baixo");
+    cd.addParameters(getCohortParameters());
+
+    cd.addSearch("haveCd4Results", mapStraightThrough(getPatientsWhoHaveCd4Results()));
+
+    cd.addSearch(
+        "cd4ByAgeAndResult", mapStraightThrough(getPatientsWithCD4BasedOnAgeAndCd4Results()));
+
+    cd.setCompositionString("haveCd4Results AND cd4ByAgeAndResult");
     return cd;
   }
 
@@ -566,30 +602,55 @@ public class ResumoMensalDAHCohortQueries {
             + "  AND e.voided = 0 "
             + "  AND o.voided = 0 "
             + "  AND e.location_id = :location "
-            + "  AND e.encounter_type = ${90} "
+            + "  AND e.encounter_type IN (${90}, ${6}) "
             + "  AND o.concept_id = ${1695} "
             + "  AND o.value_numeric IS NOT NULL "
-            + "  AND o.obs_datetime >= :startDate "
-            + "  AND o.obs_datetime <= :endDate "
-            + "GROUP BY p.patient_id "
-            + "UNION "
-            + "SELECT p.patient_id "
-            + "FROM "
-            + "    patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
-            + "WHERE p.voided = 0 "
-            + "  AND e.voided = 0 "
-            + "  AND o.voided = 0 "
-            + "  AND e.location_id = :location "
-            + "  AND e.encounter_type = ${6} "
-            + "  AND o.concept_id = ${1695} "
-            + "  AND o.value_numeric IS NOT NULL "
-            + "  AND e.encounter_datetime >= :startDate "
-            + "  AND e.encounter_datetime <= :endDate "
-            + "GROUP BY p.patient_id";
+            + " AND ( "
+            + "  ( o.obs_datetime >= :startDate "
+            + "  AND o.obs_datetime <= :endDate)"
+            + "OR "
+            + " ( e.encounter_datetime >= :startDate "
+            + "  AND e.encounter_datetime <= :endDate) "
+            + " ) "
+            + "GROUP BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(sb.replace(query));
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * Filtrando os utentes com o respectivo “Resultado de CD4” (identificado nos critérios acima
+   * definidos) de acordo com a seguinte definição:
+   * <li>< 750 para os utentes com idade < 1 ano
+   * <li>< 500 para os utentes com idade entre 1 a 4anos
+   * <li><200 para os utentes com idade >= 5 anos
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithCD4BasedOnAgeAndCd4Results() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        " “Resultado de CD4” (identificado nos critérios acima definidos) de acordo com a seguinte definição");
+    sqlCohortDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+
+    String query =
+        new EptsQueriesUtil()
+            .unionBuilder(ResumoMensalDAHQueries.getCd4ResultOverOrEqualTo5years(200))
+            .union(ResumoMensalDAHQueries.getCd4ResultBetweenOneAnd5years(500))
+            .union(ResumoMensalDAHQueries.getCd4ResultBellowOneYear(750))
+            .buildQuery();
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(substitutor.replace(query));
+
     return sqlCohortDefinition;
   }
 
