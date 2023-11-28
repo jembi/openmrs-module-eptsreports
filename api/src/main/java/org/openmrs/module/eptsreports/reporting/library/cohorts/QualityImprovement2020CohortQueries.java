@@ -8197,7 +8197,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch(
         "pregnantOnPeriod",
         EptsReportUtils.map(
-            getFirstPregnancyORBreastfeedingOnClinicalConsultation(
+            intensiveMonitoringCohortQueries.getFirstPregnancyORBreastfeedingOnClinicalConsultation(
                 commonMetadata.getPregnantConcept().getConceptId(),
                 hivMetadata.getYesConcept().getConceptId()),
             inclusionPeriodMappings));
