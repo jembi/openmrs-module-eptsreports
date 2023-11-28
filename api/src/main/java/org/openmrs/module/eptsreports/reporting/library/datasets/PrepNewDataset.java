@@ -56,6 +56,21 @@ public class PrepNewDataset extends BaseDataSet {
         EptsReportUtils.map(
             eptsCommonDimension.getPatientAgeBasedOnPrepStartDate(),
             "endDate=${endDate},location=${location}"));
+    dsd.addDimension(
+        "maternity",
+        EptsReportUtils.map(
+            eptsCommonDimension.getPregnantAndBreastfeedingPatientsBasedOnPrepNew(), mappings));
+
+    dsd.addColumn(
+        "ORAL",
+        "Oral",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Oral",
+                EptsReportUtils.map(
+                    prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
+            mappings),
+        "");
 
     dsd.addColumn(
         "TOTAL",
@@ -260,6 +275,12 @@ public class PrepNewDataset extends BaseDataSet {
     ColumnParameters msw = new ColumnParameters("msw", "Male sex workers", "KP=MSW", "25");
     ColumnParameters tg = new ColumnParameters("tg", "Transgender", "KP=TG", "26");
 
+    // Pregnant and Breastfeeding
+    ColumnParameters breastfeeding =
+        new ColumnParameters("breastfeeding", "Breastfeeding", "maternity=breastfeeding", "27");
+    ColumnParameters pregnant =
+        new ColumnParameters("pregnant", "Pregnant", "maternity=pregnant", "28");
+
     return Arrays.asList(
         fifteenTo19M,
         twentyTo24M,
@@ -286,6 +307,8 @@ public class PrepNewDataset extends BaseDataSet {
         csw,
         pri,
         msw,
-        tg);
+        tg,
+        breastfeeding,
+        pregnant);
   }
 }
