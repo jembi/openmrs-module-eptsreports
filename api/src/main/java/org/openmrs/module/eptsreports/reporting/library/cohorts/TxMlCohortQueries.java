@@ -403,7 +403,13 @@ public class TxMlCohortQueries {
             getPatientsWhoMissedNextAppointmentAndDiedDuringReportingPeriod(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("transferredOut AND NOT dead");
+    cd.addSearch(
+        "numerator",
+        EptsReportUtils.map(
+            getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("numerator AND (transferredOut AND NOT dead)");
     return cd;
   }
 
