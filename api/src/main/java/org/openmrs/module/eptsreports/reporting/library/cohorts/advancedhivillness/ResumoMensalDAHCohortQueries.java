@@ -537,6 +537,16 @@ public class ResumoMensalDAHCohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * <b>Relatório- Indicador 9 – Resultado de CD4</b>
+   * <li>que tiveram registo do “Resultado de CD4” secção B (Exames Laboratoriais à entrada e de
+   *     seguimento) na Ficha de DAH, com respectiva “Data de CD4” ocorrida durante o período (>=
+   *     “Data Início” e <= “Data Fim”) ou
+   * <li>com registo de "CD4 – Resultados Laboratoriais” (Coluna 16) na “Ficha Clínica” com “Data de
+   *     Consulta” ocorrida durante o período (>= “Data Início” e <= “Data Fim”)
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientsWhoHaveCd4Results() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Relatório- Indicador 9 – Resultado de CD4");
