@@ -219,6 +219,55 @@ public class ResumoMensalDAHCohortQueries {
   }
 
   /**
+   * <b>Relatório- Indicador 6 –Óbitos na Coorte de 6 meses</b>
+   * <li>
+   *     Com registo de “Data de Início no Modelo de DAH”, na Ficha de DAH, ocorrida
+   *     na coorte de 6 meses (“Data de Início no Modelo de DAH”>= “Data Início”
+   *     - 7 meses e <= “Data Início” – 6 meses – 1 dia)
+   * </li>
+   * <p>Filtrando todos os utentes</p>
+   * <li>
+   *     Com registo de “Data de Saída de TARV na US” >= “Data de Início no Modelo de DAH”
+   *     (>= “Data Início” - 7 meses e <= “Data Início” – 6 meses – 1 dia) e
+   *     <= “Data fim” e “Motivo de Saída” = “Óbito” ou
+   * </li>
+   * <li>
+   *     Com registo de óbito (Indicador B.8 do relatório Resumo Mensal de HIV/SIDA)
+   *     até a data fim do período
+   * </li>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoAreMarkedAsDeadDOnSixMonthsCohortComposition() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Relatório- Indicador 6 –Óbitos na Coorte de 6 meses");
+    cd.addParameters(getCohortParameters());
+
+    cd.addSearch(
+            "onDAHDuringPeriod",
+            map(
+                    listOfPatientsInAdvancedHivIllnessCohortQueries.getPatientsWhoStartedFollowupOnDAH(
+                            true),
+                    "startDate=${startDate-7m},endDate=${startDate-6m-1d},location=${location}"));
+
+    cd.addSearch(
+            "diedAfterStartDah",
+            map(
+                    getPatientsWhoAreMarkedAsDeadDOnSixMonthsCohortAndAfterFollowupDate(),
+                    "startDate=${startDate-7m},endDate=${startDate-6m-1d},reportEndDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+            "B8",
+            map(
+                    resumoMensalCohortQueries.getPatientsWhoDiedB8(true),
+                    "startDate=${startDate},endDate=${startDate-6m-1d},location=${location}"));
+
+    cd.setCompositionString("onDAHDuringPeriod AND (diedAfterStartDah OR B8)");
+    return cd;
+  }
+
+  /**
    *
    * <li>Com registo de pelo menos um motivo (Óbito/ Abandono/ Transferido Para) e “Data de Saída de
    *     TARV na US” (secção J), na Ficha de DAH, ocorrida após a data mais recente da “Data de
@@ -383,6 +432,68 @@ public class ResumoMensalDAHCohortQueries {
             + "    ) "
             + "  AND e.location_id = :location "
             + "GROUP BY p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(substitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <li>
+   *     Com registo de “Data de Saída de TARV na US” >= “Data de Início no Modelo de DAH”
+   *     (>= “Data Início” - 7 meses e <= “Data Início” – 6 meses – 1 dia) e <= “Data fim”
+   *     e “Motivo de Saída” = “Óbito”
+   * </li>
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoAreMarkedAsDeadDOnSixMonthsCohortAndAfterFollowupDate() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("reportEndDate", "reportEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    map.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
+    map.put("165386", hivMetadata.getExitDateFromArvTreatmentConcept().getConceptId());
+
+    String query =
+            "SELECT p.patient_id "
+                    + "FROM "
+                    + "    patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+                    + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
+                    + "              INNER JOIN ( "
+                    + "        SELECT p.patient_id, MAX(e.encounter_datetime) last_date "
+                    + "        FROM "
+                    + "            patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+                    + "                      INNER JOIN obs o on e.encounter_id = o.encounter_id "
+                    + "        WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+                    + "          AND e.encounter_type = ${90} "
+                    + "  AND e.encounter_datetime >= :startDate "
+                    + "  AND e.encounter_datetime <= :endDate "
+                    + "          AND e.location_id = :location "
+                    + "        GROUP BY p.patient_id "
+                    + "    ) last_dah ON last_dah.patient_id = p.patient_id "
+                    + "WHERE p.voided = 0 "
+                    + "  AND e.voided = 0 "
+                    + "  AND o.voided = 0 "
+                    + "  AND e.encounter_type = ${90} "
+                    + "  AND ( "
+                    + "        (o.concept_id = ${1708} "
+                    + "            AND o.value_coded = ${1366} "
+                    + "            AND o.obs_datetime >= last_dah.last_date "
+                    + "            AND o.obs_datetime <= :reportEndDate) "
+                    + "        OR  (o.concept_id = ${165386} "
+                    + "        AND o.value_datetime >= :last_dah.last_date "
+                    + "        AND o.value_datetime <= :reportEndDate) "
+                    + "    ) "
+                    + "  AND e.location_id = :location "
+                    + "GROUP BY p.patient_id";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
 
