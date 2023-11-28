@@ -4,6 +4,8 @@ import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map
 import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
 import org.openmrs.Location;
@@ -319,7 +321,7 @@ public class ResumoMensalDAHCohortQueries {
    * @see #getPatientsWhoHaveCd4Results
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsWithLowTBLAMResults() {
+  public CohortDefinition getPatientsWithTBLAMResults() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("Relatório – Indicador 11 Resultado TB LAM");
@@ -332,9 +334,44 @@ public class ResumoMensalDAHCohortQueries {
             "startDate=${startDate-1m},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        "tbLamResults", mapStraightThrough(getPatientsWithPositiveOrNegativeTBLAMResults()));
+        "tbLamResults",
+        mapStraightThrough(
+            getPatientsWithPositiveOrNegativeTBLAMResults(
+                Arrays.asList(hivMetadata.getPositive(), hivMetadata.getNegative()))));
 
     cd.setCompositionString("haveCd4Results AND tbLamResults");
+    return cd;
+  }
+
+  /**
+   * <b> Relatório – Indicador 12 Resultado de TB LAM Positivo</b>
+   * <li>Incluindo todos os utentes do indicador 11 – RF17
+   *
+   *     <p>Filtrando os utentes
+   * <li>que tiveram registo de "TB LAM urina” registada na secção B (Exames Laboratoriais à e
+   *     ntrada e de seguimento) da Ficha de DAH, com a respectiva “Data de TB LAM” ocorrida durante
+   *     o período (>= “Data Início” e <= “Data Fim”) e resposta igual a “Pos”, ou
+   * <li>que tiveram registo do "TB LAM – Resultados Laboratoriais” (Coluna 16) ”), na “Ficha
+   *     Clínica” com “Data de Consulta” ocorrida durante o período (>= “Data Início” e <= “Data
+   *     Fim) e resultado igual a “Positivo”.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithPositiveTBLAMResults() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Relatório – Indicador 12 Resultado de TB LAM Positivo");
+    cd.addParameters(getCohortParameters());
+
+    cd.addSearch("tbLamResults", mapStraightThrough(getPatientsWithTBLAMResults()));
+
+    cd.addSearch(
+        "tbLamPositive",
+        mapStraightThrough(
+            getPatientsWithPositiveOrNegativeTBLAMResults(
+                Collections.singletonList(hivMetadata.getPositive()))));
+
+    cd.setCompositionString("tbLamResults AND tbLamPositive");
     return cd;
   }
 
@@ -704,20 +741,27 @@ public class ResumoMensalDAHCohortQueries {
    *     Clínica” com “Data de Consulta” ocorrida durante o período (>= “Data Início” e <= “Data
    *     Fim) e resultado igual a “Positivo” ou “Negativo”.
    *
+   * @param resultConceptList List of result concepts to be checked
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsWithPositiveOrNegativeTBLAMResults() {
+  public CohortDefinition getPatientsWithPositiveOrNegativeTBLAMResults(
+      List<Concept> resultConceptList) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Utentes que tiveram resultado de TBLAM");
     sqlCohortDefinition.addParameters(getCohortParameters());
 
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
-    map.put("23951", tbMetadata.getTestTBLAM().getConceptId());
-    map.put("703", hivMetadata.getPositive().getConceptId());
-    map.put("664", hivMetadata.getNegative().getConceptId());
+    List<Integer> resultConceptIdsList =
+        resultConceptList.stream().map(Concept::getConceptId).collect(Collectors.toList());
+
+    Map<String, String> map = new HashMap<>();
+    map.put(
+        "6", String.valueOf(hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()));
+    map.put(
+        "90",
+        String.valueOf(hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId()));
+    map.put("23951", String.valueOf(tbMetadata.getTestTBLAM().getConceptId()));
+    map.put("resultConcept", StringUtils.join(resultConceptIdsList, ","));
 
     String query =
         "SELECT p.patient_id "
@@ -730,7 +774,7 @@ public class ResumoMensalDAHCohortQueries {
             + "  AND e.location_id = :location "
             + "  AND e.encounter_type IN (${90},${6}) "
             + "  AND o.concept_id = ${23951} "
-            + "  AND o.value_coded IN (${703},${664}) "
+            + "  AND o.value_coded IN (${resultConcept}) "
             + "  AND ( "
             + "        ( o.obs_datetime >= :startDate "
             + "            AND o.obs_datetime <= :endDate) "

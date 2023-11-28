@@ -205,6 +205,21 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         resumoMensalDAHDisaggregations.getColumnDisaggregations() // TO BE DEFINED
         );
 
+    // INDICATOR 12
+    dd.addColumn(
+        "TOTALI12",
+        "Indicador 12 Resultado de TB LAM Positivo",
+        getPatientsWithPositiveTBLAMResults(),
+        "");
+
+    addRow(
+        dd,
+        "I12",
+        "Indicador 12 Resultado de TB LAM Positivo",
+        getPatientsWithPositiveTBLAMResults(),
+        resumoMensalDAHDisaggregations.getColumnDisaggregations() // TO BE DEFINED
+        );
+
     return dd;
   }
 
@@ -295,6 +310,14 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
     return mapStraightThrough(
         eptsGeneralIndicator.getIndicator(
             "Relatório – Indicador 11 Resultado TB LAM",
-            mapStraightThrough(resumoMensalDAHCohortQueries.getPatientsWithLowTBLAMResults())));
+            mapStraightThrough(resumoMensalDAHCohortQueries.getPatientsWithTBLAMResults())));
+  }
+
+  private Mapped<CohortIndicator> getPatientsWithPositiveTBLAMResults() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Relatório – Indicador 12 Resultado de TB LAM Positivo",
+            mapStraightThrough(
+                resumoMensalDAHCohortQueries.getPatientsWithPositiveTBLAMResults())));
   }
 }
