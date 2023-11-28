@@ -508,9 +508,7 @@ public class ResumoMensalDAHCohortQueries {
   public CohortDefinition getPatientsWhoHaveCd4Request() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Relatório- Indicador 8 – Pedido de CD4");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+    sqlCohortDefinition.addParameters(getCohortParameters());
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -533,6 +531,52 @@ public class ResumoMensalDAHCohortQueries {
             + "       AND e.encounter_datetime >= :startDate "
             + "       AND e.encounter_datetime <= :endDate "
             + " GROUP BY p.patient_id ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+    return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getPatientsWhoHaveCd4Results() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Relatório- Indicador 9 – Resultado de CD4");
+    sqlCohortDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM "
+            + "    patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ${90} "
+            + "  AND o.concept_id = ${1695} "
+            + "  AND o.value_numeric IS NOT NULL "
+            + "  AND o.obs_datetime >= :startDate "
+            + "  AND o.obs_datetime <= :endDate "
+            + "GROUP BY p.patient_id "
+            + "UNION "
+            + "SELECT p.patient_id "
+            + "FROM "
+            + "    patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ${6} "
+            + "  AND o.concept_id = ${1695} "
+            + "  AND o.value_numeric IS NOT NULL "
+            + "  AND e.encounter_datetime >= :startDate "
+            + "  AND e.encounter_datetime <= :endDate "
+            + "GROUP BY p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(sb.replace(query));
