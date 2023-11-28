@@ -184,10 +184,8 @@ public class TxRttCohortQueries {
    * criterias below:
    *
    * <ul>
-   *   <li>At least one Ficha Clinica registered during the reporting period (Encounter Type 6 or 9,
-   *       and encounter_datetime>= startDate and <=endDate) OR
    *   <li>At least one Drugs Pick up registered in FILA during the reporting period (Encounter Type
-   *       ${}1}8, and encounter_datetime>= startDate and <=endDate) OR
+   *       18, and encounter_datetime>= startDate and <=endDate) OR
    *   <li>At least one Drugs Pick up registered in MasterCard-Recepção/Levantoy ARV, during the
    *       reporting period (Encounter Type 52, and “Levantou ARV”- concept ID 23865”= “Yes”
    *       (concept id 1065) and “Data de Levantamento” (concept Id 23866 value_datetime>= startDate
