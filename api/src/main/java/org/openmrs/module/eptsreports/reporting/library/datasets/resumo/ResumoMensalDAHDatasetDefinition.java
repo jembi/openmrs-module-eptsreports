@@ -161,6 +161,17 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         getPatientsWhoAreNewOnArtOnSixMonthsCohort(),
         resumoMensalDAHDisaggregations.getColumnDisaggregations());
 
+    // INDICATOR 8
+    dd.addColumn(
+        "TOTALI8", "Relatório- Indicador 8 – Pedido de CD4", getPatientsWhoHaveCd4Request(), "");
+
+    addRow(
+        dd,
+        "I8",
+        "Relatório- Indicador 8 – Pedido de CD4",
+        getPatientsWhoHaveCd4Request(),
+        resumoMensalDAHDisaggregations.getColumnDisaggregations()); // TO BE DEFINED
+
     return dd;
   }
 
@@ -224,5 +235,12 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
                 listOfPatientsInAdvancedHivIllnessCohortQueries.getPatientsWhoStartedFollowupOnDAH(
                     true),
                 "startDate=${startDate-7m},endDate=${startDate-6m-1d},location=${location}")));
+  }
+
+  private Mapped<CohortIndicator> getPatientsWhoHaveCd4Request() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Relatório- Indicador 8 – Pedido de CD4",
+            mapStraightThrough(resumoMensalDAHCohortQueries.getPatientsWhoHaveCd4Request())));
   }
 }

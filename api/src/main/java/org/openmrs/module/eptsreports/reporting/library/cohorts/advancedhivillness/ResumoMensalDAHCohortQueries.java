@@ -497,6 +497,48 @@ public class ResumoMensalDAHCohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * <b>Relatório- Indicador 8 – Pedido de CD4</b>
+   * <li>Incluindo todos os utentesque tiveram registo de "CD4 – Pedido” (Coluna 15) na “Ficha
+   *     Clínica” com “Data de Consulta” ocorrida durante o período (>= “Data Início” e <= “Data
+   *     Fim”)
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoHaveCd4Request() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Relatório- Indicador 8 – Pedido de CD4");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0"
+            + "       AND e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${23722} "
+            + "       AND o.value_coded = ${1695} "
+            + "       AND e.encounter_datetime >= :startDate "
+            + "       AND e.encounter_datetime <= :endDate "
+            + " GROUP BY p.patient_id ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+    return sqlCohortDefinition;
+  }
+
   private List<Parameter> getCohortParameters() {
     return Arrays.asList(
         ReportingConstants.START_DATE_PARAMETER,
