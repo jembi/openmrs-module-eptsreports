@@ -3,6 +3,7 @@ package org.openmrs.module.eptsreports.reporting.library.datasets.resumo;
 import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
 import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
+import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ResumoMensalDAHCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.BaseDataSet;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
@@ -24,6 +25,8 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
   private final EptsCommonDimension eptsCommonDimension;
   private final ResumoMensalDAHCohortQueries resumoMensalDAHCohortQueries;
   private final ResumoMensalDAHDisaggregations resumoMensalDAHDisaggregations;
+  private final ListOfPatientsInAdvancedHivIllnessCohortQueries
+      listOfPatientsInAdvancedHivIllnessCohortQueries;
 
   @Autowired
   @Qualifier("commonAgeDimensionCohort")
@@ -34,11 +37,15 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
       EptsGeneralIndicator eptsGeneralIndicator,
       EptsCommonDimension eptsCommonDimension,
       ResumoMensalDAHCohortQueries resumoMensalDAHCohortQueries,
-      ResumoMensalDAHDisaggregations resumoMensalDAHDisaggregations) {
+      ResumoMensalDAHDisaggregations resumoMensalDAHDisaggregations,
+      ListOfPatientsInAdvancedHivIllnessCohortQueries
+          listOfPatientsInAdvancedHivIllnessCohortQueries) {
     this.eptsGeneralIndicator = eptsGeneralIndicator;
     this.eptsCommonDimension = eptsCommonDimension;
     this.resumoMensalDAHCohortQueries = resumoMensalDAHCohortQueries;
     this.resumoMensalDAHDisaggregations = resumoMensalDAHDisaggregations;
+    this.listOfPatientsInAdvancedHivIllnessCohortQueries =
+        listOfPatientsInAdvancedHivIllnessCohortQueries;
   }
 
   public DataSetDefinition constructResumoMensalDAHDataset() {
@@ -123,22 +130,36 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         getPatientsWhoLeftFollowupOnDAHByDuringMonth(),
         resumoMensalDAHDisaggregations.getColumnDisaggregations());
 
-    //INDICATOR 5 IS A DISAGREGATIONCALCULATION
+    // INDICATOR 5 IS A DISAGREGATIONCALCULATION
     // PERFORMED DIRECTLY ON THE TEMPLATE
 
-    //INDICATOR 6
+    // INDICATOR 6
     dd.addColumn(
-            "TOTALI6",
-            "Indicador 6 –Óbitos na Coorte de 6 meses",
-            getPatientsWhoAreMarkedAsDeadDOnSixMonthsCohort(),
-            "");
+        "TOTALI6",
+        "Indicador 6 –Óbitos na Coorte de 6 meses",
+        getPatientsWhoAreMarkedAsDeadDOnSixMonthsCohort(),
+        "");
 
     addRow(
-            dd,
-            "I6",
-            "Indicador 6 –Óbitos na Coorte de 6 meses",
-            getPatientsWhoAreMarkedAsDeadDOnSixMonthsCohort(),
-            resumoMensalDAHDisaggregations.getColumnDisaggregations());
+        dd,
+        "I6",
+        "Indicador 6 –Óbitos na Coorte de 6 meses",
+        getPatientsWhoAreMarkedAsDeadDOnSixMonthsCohort(),
+        resumoMensalDAHDisaggregations.getColumnDisaggregations());
+
+    // INDICATOR 7
+    dd.addColumn(
+        "TOTALI7",
+        "Indicador 7 - Novos Inscritos DAH na coorte de 6 meses",
+        getPatientsWhoAreNewOnArtOnSixMonthsCohort(),
+        "");
+
+    addRow(
+        dd,
+        "I7",
+        "Indicador 7 - Novos Inscritos DAH na coorte de 6 meses",
+        getPatientsWhoAreNewOnArtOnSixMonthsCohort(),
+        resumoMensalDAHDisaggregations.getColumnDisaggregations());
 
     return dd;
   }
@@ -191,6 +212,17 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "Relatório- Indicador 6 –Óbitos na Coorte de 6 meses",
             mapStraightThrough(
-                resumoMensalDAHCohortQueries.getPatientsWhoAreMarkedAsDeadDOnSixMonthsCohortComposition())));
+                resumoMensalDAHCohortQueries
+                    .getPatientsWhoAreMarkedAsDeadDOnSixMonthsCohortComposition())));
+  }
+
+  private Mapped<CohortIndicator> getPatientsWhoAreNewOnArtOnSixMonthsCohort() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Relatório- Indicador 7 - Novos Inscritos DAH na coorte de 6 meses",
+            map(
+                listOfPatientsInAdvancedHivIllnessCohortQueries.getPatientsWhoStartedFollowupOnDAH(
+                    true),
+                "startDate=${startDate-7m},endDate=${startDate-6m-1d},location=${location}")));
   }
 }
