@@ -5657,4 +5657,19 @@ public class HivMetadata extends ProgramsMetadata {
         Context.getAdministrationService().getGlobalProperty("eptsreports.cragSoroLabsetUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 165393</b>
+   *
+   * <p><b>Name:</b> TREATMENT START DATE
+   *
+   * <p><b>Description: TREATMENT START DATE Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getTreatmentStartDateConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.treatmentStartDateUuid");
+    return getConcept(uuid);
+  }
 }

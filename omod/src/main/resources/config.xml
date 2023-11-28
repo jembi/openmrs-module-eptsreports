@@ -3807,6 +3807,14 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.treatmentStartDateUuid</property>
+		<defaultValue>5bdef973-bc81-491a-826f-bbb4f26785bc</defaultValue>
+		<description>
+			UUID for TREATMENT START DATE Concept
+		</description>
+	</globalProperty>
+
 
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 

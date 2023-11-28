@@ -478,6 +478,29 @@ public class ResumoMensalDAHCohortQueries {
   }
 
   /**
+   * <b>Relatório – Indicador 16 CrAg sérico positivo e início de MCC Preventivo</b>
+   * <li>Incluindo todos os utentes do indicador 14 – RF18
+   * <li>Filtrando os utentes que tiveram registo de “Tratamento Preventivo de MCC” na secção D
+   *     (Tratamento Preventivo da Meningite Criptocócica) da Ficha de DAH com “Data Início de
+   *     Indução” ocorrida durante o período (>= “Data Início” e <= “Data Fim)
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithPositiveCragResultsAndStartedMcc() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Indicador 16 CrAg sérico positivo e início de MCC Preventivo");
+    cd.addParameters(getCohortParameters());
+
+    cd.addSearch("cragPositive", mapStraightThrough(getPatientsWithLowCd4AndPositiveCragResults()));
+
+    cd.addSearch("mccPreventivo", mapStraightThrough(getPatientsWhoStartedMccPreventivo()));
+
+    cd.setCompositionString("cragPositive AND mccPreventivo");
+    return cd;
+  }
+
+  /**
    *
    * <li>Com registo de pelo menos um motivo (Óbito/ Abandono/ Transferido Para) e “Data de Saída de
    *     TARV na US” (secção J), na Ficha de DAH, ocorrida após a data mais recente da “Data de
@@ -931,6 +954,46 @@ public class ResumoMensalDAHCohortQueries {
             + "  AND o.value_coded IN (${703},${664}) "
             + "  AND o.obs_datetime >= :startDate "
             + "  AND o.obs_datetime <= :endDate "
+            + "GROUP BY p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(substitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   *
+   * <li>Filtrando os utentes que tiveram registo de “Tratamento Preventivo de MCC” na secção D
+   *     (Tratamento Preventivo da Meningite Criptocócica) da Ficha de DAH com “Data Início de
+   *     Indução” ocorrida durante o período (>= “Data Início” e <= “Data Fim)
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoStartedMccPreventivo() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes que Iniciaram MCC Preventivo");
+    sqlCohortDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    map.put("165393", hivMetadata.getTreatmentStartDateConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM "
+            + "    patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ${90} "
+            + "  AND o.concept_id = ${165393} "
+            + "  AND o.value_datetime >= :startDate "
+            + "  AND o.value_datetime <= :endDate "
             + "GROUP BY p.patient_id";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
