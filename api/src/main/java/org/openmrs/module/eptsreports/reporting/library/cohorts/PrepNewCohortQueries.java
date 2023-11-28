@@ -20,10 +20,16 @@ public class PrepNewCohortQueries {
 
   private CommonMetadata commonMetadata;
 
+  private GenericCohortQueries genericCohortQueries;
+
   @Autowired
-  public PrepNewCohortQueries(HivMetadata hivMetadata, CommonMetadata commonMetadata) {
+  public PrepNewCohortQueries(
+      HivMetadata hivMetadata,
+      CommonMetadata commonMetadata,
+      GenericCohortQueries genericCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
+    this.genericCohortQueries = genericCohortQueries;
   }
 
   public CohortDefinition getClientsWhoNewlyInitiatedPrep() {
@@ -44,7 +50,13 @@ public class PrepNewCohortQueries {
         EptsReportUtils.map(
             getClientsWhoAreTransferredIn(), "endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("A AND NOT B");
+    cd.addSearch(
+        "C",
+        EptsReportUtils.map(
+            genericCohortQueries.getPatientAgeBasedOnPrepStartDate(15, 200),
+            "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("(A AND C) AND NOT B");
 
     return cd;
   }
