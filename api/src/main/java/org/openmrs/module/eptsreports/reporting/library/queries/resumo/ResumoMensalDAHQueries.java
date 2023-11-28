@@ -3,7 +3,6 @@ package org.openmrs.module.eptsreports.reporting.library.queries.resumo;
 public class ResumoMensalDAHQueries {
 
   /**
-   *
    * @param valueNumeric Amount of Cd4 for each range of age
    * @return {@link String}
    */
@@ -34,7 +33,6 @@ public class ResumoMensalDAHQueries {
   }
 
   /**
-   *
    * @param valueNumeric Amount of Cd4 for each range of age
    * @return {@link String}
    */
@@ -66,7 +64,6 @@ public class ResumoMensalDAHQueries {
   }
 
   /**
-   *
    * @param valueNumeric Amount of Cd4 for each range of age
    * @return {@link String}
    */

@@ -194,6 +194,17 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         resumoMensalDAHDisaggregations.getColumnDisaggregations() // TO BE DEFINED
         );
 
+    // INDICATOR 11
+    dd.addColumn("TOTALI11", "Indicador 11 Resultado TB LAM", getPatientsWithLowTBLAMResults(), "");
+
+    addRow(
+        dd,
+        "I11",
+        "Indicador 11 Resultado TB LAM",
+        getPatientsWithLowTBLAMResults(),
+        resumoMensalDAHDisaggregations.getColumnDisaggregations() // TO BE DEFINED
+        );
+
     return dd;
   }
 
@@ -278,5 +289,12 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "Relatório – Indicador 10 Resultado de CD4 baixo",
             mapStraightThrough(resumoMensalDAHCohortQueries.getPatientsWithLowCd4Results())));
+  }
+
+  private Mapped<CohortIndicator> getPatientsWithLowTBLAMResults() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Relatório – Indicador 11 Resultado TB LAM",
+            mapStraightThrough(resumoMensalDAHCohortQueries.getPatientsWithLowTBLAMResults())));
   }
 }

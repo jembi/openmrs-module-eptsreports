@@ -8,6 +8,7 @@ import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.resumo.ResumoMensalDAHQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
@@ -26,6 +27,8 @@ public class ResumoMensalDAHCohortQueries {
       listOfPatientsInAdvancedHivIllnessCohortQueries;
   private final HivMetadata hivMetadata;
 
+  private final TbMetadata tbMetadata;
+
   private final ResumoMensalCohortQueries resumoMensalCohortQueries;
 
   @Autowired
@@ -33,10 +36,12 @@ public class ResumoMensalDAHCohortQueries {
       ListOfPatientsInAdvancedHivIllnessCohortQueries
           listOfPatientsInAdvancedHivIllnessCohortQueries,
       HivMetadata hivMetadata,
+      TbMetadata tbMetadata,
       ResumoMensalCohortQueries resumoMensalCohortQueries) {
     this.listOfPatientsInAdvancedHivIllnessCohortQueries =
         listOfPatientsInAdvancedHivIllnessCohortQueries;
     this.hivMetadata = hivMetadata;
+    this.tbMetadata = tbMetadata;
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
   }
 
@@ -294,6 +299,42 @@ public class ResumoMensalDAHCohortQueries {
         "cd4ByAgeAndResult", mapStraightThrough(getPatientsWithCD4BasedOnAgeAndCd4Results()));
 
     cd.setCompositionString("haveCd4Results AND cd4ByAgeAndResult");
+    return cd;
+  }
+
+  /**
+   * <b>Relatório – Indicador 11 Resultado TB LAM</b>
+   * <li>Incluindo todos os utentes com resultado de CD4 baixo durante o período compreendido entre
+   *     “Data Início” menos (-) 1 mês e “Data Fim” (seguindo os critérios definidos no Indicador 10
+   *     – RF16 com período diferente)
+   *
+   *     <p>Filtrando todos os utentes
+   * <li>que tiveram registo de "TB LAM urina” registada na secção B (Exames Laboratoriais à e
+   *     ntrada e de seguimento) da Ficha de DAH, com a respectiva “Data de TB LAM” ocorrida durante
+   *     o período (>= “Data Início” e <= “Data Fim”) e resposta igual a “Pos” ou “Neg”, ou
+   * <li>que tiveram registo do "TB LAM – Resultados Laboratoriais” (Coluna 16) ”), na “Ficha
+   *     Clínica” com “Data de Consulta” ocorrida durante o período (>= “Data Início” e <= “Data
+   *     Fim) e resultado igual a “Positivo” ou “Negativo”.
+   *
+   * @see #getPatientsWhoHaveCd4Results
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithLowTBLAMResults() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Relatório – Indicador 11 Resultado TB LAM");
+    cd.addParameters(getCohortParameters());
+
+    cd.addSearch(
+        "haveCd4Results",
+        map(
+            getPatientsWhoHaveCd4Results(),
+            "startDate=${startDate-1m},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "tbLamResults", mapStraightThrough(getPatientsWithPositiveOrNegativeTBLAMResults()));
+
+    cd.setCompositionString("haveCd4Results AND tbLamResults");
     return cd;
   }
 
@@ -646,6 +687,58 @@ public class ResumoMensalDAHCohortQueries {
             .union(ResumoMensalDAHQueries.getCd4ResultBetweenOneAnd5years(500))
             .union(ResumoMensalDAHQueries.getCd4ResultBellowOneYear(750))
             .buildQuery();
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(substitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * Filtrando todos os utentes
+   * <li>que tiveram registo de "TB LAM urina” registada na secção B (Exames Laboratoriais à e
+   *     ntrada e de seguimento) da Ficha de DAH, com a respectiva “Data de TB LAM” ocorrida durante
+   *     o período (>= “Data Início” e <= “Data Fim”) e resposta igual a “Pos” ou “Neg”, ou
+   * <li>que tiveram registo do "TB LAM – Resultados Laboratoriais” (Coluna 16) ”), na “Ficha
+   *     Clínica” com “Data de Consulta” ocorrida durante o período (>= “Data Início” e <= “Data
+   *     Fim) e resultado igual a “Positivo” ou “Negativo”.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithPositiveOrNegativeTBLAMResults() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes que tiveram resultado de TBLAM");
+    sqlCohortDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    map.put("23951", tbMetadata.getTestTBLAM().getConceptId());
+    map.put("703", hivMetadata.getPositive().getConceptId());
+    map.put("664", hivMetadata.getNegative().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM "
+            + "    patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type IN (${90},${6}) "
+            + "  AND o.concept_id = ${23951} "
+            + "  AND o.value_coded IN (${703},${664}) "
+            + "  AND ( "
+            + "        ( o.obs_datetime >= :startDate "
+            + "            AND o.obs_datetime <= :endDate) "
+            + "        OR "
+            + "        ( e.encounter_datetime >= :startDate "
+            + "            AND e.encounter_datetime <= :endDate) "
+            + "    ) "
+            + "GROUP BY p.patient_id";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
 
