@@ -452,6 +452,32 @@ public class ResumoMensalDAHCohortQueries {
   }
 
   /**
+   * <b>Indicador 15 Utentes CrAg sérico Positivo e registo de CrAg no LCR</b>
+   * <li>Incluindo todos os utentes do indicador 14 – RF20
+   *
+   *     <p>Filtrando os utentes
+   * <li>que tiveram registo de "CrAg LCR” registada na secção B (Exames Laboratoriais à entrada e
+   *     de seguimento) da FDAH e “Data de CrAg LCR” ocorrida durante o período (>= “Data Início” e
+   *     <= “Data Fim”) e assinalado com resultado = “Pos” ou “Neg”.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithPositiveOrNegativeOnCragLCRResults() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Indicador 15 Utentes CrAg sérico Positivo e registo de CrAg no LCR");
+    cd.addParameters(getCohortParameters());
+
+    cd.addSearch("cragPositive", mapStraightThrough(getPatientsWithLowCd4AndPositiveCragResults()));
+
+    cd.addSearch(
+        "cragResults", mapStraightThrough(getPatientsWithPositiveOrNegativeCragLCRResults()));
+
+    cd.setCompositionString("cragPositive AND cragPositive");
+    return cd;
+  }
+
+  /**
    *
    * <li>Com registo de pelo menos um motivo (Óbito/ Abandono/ Transferido Para) e “Data de Saída de
    *     TARV na US” (secção J), na Ficha de DAH, ocorrida após a data mais recente da “Data de
@@ -862,6 +888,49 @@ public class ResumoMensalDAHCohortQueries {
             + "        ( e.encounter_datetime >= :startDate "
             + "            AND e.encounter_datetime <= :endDate) "
             + "    ) "
+            + "GROUP BY p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(substitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   *
+   * <li>Utentes que tiveram registo de "CrAg LCR” registada na secção B (Exames Laboratoriais à
+   *     entrada e de seguimento) da FDAH e “Data de CrAg LCR” ocorrida durante o período (>= “Data
+   *     Início” e <= “Data Fim”) e assinalado com resultado = “Pos” ou “Neg”.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithPositiveOrNegativeCragLCRResults() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes que tiveram resultado de Crag no LCR");
+    sqlCohortDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    map.put("165362", hivMetadata.getCragLCRConcept().getConceptId());
+    map.put("703", hivMetadata.getPositive().getConceptId());
+    map.put("664", hivMetadata.getNegative().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM "
+            + "    patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ${90} "
+            + "  AND o.concept_id = ${165362} "
+            + "  AND o.value_coded IN (${703},${664}) "
+            + "  AND o.obs_datetime >= :startDate "
+            + "  AND o.obs_datetime <= :endDate "
             + "GROUP BY p.patient_id";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
