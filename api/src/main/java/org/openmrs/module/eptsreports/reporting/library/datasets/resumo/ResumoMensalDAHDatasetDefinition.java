@@ -280,6 +280,21 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         resumoMensalDAHDisaggregations.getColumnDisaggregations() // TO BE DEFINED
         );
 
+    // INDICATOR 17
+    dd.addColumn(
+        "TOTALI17",
+        "Indicador 17 CrAg LCR positivo e início de MCC",
+        getPatientsWithPositiveCragLcrResultsAndStartedMcc(),
+        "");
+
+    addRow(
+        dd,
+        "I17",
+        "Indicador 17 CrAg LCR positivo e início de MCC",
+        getPatientsWithPositiveCragLcrResultsAndStartedMcc(),
+        resumoMensalDAHDisaggregations.getColumnDisaggregations() // TO BE DEFINED
+        );
+
     return dd;
   }
 
@@ -411,5 +426,14 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
             "Relatório – Indicador 16 CrAg sérico positivo e início de MCC Preventivo",
             mapStraightThrough(
                 resumoMensalDAHCohortQueries.getPatientsWithPositiveCragResultsAndStartedMcc())));
+  }
+
+  private Mapped<CohortIndicator> getPatientsWithPositiveCragLcrResultsAndStartedMcc() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Relatório – Indicador 17 CrAg LCR positivo e início de MCC",
+            mapStraightThrough(
+                resumoMensalDAHCohortQueries
+                    .getPatientsWithPositiveCragLcrResultsAndStartedMcc())));
   }
 }

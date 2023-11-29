@@ -471,7 +471,10 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch("cragPositive", mapStraightThrough(getPatientsWithLowCd4AndPositiveCragResults()));
 
     cd.addSearch(
-        "cragResults", mapStraightThrough(getPatientsWithPositiveOrNegativeCragLCRResults()));
+        "cragResults",
+        mapStraightThrough(
+            getPatientsWithPositiveOrNegativeCragLCRResults(
+                Arrays.asList(hivMetadata.getPositive(), hivMetadata.getNegative()))));
 
     cd.setCompositionString("cragPositive AND cragPositive");
     return cd;
@@ -497,6 +500,38 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch("mccPreventivo", mapStraightThrough(getPatientsWhoStartedMccPreventivo()));
 
     cd.setCompositionString("cragPositive AND mccPreventivo");
+    return cd;
+  }
+
+  /**
+   * <b>Relatório – Indicador 17 CrAg LCR positivo e início de MCC</b>
+   * <li>Incluindo todos os utentes do indicador 14 – RF20
+   * <li>Filtrando os utentes que tiveram registo de "CrAg LCR” registada na secção B (Exames
+   *     Laboratoriais à entrada e de seguimento) da FDAH e “Data de CrAg LCR” ocorrida durante o
+   *     período (>= “Data Início” e <= “Data Fim”) e assinalado com resultado = “Pos”.
+   * <li>Filtrando os utentes que tiveram registo de “Tratamento de MCC” na secção C (Tratamento da
+   *     Meningite Criptocócica) da Ficha de DAH com a “Data de Anfotericina lipossômica (Dose
+   *     Única)” ocorrida durante o período (>= “Data Início” e <= “Data Fim)
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithPositiveCragLcrResultsAndStartedMcc() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Indicador 17 CrAg LCR positivo e início de MCC");
+    cd.addParameters(getCohortParameters());
+
+    cd.addSearch("cragPositive", mapStraightThrough(getPatientsWithLowCd4AndPositiveCragResults()));
+
+    cd.addSearch(
+        "cragLCRPositive",
+        mapStraightThrough(
+            getPatientsWithPositiveOrNegativeCragLCRResults(
+                Collections.singletonList(hivMetadata.getPositive()))));
+
+    cd.addSearch("mmcTreatment", mapStraightThrough(getPatientsInMccTretament()));
+
+    cd.setCompositionString("cragPositive AND cragLCRPositive AND mmcTreatment");
     return cd;
   }
 
@@ -928,17 +963,21 @@ public class ResumoMensalDAHCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsWithPositiveOrNegativeCragLCRResults() {
+  public CohortDefinition getPatientsWithPositiveOrNegativeCragLCRResults(
+      List<Concept> resultConceptList) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Utentes que tiveram resultado de Crag no LCR");
     sqlCohortDefinition.addParameters(getCohortParameters());
 
-    Map<String, Integer> map = new HashMap<>();
-    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
-    map.put("165362", hivMetadata.getCragLCRConcept().getConceptId());
-    map.put("703", hivMetadata.getPositive().getConceptId());
-    map.put("664", hivMetadata.getNegative().getConceptId());
+    List<Integer> resultConceptIdsList =
+        resultConceptList.stream().map(Concept::getConceptId).collect(Collectors.toList());
+    Map<String, String> map = new HashMap<>();
+    map.put(
+        "90",
+        String.valueOf(hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId()));
+    map.put("165362", String.valueOf(hivMetadata.getCragLCRConcept().getConceptId()));
+    map.put("resultConcept", StringUtils.join(resultConceptIdsList, ","));
 
     String query =
         "SELECT p.patient_id "
@@ -951,7 +990,7 @@ public class ResumoMensalDAHCohortQueries {
             + "  AND e.location_id = :location "
             + "  AND e.encounter_type = ${90} "
             + "  AND o.concept_id = ${165362} "
-            + "  AND o.value_coded IN (${703},${664}) "
+            + "  AND o.value_coded IN (${resultConcept}) "
             + "  AND o.obs_datetime >= :startDate "
             + "  AND o.obs_datetime <= :endDate "
             + "GROUP BY p.patient_id";
@@ -992,6 +1031,46 @@ public class ResumoMensalDAHCohortQueries {
             + "  AND e.location_id = :location "
             + "  AND e.encounter_type = ${90} "
             + "  AND o.concept_id = ${165393} "
+            + "  AND o.value_datetime >= :startDate "
+            + "  AND o.value_datetime <= :endDate "
+            + "GROUP BY p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(substitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   *
+   * <li>Filtrando os utentes que tiveram registo de “Tratamento de MCC” na secção C (Tratamento da
+   *     Meningite Criptocócica) da Ficha de DAH com a “Data de Anfotericina lipossômica (Dose
+   *     Única)” ocorrida durante o período (>= “Data Início” e <= “Data Fim)
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsInMccTretament() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes em Tratamento de MCC");
+    sqlCohortDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    map.put("165363", hivMetadata.getInducaoAnfotericinaLipossomicaConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM "
+            + "    patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ${90} "
+            + "  AND o.concept_id = ${165363} "
             + "  AND o.value_datetime >= :startDate "
             + "  AND o.value_datetime <= :endDate "
             + "GROUP BY p.patient_id";

@@ -3815,6 +3815,14 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.inducaoAnfotericinaLipossomicaUuid</property>
+		<defaultValue>6d9940a0-4ec4-4a8c-84cb-55ba8b60dd78</defaultValue>
+		<description>
+			UUID for INDUÇÃO ANFOTERICINA LIPOSSÔMICA Concept
+		</description>
+	</globalProperty>
+
 
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 

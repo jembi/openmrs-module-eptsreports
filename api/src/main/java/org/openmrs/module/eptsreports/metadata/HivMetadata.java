@@ -5672,4 +5672,19 @@ public class HivMetadata extends ProgramsMetadata {
         Context.getAdministrationService().getGlobalProperty("eptsreports.treatmentStartDateUuid");
     return getConcept(uuid);
   }
+  /**
+   * <b>concept_id = 165363</b>
+   *
+   * <p><b>Name:</b> INDUÇÃO ANFOTERICINA LIPOSSÔMICA
+   *
+   * <p><b>Description: INDUÇÃO ANFOTERICINA LIPOSSÔMICA Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getInducaoAnfotericinaLipossomicaConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.inducaoAnfotericinaLipossomicaUuid");
+    return getConcept(uuid);
+  }
 }
