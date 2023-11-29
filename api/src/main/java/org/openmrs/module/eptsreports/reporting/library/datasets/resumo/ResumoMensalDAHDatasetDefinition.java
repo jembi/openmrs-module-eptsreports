@@ -65,6 +65,10 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
             eptsCommonDimension.getArtStatusDimension(),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
+    dd.addDimension(
+            "maternity",
+            map(eptsCommonDimension.maternityDimension(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
     // INDICATOR 0
     dd.addColumn(
         "TOTALI0",
