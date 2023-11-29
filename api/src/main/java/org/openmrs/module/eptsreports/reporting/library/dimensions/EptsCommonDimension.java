@@ -78,24 +78,26 @@ public class EptsCommonDimension {
 
   @Autowired
   public EptsCommonDimension(
-          GenderCohortQueries genderCohortQueries,
-          TxNewCohortQueries txNewCohortQueries,
-          GenericCohortQueries genericCohortQueries,
-          Eri4MonthsCohortQueries eri4MonthsCohortQueries,
-          Eri2MonthsCohortQueries eri2MonthsCohortQueries,
-          EriCohortQueries eriCohortQueries,
-          TbPrevCohortQueries tbPrevCohortQueries,
-          HivCohortQueries hivCohortQueries,
-          TxPvlsCohortQueries txPvlsQueries,
-          TxCurrCohortQueries txCurrCohortQueries,
-          EriDSDCohortQueries eriDSDCohortQueries,
-          MISAUKeyPopsCohortQueries misauKeyPopsCohortQueries,
-          PrepCtCohortQueries prepCtCohortQueries,
-          TbPrevQueries tbPrevQueries,
-          HivMetadata hivMetadata,
-          CommonMetadata commonMetadata,
-          TxMlCohortQueries txMlCohortQueries,
-          PrepNewCohortQueries prepNewCohortQueries, TxPvlsBySourceLabOrFsrCohortQueries txPvlsBySourceLabOrFsrCohortQueries, ResumoMensalDAHCohortQueries resumoMensalDAHCohortQueries) {
+      GenderCohortQueries genderCohortQueries,
+      TxNewCohortQueries txNewCohortQueries,
+      GenericCohortQueries genericCohortQueries,
+      Eri4MonthsCohortQueries eri4MonthsCohortQueries,
+      Eri2MonthsCohortQueries eri2MonthsCohortQueries,
+      EriCohortQueries eriCohortQueries,
+      TbPrevCohortQueries tbPrevCohortQueries,
+      HivCohortQueries hivCohortQueries,
+      TxPvlsCohortQueries txPvlsQueries,
+      TxCurrCohortQueries txCurrCohortQueries,
+      EriDSDCohortQueries eriDSDCohortQueries,
+      MISAUKeyPopsCohortQueries misauKeyPopsCohortQueries,
+      PrepCtCohortQueries prepCtCohortQueries,
+      TbPrevQueries tbPrevQueries,
+      HivMetadata hivMetadata,
+      CommonMetadata commonMetadata,
+      TxMlCohortQueries txMlCohortQueries,
+      PrepNewCohortQueries prepNewCohortQueries,
+      TxPvlsBySourceLabOrFsrCohortQueries txPvlsBySourceLabOrFsrCohortQueries,
+      ResumoMensalDAHCohortQueries resumoMensalDAHCohortQueries) {
     this.genderCohortQueries = genderCohortQueries;
     this.txNewCohortQueries = txNewCohortQueries;
     this.genericCohortQueries = genericCohortQueries;
@@ -400,22 +402,24 @@ public class EptsCommonDimension {
             tbPrevQueries.getPatientsWhoStartedTptPreviouslyOnArt(),
             "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
 
-    //ART STATUS FOR RESUMO MENSAL DAH
+    // ART STATUS FOR RESUMO MENSAL DAH
     dim.addCohortDefinition(
-            "new-art-dah",
-            EptsReportUtils.map(
-                    resumoMensalDAHCohortQueries.getPatientsWhoAreNewInArtDisaggregation(),
-                    "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"
-            )
-    );
+        "new-art-dah",
+        EptsReportUtils.map(
+            resumoMensalDAHCohortQueries.getPatientsWhoAreNewInArtDisaggregation(),
+            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
 
     dim.addCohortDefinition(
-            "restart-art-dah",
-            EptsReportUtils.map(
-                    resumoMensalDAHCohortQueries.getPatientsWhoRestartedArtDisaggregation(),
-                    "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"
-            )
-    );
+        "restart-art-dah",
+        EptsReportUtils.map(
+            resumoMensalDAHCohortQueries.getPatientsWhoRestartedArtDisaggregation(),
+            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
+
+    dim.addCohortDefinition(
+        "on-art-dah",
+        EptsReportUtils.map(
+            resumoMensalDAHCohortQueries.getPatientsWhoAreInTarvDisaggregation(),
+            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
     return dim;
   }
 

@@ -38,11 +38,12 @@ public class ResumoMensalDAHCohortQueries {
 
   @Autowired
   public ResumoMensalDAHCohortQueries(
-          ListOfPatientsInAdvancedHivIllnessCohortQueries
+      ListOfPatientsInAdvancedHivIllnessCohortQueries
           listOfPatientsInAdvancedHivIllnessCohortQueries,
-          HivMetadata hivMetadata,
-          TbMetadata tbMetadata,
-          ResumoMensalCohortQueries resumoMensalCohortQueries, IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries) {
+      HivMetadata hivMetadata,
+      TbMetadata tbMetadata,
+      ResumoMensalCohortQueries resumoMensalCohortQueries,
+      IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries) {
     this.listOfPatientsInAdvancedHivIllnessCohortQueries =
         listOfPatientsInAdvancedHivIllnessCohortQueries;
     this.hivMetadata = hivMetadata;
@@ -1179,7 +1180,7 @@ public class ResumoMensalDAHCohortQueries {
   /**
    * <b>Relatório Desagregação - Novos inícios TARV</b>
    *
-   *     <p> Incluindo todos os utentes
+   * <p>Incluindo todos os utentes
    * <li>Registados como “Novo Início" no campo “Situação do TARV no início do seguimento” (Secção
    *     A) da Ficha de DAH que tem o registo de “Data de Início no Modelo de DAH” ocorrida durante
    *     o período (“Data de Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”)
@@ -1189,13 +1190,10 @@ public class ResumoMensalDAHCohortQueries {
    *     no indicador B1-Nº de utentes que iniciaram TARV nesta unidade sanitária durante o mês, do
    *     relatório “Resumo Mensal de HIV/SIDA” durante o período de compreendido entre “Data Início”
    *     menos (–) 2 meses e “Data Fim”.
-   *
-   *     <li>
-   *         Excluindo:Todas as mulheres com registo de grávida, conforme definido no RF29
-   *          RF29: selecionando todos os utentes do sexo feminino, independentemente da idade, e
-   *         registados como “Grávida=Sim” (Coluna 3) na “Ficha Clínica” e “Data de Consulta”
-   *         ocorrida durante o período (>= “Data Início” – 3 meses e <= “Data Fim”).
-   *     </li>
+   * <li>Excluindo:Todas as mulheres com registo de grávida, conforme definido no RF29 RF29:
+   *     selecionando todos os utentes do sexo feminino, independentemente da idade, e registados
+   *     como “Grávida=Sim” (Coluna 3) na “Ficha Clínica” e “Data de Consulta” ocorrida durante o
+   *     período (>= “Data Início” – 3 meses e <= “Data Fim”).
    *
    * @return {@link CohortDefinition}
    */
@@ -1206,32 +1204,32 @@ public class ResumoMensalDAHCohortQueries {
     cd.addParameters(getCohortParameters());
 
     cd.addSearch(
-            "newOnArt",
-            map(
-                    getPatientsArtSituationOnDAH(hivMetadata.getStartDrugs()),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "newOnArt",
+        map(
+            getPatientsArtSituationOnDAH(hivMetadata.getStartDrugs()),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-            "B1",
-            map(
-                    resumoMensalCohortQueries
-                            .getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1(),
-                    "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
+        "B1",
+        map(
+            resumoMensalCohortQueries
+                .getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1(),
+            "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-            "PREGNANT",
-            map(intensiveMonitoringCohortQueries.getMI15C(),
-                    "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
+        "PREGNANT",
+        map(
+            intensiveMonitoringCohortQueries.getMI15C(),
+            "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("(newOnArt OR B1) AND NOT PREGNANT");
     return cd;
   }
 
-
   /**
    * <b>Relatório Desagregação - Reinícios TARV</b>
    *
-   *     <p>Incluindo todos os utentes
+   * <p>Incluindo todos os utentes
    * <li>Registados como “Reinício" no campo “Situação do TARV no início do seguimento” (Secção A)
    *     da Ficha de DAH que tem o registo de “Data de Início no Modelo de DAH” ocorrida durante o
    *     período (“Data de Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”)
@@ -1240,13 +1238,11 @@ public class ResumoMensalDAHCohortQueries {
    *     Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”), considerar os utentes incluídos
    *     no indicador B3-Nº de reinícios TARV durante o mês, do relatório “Resumo Mensal de
    *     HIV/SIDA” durante o período compreendido entre “Data Início” menos (–) 2 meses e “Data Fim”
-
-   *     <li>
-   *         Excluindo:Todas as mulheres com registo de grávida, conforme definido no RF29
-   *          RF29: selecionando todos os utentes do sexo feminino, independentemente da idade, e
-   *         registados como “Grávida=Sim” (Coluna 3) na “Ficha Clínica” e “Data de Consulta”
-   *         ocorrida durante o período (>= “Data Início” – 3 meses e <= “Data Fim”).
-   *     </li>
+   * <li>Excluindo:Todas as mulheres com registo de grávida, conforme definido no RF29 RF29:
+   *     selecionando todos os utentes do sexo feminino, independentemente da idade, e registados
+   *     como “Grávida=Sim” (Coluna 3) na “Ficha Clínica” e “Data de Consulta” ocorrida durante o
+   *     período (>= “Data Início” – 3 meses e <= “Data Fim”).
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWhoRestartedArtDisaggregation() {
@@ -1256,23 +1252,71 @@ public class ResumoMensalDAHCohortQueries {
     cd.addParameters(getCohortParameters());
 
     cd.addSearch(
-            "restartedArt",
-            map(
-                    getPatientsArtSituationOnDAH(hivMetadata.getRestartConcept()),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "restartedArt",
+        map(
+            getPatientsArtSituationOnDAH(hivMetadata.getRestartConcept()),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-            "B3",
-            map(
-                    resumoMensalCohortQueries.getPatientsRestartedTarvtB3(),
-                    "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
+        "B3",
+        map(
+            resumoMensalCohortQueries.getPatientsRestartedTarvtB3(),
+            "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-            "PREGNANT",
-            map(intensiveMonitoringCohortQueries.getMI15C(),
-                    "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
+        "PREGNANT",
+        map(
+            intensiveMonitoringCohortQueries.getMI15C(),
+            "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("(restartedArt OR B3) AND NOT PREGNANT");
+    return cd;
+  }
+
+  /**
+   * <b>Relatório Desagregação - Activos TARV</b>
+   *
+   * <p>Incluindo todos os utentes
+   * <li>Registados como “Em TARV" no campo “Situação do TARV no início do seguimento” (Secção A) da
+   *     Ficha de DAH que tem o registo de “Data de Início no Modelo de DAH” ocorrida durante o
+   *     período (“Data de Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”)
+   * <li>Caso não exista o registo da “Situação do TARV no Início do Seguimento” na Ficha de DAH que
+   *     tem o registo de “Data de Início no Modelo de DAH” ocorrida durante o período (“Data de
+   *     Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”), considerar os utentes incluídos
+   *     no indicador B12 - Nº de utentes activos em TARV até o fim do mês anterior, do relatório
+   *     “Resumo Mensal de HIV/SIDA”
+   * <li>Excluindo:Todas as mulheres com registo de grávida, conforme definido no RF29 RF29:
+   *     selecionando todos os utentes do sexo feminino, independentemente da idade, e registados
+   *     como “Grávida=Sim” (Coluna 3) na “Ficha Clínica” e “Data de Consulta” ocorrida durante o
+   *     período (>= “Data Início” – 3 meses e <= “Data Fim”).
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoAreInTarvDisaggregation() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("utentes Activos em TARV, para desagregação dos indicadores 8 a 19");
+    cd.addParameters(getCohortParameters());
+
+    cd.addSearch(
+        "onArt",
+        map(
+            getPatientsArtSituationOnDAH(hivMetadata.getArtStatus()),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "B12",
+        map(
+            resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfPreviousMonthB12(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "PREGNANT",
+        map(
+            intensiveMonitoringCohortQueries.getMI15C(),
+            "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("(onArt OR B12) AND NOT PREGNANT");
     return cd;
   }
 
