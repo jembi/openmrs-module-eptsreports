@@ -11,6 +11,7 @@ import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.LocationDataSetDefinition;
+import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.resumo.ResumoMensalDAHDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -19,8 +20,9 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-@Deprecated
+@Component
 public class SetupResumoMensalDAHReport extends EptsDataExportManager {
 
   private GenericCohortQueries genericCohortQueries;
@@ -75,6 +77,7 @@ public class SetupResumoMensalDAHReport extends EptsDataExportManager {
 
     rd.addDataSetDefinition("DT", mapStraightThrough(new DatimCodeDatasetDefinition()));
     rd.addDataSetDefinition("HF", mapStraightThrough(new LocationDataSetDefinition()));
+    rd.addDataSetDefinition("SM", mapStraightThrough(new SismaCodeDatasetDefinition()));
 
     // Report Base Cohort
     rd.setBaseCohortDefinition(
