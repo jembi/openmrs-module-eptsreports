@@ -59,6 +59,9 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
     dd.addDimension("gender", map(eptsCommonDimension.gender(), ""));
     dd.addDimension(
         "age", map(eptsCommonDimension.age(ageDimensionCohort), "effectiveDate=${endDate}"));
+    dd.addDimension("art",
+            map(eptsCommonDimension.getArtStatusDimension(),
+                    "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     // INDICATOR 0
     dd.addColumn(

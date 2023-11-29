@@ -11,6 +11,7 @@ import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.IntensiveMonitoringCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.resumo.ResumoMensalDAHQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
@@ -33,18 +34,21 @@ public class ResumoMensalDAHCohortQueries {
 
   private final ResumoMensalCohortQueries resumoMensalCohortQueries;
 
+  private final IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries;
+
   @Autowired
   public ResumoMensalDAHCohortQueries(
-      ListOfPatientsInAdvancedHivIllnessCohortQueries
+          ListOfPatientsInAdvancedHivIllnessCohortQueries
           listOfPatientsInAdvancedHivIllnessCohortQueries,
-      HivMetadata hivMetadata,
-      TbMetadata tbMetadata,
-      ResumoMensalCohortQueries resumoMensalCohortQueries) {
+          HivMetadata hivMetadata,
+          TbMetadata tbMetadata,
+          ResumoMensalCohortQueries resumoMensalCohortQueries, IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries) {
     this.listOfPatientsInAdvancedHivIllnessCohortQueries =
         listOfPatientsInAdvancedHivIllnessCohortQueries;
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
+    this.intensiveMonitoringCohortQueries = intensiveMonitoringCohortQueries;
   }
 
   /**
@@ -1168,6 +1172,59 @@ public class ResumoMensalDAHCohortQueries {
     sqlCohortDefinition.setQuery(substitutor.replace(query));
 
     return sqlCohortDefinition;
+  }
+
+  // DISAGGREGATIONS
+
+  /**
+   * <b>Relatório Desagregação - Novos inícios TARV</b>
+   *
+   *     <p> Incluindo todos os utentes
+   * <li>Registados como “Novo Início" no campo “Situação do TARV no início do seguimento” (Secção
+   *     A) da Ficha de DAH que tem o registo de “Data de Início no Modelo de DAH” ocorrida durante
+   *     o período (“Data de Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”)
+   * <li>Caso não exista o registo da “Situação do TARV no Início do Seguimento” na Ficha de DAH que
+   *     tem o registo de “Data de Início no Modelo de DAH” ocorrida durante o período (“Data de
+   *     Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”), considerar os utentes incluídos
+   *     no indicador B1-Nº de utentes que iniciaram TARV nesta unidade sanitária durante o mês, do
+   *     relatório “Resumo Mensal de HIV/SIDA” durante o período de compreendido entre “Data Início”
+   *     menos (–) 2 meses e “Data Fim”.
+   *
+   *     <li>
+   *         Excluindo:Todas as mulheres com registo de grávida, conforme definido no RF29
+   *          RF29: selecionando todos os utentes do sexo feminino, independentemente da idade, e
+   *         registados como “Grávida=Sim” (Coluna 3) na “Ficha Clínica” e “Data de Consulta”
+   *         ocorrida durante o período (>= “Data Início” – 3 meses e <= “Data Fim”).
+   *     </li>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoAreNewInArtDisaggregation() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("utentes novos inícios de TARV, para desagregação dos indicadores 8 a 19");
+    cd.addParameters(getCohortParameters());
+
+    cd.addSearch(
+            "newOnArt",
+            map(
+                    getPatientsArtSituationOnDAH(hivMetadata.getStartDrugs()),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+            "B1",
+            map(
+                    resumoMensalCohortQueries
+                            .getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1(),
+                    "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+            "PREGANT",
+            map(intensiveMonitoringCohortQueries.getMI15C(),
+                    "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("(newOnArt OR B1) AND NOT PREGANT");
+    return cd;
   }
 
   private List<Parameter> getCohortParameters() {

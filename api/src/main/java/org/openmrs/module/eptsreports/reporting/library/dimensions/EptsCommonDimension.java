@@ -20,6 +20,7 @@ import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ResumoMensalDAHCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.TbPrevQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -67,7 +68,9 @@ public class EptsCommonDimension {
 
   private PrepNewCohortQueries prepNewCohortQueries;
 
-  @Autowired private TxPvlsBySourceLabOrFsrCohortQueries txPvlsBySourceLabOrFsrCohortQueries;
+  private TxPvlsBySourceLabOrFsrCohortQueries txPvlsBySourceLabOrFsrCohortQueries;
+
+  private ResumoMensalDAHCohortQueries resumoMensalDAHCohortQueries;
 
   @Autowired
   @Qualifier("commonAgeDimensionCohort")
@@ -75,24 +78,24 @@ public class EptsCommonDimension {
 
   @Autowired
   public EptsCommonDimension(
-      GenderCohortQueries genderCohortQueries,
-      TxNewCohortQueries txNewCohortQueries,
-      GenericCohortQueries genericCohortQueries,
-      Eri4MonthsCohortQueries eri4MonthsCohortQueries,
-      Eri2MonthsCohortQueries eri2MonthsCohortQueries,
-      EriCohortQueries eriCohortQueries,
-      TbPrevCohortQueries tbPrevCohortQueries,
-      HivCohortQueries hivCohortQueries,
-      TxPvlsCohortQueries txPvlsQueries,
-      TxCurrCohortQueries txCurrCohortQueries,
-      EriDSDCohortQueries eriDSDCohortQueries,
-      MISAUKeyPopsCohortQueries misauKeyPopsCohortQueries,
-      PrepCtCohortQueries prepCtCohortQueries,
-      TbPrevQueries tbPrevQueries,
-      HivMetadata hivMetadata,
-      CommonMetadata commonMetadata,
-      TxMlCohortQueries txMlCohortQueries,
-      PrepNewCohortQueries prepNewCohortQueries) {
+          GenderCohortQueries genderCohortQueries,
+          TxNewCohortQueries txNewCohortQueries,
+          GenericCohortQueries genericCohortQueries,
+          Eri4MonthsCohortQueries eri4MonthsCohortQueries,
+          Eri2MonthsCohortQueries eri2MonthsCohortQueries,
+          EriCohortQueries eriCohortQueries,
+          TbPrevCohortQueries tbPrevCohortQueries,
+          HivCohortQueries hivCohortQueries,
+          TxPvlsCohortQueries txPvlsQueries,
+          TxCurrCohortQueries txCurrCohortQueries,
+          EriDSDCohortQueries eriDSDCohortQueries,
+          MISAUKeyPopsCohortQueries misauKeyPopsCohortQueries,
+          PrepCtCohortQueries prepCtCohortQueries,
+          TbPrevQueries tbPrevQueries,
+          HivMetadata hivMetadata,
+          CommonMetadata commonMetadata,
+          TxMlCohortQueries txMlCohortQueries,
+          PrepNewCohortQueries prepNewCohortQueries, TxPvlsBySourceLabOrFsrCohortQueries txPvlsBySourceLabOrFsrCohortQueries, ResumoMensalDAHCohortQueries resumoMensalDAHCohortQueries) {
     this.genderCohortQueries = genderCohortQueries;
     this.txNewCohortQueries = txNewCohortQueries;
     this.genericCohortQueries = genericCohortQueries;
@@ -110,6 +113,8 @@ public class EptsCommonDimension {
     this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
     this.prepNewCohortQueries = prepNewCohortQueries;
+    this.txPvlsBySourceLabOrFsrCohortQueries = txPvlsBySourceLabOrFsrCohortQueries;
+    this.resumoMensalDAHCohortQueries = resumoMensalDAHCohortQueries;
   }
 
   /**
@@ -394,6 +399,15 @@ public class EptsCommonDimension {
         EptsReportUtils.map(
             tbPrevQueries.getPatientsWhoStartedTptPreviouslyOnArt(),
             "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
+
+    //ART STATUS FOR RESUMO MENSAL DAH
+    dim.addCohortDefinition(
+            "new-art-dah",
+            EptsReportUtils.map(
+                    resumoMensalDAHCohortQueries.getPatientsWhoAreNewInArtDisaggregation(),
+                    "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"
+            )
+    );
     return dim;
   }
 
