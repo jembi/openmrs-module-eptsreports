@@ -408,6 +408,14 @@ public class EptsCommonDimension {
                     "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"
             )
     );
+
+    dim.addCohortDefinition(
+            "restart-art-dah",
+            EptsReportUtils.map(
+                    resumoMensalDAHCohortQueries.getPatientsWhoRestartedArtDisaggregation(),
+                    "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"
+            )
+    );
     return dim;
   }
 

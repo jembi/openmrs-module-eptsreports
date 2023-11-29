@@ -1219,11 +1219,60 @@ public class ResumoMensalDAHCohortQueries {
                     "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-            "PREGANT",
+            "PREGNANT",
             map(intensiveMonitoringCohortQueries.getMI15C(),
                     "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(newOnArt OR B1) AND NOT PREGANT");
+    cd.setCompositionString("(newOnArt OR B1) AND NOT PREGNANT");
+    return cd;
+  }
+
+
+  /**
+   * <b>Relatório Desagregação - Reinícios TARV</b>
+   *
+   *     <p>Incluindo todos os utentes
+   * <li>Registados como “Reinício" no campo “Situação do TARV no início do seguimento” (Secção A)
+   *     da Ficha de DAH que tem o registo de “Data de Início no Modelo de DAH” ocorrida durante o
+   *     período (“Data de Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”)
+   * <li>Caso não exista o registo da “Situação do TARV no Início do Seguimento” na Ficha de DAH que
+   *     tem o registo de “Data de Início no Modelo de DAH” ocorrida durante o período (“Data de
+   *     Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”), considerar os utentes incluídos
+   *     no indicador B3-Nº de reinícios TARV durante o mês, do relatório “Resumo Mensal de
+   *     HIV/SIDA” durante o período compreendido entre “Data Início” menos (–) 2 meses e “Data Fim”
+
+   *     <li>
+   *         Excluindo:Todas as mulheres com registo de grávida, conforme definido no RF29
+   *          RF29: selecionando todos os utentes do sexo feminino, independentemente da idade, e
+   *         registados como “Grávida=Sim” (Coluna 3) na “Ficha Clínica” e “Data de Consulta”
+   *         ocorrida durante o período (>= “Data Início” – 3 meses e <= “Data Fim”).
+   *     </li>
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoRestartedArtDisaggregation() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("utentes Reinícios TARV, para desagregação dos indicadores 8 a 19");
+    cd.addParameters(getCohortParameters());
+
+    cd.addSearch(
+            "restartedArt",
+            map(
+                    getPatientsArtSituationOnDAH(hivMetadata.getRestartConcept()),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+            "B3",
+            map(
+                    resumoMensalCohortQueries.getPatientsRestartedTarvtB3(),
+                    "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+            "PREGNANT",
+            map(intensiveMonitoringCohortQueries.getMI15C(),
+                    "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("(restartedArt OR B3) AND NOT PREGNANT");
     return cd;
   }
 
