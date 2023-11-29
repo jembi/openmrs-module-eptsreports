@@ -245,7 +245,7 @@ public class TxMlCohortQueries {
     cd.addSearch(
         "mostRecentScheduleDuringPeriod",
         EptsReportUtils.map(
-            getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(false),
+            getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(true),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("transferredOutReportingPeriod AND mostRecentScheduleDuringPeriod");
@@ -261,6 +261,30 @@ public class TxMlCohortQueries {
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup() {
+    CompositionCohortDefinition definition = new CompositionCohortDefinition();
+    definition.setName("patientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup");
+
+    definition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    definition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    definition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition txcurr = txCurrCohortQueries.getTxCurrCompositionCohort("txcurr", true);
+    CohortDefinition withoutPickup = getPatientWithoutScheduledDrugPickup();
+
+    definition.addSearch(
+        "txcurr", EptsReportUtils.map(txcurr, "onOrBefore=${startDate-1d},location=${location}"));
+
+    definition.addSearch(
+        "withoutPickup",
+        EptsReportUtils.map(
+            withoutPickup, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    definition.setCompositionString("withoutPickup AND txcurr");
+
+    return definition;
+  }
+
+  public CohortDefinition getPatientWithoutScheduledDrugPickup() {
     SqlCohortDefinition definition = new SqlCohortDefinition();
     definition.setName("patientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup");
 
