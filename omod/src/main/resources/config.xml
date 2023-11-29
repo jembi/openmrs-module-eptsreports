@@ -3839,6 +3839,14 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.startDateForQuimiotherapyUuid</property>
+		<defaultValue>2e97b8fd-c570-46bd-86bc-538650fe9a23</defaultValue>
+		<description>
+			UUID for START DATE FOR QT Concept
+		</description>
+	</globalProperty>
+
 
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 

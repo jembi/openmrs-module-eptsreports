@@ -297,12 +297,30 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
 
     // INDICATOR 18
     dd.addColumn(
-        "TOTALI18", "Indicador 18 ", getPatientsWithSarcomaSKAndQuimiotherapyIndication(), "");
+        "TOTALI18",
+        "Indicador 18 SK e Indicação de quimioterapia",
+        getPatientsWithSarcomaSKAndQuimiotherapyIndication(),
+        "");
 
     addRow(
         dd,
         "I18",
-        "SK e Indicação de quimioterapia",
+        "Indicador 18 SK e Indicação de quimioterapia",
+        getPatientsWithSarcomaSKAndQuimiotherapyIndication(),
+        resumoMensalDAHDisaggregations.getColumnDisaggregations() // TO BE DEFINED
+        );
+
+    // INDICATOR 19
+    dd.addColumn(
+        "TOTALI19",
+        "Indicador 19 SK e Início de quimioterapia",
+        getPatientsWithSarcomaSKAndQuimiotherapyIndication(),
+        "");
+
+    addRow(
+        dd,
+        "I19",
+        "Indicador 19 SK e Início de quimioterapia",
         getPatientsWithSarcomaSKAndQuimiotherapyIndication(),
         resumoMensalDAHDisaggregations.getColumnDisaggregations() // TO BE DEFINED
         );
@@ -456,5 +474,13 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
             mapStraightThrough(
                 resumoMensalDAHCohortQueries
                     .getPatientsWithSarcomaSKAndQuimiotherapyIndication())));
+  }
+
+  private Mapped<CohortIndicator> getPatientsWithSarcomaSKAndStartedQuimiotherapy() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Relatório – Indicador 19 SK e e Início de quimioterapia",
+            mapStraightThrough(
+                resumoMensalDAHCohortQueries.getPatientsWithSarcomaSKAndStartedQuimiotherapy())));
   }
 }

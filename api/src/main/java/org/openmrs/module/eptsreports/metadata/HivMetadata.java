@@ -5718,4 +5718,20 @@ public class HivMetadata extends ProgramsMetadata {
         Context.getAdministrationService().getGlobalProperty("eptsreports.outraQuimioterapiaUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 165379</b>
+   *
+   * <p><b>Name:</b> START DATE FOR QT
+   *
+   * <p><b>Description: START DATE FOR QT Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getStartDateForQuimiotherapyConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.startDateForQuimiotherapyUuid");
+    return getConcept(uuid);
+  }
 }

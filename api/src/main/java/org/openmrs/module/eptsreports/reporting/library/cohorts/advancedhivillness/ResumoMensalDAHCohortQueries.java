@@ -1083,7 +1083,7 @@ public class ResumoMensalDAHCohortQueries {
   }
 
   /**
-   *
+   * <b> Relatório – Indicador 18 SK e Indicação de quimioterapia</b>
    * <li>Incluindo todos os utentes que tiveram registo de "Data de Diagnóstico SK” registada na
    *     secção H (Sarcoma de Kaposi (SK)) da Ficha de DAH, com “Data do Diagnóstico de SK” ocorrida
    *     durante o período (>= “Data Início” e <= “Data Fim”) e com o campo “Indicação para
@@ -1094,7 +1094,7 @@ public class ResumoMensalDAHCohortQueries {
   public CohortDefinition getPatientsWithSarcomaSKAndQuimiotherapyIndication() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Utentes em Tratamento de MCC");
+    sqlCohortDefinition.setName("Utentes com SK e indiccacao de Quimioterapia");
     sqlCohortDefinition.addParameters(getCohortParameters());
 
     Map<String, Integer> map = new HashMap<>();
@@ -1122,6 +1122,45 @@ public class ResumoMensalDAHCohortQueries {
             + "  AND o2.value_coded = ${1065}"
             + "  AND e.encounter_datetime >= :startDate "
             + "  AND e.encounter_datetime <= :endDate "
+            + "GROUP BY p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(substitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Relatório – Indicador 19 SK e Início de quimioterapia</b>
+   * <li>Incluindo todos os utentes com o campo “Data de Inicio de QT – Ciclo 1 (C1)” ocorrida
+   *     durante o período (>= “Data Início” e <= “Data Fim”), registados na Ficha de DAH.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithSarcomaSKAndStartedQuimiotherapy() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes com SK e Inicaram Quimioterapia");
+    sqlCohortDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    map.put("165379", hivMetadata.getStartDateForQuimiotherapyConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM "
+            + "    patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ${90} "
+            + "  AND o.concept_id = ${165379} "
+            + "  AND o.value_datetime >= :startDate "
+            + "  AND o.value_datetime <= :endDate "
             + "GROUP BY p.patient_id";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
