@@ -487,12 +487,17 @@ public class EptsCommonDimension {
     CohortDefinition threeTo5m = txCurrCohortQueries.quarterlyDispensationComposition();
     CohortDefinition more6m = txCurrCohortQueries.semiAnnualDispensationComposition();
     dim.addCohortDefinition(
-        "<3m", EptsReportUtils.map(less3m, "onOrBefore=${onOrBefore},location=${locationList}"));
+        "<3m",
+        EptsReportUtils.map(
+            less3m, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${locationList}"));
     dim.addCohortDefinition(
         "3-5m",
-        EptsReportUtils.map(threeTo5m, "onOrBefore=${onOrBefore},location=${locationList}"));
+        EptsReportUtils.map(
+            threeTo5m, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${locationList}"));
     dim.addCohortDefinition(
-        ">6m", EptsReportUtils.map(more6m, "onOrBefore=${onOrBefore},location=${locationList}"));
+        ">6m",
+        EptsReportUtils.map(
+            more6m, "onOrAfter={onOrAfter},onOrBefore=${onOrBefore},location=${locationList}"));
     return dim;
   }
 
