@@ -5687,4 +5687,35 @@ public class HivMetadata extends ProgramsMetadata {
             .getGlobalProperty("eptsreports.inducaoAnfotericinaLipossomicaUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 1413</b>
+   *
+   * <p><b>Name:</b> DATE OF DIAGNOSIS OF KAPOSI SARCOMA
+   *
+   * <p><b>Description: DATE OF DIAGNOSIS OF KAPOSI SARCOMA Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getDateOfDiagnosisOfKaposiSarcomaConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.dateOfDiagnosisOfKaposiSarcomaUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 20294</b>
+   *
+   * <p><b>Name:</b> Outra quimioterapia
+   *
+   * <p><b>Description: Outra quimioterapia Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getOutraQuimioterapiaConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.outraQuimioterapiaUuid");
+    return getConcept(uuid);
+  }
 }

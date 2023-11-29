@@ -1082,6 +1082,55 @@ public class ResumoMensalDAHCohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   *
+   * <li>Incluindo todos os utentes que tiveram registo de "Data de Diagnóstico SK” registada na
+   *     secção H (Sarcoma de Kaposi (SK)) da Ficha de DAH, com “Data do Diagnóstico de SK” ocorrida
+   *     durante o período (>= “Data Início” e <= “Data Fim”) e com o campo “Indicação para
+   *     quimioterapia (QT) = “Sim” registado na Ficha de DAH, onde ocorreu o diagnóstico.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithSarcomaSKAndQuimiotherapyIndication() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes em Tratamento de MCC");
+    sqlCohortDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("1413", hivMetadata.getDateOfDiagnosisOfKaposiSarcomaConcept().getConceptId());
+    map.put("20294", hivMetadata.getOutraQuimioterapiaConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM "
+            + "    patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "              INNER JOIN obs o2 on e.encounter_id = o2.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND o2.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ${90} "
+            + "  AND o.concept_id = ${1413} "
+            + "  AND o.value_datetime >= :startDate "
+            + "  AND o.value_datetime <= :endDate "
+            + "  AND o2.concept_id = ${20294} "
+            + "  AND o2.value_coded = ${1065}"
+            + "  AND e.encounter_datetime >= :startDate "
+            + "  AND e.encounter_datetime <= :endDate "
+            + "GROUP BY p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(substitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
   private List<Parameter> getCohortParameters() {
     return Arrays.asList(
         ReportingConstants.START_DATE_PARAMETER,

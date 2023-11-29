@@ -3823,6 +3823,22 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.dateOfDiagnosisOfKaposiSarcomaUuid</property>
+		<defaultValue>e1dae932-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for DATE OF DIAGNOSIS OF KAPOSI SARCOMA Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.outraQuimioterapiaUuid</property>
+		<defaultValue>45c80cfe-908a-11e6-a98e-000c29db4475</defaultValue>
+		<description>
+			UUID for Outra quimioterapia Concept
+		</description>
+	</globalProperty>
+
 
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 

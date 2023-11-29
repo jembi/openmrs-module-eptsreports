@@ -295,6 +295,18 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         resumoMensalDAHDisaggregations.getColumnDisaggregations() // TO BE DEFINED
         );
 
+    // INDICATOR 18
+    dd.addColumn(
+        "TOTALI18", "Indicador 18 ", getPatientsWithSarcomaSKAndQuimiotherapyIndication(), "");
+
+    addRow(
+        dd,
+        "I18",
+        "SK e Indicação de quimioterapia",
+        getPatientsWithSarcomaSKAndQuimiotherapyIndication(),
+        resumoMensalDAHDisaggregations.getColumnDisaggregations() // TO BE DEFINED
+        );
+
     return dd;
   }
 
@@ -435,5 +447,14 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
             mapStraightThrough(
                 resumoMensalDAHCohortQueries
                     .getPatientsWithPositiveCragLcrResultsAndStartedMcc())));
+  }
+
+  private Mapped<CohortIndicator> getPatientsWithSarcomaSKAndQuimiotherapyIndication() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Relatório – Indicador 18 SK e Indicação de quimioterapia",
+            mapStraightThrough(
+                resumoMensalDAHCohortQueries
+                    .getPatientsWithSarcomaSKAndQuimiotherapyIndication())));
   }
 }
