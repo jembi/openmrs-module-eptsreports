@@ -1012,16 +1012,12 @@ public class QualityImprovement2020Queries {
             + "        ON e.patient_id=p.patient_id "
             + "    INNER JOIN obs obs1 "
             + "        ON obs1.encounter_id=e.encounter_id "
-            + "    INNER JOIN obs obs2 "
-            + "        ON obs2.encounter_id=e.encounter_id "
             + "WHERE p.voided =0  "
             + "    AND e.voided = 0 "
             + "    AND obs1.voided =0 "
-            + "    AND obs2.voided =0 "
             + "    AND e.encounter_type = ${53}  "
             + "    AND e.location_id = :location "
-            + "    AND obs1.concept_id = ${1369} AND obs1.value_coded = ${1065} "
-            + "    AND obs2.concept_id = ${6300} AND obs2.value_coded = ${6276} ";
+            + "    AND obs1.concept_id = ${1369} AND obs1.value_coded = ${1065} ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
