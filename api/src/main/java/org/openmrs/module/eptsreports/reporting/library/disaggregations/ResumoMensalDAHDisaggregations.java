@@ -7,8 +7,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ResumoMensalDAHDisaggregations {
-
-  public List<BaseDataSet.ColumnParameters> getColumnDisaggregations() {
+  /**
+   * Method to combine dimensions by Age and Gender
+   * to fill indicators from 0 to 7
+   *
+   * @return {@link BaseDataSet}
+   */
+  public List<BaseDataSet.ColumnParameters> get0to7ColumnDisaggregations() {
     BaseDataSet.ColumnParameters tenTo14Male =
         new BaseDataSet.ColumnParameters(
             "tenTo14Male", "10 to 14 years male", "gender=M|age=10-14", "01");
@@ -41,5 +46,84 @@ public class ResumoMensalDAHDisaggregations {
         above20YearsF,
         fiveTo9,
         under5);
+  }
+
+  /**
+   * Method to combine dimensions by Art Status, Age, Pregnancy and Followup on DAH
+   * to fill indicators from 10 to 19
+   *
+   * @return {@link BaseDataSet}
+   */
+  public List<BaseDataSet.ColumnParameters> get8to19ColumnDisaggregations() {
+
+    // NEW ON ART
+    BaseDataSet.ColumnParameters under15NewArt =
+        new BaseDataSet.ColumnParameters(
+            "under15NewArt", "Under 15 New on Art", "art=new-art-dah|age=<15", "under15NewArt");
+
+    BaseDataSet.ColumnParameters above15NewArt =
+        new BaseDataSet.ColumnParameters(
+            "above15NewArt", "Above 15 New on Art", "art=new-art-dah|age=15+", "above15NewArt");
+
+    // RESTARTED ART
+    BaseDataSet.ColumnParameters under15RestartedArt =
+        new BaseDataSet.ColumnParameters(
+            "under15RestartedArt",
+            "Under 15 RestartedArt",
+            "art=restart-art-dah|age=<15",
+            "under15RestartedArt");
+
+    BaseDataSet.ColumnParameters above15RestartedArt =
+        new BaseDataSet.ColumnParameters(
+            "above15RestartedArt",
+            "Above 15 Restarted Art",
+            "art=restart-art-dah|age=15+",
+            "above15RestartedArt");
+
+    // ACTIVE ON ART
+    BaseDataSet.ColumnParameters under15ActiveArt =
+        new BaseDataSet.ColumnParameters(
+            "under15ActiveArt",
+            "Under 15 Active on Art",
+            "art=on-art-dah|age=<15",
+            "under15ActiveArt");
+
+    BaseDataSet.ColumnParameters above15ActiveArt =
+        new BaseDataSet.ColumnParameters(
+            "above15ActiveArt",
+            "Above 15 Active on Art",
+            "art=on-art-dah|age=15+",
+            "above15ActiveArt");
+
+    // PREGNANT
+    BaseDataSet.ColumnParameters pregnant =
+        new BaseDataSet.ColumnParameters(
+            "pregnant", "Pregnant", "maternity=pregnant-dah", "pregnant");
+
+    // FOLLOWUP
+    BaseDataSet.ColumnParameters under15Followup =
+        new BaseDataSet.ColumnParameters(
+            "under15Followup",
+            "Under 15 on Followup",
+            "followup=on-dah|age=<15",
+            "under15Followup");
+
+    BaseDataSet.ColumnParameters above15Followup =
+        new BaseDataSet.ColumnParameters(
+            "above15Followup",
+            "Above 15 on Followup",
+            "followup=on-dah|age=15+",
+            "above15Followup");
+
+    return Arrays.asList(
+        under15NewArt,
+        above15NewArt,
+        under15RestartedArt,
+        above15RestartedArt,
+        under15ActiveArt,
+        above15ActiveArt,
+        pregnant,
+        under15Followup,
+        above15Followup);
   }
 }
