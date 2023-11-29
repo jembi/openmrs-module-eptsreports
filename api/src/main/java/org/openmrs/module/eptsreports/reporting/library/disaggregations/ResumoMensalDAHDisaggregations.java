@@ -8,8 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ResumoMensalDAHDisaggregations {
   /**
-   * Method to combine dimensions by Age and Gender
-   * to fill indicators from 0 to 7
+   * Method to combine dimensions by Age and Gender to fill indicators from 0 to 7
    *
    * @return {@link BaseDataSet}
    */
@@ -49,8 +48,8 @@ public class ResumoMensalDAHDisaggregations {
   }
 
   /**
-   * Method to combine dimensions by Art Status, Age, Pregnancy and Followup on DAH
-   * to fill indicators from 10 to 19
+   * Method to combine dimensions by Art Status, Age, Pregnancy and Followup on DAH to fill
+   * indicators from 10 to 19
    *
    * @return {@link BaseDataSet}
    */
