@@ -3167,7 +3167,7 @@ public class IntensiveMonitoringCohortQueries {
                 hivMetadata.getArtStatus().getConceptId()),
             "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
 
-    cd.setCompositionString("pregnantOnPeriod"); // AND NOT transferredIn");
+    cd.setCompositionString("pregnantOnPeriod AND NOT transferredIn");
 
     return cd;
   }
