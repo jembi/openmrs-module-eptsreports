@@ -77,16 +77,13 @@ public class ResumoMensalDAHCohortQueries {
 
     cd.addSearch(
         "onDAH",
-        map(
+        mapStraightThrough(
             listOfPatientsInAdvancedHivIllnessCohortQueries.getPatientsWhoStartedFollowupOnDAH(
-                false),
-            "startDate=${startDate-1d},endDate=${endDate},location=${location}"));
+                false)));
 
     cd.addSearch(
         "leftTreatment",
-        map(
-            getPatientsWhoLeftFollowupOnDAHByTheEndOfPreviousMonth(),
-            "startDate=${startDate-1d},location=${location}"));
+        mapStraightThrough(getPatientsWhoLeftFollowupOnDAHByTheEndOfPreviousMonth()));
 
     cd.setCompositionString("onDAH AND NOT leftTreatment");
     return cd;
@@ -592,7 +589,8 @@ public class ResumoMensalDAHCohortQueries {
             + "  AND ( "
             + "        (o.concept_id = ${1708} "
             + "            AND o.value_coded IN (${1366},${1706},${1707}) "
-            + "            AND o.obs_datetime >= last_dah.last_date) "
+            + "            AND o.obs_datetime >= last_dah.last_date "
+            + "            AND o.obs_datetime <= :startDate) "
             + "        OR  (o.concept_id = ${165386} "
             + "        AND o.value_datetime >= last_dah.last_date "
             + "        AND o.value_datetime <= :startDate) "

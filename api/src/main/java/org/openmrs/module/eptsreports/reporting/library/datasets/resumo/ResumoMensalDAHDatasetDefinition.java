@@ -66,9 +66,17 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     dd.addDimension(
-            "maternity",
-            map(eptsCommonDimension.maternityDimension(),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "maternity",
+        map(
+            eptsCommonDimension.maternityDimension(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    dd.addDimension(
+        "followup",
+        map(
+            eptsCommonDimension.getPatientsWhoStartedFollowupOnDAHDisaggregation(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
     // INDICATOR 0
     dd.addColumn(
         "TOTALI0",
@@ -341,8 +349,9 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
     return mapStraightThrough(
         eptsGeneralIndicator.getIndicator(
             "Indicador 0: Número total de activos em DAH em TARV,  até ao fim do mês anterior",
-            mapStraightThrough(
-                resumoMensalDAHCohortQueries.getPatientsWhoStartedFollowupOnDAHComposition())));
+            map(
+                resumoMensalDAHCohortQueries.getPatientsWhoStartedFollowupOnDAHComposition(),
+                "startDate=${startDate-1d},endDate=${endDate},location=${location}")));
   }
 
   private Mapped<CohortIndicator> getPatientsWhoAreNewInArtAndStartedFollowupDuringTheMonth() {

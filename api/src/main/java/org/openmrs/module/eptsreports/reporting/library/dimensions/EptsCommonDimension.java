@@ -80,26 +80,27 @@ public class EptsCommonDimension {
 
   @Autowired
   public EptsCommonDimension(
-          GenderCohortQueries genderCohortQueries,
-          TxNewCohortQueries txNewCohortQueries,
-          GenericCohortQueries genericCohortQueries,
-          Eri4MonthsCohortQueries eri4MonthsCohortQueries,
-          Eri2MonthsCohortQueries eri2MonthsCohortQueries,
-          EriCohortQueries eriCohortQueries,
-          TbPrevCohortQueries tbPrevCohortQueries,
-          HivCohortQueries hivCohortQueries,
-          TxPvlsCohortQueries txPvlsQueries,
-          TxCurrCohortQueries txCurrCohortQueries,
-          EriDSDCohortQueries eriDSDCohortQueries,
-          MISAUKeyPopsCohortQueries misauKeyPopsCohortQueries,
-          PrepCtCohortQueries prepCtCohortQueries,
-          TbPrevQueries tbPrevQueries,
-          HivMetadata hivMetadata,
-          CommonMetadata commonMetadata,
-          TxMlCohortQueries txMlCohortQueries,
-          PrepNewCohortQueries prepNewCohortQueries,
-          TxPvlsBySourceLabOrFsrCohortQueries txPvlsBySourceLabOrFsrCohortQueries,
-          ResumoMensalDAHCohortQueries resumoMensalDAHCohortQueries, IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries) {
+      GenderCohortQueries genderCohortQueries,
+      TxNewCohortQueries txNewCohortQueries,
+      GenericCohortQueries genericCohortQueries,
+      Eri4MonthsCohortQueries eri4MonthsCohortQueries,
+      Eri2MonthsCohortQueries eri2MonthsCohortQueries,
+      EriCohortQueries eriCohortQueries,
+      TbPrevCohortQueries tbPrevCohortQueries,
+      HivCohortQueries hivCohortQueries,
+      TxPvlsCohortQueries txPvlsQueries,
+      TxCurrCohortQueries txCurrCohortQueries,
+      EriDSDCohortQueries eriDSDCohortQueries,
+      MISAUKeyPopsCohortQueries misauKeyPopsCohortQueries,
+      PrepCtCohortQueries prepCtCohortQueries,
+      TbPrevQueries tbPrevQueries,
+      HivMetadata hivMetadata,
+      CommonMetadata commonMetadata,
+      TxMlCohortQueries txMlCohortQueries,
+      PrepNewCohortQueries prepNewCohortQueries,
+      TxPvlsBySourceLabOrFsrCohortQueries txPvlsBySourceLabOrFsrCohortQueries,
+      ResumoMensalDAHCohortQueries resumoMensalDAHCohortQueries,
+      IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries) {
     this.genderCohortQueries = genderCohortQueries;
     this.txNewCohortQueries = txNewCohortQueries;
     this.genericCohortQueries = genericCohortQueries;
@@ -284,10 +285,10 @@ public class EptsCommonDimension {
 
     // PREGNANCY STATUS FOR RESUMO MENSAL DAH
     dim.addCohortDefinition(
-            "pregnant-dah",
-            EptsReportUtils.map(
-                    intensiveMonitoringCohortQueries.getMI15C(),
-                    "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
+        "pregnant-dah",
+        EptsReportUtils.map(
+            intensiveMonitoringCohortQueries.getMI15C(),
+            "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
     return dim;
   }
 
@@ -1050,6 +1051,38 @@ public class EptsCommonDimension {
         EptsReportUtils.map(
             prepNewCohortQueries.getBreastfeedingPatientsBasedOnPrepNew(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
+    return dim;
+  }
+
+  /**
+   * <b>Relatório Desagregação Utentes em Seguimento de DAH</b>
+   * <li>Com registo de “Data de Início no Modelo de DAH”, na Ficha de DAH, ocorrida até o fim do
+   *     período (“Data de Início no Modelo de DAH” <= “Data Fim”).
+   *
+   *     <p>Excluindo todos os utentes
+   * <li>Com registo de pelo menos um motivo (Óbito/ Abandono/ Transferido Para) e “Data de Saída de
+   *     TARV na US” (secção J), na Ficha de DAH, ocorrida após a data mais recente da “Data de
+   *     Início no Modelo de DAH” e e até o fim do período (“Data de Saída de TARV na US” >= “Última
+   *     Data de Início no Modelo de DAH” e <= “Data Fim”) ou
+   * <li>Com registo de “Data de Saída” (secção I), registada na Ficha de DAH e ocorrida após a data
+   *     mais recente da “Data de Início no Modelo de DAH” e até o fim do período (“Data de Saída de
+   *     TARV na US” >= “Última Data de Início no Modelo de DAH” e <= “Data Fim”)
+   *
+   * @return {@link CohortDefinitionDimension}
+   */
+  public CohortDefinitionDimension getPatientsWhoStartedFollowupOnDAHDisaggregation() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.addParameter(new Parameter("startDate", "startDate", Date.class));
+    dim.addParameter(new Parameter("endDate", "endDate", Date.class));
+    dim.addParameter(new Parameter("location", "location", Location.class));
+    dim.setName("utentes em seguimento de DAH, para desagregação dos indicadores 10 a 19");
+
+    dim.addCohortDefinition(
+        "on-dah",
+        EptsReportUtils.map(
+            resumoMensalDAHCohortQueries.getPatientsWhoStartedFollowupOnDAHComposition(),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
+
     return dim;
   }
 }
