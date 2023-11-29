@@ -8192,7 +8192,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     String inclusionPeriodMappings =
-        "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}";
+        "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},location=${location}";
 
     cd.addSearch(
         "pregnantOnPeriod",
