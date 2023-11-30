@@ -138,7 +138,7 @@ public class PrepNewDataset extends BaseDataSet {
         "KP=TG");
 
     dsd.addColumn(
-        "CSW",
+        "SW",
         "PREP NEW: Female sex workers",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -146,7 +146,7 @@ public class PrepNewDataset extends BaseDataSet {
                 EptsReportUtils.map(
                     prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
             mappings),
-        "KP=CSW");
+        "KP=SW");
 
     dsd.addColumn(
         "PRI",
@@ -345,7 +345,7 @@ public class PrepNewDataset extends BaseDataSet {
     // Key population
     ColumnParameters pid = new ColumnParameters("pid", "People who inject drugs", "KP=PID", "21");
     ColumnParameters msm = new ColumnParameters("msm", "Men who have sex with men", "KP=MSM", "22");
-    ColumnParameters csw = new ColumnParameters("csw", "Female sex workers", "KP=CSW", "23");
+    ColumnParameters csw = new ColumnParameters("sw", "Female sex workers", "KP=SW", "23");
     ColumnParameters pri =
         new ColumnParameters("pri", "People in prison and other closed settings", "KP=PRI", "24");
     ColumnParameters msw = new ColumnParameters("msw", "Male sex workers", "KP=MSW", "25");
