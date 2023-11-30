@@ -72,8 +72,13 @@ public class PrepCtCohortQueries {
         EptsReportUtils.map(
             prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "E",
+        EptsReportUtils.map(
+            getClientsWithAtleastOneFollowupVisitDuringReportingPeriodPrep(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(A or B or C or D or E) AND NOT F");
+    cd.setCompositionString("(A or (B AND E) or C or D or E) AND NOT F");
 
     return cd;
   }
@@ -323,6 +328,99 @@ public class PrepCtCohortQueries {
             hivMetadata.getHivRapidTest1QualitativeConcept().getConceptId(),
             commonMetadata.getIndeterminate().getConceptId(),
             hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
+            hivMetadata.getDateOfHivTestWithNegativeResultsPrepUuidConcept().getConceptId()));
+
+    definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    definition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    definition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return definition;
+  }
+
+  /**
+   * <b>Description:</b> Other Test Results: Clients with the field “Resultado do Teste” (concept id
+   * 1040) with value “Indeterminado” (concept id 1138) on Ficha de Consulta de Seguimento PrEP
+   * (encounter type 81) registered during the reporting period;
+   *
+   * @return
+   */
+  public CohortDefinition getOtherTestResultsA() {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("Patients with Other test Results Part 1 Prep A");
+
+    definition.setQuery(
+        PrepCtQueries.getOtherTestResultsA(
+            hivMetadata.getHivRapidTest1QualitativeConcept().getConceptId(),
+            commonMetadata.getIndeterminate().getConceptId(),
+            hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId()));
+
+    definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    definition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    definition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return definition;
+  }
+
+  /**
+   * <b>Description:</b> Other Test Results: Clients without the field “Resultado do Teste” marked
+   * with any value on the “Ficha de Consulta de Seguimento PrEP” registered during the reporting
+   * period
+   *
+   * @return
+   */
+  public CohortDefinition getOtherTestResultsB1() {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("Patients with Other test Results Part 1 Prep B1");
+
+    definition.setQuery(
+        PrepCtQueries.getOtherTestResultsB1(
+            hivMetadata.getHivRapidTest1QualitativeConcept().getConceptId(),
+            hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId()));
+
+    definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    definition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    definition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return definition;
+  }
+
+  /**
+   * <b>Description:</b> Other Test Results: Clients without “Data do teste HIV com resultado
+   * Negativo no Inicio da PrEP” filled on the “Ficha de Consulta Inicial PrEP” registered during
+   * the reporting period;
+   *
+   * @return
+   */
+  public CohortDefinition getOtherTestResultsB2() {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("Patients with Other test Results Part 1 Prep B2");
+
+    definition.setQuery(
+        PrepCtQueries.getOtherTestResultsB2(
+            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
+            hivMetadata.getDateOfHivTestWithNegativeResultsPrepUuidConcept().getConceptId()));
+
+    definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    definition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    definition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return definition;
+  }
+
+  /**
+   * <b>Description:</b> Other Test Results: Clients without “Data do teste HIV com resultado
+   * Negativo no Inicio da PrEP” registered on the “Ficha de Consulta Inicial PrEP” and that falls
+   * during the reporting Period.(C)
+   *
+   * @return
+   */
+  public CohortDefinition getOtherTestResultsC() {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("Patients with Other test Results Part 1 Prep C");
+
+    definition.setQuery(
+        PrepCtQueries.getOtherTestResultsC(
             hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
             hivMetadata.getDateOfHivTestWithNegativeResultsPrepUuidConcept().getConceptId()));
 
@@ -862,5 +960,67 @@ public class PrepCtCohortQueries {
     cd.setCompositionString("adolescentAndYouth AND NOT (exclusions OR KeyPopulation)");
 
     return cd;
+  }
+
+  /**
+   * <b>Description:</b> Other Test Results: Clients with the field “Resultado do Teste” with value
+   * “Indeterminado” on the “Ficha de Consulta de Seguimento PrEP” registered during the reporting
+   * period OR Clients without the field “Resultado do Teste” marked with any value on the “Ficha de
+   * Consulta de Seguimento PrEP” registered during the reporting period AND without “Data do teste
+   * HIV com resultado Negativo no Inicio da PrEP” filled on the “Ficha de Consulta Inicial PrEP”
+   * registered during the reporting period;
+   *
+   * @return
+   */
+  public CohortDefinition otherTestResultsComposition() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Other Test Results Composition");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(
+            getOtherTestResultsA(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "B",
+        EptsReportUtils.map(
+            getOtherTestResultsB1(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "C",
+        EptsReportUtils.map(
+            getOtherTestResultsB2(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "D",
+        EptsReportUtils.map(
+            getOtherTestResultsC(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("A OR (B AND (C OR D))");
+
+    return cd;
+  }
+
+  /** @return */
+  public CohortDefinition getClientsWithAtleastOneFollowupVisitDuringReportingPeriodPrep() {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("Patients With Atleast One Followup Visit During Reporting Period Prep");
+
+    definition.setQuery(
+        PrepCtQueries.clientsWithAtleastOneFollowupVisitDuringReportingPeriodPrep(
+            hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId()));
+
+    definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    definition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    definition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return definition;
   }
 }
