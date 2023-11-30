@@ -882,6 +882,14 @@ public class TxMlQueries {
     String query =
         "SELECT p.patient_id "
             + "FROM   patient p "
+            + "       LEFT JOIN(SELECT e.patient_id "
+            + "                 FROM   encounter e "
+            + "                 WHERE  e.encounter_type = ${18} "
+            + "                        AND e.encounter_datetime >= :startDate "
+            + "                        AND e.encounter_datetime <= :endDate "
+            + "                        AND e.voided = 0 "
+            + "                        AND e.location_id = :location "
+            + "                 GROUP  BY e.patient_id) fila ON fila.patient_id = p.patient_id "
             + "       LEFT JOIN("
             + "                   SELECT e.patient_id "
             + "                   FROM encounter e "
@@ -911,7 +919,7 @@ public class TxMlQueries {
             + "                        AND e.voided = 0 "
             + "                        AND e.location_id = :location "
             + "                 GROUP  BY e.patient_id) arv_pickup ON arv_pickup.patient_id = p.patient_id "
-            + "WHERE arv_pickup.patient_id IS NULL  AND  next.patient_id IS NULL "
+            + "WHERE fila.patient_id IS NOT NULL AND arv_pickup.patient_id IS NULL  AND  next.patient_id IS NULL "
             + "        AND p.voided = 0                  "
             + "GROUP  BY p.patient_id";
 
