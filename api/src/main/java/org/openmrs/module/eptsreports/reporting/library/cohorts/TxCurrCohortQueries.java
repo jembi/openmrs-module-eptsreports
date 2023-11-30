@@ -1441,6 +1441,7 @@ public class TxCurrCohortQueries {
 
     StringSubstitutor sub = new StringSubstitutor(valuesMap);
     patientsWithQuarterlyTypeOfDispensation.setQuery(sub.replace(sqlQuery));
+    System.out.println(sub.replace(sqlQuery));
 
     patientsWithQuarterlyTypeOfDispensation.addParameter(
         new Parameter("onOrBefore", "Before Date", Date.class));
@@ -1541,9 +1542,9 @@ public class TxCurrCohortQueries {
             + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "    INNER JOIN obs oo ON oo.encounter_id = e.encounter_id "
             + "    INNER JOIN ( "
-            + "        SELECT last_encounter.patient_id, MAX(dispensation_date) dispensation_date "
+            + "        SELECT last_encounter.patient_id,MAX(encounter_date) encounter_date, MAX(dispensation_date) dispensation_date "
             + "        FROM ( "
-            + "                SELECT e.patient_id, MAX(o.value_datetime) AS dispensation_date "
+            + "                SELECT e.patient_id, MAX(recent_date) encounter_date, MAX(o.value_datetime) AS dispensation_date "
             + "                FROM encounter e "
             + "                    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "                  INNER JOIN ( "
@@ -1568,7 +1569,7 @@ public class TxCurrCohortQueries {
             + "                AND DATE(e.encounter_datetime) = last_pickup.recent_date "
             + "                GROUP BY e.patient_id "
             + "                UNION "
-            + "                SELECT p.patient_id, MAX(e.encounter_datetime) dispensation_date "
+            + "                SELECT p.patient_id, MAX(e.encounter_datetime) encounter_date, MAX(e.encounter_datetime) dispensation_date "
             + "                FROM patient p "
             + "                    INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "                    INNER JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -1595,6 +1596,7 @@ public class TxCurrCohortQueries {
             + "    AND ( ( "
             + "            e.encounter_type = ${18} "
             + "            AND e.encounter_datetime <= :onOrBefore "
+            + "            AND e.encounter_datetime = recent_dispensation.encounter_date "
             + "            AND o.concept_id = ${5096} "
             + "            AND o.value_datetime = recent_dispensation.dispensation_date "
             + "            AND TIMESTAMPDIFF( DAY, DATE(e.encounter_datetime), o.value_datetime ) > 173 "
@@ -1632,7 +1634,9 @@ public class TxCurrCohortQueries {
     valuesMap.put("165314", hivMetadata.getAnnualArvDispensationConcept().getConceptId());
 
     StringSubstitutor sub = new StringSubstitutor(valuesMap);
+
     patientsWithSemiAnnualTypeOfDispensation.setQuery(sub.replace(sqlQuery));
+    System.out.println(sub.replace(sqlQuery));
 
     patientsWithSemiAnnualTypeOfDispensation.addParameter(
         new Parameter("onOrBefore", "Before Date", Date.class));
