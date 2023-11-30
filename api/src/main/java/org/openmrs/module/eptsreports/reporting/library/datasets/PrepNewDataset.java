@@ -47,7 +47,7 @@ public class PrepNewDataset extends BaseDataSet {
     String mappingsKp = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
     dsd.addDimension(
-        "KP", EptsReportUtils.map(eptsCommonDimension.getKeyPopsDimension(), mappingsKp));
+        "KP", EptsReportUtils.map(eptsCommonDimension.getKeyPopsDimensionForPrep(), mappingsKp));
 
     dsd.addDimension("gender", EptsReportUtils.map(eptsCommonDimension.gender(), ""));
 
