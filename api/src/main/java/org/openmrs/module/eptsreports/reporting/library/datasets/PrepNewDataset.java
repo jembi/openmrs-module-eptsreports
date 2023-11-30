@@ -56,10 +56,33 @@ public class PrepNewDataset extends BaseDataSet {
         EptsReportUtils.map(
             eptsCommonDimension.getPatientAgeBasedOnPrepStartDate(),
             "endDate=${endDate},location=${location}"));
+
     dsd.addDimension(
         "maternity",
         EptsReportUtils.map(
             eptsCommonDimension.getPregnantAndBreastfeedingPatientsBasedOnPrepNew(), mappings));
+
+    dsd.addColumn(
+        "Pregnant",
+        "PREGNANT",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Pregnant",
+                EptsReportUtils.map(
+                    prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
+            mappings),
+        "maternity=pregnant");
+
+    dsd.addColumn(
+        "Breastfeeding",
+        "BREASTFEEDING",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Breastfeeding",
+                EptsReportUtils.map(
+                    prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
+            mappings),
+        "maternity=breastfeeding");
 
     dsd.addColumn(
         "ORAL",
@@ -82,6 +105,61 @@ public class PrepNewDataset extends BaseDataSet {
                     prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
             mappings),
         "");
+
+    dsd.addColumn(
+        "PID",
+        "PREP NEW: People who inject drugs",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "People who inject drugs",
+                EptsReportUtils.map(
+                    prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
+            mappings),
+        "KP=PID");
+
+    dsd.addColumn(
+        "MSM",
+        "PREP NEW: Men who have sex with men",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Men who have sex with men",
+                EptsReportUtils.map(
+                    prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
+            mappings),
+        "KP=MSM");
+
+    dsd.addColumn(
+        "TG",
+        "PREP NEW: Transgender",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Transgender",
+                EptsReportUtils.map(
+                    prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
+            mappings),
+        "KP=TG");
+
+    dsd.addColumn(
+        "CSW",
+        "PREP NEW: Female sex workers",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Female sex workers",
+                EptsReportUtils.map(
+                    prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
+            mappings),
+        "KP=CSW");
+
+    dsd.addColumn(
+        "PRI",
+        "PREP NEW: People in prison and other closed settings",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "People in prison and other closed settings",
+                EptsReportUtils.map(
+                    prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
+            mappings),
+        "KP=PRI");
 
     addRow(
         dsd,
