@@ -1441,7 +1441,6 @@ public class TxCurrCohortQueries {
 
     StringSubstitutor sub = new StringSubstitutor(valuesMap);
     patientsWithQuarterlyTypeOfDispensation.setQuery(sub.replace(sqlQuery));
-    System.out.println(sub.replace(sqlQuery));
 
     patientsWithQuarterlyTypeOfDispensation.addParameter(
         new Parameter("onOrBefore", "Before Date", Date.class));
@@ -1636,7 +1635,6 @@ public class TxCurrCohortQueries {
     StringSubstitutor sub = new StringSubstitutor(valuesMap);
 
     patientsWithSemiAnnualTypeOfDispensation.setQuery(sub.replace(sqlQuery));
-    System.out.println(sub.replace(sqlQuery));
 
     patientsWithSemiAnnualTypeOfDispensation.addParameter(
         new Parameter("onOrBefore", "Before Date", Date.class));
