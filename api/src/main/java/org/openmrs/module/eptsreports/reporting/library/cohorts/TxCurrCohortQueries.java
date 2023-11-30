@@ -1325,8 +1325,18 @@ public class TxCurrCohortQueries {
    *
    * <blockquote>
    *
-   * Patients marked as (DT) Quartely Dispensation <b>(concept_id = 23730)</b> on Ficha Clinica
-   * Mastercard on last drug pickup <b>(concept_id = 5096 RETURN VISIT DATE FOR ARV DRUG)</b>
+   * Identify the most recent source between Ficha Clinica and FILA according to the following
+   * criteria: Most recent Ficha Clínica with Tipo de Dispensa informed by reporting end date; The
+   * next scheduled pick-up date (>= report start date) informed on the most recent FILA by
+   * reporting end date;
+   *
+   * <p>For 3-5 months ARV Dispensing disaggregation: oIf FILA is prioritized: next pick up
+   * registered is scheduled for 83 - 173 days after their last ART pick-up date (next scheduled
+   * pick up date – last pick up date >=83 days and <=173 days). oIf Ficha Clinica is prioritized
+   * (most recent Ficha Clinica with Tipo de Dispensa Informed): Tipo de Dispensa = DT
+   *
+   * <p>Note: In the query below, we use two maximums in the same select because we want the most
+   * recent scheduling date registered in the most recent pick up on file.
    *
    * </blockquote>
    *
@@ -1347,10 +1357,9 @@ public class TxCurrCohortQueries {
             + "    INNER JOIN obs oo ON oo.encounter_id = e.encounter_id "
             + "    INNER JOIN ( "
             + "        SELECT "
-            + "            last_encounter.patient_id, "
-            + "            MAX(dispensation_date) dispensation_date "
+            + "            last_encounter.patient_id, MAX(last_encounter.recent_date) encounter_date,  MAX(last_encounter.dispensation_date) dispensation_date "
             + "        FROM (  "
-            + "                SELECT e.patient_id, MAX(o.value_datetime) AS dispensation_date "
+            + "                SELECT e.patient_id, MAX(last_pickup.recent_date) recent_date, MAX(o.value_datetime) AS dispensation_date "
             + "                FROM encounter e "
             + "                    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "                  INNER JOIN ( "
@@ -1375,7 +1384,7 @@ public class TxCurrCohortQueries {
             + "                AND DATE(e.encounter_datetime) = last_pickup.recent_date "
             + "                GROUP BY e.patient_id "
             + "                UNION "
-            + "                SELECT e.patient_id, MAX(e.encounter_datetime) dispensation_date "
+            + "                SELECT e.patient_id, '' recent_date, MAX(e.encounter_datetime) dispensation_date "
             + "                FROM encounter e "
             + "                    INNER JOIN obs o ON e.encounter_id = o.encounter_id "
             + "                WHERE "
@@ -1400,6 +1409,7 @@ public class TxCurrCohortQueries {
             + "    AND ( ( "
             + "            e.encounter_type = ${18} "
             + "            AND e.encounter_datetime <= :onOrBefore "
+            + "            AND e.encounter_datetime = recent_dispensation.encounter_date "
             + "            AND o.concept_id = ${5096} "
             + "            AND o.value_datetime = recent_dispensation.dispensation_date "
             + "            AND TIMESTAMPDIFF( DAY,DATE(e.encounter_datetime), o.value_datetime ) >= 83 "
@@ -1521,8 +1531,18 @@ public class TxCurrCohortQueries {
    *
    * <blockquote>
    *
-   * Patients marked as (DS) Semi-annual Dispensation <b>(concept_id = 23888)</b> on Ficha Clinica
-   * Mastercard on last drug pickup <b>(concept_id = 5096 RETURN VISIT DATE FOR ARV DRUG)</b>
+   * Identify the most recent source between Ficha Clinica and FILA according to the following
+   * criteria: Most recent Ficha Clínica with Tipo de Dispensa informed by reporting end date; oThe
+   * next scheduled pick-up date (>= report start date) informed on the most recent FILA by
+   * reporting end date;
+   *
+   * <p>For >6 months ARV Dispensing disaggregation: oIf FILA is prioritized: next pick up
+   * registered is scheduled >173 days after their last ART pick-up date (next scheduled pick up
+   * date – last pick up date >173 days). oIf Ficha Clinica is prioritized (most recent Ficha
+   * Clínica with Tipo de Dispensa Informed): Tipo de Dispensa = DS
+   *
+   * <p>Note: In the query below, we use two maximums in the same select because we want the most
+   * recent scheduling date registered in the most recent pick up on file.
    *
    * </blockquote>
    *
@@ -1541,9 +1561,9 @@ public class TxCurrCohortQueries {
             + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "    INNER JOIN obs oo ON oo.encounter_id = e.encounter_id "
             + "    INNER JOIN ( "
-            + "        SELECT last_encounter.patient_id, MAX(dispensation_date) dispensation_date "
+            + "        SELECT last_encounter.patient_id,MAX(last_encounter.encounter_date) encounter_date, MAX(last_encounter.dispensation_date) dispensation_date "
             + "        FROM ( "
-            + "                SELECT e.patient_id, MAX(o.value_datetime) AS dispensation_date "
+            + "                SELECT e.patient_id, MAX(last_pickup.recent_date) encounter_date, MAX(o.value_datetime) AS dispensation_date "
             + "                FROM encounter e "
             + "                    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "                  INNER JOIN ( "
@@ -1568,7 +1588,7 @@ public class TxCurrCohortQueries {
             + "                AND DATE(e.encounter_datetime) = last_pickup.recent_date "
             + "                GROUP BY e.patient_id "
             + "                UNION "
-            + "                SELECT p.patient_id, MAX(e.encounter_datetime) dispensation_date "
+            + "                SELECT p.patient_id, '' recent_date, MAX(e.encounter_datetime) dispensation_date "
             + "                FROM patient p "
             + "                    INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "                    INNER JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -1595,6 +1615,7 @@ public class TxCurrCohortQueries {
             + "    AND ( ( "
             + "            e.encounter_type = ${18} "
             + "            AND e.encounter_datetime <= :onOrBefore "
+            + "            AND e.encounter_datetime = recent_dispensation.encounter_date "
             + "            AND o.concept_id = ${5096} "
             + "            AND o.value_datetime = recent_dispensation.dispensation_date "
             + "            AND TIMESTAMPDIFF( DAY, DATE(e.encounter_datetime), o.value_datetime ) > 173 "
@@ -1632,6 +1653,7 @@ public class TxCurrCohortQueries {
     valuesMap.put("165314", hivMetadata.getAnnualArvDispensationConcept().getConceptId());
 
     StringSubstitutor sub = new StringSubstitutor(valuesMap);
+
     patientsWithSemiAnnualTypeOfDispensation.setQuery(sub.replace(sqlQuery));
 
     patientsWithSemiAnnualTypeOfDispensation.addParameter(

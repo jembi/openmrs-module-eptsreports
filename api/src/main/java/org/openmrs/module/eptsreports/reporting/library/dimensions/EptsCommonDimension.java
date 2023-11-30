@@ -497,7 +497,7 @@ public class EptsCommonDimension {
     dim.addCohortDefinition(
         ">6m",
         EptsReportUtils.map(
-            more6m, "onOrAfter={onOrAfter},onOrBefore=${onOrBefore},location=${locationList}"));
+            more6m, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${locationList}"));
     return dim;
   }
 
