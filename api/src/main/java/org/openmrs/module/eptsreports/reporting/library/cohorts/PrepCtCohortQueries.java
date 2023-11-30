@@ -315,22 +315,33 @@ public class PrepCtCohortQueries {
    * @return
    */
   public CohortDefinition getOtherTestResults() {
-    SqlCohortDefinition definition = new SqlCohortDefinition();
-    definition.setName("Patients with Other test Results Part 1 Prep");
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients with Other test Results Part 1 Prep");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    definition.setQuery(
-        PrepCtQueries.getOtherTestResults(
-            hivMetadata.getHivRapidTest1QualitativeConcept().getConceptId(),
-            commonMetadata.getIndeterminate().getConceptId(),
-            hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
-            hivMetadata.getDateOfHivTestWithNegativeResultsPrepUuidConcept().getConceptId()));
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(
+            getPREPCTNumerator(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    definition.addParameter(new Parameter("endDate", "End Date", Date.class));
-    definition.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addSearch(
+        "B",
+        EptsReportUtils.map(
+            getPositiveTestResults(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    return definition;
+    cd.addSearch(
+        "C",
+        EptsReportUtils.map(
+            getNegativeTestResults(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("A AND NOT (B OR C)");
+
+    return cd;
   }
 
   public CohortDefinition getkeypop() {
