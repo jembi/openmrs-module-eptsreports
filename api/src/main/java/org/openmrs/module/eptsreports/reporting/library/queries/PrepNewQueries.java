@@ -245,7 +245,7 @@ public class PrepNewQueries {
             + "                                                             AND e.voided = 0 "
             + "                                                             AND o.voided = 0 "
             + "                                                             AND "
-            + "                                          e.encounter_type = 80 "
+            + "                                          e.encounter_type = ${80} "
             + "                                                             AND "
             + "                                          o.concept_id = ${165296} "
             + "                                                             AND "
