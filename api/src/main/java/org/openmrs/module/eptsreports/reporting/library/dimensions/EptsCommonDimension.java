@@ -497,7 +497,7 @@ public class EptsCommonDimension {
     dim.addCohortDefinition(
         ">6m",
         EptsReportUtils.map(
-            more6m, "onOrAfter={onOrAfter},onOrBefore=${onOrBefore},location=${locationList}"));
+            more6m, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${locationList}"));
     return dim;
   }
 
@@ -691,6 +691,7 @@ public class EptsCommonDimension {
    */
   public CohortDefinitionDimension getPatientAgeBasedOnPrepStartDate() {
     CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.addParameter(new Parameter("startDate", "startDate", Date.class));
     dim.addParameter(new Parameter("endDate", "endDate", Date.class));
     dim.addParameter(new Parameter("location", "location", Location.class));
     dim.setName("Patients having age based on PrEP Start Date");
@@ -701,48 +702,48 @@ public class EptsCommonDimension {
         DimensionKeyForAge.between15And19Years.getKey(),
         EptsReportUtils.map(
             genericCohortQueries.getPatientAgeBasedOnPrepStartDate(15, 19),
-            "endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     dim.addCohortDefinition(
         DimensionKeyForAge.between20And24Years.getKey(),
         EptsReportUtils.map(
             genericCohortQueries.getPatientAgeBasedOnPrepStartDate(20, 24),
-            "endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     dim.addCohortDefinition(
         DimensionKeyForAge.between25And29Years.getKey(),
         EptsReportUtils.map(
             genericCohortQueries.getPatientAgeBasedOnPrepStartDate(25, 29),
-            "endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     dim.addCohortDefinition(
         DimensionKeyForAge.between30And34Years.getKey(),
         EptsReportUtils.map(
             genericCohortQueries.getPatientAgeBasedOnPrepStartDate(30, 34),
-            "endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     dim.addCohortDefinition(
         DimensionKeyForAge.between35And39Years.getKey(),
         EptsReportUtils.map(
             genericCohortQueries.getPatientAgeBasedOnPrepStartDate(35, 39),
-            "endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     dim.addCohortDefinition(
         DimensionKeyForAge.between40And44Years.getKey(),
         EptsReportUtils.map(
             genericCohortQueries.getPatientAgeBasedOnPrepStartDate(40, 44),
-            "endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     dim.addCohortDefinition(
         DimensionKeyForAge.between45and49Years.getKey(),
         EptsReportUtils.map(
             genericCohortQueries.getPatientAgeBasedOnPrepStartDate(45, 49),
-            "endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     dim.addCohortDefinition(
         DimensionKeyForAge.overOrEqualTo50Years.getKey(),
         EptsReportUtils.map(
             genericCohortQueries.getPatientAgeBasedOnPrepStartDate(50, 200),
-            "endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dim.addCohortDefinition(
         DimensionKeyForAge.overOrEqualTo15Years.getKey(),
         EptsReportUtils.map(
             genericCohortQueries.getPatientAgeBasedOnPrepStartDate(15, 200),
-            "endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     return dim;
   }
@@ -772,7 +773,7 @@ public class EptsCommonDimension {
     dim.addCohortDefinition(
         "other",
         EptsReportUtils.map(
-            prepCtCohortQueries.getOtherTestResults(),
+            prepCtCohortQueries.otherTestResultsComposition(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     return dim;
   }

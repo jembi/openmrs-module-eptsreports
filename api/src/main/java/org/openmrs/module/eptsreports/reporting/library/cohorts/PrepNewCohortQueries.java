@@ -54,7 +54,7 @@ public class PrepNewCohortQueries {
         "C",
         EptsReportUtils.map(
             genericCohortQueries.getPatientAgeBasedOnPrepStartDate(15, 200),
-            "endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("(A AND C) AND NOT B");
 
