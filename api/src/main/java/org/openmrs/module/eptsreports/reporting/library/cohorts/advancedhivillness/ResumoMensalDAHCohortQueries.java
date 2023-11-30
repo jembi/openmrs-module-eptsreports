@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness;
 
+import static org.openmrs.module.eptsreports.reporting.library.cohorts.AdvancedDiseaseAndTBCascadeCohortQueries.*;
 import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
 import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
@@ -11,10 +12,10 @@ import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.AgeCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.IntensiveMonitoringCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.queries.resumo.ResumoMensalDAHQueries;
-import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
+import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -36,6 +37,8 @@ public class ResumoMensalDAHCohortQueries {
 
   private final IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries;
 
+  private AgeCohortQueries ageCohortQueries;
+
   @Autowired
   public ResumoMensalDAHCohortQueries(
       ListOfPatientsInAdvancedHivIllnessCohortQueries
@@ -43,13 +46,15 @@ public class ResumoMensalDAHCohortQueries {
       HivMetadata hivMetadata,
       TbMetadata tbMetadata,
       ResumoMensalCohortQueries resumoMensalCohortQueries,
-      IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries) {
+      IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries,
+      AgeCohortQueries ageCohortQueries) {
     this.listOfPatientsInAdvancedHivIllnessCohortQueries =
         listOfPatientsInAdvancedHivIllnessCohortQueries;
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
     this.intensiveMonitoringCohortQueries = intensiveMonitoringCohortQueries;
+    this.ageCohortQueries = ageCohortQueries;
   }
 
   /**
@@ -870,31 +875,48 @@ public class ResumoMensalDAHCohortQueries {
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithCD4BasedOnAgeAndCd4Results() {
-
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName(
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
         " “Resultado de CD4” (identificado nos critérios acima definidos) de acordo com a seguinte definição");
-    sqlCohortDefinition.addParameters(getCohortParameters());
+    cd.addParameters(getCohortParameters());
 
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
-    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    CohortDefinition cd200overOrEqualTo5years =
+        getPatientsWithCD4BasedOnAgeAndCd4(Cd4CountComparison.LessThanOrEqualTo200mm3, 5, null);
+    CohortDefinition cd500betweenOneAnd5years =
+        getPatientsWithCD4BasedOnAgeAndCd4(Cd4CountComparison.LessThanOrEqualTo500mm3, 1, 4);
+    CohortDefinition cd750bellowOneYear =
+        getPatientsWithCD4BasedOnAgeAndCd4(Cd4CountComparison.LessThanOrEqualTo750mm3, null, 1);
 
-    String query =
-        new EptsQueriesUtil()
-            .unionBuilder(ResumoMensalDAHQueries.getCd4ResultOverOrEqualTo5years(200))
-            .union(ResumoMensalDAHQueries.getCd4ResultBetweenOneAnd5years(500))
-            .union(ResumoMensalDAHQueries.getCd4ResultBellowOneYear(750))
-            .buildQuery();
+    cd.addSearch("cd4Under200", mapStraightThrough(cd200overOrEqualTo5years));
+    cd.addSearch("cd4Under500", mapStraightThrough(cd500betweenOneAnd5years));
+    cd.addSearch("cd4Under750", mapStraightThrough(cd750bellowOneYear));
 
-    StringSubstitutor substitutor = new StringSubstitutor(map);
-
-    sqlCohortDefinition.setQuery(substitutor.replace(query));
-
-    return sqlCohortDefinition;
+    cd.setCompositionString("cd4Under200 OR cd4Under500 OR cd4Under750");
+    return cd;
   }
 
+  /**
+   * @param cd4 Amount of Cd4 for each range of age
+   * @param minAge Minimum age to check
+   * @param maxAge Maximum age to check
+   * @return {@link CohortDefinition}
+   */
+  private CohortDefinition getPatientsWithCD4BasedOnAgeAndCd4(
+      Cd4CountComparison cd4, Integer minAge, Integer maxAge) {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Cd4 Result and Age Combination");
+    cd.addParameters(getCohortParameters());
+
+    CohortDefinition cd4Result = getCd4Result(cd4);
+    CohortDefinition age = ageCohortQueries.createXtoYAgeCohort("Age", minAge, maxAge);
+
+    cd.addSearch("cd4Result", mapStraightThrough(cd4Result));
+    cd.addSearch("age", EptsReportUtils.map(age, "effectiveDate=${endDate}"));
+
+    cd.setCompositionString("cd4Result AND age");
+    return cd;
+  }
   /**
    * Filtrando todos os utentes
    * <li>que tiveram registo de "TB LAM urina” registada na secção B (Exames Laboratoriais à e
@@ -1316,6 +1338,50 @@ public class ResumoMensalDAHCohortQueries {
 
     cd.setCompositionString("(onArt OR B12) AND NOT PREGNANT");
     return cd;
+  }
+
+  /**
+   * @param cd4 Amount of Cd4 for each range of age
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getCd4Result(Cd4CountComparison cd4) {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Resultado de CD4");
+    sqlCohortDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+
+    String query =
+        "  SELECT ps.person_id FROM   person ps "
+            + "       INNER JOIN encounter e "
+            + "               ON ps.person_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "WHERE  ps.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type IN (${90}, ${6})  "
+            + "       AND o.concept_id = ${1695}  "
+            + "       AND ".concat(cd4.getProposition())
+            + " AND ( "
+            + "  ( o.obs_datetime >= :startDate "
+            + "  AND o.obs_datetime <= :endDate)"
+            + "OR "
+            + " ( e.encounter_datetime >= :startDate "
+            + "  AND e.encounter_datetime <= :endDate) "
+            + " ) "
+            + "  AND e.location_id = :location"
+            + "  GROUP BY ps.person_id ";
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(substitutor.replace(query));
+
+    return sqlCohortDefinition;
   }
 
   private List<Parameter> getCohortParameters() {
