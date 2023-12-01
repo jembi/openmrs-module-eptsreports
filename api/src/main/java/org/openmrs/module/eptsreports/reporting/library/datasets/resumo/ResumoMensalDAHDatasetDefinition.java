@@ -321,14 +321,14 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
     dd.addColumn(
         "TOTALI19",
         "Indicador 19 SK e Início de quimioterapia",
-        getPatientsWithSarcomaSKAndQuimiotherapyIndication(),
+        getPatientsWithSarcomaSKAndStartedQuimiotherapy(),
         "");
 
     addRow(
         dd,
         "I19",
         "Indicador 19 SK e Início de quimioterapia",
-        getPatientsWithSarcomaSKAndQuimiotherapyIndication(),
+        getPatientsWithSarcomaSKAndStartedQuimiotherapy(),
         resumoMensalDAHDisaggregations.get8to19ColumnDisaggregations());
 
     return dd;
