@@ -773,7 +773,7 @@ public class EptsCommonDimension {
     dim.addCohortDefinition(
         "other",
         EptsReportUtils.map(
-            prepCtCohortQueries.otherTestResultsComposition(),
+            prepCtCohortQueries.getOtherTestResults(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     return dim;
   }
