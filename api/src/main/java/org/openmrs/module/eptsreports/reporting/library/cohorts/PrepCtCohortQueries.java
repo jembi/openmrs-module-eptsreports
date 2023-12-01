@@ -81,7 +81,7 @@ public class PrepCtCohortQueries {
             getClientsWithAtleastOneFollowupVisitDuringReportingPeriodPrep(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-        cd.setCompositionString("(A or (B AND E) or C or D) AND NOT F");
+    cd.setCompositionString("(A or (B AND E) or C or D) AND NOT F");
 
     return cd;
   }
