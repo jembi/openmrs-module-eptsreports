@@ -245,7 +245,7 @@ public class TxMlCohortQueries {
     cd.addSearch(
         "mostRecentScheduleDuringPeriod",
         EptsReportUtils.map(
-            getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(false),
+            getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(true),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("transferredOutReportingPeriod AND mostRecentScheduleDuringPeriod");
@@ -261,6 +261,30 @@ public class TxMlCohortQueries {
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup() {
+    CompositionCohortDefinition definition = new CompositionCohortDefinition();
+    definition.setName("patientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup");
+
+    definition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    definition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    definition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition txcurr = txCurrCohortQueries.getTxCurrCompositionCohort("txcurr", true);
+    CohortDefinition withoutPickup = getPatientWithoutScheduledDrugPickup();
+
+    definition.addSearch(
+        "txcurr", EptsReportUtils.map(txcurr, "onOrBefore=${startDate-1d},location=${location}"));
+
+    definition.addSearch(
+        "withoutPickup",
+        EptsReportUtils.map(
+            withoutPickup, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    definition.setCompositionString("withoutPickup AND txcurr");
+
+    return definition;
+  }
+
+  public CohortDefinition getPatientWithoutScheduledDrugPickup() {
     SqlCohortDefinition definition = new SqlCohortDefinition();
     definition.setName("patientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup");
 
@@ -403,7 +427,13 @@ public class TxMlCohortQueries {
             getPatientsWhoMissedNextAppointmentAndDiedDuringReportingPeriod(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("transferredOut AND NOT dead");
+    cd.addSearch(
+        "numerator",
+        EptsReportUtils.map(
+            getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("numerator AND (transferredOut AND NOT dead)");
     return cd;
   }
 
@@ -1650,7 +1680,7 @@ public class TxMlCohortQueries {
     cd.addSearch(
         "missedAppointment",
         EptsReportUtils.map(
-            getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
+            getPatientsWithIITComposition(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
@@ -1658,19 +1688,8 @@ public class TxMlCohortQueries {
         EptsReportUtils.map(
             getTreatmentInterruptionOfXDaysBeforeReturningToTreatment(180, null),
             "endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "dead",
-        EptsReportUtils.map(
-            getPatientsWhoMissedNextAppointmentAndDiedDuringReportingPeriod(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "transferredOut",
-        EptsReportUtils.map(
-            getPatientsWhoMissedNextAppointmentAndTransferredOut(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString(
-        "(missedAppointment AND moreThan180Days) AND NOT (dead OR transferredOut)");
+    cd.setCompositionString("(missedAppointment AND moreThan180Days)");
     return cd;
   }
 
@@ -1692,7 +1711,7 @@ public class TxMlCohortQueries {
     cd.addSearch(
         "missedAppointment",
         EptsReportUtils.map(
-            getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
+            getPatientsWithIITComposition(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
@@ -1701,20 +1720,7 @@ public class TxMlCohortQueries {
             getTreatmentInterruptionOfXDaysBeforeReturningToTreatment(null, 90),
             "endDate=${endDate},location=${location}"));
 
-    cd.addSearch(
-        "dead",
-        EptsReportUtils.map(
-            txCurrCohortQueries.getPatientsWhoAreDead(),
-            "onOrBefore=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "transferredOut",
-        EptsReportUtils.map(
-            getPatientsWhoMissedNextAppointmentAndTransferredOut(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.setCompositionString(
-        "(missedAppointment AND lessThan90days) AND NOT (dead OR transferredOut)");
+    cd.setCompositionString("(missedAppointment AND lessThan90days)");
 
     return cd;
   }
@@ -1738,7 +1744,7 @@ public class TxMlCohortQueries {
     cd.addSearch(
         "missedAppointment",
         EptsReportUtils.map(
-            getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
+            getPatientsWithIITComposition(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
@@ -1747,20 +1753,7 @@ public class TxMlCohortQueries {
             getTreatmentInterruptionOfXDaysBeforeReturningToTreatment(90, 180),
             "endDate=${endDate},location=${location}"));
 
-    cd.addSearch(
-        "dead",
-        EptsReportUtils.map(
-            getPatientsWhoMissedNextAppointmentAndDiedDuringReportingPeriod(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "transferredOut",
-        EptsReportUtils.map(
-            getPatientsWhoMissedNextAppointmentAndTransferredOut(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.setCompositionString(
-        "(missedAppointment AND greaterThan90AndLessThan180days) AND NOT (dead OR transferredOut)");
+    cd.setCompositionString("(missedAppointment AND greaterThan90AndLessThan180days)");
     return cd;
   }
 
@@ -1788,33 +1781,11 @@ public class TxMlCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        "lessThan90days",
+        "iit",
         EptsReportUtils.map(
-            getPatientsIITLessThan90DaysComposition(),
+            getPatientsWhoExperiencedInterruptionInTreatmentComposition(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "moreThan180Days",
-        EptsReportUtils.map(
-            getPatientsIITMoreThan180DaysComposition(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "greaterThan90AndLessThan180days",
-        EptsReportUtils.map(
-            getPatientsIITBetween90DaysAnd180DaysComposition(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "dead",
-        EptsReportUtils.map(
-            getPatientsWhoMissedNextAppointmentAndDiedDuringReportingPeriod(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "transferredOut",
-        EptsReportUtils.map(
-            getPatientsWhoMissedNextAppointmentAndTransferredOut(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.setCompositionString(
-        "(missedAppointment AND (lessThan90days OR moreThan180Days OR greaterThan90AndLessThan180days)) AND NOT (dead OR transferredOut)");
+    cd.setCompositionString("missedAppointment AND iit");
     return cd;
   }
 
