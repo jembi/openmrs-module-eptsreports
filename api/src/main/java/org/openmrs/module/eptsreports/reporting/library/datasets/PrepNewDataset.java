@@ -47,17 +47,40 @@ public class PrepNewDataset extends BaseDataSet {
     String mappingsKp = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
     dsd.addDimension(
-        "KP", EptsReportUtils.map(eptsCommonDimension.getKeyPopsDimension(), mappingsKp));
+        "KP", EptsReportUtils.map(eptsCommonDimension.getKeyPopsDimensionForPrep(), mappingsKp));
 
     dsd.addDimension("gender", EptsReportUtils.map(eptsCommonDimension.gender(), ""));
 
     dsd.addDimension(
         "age",
         EptsReportUtils.map(eptsCommonDimension.getPatientAgeBasedOnPrepStartDate(), mappings));
+
     dsd.addDimension(
         "maternity",
         EptsReportUtils.map(
             eptsCommonDimension.getPregnantAndBreastfeedingPatientsBasedOnPrepNew(), mappings));
+
+    dsd.addColumn(
+        "Pregnant",
+        "PREGNANT",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Pregnant",
+                EptsReportUtils.map(
+                    prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
+            mappings),
+        "maternity=pregnant");
+
+    dsd.addColumn(
+        "Breastfeeding",
+        "BREASTFEEDING",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Breastfeeding",
+                EptsReportUtils.map(
+                    prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
+            mappings),
+        "maternity=breastfeeding");
 
     dsd.addColumn(
         "ORAL",
@@ -80,6 +103,61 @@ public class PrepNewDataset extends BaseDataSet {
                     prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
             mappings),
         "");
+
+    dsd.addColumn(
+        "PID",
+        "PREP NEW: People who inject drugs",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "People who inject drugs",
+                EptsReportUtils.map(
+                    prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
+            mappings),
+        "KP=PID");
+
+    dsd.addColumn(
+        "MSM",
+        "PREP NEW: Men who have sex with men",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Men who have sex with men",
+                EptsReportUtils.map(
+                    prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
+            mappings),
+        "KP=MSM");
+
+    dsd.addColumn(
+        "TG",
+        "PREP NEW: Transgender",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Transgender",
+                EptsReportUtils.map(
+                    prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
+            mappings),
+        "KP=TG");
+
+    dsd.addColumn(
+        "SW",
+        "PREP NEW: Female sex workers",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Female sex workers",
+                EptsReportUtils.map(
+                    prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
+            mappings),
+        "KP=SW");
+
+    dsd.addColumn(
+        "PRI",
+        "PREP NEW: People in prison and other closed settings",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "People in prison and other closed settings",
+                EptsReportUtils.map(
+                    prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
+            mappings),
+        "KP=PRI");
 
     addRow(
         dsd,
@@ -264,21 +342,6 @@ public class PrepNewDataset extends BaseDataSet {
                 .getDimensions(),
             "19");
 
-    // Key population
-    ColumnParameters pid = new ColumnParameters("pid", "People who inject drugs", "KP=PID", "21");
-    ColumnParameters msm = new ColumnParameters("msm", "Men who have sex with men", "KP=MSM", "22");
-    ColumnParameters csw = new ColumnParameters("csw", "Female sex workers", "KP=CSW", "23");
-    ColumnParameters pri =
-        new ColumnParameters("pri", "People in prison and other closed settings", "KP=PRI", "24");
-    ColumnParameters msw = new ColumnParameters("msw", "Male sex workers", "KP=MSW", "25");
-    ColumnParameters tg = new ColumnParameters("tg", "Transgender", "KP=TG", "26");
-
-    // Pregnant and Breastfeeding
-    ColumnParameters breastfeeding =
-        new ColumnParameters("breastfeeding", "Breastfeeding", "maternity=breastfeeding", "27");
-    ColumnParameters pregnant =
-        new ColumnParameters("pregnant", "Pregnant", "maternity=pregnant", "28");
-
     return Arrays.asList(
         fifteenTo19M,
         twentyTo24M,
@@ -299,14 +362,6 @@ public class PrepNewDataset extends BaseDataSet {
         forty5To49F,
         above50F,
         unknownF,
-        totalF,
-        pid,
-        msm,
-        csw,
-        pri,
-        msw,
-        tg,
-        breastfeeding,
-        pregnant);
+        totalF);
   }
 }
