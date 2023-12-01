@@ -1033,7 +1033,7 @@ public class TxMlQueries {
             + "                       GROUP  BY pa.patient_id "
             + "                   ) most_recent "
             + "               GROUP BY most_recent.patient_id "
-            + "               HAVING final_encounter_date >= :startDate AND final_encounter_date < :endDate "
+            + "               HAVING final_encounter_date > :startDate AND final_encounter_date < :endDate "
             + "            ) final ";
     return new StringSubstitutor(map).replace(query);
   }
