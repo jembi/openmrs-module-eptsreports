@@ -1145,8 +1145,6 @@ public class ResumoMensalDAHCohortQueries {
             + "  AND o.value_datetime <= :endDate "
             + "  AND o2.concept_id = ${20294} "
             + "  AND o2.value_coded = ${1065}"
-            + "  AND e.encounter_datetime >= :startDate "
-            + "  AND e.encounter_datetime <= :endDate "
             + "GROUP BY p.patient_id";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
