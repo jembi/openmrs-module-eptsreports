@@ -3367,7 +3367,7 @@ public class IntensiveMonitoringCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     String inclusionPeriodMappings =
-        "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}";
+        "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}";
 
     cd.addSearch(
         "pregnantOnPeriod",
@@ -3406,7 +3406,7 @@ public class IntensiveMonitoringCohortQueries {
             qualityImprovement2020CohortQueries.getCd4ResultAfterFirstConsultationOfPregnancy(
                 commonMetadata.getPregnantConcept().getConceptId(),
                 hivMetadata.getYesConcept().getConceptId()),
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
+            inclusionPeriodMappings));
 
     if (flag == 5) {
       cd.setCompositionString("(pregnantOnPeriod AND requestCd4ForPregnant) AND NOT transferredIn");
