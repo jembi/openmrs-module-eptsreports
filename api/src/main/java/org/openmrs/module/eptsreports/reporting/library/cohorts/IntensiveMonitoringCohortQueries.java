@@ -3352,22 +3352,22 @@ public class IntensiveMonitoringCohortQueries {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    switch (flag) {
-      case 5:
-        cd.setName(
-            "Pedido de CD4 = “% de MG HIV+ que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra”");
-        break;
-      case 6:
-        cd.setName(
-            "Resultado de CD4 = “% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez”");
-        break;
+    String inclusionPeriodMappings = "";
+
+    if (flag == 5) {
+      cd.setName(
+          "Pedido de CD4 = “% de MG HIV+ que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra”");
+      inclusionPeriodMappings =
+          "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}";
+    } else if (flag == 6) {
+      cd.setName(
+          "Resultado de CD4 = “% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez”");
+      inclusionPeriodMappings =
+          "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}";
     }
 
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    String inclusionPeriodMappings =
-        "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}";
 
     cd.addSearch(
         "pregnantOnPeriod",
