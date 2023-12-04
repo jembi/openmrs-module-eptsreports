@@ -211,8 +211,7 @@ public class PrepNewQueries {
     valuesMap.put("maxAge", maxAge);
 
     String query =
-        ""
-            + "SELECT patient_id "
+        "SELECT patient_id "
             + "FROM ( "
             + "	SELECT pat.patient_id, Timestampdiff(year, pn.birthdate, clients.earliest_date_ever) AS 	age "
             + "	FROM   patient pat "
@@ -508,9 +507,9 @@ public class PrepNewQueries {
             + "AND e.encounter_type = ${80} "
             + "AND pe.gender = 'F' "
             + "AND ( "
-            + " (o.concept_id = ${1982} AND o.value_coded = ${1065} ) "
+            + " (o.concept_id = ${6332} AND o.value_coded = ${1065} ) "
             + "    OR "
-            + "    (o.concept_id = ${165196} AND o.value_coded = ${1982} ) "
+            + "    (o.concept_id = ${165196} AND o.value_coded = ${6332} ) "
             + ") "
             + "AND e.encounter_datetime = breastfeeding.breastfeeding_date "
             + "AND p.patient_id NOT IN ( "

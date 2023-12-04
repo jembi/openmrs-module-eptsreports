@@ -23,15 +23,18 @@ public class PrepCtCohortQueries {
   private HivMetadata hivMetadata;
   private PrepNewCohortQueries prepNewCohortQueries;
   private CommonMetadata commonMetadata;
+  private GenderCohortQueries genderCohortQueries;
 
   @Autowired
   public PrepCtCohortQueries(
       HivMetadata hivMetadata,
       PrepNewCohortQueries prepNewCohortQueries,
-      CommonMetadata commonMetadata) {
+      CommonMetadata commonMetadata,
+      GenderCohortQueries genderCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.prepNewCohortQueries = prepNewCohortQueries;
     this.commonMetadata = commonMetadata;
+    this.genderCohortQueries = genderCohortQueries;
   }
 
   public CohortDefinition getPREPCTNumerator() {
@@ -578,6 +581,10 @@ public class PrepCtCohortQueries {
                 hivMetadata.getSexWorkerConcept(),
                 hivMetadata.getTransGenderConcept()));
 
+    CohortDefinition male = genderCohortQueries.maleCohort();
+
+    cd.addSearch("male", EptsReportUtils.map(male, ""));
+
     cd.addSearch(
         "homosexual",
         EptsReportUtils.map(
@@ -588,7 +595,7 @@ public class PrepCtCohortQueries {
         EptsReportUtils.map(
             exclusion, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
-    cd.setCompositionString("homosexual AND NOT exclusion");
+    cd.setCompositionString("(homosexual AND male) AND NOT exclusion");
 
     return cd;
   }
@@ -686,7 +693,7 @@ public class PrepCtCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getPatientsWhoAreSexWorker() {
+  public CohortDefinition getFemalePatientsWhoAreSexWorker() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Sex Worker");
     cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
@@ -697,18 +704,21 @@ public class PrepCtCohortQueries {
         getPatientsWhoAreKeypopulation(Arrays.asList(hivMetadata.getSexWorkerConcept()));
     CohortDefinition onDrugs =
         getPatientsWhoAreKeypopulation(Arrays.asList(hivMetadata.getDrugUseConcept()));
+    CohortDefinition female = genderCohortQueries.femaleCohort();
 
     cd.addSearch(
         "drugUser",
         EptsReportUtils.map(
             onDrugs, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
+    cd.addSearch("female", EptsReportUtils.map(female, ""));
+
     cd.addSearch(
         "sexWorker",
         EptsReportUtils.map(
             SW, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
-    cd.setCompositionString("sexWorker AND NOT drugUser");
+    cd.setCompositionString("(sexWorker AND female) AND NOT drugUser");
 
     return cd;
   }
