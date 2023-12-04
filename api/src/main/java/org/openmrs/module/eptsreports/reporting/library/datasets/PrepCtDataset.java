@@ -146,7 +146,7 @@ public class PrepCtDataset extends BaseDataSet {
                 "Age, Gender, and Test Results",
                 EptsReportUtils.map(prepCtCohortQueries.getPREPCTNumerator(), mappings)),
             mappings),
-        getColumnsForAgeAndGenderAndKeyPop());
+        getColumnsForAgeAndGender());
 
     return dsd;
   }
@@ -156,7 +156,7 @@ public class PrepCtDataset extends BaseDataSet {
    *
    * @return
    */
-  private List<ColumnParameters> getColumnsForAgeAndGenderAndKeyPop() {
+  private List<ColumnParameters> getColumnsForAgeAndGender() {
     ColumnParameters fifteenTo19M =
         new ColumnParameters(
             "fifteenTo19M",
@@ -315,18 +315,6 @@ public class PrepCtDataset extends BaseDataSet {
             EptsCommonDimensionKey.of(DimensionKeyForGender.female).getDimensions(),
             "19");
 
-    // Key population
-    //    ColumnParameters pid = new ColumnParameters("pid", "People who inject drugs", "KP=PID",
-    // "21");
-    //    ColumnParameters msm = new ColumnParameters("msm", "Men who have sex with men", "KP=MSM",
-    // "22");
-    //    ColumnParameters csw = new ColumnParameters("csw", "Female sex workers", "KP=CSW", "23");
-    //    ColumnParameters pri =
-    //        new ColumnParameters("pri", "People in prison and other closed settings", "KP=PRI",
-    // "24");
-    //    ColumnParameters msw = new ColumnParameters("msw", "Male sex workers", "KP=MSW", "25");
-    //    ColumnParameters tg = new ColumnParameters("tg", "Transgender", "KP=TG", "26");
-
     // Maternity
     ColumnParameters pregnant =
         new ColumnParameters("pregnant", "Pregnant", "maternity=pregnant", "27");
@@ -361,12 +349,6 @@ public class PrepCtDataset extends BaseDataSet {
         above50F,
         unknownF,
         totalF,
-        //        pid,
-        //        msm,
-        //        csw,
-        //        pri,
-        //        msw,
-        //        tg,
         pregnant,
         breastfeeding,
         positive,
