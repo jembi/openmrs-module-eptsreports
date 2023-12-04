@@ -62,6 +62,11 @@ public class TxRttCohortQueries {
 
   private final String previousReportingPeriod = "endDate=${endDate},location=${location}";
 
+  private void addGeneralParameters(CohortDefinition cd) {
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+  }
+
   @Autowired
   public TxRttCohortQueries(
       HivMetadata hivMetadata,
@@ -1136,11 +1141,6 @@ public class TxRttCohortQueries {
         "txRtt AND NOT (cd4Under200AndAge OR cd4Above200AndAge OR notEligibleForCd4AndAge)");
 
     return cd;
-  }
-
-  private void addGeneralParameters(CohortDefinition cd) {
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
   }
 
   /**
