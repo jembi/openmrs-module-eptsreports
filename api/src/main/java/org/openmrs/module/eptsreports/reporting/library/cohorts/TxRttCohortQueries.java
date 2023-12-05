@@ -62,6 +62,11 @@ public class TxRttCohortQueries {
 
   private final String previousReportingPeriod = "endDate=${endDate},location=${location}";
 
+  private void addGeneralParameters(CohortDefinition cd) {
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+  }
+
   @Autowired
   public TxRttCohortQueries(
       HivMetadata hivMetadata,
@@ -427,29 +432,27 @@ public class TxRttCohortQueries {
 
     CohortDefinition txCurr = txCurrCohortQueries.getTxCurrCompositionCohort("txCurr", true);
 
-    CohortDefinition transferredOut =
-        commonCohortQueries.getMohTransferredOutPatientsByEndOfPeriod();
+    CohortDefinition transferredOut = getPatientsWhoAreTransferredOut();
 
     CohortDefinition homeVisitTrfOut =
         txCurrCohortQueries.getPatientsTransferedOutInLastHomeVisitCard();
 
-    CohortDefinition clinicalVisit = this.getPatientsReturnedTreatmentDuringReportingPeriod();
+    CohortDefinition drugPickUp = getPatientsReturnedTreatmentDuringReportingPeriod();
 
     String mappingsTrfIn = "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}";
     String mappingsCurr = "onOrBefore=${onOrBefore-3m},location=${location}";
-    String mappingsTrfOut = "onOrBefore=${onOrAfter-1d},location=${location}";
+    String mappingsTrfOut = "startDate=${onOrAfter},location=${location}";
     String mappingsHomeVisitTrfOut = "onOrBefore=${onOrAfter-1d},location=${location}";
-    String mappingsClinicalVisit =
+    String mappingsPickUplVisit =
         "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}";
 
     cd.addSearch("transferredIn", EptsReportUtils.map(transferredIn, mappingsTrfIn));
     cd.addSearch("txCurr", EptsReportUtils.map(txCurr, mappingsCurr));
     cd.addSearch("transferredOut", EptsReportUtils.map(transferredOut, mappingsTrfOut));
     cd.addSearch("homeVisitTrfOut", EptsReportUtils.map(homeVisitTrfOut, mappingsHomeVisitTrfOut));
-    cd.addSearch("clinicalVisit", EptsReportUtils.map(clinicalVisit, mappingsClinicalVisit));
+    cd.addSearch("drugPickUp", EptsReportUtils.map(drugPickUp, mappingsPickUplVisit));
 
-    cd.setCompositionString(
-        "(transferredIn OR transferredOut OR homeVisitTrfOut) AND clinicalVisit AND NOT txCurr");
+    cd.setCompositionString("(transferredIn OR transferredOut) AND drugPickUp AND NOT txCurr");
 
     return cd;
   }
@@ -1138,5 +1141,59 @@ public class TxRttCohortQueries {
         "txRtt AND NOT (cd4Under200AndAge OR cd4Above200AndAge OR notEligibleForCd4AndAge)");
 
     return cd;
+  }
+
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>The system will identify patients who were transferred out by end of previous reporting
+   * period as follows:
+   *
+   * <ul>
+   *   <li>Patients enrolled on ART Program (Service TARV- Tratamento) with the following last
+   *       status: Transferred Out or
+   *   <li>Patients who have “Mudança no Estado de Permanência TARV” filled out in Ficha Resumo or
+   *       Ficha Clinica – Master Card for the following reasons that are specified in the patient
+   *       chart: patient Transferred Out or
+   *   <li>Patients who have REASON PATIENT MISSED VISIT (MOTIVOS DA FALTA) as “Transferido para
+   *       outra US” or “Auto-transferência” marked in the last Home Visit Card by reporting end
+   *       date. Use the “data da visita” when the patient reason was marked on the home visit card
+   *       as the reference date.
+   * </ul>
+   *
+   * <br>
+   *
+   * <p>The system will identify the most recent date from the different sources as the date of
+   * Transferred Out. Patients who are “marked” as transferred out who have an ARV pick-up
+   * registered in FILA or have a clinical consultation after the date the patient was “marked” as
+   * transferred out will not be considered as Transferred Out.<br>
+   *
+   * <p>The system will consider patient as transferred out as above defined only if the most recent
+   * date between (next scheduled ART pick-up on FILA + 1 day) and (the most recent ART pickup date
+   * on Ficha Recepção – Levantou ARVs + 31 days) falls during the reporting period.
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoAreTransferredOut() {
+    CompositionCohortDefinition definition = new CompositionCohortDefinition();
+    addGeneralParameters(definition);
+    definition.setName("TxTB - Transferred Out");
+    definition.addSearch(
+        "transferred-out",
+        EptsReportUtils.map(
+            txCurrCohortQueries.getPatientsWhoAreTransferredOutToAnotherHf(),
+            "onOrBefore=${startDate-1d},location=${location}"));
+    definition.addSearch(
+        "transferred-out-fila-arv",
+        EptsReportUtils.map(
+            txCurrCohortQueries.getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(),
+            "onOrBefore=${startDate-1d},location=${location}"));
+    definition.setCompositionString("transferred-out AND transferred-out-fila-arv");
+
+    return definition;
   }
 }
