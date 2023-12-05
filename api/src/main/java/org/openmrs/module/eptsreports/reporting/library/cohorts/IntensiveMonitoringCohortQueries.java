@@ -3081,7 +3081,7 @@ public class IntensiveMonitoringCohortQueries {
                 hivMetadata.getYesConcept().getConceptId()),
             inclusionResultPeriodMappings));
     cd.addSearch(
-        "EE",
+        "transferredIn",
         EptsReportUtils.map(
             QualityImprovement2020Queries.getTransferredInPatients(
                 hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
@@ -3110,12 +3110,15 @@ public class IntensiveMonitoringCohortQueries {
     if (flag == 1) {
       cd.setCompositionString(
           "A AND (AGE OR D OR breastfeedingOnPeriod) AND NOT (E OR C OR pregnantOnPeriod)");
+    } else if (flag == 2) {
+      cd.setCompositionString(
+          "AA AND (AGE OR DD OR breastfeedingOnPeriodCd4Result) AND NOT (transferredIn OR CC OR pregnantOnPeriodCd4Resul)");
     } else if (flag == 3) {
       cd.setCompositionString(
           "A AND AGE AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod)");
-    } else if (flag == 2 || flag == 4) {
+    } else if (flag == 4) {
       cd.setCompositionString(
-          "AA AND (AGE OR DD OR breastfeedingOnPeriodCd4Result) AND NOT (EE OR CC OR pregnantOnPeriodCd4Resul)");
+          "(AA AND AGE) AND NOT (DD OR breastfeedingOnPeriodCd4Result OR transferredIn OR CC OR pregnantOnPeriodCd4Resul)");
     }
     return cd;
   }
