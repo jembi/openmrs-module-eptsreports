@@ -45,7 +45,7 @@ public class PrepCtDataset extends BaseDataSet {
     String mappingsKp = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
     dsd.addDimension(
-        "KP", EptsReportUtils.map(eptsCommonDimension.getKeyPopsDimension(), mappingsKp));
+        "KP", EptsReportUtils.map(eptsCommonDimension.getKeyPopsDimensionForPrep(), mappingsKp));
     dsd.addDimension("gender", EptsReportUtils.map(eptsCommonDimension.gender(), ""));
     dsd.addDimension(
         "maternity",
@@ -87,16 +87,66 @@ public class PrepCtDataset extends BaseDataSet {
             mappings),
         "");
 
+    dsd.addColumn(
+        "PID",
+        "PREP CT: People who inject drugs",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "People who inject drugs",
+                EptsReportUtils.map(prepCtCohortQueries.getPREPCTNumerator(), mappings)),
+            mappings),
+        "KP=PID");
+
+    dsd.addColumn(
+        "MSM",
+        "PREP CT: Men who have sex with men",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Men who have sex with men",
+                EptsReportUtils.map(prepCtCohortQueries.getPREPCTNumerator(), mappings)),
+            mappings),
+        "KP=MSM");
+
+    dsd.addColumn(
+        "TG",
+        "PREP CT: Transgender",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Transgender",
+                EptsReportUtils.map(prepCtCohortQueries.getPREPCTNumerator(), mappings)),
+            mappings),
+        "KP=TG");
+
+    dsd.addColumn(
+        "SW",
+        "PREP CT: Female sex workers",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Female sex workers",
+                EptsReportUtils.map(prepCtCohortQueries.getPREPCTNumerator(), mappings)),
+            mappings),
+        "KP=SW");
+
+    dsd.addColumn(
+        "PRI",
+        "PREP CT: People in prison and other closed settings",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "People in prison and other closed settings",
+                EptsReportUtils.map(prepCtCohortQueries.getPREPCTNumerator(), mappings)),
+            mappings),
+        "KP=PRI");
+
     addRow(
         dsd,
         "PREPCT",
-        "Age, Gender, Key Population and Test Results",
+        "Age, Gender, and Test Results",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "Age, Gender, Key Population and Test Results",
+                "Age, Gender, and Test Results",
                 EptsReportUtils.map(prepCtCohortQueries.getPREPCTNumerator(), mappings)),
             mappings),
-        getColumnsForAgeAndGenderAndKeyPop());
+        getColumnsForAgeAndGender());
 
     return dsd;
   }
@@ -106,7 +156,7 @@ public class PrepCtDataset extends BaseDataSet {
    *
    * @return
    */
-  private List<ColumnParameters> getColumnsForAgeAndGenderAndKeyPop() {
+  private List<ColumnParameters> getColumnsForAgeAndGender() {
     ColumnParameters fifteenTo19M =
         new ColumnParameters(
             "fifteenTo19M",
@@ -265,15 +315,6 @@ public class PrepCtDataset extends BaseDataSet {
             EptsCommonDimensionKey.of(DimensionKeyForGender.female).getDimensions(),
             "19");
 
-    // Key population
-    ColumnParameters pid = new ColumnParameters("pid", "People who inject drugs", "KP=PID", "21");
-    ColumnParameters msm = new ColumnParameters("msm", "Men who have sex with men", "KP=MSM", "22");
-    ColumnParameters csw = new ColumnParameters("csw", "Female sex workers", "KP=CSW", "23");
-    ColumnParameters pri =
-        new ColumnParameters("pri", "People in prison and other closed settings", "KP=PRI", "24");
-    ColumnParameters msw = new ColumnParameters("msw", "Male sex workers", "KP=MSW", "25");
-    ColumnParameters tg = new ColumnParameters("tg", "Transgender", "KP=TG", "26");
-
     // Maternity
     ColumnParameters pregnant =
         new ColumnParameters("pregnant", "Pregnant", "maternity=pregnant", "27");
@@ -308,12 +349,6 @@ public class PrepCtDataset extends BaseDataSet {
         above50F,
         unknownF,
         totalF,
-        pid,
-        msm,
-        csw,
-        pri,
-        msw,
-        tg,
         pregnant,
         breastfeeding,
         positive,
