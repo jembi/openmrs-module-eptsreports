@@ -432,7 +432,7 @@ public class TxRttCohortQueries {
 
     CohortDefinition txCurr = txCurrCohortQueries.getTxCurrCompositionCohort("txCurr", true);
 
-    CohortDefinition transferredOut = getTrfOut();
+    CohortDefinition transferredOut = getPatientsWhoAreTransferredOut();
 
     CohortDefinition homeVisitTrfOut =
         txCurrCohortQueries.getPatientsTransferedOutInLastHomeVisitCard();
@@ -1178,7 +1178,7 @@ public class TxRttCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getTrfOut() {
+  public CohortDefinition getPatientsWhoAreTransferredOut() {
     CompositionCohortDefinition definition = new CompositionCohortDefinition();
     addGeneralParameters(definition);
     definition.setName("TxTB - Transferred Out");
