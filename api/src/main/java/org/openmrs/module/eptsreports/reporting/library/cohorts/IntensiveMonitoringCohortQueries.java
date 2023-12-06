@@ -3081,7 +3081,7 @@ public class IntensiveMonitoringCohortQueries {
                 hivMetadata.getYesConcept().getConceptId()),
             inclusionResultPeriodMappings));
     cd.addSearch(
-        "EE",
+        "transferredIn",
         EptsReportUtils.map(
             QualityImprovement2020Queries.getTransferredInPatients(
                 hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
@@ -3110,12 +3110,15 @@ public class IntensiveMonitoringCohortQueries {
     if (flag == 1) {
       cd.setCompositionString(
           "A AND (AGE OR D OR breastfeedingOnPeriod) AND NOT (E OR C OR pregnantOnPeriod)");
+    } else if (flag == 2) {
+      cd.setCompositionString(
+          "AA AND (AGE OR DD OR breastfeedingOnPeriodCd4Result) AND NOT (transferredIn OR CC OR pregnantOnPeriodCd4Resul)");
     } else if (flag == 3) {
       cd.setCompositionString(
           "A AND AGE AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod)");
-    } else if (flag == 2 || flag == 4) {
+    } else if (flag == 4) {
       cd.setCompositionString(
-          "AA AND (AGE OR DD OR breastfeedingOnPeriodCd4Result) AND NOT (EE OR CC OR pregnantOnPeriodCd4Resul)");
+          "(AA AND AGE) AND NOT (DD OR breastfeedingOnPeriodCd4Result OR transferredIn OR CC OR pregnantOnPeriodCd4Resul)");
     }
     return cd;
   }
@@ -3352,22 +3355,22 @@ public class IntensiveMonitoringCohortQueries {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    switch (flag) {
-      case 5:
-        cd.setName(
-            "Pedido de CD4 = “% de MG HIV+ que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra”");
-        break;
-      case 6:
-        cd.setName(
-            "Resultado de CD4 = “% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez”");
-        break;
+    String inclusionPeriodMappings = "";
+
+    if (flag == 5) {
+      cd.setName(
+          "Pedido de CD4 = “% de MG HIV+ que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra”");
+      inclusionPeriodMappings =
+          "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}";
+    } else if (flag == 6) {
+      cd.setName(
+          "Resultado de CD4 = “% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez”");
+      inclusionPeriodMappings =
+          "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}";
     }
 
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    String inclusionPeriodMappings =
-        "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}";
 
     cd.addSearch(
         "pregnantOnPeriod",
@@ -3406,7 +3409,7 @@ public class IntensiveMonitoringCohortQueries {
             qualityImprovement2020CohortQueries.getCd4ResultAfterFirstConsultationOfPregnancy(
                 commonMetadata.getPregnantConcept().getConceptId(),
                 hivMetadata.getYesConcept().getConceptId()),
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
+            inclusionPeriodMappings));
 
     if (flag == 5) {
       cd.setCompositionString("(pregnantOnPeriod AND requestCd4ForPregnant) AND NOT transferredIn");
