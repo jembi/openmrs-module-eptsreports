@@ -53,8 +53,7 @@ public class TxPvlsBySourceQueries {
     map.put("856", String.valueOf(vlConceptQuestion));
     map.put("1305", String.valueOf(vlQualitativeConceptQuestion));
     String query =
-        ""
-            + "SELECT p.patient_id "
+        "SELECT p.patient_id "
             + "FROM   patient p "
             + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -73,21 +72,23 @@ public class TxPvlsBySourceQueries {
             + "               ON vl.patient_id = p.patient_id "
             + "WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
             + "       AND e.encounter_type IN ( ${13}, ${51} ) "
             + "       AND DATE(e.encounter_datetime) = vl.recent_date "
             + "       AND e.location_id = :location "
             + "       AND o.concept_id IN ( ${856}, ${1305} ) "
-            + "       AND ( ( o.value_numeric IS NOT NULL AND o.value_numeric < 1000 ) OR o.value_coded IS NOT NULL ) "
+            + "       AND ( o.value_numeric < 1000  OR o.value_coded IS NOT NULL  ) "
             + "       AND NOT EXISTS(SELECT en.patient_id "
             + "                      FROM   encounter en "
             + "                             INNER JOIN obs ob ON ob.encounter_id = en.encounter_id "
             + "                      WHERE  en.voided = 0 "
+            + "                             AND ob.voided = 0 "
             + "                             AND en.location_id = :location "
             + "                             AND encounter_type IN ( ${13}, ${51} ) "
             + "                             AND DATE(en.encounter_datetime) = vl.recent_date "
             + "                             AND en.patient_id = p.patient_id "
             + "                             AND ob.concept_id = ${856} "
-            + "                             AND o.value_numeric > 1000 "
+            + "                             AND ob.value_numeric >= 1000 "
             + "                      GROUP  BY en.patient_id) "
             + "GROUP  BY p.patient_id";
 
