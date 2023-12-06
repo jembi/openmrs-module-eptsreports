@@ -1371,6 +1371,7 @@ public class TxCurrCohortQueries {
             + "                                     AND o.concept_id = ${5096} "
             + "                                     AND o.value_datetime IS NOT NULL "
             + "                                     AND e.voided = 0 "
+            + "                                     AND o.voided =0 "
             + "                                     AND e.location_id = :location "
             + "                                     AND DATE(e.encounter_datetime) <= :onOrBefore "
             + "                                     GROUP BY e.patient_id "
@@ -1380,6 +1381,7 @@ public class TxCurrCohortQueries {
             + "                AND o.concept_id = ${5096} "
             + "                AND o.value_datetime >= :onOrAfter "
             + "                AND e.voided = 0 "
+            + "                AND o.voided =0 "
             + "                AND e.location_id = :location "
             + "                AND DATE(e.encounter_datetime) = last_pickup.recent_date "
             + "                GROUP BY e.patient_id "
@@ -1575,6 +1577,7 @@ public class TxCurrCohortQueries {
             + "                                     AND o.concept_id = ${5096} "
             + "                                     AND o.value_datetime IS NOT NULL "
             + "                                     AND e.voided = 0 "
+            + "                                     AND o.voided =0 "
             + "                                     AND e.location_id = :location "
             + "                                     AND DATE(e.encounter_datetime) <= :onOrBefore "
             + "                                     GROUP BY e.patient_id "
@@ -1584,6 +1587,7 @@ public class TxCurrCohortQueries {
             + "                AND o.concept_id = ${5096} "
             + "                AND o.value_datetime >= :onOrAfter "
             + "                AND e.voided = 0 "
+            + "                AND o.voided = 0 "
             + "                AND e.location_id = :location "
             + "                AND DATE(e.encounter_datetime) = last_pickup.recent_date "
             + "                GROUP BY e.patient_id "
@@ -1662,6 +1666,7 @@ public class TxCurrCohortQueries {
         new Parameter("onOrAfter", "After Date", Date.class));
     patientsWithSemiAnnualTypeOfDispensation.addParameter(
         new Parameter("location", "Location", Location.class));
+    System.out.println(patientsWithSemiAnnualTypeOfDispensation.getQuery());
     return patientsWithSemiAnnualTypeOfDispensation;
   }
 
