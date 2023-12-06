@@ -25,16 +25,20 @@ public class PrepCtCohortQueries {
   private CommonMetadata commonMetadata;
   private GenderCohortQueries genderCohortQueries;
 
+  private GenericCohortQueries genericCohortQueries;
+
   @Autowired
   public PrepCtCohortQueries(
       HivMetadata hivMetadata,
       PrepNewCohortQueries prepNewCohortQueries,
       CommonMetadata commonMetadata,
-      GenderCohortQueries genderCohortQueries) {
+      GenderCohortQueries genderCohortQueries,
+      GenericCohortQueries genericCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.prepNewCohortQueries = prepNewCohortQueries;
     this.commonMetadata = commonMetadata;
     this.genderCohortQueries = genderCohortQueries;
+    this.genericCohortQueries = genericCohortQueries;
   }
 
   public CohortDefinition getPREPCTNumerator() {
@@ -76,12 +80,18 @@ public class PrepCtCohortQueries {
             prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
-        "E",
+        "G",
         EptsReportUtils.map(
             getClientsWithAtleastOneFollowupVisitDuringReportingPeriodPrep(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(A or (B AND E) or C or D) AND NOT F");
+    cd.addSearch(
+        "H",
+        EptsReportUtils.map(
+            genericCohortQueries.getPatientAgeBasedOnPrepEndDate(15, 200),
+            "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("((((A OR B) AND G) OR C OR D OR E) AND NOT F) AND H");
 
     return cd;
   }
