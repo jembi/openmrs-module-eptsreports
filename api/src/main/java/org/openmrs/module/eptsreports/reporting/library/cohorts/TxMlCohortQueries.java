@@ -180,14 +180,14 @@ public class TxMlCohortQueries {
     cd.addSearch(
         "iitWithoutNextScheduledDrugPickup",
         EptsReportUtils.map(
-            getPatientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup(),
+            getPatientWithoutScheduledDrugPickup(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "iitMostRecentScheduleAfter28Days",
         EptsReportUtils.map(
             getPatientHavingLastScheduledDrugPickupDate(28),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            "startDate=${startDate-1d},endDate=${endDate},location=${location}"));
 
     // EXCLUSIONS
     cd.addSearch(
@@ -250,38 +250,6 @@ public class TxMlCohortQueries {
 
     cd.setCompositionString("transferredOutReportingPeriod AND mostRecentScheduleDuringPeriod");
     return cd;
-  }
-
-  /**
-   * <b>Patients experienced Interruption in Treatment (IIT)</b>
-   * <li>All patients who do not have the next scheduled drug pick up date on their last drug
-   *     pick-up (FILA) that occurred during the reporting period nor any ART pickup date registered
-   *     on Ficha Recepção – Levantou ARVs or FILA during the reporting period.
-   *
-   * @return {@link CohortDefinition}
-   */
-  public CohortDefinition getPatientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup() {
-    CompositionCohortDefinition definition = new CompositionCohortDefinition();
-    definition.setName("patientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup");
-
-    definition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    definition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    definition.addParameter(new Parameter("location", "location", Location.class));
-
-    CohortDefinition txcurr = txCurrCohortQueries.getTxCurrCompositionCohort("txcurr", true);
-    CohortDefinition withoutPickup = getPatientWithoutScheduledDrugPickup();
-
-    definition.addSearch(
-        "txcurr", EptsReportUtils.map(txcurr, "onOrBefore=${startDate-1d},location=${location}"));
-
-    definition.addSearch(
-        "withoutPickup",
-        EptsReportUtils.map(
-            withoutPickup, "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    definition.setCompositionString("withoutPickup AND txcurr");
-
-    return definition;
   }
 
   public CohortDefinition getPatientWithoutScheduledDrugPickup() {
