@@ -338,6 +338,8 @@ public class PrepCtQueries {
             + "   AND e.location_id = :location AND e.encounter_type= ${81}  "
             + "   AND e.encounter_datetime >= :startDate  "
             + "   AND e.encounter_datetime <= :endDate  "
+            + "   AND o.obs_datetime >= :startDate  "
+            + "   AND o.obs_datetime <= :endDate  "
             + "   GROUP  BY p.patient_id  "
             + "      "
             + "   UNION  "
