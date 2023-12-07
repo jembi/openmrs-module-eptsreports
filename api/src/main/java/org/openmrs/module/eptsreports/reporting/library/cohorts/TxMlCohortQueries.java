@@ -112,17 +112,20 @@ public class TxMlCohortQueries {
         getPatientsWhoExperiencedInterruptionInTreatmentComposition();
 
     CohortDefinition transferredOut = getPatientsWhoHasTransferredOutComposition();
+    CohortDefinition transferredOutPrevious = getPatientsWhoHasTransferredOutByEndOfPeriod();
+
+
 
     String mappings = "onOrBefore=${endDate},location=${location}";
     String mappings2 = "startDate=${startDate},endDate=${endDate},location=${location}";
     String previousPeriodMappings =
-        "startDate=${startDate-3m},endDate=${startDate-1d},location=${location}";
+        "endDate=${startDate-1d},location=${location}";
 
     CohortDefinition dead = txCurrCohortQueries.getPatientsWhoAreDead();
 
     cd.addSearch(
         "transferredOutPreviousPeriod",
-        EptsReportUtils.map(transferredOut, previousPeriodMappings));
+        EptsReportUtils.map(transferredOutPrevious , previousPeriodMappings));
 
     cd.addSearch("transferredOutReportingPeriod", EptsReportUtils.map(transferredOut, mappings2));
 
@@ -247,6 +250,30 @@ public class TxMlCohortQueries {
         EptsReportUtils.map(
             getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(true),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("transferredOutReportingPeriod AND mostRecentScheduleDuringPeriod");
+    return cd;
+  }
+
+
+  public CohortDefinition getPatientsWhoHasTransferredOutByEndOfPeriod() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Patients who are Transferred Out to another HF");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+            "transferredOutReportingPeriod",
+            EptsReportUtils.map(
+                    txCurrCohortQueries.getPatientsWhoAreTransferredOutToAnotherHf(),
+                    "onOrBefore=${endDate},location=${location}"));
+
+    cd.addSearch(
+            "mostRecentScheduleDuringPeriod",
+            EptsReportUtils.map(
+                   txCurrCohortQueries.getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(),
+                    "onOrBefore=${endDate},location=${location}"));
 
     cd.setCompositionString("transferredOutReportingPeriod AND mostRecentScheduleDuringPeriod");
     return cd;
@@ -1983,7 +2010,6 @@ public class TxMlCohortQueries {
             + " final.max_date  <= :endDate  ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-
     definition.setQuery(stringSubstitutor.replace(query));
 
     return definition;
