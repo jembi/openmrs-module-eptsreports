@@ -178,7 +178,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
         duringThePeriod
             ? "  AND e.encounter_datetime >= :startDate "
                 + "  AND e.encounter_datetime <= :endDate "
-            : " AND e.encounter_datetime < :startDate ";
+            : " AND e.encounter_datetime <= :startDate ";
 
     query += "  AND e.location_id = :location " + "GROUP BY p.patient_id";
 

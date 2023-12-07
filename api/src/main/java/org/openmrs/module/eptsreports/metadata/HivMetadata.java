@@ -5610,4 +5610,128 @@ public class HivMetadata extends ProgramsMetadata {
         Context.getAdministrationService().getGlobalProperty("eptsreports.artInitiationCd4");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 1708</b>
+   *
+   * <p><b>Name:</b> EXIT FROM ARV TREATMENT
+   *
+   * <p><b>Description: EXIT FROM ARV TREATMENT Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getExitFromArvTreatmentConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.exitFromArvTreatmentUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165386</b>
+   *
+   * <p><b>Name:</b> EXIT DATE
+   *
+   * <p><b>Description: EXIT DATE Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getExitDateFromArvTreatmentConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.exitDateFromArvTreatmentUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165390</b>
+   *
+   * <p><b>Name:</b> CrAg Soro / LCR LABSET
+   *
+   * <p><b>Description: CrAg Soro / LCR LABSET Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCragSoroLabsetConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.cragSoroLabsetUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165393</b>
+   *
+   * <p><b>Name:</b> TREATMENT START DATE
+   *
+   * <p><b>Description: TREATMENT START DATE Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getTreatmentStartDateConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.treatmentStartDateUuid");
+    return getConcept(uuid);
+  }
+  /**
+   * <b>concept_id = 165363</b>
+   *
+   * <p><b>Name:</b> INDUÇÃO ANFOTERICINA LIPOSSÔMICA
+   *
+   * <p><b>Description: INDUÇÃO ANFOTERICINA LIPOSSÔMICA Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getInducaoAnfotericinaLipossomicaConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.inducaoAnfotericinaLipossomicaUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 1413</b>
+   *
+   * <p><b>Name:</b> DATE OF DIAGNOSIS OF KAPOSI SARCOMA
+   *
+   * <p><b>Description: DATE OF DIAGNOSIS OF KAPOSI SARCOMA Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getDateOfDiagnosisOfKaposiSarcomaConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.dateOfDiagnosisOfKaposiSarcomaUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 20294</b>
+   *
+   * <p><b>Name:</b> Outra quimioterapia
+   *
+   * <p><b>Description: Outra quimioterapia Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getOutraQuimioterapiaConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.outraQuimioterapiaUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165379</b>
+   *
+   * <p><b>Name:</b> START DATE FOR QT
+   *
+   * <p><b>Description: START DATE FOR QT Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getStartDateForQuimiotherapyConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.startDateForQuimiotherapyUuid");
+    return getConcept(uuid);
+  }
 }

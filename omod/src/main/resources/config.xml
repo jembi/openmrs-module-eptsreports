@@ -3783,6 +3783,70 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.exitFromArvTreatmentUuid</property>
+		<defaultValue>e1de1ef4-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for EXIT FROM ARV TREATMENT Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.exitDateFromArvTreatmentUuid</property>
+		<defaultValue>ea476870-5db1-4307-922f-161889355cae</defaultValue>
+		<description>
+			UUID for EXIT FROM ARV TREATMENT Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.cragSoroLabsetUuid</property>
+		<defaultValue>23f463dd-a146-4097-ada9-a18ecc535f59</defaultValue>
+		<description>
+			UUID for CrAg Soro / LCR LABSET Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.treatmentStartDateUuid</property>
+		<defaultValue>5bdef973-bc81-491a-826f-bbb4f26785bc</defaultValue>
+		<description>
+			UUID for TREATMENT START DATE Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.inducaoAnfotericinaLipossomicaUuid</property>
+		<defaultValue>6d9940a0-4ec4-4a8c-84cb-55ba8b60dd78</defaultValue>
+		<description>
+			UUID for INDUÇÃO ANFOTERICINA LIPOSSÔMICA Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.dateOfDiagnosisOfKaposiSarcomaUuid</property>
+		<defaultValue>e1dae932-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for DATE OF DIAGNOSIS OF KAPOSI SARCOMA Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.outraQuimioterapiaUuid</property>
+		<defaultValue>45c80cfe-908a-11e6-a98e-000c29db4475</defaultValue>
+		<description>
+			UUID for Outra quimioterapia Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.startDateForQuimiotherapyUuid</property>
+		<defaultValue>2e97b8fd-c570-46bd-86bc-538650fe9a23</defaultValue>
+		<description>
+			UUID for START DATE FOR QT Concept
+		</description>
+	</globalProperty>
+
 
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 
