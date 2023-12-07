@@ -314,7 +314,7 @@ public class PrepCtCohortQueries {
         PrepCtQueries.getNegativeTestResults(
             hivMetadata.getHivRapidTest1QualitativeConcept().getConceptId(),
             commonMetadata.getNegative().getConceptId(),
-            hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
             hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getDateOfInitialHivTestConcept().getConceptId()));
 
