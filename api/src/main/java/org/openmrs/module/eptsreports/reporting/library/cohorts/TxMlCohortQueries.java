@@ -114,18 +114,15 @@ public class TxMlCohortQueries {
     CohortDefinition transferredOut = getPatientsWhoHasTransferredOutComposition();
     CohortDefinition transferredOutPrevious = getPatientsWhoHasTransferredOutByEndOfPeriod();
 
-
-
     String mappings = "onOrBefore=${endDate},location=${location}";
     String mappings2 = "startDate=${startDate},endDate=${endDate},location=${location}";
-    String previousPeriodMappings =
-        "endDate=${startDate-1d},location=${location}";
+    String previousPeriodMappings = "endDate=${startDate-1d},location=${location}";
 
     CohortDefinition dead = txCurrCohortQueries.getPatientsWhoAreDead();
 
     cd.addSearch(
         "transferredOutPreviousPeriod",
-        EptsReportUtils.map(transferredOutPrevious , previousPeriodMappings));
+        EptsReportUtils.map(transferredOutPrevious, previousPeriodMappings));
 
     cd.addSearch("transferredOutReportingPeriod", EptsReportUtils.map(transferredOut, mappings2));
 
@@ -205,8 +202,14 @@ public class TxMlCohortQueries {
             getPatientsWhoHasTransferredOutComposition(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
+    cd.addSearch(
+        "transferredOutPrevious",
+        EptsReportUtils.map(
+            getPatientsWhoHasTransferredOutByEndOfPeriod(),
+            "endDate=${startDate-1d},location=${location}"));
+
     cd.setCompositionString(
-        "(iitMostRecentScheduleAfter28Days OR iitWithoutNextScheduledDrugPickup) AND NOT (deadReportingPeriod OR transferredOut)");
+        "(iitMostRecentScheduleAfter28Days OR iitWithoutNextScheduledDrugPickup) AND NOT (deadReportingPeriod OR (transferredOut NOT transferredOutPrevious))");
     return cd;
   }
 
@@ -255,7 +258,6 @@ public class TxMlCohortQueries {
     return cd;
   }
 
-
   public CohortDefinition getPatientsWhoHasTransferredOutByEndOfPeriod() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
@@ -264,16 +266,16 @@ public class TxMlCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     cd.addSearch(
-            "transferredOutReportingPeriod",
-            EptsReportUtils.map(
-                    txCurrCohortQueries.getPatientsWhoAreTransferredOutToAnotherHf(),
-                    "onOrBefore=${endDate},location=${location}"));
+        "transferredOutReportingPeriod",
+        EptsReportUtils.map(
+            txCurrCohortQueries.getPatientsWhoAreTransferredOutToAnotherHf(),
+            "onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch(
-            "mostRecentScheduleDuringPeriod",
-            EptsReportUtils.map(
-                   txCurrCohortQueries.getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(),
-                    "onOrBefore=${endDate},location=${location}"));
+        "mostRecentScheduleDuringPeriod",
+        EptsReportUtils.map(
+            txCurrCohortQueries.getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(),
+            "onOrBefore=${endDate},location=${location}"));
 
     cd.setCompositionString("transferredOutReportingPeriod AND mostRecentScheduleDuringPeriod");
     return cd;
