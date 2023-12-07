@@ -673,6 +673,7 @@ public class TxRttCohortQueries {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patients with CD4 Result");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -696,9 +697,35 @@ public class TxRttCohortQueries {
             + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "                          INNER JOIN ( "
             + "        SELECT first.patient_id, "
-            + "               Min(first.pickup_date) AS first_pickup_ever "
+            + "               Min(first.pickup_date) AS first_pickup "
             + "        FROM   ("
-            + CommonQueries.getFirstDrugPickOnFilaOrRecepcaoLevantouQuery()
+            + "                SELECT p.patient_id, "
+            + "                       Min(e.encounter_datetime) AS pickup_date "
+            + "                FROM   patient p "
+            + "                       INNER JOIN encounter e "
+            + "                               ON e.patient_id = p.patient_id "
+            + "                WHERE  e.encounter_type = ${18} "
+            + "                       AND e.voided = 0 "
+            + "                       AND p.voided = 0 "
+            + "                       AND e.location_id = :location "
+            + "                       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                GROUP  BY p.patient_id "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       Min(o.value_datetime) AS pickup_date "
+            + "                FROM   patient p "
+            + "                       INNER JOIN encounter e "
+            + "                               ON e.patient_id = p.patient_id "
+            + "                       INNER JOIN obs o "
+            + "                               ON o.encounter_id = e.encounter_id "
+            + "                WHERE  e.encounter_type = ${52} "
+            + "                       AND o.concept_id = ${23866} "
+            + "                       AND e.location_id = :location "
+            + "                       AND o.value_datetime BETWEEN :startDate AND :endDate "
+            + "                       AND p.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND o.voided = 0 "
+            + "                GROUP  BY p.patient_id "
             + "        ) first "
             + "          GROUP  BY first.patient_id "
             + "                 ) returned "
@@ -727,9 +754,9 @@ public class TxRttCohortQueries {
             + "   AND o.voided = 0 "
             + "   AND e.location_id = :location "
             + "   AND o.value_numeric IS NOT NULL "
-            + "   AND ( ( DATE(e.encounter_datetime) BETWEEN DATE_SUB(returned.first_pickup_ever, INTERVAL 30 day) AND DATE_ADD(returned.first_pickup_ever, INTERVAL 28 day) "
+            + "   AND ( ( DATE(e.encounter_datetime) BETWEEN DATE_SUB(returned.first_pickup, INTERVAL 30 day) AND DATE_ADD(returned.first_pickup, INTERVAL 28 day) "
             + "             AND e.encounter_type IN ( ${6}, ${13}, ${51} ) AND o.concept_id = ${1695} ) "
-            + "          OR ( DATE(o.obs_datetime) BETWEEN DATE_SUB(returned.first_pickup_ever, INTERVAL 30 day) AND DATE_ADD(returned.first_pickup_ever, INTERVAL 28 day) "
+            + "          OR ( DATE(o.obs_datetime) BETWEEN DATE_SUB(returned.first_pickup, INTERVAL 30 day) AND DATE_ADD(returned.first_pickup, INTERVAL 28 day) "
             + "   AND e.encounter_type = ${53} AND o.concept_id = ${1695} ) ) "
             + "   GROUP  BY e.patient_id) min_cd4 ON min_cd4.patient_id = p.patient_id "
             + " WHERE  p.voided = 0 "
@@ -762,14 +789,13 @@ public class TxRttCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Cd4 And Age");
     cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
 
     CohortDefinition getCd4Result = getCd4Result(cd4);
     CohortDefinition age = ageCohortQueries.createXtoYAgeCohort("Age", minAge, maxAge);
 
-    cd.addSearch(
-        "getCd4Result",
-        EptsReportUtils.map(getCd4Result, "endDate=${endDate},location=${location}"));
+    cd.addSearch("getCd4Result", EptsReportUtils.map(getCd4Result, DEFAULT_MAPPING));
 
     cd.addSearch("age", EptsReportUtils.map(age, "effectiveDate=${endDate}"));
 
@@ -996,12 +1022,8 @@ public class TxRttCohortQueries {
     CohortDefinition notEligibleForCd4AndAge = getPatientsNotEligibleForCd4AndAge(5, null);
 
     cd.addSearch("txRtt", EptsReportUtils.map(txRtt, DEFAULT_MAPPING));
-    cd.addSearch(
-        "cd4Under200AndAge",
-        EptsReportUtils.map(cd4Under200AndAge, "endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "cd4Above200AndAge",
-        EptsReportUtils.map(cd4Above200AndAge, "endDate=${endDate},location=${location}"));
+    cd.addSearch("cd4Under200AndAge", EptsReportUtils.map(cd4Under200AndAge, DEFAULT_MAPPING));
+    cd.addSearch("cd4Above200AndAge", EptsReportUtils.map(cd4Above200AndAge, DEFAULT_MAPPING));
     cd.addSearch(
         "notEligibleForCd4AndAge", EptsReportUtils.map(notEligibleForCd4AndAge, DEFAULT_MAPPING));
 
@@ -1073,13 +1095,9 @@ public class TxRttCohortQueries {
 
     cd.addSearch("txRtt", EptsReportUtils.map(txRtt, DEFAULT_MAPPING));
 
-    cd.addSearch(
-        "cd4Above200AndAge",
-        EptsReportUtils.map(cd4Above200AndAge, "endDate=${endDate},location=${location}"));
+    cd.addSearch("cd4Above200AndAge", EptsReportUtils.map(cd4Above200AndAge, DEFAULT_MAPPING));
 
-    cd.addSearch(
-        "cd4Under200AndAge",
-        EptsReportUtils.map(cd4Under200AndAge, "endDate=${endDate},location=${location}"));
+    cd.addSearch("cd4Under200AndAge", EptsReportUtils.map(cd4Under200AndAge, DEFAULT_MAPPING));
     cd.addSearch(
         "notEligibleForCd4AndAge", EptsReportUtils.map(notEligibleForCd4AndAge, DEFAULT_MAPPING));
 
@@ -1128,12 +1146,8 @@ public class TxRttCohortQueries {
     CohortDefinition notEligibleForCd4AndAge = getPatientsNotEligibleForCd4AndAge(5, null);
 
     cd.addSearch("txRtt", EptsReportUtils.map(txRtt, DEFAULT_MAPPING));
-    cd.addSearch(
-        "cd4Under200AndAge",
-        EptsReportUtils.map(cd4Under200AndAge, "endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "cd4Above200AndAge",
-        EptsReportUtils.map(cd4Above200AndAge, "endDate=${endDate},location=${location}"));
+    cd.addSearch("cd4Under200AndAge", EptsReportUtils.map(cd4Under200AndAge, DEFAULT_MAPPING));
+    cd.addSearch("cd4Above200AndAge", EptsReportUtils.map(cd4Above200AndAge, DEFAULT_MAPPING));
     cd.addSearch(
         "notEligibleForCd4AndAge", EptsReportUtils.map(notEligibleForCd4AndAge, DEFAULT_MAPPING));
 

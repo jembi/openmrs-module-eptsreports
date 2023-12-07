@@ -20,6 +20,7 @@ import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ResumoMensalDAHCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.TbPrevQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -67,7 +68,11 @@ public class EptsCommonDimension {
 
   private PrepNewCohortQueries prepNewCohortQueries;
 
-  @Autowired private TxPvlsBySourceLabOrFsrCohortQueries txPvlsBySourceLabOrFsrCohortQueries;
+  private TxPvlsBySourceLabOrFsrCohortQueries txPvlsBySourceLabOrFsrCohortQueries;
+
+  private ResumoMensalDAHCohortQueries resumoMensalDAHCohortQueries;
+
+  private IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries;
 
   @Autowired
   @Qualifier("commonAgeDimensionCohort")
@@ -92,7 +97,10 @@ public class EptsCommonDimension {
       HivMetadata hivMetadata,
       CommonMetadata commonMetadata,
       TxMlCohortQueries txMlCohortQueries,
-      PrepNewCohortQueries prepNewCohortQueries) {
+      PrepNewCohortQueries prepNewCohortQueries,
+      TxPvlsBySourceLabOrFsrCohortQueries txPvlsBySourceLabOrFsrCohortQueries,
+      ResumoMensalDAHCohortQueries resumoMensalDAHCohortQueries,
+      IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries) {
     this.genderCohortQueries = genderCohortQueries;
     this.txNewCohortQueries = txNewCohortQueries;
     this.genericCohortQueries = genericCohortQueries;
@@ -110,6 +118,9 @@ public class EptsCommonDimension {
     this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
     this.prepNewCohortQueries = prepNewCohortQueries;
+    this.txPvlsBySourceLabOrFsrCohortQueries = txPvlsBySourceLabOrFsrCohortQueries;
+    this.resumoMensalDAHCohortQueries = resumoMensalDAHCohortQueries;
+    this.intensiveMonitoringCohortQueries = intensiveMonitoringCohortQueries;
   }
 
   /**
@@ -271,6 +282,13 @@ public class EptsCommonDimension {
         EptsReportUtils.map(
             txNewCohortQueries.getPatientsPregnantEnrolledOnART(false),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    // PREGNANCY STATUS FOR RESUMO MENSAL DAH
+    dim.addCohortDefinition(
+        "pregnant-dah",
+        EptsReportUtils.map(
+            intensiveMonitoringCohortQueries.getMI15C(),
+            "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
     return dim;
   }
 
@@ -393,6 +411,25 @@ public class EptsCommonDimension {
         "previously-on-art",
         EptsReportUtils.map(
             tbPrevQueries.getPatientsWhoStartedTptPreviouslyOnArt(),
+            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
+
+    // ART STATUS FOR RESUMO MENSAL DAH
+    dim.addCohortDefinition(
+        "new-art-dah",
+        EptsReportUtils.map(
+            resumoMensalDAHCohortQueries.getPatientsWhoAreNewInArtDisaggregation(),
+            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
+
+    dim.addCohortDefinition(
+        "restart-art-dah",
+        EptsReportUtils.map(
+            resumoMensalDAHCohortQueries.getPatientsWhoRestartedArtDisaggregation(),
+            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
+
+    dim.addCohortDefinition(
+        "on-art-dah",
+        EptsReportUtils.map(
+            resumoMensalDAHCohortQueries.getPatientsWhoAreInTarvDisaggregation(),
             "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
     return dim;
   }
@@ -1021,6 +1058,38 @@ public class EptsCommonDimension {
         EptsReportUtils.map(
             prepNewCohortQueries.getBreastfeedingPatientsBasedOnPrepNew(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
+    return dim;
+  }
+
+  /**
+   * <b>Relatório Desagregação Utentes em Seguimento de DAH</b>
+   * <li>Com registo de “Data de Início no Modelo de DAH”, na Ficha de DAH, ocorrida até o fim do
+   *     período (“Data de Início no Modelo de DAH” <= “Data Fim”).
+   *
+   *     <p>Excluindo todos os utentes
+   * <li>Com registo de pelo menos um motivo (Óbito/ Abandono/ Transferido Para) e “Data de Saída de
+   *     TARV na US” (secção J), na Ficha de DAH, ocorrida após a data mais recente da “Data de
+   *     Início no Modelo de DAH” e e até o fim do período (“Data de Saída de TARV na US” >= “Última
+   *     Data de Início no Modelo de DAH” e <= “Data Fim”) ou
+   * <li>Com registo de “Data de Saída” (secção I), registada na Ficha de DAH e ocorrida após a data
+   *     mais recente da “Data de Início no Modelo de DAH” e até o fim do período (“Data de Saída de
+   *     TARV na US” >= “Última Data de Início no Modelo de DAH” e <= “Data Fim”)
+   *
+   * @return {@link CohortDefinitionDimension}
+   */
+  public CohortDefinitionDimension getPatientsWhoStartedFollowupOnDAHDisaggregation() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.addParameter(new Parameter("startDate", "startDate", Date.class));
+    dim.addParameter(new Parameter("endDate", "endDate", Date.class));
+    dim.addParameter(new Parameter("location", "location", Location.class));
+    dim.setName("utentes em seguimento de DAH, para desagregação dos indicadores 10 a 19");
+
+    dim.addCohortDefinition(
+        "on-dah",
+        EptsReportUtils.map(
+            resumoMensalDAHCohortQueries.getPatientsWhoStartedFollowupOnDAHComposition(),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
+
     return dim;
   }
 }
