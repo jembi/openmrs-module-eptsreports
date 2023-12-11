@@ -875,4 +875,58 @@ public class PrepCtQueries {
 
     return stringSubstitutor.replace(query);
   }
+
+  public static String clientsWithReasonForPrepInterruptionA(
+          int prepStatus,
+          int stopAll,
+          int reasonNotPrescribePrEp,
+          int hivInfected,
+          int patientDoesNotLikeArvTreatmentSideEffects,
+          int noMoreSubstantialRisk,
+          int userPreference,
+          int other,
+          int prepIncialEncounterType
+          ){
+    Map<String, Integer> map = new HashMap<>();
+    map.put("165292", prepStatus);
+    map.put("1260", stopAll);
+    map.put("165225", reasonNotPrescribePrEp);
+    map.put("1169", hivInfected);
+    map.put("2015", patientDoesNotLikeArvTreatmentSideEffects);
+    map.put("165226", noMoreSubstantialRisk);
+    map.put("165227", userPreference);
+    map.put("5622", other);
+    map.put("80", prepIncialEncounterType);
+
+    String query = "";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    return stringSubstitutor.replace(query);
+  }
+
+  public static String clientsWithReasonForPrepInterruptionB(
+          int reasonNotPrescribePrEp,
+          int hivInfected,
+          int patientDoesNotLikeArvTreatmentSideEffects,
+          int noMoreSubstantialRisk,
+          int userPreference,
+          int other,
+          int prepSeguimentoEncounterType
+  ){
+    Map<String, Integer> map = new HashMap<>();
+    map.put("165225", reasonNotPrescribePrEp);
+    map.put("1169", hivInfected);
+    map.put("2015", patientDoesNotLikeArvTreatmentSideEffects);
+    map.put("165226", noMoreSubstantialRisk);
+    map.put("165227", userPreference);
+    map.put("5622", other);
+    map.put("81", prepSeguimentoEncounterType);
+
+    String query = "";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    return stringSubstitutor.replace(query);
+  }
 }
