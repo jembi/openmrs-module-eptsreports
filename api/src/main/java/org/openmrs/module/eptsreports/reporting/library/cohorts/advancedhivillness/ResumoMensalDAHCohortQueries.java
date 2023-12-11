@@ -1144,7 +1144,7 @@ public class ResumoMensalDAHCohortQueries {
             + "  AND o.value_datetime >= :startDate "
             + "  AND o.value_datetime <= :endDate "
             + "  AND o2.concept_id = ${20294} "
-            + "  AND o2.value_coded = ${1065}"
+            + "  AND o2.value_coded = ${1065} "
             + "GROUP BY p.patient_id";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
@@ -1276,10 +1276,22 @@ public class ResumoMensalDAHCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        "B3",
+        "B3P1",
         map(
             resumoMensalCohortQueries.getPatientsRestartedTarvtB3(),
-            "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
+            "startDate=${startDate-2m},endDate=${endDate-2m},location=${location}"));
+
+    cd.addSearch(
+        "B3P2",
+        map(
+            resumoMensalCohortQueries.getPatientsRestartedTarvtB3(),
+            "startDate=${startDate-1m},endDate=${endDate-1m},location=${location}"));
+
+    cd.addSearch(
+        "B3P3",
+        map(
+            resumoMensalCohortQueries.getPatientsRestartedTarvtB3(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "PREGNANT",
@@ -1287,7 +1299,7 @@ public class ResumoMensalDAHCohortQueries {
             intensiveMonitoringCohortQueries.getMI15C(),
             "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(restartedArt OR B3) AND NOT PREGNANT");
+    cd.setCompositionString("(restartedArt OR B3P1 OR B3P2 OR B3P3) AND NOT PREGNANT");
     return cd;
   }
 
