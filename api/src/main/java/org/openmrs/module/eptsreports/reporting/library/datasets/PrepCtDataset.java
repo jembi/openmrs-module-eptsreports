@@ -138,14 +138,14 @@ public class PrepCtDataset extends BaseDataSet {
         "KP=PRI");
 
     dsd.addColumn(
-            "MSW",
-            "PREP CT: Male sex workers",
-            EptsReportUtils.map(
-                    eptsGeneralIndicator.getIndicator(
-                            "Male sex workers",
-                            EptsReportUtils.map(prepCtCohortQueries.getPREPCTNumerator(), mappings)),
-                    mappings),
-            "KP=MSW");
+        "MSW",
+        "PREP CT: Male sex workers",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Male sex workers",
+                EptsReportUtils.map(prepCtCohortQueries.getPREPCTNumerator(), mappings)),
+            mappings),
+        "KP=MSW");
 
     addRow(
         dsd,

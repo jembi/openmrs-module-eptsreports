@@ -877,16 +877,15 @@ public class PrepCtQueries {
   }
 
   public static String clientsWithReasonForPrepInterruptionA(
-          int prepStatus,
-          int stopAll,
-          int reasonNotPrescribePrEp,
-          int hivInfected,
-          int patientDoesNotLikeArvTreatmentSideEffects,
-          int noMoreSubstantialRisk,
-          int userPreference,
-          int other,
-          int prepIncialEncounterType
-          ){
+      int prepStatus,
+      int stopAll,
+      int reasonNotPrescribePrEp,
+      int hivInfected,
+      int patientDoesNotLikeArvTreatmentSideEffects,
+      int noMoreSubstantialRisk,
+      int userPreference,
+      int other,
+      int prepIncialEncounterType) {
     Map<String, Integer> map = new HashMap<>();
     map.put("165292", prepStatus);
     map.put("1260", stopAll);
@@ -906,14 +905,13 @@ public class PrepCtQueries {
   }
 
   public static String clientsWithReasonForPrepInterruptionB(
-          int reasonNotPrescribePrEp,
-          int hivInfected,
-          int patientDoesNotLikeArvTreatmentSideEffects,
-          int noMoreSubstantialRisk,
-          int userPreference,
-          int other,
-          int prepSeguimentoEncounterType
-  ){
+      int reasonNotPrescribePrEp,
+      int hivInfected,
+      int patientDoesNotLikeArvTreatmentSideEffects,
+      int noMoreSubstantialRisk,
+      int userPreference,
+      int other,
+      int prepSeguimentoEncounterType) {
     Map<String, Integer> map = new HashMap<>();
     map.put("165225", reasonNotPrescribePrEp);
     map.put("1169", hivInfected);

@@ -5734,4 +5734,120 @@ public class HivMetadata extends ProgramsMetadata {
             .getGlobalProperty("eptsreports.startDateForQuimiotherapyUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 165292</b>
+   *
+   * <p><b>Name:</b> PrEP Status
+   *
+   * <p><b>Description: PrEP Status Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getPrepStatusConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.prepStatusConceptUuid");
+
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 1260</b>
+   *
+   * <p><b>Name:</b> STOP ALL
+   *
+   * <p><b>Description: STOP ALL Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getStopAllConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.stopAllConceptUuid");
+
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165225</b>
+   *
+   * <p><b>Name:</b> REASON TO NOT PRESCRIBE PREP
+   *
+   * <p><b>Description: REASON TO NOT PRESCRIBE PREP Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getReasonToNotPrescribePrepConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.reasonToNotPrescribePrepConceptUuid");
+
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 1169</b>
+   *
+   * <p><b>Name:</b> HIV INFECTED
+   *
+   * <p><b>Description: HIV INFECTED Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getHivInfectedConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.hivInfectedConceptUuid");
+
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165226</b>
+   *
+   * <p><b>Name:</b> NO MORE SUBSTANTIAL RISKS
+   *
+   * <p><b>Description: NO MORE SUBSTANTIAL RISKS Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getNoMoreSubstantialRisksConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.noMoreSubstantialRisksConceptUuid");
+
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165227</b>
+   *
+   * <p><b>Name:</b> USER PREFERENCE
+   *
+   * <p><b>Description: USER PREFERENCE Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getUserPreferenceConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.userPreferenceConceptUuid");
+
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 1175</b>
+   *
+   * <p><b>Name:</b> NOT APPLICABLE
+   *
+   * <p><b>Description: NOT APPLICABLE Concept</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getNotApplicableConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.notApplicableConceptUuid");
+
+    return getConcept(uuid);
+  }
 }
