@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Date;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
-import org.openmrs.module.eptsreports.reporting.utils.EptsReportConstants;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -165,13 +164,8 @@ public class TxPvlsBySourceClinicalOrFichaResumoCohortQueries {
     cd.addSearch(
         "breastfeeding",
         EptsReportUtils.map(
-            txPvlsCohortQueries.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
-                EptsReportConstants.PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN,
-                Arrays.asList(
-                    hivMetadata.getAdultoSeguimentoEncounterType(),
-                    hivMetadata.getPediatriaSeguimentoEncounterType(),
-                    hivMetadata.getMasterCardEncounterType())),
-            "onOrBefore=${endDate},location=${location}"));
+            txPvlsCohortQueries.getBreastfeedingPatients(),
+            "endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "suppression",
@@ -199,13 +193,8 @@ public class TxPvlsBySourceClinicalOrFichaResumoCohortQueries {
     cd.addSearch(
         "breastfeeding",
         EptsReportUtils.map(
-            txPvlsCohortQueries.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
-                EptsReportConstants.PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN,
-                Arrays.asList(
-                    hivMetadata.getAdultoSeguimentoEncounterType(),
-                    hivMetadata.getPediatriaSeguimentoEncounterType(),
-                    hivMetadata.getMasterCardEncounterType())),
-            "onOrBefore=${endDate},location=${location}"));
+            txPvlsCohortQueries.getBreastfeedingPatients(),
+            "endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "results",
@@ -237,13 +226,7 @@ public class TxPvlsBySourceClinicalOrFichaResumoCohortQueries {
     cd.addSearch(
         "pregnant",
         EptsReportUtils.map(
-            txPvlsCohortQueries.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
-                EptsReportConstants.PregnantOrBreastfeedingWomen.PREGNANTWOMEN,
-                Arrays.asList(
-                    hivMetadata.getAdultoSeguimentoEncounterType(),
-                    hivMetadata.getPediatriaSeguimentoEncounterType(),
-                    hivMetadata.getMasterCardEncounterType())),
-            "onOrBefore=${endDate},location=${location}"));
+            txPvlsCohortQueries.getPregnantWoman(), "endDate=${endDate},location=${location}"));
     cd.setCompositionString("suppression AND pregnant");
     return cd;
   }
@@ -267,13 +250,7 @@ public class TxPvlsBySourceClinicalOrFichaResumoCohortQueries {
     cd.addSearch(
         "pregnant",
         EptsReportUtils.map(
-            txPvlsCohortQueries.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
-                EptsReportConstants.PregnantOrBreastfeedingWomen.PREGNANTWOMEN,
-                Arrays.asList(
-                    hivMetadata.getAdultoSeguimentoEncounterType(),
-                    hivMetadata.getPediatriaSeguimentoEncounterType(),
-                    hivMetadata.getMasterCardEncounterType())),
-            "onOrBefore=${endDate},location=${location}"));
+            txPvlsCohortQueries.getPregnantWoman(), "endDate=${endDate},location=${location}"));
     cd.setCompositionString("results AND pregnant");
     return cd;
   }
