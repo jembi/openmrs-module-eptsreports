@@ -1107,6 +1107,31 @@ public class TxCurrCohortQueries {
     return defintion;
   }
 
+  public CohortDefinition getPatientsWhoAreTransferredOutToAnotherHfIIT() {
+    SqlCohortDefinition defintion = new SqlCohortDefinition();
+
+    defintion.setName("Patients who are Transferred Out to another HF");
+    defintion.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    defintion.addParameter(new Parameter("endDate", "endDate", Date.class));
+    defintion.addParameter(new Parameter("location", "location", Location.class));
+
+    defintion.setQuery(
+        TXCurrQueries.getPatientsWhoAreTransferredOutToAnotherHfQueryIIT(
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getARVPharmaciaEncounterType(),
+            hivMetadata.getMasterCardEncounterType(),
+            hivMetadata.getTransferredOutToAnotherHealthFacilityWorkflowState(),
+            hivMetadata.getBuscaActivaEncounterType(),
+            hivMetadata.getStateOfStayOfPreArtPatient(),
+            hivMetadata.getTransferredOutConcept(),
+            hivMetadata.getARTProgram(),
+            hivMetadata.getDefaultingMotiveConcept(),
+            hivMetadata.getAutoTransferConcept(),
+            hivMetadata.getStateOfStayOfArtPatient()));
+
+    return defintion;
+  }
+
   /**
    * <b>Technical Specs</b>
    *
