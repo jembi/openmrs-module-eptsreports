@@ -375,18 +375,17 @@ public class TxMlCohortQueries {
     String mappings = "onOrBefore=${endDate},location=${location}";
 
     CohortDefinition suspendedTreatment =
-            txCurrCohortQueries.getPatientsWhoStoppedOrSuspendedTreatment();
+        txCurrCohortQueries.getPatientsWhoStoppedOrSuspendedTreatment();
 
     cd.addSearch(
-            "numerator",
-            EptsReportUtils.map(
-                    getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "numerator",
+        EptsReportUtils.map(
+            getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch("suspendedReportingPeriod", EptsReportUtils.map(suspendedTreatment, mappings));
 
-    cd.setCompositionString(
-        "numerator AND suspendedReportingPeriod");
+    cd.setCompositionString("numerator AND suspendedReportingPeriod");
 
     return cd;
   }
