@@ -371,29 +371,22 @@ public class TxMlCohortQueries {
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    String mappings = "onOrBefore=${endDate},location=${location}";
+
+    CohortDefinition suspendedTreatment =
+            txCurrCohortQueries.getPatientsWhoStoppedOrSuspendedTreatment();
+
     cd.addSearch(
-        "missedAppointmentLessTransfers",
-        EptsReportUtils.map(
-            getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "refusedOrStoppedTreatment",
-        EptsReportUtils.map(
-            getRefusedOrStoppedTreatmentQuery(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "dead",
-        EptsReportUtils.map(
-            getDeadPatientsComposition(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "transferOut",
-        EptsReportUtils.map(
-            getTransferredOutPatientsComposition(),
-            "startDate=${startDate},endDate=${endDate},reportEndDate=${endDate},location=${location}"));
+            "numerator",
+            EptsReportUtils.map(
+                    getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch("suspendedReportingPeriod", EptsReportUtils.map(suspendedTreatment, mappings));
 
     cd.setCompositionString(
-        "(missedAppointmentLessTransfers AND refusedOrStoppedTreatment) AND NOT (dead OR transferOut)");
+        "numerator AND suspendedReportingPeriod");
 
     return cd;
   }
