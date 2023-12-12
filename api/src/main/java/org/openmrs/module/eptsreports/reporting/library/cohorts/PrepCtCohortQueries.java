@@ -973,4 +973,37 @@ public class PrepCtCohortQueries {
 
     return sqlCohortDefinition;
   }
+
+  /**
+   * <b>Description:</b> Clients marked with “PrEP Interrompida” and field “Razões para Interromper
+   * PrEP” with one of reasons of interruption on the “Ficha de Consulta Inicial PrEP” with the most
+   * recent date that falls during the reporting period OR Clients with the field “PrEP
+   * Interrompida” marked with one of the reasons of interruption on the most recent the “Ficha de
+   * Consulta de Seguimento PrEP” during the reporting period
+   *
+   * @return
+   */
+  public CohortDefinition getClientsWithReasonForPrepInterruption() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients With Reason For Prep Interruption");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(
+            getClientsWithReasonForPrepInterruptionA(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "B",
+        EptsReportUtils.map(
+            getClientsWithReasonForPrepInterruptionB(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("A OR B");
+
+    return cd;
+  }
 }
