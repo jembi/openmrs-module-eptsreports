@@ -1678,7 +1678,20 @@ public class TxMlCohortQueries {
             getTreatmentInterruptionOfXDaysBeforeReturningToTreatment(180, null),
             "endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(missedAppointment AND moreThan180Days)");
+    cd.addSearch(
+        "iit",
+        EptsReportUtils.map(
+            getPatientsWhoExperiencedInterruptionInTreatmentComposition(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "suspendedTreatment",
+        EptsReportUtils.map(
+            txCurrCohortQueries.getPatientsWhoStoppedOrSuspendedTreatment(),
+            "onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "(missedAppointment AND (iit OR suspendedTreatment) AND moreThan180Days)");
     return cd;
   }
 
@@ -1709,7 +1722,20 @@ public class TxMlCohortQueries {
             getTreatmentInterruptionOfXDaysBeforeReturningToTreatment(null, 90),
             "endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(missedAppointment AND lessThan90days)");
+    cd.addSearch(
+        "iit",
+        EptsReportUtils.map(
+            getPatientsWhoExperiencedInterruptionInTreatmentComposition(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "suspendedTreatment",
+        EptsReportUtils.map(
+            txCurrCohortQueries.getPatientsWhoStoppedOrSuspendedTreatment(),
+            "onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "(missedAppointment AND (iit OR suspendedTreatment) AND lessThan90days)");
 
     return cd;
   }
@@ -1742,7 +1768,20 @@ public class TxMlCohortQueries {
             getTreatmentInterruptionOfXDaysBeforeReturningToTreatment(90, 180),
             "endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(missedAppointment AND greaterThan90AndLessThan180days)");
+    cd.addSearch(
+        "iit",
+        EptsReportUtils.map(
+            getPatientsWhoExperiencedInterruptionInTreatmentComposition(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "suspendedTreatment",
+        EptsReportUtils.map(
+            txCurrCohortQueries.getPatientsWhoStoppedOrSuspendedTreatment(),
+            "onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "(missedAppointment AND (iit OR suspendedTreatment) AND greaterThan90AndLessThan180days)");
     return cd;
   }
 
@@ -1774,7 +1813,14 @@ public class TxMlCohortQueries {
         EptsReportUtils.map(
             getPatientsWhoExperiencedInterruptionInTreatmentComposition(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.setCompositionString("missedAppointment AND iit");
+
+    cd.addSearch(
+        "suspendedTreatment",
+        EptsReportUtils.map(
+            txCurrCohortQueries.getPatientsWhoStoppedOrSuspendedTreatment(),
+            "onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString("missedAppointment AND (iit OR suspendedTreatment)");
     return cd;
   }
 
