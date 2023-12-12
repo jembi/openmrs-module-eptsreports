@@ -876,6 +876,22 @@ public class PrepCtQueries {
     return stringSubstitutor.replace(query);
   }
 
+  /**
+   * <b>Description:</b> Clients marked with “PrEP Interrompida” and field “Razões para Interromper
+   * PrEP” with one of reasons of interruption on the “Ficha de Consulta Inicial PrEP” with the most
+   * recent date that falls during the reporting period
+   *
+   * @param prepStatus
+   * @param stopAll
+   * @param reasonNotPrescribePrEp
+   * @param hivInfected
+   * @param patientDoesNotLikeArvTreatmentSideEffects
+   * @param noMoreSubstantialRisk
+   * @param userPreference
+   * @param other
+   * @param prepIncialEncounterType
+   * @return
+   */
   public static String clientsWithReasonForPrepInterruptionA(
       int prepStatus,
       int stopAll,
@@ -897,13 +913,53 @@ public class PrepCtQueries {
     map.put("5622", other);
     map.put("80", prepIncialEncounterType);
 
-    String query = "";
+    String query =
+        "SELECT p.patient_id \n"
+            + "FROM patient p\n"
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id\n"
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id\n"
+            + "INNER JOIN \n"
+            + "\t(\n"
+            + "\tSELECT p.patient_id, MAX(o.obs_datetime) obs_datetime\n"
+            + "\tFROM patient p\n"
+            + "\tINNER JOIN encounter e ON e.patient_id = p.patient_id\n"
+            + "\tINNER JOIN obs o ON o.encounter_id = e.encounter_id\n"
+            + "    INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id\n"
+            + "\tWHERE p.voided = 0\n"
+            + "\tAND e.location_id = 398\n"
+            + "\tAND e.encounter_type = 80\n"
+            + "\tAND o.concept_id = 165292 AND o.value_coded = 1260\n"
+            + "    AND o2.concept_id = 165225 AND o2.value_coded IN (1169, 2015, 165226, 165227, 5622)\n"
+            + "\tAND o.obs_datetime >= '2023-06-21'\n"
+            + "\tAND o.obs_datetime <= '2023-09-20'\n"
+            + "\tGROUP BY p.patient_id\n"
+            + "\t) a ON a.patient_id = p.patient_id\n"
+            + "WHERE p.voided = 0\n"
+            + "AND e.location_id = 398\n"
+            + "AND e.encounter_type = 80\n"
+            + "AND o.obs_datetime >= '2023-06-21'\n"
+            + "AND o.obs_datetime <= '2023-09-20'\n"
+            + "GROUP BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     return stringSubstitutor.replace(query);
   }
 
+  /**
+   * <b>Description:</b> Clients with the field “PrEP Interrompida” marked with one of the reasons
+   * of interruption on the most recent the “Ficha de Consulta de Seguimento PrEP” during the
+   * reporting period
+   *
+   * @param reasonNotPrescribePrEp
+   * @param hivInfected
+   * @param patientDoesNotLikeArvTreatmentSideEffects
+   * @param noMoreSubstantialRisk
+   * @param userPreference
+   * @param other
+   * @param prepSeguimentoEncounterType
+   * @return
+   */
   public static String clientsWithReasonForPrepInterruptionB(
       int reasonNotPrescribePrEp,
       int hivInfected,
@@ -921,7 +977,31 @@ public class PrepCtQueries {
     map.put("5622", other);
     map.put("81", prepSeguimentoEncounterType);
 
-    String query = "";
+    String query =
+        "SELECT p.patient_id \n"
+            + "FROM patient p\n"
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id\n"
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id\n"
+            + "INNER JOIN \n"
+            + "\t(\n"
+            + "\tSELECT p.patient_id, MAX(e.encounter_datetime) encounter_datetime\n"
+            + "\tFROM patient p\n"
+            + "\tINNER JOIN encounter e ON e.patient_id = p.patient_id\n"
+            + "\tINNER JOIN obs o ON o.encounter_id = e.encounter_id\n"
+            + "\tWHERE p.voided = 0\n"
+            + "\tAND e.location_id = 398\n"
+            + "\tAND e.encounter_type = 81\n"
+            + "    AND o.concept_id = 165225 AND o.value_coded IN (1169, 2015, 165226, 165227, 5622)\n"
+            + "\tAND e.encounter_datetime >= '2023-06-21'\n"
+            + "\tAND e.encounter_datetime <= '2023-09-20'\n"
+            + "\tGROUP BY p.patient_id\n"
+            + "\t) a ON a.patient_id = p.patient_id\n"
+            + "WHERE p.voided = 0\n"
+            + "AND e.location_id = 398\n"
+            + "AND e.encounter_type = 81\n"
+            + "AND e.encounter_datetime >= '2023-06-21'\n"
+            + "AND e.encounter_datetime <= '2023-09-20'\n"
+            + "GROUP BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 

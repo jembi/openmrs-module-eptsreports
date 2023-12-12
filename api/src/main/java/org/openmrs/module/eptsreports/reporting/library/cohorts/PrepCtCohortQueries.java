@@ -915,4 +915,62 @@ public class PrepCtCohortQueries {
 
     return definition;
   }
+
+  /**
+   * <b>Description:</b> Clients marked with “PrEP Interrompida” and field “Razões para Interromper
+   * PrEP” with one of reasons of interruption on the “Ficha de Consulta Inicial PrEP” with the most
+   * recent date that falls during the reporting period
+   *
+   * @return
+   */
+  public CohortDefinition getClientsWithReasonForPrepInterruptionA() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients With Reason For Prep Interruption A");
+
+    sqlCohortDefinition.setQuery(
+        PrepCtQueries.clientsWithReasonForPrepInterruptionA(
+            hivMetadata.getPrepStatusConcept().getConceptId(),
+            hivMetadata.getStopAllConcept().getConceptId(),
+            hivMetadata.getReasonToNotPrescribePrepConcept().getConceptId(),
+            hivMetadata.getHivInfectedConcept().getConceptId(),
+            hivMetadata.getAdverseReaction().getConceptId(),
+            hivMetadata.getNoMoreSubstantialRisksConcept().getConceptId(),
+            hivMetadata.getUserPreferenceConcept().getConceptId(),
+            hivMetadata.getOtherOrNonCodedConcept().getConceptId(),
+            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId()));
+
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Description:</b> Clients with the field “PrEP Interrompida” marked with one of the reasons
+   * of interruption on the most recent the “Ficha de Consulta de Seguimento PrEP” during the
+   * reporting period
+   *
+   * @return
+   */
+  public CohortDefinition getClientsWithReasonForPrepInterruptionB() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients With Reason For Prep Interruption B");
+
+    sqlCohortDefinition.setQuery(
+        PrepCtQueries.clientsWithReasonForPrepInterruptionB(
+            hivMetadata.getReasonToNotPrescribePrepConcept().getConceptId(),
+            hivMetadata.getHivInfectedConcept().getConceptId(),
+            hivMetadata.getAdverseReaction().getConceptId(),
+            hivMetadata.getNoMoreSubstantialRisksConcept().getConceptId(),
+            hivMetadata.getUserPreferenceConcept().getConceptId(),
+            hivMetadata.getOtherOrNonCodedConcept().getConceptId(),
+            hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId()));
+
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return sqlCohortDefinition;
+  }
 }
