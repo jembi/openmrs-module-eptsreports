@@ -131,6 +131,19 @@ public class TxMlDataset25 extends BaseDataSet {
             mappings),
         getColumnsForAgeAndGenderAndKeyPop());
 
+    // Totals Refused Or Stopped Treatment
+    dsd.addColumn(
+        "M66",
+        "RefusedOrStoppedTreatment",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "RefusedOrStoppedTreatment",
+                EptsReportUtils.map(
+                    txMlCohortQueries
+                        .getPatientsWhoMissedNextAppointmentAndRefusedOrStoppedTreatment(),
+                    mappings)),
+            mappings),
+        "");
     //     Refused Or Stopped Treatment
     addRow(
         dsd,
