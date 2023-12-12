@@ -1723,7 +1723,7 @@ public class TxMlCohortQueries {
             "onOrBefore=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "(missedAppointment AND (iit OR suspendedTreatment) AND moreThan180Days)");
+        "(missedAppointment AND (iit OR suspendedTreatment)) AND moreThan180Days");
     return cd;
   }
 
@@ -1767,7 +1767,7 @@ public class TxMlCohortQueries {
             "onOrBefore=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "(missedAppointment AND (iit OR suspendedTreatment) AND lessThan90days)");
+        "(missedAppointment AND (iit OR suspendedTreatment)) AND lessThan90days");
 
     return cd;
   }
@@ -1813,7 +1813,7 @@ public class TxMlCohortQueries {
             "onOrBefore=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "(missedAppointment AND (iit OR suspendedTreatment) AND greaterThan90AndLessThan180days)");
+        "(missedAppointment AND (iit OR suspendedTreatment)) AND greaterThan90AndLessThan180days");
     return cd;
   }
 
