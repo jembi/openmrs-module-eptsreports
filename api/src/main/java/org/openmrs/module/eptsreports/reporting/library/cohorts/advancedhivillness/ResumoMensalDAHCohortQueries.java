@@ -184,7 +184,13 @@ public class ResumoMensalDAHCohortQueries {
             resumoMensalCohortQueries.getPatientsRestartedTarvtB3(),
             "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("onDAHDuringPeriod AND (restartedArt OR B3)");
+    cd.addSearch(
+        "I1",
+        map(
+            getPatientsWhoAreNewInArtAndStartedFollowupDuringTheMonthComposition(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("(onDAHDuringPeriod AND (restartedArt OR B3)) AND NOT I1");
     return cd;
   }
 
@@ -230,7 +236,19 @@ public class ResumoMensalDAHCohortQueries {
             resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfPreviousMonthB12(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("onDAHDuringPeriod AND (onArt OR B12)");
+    cd.addSearch(
+        "I1",
+        map(
+            getPatientsWhoAreNewInArtAndStartedFollowupDuringTheMonthComposition(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "I2",
+        map(
+            getPatientsWhoRestartedArtAndStartedFollowupDuringTheMonthComposition(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("(onDAHDuringPeriod AND (onArt OR B12)) AND NOT (I1 OR I2)");
     return cd;
   }
 
@@ -1299,7 +1317,10 @@ public class ResumoMensalDAHCohortQueries {
             intensiveMonitoringCohortQueries.getMI15C(),
             "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(restartedArt OR B3P1 OR B3P2 OR B3P3) AND NOT PREGNANT");
+    cd.addSearch("newArt", mapStraightThrough(getPatientsWhoAreNewInArtDisaggregation()));
+
+    cd.setCompositionString(
+        "((restartedArt OR B3P1 OR B3P2 OR B3P3) AND NOT PREGNANT) AND NOT newArt");
     return cd;
   }
 
@@ -1346,7 +1367,11 @@ public class ResumoMensalDAHCohortQueries {
             intensiveMonitoringCohortQueries.getMI15C(),
             "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(onArt OR B12) AND NOT PREGNANT");
+    cd.addSearch("restarted", mapStraightThrough(getPatientsWhoRestartedArtDisaggregation()));
+
+    cd.addSearch("newArt", mapStraightThrough(getPatientsWhoAreNewInArtDisaggregation()));
+
+    cd.setCompositionString("((onArt OR B12) AND NOT PREGNANT) AND NOT (restarted OR newArt)");
     return cd;
   }
 
