@@ -884,11 +884,7 @@ public class PrepCtQueries {
    * @param prepStatus
    * @param stopAll
    * @param reasonNotPrescribePrEp
-   * @param hivInfected
-   * @param patientDoesNotLikeArvTreatmentSideEffects
-   * @param noMoreSubstantialRisk
-   * @param userPreference
-   * @param other
+   * @param reasonNotPrescribePrEpAnswer
    * @param prepIncialEncounterType
    * @return
    */
@@ -896,49 +892,51 @@ public class PrepCtQueries {
       int prepStatus,
       int stopAll,
       int reasonNotPrescribePrEp,
-      int hivInfected,
-      int patientDoesNotLikeArvTreatmentSideEffects,
-      int noMoreSubstantialRisk,
-      int userPreference,
-      int other,
+      int reasonNotPrescribePrEpAnswer,
+      //      int hivInfected,
+      //      int patientDoesNotLikeArvTreatmentSideEffects,
+      //      int noMoreSubstantialRisk,
+      //      int userPreference,
+      //      int other,
       int prepIncialEncounterType) {
     Map<String, Integer> map = new HashMap<>();
     map.put("165292", prepStatus);
     map.put("1260", stopAll);
     map.put("165225", reasonNotPrescribePrEp);
-    map.put("1169", hivInfected);
-    map.put("2015", patientDoesNotLikeArvTreatmentSideEffects);
-    map.put("165226", noMoreSubstantialRisk);
-    map.put("165227", userPreference);
-    map.put("5622", other);
+    map.put("answer", reasonNotPrescribePrEpAnswer);
+    //    map.put("1169", hivInfected);1
+    //    map.put("2015", patientDoesNotLikeArvTreatmentSideEffects);2
+    //    map.put("165226", noMoreSubstantialRisk);3
+    //    map.put("165227", userPreference);4
+    //    map.put("5622", other);5
     map.put("80", prepIncialEncounterType);
 
     String query =
-        "SELECT p.patient_id \n"
-            + "FROM patient p\n"
-            + "INNER JOIN encounter e ON e.patient_id = p.patient_id\n"
-            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id\n"
-            + "INNER JOIN \n"
-            + "\t(\n"
-            + "\tSELECT p.patient_id, MAX(o.obs_datetime) obs_datetime\n"
-            + "\tFROM patient p\n"
-            + "\tINNER JOIN encounter e ON e.patient_id = p.patient_id\n"
-            + "\tINNER JOIN obs o ON o.encounter_id = e.encounter_id\n"
-            + "    INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id\n"
-            + "\tWHERE p.voided = 0\n"
-            + "\tAND e.location_id = 398\n"
-            + "\tAND e.encounter_type = 80\n"
-            + "\tAND o.concept_id = 165292 AND o.value_coded = 1260\n"
-            + "    AND o2.concept_id = 165225 AND o2.value_coded IN (1169, 2015, 165226, 165227, 5622)\n"
-            + "\tAND o.obs_datetime >= '2023-06-21'\n"
-            + "\tAND o.obs_datetime <= '2023-09-20'\n"
-            + "\tGROUP BY p.patient_id\n"
-            + "\t) a ON a.patient_id = p.patient_id\n"
-            + "WHERE p.voided = 0\n"
-            + "AND e.location_id = 398\n"
-            + "AND e.encounter_type = 80\n"
-            + "AND o.obs_datetime >= '2023-06-21'\n"
-            + "AND o.obs_datetime <= '2023-09-20'\n"
+        "SELECT p.patient_id  "
+            + "FROM patient p "
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "INNER JOIN  "
+            + " ( "
+            + " SELECT p.patient_id, MAX(o.obs_datetime) obs_datetime "
+            + " FROM patient p "
+            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + " INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "    INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + " WHERE p.voided = 0 "
+            + " AND e.location_id = :location "
+            + " AND e.encounter_type = ${80} "
+            + " AND o.concept_id = ${165292} AND o.value_coded = ${1260} "
+            + "    AND o2.concept_id = ${165225} AND o2.value_coded IN (${answer}) "
+            + " AND o.obs_datetime >= :startDate "
+            + " AND o.obs_datetime <= :endDate "
+            + " GROUP BY p.patient_id "
+            + " ) a ON a.patient_id = p.patient_id "
+            + "WHERE p.voided = 0 "
+            + "AND e.location_id = :location "
+            + "AND e.encounter_type = ${80} "
+            + "AND o.obs_datetime >= :startDate "
+            + "AND o.obs_datetime <= :endDate "
             + "GROUP BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -952,55 +950,53 @@ public class PrepCtQueries {
    * reporting period
    *
    * @param reasonNotPrescribePrEp
-   * @param hivInfected
-   * @param patientDoesNotLikeArvTreatmentSideEffects
-   * @param noMoreSubstantialRisk
-   * @param userPreference
-   * @param other
+   * @param reasonNotPrescribePrEpAnswer
    * @param prepSeguimentoEncounterType
    * @return
    */
   public static String clientsWithReasonForPrepInterruptionB(
       int reasonNotPrescribePrEp,
-      int hivInfected,
-      int patientDoesNotLikeArvTreatmentSideEffects,
-      int noMoreSubstantialRisk,
-      int userPreference,
-      int other,
+      //      int hivInfected,
+      //      int patientDoesNotLikeArvTreatmentSideEffects,
+      //      int noMoreSubstantialRisk,
+      //      int userPreference,
+      //      int other,
+      int reasonNotPrescribePrEpAnswer,
       int prepSeguimentoEncounterType) {
     Map<String, Integer> map = new HashMap<>();
     map.put("165225", reasonNotPrescribePrEp);
-    map.put("1169", hivInfected);
-    map.put("2015", patientDoesNotLikeArvTreatmentSideEffects);
-    map.put("165226", noMoreSubstantialRisk);
-    map.put("165227", userPreference);
-    map.put("5622", other);
+    map.put("answer", reasonNotPrescribePrEpAnswer);
+    //    map.put("1169", hivInfected);
+    //    map.put("2015", patientDoesNotLikeArvTreatmentSideEffects);
+    //    map.put("165226", noMoreSubstantialRisk);
+    //    map.put("165227", userPreference);
+    //    map.put("5622", other);
     map.put("81", prepSeguimentoEncounterType);
 
     String query =
-        "SELECT p.patient_id \n"
-            + "FROM patient p\n"
-            + "INNER JOIN encounter e ON e.patient_id = p.patient_id\n"
-            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id\n"
-            + "INNER JOIN \n"
-            + "\t(\n"
-            + "\tSELECT p.patient_id, MAX(e.encounter_datetime) encounter_datetime\n"
-            + "\tFROM patient p\n"
-            + "\tINNER JOIN encounter e ON e.patient_id = p.patient_id\n"
-            + "\tINNER JOIN obs o ON o.encounter_id = e.encounter_id\n"
-            + "\tWHERE p.voided = 0\n"
-            + "\tAND e.location_id = 398\n"
-            + "\tAND e.encounter_type = 81\n"
-            + "    AND o.concept_id = 165225 AND o.value_coded IN (1169, 2015, 165226, 165227, 5622)\n"
-            + "\tAND e.encounter_datetime >= '2023-06-21'\n"
-            + "\tAND e.encounter_datetime <= '2023-09-20'\n"
-            + "\tGROUP BY p.patient_id\n"
-            + "\t) a ON a.patient_id = p.patient_id\n"
-            + "WHERE p.voided = 0\n"
-            + "AND e.location_id = 398\n"
-            + "AND e.encounter_type = 81\n"
-            + "AND e.encounter_datetime >= '2023-06-21'\n"
-            + "AND e.encounter_datetime <= '2023-09-20'\n"
+        "SELECT p.patient_id  "
+            + "FROM patient p "
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "INNER JOIN  "
+            + " ( "
+            + " SELECT p.patient_id, MAX(e.encounter_datetime) encounter_datetime "
+            + " FROM patient p "
+            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + " INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + " WHERE p.voided = 0 "
+            + " AND e.location_id = :location "
+            + " AND e.encounter_type = ${81} "
+            + "    AND o.concept_id = ${165225} AND o.value_coded IN (${answer}) "
+            + " AND e.encounter_datetime >= :startDate "
+            + " AND e.encounter_datetime <= :endDate "
+            + " GROUP BY p.patient_id "
+            + " ) a ON a.patient_id = p.patient_id "
+            + "WHERE p.voided = 0 "
+            + "AND e.location_id = :location "
+            + "AND e.encounter_type = ${81} "
+            + "AND e.encounter_datetime >= :startDate "
+            + "AND e.encounter_datetime <= :endDate "
             + "GROUP BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);

@@ -923,7 +923,8 @@ public class PrepCtCohortQueries {
    *
    * @return
    */
-  public CohortDefinition getClientsWithReasonForPrepInterruptionA() {
+  public CohortDefinition getClientsWithReasonForPrepInterruptionA(
+      int reasonToNotPrescribePrepAnswer) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients With Reason For Prep Interruption A");
 
@@ -932,11 +933,7 @@ public class PrepCtCohortQueries {
             hivMetadata.getPrepStatusConcept().getConceptId(),
             hivMetadata.getStopAllConcept().getConceptId(),
             hivMetadata.getReasonToNotPrescribePrepConcept().getConceptId(),
-            hivMetadata.getHivInfectedConcept().getConceptId(),
-            hivMetadata.getAdverseReaction().getConceptId(),
-            hivMetadata.getNoMoreSubstantialRisksConcept().getConceptId(),
-            hivMetadata.getUserPreferenceConcept().getConceptId(),
-            hivMetadata.getOtherOrNonCodedConcept().getConceptId(),
+            reasonToNotPrescribePrepAnswer,
             hivMetadata.getPrepInicialEncounterType().getEncounterTypeId()));
 
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -953,18 +950,15 @@ public class PrepCtCohortQueries {
    *
    * @return
    */
-  public CohortDefinition getClientsWithReasonForPrepInterruptionB() {
+  public CohortDefinition getClientsWithReasonForPrepInterruptionB(
+      int reasonToNotPrescribePrepAnswer) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients With Reason For Prep Interruption B");
 
     sqlCohortDefinition.setQuery(
         PrepCtQueries.clientsWithReasonForPrepInterruptionB(
             hivMetadata.getReasonToNotPrescribePrepConcept().getConceptId(),
-            hivMetadata.getHivInfectedConcept().getConceptId(),
-            hivMetadata.getAdverseReaction().getConceptId(),
-            hivMetadata.getNoMoreSubstantialRisksConcept().getConceptId(),
-            hivMetadata.getUserPreferenceConcept().getConceptId(),
-            hivMetadata.getOtherOrNonCodedConcept().getConceptId(),
+            reasonToNotPrescribePrepAnswer,
             hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId()));
 
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -983,7 +977,8 @@ public class PrepCtCohortQueries {
    *
    * @return
    */
-  public CohortDefinition getClientsWithReasonForPrepInterruption() {
+  public CohortDefinition getClientsWithReasonForPrepInterruption(
+      int reasonToNotPrescribePrepAnswer) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Patients With Reason For Prep Interruption");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -993,13 +988,13 @@ public class PrepCtCohortQueries {
     cd.addSearch(
         "A",
         EptsReportUtils.map(
-            getClientsWithReasonForPrepInterruptionA(),
+            getClientsWithReasonForPrepInterruptionA(reasonToNotPrescribePrepAnswer),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "B",
         EptsReportUtils.map(
-            getClientsWithReasonForPrepInterruptionB(),
+            getClientsWithReasonForPrepInterruptionB(reasonToNotPrescribePrepAnswer),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("A OR B");
