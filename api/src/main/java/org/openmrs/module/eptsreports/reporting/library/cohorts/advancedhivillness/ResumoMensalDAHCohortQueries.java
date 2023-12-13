@@ -501,7 +501,7 @@ public class ResumoMensalDAHCohortQueries {
             getPatientsWithPositiveOrNegativeCragLCRResults(
                 Arrays.asList(hivMetadata.getPositive(), hivMetadata.getNegative()))));
 
-    cd.setCompositionString("cragPositive AND cragPositive");
+    cd.setCompositionString("cragPositive AND cragResults");
     return cd;
   }
 
@@ -1401,14 +1401,15 @@ public class ResumoMensalDAHCohortQueries {
             + "WHERE  ps.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
-            + "       AND e.encounter_type IN (${90}, ${6})  "
             + "       AND o.concept_id = ${1695}  "
             + "       AND ".concat(cd4.getProposition())
             + " AND ( "
-            + "  ( o.obs_datetime >= :startDate "
+            + "  ( e.encounter_type = ${90} "
+            + " AND o.obs_datetime >= :startDate "
             + "  AND o.obs_datetime <= :endDate)"
             + "OR "
-            + " ( e.encounter_datetime >= :startDate "
+            + " ( e.encounter_type = ${6} "
+            + " AND e.encounter_datetime >= :startDate "
             + "  AND e.encounter_datetime <= :endDate) "
             + " ) "
             + "  AND e.location_id = :location"
