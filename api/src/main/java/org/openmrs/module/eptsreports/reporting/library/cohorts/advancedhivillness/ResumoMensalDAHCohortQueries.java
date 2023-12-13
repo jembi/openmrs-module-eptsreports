@@ -424,9 +424,9 @@ public class ResumoMensalDAHCohortQueries {
     cd.addParameters(getCohortParameters());
 
     cd.addSearch(
-        "haveCd4Results",
+        "haveLowCd4Results",
         map(
-            getPatientsWhoHaveCd4Results(),
+            getPatientsWithLowCd4Results(),
             "startDate=${startDate-1m},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
@@ -437,7 +437,7 @@ public class ResumoMensalDAHCohortQueries {
                     hivMetadata.getCragSoroLabsetConcept(), hivMetadata.getCragSoroConcept()),
                 Arrays.asList(hivMetadata.getPositive(), hivMetadata.getNegative()))));
 
-    cd.setCompositionString("haveCd4Results AND cragResults");
+    cd.setCompositionString("haveLowCd4Results AND cragResults");
     return cd;
   }
 
@@ -1376,18 +1376,21 @@ public class ResumoMensalDAHCohortQueries {
   }
 
   /**
+   *
    * <li>Caso não exista o registo da “Situação do TARV no Início do Seguimento” na Ficha de DAH que
    *     tem o registo de “Data de Início no Modelo de DAH” ocorrida durante o período (“Data de
    *     Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”), considerar os utentes incluídos
    *     no indicador B1-Nº de utentes que iniciaram TARV nesta unidade sanitária durante o mês, do
    *     relatório “Resumo Mensal de HIV/SIDA” durante o período de compreendido entre “Data Início”
    *     menos (–) 2 meses e “Data Fim”.
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getB1IfPatientDontHaveTarvSituationOnDah() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    cd.setName("Patients Who dont have Situacao de Tarv On Ficha de DAH and Are from B1 Resumo mensal");
+    cd.setName(
+        "Patients Who dont have Situacao de Tarv On Ficha de DAH and Are from B1 Resumo mensal");
     cd.addParameters(getCohortParameters());
 
     cd.addSearch(
@@ -1397,9 +1400,9 @@ public class ResumoMensalDAHCohortQueries {
                 .getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1(),
             "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
 
-    cd.addSearch("noTarvSituation", mapStraightThrough(getPatientsWhoDontArtSituationOnDAH()));
+    cd.addSearch("tarvSituation", mapStraightThrough(getPatientsWithAnyArtSituationOnDAH()));
 
-    cd.setCompositionString("B1 AND noTarvSituation");
+    cd.setCompositionString("B1 AND NOT tarvSituation");
     return cd;
   }
 
@@ -1449,14 +1452,13 @@ public class ResumoMensalDAHCohortQueries {
   }
 
   /**
-   * Get Patients who do not have
-   * “Situação do TARV no início do seguimento” (Secção A) da
-   * Ficha de DAH que tem o registo de “Data de Início no Modelo de DAH” ocorrida durante
-   * o período (“Data de Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”)
+   * Get Patients who do not have “Situação do TARV no início do seguimento” (Secção A) da Ficha de
+   * DAH que tem o registo de “Data de Início no Modelo de DAH” ocorrida durante o período (“Data de
+   * Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”)
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsWhoDontArtSituationOnDAH() {
+  public CohortDefinition getPatientsWithAnyArtSituationOnDAH() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients who do not have Situacao de Tarv Marked on DAH”");
@@ -1467,28 +1469,7 @@ public class ResumoMensalDAHCohortQueries {
     map.put("1255", hivMetadata.getARVPlanConcept().getConceptId());
 
     String query =
-        "SELECT pp.patient_id  "
-            + "FROM  "
-            + "    patient pp INNER JOIN encounter e ON pp.patient_id = e.patient_id  "
-            + "               INNER JOIN (  "
-            + "        SELECT p.patient_id, MAX(e.encounter_datetime) as last_date  "
-            + "        FROM  "
-            + "            patient p INNER JOIN encounter e ON p.patient_id= e.patient_id  "
-            + "                      INNER JOIN obs o on e.encounter_id = o.encounter_id  "
-            + "        WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0  "
-            + "          AND e.encounter_type = ${90}   "
-            + "          AND e.encounter_datetime >= :startDate  "
-            + "          AND e.encounter_datetime <= :endDate  "
-            + "          AND e.location_id = :location  "
-            + "        GROUP BY p.patient_id  "
-            + "    ) last_dah ON last_dah.patient_id = pp.patient_id  "
-            + "WHERE pp.voided = 0  "
-            + "  AND e.voided = 0  "
-            + "  AND e.encounter_type = ${90}  "
-            + "  AND e.encounter_datetime = last_dah.last_date  "
-            + "  AND e.location_id = :location  "
-            + "  AND pp.patient_id NOT IN (  "
-            + "    SELECT p.patient_id  "
+        "    SELECT p.patient_id  "
             + "    FROM  "
             + "        patient p INNER JOIN encounter e ON p.patient_id = e.patient_id  "
             + "                  INNER JOIN obs o on e.encounter_id = o.encounter_id  "
@@ -1507,15 +1488,12 @@ public class ResumoMensalDAHCohortQueries {
             + "    WHERE p.voided = 0  "
             + "      AND e.voided = 0  "
             + "      AND o.voided = 0  "
-            + "      AND p.patient_id = pp.patient_id  "
             + "      AND e.encounter_type = ${90}  "
             + "      AND o.concept_id = ${1255}  "
             + "      AND o.value_coded IS NOT NULL  "
             + "      AND e.encounter_datetime = last_dah.last_date  "
             + "      AND e.location_id = :location  "
-            + "    GROUP BY p.patient_id  "
-            + ")  "
-            + "GROUP BY pp.patient_id ";
+            + "    GROUP BY p.patient_id  ";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
 
