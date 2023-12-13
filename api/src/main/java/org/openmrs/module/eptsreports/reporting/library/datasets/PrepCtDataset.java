@@ -58,6 +58,10 @@ public class PrepCtDataset extends BaseDataSet {
             "endDate=${endDate},location=${location}"));
     dsd.addDimension(
         "results", EptsReportUtils.map(eptsCommonDimension.getPatientTestResultsPrep(), mappings));
+    dsd.addDimension(
+        "prepInterruption",
+        EptsReportUtils.map(
+            eptsCommonDimension.getClientsWithReasonForPrepInterruptionDisaggregation(), mappings));
 
     dsd.addColumn(
         "ORAL",
@@ -150,7 +154,7 @@ public class PrepCtDataset extends BaseDataSet {
     addRow(
         dsd,
         "PREPCT",
-        "Age, Gender, and Test Results",
+        "Age, Gender, Prep Interruption Reasons, and Test Results",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
                 "Age, Gender, and Test Results",
@@ -338,6 +342,24 @@ public class PrepCtDataset extends BaseDataSet {
         new ColumnParameters("negative", "Negative", "results=negative", "30");
     ColumnParameters other = new ColumnParameters("other", "Other", "results=other", "31");
 
+    // PrepInterruption Reasons
+    ColumnParameters hivInfected =
+        new ColumnParameters("hivinfected", "HIV Infected", "prepInterruption=hivInfected", "32");
+    ColumnParameters adverseReaction =
+        new ColumnParameters(
+            "adversereaction", "Adverse Reaction", "prepInterruption=adverseReaction", "33");
+    ColumnParameters noMoreSubstantialRisks =
+        new ColumnParameters(
+            "nomoresubstantialrisks",
+            "No More Substantial Risks",
+            "prepInterruption=noMoreSubstantialRisks",
+            "34");
+    ColumnParameters userPreference =
+        new ColumnParameters(
+            "userpreference", "User Preference", "prepInterruption=userPreference", "35");
+    ColumnParameters otherReasons =
+        new ColumnParameters("other", "Other (PrepInterruption)", "prepInterruption=other", "36");
+
     return Arrays.asList(
         fifteenTo19M,
         twentyTo24M,
@@ -363,6 +385,11 @@ public class PrepCtDataset extends BaseDataSet {
         breastfeeding,
         positive,
         negative,
-        other);
+        other,
+        hivInfected,
+        adverseReaction,
+        noMoreSubstantialRisks,
+        userPreference,
+        otherReasons);
   }
 }

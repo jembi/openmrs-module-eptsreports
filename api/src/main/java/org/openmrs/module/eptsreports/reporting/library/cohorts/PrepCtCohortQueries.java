@@ -1001,4 +1001,34 @@ public class PrepCtCohortQueries {
 
     return cd;
   }
+
+  public CohortDefinition getMalePatientsWhoAreSexWorker() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Male Sex Workers");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition SW =
+        getPatientsWhoAreKeypopulation(Arrays.asList(hivMetadata.getSexWorkerConcept()));
+    CohortDefinition onDrugs =
+        getPatientsWhoAreKeypopulation(Arrays.asList(hivMetadata.getDrugUseConcept()));
+    CohortDefinition male = genderCohortQueries.maleCohort();
+
+    cd.addSearch(
+        "drugUser",
+        EptsReportUtils.map(
+            onDrugs, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch("male", EptsReportUtils.map(male, ""));
+
+    cd.addSearch(
+        "sexWorker",
+        EptsReportUtils.map(
+            SW, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.setCompositionString("(sexWorker AND male) AND NOT drugUser");
+
+    return cd;
+  }
 }

@@ -453,6 +453,8 @@ public class EptsCommonDimension {
     CohortDefinition transgenderKeyPopCohort = prepCtCohortQueries.getPatientsWhoAreTransgender();
     CohortDefinition femaleSexWorkersKeyPopCohort =
         prepCtCohortQueries.getFemalePatientsWhoAreSexWorker();
+    CohortDefinition maleSexWorkersKeyPopCohort =
+        prepCtCohortQueries.getMalePatientsWhoAreSexWorker();
     CohortDefinition outroKeyPopCohort = prepCtCohortQueries.getPatientsWhoAreOutro();
     dim.addCohortDefinition("PID", mapStraightThrough(drugUserKeyPopCohort));
     dim.addCohortDefinition("MSM", mapStraightThrough(homosexualKeyPopCohort));
@@ -460,6 +462,8 @@ public class EptsCommonDimension {
     dim.addCohortDefinition("TG", mapStraightThrough(transgenderKeyPopCohort));
     dim.addCohortDefinition("SW", mapStraightThrough(femaleSexWorkersKeyPopCohort));
     dim.addCohortDefinition("OUT", mapStraightThrough(outroKeyPopCohort));
+    dim.addCohortDefinition("MSW", mapStraightThrough(maleSexWorkersKeyPopCohort));
+
     return dim;
   }
 
@@ -1125,7 +1129,7 @@ public class EptsCommonDimension {
             "startDate=${endDate},endDate=${endDate},location=${location}"));
 
     dim.addCohortDefinition(
-        "noMoreSubstantialRisk",
+        "noMoreSubstantialRisks",
         EptsReportUtils.map(
             prepCtCohortQueries.getClientsWithReasonForPrepInterruption(
                 hivMetadata.getNoMoreSubstantialRisksConcept().getConceptId()),
