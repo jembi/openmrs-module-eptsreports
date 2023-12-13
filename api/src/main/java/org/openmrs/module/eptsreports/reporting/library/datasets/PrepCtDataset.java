@@ -141,20 +141,10 @@ public class PrepCtDataset extends BaseDataSet {
             mappings),
         "KP=PRI");
 
-    dsd.addColumn(
-        "MSW",
-        "PREP CT: Male sex workers",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Male sex workers",
-                EptsReportUtils.map(prepCtCohortQueries.getPREPCTNumerator(), mappings)),
-            mappings),
-        "KP=MSW");
-
     addRow(
         dsd,
         "PREPCT",
-        "Age, Gender, Prep Interruption Reasons, and Test Results",
+        "Age, Gender, and Test Results",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
                 "Age, Gender, and Test Results",
@@ -342,24 +332,6 @@ public class PrepCtDataset extends BaseDataSet {
         new ColumnParameters("negative", "Negative", "results=negative", "30");
     ColumnParameters other = new ColumnParameters("other", "Other", "results=other", "31");
 
-    // PrepInterruption Reasons
-    ColumnParameters hivInfected =
-        new ColumnParameters("hivinfected", "HIV Infected", "prepInterruption=hivInfected", "32");
-    ColumnParameters adverseReaction =
-        new ColumnParameters(
-            "adversereaction", "Adverse Reaction", "prepInterruption=adverseReaction", "33");
-    ColumnParameters noMoreSubstantialRisks =
-        new ColumnParameters(
-            "nomoresubstantialrisks",
-            "No More Substantial Risks",
-            "prepInterruption=noMoreSubstantialRisks",
-            "34");
-    ColumnParameters userPreference =
-        new ColumnParameters(
-            "userpreference", "User Preference", "prepInterruption=userPreference", "35");
-    ColumnParameters otherReasons =
-        new ColumnParameters("other", "Other (PrepInterruption)", "prepInterruption=other", "36");
-
     return Arrays.asList(
         fifteenTo19M,
         twentyTo24M,
@@ -385,11 +357,6 @@ public class PrepCtDataset extends BaseDataSet {
         breastfeeding,
         positive,
         negative,
-        other,
-        hivInfected,
-        adverseReaction,
-        noMoreSubstantialRisks,
-        userPreference,
-        otherReasons);
+        other);
   }
 }
