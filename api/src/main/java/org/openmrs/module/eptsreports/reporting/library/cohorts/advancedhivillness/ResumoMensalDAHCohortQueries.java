@@ -118,6 +118,9 @@ public class ResumoMensalDAHCohortQueries {
     cd.setName("Número total de activos em DAH em TARV,  até ao fim do mês anterior");
     cd.addParameters(getCohortParameters());
 
+    CohortDefinition rmB1 =
+        resumoMensalCohortQueries.getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1();
+
     cd.addSearch(
         "onDAHDuringPeriod",
         map(
@@ -134,7 +137,7 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "B1",
         map(
-            getB1IfPatientDontHaveTarvSituationOnDah(),
+            getRMDefinitionsIfPatientDontHaveTarvSituationOnDah(rmB1),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("onDAHDuringPeriod AND (newOnArt OR B1)");
@@ -164,6 +167,8 @@ public class ResumoMensalDAHCohortQueries {
     cd.setName("Relatório-Indicador 2 - Reinícios TARV e Início DAH");
     cd.addParameters(getCohortParameters());
 
+    CohortDefinition rmB3 = resumoMensalCohortQueries.getPatientsRestartedTarvtB3();
+
     cd.addSearch(
         "onDAHDuringPeriod",
         map(
@@ -180,8 +185,8 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "B3",
         map(
-            resumoMensalCohortQueries.getPatientsRestartedTarvtB3(),
-            "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
+            getRMDefinitionsIfPatientDontHaveTarvSituationOnDah(rmB3),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "I1",
@@ -1240,6 +1245,9 @@ public class ResumoMensalDAHCohortQueries {
     cd.setName("utentes novos inícios de TARV, para desagregação dos indicadores 8 a 19");
     cd.addParameters(getCohortParameters());
 
+    CohortDefinition rmB1 =
+        resumoMensalCohortQueries.getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1();
+
     cd.addSearch(
         "newOnArt",
         map(
@@ -1249,7 +1257,7 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "B1",
         map(
-            getB1IfPatientDontHaveTarvSituationOnDah(),
+            getRMDefinitionsIfPatientDontHaveTarvSituationOnDah(rmB1),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
@@ -1386,7 +1394,8 @@ public class ResumoMensalDAHCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getB1IfPatientDontHaveTarvSituationOnDah() {
+  public CohortDefinition getRMDefinitionsIfPatientDontHaveTarvSituationOnDah(
+      CohortDefinition rmDefinition) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName(
@@ -1394,15 +1403,12 @@ public class ResumoMensalDAHCohortQueries {
     cd.addParameters(getCohortParameters());
 
     cd.addSearch(
-        "B1",
-        map(
-            resumoMensalCohortQueries
-                .getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1(),
-            "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
+        "RM",
+        map(rmDefinition, "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
 
     cd.addSearch("tarvSituation", mapStraightThrough(getPatientsWithAnyArtSituationOnDAH()));
 
-    cd.setCompositionString("B1 AND NOT tarvSituation");
+    cd.setCompositionString("RM AND NOT tarvSituation");
     return cd;
   }
 
