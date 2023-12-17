@@ -913,18 +913,34 @@ public class TxRttCohortQueries {
             + "                          Max(most_recent.value_datetime) AS "
             + "                          final_encounter_date "
             + "                   FROM   (SELECT p.patient_id, "
-            + "                                  Max(o.value_datetime) value_datetime "
+            + "                                  o.value_datetime value_datetime "
             + "                           FROM   patient p "
             + "                                  INNER JOIN encounter e "
             + "                                          ON e.patient_id = p.patient_id "
             + "                                  INNER JOIN obs o "
             + "                                          ON o.encounter_id = e.encounter_id "
+            + "                                  INNER JOIN (SELECT p.patient_id, "
+            + "                                                     Max(e.encounter_datetime) "
+            + "                                                     value_datetime "
+            + "                                              FROM   patient p "
+            + "                                                     INNER JOIN encounter e "
+            + "                                                             ON e.patient_id = "
+            + "                                                                p.patient_id "
+            + "                                              WHERE  p.voided = 0 "
+            + "                                                     AND e.voided = 0 "
+            + "                                                     AND e.encounter_type = ${18} "
+            + "                                                     AND e.encounter_datetime < "
+            + "                                                         :startDate "
+            + "                                                     AND e.location_id = :location "
+            + "                                              GROUP  BY p.patient_id) last_fila "
+            + "                                          ON last_fila.patient_id = p.patient_id "
             + "                           WHERE  p.voided = 0 "
             + "                                  AND e.voided = 0 "
             + "                                  AND o.voided = 0 "
             + "                                  AND e.encounter_type = ${18} "
             + "                                  AND o.concept_id = ${5096} "
-            + "                                  AND o.value_datetime < :startDate "
+            + "                                  AND e.encounter_datetime = "
+            + "                                      last_fila.value_datetime "
             + "                                  AND e.location_id = :location "
             + "                           GROUP  BY p.patient_id "
             + "                           UNION "
@@ -948,8 +964,9 @@ public class TxRttCohortQueries {
             + "                   GROUP  BY most_recent.patient_id) "
             + "                  most_recent_of_previous_period "
             + "               ON most_recent_of_previous_period.patient_id = p.patient_id "
-            + "WHERE p.voided = 0 "
-            + "AND  TIMESTAMPDIFF(DAY, most_recent_of_previous_period.final_encounter_date, "
+            + "WHERE  p.voided = 0 "
+            + "       AND Timestampdiff(day, "
+            + "           most_recent_of_previous_period.final_encounter_date, "
             + "               restarted.pick_up_date) < 60";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -1055,22 +1072,14 @@ public class TxRttCohortQueries {
             5,
             null);
 
-    CohortDefinition cd4Above200AndAge =
-        getPatientsWithCd4AndAge(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.GreaterThanOrEqualTo200mm3,
-            5,
-            null);
-
     CohortDefinition notEligibleForCd4AndAge = getPatientsNotEligibleForCd4AndAge(5, null);
 
     cd.addSearch("txRtt", EptsReportUtils.map(txRtt, DEFAULT_MAPPING));
     cd.addSearch("cd4Under200AndAge", EptsReportUtils.map(cd4Under200AndAge, DEFAULT_MAPPING));
-    cd.addSearch("cd4Above200AndAge", EptsReportUtils.map(cd4Above200AndAge, DEFAULT_MAPPING));
     cd.addSearch(
         "notEligibleForCd4AndAge", EptsReportUtils.map(notEligibleForCd4AndAge, DEFAULT_MAPPING));
 
-    cd.setCompositionString(
-        "(txRtt AND cd4Under200AndAge) AND NOT (cd4Above200AndAge OR notEligibleForCd4AndAge)");
+    cd.setCompositionString("(txRtt AND cd4Under200AndAge) AND NOT notEligibleForCd4AndAge");
 
     return cd;
   }
