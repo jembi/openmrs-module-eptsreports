@@ -3907,4 +3907,60 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.prepStatusConceptUuid</property>
+		<defaultValue>0d9965b3-d30d-4d5c-8ac1-fd8b32c49767</defaultValue>
+		<description>
+			UUID for the PrEP Status concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.stopAllConceptUuid</property>
+		<defaultValue>e1d9f36a-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for the STOP ALL concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.reasonToNotPrescribePrepConceptUuid</property>
+		<defaultValue>157fba33-7504-477a-aa02-b3cb0f639403</defaultValue>
+		<description>
+			UUID for the REASON TO NOT PRESCRIBE PREP concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.hivInfectedConceptUuid</property>
+		<defaultValue>e1d8dab6-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for the HIV INFECTED concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.noMoreSubstantialRisksConceptUuid</property>
+		<defaultValue>dad6ca9b-e15e-4773-8f18-c7805cda9b6b</defaultValue>
+		<description>
+			UUID for the NO MORE SUBSTANTIAL RISKS concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.userPreferenceConceptUuid</property>
+		<defaultValue>16810d18-2c75-47a0-9b00-7aa21fb4667f</defaultValue>
+		<description>
+			UUID for the USER PREFERENCE concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.notApplicableConceptUuid</property>
+		<defaultValue>e1d8e10a-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for the NOT APPLICABLE concept
+		</description>
+	</globalProperty>
+
 </module>

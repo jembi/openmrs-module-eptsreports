@@ -58,6 +58,10 @@ public class PrepCtDataset extends BaseDataSet {
             "endDate=${endDate},location=${location}"));
     dsd.addDimension(
         "results", EptsReportUtils.map(eptsCommonDimension.getPatientTestResultsPrep(), mappings));
+    dsd.addDimension(
+        "prepInterruption",
+        EptsReportUtils.map(
+            eptsCommonDimension.getClientsWithReasonForPrepInterruptionDisaggregation(), mappings));
 
     dsd.addColumn(
         "ORAL",
