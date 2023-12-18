@@ -50,6 +50,8 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
 
   private PrepCtDataset prepCtDataset;
 
+  private PrepOtherDisaggregationDataset prepOtherDisaggregationDataset;
+
   @Autowired
   public SetupMERQuarterly27(
       TxPvlsDataset txPvlsDataset,
@@ -64,7 +66,8 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
       CXCASCRNPositiveDataset cxcascrnPositiveDataset,
       TXCXCADataset txcxcaDataset,
       PrepNewDataset prepNewDataset,
-      PrepCtDataset prepCtDataset) {
+      PrepCtDataset prepCtDataset,
+      PrepOtherDisaggregationDataset prepOtherDisaggregationDataset) {
     this.txPvlsDataset = txPvlsDataset;
     this.txNewDataset = txNewDataset;
     this.txCurrDataset = txCurrDataset;
@@ -75,6 +78,7 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
     this.txRTTPLHIVDateset = txRTTPLHIVDateset;
     this.prepNewDataset = prepNewDataset;
     this.prepCtDataset = prepCtDataset;
+    this.prepOtherDisaggregationDataset = prepOtherDisaggregationDataset;
   }
 
   @Override
@@ -125,6 +129,10 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
     rd.addDataSetDefinition(
         "PREPNUM", Mapped.mapStraightThrough(prepCtDataset.constructPrepCtDataset()));
     rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
+    rd.addDataSetDefinition(
+        "OTHERDISAGG",
+        Mapped.mapStraightThrough(
+            prepOtherDisaggregationDataset.constructPrepOtherDisaggregationDataset()));
     // add a base cohort here to help in calculations running
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(
