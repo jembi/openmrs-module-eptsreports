@@ -453,6 +453,8 @@ public class EptsCommonDimension {
     CohortDefinition transgenderKeyPopCohort = prepCtCohortQueries.getPatientsWhoAreTransgender();
     CohortDefinition femaleSexWorkersKeyPopCohort =
         prepCtCohortQueries.getFemalePatientsWhoAreSexWorker();
+    CohortDefinition maleSexWorkersKeyPopCohort =
+        prepCtCohortQueries.getMalePatientsWhoAreSexWorker();
     CohortDefinition outroKeyPopCohort = prepCtCohortQueries.getPatientsWhoAreOutro();
     dim.addCohortDefinition("PID", mapStraightThrough(drugUserKeyPopCohort));
     dim.addCohortDefinition("MSM", mapStraightThrough(homosexualKeyPopCohort));
@@ -460,6 +462,8 @@ public class EptsCommonDimension {
     dim.addCohortDefinition("TG", mapStraightThrough(transgenderKeyPopCohort));
     dim.addCohortDefinition("SW", mapStraightThrough(femaleSexWorkersKeyPopCohort));
     dim.addCohortDefinition("OUT", mapStraightThrough(outroKeyPopCohort));
+    dim.addCohortDefinition("MSW", mapStraightThrough(maleSexWorkersKeyPopCohort));
+
     return dim;
   }
 
@@ -1088,6 +1092,61 @@ public class EptsCommonDimension {
         "on-dah",
         EptsReportUtils.map(
             resumoMensalDAHCohortQueries.getPatientsWhoStartedFollowupOnDAHComposition(),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
+
+    return dim;
+  }
+
+  /**
+   * <b>Description:</b> Clients marked with “PrEP Interrompida” and field “Razões para Interromper
+   * PrEP” with one of reasons of interruption on the “Ficha de Consulta Inicial PrEP” with the most
+   * recent date that falls during the reporting period OR Clients with the field “PrEP
+   * Interrompida” marked with one of the reasons of interruption on the most recent the “Ficha de
+   * Consulta de Seguimento PrEP” during the reporting period
+   *
+   * @return
+   */
+  public CohortDefinitionDimension getClientsWithReasonForPrepInterruptionDisaggregation() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+
+    dim.addParameter(new Parameter("startDate", "startDate", Date.class));
+    dim.addParameter(new Parameter("endDate", "endDate", Date.class));
+    dim.addParameter(new Parameter("location", "location", Location.class));
+    dim.setName("Patients With Reason For Prep Interruption Disaggregation");
+
+    dim.addCohortDefinition(
+        "hivInfected",
+        EptsReportUtils.map(
+            prepCtCohortQueries.getClientsWithReasonForPrepInterruption(
+                hivMetadata.getHivInfectedConcept().getConceptId()),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
+
+    dim.addCohortDefinition(
+        "adverseReaction",
+        EptsReportUtils.map(
+            prepCtCohortQueries.getClientsWithReasonForPrepInterruption(
+                hivMetadata.getAdverseReaction().getConceptId()),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
+
+    dim.addCohortDefinition(
+        "noMoreSubstantialRisks",
+        EptsReportUtils.map(
+            prepCtCohortQueries.getClientsWithReasonForPrepInterruption(
+                hivMetadata.getNoMoreSubstantialRisksConcept().getConceptId()),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
+
+    dim.addCohortDefinition(
+        "userPreference",
+        EptsReportUtils.map(
+            prepCtCohortQueries.getClientsWithReasonForPrepInterruption(
+                hivMetadata.getUserPreferenceConcept().getConceptId()),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
+
+    dim.addCohortDefinition(
+        "other",
+        EptsReportUtils.map(
+            prepCtCohortQueries.getClientsWithReasonForPrepInterruption(
+                hivMetadata.getOtherOrNonCodedConcept().getConceptId()),
             "startDate=${endDate},endDate=${endDate},location=${location}"));
 
     return dim;

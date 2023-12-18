@@ -915,4 +915,120 @@ public class PrepCtCohortQueries {
 
     return definition;
   }
+
+  /**
+   * <b>Description:</b> Clients marked with “PrEP Interrompida” and field “Razões para Interromper
+   * PrEP” with one of reasons of interruption on the “Ficha de Consulta Inicial PrEP” with the most
+   * recent date that falls during the reporting period
+   *
+   * @return
+   */
+  public CohortDefinition getClientsWithReasonForPrepInterruptionA(
+      int reasonToNotPrescribePrepAnswer) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients With Reason For Prep Interruption A");
+
+    sqlCohortDefinition.setQuery(
+        PrepCtQueries.clientsWithReasonForPrepInterruptionA(
+            hivMetadata.getPrepStatusConcept().getConceptId(),
+            hivMetadata.getStopAllConcept().getConceptId(),
+            hivMetadata.getReasonToNotPrescribePrepConcept().getConceptId(),
+            reasonToNotPrescribePrepAnswer,
+            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId()));
+
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Description:</b> Clients with the field “PrEP Interrompida” marked with one of the reasons
+   * of interruption on the most recent the “Ficha de Consulta de Seguimento PrEP” during the
+   * reporting period
+   *
+   * @return
+   */
+  public CohortDefinition getClientsWithReasonForPrepInterruptionB(
+      int reasonToNotPrescribePrepAnswer) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients With Reason For Prep Interruption B");
+
+    sqlCohortDefinition.setQuery(
+        PrepCtQueries.clientsWithReasonForPrepInterruptionB(
+            hivMetadata.getReasonToNotPrescribePrepConcept().getConceptId(),
+            reasonToNotPrescribePrepAnswer,
+            hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId()));
+
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Description:</b> Clients marked with “PrEP Interrompida” and field “Razões para Interromper
+   * PrEP” with one of reasons of interruption on the “Ficha de Consulta Inicial PrEP” with the most
+   * recent date that falls during the reporting period OR Clients with the field “PrEP
+   * Interrompida” marked with one of the reasons of interruption on the most recent the “Ficha de
+   * Consulta de Seguimento PrEP” during the reporting period
+   *
+   * @return
+   */
+  public CohortDefinition getClientsWithReasonForPrepInterruption(
+      int reasonToNotPrescribePrepAnswer) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients With Reason For Prep Interruption");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(
+            getClientsWithReasonForPrepInterruptionA(reasonToNotPrescribePrepAnswer),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "B",
+        EptsReportUtils.map(
+            getClientsWithReasonForPrepInterruptionB(reasonToNotPrescribePrepAnswer),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("A OR B");
+
+    return cd;
+  }
+
+  public CohortDefinition getMalePatientsWhoAreSexWorker() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Male Sex Workers");
+    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition SW =
+        getPatientsWhoAreKeypopulation(Arrays.asList(hivMetadata.getSexWorkerConcept()));
+    CohortDefinition onDrugs =
+        getPatientsWhoAreKeypopulation(Arrays.asList(hivMetadata.getDrugUseConcept()));
+    CohortDefinition male = genderCohortQueries.maleCohort();
+
+    cd.addSearch(
+        "drugUser",
+        EptsReportUtils.map(
+            onDrugs, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch("male", EptsReportUtils.map(male, ""));
+
+    cd.addSearch(
+        "sexWorker",
+        EptsReportUtils.map(
+            SW, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.setCompositionString("(sexWorker AND male) AND NOT drugUser");
+
+    return cd;
+  }
 }
