@@ -118,6 +118,9 @@ public class ResumoMensalDAHCohortQueries {
     cd.setName("Número total de activos em DAH em TARV,  até ao fim do mês anterior");
     cd.addParameters(getCohortParameters());
 
+    CohortDefinition rmB1 =
+        resumoMensalCohortQueries.getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1();
+
     cd.addSearch(
         "onDAHDuringPeriod",
         map(
@@ -134,9 +137,8 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "B1",
         map(
-            resumoMensalCohortQueries
-                .getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1(),
-            "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
+            getRMDefinitionsIfPatientDontHaveTarvSituationOnDah(rmB1),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("onDAHDuringPeriod AND (newOnArt OR B1)");
     return cd;
@@ -165,6 +167,8 @@ public class ResumoMensalDAHCohortQueries {
     cd.setName("Relatório-Indicador 2 - Reinícios TARV e Início DAH");
     cd.addParameters(getCohortParameters());
 
+    CohortDefinition rmB3 = resumoMensalCohortQueries.getPatientsRestartedTarvtB3();
+
     cd.addSearch(
         "onDAHDuringPeriod",
         map(
@@ -181,10 +185,16 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "B3",
         map(
-            resumoMensalCohortQueries.getPatientsRestartedTarvtB3(),
-            "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
+            getRMDefinitionsIfPatientDontHaveTarvSituationOnDah(rmB3),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("onDAHDuringPeriod AND (restartedArt OR B3)");
+    cd.addSearch(
+        "I1",
+        map(
+            getPatientsWhoAreNewInArtAndStartedFollowupDuringTheMonthComposition(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("(onDAHDuringPeriod AND (restartedArt OR B3)) AND NOT I1");
     return cd;
   }
 
@@ -230,7 +240,19 @@ public class ResumoMensalDAHCohortQueries {
             resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfPreviousMonthB12(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("onDAHDuringPeriod AND (onArt OR B12)");
+    cd.addSearch(
+        "I1",
+        map(
+            getPatientsWhoAreNewInArtAndStartedFollowupDuringTheMonthComposition(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "I2",
+        map(
+            getPatientsWhoRestartedArtAndStartedFollowupDuringTheMonthComposition(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("(onDAHDuringPeriod AND (onArt OR B12)) AND NOT (I1 OR I2)");
     return cd;
   }
 
@@ -407,9 +429,9 @@ public class ResumoMensalDAHCohortQueries {
     cd.addParameters(getCohortParameters());
 
     cd.addSearch(
-        "haveCd4Results",
+        "haveLowCd4Results",
         map(
-            getPatientsWhoHaveCd4Results(),
+            getPatientsWithLowCd4Results(),
             "startDate=${startDate-1m},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
@@ -420,7 +442,7 @@ public class ResumoMensalDAHCohortQueries {
                     hivMetadata.getCragSoroLabsetConcept(), hivMetadata.getCragSoroConcept()),
                 Arrays.asList(hivMetadata.getPositive(), hivMetadata.getNegative()))));
 
-    cd.setCompositionString("haveCd4Results AND cragResults");
+    cd.setCompositionString("haveLowCd4Results AND cragResults");
     return cd;
   }
 
@@ -483,7 +505,7 @@ public class ResumoMensalDAHCohortQueries {
             getPatientsWithPositiveOrNegativeCragLCRResults(
                 Arrays.asList(hivMetadata.getPositive(), hivMetadata.getNegative()))));
 
-    cd.setCompositionString("cragPositive AND cragPositive");
+    cd.setCompositionString("cragPositive AND cragResults");
     return cd;
   }
 
@@ -848,14 +870,15 @@ public class ResumoMensalDAHCohortQueries {
             + "  AND e.voided = 0 "
             + "  AND o.voided = 0 "
             + "  AND e.location_id = :location "
-            + "  AND e.encounter_type IN (${90}, ${6}) "
             + "  AND o.concept_id = ${1695} "
             + "  AND o.value_numeric IS NOT NULL "
             + " AND ( "
-            + "  ( o.obs_datetime >= :startDate "
+            + "  ( e.encounter_type = ${90} "
+            + " AND o.obs_datetime >= :startDate "
             + "  AND o.obs_datetime <= :endDate)"
             + "OR "
-            + " ( e.encounter_datetime >= :startDate "
+            + " ( e.encounter_type = ${6} "
+            + " AND e.encounter_datetime >= :startDate "
             + "  AND e.encounter_datetime <= :endDate) "
             + " ) "
             + "GROUP BY p.patient_id ";
@@ -961,14 +984,15 @@ public class ResumoMensalDAHCohortQueries {
             + "  AND e.voided = 0 "
             + "  AND o.voided = 0 "
             + "  AND e.location_id = :location "
-            + "  AND e.encounter_type IN (${90},${6}) "
             + "  AND o.concept_id IN ( ${examConcept} ) "
             + "  AND o.value_coded IN (${resultConcept}) "
             + "  AND ( "
-            + "        ( o.obs_datetime >= :startDate "
+            + "        ( e.encounter_type = ${90} AND "
+            + " o.obs_datetime >= :startDate "
             + "            AND o.obs_datetime <= :endDate) "
             + "        OR "
-            + "        ( e.encounter_datetime >= :startDate "
+            + "        ( e.encounter_type = ${6} AND "
+            + " e.encounter_datetime >= :startDate "
             + "            AND e.encounter_datetime <= :endDate) "
             + "    ) "
             + "GROUP BY p.patient_id";
@@ -1144,7 +1168,7 @@ public class ResumoMensalDAHCohortQueries {
             + "  AND o.value_datetime >= :startDate "
             + "  AND o.value_datetime <= :endDate "
             + "  AND o2.concept_id = ${20294} "
-            + "  AND o2.value_coded = ${1065}"
+            + "  AND o2.value_coded = ${1065} "
             + "GROUP BY p.patient_id";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
@@ -1221,6 +1245,9 @@ public class ResumoMensalDAHCohortQueries {
     cd.setName("utentes novos inícios de TARV, para desagregação dos indicadores 8 a 19");
     cd.addParameters(getCohortParameters());
 
+    CohortDefinition rmB1 =
+        resumoMensalCohortQueries.getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1();
+
     cd.addSearch(
         "newOnArt",
         map(
@@ -1230,9 +1257,8 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "B1",
         map(
-            resumoMensalCohortQueries
-                .getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1(),
-            "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
+            getRMDefinitionsIfPatientDontHaveTarvSituationOnDah(rmB1),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "PREGNANT",
@@ -1276,10 +1302,22 @@ public class ResumoMensalDAHCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        "B3",
+        "B3P1",
         map(
             resumoMensalCohortQueries.getPatientsRestartedTarvtB3(),
-            "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
+            "startDate=${startDate-2m},endDate=${endDate-2m},location=${location}"));
+
+    cd.addSearch(
+        "B3P2",
+        map(
+            resumoMensalCohortQueries.getPatientsRestartedTarvtB3(),
+            "startDate=${startDate-1m},endDate=${endDate-1m},location=${location}"));
+
+    cd.addSearch(
+        "B3P3",
+        map(
+            resumoMensalCohortQueries.getPatientsRestartedTarvtB3(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "PREGNANT",
@@ -1287,7 +1325,10 @@ public class ResumoMensalDAHCohortQueries {
             intensiveMonitoringCohortQueries.getMI15C(),
             "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(restartedArt OR B3) AND NOT PREGNANT");
+    cd.addSearch("newArt", mapStraightThrough(getPatientsWhoAreNewInArtDisaggregation()));
+
+    cd.setCompositionString(
+        "((restartedArt OR B3P1 OR B3P2 OR B3P3) AND NOT PREGNANT) AND NOT newArt");
     return cd;
   }
 
@@ -1334,7 +1375,40 @@ public class ResumoMensalDAHCohortQueries {
             intensiveMonitoringCohortQueries.getMI15C(),
             "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(onArt OR B12) AND NOT PREGNANT");
+    cd.addSearch("restarted", mapStraightThrough(getPatientsWhoRestartedArtDisaggregation()));
+
+    cd.addSearch("newArt", mapStraightThrough(getPatientsWhoAreNewInArtDisaggregation()));
+
+    cd.setCompositionString("((onArt OR B12) AND NOT PREGNANT) AND NOT (restarted OR newArt)");
+    return cd;
+  }
+
+  /**
+   *
+   * <li>Caso não exista o registo da “Situação do TARV no Início do Seguimento” na Ficha de DAH que
+   *     tem o registo de “Data de Início no Modelo de DAH” ocorrida durante o período (“Data de
+   *     Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”), considerar os utentes incluídos
+   *     no indicador B1-Nº de utentes que iniciaram TARV nesta unidade sanitária durante o mês, do
+   *     relatório “Resumo Mensal de HIV/SIDA” durante o período de compreendido entre “Data Início”
+   *     menos (–) 2 meses e “Data Fim”.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getRMDefinitionsIfPatientDontHaveTarvSituationOnDah(
+      CohortDefinition rmDefinition) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName(
+        "Patients Who dont have Situacao de Tarv On Ficha de DAH and Are from B1 Resumo mensal");
+    cd.addParameters(getCohortParameters());
+
+    cd.addSearch(
+        "RM",
+        map(rmDefinition, "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
+
+    cd.addSearch("tarvSituation", mapStraightThrough(getPatientsWithAnyArtSituationOnDAH()));
+
+    cd.setCompositionString("RM AND NOT tarvSituation");
     return cd;
   }
 
@@ -1362,18 +1436,70 @@ public class ResumoMensalDAHCohortQueries {
             + "WHERE  ps.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
-            + "       AND e.encounter_type IN (${90}, ${6})  "
             + "       AND o.concept_id = ${1695}  "
             + "       AND ".concat(cd4.getProposition())
             + " AND ( "
-            + "  ( o.obs_datetime >= :startDate "
+            + "  ( e.encounter_type = ${90} "
+            + " AND o.obs_datetime >= :startDate "
             + "  AND o.obs_datetime <= :endDate)"
             + "OR "
-            + " ( e.encounter_datetime >= :startDate "
+            + " ( e.encounter_type = ${6} "
+            + " AND e.encounter_datetime >= :startDate "
             + "  AND e.encounter_datetime <= :endDate) "
             + " ) "
             + "  AND e.location_id = :location"
             + "  GROUP BY ps.person_id ";
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(substitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * Get Patients who do not have “Situação do TARV no início do seguimento” (Secção A) da Ficha de
+   * DAH que tem o registo de “Data de Início no Modelo de DAH” ocorrida durante o período (“Data de
+   * Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”)
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithAnyArtSituationOnDAH() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients who do not have Situacao de Tarv Marked on DAH”");
+    sqlCohortDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    map.put("1255", hivMetadata.getARVPlanConcept().getConceptId());
+
+    String query =
+        "    SELECT p.patient_id  "
+            + "    FROM  "
+            + "        patient p INNER JOIN encounter e ON p.patient_id = e.patient_id  "
+            + "                  INNER JOIN obs o on e.encounter_id = o.encounter_id  "
+            + "                  INNER JOIN (  "
+            + "            SELECT p.patient_id, MAX(e.encounter_datetime) as last_date  "
+            + "            FROM  "
+            + "                patient p INNER JOIN encounter e ON p.patient_id= e.patient_id  "
+            + "                          INNER JOIN obs o on e.encounter_id = o.encounter_id  "
+            + "            WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0  "
+            + "              AND e.encounter_type = ${90}  "
+            + "              AND e.encounter_datetime >= :startDate  "
+            + "              AND e.encounter_datetime <= :endDate  "
+            + "              AND e.location_id = :location  "
+            + "            GROUP BY p.patient_id  "
+            + "        ) last_dah ON last_dah.patient_id = p.patient_id  "
+            + "    WHERE p.voided = 0  "
+            + "      AND e.voided = 0  "
+            + "      AND o.voided = 0  "
+            + "      AND e.encounter_type = ${90}  "
+            + "      AND o.concept_id = ${1255}  "
+            + "      AND o.value_coded IS NOT NULL  "
+            + "      AND e.encounter_datetime = last_dah.last_date  "
+            + "      AND e.location_id = :location  "
+            + "    GROUP BY p.patient_id  ";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
 
