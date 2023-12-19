@@ -451,35 +451,43 @@ public class TxPvlsBySourceLabOrFsrCohortQueries {
   }
 
   /**
-   * <b>PVLS_FR9</b>
+   * <b>PVLS_FR8</b>
    *
    * <blockquote>
    *
-   * <p>The system will identify female patients who are breastfeeding as following:
+   * <p>The system will identify female patients who are pregnant as follows:
    *
    * <ul>
-   *   <li>Patients who have the “Delivery date” registered in the initial or follow-up
-   *       consultations (Processo Clinico Parte A or Ficha de Seguimento Adulto) and where the
-   *       delivery date is within the period range or
-   *   <li>Patients who started ART for being breastfeeding as specified in “CRITÉRIO PARA INÍCIO DE
-   *       TRATAMENTO ARV” in the initial or follow-up consultations (Processo Clinico Parte A or
-   *       Ficha de Seguimento Adulto) that occurred within period range or chart: patient
-   *       Transferred Out or
-   *   <li>Patients who have been registered as breastfeeding in follow up consultation (Ficha de
-   *       Seguimento Adulto) within the period range.
-   *   <li>Have registered as breastfeeding in Ficha Resumo or Ficha Clinica within the period range
-   *       OR
+   *   <li>Patients marked as “PREGNANT” in the initial consultation (Processo Clinico Parte A or
+   *       Ficha Resumo – Master Card) or follow-up consultation (Ficha de Seguimento Adulto or
+   *       Ficha Clinica – Master Card) during the period range or
+   *   <li>Patients who have “Number of weeks Pregnant” registered in the initial or follow-up
+   *       consultation (Processo Clinico Parte A or Ficha de Seguimento Adulto) during the period
+   *       range or
+   *   <li>Patients who have “Pregnancy Due Date” registered in the initial or follow-up
+   *       consultation (Processo Clinico Parte A or Ficha de Seguimento Adulto) during the period
+   *       range or
    *   <li>Patients enrolled on Prevention of the Vertical Transmission/Elimination of the Vertical
-   *       Transmission (PTV/ETV) program with state 27 (gave birth) within the period range.
-   *   <li>Patient who have “Actualmente está a amamentar” marked as “Sim” on FSR Form and Data de
-   *       Colheita is during the period range.
+   *       Transmission (PTV/ETV) program during the period range or
+   *   <li>Have started ART for being B+ as specified in “CRITÉRIO PARA INÍCIO DE TARV” in the
+   *       follow-up consultations (Ficha de Seguimento) that occurred during the period range or
+   *   <li>Patient who have “Actualmente encontra-se gravida” marked as “Sim” on e-Lab Form and Data
+   *       de Colheita is during the period range.
    * </ul>
    *
    * <br>
    *
-   * <p>If the patient has both states (pregnant and breastfeeding) the most recent one should be
-   * considered. For patients who have both state (pregnant and breastfeeding) marked on the same
-   * day, the system will consider the patient as pregnant.<br>
+   * <p>If the patient has the both states (pregnant and breastfeeding), the most recent state
+   * should be considered. For patients who have both states (pregnant and breastfeeding) marked on
+   * the same date, the system will consider the patient as pregnant.<br>
+   *
+   * <ul>
+   *   <li>Period range:
+   *       <ul>
+   *         <li>start_date = the most recent VL result date - 9 months
+   *         <li>end_date = the most recent VL result date
+   *       </ul>
+   * </ul>
    *
    * </blockquote>
    *
@@ -488,7 +496,7 @@ public class TxPvlsBySourceLabOrFsrCohortQueries {
   public CohortDefinition getPregnantWomanWithLaboratoryVLResult() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
-        " Patients disaggregation - Pregnant with Clinical OR Ficah Resumo VL Result");
+        " Patients disaggregation - Pregnant with Laboratory VL Result");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
     Map<String, Integer> map = new HashMap<>();
@@ -849,7 +857,7 @@ public class TxPvlsBySourceLabOrFsrCohortQueries {
    */
   public CohortDefinition getBreastfeedingPatientsForLabViralLoadResults() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName(" Patients disaggregation - breastfeeding for Lab VL");
+    sqlCohortDefinition.setName(" Patients disaggregation - breastfeeding with Lab VL");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
