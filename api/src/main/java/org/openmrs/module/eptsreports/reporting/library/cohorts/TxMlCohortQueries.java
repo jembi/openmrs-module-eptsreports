@@ -113,16 +113,23 @@ public class TxMlCohortQueries {
 
     CohortDefinition transferredOut = getPatientsWhoHasTransferredOutComposition();
     CohortDefinition transferredOutPrevious = getPatientsWhoHasTransferredOutByEndOfPeriod();
+    CohortDefinition transferredOutPreviousIIT = getPatientsWhoHasTransferredOutByEndOfPeriodIIT();
 
     String mappings = "onOrBefore=${endDate},location=${location}";
     String mappings2 = "startDate=${startDate},endDate=${endDate},location=${location}";
     String previousPeriodMappings = "endDate=${startDate-1d},location=${location}";
+    String previousPeriodMappingsIIT =
+        "onOrBefore=${startDate-1d},endDate=${endDate},location=${location}";
 
     CohortDefinition dead = txCurrCohortQueries.getPatientsWhoAreDead();
 
     cd.addSearch(
         "transferredOutPreviousPeriod",
         EptsReportUtils.map(transferredOutPrevious, previousPeriodMappings));
+
+    cd.addSearch(
+        "transferredOutPreviousPeriodIIT",
+        EptsReportUtils.map(transferredOutPreviousIIT, previousPeriodMappingsIIT));
 
     cd.addSearch("transferredOutReportingPeriod", EptsReportUtils.map(transferredOut, mappings2));
 
@@ -152,7 +159,7 @@ public class TxMlCohortQueries {
     cd.setCompositionString(
         "( (startedArtBeforeDecember2023 OR startedArtAfterDecember2023) AND"
             + " (deadReportingPeriod OR suspendedReportingPeriod OR transferredOutReportingPeriod OR iit) ) "
-            + "AND NOT (transferredOutPreviousPeriod OR deadPreviousPeriod OR suspendedPreviousPeriod)");
+            + "AND NOT (transferredOutPreviousPeriodIIT OR deadPreviousPeriod OR suspendedPreviousPeriod)");
 
     return cd;
   }
@@ -203,13 +210,13 @@ public class TxMlCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        "transferredOutPrevious",
+        "transferredOutPreviousIIT",
         EptsReportUtils.map(
-            getPatientsWhoHasTransferredOutByEndOfPeriod(),
-            "endDate=${startDate-1d},location=${location}"));
+            getPatientsWhoHasTransferredOutByEndOfPeriodIIT(),
+            "onOrBefore=${startDate-1d},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "(iitMostRecentScheduleAfter28Days OR iitWithoutNextScheduledDrugPickup) AND NOT (deadReportingPeriod OR (transferredOut NOT transferredOutPrevious))");
+        "(iitMostRecentScheduleAfter28Days OR iitWithoutNextScheduledDrugPickup) AND NOT (deadReportingPeriod OR (transferredOut NOT transferredOutPreviousIIT))");
     return cd;
   }
 
@@ -276,6 +283,31 @@ public class TxMlCohortQueries {
         EptsReportUtils.map(
             txCurrCohortQueries.getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(),
             "onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString("transferredOutReportingPeriod AND mostRecentScheduleDuringPeriod");
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWhoHasTransferredOutByEndOfPeriodIIT() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Patients who are Transferred Out to another HF");
+    //    onOrBefore = startDate-1d
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "transferredOutReportingPeriod",
+        EptsReportUtils.map(
+            txCurrCohortQueries.getPatientsWhoAreTransferredOutToAnotherHfIIT(),
+            "onOrBefore=${onOrBefore},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "mostRecentScheduleDuringPeriod",
+        EptsReportUtils.map(
+            txCurrCohortQueries.getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(),
+            "onOrBefore=${onOrBefore},location=${location}"));
 
     cd.setCompositionString("transferredOutReportingPeriod AND mostRecentScheduleDuringPeriod");
     return cd;
@@ -371,29 +403,21 @@ public class TxMlCohortQueries {
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    String mappings = "onOrBefore=${endDate},location=${location}";
+
+    CohortDefinition suspendedTreatment =
+        txCurrCohortQueries.getPatientsWhoStoppedOrSuspendedTreatment();
+
     cd.addSearch(
-        "missedAppointmentLessTransfers",
+        "numerator",
         EptsReportUtils.map(
             getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "refusedOrStoppedTreatment",
-        EptsReportUtils.map(
-            getRefusedOrStoppedTreatmentQuery(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "dead",
-        EptsReportUtils.map(
-            getDeadPatientsComposition(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "transferOut",
-        EptsReportUtils.map(
-            getTransferredOutPatientsComposition(),
-            "startDate=${startDate},endDate=${endDate},reportEndDate=${endDate},location=${location}"));
 
-    cd.setCompositionString(
-        "(missedAppointmentLessTransfers AND refusedOrStoppedTreatment) AND NOT (dead OR transferOut)");
+    cd.addSearch("suspendedReportingPeriod", EptsReportUtils.map(suspendedTreatment, mappings));
+
+    cd.setCompositionString("numerator AND suspendedReportingPeriod");
 
     return cd;
   }
@@ -1686,7 +1710,20 @@ public class TxMlCohortQueries {
             getTreatmentInterruptionOfXDaysBeforeReturningToTreatment(180, null),
             "endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(missedAppointment AND moreThan180Days)");
+    cd.addSearch(
+        "iit",
+        EptsReportUtils.map(
+            getPatientsWhoExperiencedInterruptionInTreatmentComposition(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "suspendedTreatment",
+        EptsReportUtils.map(
+            txCurrCohortQueries.getPatientsWhoStoppedOrSuspendedTreatment(),
+            "onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "(missedAppointment AND (iit OR suspendedTreatment)) AND moreThan180Days");
     return cd;
   }
 
@@ -1717,7 +1754,20 @@ public class TxMlCohortQueries {
             getTreatmentInterruptionOfXDaysBeforeReturningToTreatment(null, 90),
             "endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(missedAppointment AND lessThan90days)");
+    cd.addSearch(
+        "iit",
+        EptsReportUtils.map(
+            getPatientsWhoExperiencedInterruptionInTreatmentComposition(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "suspendedTreatment",
+        EptsReportUtils.map(
+            txCurrCohortQueries.getPatientsWhoStoppedOrSuspendedTreatment(),
+            "onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "(missedAppointment AND (iit OR suspendedTreatment)) AND lessThan90days");
 
     return cd;
   }
@@ -1750,7 +1800,20 @@ public class TxMlCohortQueries {
             getTreatmentInterruptionOfXDaysBeforeReturningToTreatment(90, 180),
             "endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(missedAppointment AND greaterThan90AndLessThan180days)");
+    cd.addSearch(
+        "iit",
+        EptsReportUtils.map(
+            getPatientsWhoExperiencedInterruptionInTreatmentComposition(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "suspendedTreatment",
+        EptsReportUtils.map(
+            txCurrCohortQueries.getPatientsWhoStoppedOrSuspendedTreatment(),
+            "onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "(missedAppointment AND (iit OR suspendedTreatment)) AND greaterThan90AndLessThan180days");
     return cd;
   }
 
@@ -1782,7 +1845,14 @@ public class TxMlCohortQueries {
         EptsReportUtils.map(
             getPatientsWhoExperiencedInterruptionInTreatmentComposition(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.setCompositionString("missedAppointment AND iit");
+
+    cd.addSearch(
+        "suspendedTreatment",
+        EptsReportUtils.map(
+            txCurrCohortQueries.getPatientsWhoStoppedOrSuspendedTreatment(),
+            "onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString("missedAppointment AND (iit OR suspendedTreatment)");
     return cd;
   }
 

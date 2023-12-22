@@ -1120,7 +1120,6 @@ public class TxMlQueries {
             + "                                    GROUP  BY pa.patient_id "
             + "                                ) most_recent "
             + "                            GROUP BY most_recent.patient_id "
-            + "                            HAVING final_encounter_date < :endDate "
             + "                       ) last_pickup "
             + "     on last_pickup.patient_id = start_art.patient_id ";
 
