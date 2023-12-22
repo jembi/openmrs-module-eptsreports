@@ -150,6 +150,41 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   }
 
   /**
+   * <b>Total de utentes em MDS de DAH </b>
+   * <li>Utentes que iniciaram o seguimento do Modelo de DAH OR
+   * <li>Excluindo todos os utentes que:
+   * <li>tenham iniciado um Modelo de DAH antes da data de início do período de avaliação
+   * <li>tenham sido transferidos para outra unidade sanitária até o fim do período de avaliação
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getTotalOfPatientsWhoAreOnMDSDah() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Total de utentes em MDS de DAH");
+    cd.addParameters(getCohortParameters());
+
+    cd.addSearch(
+        "STARTEDFOLLOWUP", EptsReportUtils.map(getPatientsWhoStartedFollowupOnDAH(true), mappings));
+
+    // EXCLUSIONS
+    cd.addSearch(
+        "FOLLOWUPBEFORESTARTDATE",
+        EptsReportUtils.map(getPatientsWhoStartedFollowupOnDAH(false), mappings));
+
+    cd.addSearch(
+        "TRANSFERREDOUT",
+        EptsReportUtils.map(
+            getPatientsTransferredOutByTheEndOfPeriod(),
+            "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("STARTEDFOLLOWUP AND NOT (FOLLOWUPBEFORESTARTDATE OR TRANSFERREDOUT)");
+
+    return cd;
+  }
+
+  /**
    * <b>DAH FR3 - Utentes que iniciaram o seguimento no Modelo de DAH </b>
    *
    * <p>Utentes com registo do “Início de Seguimento no Modelo de Doença Avançada” (Data Início DAH
