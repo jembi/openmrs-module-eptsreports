@@ -412,7 +412,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "                                       INNER JOIN obs o on e.encounter_id = o.encounter_id "
             + "                         WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                           AND e.encounter_type = ${90} "
-            + "                           AND e.encounter_datetime <= :startDate "
+            + "                           AND e.encounter_datetime >= :startDate "
             + "                           AND e.encounter_datetime <= :endDate "
             + "                           AND e.location_id = :location "
             + "                         GROUP BY p.patient_id)followup ON followup.patient_id = e.patient_id "
