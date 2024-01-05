@@ -64,15 +64,6 @@ public class PrepCtDataset extends BaseDataSet {
             eptsCommonDimension.getClientsWithReasonForPrepInterruptionDisaggregation(), mappings));
 
     dsd.addColumn(
-        "ORAL",
-        "Oral",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Oral", EptsReportUtils.map(prepCtCohortQueries.getPREPCTNumerator(), mappings)),
-            mappings),
-        "");
-
-    dsd.addColumn(
         "TOTAL-CT",
         "Total PrEP CT Numerator",
         EptsReportUtils.map(
@@ -83,7 +74,7 @@ public class PrepCtDataset extends BaseDataSet {
         "");
 
     dsd.addColumn(
-        "ORAL",
+        "ORAL-CT",
         "Oral",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
