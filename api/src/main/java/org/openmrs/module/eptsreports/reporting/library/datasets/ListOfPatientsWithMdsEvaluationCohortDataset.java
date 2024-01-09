@@ -3,7 +3,6 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 import java.util.Arrays;
 import java.util.List;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.data.converter.*;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
 import org.openmrs.module.reporting.data.person.definition.*;
@@ -17,39 +16,12 @@ import org.springframework.stereotype.Component;
 public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
 
   private ListOfPatientsWithMdsEvaluationCohortQueries listOfPatientsWithMdsEvaluationCohortQueries;
-  private ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries;
-
-  private TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet;
-
-  private TPTInitiationDataDefinitionQueries tptInitiationDataDefinitionQueries;
-
-  private final DQACargaViralCohortQueries dQACargaViralCohortQueries;
-
-  private final TbMetadata tbMetadata;
-
-  private ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset;
-
-  private ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries;
 
   @Autowired
   public ListOfPatientsWithMdsEvaluationCohortDataset(
-      ListOfPatientsWithMdsEvaluationCohortQueries listOfPatientsWithMdsEvaluationCohortQueries,
-      ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries,
-      TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet,
-      TPTInitiationDataDefinitionQueries tptInitiationDataDefinitionQueries,
-      DQACargaViralCohortQueries dQACargaViralCohortQueries,
-      TbMetadata tbMetadata,
-      ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries,
-      ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset) {
+      ListOfPatientsWithMdsEvaluationCohortQueries listOfPatientsWithMdsEvaluationCohortQueries) {
     this.listOfPatientsWithMdsEvaluationCohortQueries =
         listOfPatientsWithMdsEvaluationCohortQueries;
-    this.listOfPatientsArtCohortCohortQueries = listOfPatientsArtCohortCohortQueries;
-    this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
-    this.tptInitiationDataDefinitionQueries = tptInitiationDataDefinitionQueries;
-    this.dQACargaViralCohortQueries = dQACargaViralCohortQueries;
-    this.tbMetadata = tbMetadata;
-    this.listOfPatientsDefaultersOrIITCohortQueries = listOfPatientsDefaultersOrIITCohortQueries;
-    this.listChildrenOnARTandFormulationsDataset = listChildrenOnARTandFormulationsDataset;
   }
 
   public DataSetDefinition contructDataset() {
