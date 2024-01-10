@@ -86,25 +86,25 @@ public class TxCurrDataset extends BaseDataSet {
         "C1All", "TX_CURR: Currently on ART", EptsReportUtils.map(txCurrIndicator, mappings), "");
 
     dataSetDefinition.addColumn(
-        "PID",
+        "PID-TX_CURR",
         "TX_CURR: People who inject drugs",
         EptsReportUtils.map(txCurrIndicator, mappings),
         "keypop=PID");
 
     dataSetDefinition.addColumn(
-        "MSM",
+        "MSM-TX_CURR",
         "TX_CURR: Men who have sex with men",
         EptsReportUtils.map(txCurrIndicator, mappings),
         "keypop=MSM");
 
     dataSetDefinition.addColumn(
-        "CSW",
+        "CSW-TX_CURR",
         "TX_CURR: Female sex workers",
         EptsReportUtils.map(txCurrIndicator, mappings),
         "keypop=CSW");
 
     dataSetDefinition.addColumn(
-        "PRI",
+        "PRI-TX_CURR",
         "TX_CURR: People in prison and other closed settings",
         EptsReportUtils.map(txCurrIndicator, mappings),
         "keypop=PRI");
