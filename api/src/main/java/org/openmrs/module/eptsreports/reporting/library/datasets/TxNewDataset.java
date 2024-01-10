@@ -152,25 +152,25 @@ public class TxNewDataset extends BaseDataSet {
         "maternity=breastfeeding");
 
     dataSetDefinition.addColumn(
-        "PID",
+        "PID-TX_NEW",
         "TX_NEW: People who inject drugs",
         EptsReportUtils.map(patientEnrolledInHIVStartedARTIndicator, mappings),
         "keypop=PID");
 
     dataSetDefinition.addColumn(
-        "MSM",
+        "MSM-TX_NEW",
         "TX_NEW: Men who have sex with men",
         EptsReportUtils.map(patientEnrolledInHIVStartedARTIndicator, mappings),
         "keypop=MSM");
 
     dataSetDefinition.addColumn(
-        "CSW",
+        "CSW-TX_NEW",
         "TX_NEW: Female sex workers",
         EptsReportUtils.map(patientEnrolledInHIVStartedARTIndicator, mappings),
         "keypop=CSW");
 
     dataSetDefinition.addColumn(
-        "PRI",
+        "PRI-TX_NEW",
         "TX_NEW: People in prison and other closed settings",
         EptsReportUtils.map(patientEnrolledInHIVStartedARTIndicator, mappings),
         "keypop=PRI");
