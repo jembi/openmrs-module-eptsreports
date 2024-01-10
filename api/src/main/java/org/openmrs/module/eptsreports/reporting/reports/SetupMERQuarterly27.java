@@ -124,12 +124,12 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
         "TXML", Mapped.mapStraightThrough(txMlDataset25.constructtxMlDataset()));
         rd.addDataSetDefinition("R",
      Mapped.mapStraightThrough(txRttDataset.constructTxRttDataset()));
-    //    rd.addDataSetDefinition(
-    //        "T", Mapped.mapStraightThrough(transferredInDataset.constructTransferInDataset()));
-    //    rd.addDataSetDefinition(
-    //        "PL", Mapped.mapStraightThrough(txRTTPLHIVDateset.constructTxRTTPLHIVDateset()));
-    //    rd.addDataSetDefinition(
-    //        "PREP", Mapped.mapStraightThrough(prepNewDataset.constructPrepNewDataset()));
+        rd.addDataSetDefinition(
+            "T", Mapped.mapStraightThrough(transferredInDataset.constructTransferInDataset()));
+        rd.addDataSetDefinition(
+            "PL", Mapped.mapStraightThrough(txRTTPLHIVDateset.constructTxRTTPLHIVDateset()));
+        rd.addDataSetDefinition(
+            "PREP", Mapped.mapStraightThrough(prepNewDataset.constructPrepNewDataset()));
     //    rd.addDataSetDefinition(
     //        "PREPNUM", Mapped.mapStraightThrough(prepCtDataset.constructPrepCtDataset()));
     rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
