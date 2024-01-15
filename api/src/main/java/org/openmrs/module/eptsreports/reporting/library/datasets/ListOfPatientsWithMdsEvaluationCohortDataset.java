@@ -47,18 +47,16 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "coort",
         listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24Months(),
-        "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        "evaluationYear=${evaluationYear},location=${location}");
 
     // A3- Sexo: (coluna C)
-    pdd.addColumn("gender", new GenderDataDefinition(), "", null);
+    pdd.addColumn("gender", new GenderDataDefinition(), "");
 
     // A4- Idade: (coluna D)
     pdd.addColumn(
         "age",
         listOfPatientsWithMdsEvaluationCohortQueries.getAgeOnMOHArtStartDate(),
-        "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        "evaluationYear=${evaluationYear},location=${location}");
 
     // A5- Data início TARV: (coluna E)
     pdd.addColumn(
