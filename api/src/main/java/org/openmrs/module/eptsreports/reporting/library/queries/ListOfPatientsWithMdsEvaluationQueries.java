@@ -6,12 +6,16 @@ import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCohortQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 
 public class ListOfPatientsWithMdsEvaluationQueries {
   private static HivMetadata hivMetadata = new HivMetadata();
   private static TbMetadata tbMetadata = new TbMetadata();
   private static CommonMetadata commonMetadata = new CommonMetadata();
+
+  private static final ResumoMensalCohortQueries resumoMensalCohortQueries = new ResumoMensalCohortQueries(new HivMetadata(),new TbMetadata(),new GenericCohortQueries());
 
   /**
    * O sistema irá determinar a Data Início TARV do utente da seguinte forma:
@@ -253,10 +257,9 @@ public class ListOfPatientsWithMdsEvaluationQueries {
    * registada em 33 dias do Início TARV, ou seja, entre “Data Início TARV” e “Data Início TARV” +
    * 33 dias.
    *
-   * @param inclusionEndMonthAndDay = '-06-20'
    * @return String
    */
-  public static String getTbActive(String inclusionEndMonthAndDay) {
+  public static String getTbActive() {
 
     String query =
         " SELECT     p.patient_id, "
@@ -270,7 +273,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "               SELECT art_patient.patient_id, "
             + "                      art_patient.first_pickup AS art_encounter "
             + "               FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
             + "                       ) art_patient "
             + " ) art ON art.patient_id = p.patient_id "
             + " WHERE  p.voided = 0 "
@@ -298,10 +301,9 @@ public class ListOfPatientsWithMdsEvaluationQueries {
    * registada em 33 dias do Início TARV, ou seja, entre “Data Início TARV” e “Data Início TARV” +
    * 33 dias.
    *
-   * @param inclusionEndMonthAndDay = '-06-20'
    * @return String
    */
-  public static String getTBSymptoms(String inclusionEndMonthAndDay) {
+  public static String getTBSymptoms() {
 
     String query =
         " SELECT     p.patient_id, "
@@ -315,7 +317,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "             SELECT art_patient.patient_id, "
             + "                    art_patient.first_pickup AS art_encounter "
             + "             FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
             + "                    ) art_patient "
             + " ) art ON art.patient_id = p.patient_id "
             + " WHERE  p.voided = 0 "
@@ -344,10 +346,9 @@ public class ListOfPatientsWithMdsEvaluationQueries {
    * Clínica (“Data Consulta”) registada em 33 dias do Início TARV, ou seja, entre “Data Início
    * TARV” e “Data Início TARV” + 33 dias.
    *
-   * @param inclusionEndMonthAndDay = '-06-20'
    * @return String
    */
-  public static String getTBSymptomsTypes(String inclusionEndMonthAndDay) {
+  public static String getTBSymptomsTypes() {
     String query =
         " SELECT     p.patient_id, "
             + "          e.encounter_datetime AS encounter_date "
@@ -360,7 +361,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "              SELECT art_patient.patient_id, "
             + "                     art_patient.first_pickup AS art_encounter "
             + "              FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
             + "                     ) art_patient "
             + " ) art ON art.patient_id = p.patient_id "
             + " WHERE  p.voided = 0 "
@@ -395,10 +396,9 @@ public class ListOfPatientsWithMdsEvaluationQueries {
    * “Data de Tratamento” registada em 33 dias do Início TARV, ou seja, entre “Data Início TARV” e
    * “Data Início TARV” + 33 dias.
    *
-   * @param inclusionEndMonthAndDay = '-06-20'
    * @return String
    */
-  public static String getTbTreatment(String inclusionEndMonthAndDay) {
+  public static String getTbTreatment() {
     String query =
         " SELECT     p.patient_id, "
             + "          o.obs_datetime AS encounter_date "
@@ -411,7 +411,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "               SELECT art_patient.patient_id, "
             + "                      art_patient.first_pickup AS art_encounter "
             + "               FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
             + "                      ) art_patient "
             + " ) art ON art.patient_id = p.patient_id "
             + " WHERE  p.voided = 0 "
@@ -440,10 +440,9 @@ public class ListOfPatientsWithMdsEvaluationQueries {
    * O registo de “TB” nas “Condições médicas Importantes” na Ficha Resumo com “Data” registada em
    * 33 dias do Início TARV, ou seja, entre “Data Início TARV” e “Data Início TARV” + 33 dias.
    *
-   * @param inclusionEndMonthAndDay = '-06-20'
    * @return String
    */
-  public static String getImportantMedicalConditions(String inclusionEndMonthAndDay) {
+  public static String getImportantMedicalConditions() {
     String query =
         " SELECT     p.patient_id, "
             + "          o.obs_datetime AS encounter_date "
@@ -456,7 +455,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "               SELECT art_patient.patient_id, "
             + "                      art_patient.first_pickup AS art_encounter "
             + "               FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
             + "                      ) art_patient "
             + " ) art ON art.patient_id = p.patient_id "
             + " WHERE  p.voided = 0 "

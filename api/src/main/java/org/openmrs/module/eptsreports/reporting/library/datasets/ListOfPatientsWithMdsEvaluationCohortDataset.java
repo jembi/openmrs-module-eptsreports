@@ -17,6 +17,8 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
 
   private ListOfPatientsWithMdsEvaluationCohortQueries listOfPatientsWithMdsEvaluationCohortQueries;
 
+  private String endDateMappings = "endDate=${evaluationYear}-06-20,location=${location}";
+
   @Autowired
   public ListOfPatientsWithMdsEvaluationCohortDataset(
       ListOfPatientsWithMdsEvaluationCohortQueries listOfPatientsWithMdsEvaluationCohortQueries) {
@@ -62,35 +64,35 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "art_start",
         listOfPatientsWithMdsEvaluationCohortQueries.getArtStartDate(),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // A6- Elegível ao TPT no Início do TARV: (coluna F)
     pdd.addColumn(
         "tpt_eligible_tarv",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsTptNotEligible(),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new YesOrNoConverter());
 
     // A7- Data de início do TPT: (coluna G)
     pdd.addColumn(
         "tpt_start_date",
         listOfPatientsWithMdsEvaluationCohortQueries.getTptInitiationDate(),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // A8- Data de registo do resultado de CD4 inicial: (coluna H)
     pdd.addColumn(
         "cd4_register_date",
         listOfPatientsWithMdsEvaluationCohortQueries.getCd4ResultDate(),
-        "evaluationYear=${evaluationYear},location=${location}",
+            endDateMappings,
         new GeneralDateConverter());
 
     // A9- Resultado do CD4 Inicial: (coluna I)
     pdd.addColumn(
         "initial_cd4_result",
         listOfPatientsWithMdsEvaluationCohortQueries.getCd4Result(),
-        "evaluationYear=${evaluationYear},location=${location}");
+        endDateMappings);
 
     //  SECÇÃO B
     //  12 MESES DEPOIS DO INÍCIO DO TARV: ELIGIBILIDADE A MDS
@@ -99,7 +101,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "first_cv_date",
         listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoad(),
-        "evaluationYear=${evaluationYear},location=${location}",
+            endDateMappings,
         new GeneralDateConverter());
 
     // B.2 - Data de registo do resultado da 1ª CV - Sheet 1: Column K
