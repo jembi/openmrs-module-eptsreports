@@ -15,7 +15,9 @@ public class ListOfPatientsWithMdsEvaluationQueries {
   private static TbMetadata tbMetadata = new TbMetadata();
   private static CommonMetadata commonMetadata = new CommonMetadata();
 
-  private static final ResumoMensalCohortQueries resumoMensalCohortQueries = new ResumoMensalCohortQueries(new HivMetadata(),new TbMetadata(),new GenericCohortQueries());
+  private static final ResumoMensalCohortQueries resumoMensalCohortQueries =
+      new ResumoMensalCohortQueries(
+          new HivMetadata(), new TbMetadata(), new GenericCohortQueries());
 
   /**
    * O sistema irá determinar a Data Início TARV do utente da seguinte forma:

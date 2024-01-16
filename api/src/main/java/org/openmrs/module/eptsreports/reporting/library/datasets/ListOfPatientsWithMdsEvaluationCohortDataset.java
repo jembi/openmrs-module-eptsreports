@@ -85,7 +85,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "cd4_register_date",
         listOfPatientsWithMdsEvaluationCohortQueries.getCd4ResultDate(),
-            endDateMappings,
+        endDateMappings,
         new GeneralDateConverter());
 
     // A9- Resultado do CD4 Inicial: (coluna I)
@@ -101,21 +101,21 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "first_cv_date",
         listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoad(),
-            endDateMappings,
+        endDateMappings,
         new GeneralDateConverter());
 
     // B.2 - Data de registo do resultado da 1ª CV - Sheet 1: Column K
     pdd.addColumn(
         "first_cv_result_date",
         listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoadResultDate(),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // B.3 - Resultado da 1ª CV - Sheet 1: Column L
     pdd.addColumn(
         "first_cv_result",
         listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoadResult(),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new ViralLoadQualitativeLabelConverter());
 
     // B.4 - Resultado do 2˚ CD4 (2˚ CD4 feito nos 1˚s 12 meses de TARV) - Sheet 1: Column M

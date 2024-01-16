@@ -35,11 +35,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   @Autowired
   public ListOfPatientsWithMdsEvaluationCohortQueries(
-          HivMetadata hivMetadata, TbMetadata tbMetadata, CommonMetadata commonMetadata, ResumoMensalCohortQueries resumoMensalCohortQueries) {
+      HivMetadata hivMetadata,
+      TbMetadata tbMetadata,
+      CommonMetadata commonMetadata,
+      ResumoMensalCohortQueries resumoMensalCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
     this.commonMetadata = commonMetadata;
-      this.resumoMensalCohortQueries = resumoMensalCohortQueries;
+    this.resumoMensalCohortQueries = resumoMensalCohortQueries;
   }
 
   /**
@@ -205,8 +208,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
         .union(ListOfPatientsWithMdsEvaluationQueries.getTBSymptoms())
         .union(ListOfPatientsWithMdsEvaluationQueries.getTBSymptomsTypes())
         .union(ListOfPatientsWithMdsEvaluationQueries.getTbTreatment())
-        .union(
-            ListOfPatientsWithMdsEvaluationQueries.getImportantMedicalConditions())
+        .union(ListOfPatientsWithMdsEvaluationQueries.getImportantMedicalConditions())
         .buildQuery();
   }
 
@@ -241,7 +243,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   public DataDefinition getPatientsTptNotEligible() {
     SqlPatientDataDefinition dd = new SqlPatientDataDefinition();
     dd.setName("Elegível ao TPT no Início do TARV: (coluna F)");
-      dd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    dd.addParameter(new Parameter("endDate", "endDate", Date.class));
     dd.addParameter(new Parameter("location", "location", Location.class));
 
     String sql = getUnionQuery();
@@ -436,8 +438,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "Identificação de Data de registo do resultado de CD4 inicial");
-    sqlPatientDataDefinition.addParameter(
-        new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -563,8 +564,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   public DataDefinition getCd4Result() {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Resultado do CD4 inicial - A.9 (Coluna I)");
-    sqlPatientDataDefinition.addParameter(
-        new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> map = new HashMap<>();
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
@@ -690,8 +690,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   public DataDefinition getFirstViralLoad() {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Data do pedido da 1a CV");
-    sqlPatientDataDefinition.addParameter(
-        new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> map = new HashMap<>();
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
@@ -865,8 +864,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   public DataDefinition getFirstViralLoadResultDate() {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B2- Data de registo do resultado da 1ª CV");
-    sqlPatientDataDefinition.addParameter(
-        new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -878,44 +876,47 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
 
-    String query =
-        "SELECT     p.patient_id, "
-            + "           MIN(e.encounter_datetime) AS first_vl_date  "
-            + "FROM       patient p "
-            + "INNER JOIN encounter e "
-            + "ON         e.patient_id = p.patient_id "
-            + "INNER JOIN obs o "
-            + "ON         o.encounter_id = e.encounter_id "
-            + "INNER JOIN "
-            + "           ( "
-            + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.first_pickup AS art_encounter "
-            + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
-            + "                           ) art_patient "
-            + "                     ) art ON art.patient_id = p.patient_id "
-            + "       WHERE  p.voided = 0 "
-            + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "AND      e.encounter_type = ${6} "
-            + "AND        ( ( "
-            + "                                 o.concept_id= ${856} "
-            + "                         AND     o.value_numeric IS NOT NULL ) "
-            + "           OR         ( "
-            + "                                 o.concept_id = ${1305} "
-            + "                      AND        o.value_coded IS NOT NULL)) "
-            + "AND        e.location_id = :location "
-            + "AND        e.encounter_datetime >= art.art_encounter "
-            + "AND        p.voided = 0 "
-            + "AND        e.voided = 0 "
-            + "AND        o.voided = 0 "
-            + "GROUP BY   p.patient_id";
+    String query = getFirstVlDateQuery();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlPatientDataDefinition;
+  }
+
+  private String getFirstVlDateQuery() {
+    return "SELECT     p.patient_id, "
+        + "           MIN(e.encounter_datetime) AS first_vl_date  "
+        + "FROM       patient p "
+        + "INNER JOIN encounter e "
+        + "ON         e.patient_id = p.patient_id "
+        + "INNER JOIN obs o "
+        + "ON         o.encounter_id = e.encounter_id "
+        + "INNER JOIN "
+        + "           ( "
+        + "                           SELECT art_patient.patient_id, "
+        + "                                  art_patient.first_pickup AS art_encounter "
+        + "                           FROM   ( "
+        + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
+        + "                           ) art_patient "
+        + "                     ) art ON art.patient_id = p.patient_id "
+        + "       WHERE  p.voided = 0 "
+        + "       AND e.voided = 0 "
+        + "       AND o.voided = 0 "
+        + "AND      e.encounter_type = ${6} "
+        + "AND        ( ( "
+        + "                                 o.concept_id= ${856} "
+        + "                         AND     o.value_numeric IS NOT NULL ) "
+        + "           OR         ( "
+        + "                                 o.concept_id = ${1305} "
+        + "                      AND        o.value_coded IS NOT NULL)) "
+        + "AND        e.location_id = :location "
+        + "AND        e.encounter_datetime >= art.art_encounter "
+        + "AND        p.voided = 0 "
+        + "AND        e.voided = 0 "
+        + "AND        o.voided = 0 "
+        + "GROUP BY   p.patient_id";
   }
 
   /**
@@ -1033,8 +1034,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   public DataDefinition getFirstViralLoadResult() {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B3- Resultado da 1ª CV");
-    sqlPatientDataDefinition.addParameter(
-        new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -1048,7 +1048,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     String query =
         "SELECT     p.patient_id, "
-            + "     IF(MIN(o.value_numeric) IS NOT NULL, MIN(o.value_numeric), IF(MIN(o.value_coded) = 165331, CONCAT('MENOR QUE ',o.comments), MIN(o.value_coded))) AS first_vl_result  "
+            + "     IF(o.value_numeric IS NOT NULL, o.value_numeric, IF(o.value_coded = 165331, CONCAT('MENOR QUE ',o.comments), o.value_coded)) AS first_vl_result  "
             + "FROM       patient p "
             + "INNER JOIN encounter e "
             + "ON         e.patient_id = p.patient_id "
@@ -1056,12 +1056,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "ON         o.encounter_id = e.encounter_id "
             + "INNER JOIN "
             + "           ( "
-            + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.first_pickup AS art_encounter "
-            + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
-            + "                           ) art_patient "
-            + "                     ) art ON art.patient_id = p.patient_id "
+            + getFirstVlDateQuery()
+            + "                     ) first_vl ON first_vl.patient_id = p.patient_id "
             + "       WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
@@ -1073,7 +1069,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                 o.concept_id = ${1305} "
             + "                      AND        o.value_coded IS NOT NULL)) "
             + "AND        e.location_id = :location "
-            + "AND        e.encounter_datetime > art.art_encounter "
+            + "AND        e.encounter_datetime = first_vl.first_vl_date "
             + "AND        p.voided = 0 "
             + "AND        e.voided = 0 "
             + "AND        o.voided = 0 "
