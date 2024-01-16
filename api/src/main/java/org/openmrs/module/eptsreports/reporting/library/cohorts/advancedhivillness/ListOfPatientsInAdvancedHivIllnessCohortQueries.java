@@ -10,6 +10,7 @@ import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.advancedhivillness.ListOfPatientsOnAdvancedHivIllnessQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
@@ -37,6 +38,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
   private final ResumoMensalCohortQueries resumoMensalCohortQueries;
 
+  private final GenericCohortQueries genericCohortQueries;
+
   private final String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
   @Autowired
@@ -45,12 +48,14 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
       CommonMetadata commonMetadata,
       TbMetadata tbMetadata,
       ListOfPatientsOnAdvancedHivIllnessQueries listOfPatientsOnAdvancedHivIllnessQueries,
-      ResumoMensalCohortQueries resumoMensalCohortQueries) {
+      ResumoMensalCohortQueries resumoMensalCohortQueries,
+      GenericCohortQueries genericCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
     this.tbMetadata = tbMetadata;
     this.listOfPatientsOnAdvancedHivIllnessQueries = listOfPatientsOnAdvancedHivIllnessQueries;
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
+    this.genericCohortQueries = genericCohortQueries;
   }
 
   /**
@@ -90,6 +95,11 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
         "ESTADIO",
         EptsReportUtils.map(getPatientsWithCriterioEstadiamentoInicioSeguimento(), mappings));
 
+    cd.addSearch(
+        "BASECOHORT",
+        EptsReportUtils.map(
+            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
+
     // EXCLUSIONS
 
     cd.addSearch(
@@ -103,7 +113,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "(STARTEDFOLLOWUP OR CD4 OR ESTADIO) AND NOT (FOLLOWUPBEFORESTARTDATE OR TRANSFERREDOUT)");
+        "((STARTEDFOLLOWUP OR CD4 OR ESTADIO) AND BASECOHORT) AND NOT (FOLLOWUPBEFORESTARTDATE OR TRANSFERREDOUT)");
 
     return cd;
   }
@@ -136,6 +146,11 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
         "ESTADIO",
         EptsReportUtils.map(getPatientsWithCriterioEstadiamentoInicioSeguimento(), mappings));
 
+    cd.addSearch(
+        "BASECOHORT",
+        EptsReportUtils.map(
+            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
+
     // EXCLUSIONS
     cd.addSearch(
         "FOLLOWUPBEFORESTARTDATE",
@@ -147,7 +162,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             getPatientsTransferredOutByTheEndOfPeriod(),
             "endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(CD4 OR ESTADIO) AND NOT (FOLLOWUPBEFORESTARTDATE OR TRANSFERREDOUT)");
+    cd.setCompositionString(
+        "((CD4 OR ESTADIO) AND BASECOHORT) AND NOT (FOLLOWUPBEFORESTARTDATE OR TRANSFERREDOUT)");
 
     return cd;
   }
@@ -171,6 +187,11 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     cd.addSearch(
         "STARTEDFOLLOWUP", EptsReportUtils.map(getPatientsWhoStartedFollowupOnDAH(true), mappings));
 
+    cd.addSearch(
+        "BASECOHORT",
+        EptsReportUtils.map(
+            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
+
     // EXCLUSIONS
     cd.addSearch(
         "FOLLOWUPBEFORESTARTDATE",
@@ -182,7 +203,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             getPatientsTransferredOutByTheEndOfPeriod(),
             "endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("STARTEDFOLLOWUP AND NOT (FOLLOWUPBEFORESTARTDATE OR TRANSFERREDOUT)");
+    cd.setCompositionString(
+        "(STARTEDFOLLOWUP AND BASECOHORT) AND NOT (FOLLOWUPBEFORESTARTDATE OR TRANSFERREDOUT)");
 
     return cd;
   }
