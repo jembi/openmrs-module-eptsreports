@@ -122,7 +122,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "second_cd4_result",
         listOfPatientsWithMdsEvaluationCohortQueries.getSecondCd4Result(),
-        "evaluationYear=${evaluationYear},location=${location}");
+        endDateMappings);
 
     // B5- Teve registo de boa adesão em TODAS consultas entre 1˚ e 3˚ mês de TARV?
     pdd.addColumn(
