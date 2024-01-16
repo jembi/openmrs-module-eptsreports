@@ -128,90 +128,89 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "good_adherence_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(true),
-        "evaluationYear=${evaluationYear},location=${location}");
+        endDateMappings);
 
     // B6- Esteve grávida ou foi lactante entre 3˚ e 9º mês de TARV?: (coluna M)- Resposta = Sim ou
     // Não (RF22)
     pdd.addColumn(
         "pregnant_breastfeeding_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsPregnantBreastfeeding3MonthsTarv(
-            3, 9),
-        "evaluationYear=${evaluationYear},location=${location}");
+            3, 9), endDateMappings);
 
     // B8- Teve TB nos 1˚s 12 meses de TARV: (coluna Q) - Resposta = Sim ou Não (RF23)
     pdd.addColumn(
         "tb_tarv_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithTbThirdToNineMonth(3, 9),
-        "evaluationYear=${evaluationYear},location=${location}");
+        endDateMappings);
 
     // B9- Data de inscrição no MDS: (coluna R) - Resposta = Data de Inscrição (RF24)
     pdd.addColumn(
         "mds_date",
         listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(3, 9, true),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // B10.1 -Tipo de MDS: (MDS1) Coluna S
     pdd.addColumn(
         "mds_one_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds1(12),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new DispensationTypeMdcConverter());
 
     // B10.2 - Data Início de MDS1: Coluna T
     pdd.addColumn(
         "mds_one_start_date_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds1StartDate(12),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // B10.3 - Data Fim de MDS1: Coluna U
     pdd.addColumn(
         "mds_one_end_date_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds1EndDate(12),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // B10.4 - Tipo de MDS: (MDS2) Coluna V
     pdd.addColumn(
         "mds_two_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds2(12),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new DispensationTypeMdcConverter());
 
     // B10.5 - Data Início de MDS2: Coluna W
     pdd.addColumn(
         "mds_two_start_date_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds2StartDate(12),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // B10.6 - Data Fim de MDS2: Coluna X
     pdd.addColumn(
         "mds_two_end_date_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds2EndDate(12),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // B10.7 - Tipo de MDS: (MDS3) Coluna Y
     pdd.addColumn(
         "mds_three_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds3(12),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new DispensationTypeMdcConverter());
 
     // B10.8 - Data Início de MDS3: Coluna Z
     pdd.addColumn(
         "mds_three_start_date_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds3StartDate(12),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // B10.9 - Data Fim de MDS3: Coluna AA
     pdd.addColumn(
         "mds_three_end_date_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds3EndDate(12),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // B10.10 - Tipo de MDS: (MDS4) Coluna AB

@@ -966,7 +966,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         + "GROUP BY final.patient_id ";
   }
 
-  public static String getFirstMdsAndDateQuery(int numberOfMonths, String inclusionEndMonthAndDay) {
+  public static String getFirstMdsAndDateQuery(int numberOfMonths) {
     return "   SELECT     mds1.patient_id, "
         + "                             otype1.value_coded AS mds_one,"
         + "                                      enc.encounter_datetime AS first_mds "
@@ -991,7 +991,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         + "                           SELECT art_patient.patient_id, "
         + "                                  art_patient.first_pickup AS art_encounter "
         + "                           FROM   ( "
-        + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+        + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
         + "                           ) art_patient "
         + "                             ) art "
         + "                  ON         art.patient_id = p.patient_id "
