@@ -372,10 +372,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
   /**
    * <b> Data de Último Levantamento TARV</b>
-   * <li>A data mais recente de Levantamento de TARV, decorrida no período de avaliação, registrado
-   *     no FILA (“Data de Levantamento”) ou “Ficha Recepção/ Levantou ARVs?” com “Levantou ARV” =
-   *     Sim (“Data de Levantamento”) "data mais recente">= “DataInicioAvaliação” "data mais
-   *     recente" <= “DataFimAvaliação”
+   * <li>A data mais recente de Levantamento de TARV, decorrida até o fim do período de avaliação,
+   *     registrado no FILA (“Data de Levantamento”) "data mais recente <= “DataFimAvaliação”
    *
    * @return {@link DataDefinition}
    */
