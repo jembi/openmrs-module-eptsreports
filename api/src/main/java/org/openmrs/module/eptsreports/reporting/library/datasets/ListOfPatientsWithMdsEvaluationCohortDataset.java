@@ -5,6 +5,7 @@ import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.data.converter.*;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
 import org.openmrs.module.reporting.data.person.definition.*;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
@@ -18,12 +19,21 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
   private ListOfPatientsWithMdsEvaluationCohortQueries listOfPatientsWithMdsEvaluationCohortQueries;
 
   private String endDateMappings = "endDate=${evaluationYear}-06-20,location=${location}";
+  private String b18Mappings = "endDate=${evaluationYear-1}-06-20,location=${location}";
+  private String c18Mappings = "endDate=${evaluationYear-2}-06-20,location=${location}";
+
+  private final ListOfPatientsInAdvancedHivIllnessCohortQueries
+      listOfPatientsInAdvancedHivIllnessCohortQueries;
 
   @Autowired
   public ListOfPatientsWithMdsEvaluationCohortDataset(
-      ListOfPatientsWithMdsEvaluationCohortQueries listOfPatientsWithMdsEvaluationCohortQueries) {
+      ListOfPatientsWithMdsEvaluationCohortQueries listOfPatientsWithMdsEvaluationCohortQueries,
+      ListOfPatientsInAdvancedHivIllnessCohortQueries
+          listOfPatientsInAdvancedHivIllnessCohortQueries) {
     this.listOfPatientsWithMdsEvaluationCohortQueries =
         listOfPatientsWithMdsEvaluationCohortQueries;
+    this.listOfPatientsInAdvancedHivIllnessCohortQueries =
+        listOfPatientsInAdvancedHivIllnessCohortQueries;
   }
 
   public DataSetDefinition contructDataset() {
@@ -135,7 +145,8 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "pregnant_breastfeeding_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsPregnantBreastfeeding3MonthsTarv(
-            3, 9), endDateMappings);
+            3, 9),
+        endDateMappings);
 
     // B8- Teve TB nos 1˚s 12 meses de TARV: (coluna Q) - Resposta = Sim ou Não (RF23)
     pdd.addColumn(
@@ -252,7 +263,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "mds_five_end_date_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds5EndDate(12),
-            endDateMappings,
+        endDateMappings,
         new GeneralDateConverter());
 
     // B11 - Rastreado para TB em TODAS as consultas entre a data de inscrição no MDS e 12˚ mês de
@@ -260,7 +271,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "tb_screening_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionB(3, 9, true),
-            endDateMappings,
+        endDateMappings,
         new NotApplicableIfNullConverter());
 
     // B14 - Identificação de registo de PB/IMC em TODAS as consultas desde a inscrição no MDS até
@@ -286,8 +297,8 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B18 - Estado de permanência no 12˚ mês de TARV: (coluna AO)
     pdd.addColumn(
         "permanence_state_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(1),
-        "evaluationYear=${evaluationYear},location=${location}");
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastStateOfStayOnTarv(),
+        b18Mappings);
 
     // C1 - Data do pedido da CV de seguimento: (coluna AP)
     pdd.addColumn(
@@ -478,8 +489,8 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C18 - Estado de permanência no 24˚ mês de TARV: (coluna BU)
     pdd.addColumn(
         "permanence_state_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(2),
-        "evaluationYear=${evaluationYear},location=${location}");
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastStateOfStayOnTarv(),
+        c18Mappings);
 
     return pdd;
   }

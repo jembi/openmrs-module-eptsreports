@@ -2330,8 +2330,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                             ) art "
             + "                  ON         art.patient_id = mds1_end.patient_id "
             + "                  INNER JOIN ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getFirstMdsAndDateQuery(
-                numberOfMonths)
+            + ListOfPatientsWithMdsEvaluationQueries.getFirstMdsAndDateQuery(numberOfMonths)
             + "                  ) mds1 "
             + "                  ON         mds1.patient_id = mds1_end.patient_id "
             + "                  WHERE      mds1_end.voided = 0 "
@@ -2368,8 +2367,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   public DataDefinition getMds2(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Tipo de MDS: (MDS2) Coluna V");
-    sqlPatientDataDefinition.addParameter(
-        new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -2481,8 +2479,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   public DataDefinition getMds3(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Tipo de MDS: (MDS3) Coluna Y");
-    sqlPatientDataDefinition.addParameter(
-            new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -2631,8 +2628,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   public DataDefinition getMds3StartDate(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Data Início de MDS3: Coluna Z");
-    sqlPatientDataDefinition.addParameter(
-            new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -2781,8 +2777,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   public DataDefinition getMds3EndDate(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Data Fim de MDS3: Coluna AA");
-    sqlPatientDataDefinition.addParameter(
-            new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -2968,8 +2963,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   public DataDefinition getMds4(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Tipo de MDS: (MDS4) Coluna AB");
-    sqlPatientDataDefinition.addParameter(
-            new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -3155,8 +3149,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   public DataDefinition getMds4StartDate(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Data Início de MDS4: Coluna AC");
-    sqlPatientDataDefinition.addParameter(
-            new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -3342,8 +3335,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   public DataDefinition getMds4EndDate(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Data Fim de MDS4: Coluna AD");
-    sqlPatientDataDefinition.addParameter(
-            new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -3566,8 +3558,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   public DataDefinition getMds5(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Tipo de MDS: (MDS5) Coluna AE");
-    sqlPatientDataDefinition.addParameter(
-            new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -3790,8 +3781,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   public DataDefinition getMds5StartDate(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Data Início de MDS5: Coluna AF");
-    sqlPatientDataDefinition.addParameter(
-            new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -4014,8 +4004,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   public DataDefinition getMds5EndDate(int numberOfMonthss) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Data Fim de MDS5: Coluna AG");
-    sqlPatientDataDefinition.addParameter(
-            new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -4304,8 +4293,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "B11 - Identificação de Utente Rastreado para TB em TODAS as consultas entre a data de inscrição no MDS e 12˚ mês de TARV");
-    sqlPatientDataDefinition.addParameter(
-        new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> map = new HashMap<>();
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
@@ -4588,8 +4576,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   public DataDefinition getNrClinicalConsultations(int minNumberOfMonths, int maxNumberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B16- Identificação de n˚ de consultas clínicas");
-    sqlPatientDataDefinition.addParameter(
-        new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -4660,8 +4647,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   public DataDefinition getNrApssPpConsultations(int minNumberOfMonths, int maxNumberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B17- Identificação de n˚ de consultas apss/pp");
-    sqlPatientDataDefinition.addParameter(
-        new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -4707,87 +4693,6 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + maxNumberOfMonths
             + " MONTH ) "
             + "                  GROUP BY   p.patient_id";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
-
-    return sqlPatientDataDefinition;
-  }
-
-  /**
-   * <b> Último Estado de Permanência TARV </b>
-   * <li>Resposta = “Abandono”, os utentes em TARV que abandonaram o tratamento
-   * <li>Resposta = “Óbito”, os utentes em TARV que foram óbito
-   * <li>Resposta = “Suspenso”, os utentes em TARV que suspenderam o tratamento
-   * <li>Resposta = “Activo”, os utentes activos em TARV
-   *
-   * @return {@link DataDefinition}
-   */
-  public DataDefinition getLastStateOfStayOnTarv(int cohortYear) {
-    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-
-    sqlPatientDataDefinition.setName("Get the Last State of stay ");
-    sqlPatientDataDefinition.addParameter(
-        new Parameter("evaluationYear", "evaluationYear", Integer.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    map.put("1", hivMetadata.getHIVCareProgram().getProgramId());
-    map.put("2", hivMetadata.getARTProgram().getProgramId());
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("10", hivMetadata.getArtDeadWorkflowState().getProgramWorkflowStateId());
-    map.put("8", hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId());
-    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
-    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
-    map.put(
-        "28",
-        hivMetadata
-            .getArtCareTransferredFromOtherHealthFacilityWorkflowState()
-            .getProgramWorkflowStateId());
-    map.put(
-        "29",
-        hivMetadata
-            .getTransferredFromOtherHealthFacilityWorkflowState()
-            .getProgramWorkflowStateId());
-    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
-    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
-    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
-    map.put("6275", hivMetadata.getPreTarvConcept().getConceptId());
-    map.put("6276", hivMetadata.getArtStatus().getConceptId());
-    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
-    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
-    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
-    map.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
-    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
-    map.put("1709", hivMetadata.getSuspendedTreatmentConcept().getConceptId());
-
-    String query =
-        new EptsQueriesUtil()
-            .unionBuilder(
-                ListOfPatientsWithMdsEvaluationQueries.getPatientsWhoAbandonedTarvQuery(
-                    true, inclusionEndMonthAndDay, cohortYear))
-            .union(
-                ListOfPatientsWithMdsEvaluationQueries.getPatientsWhoDied(
-                    true, inclusionEndMonthAndDay, cohortYear))
-            .union(
-                ListOfPatientsWithMdsEvaluationQueries
-                    .getPatientsWhoSuspendedTarvOrAreTransferredOut(
-                        hivMetadata
-                            .getSuspendedTreatmentWorkflowState()
-                            .getProgramWorkflowStateId(),
-                        hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
-                        false,
-                        false,
-                        inclusionEndMonthAndDay,
-                        cohortYear))
-            .union(
-                ListOfPatientsWithMdsEvaluationQueries.getPatientsActiveOnTarv(
-                    inclusionEndMonthAndDay, cohortYear))
-            .buildQuery();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
