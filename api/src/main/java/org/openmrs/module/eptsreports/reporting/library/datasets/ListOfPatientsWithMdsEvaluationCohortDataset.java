@@ -217,42 +217,42 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "mds_four_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds4(12),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new DispensationTypeMdcConverter());
 
     // B10.11 - Data Início de MDS4: Coluna AC
     pdd.addColumn(
         "mds_four_start_date_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds4StartDate(12),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // B10.12 - Data Fim de MDS4: Coluna AD
     pdd.addColumn(
         "mds_four_end_date_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds4EndDate(12),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // B10.13 - Tipo de MDS: (MDS5) Coluna AE
     pdd.addColumn(
         "mds_five_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds5(12),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new DispensationTypeMdcConverter());
 
     // B10.14 - Data Início de MDS5: Coluna AF
     pdd.addColumn(
         "mds_five_start_date_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds5StartDate(12),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // B10.15 - Data Fim de MDS5: Coluna AG
     pdd.addColumn(
         "mds_five_end_date_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds5EndDate(12),
-        "evaluationYear=${evaluationYear},location=${location}",
+            endDateMappings,
         new GeneralDateConverter());
 
     // B11 - Rastreado para TB em TODAS as consultas entre a data de inscrição no MDS e 12˚ mês de
@@ -260,7 +260,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "tb_screening_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionB(3, 9, true),
-        "evaluationYear=${evaluationYear},location=${location}",
+            endDateMappings,
         new NotApplicableIfNullConverter());
 
     // B14 - Identificação de registo de PB/IMC em TODAS as consultas desde a inscrição no MDS até
@@ -268,20 +268,20 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "pb_imc_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionB(3, 9, false),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new NotApplicableIfNullConverter());
 
     // B16 - Identificação de n˚ de consultas clínicas entre 6˚ e 12˚ mês de TARV Coluna AM
     pdd.addColumn(
         "clinical_consultations_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(6, 12),
-        "evaluationYear=${evaluationYear},location=${location}");
+        endDateMappings);
 
     // B17 - N˚ de consultas de APSS/PP entre 6˚ e 12˚ mês de TARV - Coluna AN
     pdd.addColumn(
         "apss_pp_consultations_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(6, 12),
-        "evaluationYear=${evaluationYear},location=${location}");
+        endDateMappings);
 
     // B18 - Estado de permanência no 12˚ mês de TARV: (coluna AO)
     pdd.addColumn(
