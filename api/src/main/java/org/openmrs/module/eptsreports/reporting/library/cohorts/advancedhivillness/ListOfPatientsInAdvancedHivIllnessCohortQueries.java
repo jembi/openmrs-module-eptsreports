@@ -392,7 +392,6 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + " FROM patient p "
             + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + " WHERE e.encounter_type = ${18} "
-            + " AND e.encounter_datetime >= :startDate "
             + " AND e.encounter_datetime <= :endDate "
             + " AND e.voided = 0 "
             + " AND p.voided = 0 "
@@ -895,6 +894,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    System.out.println(sqlPatientDataDefinition.getQuery());
 
     return sqlPatientDataDefinition;
   }
