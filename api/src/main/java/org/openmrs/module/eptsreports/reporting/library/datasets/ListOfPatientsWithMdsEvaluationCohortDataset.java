@@ -304,34 +304,34 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "cv_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getSecondViralLoad(),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // C.2 - Data de registo do resultado da CV de Seguimento - Sheet 1: (coluna AQ)
     pdd.addColumn(
         "cv_result_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getSecondViralLoadResultDate(),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // C.3 - Identificação do Resultado da CV de Seguimento - Sheet 1: (coluna AR)
     pdd.addColumn(
         "cv_result_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getSecondViralLoadResult(),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new ViralLoadQualitativeLabelConverter());
 
     // C4 - Resultado do CD4 feito entre 12˚ e 24˚ mês de TARV- C.4 (Coluna AS)
     pdd.addColumn(
         "cd4_result_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getCd4ResultSectionC(),
-        "evaluationYear=${evaluationYear},location=${location}");
+        endDateMappings);
 
     // C5- Teve registo de boa adesão em TODAS consultas entre 12˚ e 24˚ mês de TARV?
     pdd.addColumn(
         "good_adherence_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(false),
-        "evaluationYear=${evaluationYear},location=${location}");
+        endDateMappings);
 
     // C6 - Esteve grávida ou foi lactante entre 12˚ e 24º mês de TARV?: (coluna AU) - Resposta =
     // Sim ou Não (RF37)
@@ -339,62 +339,62 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "pregnant_breastfeeding_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsPregnantBreastfeeding3MonthsTarv(
             12, 24),
-        "evaluationYear=${evaluationYear},location=${location}");
+        endDateMappings);
 
     // C8 - Teve TB entre 12˚ e 24 ˚ meses de TARV: (coluna AW) - Resposta = Sim ou Não (RF38)
     pdd.addColumn(
         "tb_tarv_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithTbThirdToNineMonth(12, 24),
-        "evaluationYear=${evaluationYear},location=${location}");
+        endDateMappings);
 
     // C9 - Data de inscrição no MDS entre 12º e 24º mês de TAV: (coluna AX) - Resposta = Data de
     // Inscrição (RF39)
     pdd.addColumn(
         "mds_tarv_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(12, 24, false),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // C10.1 -Tipo de MDS: (MDS1) Coluna AY
     pdd.addColumn(
         "mds_one_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds1(24),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new DispensationTypeMdcConverter());
 
     // C10.2 - Data Início de MDS1: Coluna AZ
     pdd.addColumn(
         "mds_one_start_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds1StartDate(24),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // C10.3 - Data Fim de MDS1: Coluna BA
     pdd.addColumn(
         "mds_one_end_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds1EndDate(24),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // C10.4 - Tipo de MDS: (MDS2) Coluna BB
     pdd.addColumn(
         "mds_two_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds2(24),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new DispensationTypeMdcConverter());
 
     // C10.5 - Data Início de MDS2: Coluna BC
     pdd.addColumn(
         "mds_two_start_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds2StartDate(24),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // C10.6 - Data Fim de MDS2: Coluna BD
     pdd.addColumn(
         "mds_two_end_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds2EndDate(24),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // C10.7 - Tipo de MDS: (MDS3) Coluna BE
@@ -408,83 +408,83 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "mds_three_start_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds3StartDate(24),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // C10.9 - Data Fim de MDS3: Coluna BG
     pdd.addColumn(
         "mds_three_end_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds3EndDate(24),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // C10.10 - Tipo de MDS: (MDS4) Coluna BH
     pdd.addColumn(
         "mds_four_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds4(24),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new DispensationTypeMdcConverter());
 
     // C10.11 - Data Início de MDS4: Coluna BI
     pdd.addColumn(
         "mds_four_start_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds4StartDate(24),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // C10.12 - Data Fim de MDS4: Coluna BJ
     pdd.addColumn(
         "mds_four_end_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds4EndDate(24),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // C10.13 - Tipo de MDS: (MDS5) Coluna BK
     pdd.addColumn(
         "mds_five_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds5(24),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new DispensationTypeMdcConverter());
 
     // C10.14 - Data Início de MDS5: Coluna BL
     pdd.addColumn(
         "mds_five_start_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds5StartDate(24),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // C10.15 - Data Fim de MDS5: Coluna BM
     pdd.addColumn(
         "mds_five_end_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds5EndDate(24),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new GeneralDateConverter());
 
     // C11 - Rastreado para TB em TODAS as consultas entre 12˚ e 24˚ mês de TARV?- C.11 (Coluna BN)
     pdd.addColumn(
         "tb_screening_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(true),
-        "evaluationYear=${evaluationYear},location=${location}");
+        endDateMappings);
 
     // C14 - PB/IMC registado em TODAS as consultas entre o 12˚ a 24º mês de TARV? (coluna BQ) -
     // Resposta = Sim ou Não ou N/A (RF27)
     pdd.addColumn(
         "pb_imc_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(false),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new NotApplicableIfNullConverter());
 
     // C16 - Identificação de n˚ de consultas clínicas entre 6˚ e 12˚ mês de TARV Coluna AJ
     pdd.addColumn(
         "clinical_consultations_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(12, 24),
-        "evaluationYear=${evaluationYear},location=${location}");
+        endDateMappings);
 
     // C17 - N˚ de consultas de APSS/PP tre 12˚ e 24˚ mês de TARV - Coluna BT
     pdd.addColumn(
         "apss_pp_consultations_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(12, 24),
-        "evaluationYear=${evaluationYear},location=${location}");
+        endDateMappings);
 
     // C18 - Estado de permanência no 24˚ mês de TARV: (coluna BU)
     pdd.addColumn(
