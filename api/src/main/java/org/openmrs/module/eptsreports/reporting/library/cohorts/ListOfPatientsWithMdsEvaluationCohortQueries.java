@@ -959,7 +959,17 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
 
     String query =
-        "SELECT     second_vl.patient_id, "
+            getSecondVlResultDateQuery();
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  private String getSecondVlResultDateQuery() {
+    return " SELECT     second_vl.patient_id, "
             + "           MIN(ee.encounter_datetime) AS second_vl_date  "
             + "FROM       patient second_vl "
             + "INNER JOIN encounter ee "
@@ -967,37 +977,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "INNER JOIN obs oo "
             + "ON         oo.encounter_id = ee.encounter_id "
             + "INNER JOIN ( "
-            + "SELECT     p.patient_id, "
-            + "           MIN(e.encounter_datetime) AS first_vl_date  "
-            + "FROM       patient p "
-            + "INNER JOIN encounter e "
-            + "ON         e.patient_id = p.patient_id "
-            + "INNER JOIN obs o "
-            + "ON         o.encounter_id = e.encounter_id "
-            + "INNER JOIN "
-            + "           ( "
-            + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.first_pickup AS art_encounter "
-            + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
-            + "                           ) art_patient "
-            + "                     ) art ON art.patient_id = p.patient_id "
-            + "       WHERE  p.voided = 0 "
-            + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "AND      e.encounter_type = ${6} "
-            + "AND        ( ( "
-            + "                                 o.concept_id= ${856} "
-            + "                         AND     o.value_numeric IS NOT NULL ) "
-            + "           OR         ( "
-            + "                                 o.concept_id = ${1305} "
-            + "                      AND        o.value_coded IS NOT NULL)) "
-            + "AND        e.location_id = :location "
-            + "AND        e.encounter_datetime >= art.art_encounter "
-            + "AND        p.voided = 0 "
-            + "AND        e.voided = 0 "
-            + "AND        o.voided = 0 "
-            + "GROUP BY   p.patient_id ) first_vl "
+            + getFirstVlDateQuery()
+            + " ) first_vl "
             + " ON first_vl.patient_id = second_vl.patient_id "
             + "WHERE second_vl.voided = 0 "
             + "AND ee.voided = 0 "
@@ -1012,12 +993,6 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                 oo.concept_id = ${1305} "
             + "                      AND        oo.value_coded IS NOT NULL)) "
             + "GROUP BY   second_vl.patient_id";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
-
-    return sqlPatientDataDefinition;
   }
 
   /**
@@ -1106,8 +1081,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   public DataDefinition getSecondViralLoadResult() {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("C3- Resultado da CV de seguimento : (coluna AR)");
-    sqlPatientDataDefinition.addParameter(
-        new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -1121,49 +1095,20 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     String query =
         "SELECT     second_vl.patient_id, "
-            + "          IF(MIN(oo.value_numeric) IS NOT NULL, MIN(oo.value_numeric), IF(MIN(oo.value_coded) = 165331, CONCAT('MENOR QUE ',oo.comments), MIN(oo.value_coded))) AS second_vl_result  "
+            + "          IF(oo.value_numeric IS NOT NULL, oo.value_numeric, IF(oo.value_coded = 165331, CONCAT('MENOR QUE ',oo.comments), oo.value_coded)) AS second_vl_result  "
             + "FROM       patient second_vl "
             + "INNER JOIN encounter ee "
             + "ON         ee.patient_id = second_vl.patient_id "
             + "INNER JOIN obs oo "
             + "ON         oo.encounter_id = ee.encounter_id "
             + "INNER JOIN ( "
-            + "SELECT     p.patient_id, "
-            + "           MIN(e.encounter_datetime) AS first_vl_date  "
-            + "FROM       patient p "
-            + "INNER JOIN encounter e "
-            + "ON         e.patient_id = p.patient_id "
-            + "INNER JOIN obs o "
-            + "ON         o.encounter_id = e.encounter_id "
-            + "INNER JOIN "
-            + "           ( "
-            + "                           SELECT art_patient.patient_id, "
-            + "                                  art_patient.first_pickup AS art_encounter "
-            + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
-            + "                           ) art_patient "
-            + "                     ) art ON art.patient_id = p.patient_id "
-            + "       WHERE  p.voided = 0 "
-            + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "AND      e.encounter_type = ${6} "
-            + "AND        ( ( "
-            + "                                 o.concept_id= ${856} "
-            + "                         AND     o.value_numeric IS NOT NULL ) "
-            + "           OR         ( "
-            + "                                 o.concept_id = ${1305} "
-            + "                      AND        o.value_coded IS NOT NULL)) "
-            + "AND        e.location_id = :location "
-            + "AND        e.encounter_datetime >= art.art_encounter "
-            + "AND        p.voided = 0 "
-            + "AND        e.voided = 0 "
-            + "AND        o.voided = 0 "
-            + "GROUP BY   p.patient_id ) first_vl "
-            + " ON first_vl.patient_id = second_vl.patient_id "
+                + getSecondVlResultDateQuery()
+            + "  ) second_vl_date "
+            + " ON second_vl_date.patient_id = second_vl.patient_id "
             + "WHERE second_vl.voided = 0 "
             + "AND ee.voided = 0 "
             + "AND oo.voided = 0 "
-            + "AND ee.encounter_datetime > first_vl.first_vl_date "
+            + "AND ee.encounter_datetime = second_vl_date.second_vl_date "
             + "AND      ee.encounter_type = ${6} "
             + "AND        ee.location_id = :location "
             + "AND        ( ( "
