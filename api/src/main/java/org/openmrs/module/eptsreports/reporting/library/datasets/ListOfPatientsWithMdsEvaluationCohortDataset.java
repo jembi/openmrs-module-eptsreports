@@ -401,7 +401,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "mds_three_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds3(24),
-        "evaluationYear=${evaluationYear},location=${location}",
+        endDateMappings,
         new DispensationTypeMdcConverter());
 
     // C10.8 - Data Início de MDS3: Coluna BF
