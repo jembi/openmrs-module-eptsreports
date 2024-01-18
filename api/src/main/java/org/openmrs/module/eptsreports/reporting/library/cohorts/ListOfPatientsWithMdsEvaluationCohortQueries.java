@@ -18,6 +18,7 @@ import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinitio
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
+import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -79,10 +80,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     CohortDefinition twelveMonths = getCoort(2, 1, false);
     CohortDefinition twentyFourMonths = getCoort(3, 2, false);
 
-    String mapping = "evaluationYear=${evaluationYear},location=${location}";
-
-    cd.addSearch("twelveMonths", map(twelveMonths, mapping));
-    cd.addSearch("twentyFourMonths", map(twentyFourMonths, mapping));
+    cd.addSearch("twelveMonths", Mapped.mapStraightThrough(twelveMonths));
+    cd.addSearch("twentyFourMonths", Mapped.mapStraightThrough(twentyFourMonths));
 
     cd.setCompositionString("twelveMonths OR twentyFourMonths");
 
@@ -92,7 +91,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   private String getCoort12Or24Query(
       int numberOfYearsStartDate, int numberOfYearsEndDate, boolean coortName) {
 
-    String query = new String();
+    String query = "";
 
     String fromQuery =
         "     FROM   ( "
@@ -182,6 +181,13 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     dd.addParameter(new Parameter("endDate", "endDate", Date.class));
     dd.addParameter(new Parameter("location", "location", Location.class));
 
+    Map<String, Integer> map = new HashMap<>();
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+
     String query =
         "       SELECT start.patient_id, "
             + "        start.first_pickup AS first_pickup "
@@ -189,7 +195,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
             + "       ) start ";
 
-    dd.setQuery(query);
+    StringSubstitutor sb = new StringSubstitutor(map);
+    dd.setQuery(sb.replace(query));
 
     return dd;
   }
@@ -266,18 +273,26 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   public DataDefinition getAgeOnMOHArtStartDate() {
     SqlPatientDataDefinition dd = new SqlPatientDataDefinition();
     dd.setName("Age on MOH ART start date");
-    dd.addParameter(new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    dd.addParameter(new Parameter("endDate", "endDate", Date.class));
     dd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id, FLOOR(DATEDIFF(art.first_pickup,ps.birthdate)/365) AS age "
             + "FROM patient p "
             + "     INNER JOIN ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
             + "   ) AS art ON art.patient_id = p.patient_id "
             + "  INNER JOIN person ps ON p.patient_id=ps.person_id WHERE p.voided=0 AND ps.voided=0 ";
 
-    dd.setQuery(query);
+    StringSubstitutor sb = new StringSubstitutor(map);
+    dd.setQuery(sb.replace(query));
 
     return dd;
   }

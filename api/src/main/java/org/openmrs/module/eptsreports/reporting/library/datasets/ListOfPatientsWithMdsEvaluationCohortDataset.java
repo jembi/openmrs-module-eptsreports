@@ -68,7 +68,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "age",
         listOfPatientsWithMdsEvaluationCohortQueries.getAgeOnMOHArtStartDate(),
-        "evaluationYear=${evaluationYear},location=${location}");
+        endDateMappings);
 
     // A5- Data início TARV: (coluna E)
     pdd.addColumn(
