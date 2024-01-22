@@ -7915,16 +7915,11 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "A1",
-        EptsReportUtils.map(
-            txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter4MQ(
-                EptsReportConstants.PregnantOrBreastfeedingWomen.PREGNANTWOMEN, null),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+        EptsReportUtils.map(txPvls.getPregnantWoman(), "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "A2",
         EptsReportUtils.map(
-            txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter4MQ(
-                EptsReportConstants.PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN, null),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            txPvls.getBreastfeedingPatients(), "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(preposition.getCompositionString());
 
@@ -8058,16 +8053,11 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "B1",
-        EptsReportUtils.map(
-            txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter4MQ(
-                EptsReportConstants.PregnantOrBreastfeedingWomen.PREGNANTWOMEN, null),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+        EptsReportUtils.map(txPvls.getPregnantWoman(), "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "B2",
         EptsReportUtils.map(
-            txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter4MQ(
-                EptsReportConstants.PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN, null),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            txPvls.getBreastfeedingPatients(), "endDate=${endDate},location=${location}"));
     cd.setCompositionString(preposition.getCompositionString());
 
     return cd;
