@@ -136,25 +136,25 @@ public class TxRttDataset extends BaseDataSet {
         dissagChildrenAndAdultsAndKeyPop());
 
     dsd.addColumn(
-        "PID",
+        "PID-TX_RTT",
         "TX_RTT: People who inject drugs",
         EptsReportUtils.map(patientsThatReturnedToTreatment, mappings),
         "KP=PID");
 
     dsd.addColumn(
-        "MSM",
+        "MSM-TX_RTT",
         "TX_RTT: Men who have sex with men",
         EptsReportUtils.map(patientsThatReturnedToTreatment, mappings),
         "KP=MSM");
 
     dsd.addColumn(
-        "CSW",
+        "CSW-TX_RTT",
         "TX_RTT: Female sex workers",
         EptsReportUtils.map(patientsThatReturnedToTreatment, mappings),
         "KP=CSW");
 
     dsd.addColumn(
-        "PRI",
+        "PRI-TX_RTT",
         "TX_RTT: People in prison and other closed settings",
         EptsReportUtils.map(patientsThatReturnedToTreatment, mappings),
         "KP=PRI");

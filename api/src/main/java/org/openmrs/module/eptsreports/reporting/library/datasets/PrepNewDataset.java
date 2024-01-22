@@ -105,7 +105,7 @@ public class PrepNewDataset extends BaseDataSet {
         "");
 
     dsd.addColumn(
-        "PID",
+        "PID-NEW",
         "PREP NEW: People who inject drugs",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -116,7 +116,7 @@ public class PrepNewDataset extends BaseDataSet {
         "KP=PID");
 
     dsd.addColumn(
-        "MSM",
+        "MSM-NEW",
         "PREP NEW: Men who have sex with men",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -127,7 +127,7 @@ public class PrepNewDataset extends BaseDataSet {
         "KP=MSM");
 
     dsd.addColumn(
-        "TG",
+        "TG-NEW",
         "PREP NEW: Transgender",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -138,7 +138,7 @@ public class PrepNewDataset extends BaseDataSet {
         "KP=TG");
 
     dsd.addColumn(
-        "SW",
+        "SW-NEW",
         "PREP NEW: Female sex workers",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -149,7 +149,7 @@ public class PrepNewDataset extends BaseDataSet {
         "KP=SW");
 
     dsd.addColumn(
-        "PRI",
+        "PRI-NEW",
         "PREP NEW: People in prison and other closed settings",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
