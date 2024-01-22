@@ -64,15 +64,6 @@ public class PrepCtDataset extends BaseDataSet {
             eptsCommonDimension.getClientsWithReasonForPrepInterruptionDisaggregation(), mappings));
 
     dsd.addColumn(
-        "ORAL",
-        "Oral",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Oral", EptsReportUtils.map(prepCtCohortQueries.getPREPCTNumerator(), mappings)),
-            mappings),
-        "");
-
-    dsd.addColumn(
         "TOTAL-CT",
         "Total PrEP CT Numerator",
         EptsReportUtils.map(
@@ -83,7 +74,7 @@ public class PrepCtDataset extends BaseDataSet {
         "");
 
     dsd.addColumn(
-        "ORAL",
+        "ORAL-CT",
         "Oral",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -92,7 +83,7 @@ public class PrepCtDataset extends BaseDataSet {
         "");
 
     dsd.addColumn(
-        "PID",
+        "PID-CT",
         "PREP CT: People who inject drugs",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -102,7 +93,7 @@ public class PrepCtDataset extends BaseDataSet {
         "KP=PID");
 
     dsd.addColumn(
-        "MSM",
+        "MSM-CT",
         "PREP CT: Men who have sex with men",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -112,7 +103,7 @@ public class PrepCtDataset extends BaseDataSet {
         "KP=MSM");
 
     dsd.addColumn(
-        "TG",
+        "TG-CT",
         "PREP CT: Transgender",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -122,7 +113,7 @@ public class PrepCtDataset extends BaseDataSet {
         "KP=TG");
 
     dsd.addColumn(
-        "SW",
+        "SW-CT",
         "PREP CT: Female sex workers",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -132,7 +123,7 @@ public class PrepCtDataset extends BaseDataSet {
         "KP=SW");
 
     dsd.addColumn(
-        "PRI",
+        "PRI-CT",
         "PREP CT: People in prison and other closed settings",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
