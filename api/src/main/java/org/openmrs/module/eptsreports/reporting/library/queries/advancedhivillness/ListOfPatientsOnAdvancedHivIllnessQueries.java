@@ -151,11 +151,43 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * @return {@link String}
    */
   public String getCd4ResultOverOrEqualTo5y() {
-    return getPatientsWithCD4AbsoluteResultOnPeriodQuery(200, false)
+    return " SELECT ps.person_id, o.value_numeric as cd4  "
+        + "FROM   person ps  "
+        + "           INNER JOIN encounter e  "
+        + "                      ON ps.person_id = e.patient_id  "
+        + "           INNER JOIN obs o  "
+        + "                      ON e.encounter_id = o.encounter_id  "
+        + "INNER JOIN ( "
+        + getLastCd4ResultDateQueries()
+        + " ) last_cd4 ON last_cd4.person_id = ps.person_id  "
+        + " WHERE  ps.voided = 0  "
+        + "  AND e.voided = 0   "
+        + "  AND o.voided = 0  "
+        + "  AND e.encounter_type IN ( ${6}, ${13}, ${51} )  "
+        + "  AND o.concept_id = ${1695}  "
+        + "  AND o.value_numeric < 200  "
+        + "  AND Date(e.encounter_datetime) = last_cd4.most_recent  "
+        + "  AND e.location_id = :location "
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=5 "
         + "  GROUP BY ps.person_id "
         + " UNION "
-        + getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(200, false)
+        + "  SELECT ps.person_id, o.value_numeric as cd4  "
+        + "FROM   person ps  "
+        + "           INNER JOIN encounter e  "
+        + "                      ON ps.person_id = e.patient_id  "
+        + "           INNER JOIN obs o  "
+        + "                      ON e.encounter_id = o.encounter_id  "
+        + "INNER JOIN ( "
+        + getLastCd4ResultDateQueries()
+        + " ) last_cd4 ON last_cd4.person_id = ps.person_id  "
+        + " WHERE  ps.voided = 0  "
+        + " AND e.voided = 0  "
+        + "  AND o.voided = 0  "
+        + "  AND e.encounter_type IN ( ${53}, ${90} )  "
+        + "  AND o.concept_id = ${1695}  "
+        + "  AND o.value_numeric < 200  "
+        + "  AND o.obs_datetime = last_cd4.most_recent  "
+        + "  AND e.location_id = :location "
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=5 "
         + "  GROUP BY ps.person_id ";
   }
@@ -165,12 +197,44 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * @return {@link String}
    */
   public String getCd4ResultBetweenOneAnd5y() {
-    return getPatientsWithCD4AbsoluteResultOnPeriodQuery(500, false)
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=1 "
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <5 "
+
+    return " SELECT ps.person_id, o.value_numeric as cd4  "
+        + "FROM   person ps  "
+        + "           INNER JOIN encounter e  "
+        + "                      ON ps.person_id = e.patient_id  "
+        + "           INNER JOIN obs o  "
+        + "                      ON e.encounter_id = o.encounter_id  "
+        + "INNER JOIN ( "
+        + getLastCd4ResultDateQueries()
+        + " ) last_cd4 ON last_cd4.person_id = ps.person_id  "
+        + " WHERE  ps.voided = 0  "
+        + "  AND e.voided = 0   "
+        + "  AND o.voided = 0  "
+        + "  AND e.encounter_type IN ( ${6}, ${13}, ${51} )  "
+        + "  AND o.concept_id = ${1695}  "
+        + "  AND o.value_numeric < 500  "
+        + "  AND Date(e.encounter_datetime) = last_cd4.most_recent  "
+        + "  AND e.location_id = :location "
+        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=5 "
         + "  GROUP BY ps.person_id "
         + " UNION "
-        + getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(500, false)
+        + "  SELECT ps.person_id, o.value_numeric as cd4  "
+        + "FROM   person ps  "
+        + "           INNER JOIN encounter e  "
+        + "                      ON ps.person_id = e.patient_id  "
+        + "           INNER JOIN obs o  "
+        + "                      ON e.encounter_id = o.encounter_id  "
+        + "INNER JOIN ( "
+        + getLastCd4ResultDateQueries()
+        + " ) last_cd4 ON last_cd4.person_id = ps.person_id  "
+        + " WHERE  ps.voided = 0  "
+        + " AND e.voided = 0  "
+        + "  AND o.voided = 0  "
+        + "  AND e.encounter_type IN ( ${53}, ${90} )  "
+        + "  AND o.concept_id = ${1695}  "
+        + "  AND o.value_numeric < 500  "
+        + "  AND o.obs_datetime = last_cd4.most_recent  "
+        + "  AND e.location_id = :location "
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=1 "
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <5 "
         + "  GROUP BY ps.person_id ";
@@ -181,11 +245,44 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * @return {@link String}
    */
   public String getCd4ResultBellow1y() {
-    return getPatientsWithCD4AbsoluteResultOnPeriodQuery(750, false)
+
+    return " SELECT ps.person_id, o.value_numeric as cd4  "
+        + "FROM   person ps  "
+        + "           INNER JOIN encounter e  "
+        + "                      ON ps.person_id = e.patient_id  "
+        + "           INNER JOIN obs o  "
+        + "                      ON e.encounter_id = o.encounter_id  "
+        + "INNER JOIN ( "
+        + getLastCd4ResultDateQueries()
+        + " ) last_cd4 ON last_cd4.person_id = ps.person_id  "
+        + " WHERE  ps.voided = 0  "
+        + "  AND e.voided = 0   "
+        + "  AND o.voided = 0  "
+        + "  AND e.encounter_type IN ( ${6}, ${13}, ${51} )  "
+        + "  AND o.concept_id = ${1695}  "
+        + "  AND o.value_numeric < 750  "
+        + "  AND Date(e.encounter_datetime) = last_cd4.most_recent  "
+        + "  AND e.location_id = :location "
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <1 "
         + "  GROUP BY ps.person_id "
         + " UNION "
-        + getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(750, false)
+        + "  SELECT ps.person_id, o.value_numeric as cd4  "
+        + "FROM   person ps  "
+        + "           INNER JOIN encounter e  "
+        + "                      ON ps.person_id = e.patient_id  "
+        + "           INNER JOIN obs o  "
+        + "                      ON e.encounter_id = o.encounter_id  "
+        + "INNER JOIN ( "
+        + getLastCd4ResultDateQueries()
+        + " ) last_cd4 ON last_cd4.person_id = ps.person_id  "
+        + " WHERE  ps.voided = 0  "
+        + " AND e.voided = 0  "
+        + "  AND o.voided = 0  "
+        + "  AND e.encounter_type IN ( ${53}, ${90} )  "
+        + "  AND o.concept_id = ${1695}  "
+        + "  AND o.value_numeric < 750  "
+        + "  AND o.obs_datetime = last_cd4.most_recent  "
+        + "  AND e.location_id = :location "
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <1 "
         + "  GROUP BY ps.person_id ";
   }
@@ -998,5 +1095,18 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "                                    AND e.encounter_datetime = first_consultation.consultation_date "
         + "                                    AND e.location_id = :location "
         + "                             GROUP  BY p.patient_id ";
+  }
+
+  public String getLastCd4ResultDateQueries() {
+    String unionQuery =
+        new EptsQueriesUtil()
+            .unionBuilder(getCd4ResultOverOrEqualTo5years())
+            .union(getCd4ResultBetweenOneAnd5years())
+            .union(getCd4ResultBellowOneYear())
+            .buildQuery();
+
+    return " SELECT absolute_cd4.person_id, max(absolute_cd4.most_recent) AS most_recent FROM ( "
+        + unionQuery
+        + " ) absolute_cd4 GROUP BY absolute_cd4.person_id ";
   }
 }

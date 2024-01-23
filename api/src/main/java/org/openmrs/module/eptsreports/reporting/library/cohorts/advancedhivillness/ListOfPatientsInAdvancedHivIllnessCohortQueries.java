@@ -585,13 +585,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
     Map<String, Integer> map = getStringIntegerMap();
 
-    String query =
-        new EptsQueriesUtil()
-            .unionBuilder(
-                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultOverOrEqualTo5years())
-            .union(listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBetweenOneAnd5years())
-            .union(listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBellowOneYear())
-            .buildQuery();
+    String query = listOfPatientsOnAdvancedHivIllnessQueries.getLastCd4ResultDateQueries();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
