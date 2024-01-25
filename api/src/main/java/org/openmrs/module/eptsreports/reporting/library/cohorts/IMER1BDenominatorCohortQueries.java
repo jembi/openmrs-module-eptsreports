@@ -60,7 +60,7 @@ public class IMER1BDenominatorCohortQueries {
     compositionCohortDefinition.addSearch(
         "E",
         EptsReportUtils.map(
-            getPatientsWhoStartedArtBeforeArtCareDate(),
+            getPatientsWhoStartedArtBeforeArtCareDate(true),
             "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString("A AND NOT D AND NOT E");
@@ -101,7 +101,7 @@ public class IMER1BDenominatorCohortQueries {
     compositionCohortDefinition.addSearch(
         "E",
         EptsReportUtils.map(
-            getPatientsWhoStartedArtBeforeArtCareDate(),
+            getPatientsWhoStartedArtBeforeArtCareDate(true),
             "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString("A AND B  AND NOT (C OR D OR E)");
@@ -141,7 +141,7 @@ public class IMER1BDenominatorCohortQueries {
     compositionCohortDefinition.addSearch(
         "E",
         EptsReportUtils.map(
-            getPatientsWhoStartedArtBeforeArtCareDate(),
+            getPatientsWhoStartedArtBeforeArtCareDate(true),
             "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString("A AND C AND NOT (B OR D OR E)");
@@ -188,7 +188,7 @@ public class IMER1BDenominatorCohortQueries {
     compositionCohortDefinition.addSearch(
         "E",
         EptsReportUtils.map(
-            getPatientsWhoStartedArtBeforeArtCareDate(),
+            getPatientsWhoStartedArtBeforeArtCareDate(true),
             "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString("(A AND CHILDREN) AND NOT (B OR C OR D OR E)");
@@ -229,7 +229,7 @@ public class IMER1BDenominatorCohortQueries {
     compositionCohortDefinition.addSearch(
         "E",
         EptsReportUtils.map(
-            getPatientsWhoStartedArtBeforeArtCareDate(),
+            getPatientsWhoStartedArtBeforeArtCareDate(true),
             "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
@@ -307,7 +307,7 @@ public class IMER1BDenominatorCohortQueries {
         + "        BETWEEN :onOrAfter AND :onOrBefore  ";
   }
 
-  public CohortDefinition getPatientsWhoStartedArtBeforeArtCareDate() {
+  public CohortDefinition getPatientsWhoStartedArtBeforeArtCareDate(boolean denominator) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Get Earliest Pre-ART");
     sqlCohortDefinition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
@@ -335,7 +335,11 @@ public class IMER1BDenominatorCohortQueries {
             + getEarliestPreARTQuery()
             + "          ) enrolled_art_care "
             + "     ON enrolled_art_care.patient_id = p.patient_id "
-            + " WHERE art_start_date.first_pickup < enrolled_art_care.mdate "
+            + " WHERE "
+                .concat(
+                    denominator
+                        ? " art_start_date.first_pickup < enrolled_art_care.mdate "
+                        : " art_start_date.first_pickup BETWEEN enrolled_art_care.mdate AND DATE_ADD(enrolled_art_care.mdate, INTERVAL 15 DAY) ")
             + " ) AS final";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);

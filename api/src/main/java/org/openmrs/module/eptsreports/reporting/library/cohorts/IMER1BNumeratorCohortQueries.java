@@ -86,7 +86,8 @@ public class IMER1BNumeratorCohortQueries {
     cd.addSearch(
         "E",
         EptsReportUtils.map(
-            getE(true), "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate},location=${location}"));
+            imer1BDenominatorCohortQueries.getPatientsWhoStartedArtBeforeArtCareDate(false),
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("A AND E AND NOT D");
 
@@ -137,7 +138,8 @@ public class IMER1BNumeratorCohortQueries {
     cd.addSearch(
         "E",
         EptsReportUtils.map(
-            getE(true), "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate},location=${location}"));
+            imer1BDenominatorCohortQueries.getPatientsWhoStartedArtBeforeArtCareDate(false),
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("A AND B AND E AND NOT (C OR D)");
 
@@ -188,7 +190,8 @@ public class IMER1BNumeratorCohortQueries {
     cd.addSearch(
         "E",
         EptsReportUtils.map(
-            getE(true), "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate},location=${location}"));
+            imer1BDenominatorCohortQueries.getPatientsWhoStartedArtBeforeArtCareDate(false),
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("A AND C AND E AND NOT (B OR D)");
 
@@ -239,7 +242,8 @@ public class IMER1BNumeratorCohortQueries {
     cd.addSearch(
         "E",
         EptsReportUtils.map(
-            getE(true), "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate},location=${location}"));
+            imer1BDenominatorCohortQueries.getPatientsWhoStartedArtBeforeArtCareDate(false),
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "CHILDREN",
@@ -296,7 +300,8 @@ public class IMER1BNumeratorCohortQueries {
     cd.addSearch(
         "E",
         EptsReportUtils.map(
-            getE(true), "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate},location=${location}"));
+            imer1BDenominatorCohortQueries.getPatientsWhoStartedArtBeforeArtCareDate(false),
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "ADULTS",
