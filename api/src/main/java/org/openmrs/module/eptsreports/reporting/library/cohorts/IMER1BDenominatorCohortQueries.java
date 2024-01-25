@@ -101,8 +101,8 @@ public class IMER1BDenominatorCohortQueries {
     compositionCohortDefinition.addSearch(
         "E",
         EptsReportUtils.map(
-            CompareInitArtStartDateAndStartDate(),
-            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
+            getPatientsWhoStartedArtBeforeArtCareDate(),
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString("A AND B  AND NOT (C OR D OR E)");
     return compositionCohortDefinition;
@@ -141,8 +141,8 @@ public class IMER1BDenominatorCohortQueries {
     compositionCohortDefinition.addSearch(
         "E",
         EptsReportUtils.map(
-            CompareInitArtStartDateAndStartDate(),
-            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
+            getPatientsWhoStartedArtBeforeArtCareDate(),
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString("A AND C AND NOT (B OR D OR E)");
 
@@ -188,8 +188,8 @@ public class IMER1BDenominatorCohortQueries {
     compositionCohortDefinition.addSearch(
         "E",
         EptsReportUtils.map(
-            CompareInitArtStartDateAndStartDate(),
-            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
+            getPatientsWhoStartedArtBeforeArtCareDate(),
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString("(A AND CHILDREN) AND NOT (B OR C OR D OR E)");
 
@@ -229,8 +229,8 @@ public class IMER1BDenominatorCohortQueries {
     compositionCohortDefinition.addSearch(
         "E",
         EptsReportUtils.map(
-            CompareInitArtStartDateAndStartDate(),
-            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
+            getPatientsWhoStartedArtBeforeArtCareDate(),
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "ADULTS",
