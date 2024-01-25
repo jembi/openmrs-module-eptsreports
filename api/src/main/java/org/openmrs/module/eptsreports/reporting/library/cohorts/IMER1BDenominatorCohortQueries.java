@@ -50,7 +50,7 @@ public class IMER1BDenominatorCohortQueries {
         "A",
         EptsReportUtils.map(
             getEarliestPreART(),
-            "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}"));
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "D",
@@ -79,7 +79,7 @@ public class IMER1BDenominatorCohortQueries {
         "A",
         EptsReportUtils.map(
             getEarliestPreART(),
-            "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}"));
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "B",
@@ -119,7 +119,7 @@ public class IMER1BDenominatorCohortQueries {
         "A",
         EptsReportUtils.map(
             getEarliestPreART(),
-            "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}"));
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "B",
@@ -160,7 +160,7 @@ public class IMER1BDenominatorCohortQueries {
         "A",
         EptsReportUtils.map(
             getEarliestPreART(),
-            "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}"));
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "B",
@@ -207,7 +207,7 @@ public class IMER1BDenominatorCohortQueries {
         "A",
         EptsReportUtils.map(
             getEarliestPreART(),
-            "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}"));
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "B",
@@ -246,8 +246,8 @@ public class IMER1BDenominatorCohortQueries {
   public CohortDefinition getEarliestPreART() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Get Earliest Pre-ART");
-    sqlCohortDefinition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();

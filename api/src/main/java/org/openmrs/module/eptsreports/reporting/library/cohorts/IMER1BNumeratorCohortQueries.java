@@ -75,7 +75,7 @@ public class IMER1BNumeratorCohortQueries {
         "A",
         EptsReportUtils.map(
             imer1BDenominatorCohortQueries.getEarliestPreART(),
-            "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}"));
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
 
     cd.addSearch(
         "D",
@@ -115,7 +115,7 @@ public class IMER1BNumeratorCohortQueries {
         "A",
         EptsReportUtils.map(
             imer1BDenominatorCohortQueries.getEarliestPreART(),
-            "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}"));
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
 
     cd.addSearch(
         "B",
@@ -167,7 +167,7 @@ public class IMER1BNumeratorCohortQueries {
         "A",
         EptsReportUtils.map(
             imer1BDenominatorCohortQueries.getEarliestPreART(),
-            "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}"));
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
 
     cd.addSearch(
         "B",
@@ -219,7 +219,7 @@ public class IMER1BNumeratorCohortQueries {
         "A",
         EptsReportUtils.map(
             imer1BDenominatorCohortQueries.getEarliestPreART(),
-            "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}"));
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
 
     cd.addSearch(
         "B",
@@ -277,7 +277,7 @@ public class IMER1BNumeratorCohortQueries {
         "A",
         EptsReportUtils.map(
             imer1BDenominatorCohortQueries.getEarliestPreART(),
-            "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}"));
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
 
     cd.addSearch(
         "B",
