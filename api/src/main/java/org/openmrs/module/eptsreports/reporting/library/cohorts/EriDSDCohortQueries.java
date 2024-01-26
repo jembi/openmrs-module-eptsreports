@@ -2189,7 +2189,7 @@ public class EriDSDCohortQueries {
    *
    * @return CohortDefinition
    */
-  private CohortDefinition getFilaOrDrugPickup() {
+  public CohortDefinition getFilaOrDrugPickup() {
     String dsdMappings = "startDate=${endDate-3m},endDate=${endDate},location=${location}";
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
