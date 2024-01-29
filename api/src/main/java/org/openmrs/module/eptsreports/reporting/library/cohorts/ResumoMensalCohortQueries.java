@@ -3251,8 +3251,6 @@ public class ResumoMensalCohortQueries {
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId(),
             hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId(),
             hivMetadata.getARTProgram().getProgramId(),
             hivMetadata

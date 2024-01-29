@@ -813,8 +813,6 @@ public class ResumoMensalQueries {
       int mastercard,
       int transferFromOther,
       int yes,
-      int typeOfPatient,
-      int answer,
       int masteCardFileOpenDate,
       int programEnrolled,
       int transferredInState) {
@@ -823,8 +821,6 @@ public class ResumoMensalQueries {
     map.put("mastercard", mastercard);
     map.put("transferFromOther", transferFromOther);
     map.put("yes", yes);
-    map.put("typeOfPatient", typeOfPatient);
-    map.put("answer", answer);
     map.put("masteCardFileOpenDate", masteCardFileOpenDate);
     map.put("programEnrolled", programEnrolled);
     map.put("transferredInState", transferredInState);
@@ -850,9 +846,6 @@ public class ResumoMensalQueries {
             + "           AND transf.concept_id = ${transferFromOther}  "
             + "           AND transf.value_coded = ${yes}  "
             + "     "
-            + "           AND type.voided = 0  "
-            + "           AND type.concept_id = ${typeOfPatient}  "
-            + "           AND type.value_coded = ${answer}  "
             + "          AND mastercardFile.voided = 0 "
             + "           AND mastercardFile.concept_id = ${masteCardFileOpenDate}"
             + "	         AND mastercardFile.value_datetime BETWEEN  "
