@@ -39,8 +39,6 @@ public class EptsTransferredInCohortDefinitionEvaluator implements CohortDefinit
     EptsTransferredInCohortDefinition cd = (EptsTransferredInCohortDefinition) cohortDefinition;
     EvaluatedCohort ret = new EvaluatedCohort(null, cd, context);
 
-    // Boolean B10Flag = cd.getB10Flag();
-
     SqlQueryBuilder q = new SqlQueryBuilder();
     q.append("SELECT p.patient_id ");
     q.append("FROM   patient p ");
@@ -62,12 +60,6 @@ public class EptsTransferredInCohortDefinitionEvaluator implements CohortDefinit
     q.append("       AND transf.value_coded = :yes ");
 
     q.append("       AND type.voided = 0 ");
-    q.append("       AND type.concept_id = :typeOfPatient ");
-    if (cd.getB10Flag()) {
-      q.append("       AND type.value_coded = :tarv ");
-    } else {
-      q.append("       AND type.value_coded in (:tarv,:preTarv) ");
-    }
     q.append("       AND opening.voided = 0 ");
     q.append("       AND opening.concept_id = :dateOfMasterCardFileOpening ");
     if (cd.getOnOrBefore() == null) {
@@ -154,14 +146,11 @@ public class EptsTransferredInCohortDefinitionEvaluator implements CohortDefinit
     q.addParameter("mastercard", hivMetadata.getMasterCardEncounterType());
     q.addParameter("transferFromOther", hivMetadata.getTransferFromOtherFacilityConcept());
     q.addParameter("yes", hivMetadata.getYesConcept());
-    q.addParameter("typeOfPatient", hivMetadata.getTypeOfPatientTransferredFrom());
     Program programEnrolled = cd.getProgramEnrolled();
     Program programEnrolled2 = cd.getProgramEnrolled2();
     ProgramWorkflowState programWorkflowState = cd.getPatientState();
     ProgramWorkflowState programWorkflowState2 = cd.getPatientState2();
 
-    q.addParameter("preTarv", hivMetadata.getPreTarvConcept());
-    q.addParameter("tarv", hivMetadata.getArtStatus());
     q.addParameter(
         "dateOfMasterCardFileOpening", hivMetadata.getDateOfMasterCardFileOpeningConcept());
     q.addParameter("programEnrolled", programEnrolled);

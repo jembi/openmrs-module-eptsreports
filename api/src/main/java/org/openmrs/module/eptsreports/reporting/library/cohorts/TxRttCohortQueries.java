@@ -428,7 +428,8 @@ public class TxRttCohortQueries {
     cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition transferredIn = resumoMensalCohortQueries.getTransferredInPatients(false);
+    CohortDefinition transferredIn =
+        resumoMensalCohortQueries.getPatientsWhoAreTransferredIn(false);
 
     CohortDefinition txCurr = txCurrCohortQueries.getTxCurrCompositionCohort("txCurr", true);
 
