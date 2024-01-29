@@ -176,7 +176,7 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
       q.append("                     WHERE      p.voided = 0");
       q.append("                       AND        e.voided = 0");
       q.append("                       AND        p.patient_id = transferred_out.patient_id");
-      q.append("                       AND e.encounter_type IN (  :adultSeg, :childSeg, :fila)");
+      q.append("                       AND e.encounter_type = :fila ");
       q.append("                       AND e.encounter_datetime > transferred_out.last_date ");
       q.append("                       AND e.encounter_datetime <= :onOrBefore ");
       q.append("                       AND e.location_id = :location");
@@ -253,7 +253,7 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
       q.append("                                       ON p.patient_id = e.patient_id ");
       q.append("                         WHERE p.voided = 0 ");
       q.append("                           AND e.voided = 0 ");
-      q.append("                           AND e.encounter_type IN (:adultSeg, :childSeg, :fila) ");
+      q.append("                           AND e.encounter_type = :fila ");
       q.append("                           AND e.location_id = :location ");
       q.append("                           AND e.encounter_datetime > transferout_date ");
       q.append("                           AND e.encounter_datetime <= :onOrBefore ");
