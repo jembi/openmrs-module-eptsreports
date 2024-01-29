@@ -1059,8 +1059,8 @@ public class ResumoMensalCohortQueries {
    *          Patient_State.state = 7 (Transferred-out) or
    *          Patient_State.start_date >= startDate and <= endDate
    *          Patient_State.end_date = null -> deve se selecionar a max (start_date)</code>
-   *   <li>Except all patients who after the most recent date from 1 to 3 have a drugs pick up or
-   *       consultation by reporting endDate: <code>Encounter Type ID= 6, 9, 18 and
+   *   <li>Except all patients who after the most recent date from 1 to 3 have a drugs pick up by
+   *       reporting endDate: <code>Encounter Type ID= 18 and
    *          encounter_datetime> the most recent date and <=endDate
    *          or
    *          Encounter Type ID = 52 and “Data de Levantamento” (Concept Id 23866 value_datetime) > the most recent date and <=endDate
@@ -2839,7 +2839,7 @@ public class ResumoMensalCohortQueries {
    * recebeu um resultado de Carga Viral (CV) durante o mês (Notificação anual) B13=B12+B4-B9)
    *
    * <ul>
-   *   <li>B13: {@link ResumoMensalCohortQueries#getActivePatientsInARTByEndOfCurrentMonth()}
+   *   <li>B13: {@link ResumoMensalCohortQueries# getActivePatientsInARTByEndOfCurrentMonth()}
    *       <b>AND</b>
    *   <li>Filter all patients registered in encounter “S.TARV – Adulto Seguimento” (encounter id 6)
    *       with the following information:

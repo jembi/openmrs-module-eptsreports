@@ -180,6 +180,70 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
       q.append("                       AND e.encounter_datetime > transferred_out.last_date ");
       q.append("                       AND e.encounter_datetime <= :onOrBefore ");
       q.append("                       AND e.location_id = :location");
+      q.append("                      UNION ");
+      q.append("                      SELECT p.patient_id FROM patient p ");
+      q.append("                      INNER JOIN ( ");
+      q.append("                          SELECT last_next_pick_up.patient_id, ");
+      q.append(
+          "                                 Max(last_next_pick_up.result_value) AS max_datetame ");
+      q.append("                          FROM (");
+      q.append("                              SELECT p.patient_id, ");
+      q.append("                                     o.value_datetime AS result_value ");
+      q.append("                              FROM patient p ");
+      q.append(
+          "                              INNER JOIN encounter e ON p.patient_id = e.patient_id ");
+      q.append(
+          "                              INNER JOIN obs o ON e.encounter_id = o.encounter_id ");
+      q.append("                              INNER JOIN (");
+      q.append("                                  SELECT p.patient_id, ");
+      q.append("                                         Max(e.encounter_datetime) AS e_datetime ");
+      q.append("                                  FROM patient p ");
+      q.append(
+          "                                  INNER JOIN encounter e ON p.patient_id = e.patient_id ");
+      q.append("                                  WHERE p.voided = 0 ");
+      q.append("                                    AND e.voided = 0 ");
+      q.append("                                    AND e.location_id = :location ");
+      q.append("                                    AND e.encounter_type = :fila ");
+      q.append("                                    AND e.encounter_datetime <= :onOrBefore ");
+      q.append("                                  GROUP BY p.patient_id ");
+      q.append(
+          "                              ) most_recent ON p.patient_id = most_recent.patient_id ");
+      q.append("                              WHERE p.voided = 0 ");
+      q.append("                                AND e.voided = 0 ");
+      q.append("                                AND o.voided = 0 ");
+      q.append("                                AND e.location_id = :location ");
+      q.append("                                AND e.encounter_type = :fila ");
+      q.append("                                AND o.concept_id = :nextPickUp ");
+      q.append("                                AND e.encounter_datetime = most_recent.e_datetime");
+      q.append("                              GROUP BY p.patient_id");
+      q.append("                              UNION");
+      q.append("                              SELECT p.patient_id,");
+      q.append(
+          "                                     date_add(max(o.value_datetime), INTERVAL 30 day) AS result_value ");
+      q.append("                              FROM patient p ");
+      q.append(
+          "                              INNER JOIN encounter e ON p.patient_id = e.patient_id ");
+      q.append(
+          "                              INNER JOIN obs o ON e.encounter_id = o.encounter_id ");
+      q.append(
+          "                              INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id ");
+      q.append("                              WHERE p.voided = 0 ");
+      q.append("                                AND e.voided = 0 ");
+      q.append("                                AND o.voided = 0 ");
+      q.append("                                AND o2.voided = 0 ");
+      q.append("                                AND e.location_id = :location ");
+      q.append("                                AND e.encounter_type = :arvPickUp ");
+      q.append("                                AND (o.concept_id = :arvPickUpDate ");
+      q.append("                                    AND o.value_datetime <= :onOrBefore)");
+      q.append("                                AND (o2.concept_id = :pickedUpArv ");
+      q.append("                                    AND o2.value_coded = :yes) ");
+      q.append("                              GROUP BY p.patient_id ");
+      q.append("                          ) AS last_next_pick_up ");
+      q.append("                          GROUP BY last_next_pick_up.patient_id ");
+      q.append(
+          "                      ) AS last_next_scheduled_pick_up ON last_next_scheduled_pick_up.patient_id = p.patient_id ");
+      q.append("          WHERE last_next_scheduled_pick_up.max_datetame < :onOrBefore ");
+
       q.append("                 )");
       q.append("      GROUP BY transferred_out.patient_id");
 
@@ -257,7 +321,71 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
       q.append("                           AND e.location_id = :location ");
       q.append("                           AND e.encounter_datetime > transferout_date ");
       q.append("                           AND e.encounter_datetime <= :onOrBefore ");
-      q.append("                                                 )");
+      q.append("                      UNION ");
+      q.append("                      SELECT p.patient_id FROM patient p   ");
+      q.append("                      INNER JOIN ( ");
+      q.append("                          SELECT last_next_pick_up.patient_id, ");
+      q.append(
+          "                                 Max(last_next_pick_up.result_value) AS max_datetame ");
+      q.append("                          FROM (");
+      q.append("                              SELECT p.patient_id, ");
+      q.append("                                     o.value_datetime AS result_value ");
+      q.append("                              FROM patient p");
+      q.append(
+          "                              INNER JOIN encounter e ON p.patient_id = e.patient_id ");
+      q.append(
+          "                              INNER JOIN obs o ON e.encounter_id = o.encounter_id ");
+      q.append("                              INNER JOIN ( ");
+      q.append("                                  SELECT p.patient_id, ");
+      q.append("                                         Max(e.encounter_datetime) AS e_datetime ");
+      q.append("                                  FROM patient p ");
+      q.append(
+          "                                  INNER JOIN encounter e ON p.patient_id = e.patient_id ");
+      q.append("                                  WHERE p.voided = 0 ");
+      q.append("                                    AND e.voided = 0 ");
+      q.append("                                    AND e.location_id = :location ");
+      q.append("                                    AND e.encounter_type = :fila ");
+      q.append("                                    AND e.encounter_datetime <= :onOrBefore ");
+      q.append("                                  GROUP BY p.patient_id ");
+      q.append(
+          "                              ) most_recent ON p.patient_id = most_recent.patient_id ");
+      q.append("                              WHERE p.voided = 0 ");
+      q.append("                                AND e.voided = 0 ");
+      q.append("                                AND o.voided = 0 ");
+      q.append("                                AND e.location_id = :location ");
+      q.append("                                AND e.encounter_type = :fila ");
+      q.append("                                AND o.concept_id = :nextPickUp ");
+      q.append(
+          "                                AND e.encounter_datetime = most_recent.e_datetime ");
+      q.append("                              GROUP BY p.patient_id ");
+      q.append("                              UNION ");
+      q.append("                              SELECT p.patient_id, ");
+      q.append(
+          "                                     date_add(max(o.value_datetime), INTERVAL 30 day) AS result_value ");
+      q.append("                              FROM patient p ");
+      q.append(
+          "                              INNER JOIN encounter e ON p.patient_id = e.patient_id ");
+      q.append(
+          "                              INNER JOIN obs o ON e.encounter_id = o.encounter_id ");
+      q.append(
+          "                              INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id ");
+      q.append("                              WHERE p.voided = 0 ");
+      q.append("                                AND e.voided = 0 ");
+      q.append("                                AND o.voided = 0 ");
+      q.append("                                AND o2.voided = 0 ");
+      q.append("                                AND e.location_id = :location ");
+      q.append("                                AND e.encounter_type = :arvPickUp ");
+      q.append("                                AND (o.concept_id = :arvPickUpDate ");
+      q.append("                                    AND o.value_datetime <= :onOrBefore) ");
+      q.append("                                AND (o2.concept_id = :pickedUpArv ");
+      q.append("                                    AND o2.value_coded = :yes) ");
+      q.append("                              GROUP BY p.patient_id ");
+      q.append("                          ) AS last_next_pick_up ");
+      q.append("                          GROUP BY last_next_pick_up.patient_id ");
+      q.append(
+          "                      ) AS last_next_scheduled_pick_up ON last_next_scheduled_pick_up.patient_id = p.patient_id ");
+      q.append("          WHERE last_next_scheduled_pick_up.max_datetame < :onOrBefore ");
+      q.append("                                                 ) ");
     }
     q.addParameter("art", hivMetadata.getARTProgram().getProgramId());
 
@@ -276,6 +404,12 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
     q.addParameter("location", cd.getLocation());
     q.addParameter("onOrAfter", cd.getOnOrAfter());
     q.addParameter("onOrBefore", DateUtil.getEndOfDayIfTimeExcluded(cd.getOnOrBefore()));
+    q.addParameter(
+        "arvPickUp", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    q.addParameter("arvPickUpDate", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    q.addParameter("pickedUpArv", hivMetadata.getArtPickupConcept().getConceptId());
+    q.addParameter("yes", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    q.addParameter("nextPickUp", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
 
     List<Integer> results = evaluationService.evaluateToList(q, Integer.class, context);
     ret.setMemberIds(new HashSet<>(results));
