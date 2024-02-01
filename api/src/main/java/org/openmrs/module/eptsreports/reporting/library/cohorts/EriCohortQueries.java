@@ -12,6 +12,9 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -35,6 +38,8 @@ public class EriCohortQueries {
 
   @Autowired private ResumoMensalCohortQueries resumoMensalCohortQueries;
 
+  @Autowired private HivMetadata hivMetadata;
+
   /**
    * Get all patients who initiated ART 2 months from ART initiation less transfer ins return the
    * patient who initiated ART A and B
@@ -51,16 +56,13 @@ public class EriCohortQueries {
 
     CohortDefinition startedArtOnPeriod = getPatientsArtStartDate();
 
-    CohortDefinition transferIns =
-        resumoMensalCohortQueries
-            .getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2E();
+    CohortDefinition transferIns = getPatientWhoHaveBeenTransferredIn();
 
-    String mappings = "startDate=${cohortStartDate},endDate=${cohortEndDate},location=${location}";
+    String artMappings =
+        "startDate=${cohortStartDate},endDate=${cohortEndDate},location=${location}";
+    cd.addSearch("initiatedArt", EptsReportUtils.map(startedArtOnPeriod, artMappings));
 
-    cd.addSearch("initiatedArt", EptsReportUtils.map(startedArtOnPeriod, mappings));
-
-    String transferInMappings =
-        "onOrAfter=${cohortStartDate},onOrBefore=${reportingEndDate},location=${location}";
+    String transferInMappings = "onOrBefore=${reportingEndDate},location=${location}";
     cd.addSearch("transferIns", EptsReportUtils.map(transferIns, transferInMappings));
 
     cd.setCompositionString("initiatedArt AND NOT transferIns");
@@ -258,6 +260,87 @@ public class EriCohortQueries {
             + " WHERE start.first_pickup BETWEEN :startDate AND :endDate ";
 
     cd.setQuery(query);
+    return cd;
+  }
+
+  /**
+   * <b>IM-ER4_FR7:</b> Patients who have been transferred in – to be excluded
+   *
+   * <p>The system will identify patients who have been transferred in as follows:
+   *
+   * <ul>
+   *   <li>All patients who are enrolled in ARV Program (Serviço TARV- Tratamento) and have as state
+   *       of patient “Transfer from another facility” in the patient chart prior to the reporting
+   *       end date
+   *   <li>All patients who have filled “Transferido de outra US” and checked “Em TARV” in Ficha
+   *       Resumo – Master Card, with MasterCard file opening Date prior to the reporting end date.
+   * </ul>
+   */
+  public CohortDefinition getPatientWhoHaveBeenTransferredIn() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients who have been transferred in");
+    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1369", hivMetadata.getTransferredFromOtherFacilityConcept().getConceptId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
+    map.put("6276", hivMetadata.getArtStatus().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "           JOIN encounter e "
+            + "                ON p.patient_id = e.patient_id "
+            + "           JOIN obs transf "
+            + "                ON transf.encounter_id = e.encounter_id "
+            + "           JOIN obs type "
+            + "                ON type.encounter_id = e.encounter_id "
+            + "           JOIN obs opening "
+            + "                ON opening.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND e.encounter_type = ${53} "
+            + "  AND e.location_id = :location "
+            + "  AND transf.voided = 0 "
+            + "  AND transf.concept_id = ${1369} "
+            + "  AND transf.value_coded = ${1065} "
+            + "  AND type.voided = 0 "
+            + "  AND type.concept_id = ${6300} "
+            + "  AND type.value_coded = ${6276} "
+            + "  AND opening.voided = 0 "
+            + "  AND opening.concept_id = ${23891} "
+            + "  AND opening.value_datetime <= :onOrBefore "
+            + "UNION "
+            + "SELECT pgEnrollment.patient_id "
+            + "FROM  (SELECT p.patient_id, "
+            + "              pp.patient_program_id, "
+            + "              Min(ps.start_date) AS pgEnrollmentDate "
+            + "       FROM   patient p "
+            + "                  JOIN patient_program pp "
+            + "                       ON p.patient_id = pp.patient_id "
+            + "                  JOIN patient_state ps "
+            + "                       ON pp.patient_program_id = ps.patient_program_id "
+            + "       WHERE  pp.voided = 0 "
+            + "         AND ps.voided = 0 "
+            + "         AND p.voided = 0 "
+            + "         AND pp.program_id = ${2}"
+            + "         AND location_id = :location "
+            + "         AND ps.start_date <= :onOrBefore "
+            + "       GROUP  BY pp.patient_program_id) pgEnrollment "
+            + "          JOIN patient_state ps "
+            + "               ON ps.patient_program_id = pgEnrollment.patient_program_id "
+            + "WHERE  ps.start_date = pgEnrollment.pgenrollmentdate "
+            + "  AND ps.state = ${29} "
+            + "  AND ps.voided = 0";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    cd.setQuery(sb.replace(query));
     return cd;
   }
 }
