@@ -271,7 +271,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
                 commonMetadata.getPositive(),
                 commonMetadata.getNegative(),
                 hivMetadata.getNAConcept(),
-                tbMetadata.getIndeterminate()),
+                tbMetadata.getNotDoneConcept()),
             true),
         "endDate=${endDate},location=${location}",
         new TestResultConverter());
@@ -289,7 +289,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
                 commonMetadata.getPositive(),
                 commonMetadata.getNegative(),
                 hivMetadata.getNAConcept(),
-                tbMetadata.getIndeterminate()),
+                tbMetadata.getNotDoneConcept()),
             false),
         "endDate=${endDate},location=${location}",
         new DashDateFormatConverter());

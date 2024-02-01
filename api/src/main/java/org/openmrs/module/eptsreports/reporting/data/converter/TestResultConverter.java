@@ -20,7 +20,7 @@ public class TestResultConverter implements DataConverter {
         return "Sim";
       case "1066":
         return "Não";
-      case "1138":
+      case "1118":
         return "NF";
       case "165184":
         return "Não Encontrado";
