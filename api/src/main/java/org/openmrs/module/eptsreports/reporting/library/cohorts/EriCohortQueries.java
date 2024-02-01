@@ -13,9 +13,13 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
 import java.util.Date;
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.metadata.CommonMetadata;
+import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -45,13 +49,14 @@ public class EriCohortQueries {
     cd.addParameter(new Parameter("reportingEndDate", "Reporting End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition startedArtOnPeriod = genericCohortQueries.getStartedArtOnPeriod(false, true);
+    CohortDefinition startedArtOnPeriod = getPatientsArtStartDate();
+
     CohortDefinition transferIns =
         resumoMensalCohortQueries
             .getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2E();
 
-    String mappings =
-        "onOrAfter=${cohortStartDate},onOrBefore=${cohortEndDate},location=${location}";
+    String mappings = "startDate=${cohortStartDate},endDate=${cohortEndDate},location=${location}";
+
     cd.addSearch("initiatedArt", EptsReportUtils.map(startedArtOnPeriod, mappings));
 
     String transferInMappings =
@@ -214,6 +219,45 @@ public class EriCohortQueries {
             txNewCohortQueries.getTxNewBreastfeedingComposition(false),
             "onOrAfter=${cohortStartDate},onOrBefore=${cohortEndDate},location=${location}"));
     cd.setCompositionString("(initiatedART AND adults) AND NOT (pregnant OR breastfeeding)");
+    return cd;
+  }
+
+  /**
+   * <b>IM-ER4_FR6.1:</b> Patient’s earliest ART start date from pick-up and clinical sources
+   *
+   * <p>The system will identify the patient ART start date by selecting the earliest date from the
+   * following sources:
+   *
+   * <ul>
+   *   <li>First ever drug pick-up date registered on (FILA)
+   *   <li>Drug initiation date (ARV PLAN = START DRUGS) during the pharmacy or clinical visits
+   *   <li>First start drug date set in Clinical tools (Ficha de Seguimento Adulto and Ficha de
+   *       Seguimento Pediatria) or Ficha Resumo - Master Card.
+   *   <li>Date of enrollment in ART Program
+   *   <li>First ever drug pick-up date registered on (Recepção Levantou ARV) – Master Card
+   * </ul>
+   *
+   * <p><b>Note:</b>Ensure that the ART start date is truly the first occurrence ever for the
+   * patient. This is particularly important for patients that have different ART start dates
+   * registered in the system.
+   */
+  public CohortDefinition getPatientsArtStartDate() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patient’s earliest ART start date from pick-up and clinical sources");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
+
+    String query =
+        "       SELECT patient_id "
+            + " FROM ( "
+            + commonQueries.getARTStartDate(true)
+            + "       ) start "
+            + " WHERE start.first_pickup BETWEEN :startDate AND :endDate ";
+
+    cd.setQuery(query);
     return cd;
   }
 }

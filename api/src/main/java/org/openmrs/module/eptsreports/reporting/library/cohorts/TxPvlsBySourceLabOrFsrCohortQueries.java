@@ -495,8 +495,7 @@ public class TxPvlsBySourceLabOrFsrCohortQueries {
    */
   public CohortDefinition getPregnantWomanWithLaboratoryVLResult() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName(
-        " Patients disaggregation - Pregnant with Laboratory VL Result");
+    sqlCohortDefinition.setName(" Patients disaggregation - Pregnant with Laboratory VL Result");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
     Map<String, Integer> map = new HashMap<>();
