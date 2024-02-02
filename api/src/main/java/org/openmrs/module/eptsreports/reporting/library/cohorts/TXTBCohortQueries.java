@@ -2547,4 +2547,107 @@ public class TXTBCohortQueries {
     addGeneralParameters(cd);
     return cd;
   }
+
+  /**
+   * <b>Patients screened using Symptom Screen (alone)</b>
+   *
+   * <p>All patients on ART screened for TB (denominator) (TX_TB_FR2) that are not included in the
+   * CXR screening type disaggregate
+   *
+   * @see #getDenominator()
+   * @see #getPatientsScreenedUsingCXR()
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getSymtomScreen() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients screened using Symptom Screen (alone)");
+    addGeneralParameters(cd);
+
+    cd.addSearch(
+        "DENOMINATOR",
+        EptsReportUtils.map(
+            getDenominator(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "CXR",
+        EptsReportUtils.map(
+            getPatientsScreenedUsingCXR(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("DENOMINATOR AND NOT CXR");
+    return cd;
+  }
+
+  /**
+   * <b>Patients screened using CXR</b>
+   *
+   * <p>All patients >=10 years of age (TX_TB_FR12) who have Investigações - Resultados
+   * Laboratoriais with ANY RESULT recorded for Raio-X marked oin a Ficha Clíinica during the
+   * reporting period
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsScreenedUsingCXR() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients screened using CXR");
+    addGeneralParameters(cd);
+
+    cd.addSearch(
+        "XRAY",
+        EptsReportUtils.map(
+            getPatientsWithAnyXrayResult(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "AGE",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnReportEndDate(10, 200),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString("XRAY AND AGE");
+    return cd;
+  }
+
+  /**
+   * All patients who have Investigações - Resultados Laboratoriais with ANY RESULT recorded for
+   * Raio-X marked oin a Ficha Clínica during the reporting period
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithAnyXrayResult() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+
+    cd.setName("Patients with any result for Raio X");
+    addGeneralParameters(cd);
+
+    Map<String, Integer> map = new HashMap<String, Integer>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("12", tbMetadata.getXRayChest().getConceptId());
+
+    String query =
+        " SELECT p.patient_id "
+            + "FROM patient p "
+            + "    INNER JOIN encounter e "
+            + "        ON e.patient_id = p.patient_id "
+            + "    INNER JOIN obs o "
+            + "        ON o.encounter_id = e.encounter_id "
+            + "WHERE "
+            + "  p.voided = 0  "
+            + "  AND  e.voided = 0  "
+            + "  AND  o.voided = 0  "
+            + "  AND  e.encounter_type = ${6} "
+            + "  AND o.concept_id = ${12} "
+            + "  AND o.value_coded IS NOT NULL "
+            + "  AND  e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "  AND  e.location_id  = :location";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    String replaceQuery = sb.replace(query);
+
+    cd.setQuery(replaceQuery);
+
+    return cd;
+  }
 }

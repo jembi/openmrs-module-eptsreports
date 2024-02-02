@@ -125,6 +125,16 @@ public class TxTBDataset extends BaseDataSet {
             "positiveInvestigationResult",
             EptsReportUtils.map(txTbCohortQueries.positiveResultsReturned(), mappings));
 
+    CohortIndicator symptomScreen =
+        eptsGeneralIndicator.getIndicator(
+            "Symptom Screen Alone",
+            EptsReportUtils.map(txTbCohortQueries.getSymtomScreen(), mappings));
+
+    CohortIndicator screenedUsingCXR =
+        eptsGeneralIndicator.getIndicator(
+            "Patients screened using CXR",
+            EptsReportUtils.map(txTbCohortQueries.getPatientsScreenedUsingCXR(), mappings));
+
     dataSetDefinition.addColumn(
         "TXB_DEN",
         "TX_TB: Denominator total",
@@ -189,6 +199,12 @@ public class TxTBDataset extends BaseDataSet {
         "TX_TB: Denominator (Positive Result Returned)",
         EptsReportUtils.map(positiveResultsReturned, mappings),
         "");
+
+    dataSetDefinition.addColumn(
+        "SSA", "Symptom Screen Alone", EptsReportUtils.map(symptomScreen, mappings), "");
+
+    dataSetDefinition.addColumn(
+        "CXR", "Patients screened using CXR", EptsReportUtils.map(screenedUsingCXR, mappings), "");
   }
 
   private List<ColumnParameters> dissagregations() {
