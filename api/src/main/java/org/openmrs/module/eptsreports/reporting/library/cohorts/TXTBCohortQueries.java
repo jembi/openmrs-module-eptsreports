@@ -36,6 +36,8 @@ public class TXTBCohortQueries {
 
   @Autowired private GenericCohortQueries genericCohortQueries;
 
+  @Autowired private TxNewCohortQueries txNewCohortQueries;
+
   private final String generalParameterMapping =
       "startDate=${startDate},endDate=${endDate},location=${location}";
 
@@ -1066,18 +1068,20 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <b>Description:</b> New On ART Positive Screening
+   * <b>Patients New on ART (TX_TB_FR7): Positive Screening (TX_TB_FR9)
    *
-   * <p><b>Technical Specs</b>
+   * @see TxNewCohortQueries#getTxNewCompositionCohort(String) 
+   * @see #getDenominator()
+   * @see #positiveScreening()
    *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition newOnARTPositiveScreening() {
     CompositionCohortDefinition definition = new CompositionCohortDefinition();
-    definition.setName("newOnARTPositiveScreening()");
+    definition.setName("Patients New on ART: Positive Screening");
     definition.addSearch(
         "denominator", EptsReportUtils.map(getDenominator(), generalParameterMapping));
-    definition.addSearch("new-on-art", EptsReportUtils.map(getNewOnArt(), generalParameterMapping));
+    definition.addSearch("new-on-art", EptsReportUtils.map(txNewCohortQueries.getTxNewCompositionCohort("New on ART"), generalParameterMapping));
     definition.addSearch(
         "positive-screening", EptsReportUtils.map(positiveScreening(), generalParameterMapping));
     addGeneralParameters(definition);
