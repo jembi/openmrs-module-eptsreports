@@ -95,7 +95,7 @@ public class CXCASCRNCohortQueries {
    * @return CohortDefinition
    */
   public CohortDefinition getPatientsWithScreeningTestForCervicalCancer(
-      CXCASCRNCohortQueries.CXCASCRNResult cxcascrnResult) {
+      CXCASCRNCohortQueries.CXCASCRNResult cxcascrnResult, boolean beforeStartDate) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patients with Screening Result for Cervical Cancer");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -138,9 +138,14 @@ public class CXCASCRNCohortQueries {
     } else if (cxcascrnResult == CXCASCRNCohortQueries.CXCASCRNResult.ANY) {
       query.append("    AND o.value_coded IN (${2093}, ${664}, ${703}) ");
     }
+    query.append("                          AND        e.encounter_datetime  ");
+    if (beforeStartDate) {
+      query.append(" < :startDate ");
+    } else {
+      query.append("  BETWEEN :startDate AND  :endDate ");
+    }
     query.append(
-        "                          AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
-            + "                          AND        e.location_id = :location "
+        "                          AND        e.location_id = :location "
             + "                        GROUP BY   p.patient_id "
             + "                        UNION "
             + "                        SELECT     p.patient_id, "
@@ -156,10 +161,17 @@ public class CXCASCRNCohortQueries {
             + "                          AND        e.encounter_type = ${28} "
             + "                          AND        o.concept_id = ${165436} "
             + "                          AND        o.value_coded = ${664} "
-            + "                          AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
-            + "                          AND        e.location_id = :location "
-            + "                        GROUP BY   p.patient_id ) via_or_hpv "
-            + "           GROUP BY via_or_hpv.patient_id ) final");
+            + "                          AND        e.encounter_datetime ");
+    if (beforeStartDate) {
+      query.append(" < :startDate ");
+    } else {
+      query.append("  BETWEEN :startDate AND  :endDate ");
+    }
+    query.append(
+        "                          AND        e.location_id = :location "
+            + "                        GROUP BY   p.patient_id "
+            + "   ) via_or_hpv "
+            + "   GROUP BY via_or_hpv.patient_id ) final");
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     cd.setQuery(stringSubstitutor.replace(query.toString()));
@@ -409,7 +421,7 @@ public class CXCASCRNCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition aa = getPatientsWithScreeningTestForCervicalCancer(cxcascrnResult);
+    CohortDefinition aa = getPatientsWithScreeningTestForCervicalCancer(cxcascrnResult, false);
 
     CohortDefinition a = this.getA();
 
