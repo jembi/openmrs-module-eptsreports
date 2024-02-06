@@ -5850,4 +5850,20 @@ public class HivMetadata extends ProgramsMetadata {
 
     return getConcept(uuid);
   }
+
+  /**
+   * <b>enconter_type_id = 165436</b>
+   *
+   * <p><b>Name:</b> HUMAN PAPILLOMAVIRUS - DNA
+   *
+   * <p><b>Description: HPV -DNA</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getHumanPapillomavirusDna() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.humanPapillomavirusDnaConceptUuid");
+    return getConcept(uuid);
+  }
 }

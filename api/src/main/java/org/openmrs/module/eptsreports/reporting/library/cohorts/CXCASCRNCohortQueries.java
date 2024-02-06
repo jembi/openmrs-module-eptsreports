@@ -1,6 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
 import java.util.*;
+import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -76,6 +77,88 @@ public class CXCASCRNCohortQueries {
 
     return cd;
   }
+
+  /**
+   * <p><b>SCRN_FR4</b>Patient with a screening test for Cervical cancer</p>
+   *
+   * <p>Have Resultado do Rastreio HPV-DNA Negativo marked on Ficha de Registo Individual: Rastreio
+   * dos Cancros do Colo do Útero e da Mama during the reporting period.
+   *
+   * @return CohortDefinition
+  */
+  public CohortDefinition getPatientsWithScreeningTestForCervicalCancer(CXCASCRNCohortQueries.CXCASCRNResult cxcascrnResult) {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients with Screening Result for Cervical Cancer");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("28", hivMetadata.getRastreioDoCancroDoColoUterinoEncounterType().getEncounterTypeId());
+    map.put("2094", hivMetadata.getResultadoViaConcept().getConceptId());
+    map.put("664", hivMetadata.getNegative().getConceptId());
+    map.put("703", hivMetadata.getPositive().getConceptId());
+    map.put("2093", hivMetadata.getSuspectedCancerConcept().getConceptId());
+    map.put("165436", hivMetadata.getHumanPapillomavirusDna().getConceptId());
+
+    StringBuilder query = new StringBuilder(
+            "SELECT final.patient_id "
+                    + "FROM   ( "
+                    + "           SELECT   via_or_hpv.patient_id, "
+                    + "                    Max(via_or_hpv.screening_date) AS last_screening_date "
+                    + "           FROM     ( "
+                    + "                        SELECT     p.patient_id, "
+                    + "                                   Date(e.encounter_datetime) AS screening_date "
+                    + "                        FROM       patient p "
+                    + "                                       INNER JOIN encounter e "
+                    + "                                                  ON         e.patient_id = p.patient_id "
+                    + "                                       INNER JOIN obs o "
+                    + "                                                  ON         o.encounter_id = e.encounter_id "
+                    + "                        WHERE      p.voided = 0 "
+                    + "                          AND        e.voided = 0 "
+                    + "                          AND        o.voided = 0 "
+                    + "                          AND        e.encounter_type = ${28} "
+                    + "                          AND        o.concept_id = ${2094} "
+    );
+    if (cxcascrnResult == CXCASCRNCohortQueries.CXCASCRNResult.NEGATIVE) {
+      query.append("    AND o.value_coded = ${664} ");
+    } else if (cxcascrnResult == CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE) {
+      query.append("    AND o.value_coded = ${703} ");
+    } else if (cxcascrnResult == CXCASCRNCohortQueries.CXCASCRNResult.SUSPECTED) {
+      query.append("    AND o.value_coded = ${2093} ");
+    } else if (cxcascrnResult == CXCASCRNCohortQueries.CXCASCRNResult.ANY) {
+      query.append("    AND o.value_coded IN (${2093}, ${664}, ${703}) ");
+    }
+    query.append(
+            "                          AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
+                    + "                          AND        e.location_id = :location "
+                    + "                        GROUP BY   p.patient_id "
+                    + "                        UNION "
+                    + "                        SELECT     p.patient_id, "
+                    + "                                   date(e.encounter_datetime) AS screening_date "
+                    + "                        FROM       patient p "
+                    + "                                       INNER JOIN encounter e "
+                    + "                                                  ON         p.patient_id = e.patient_id "
+                    + "                                       INNER JOIN obs o "
+                    + "                                                  ON         e.encounter_id = o.encounter_id "
+                    + "                        WHERE      p.voided = 0 "
+                    + "                          AND        e.voided = 0 "
+                    + "                          AND        o.voided = 0 "
+                    + "                          AND        e.encounter_type = ${28} "
+                    + "                          AND        o.concept_id = ${165436} "
+                    + "                          AND        o.value_coded = ${664} "
+                    + "                          AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
+                    + "                          AND        e.location_id = :location "
+                    + "                        GROUP BY   p.patient_id ) via_or_hpv "
+                    + "           GROUP BY via_or_hpv.patient_id ) final"
+    );
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    cd.setQuery(stringSubstitutor.replace(query.toString()));
+
+    return cd;
+  }
+
 
   /**
    *
@@ -319,7 +402,7 @@ public class CXCASCRNCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition aa = getAA(cxcascrnResult);
+    CohortDefinition aa = getPatientsWithScreeningTestForCervicalCancer(cxcascrnResult);
 
     CohortDefinition a = this.getA();
 
@@ -328,7 +411,7 @@ public class CXCASCRNCohortQueries {
     cd.addSearch(
         "AA",
         EptsReportUtils.map(
-            aa, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            aa, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("A AND AA");
 

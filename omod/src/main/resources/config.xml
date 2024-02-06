@@ -3963,4 +3963,12 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>eptsreports.humanPapillomavirusDnaConceptUuid</property>
+		<defaultValue>527d62e2-b43e-4523-835f-2f0919ef46c5</defaultValue>
+		<description>
+			UUID for the HUMAN PAPILLOMAVIRUS - DNA concept
+		</description>
+	</globalProperty>
+
 </module>
