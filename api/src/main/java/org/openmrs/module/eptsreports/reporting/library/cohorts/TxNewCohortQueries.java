@@ -24,6 +24,7 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.BreastfeedingQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.PregnantQueries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -267,9 +268,10 @@ public class TxNewCohortQueries {
     String query =
         "       SELECT patient_id "
             + " FROM ( "
-            + commonQueries.getFirstDrugPickup()
+            + new EptsQueriesUtil().min(commonQueries.getFirstDrugPickup()).getQuery()
             + "       ) start "
-            + " WHERE start.first_pickup_ever >= '2023-12-21' ";
+            + " WHERE start.first_date >= :startDate "
+            + " AND start.first_date <= :endDate ";
 
     cd.setQuery(query);
     return cd;
@@ -334,8 +336,7 @@ public class TxNewCohortQueries {
             + " FROM ( "
             + commonQueries.getARTStartDate(true)
             + "       ) start "
-            + " WHERE start.first_pickup >= '2023-12-21' "
-            + " AND start.first_pickup BETWEEN :startDate AND :endDate ";
+            + " WHERE start.first_pickup >= '2023-12-21' ";
 
     cd.setQuery(query);
     return cd;
@@ -371,7 +372,7 @@ public class TxNewCohortQueries {
 
     CohortDefinition earliestArtStartDateBeforePeriod = getPatientsArtStartDateBeforePeriod();
     CohortDefinition earliestArtStartDateAfterPeriod = getPatientsArtStartDate();
-    CohortDefinition firstDrugPickUpAfterPeriod = getPatientsFirstDrugPickup();
+    CohortDefinition firstDrugPickUpDuringPeriod = getPatientsFirstDrugPickup();
 
     cd.addSearch(
         "earliestArtStartDateBeforePeriod",
@@ -380,10 +381,10 @@ public class TxNewCohortQueries {
         "earliestArtStartDateAfterPeriod",
         EptsReportUtils.map(earliestArtStartDateAfterPeriod, mapping1));
     cd.addSearch(
-        "firstDrugPickUpAfterPeriod", EptsReportUtils.map(firstDrugPickUpAfterPeriod, mapping1));
+        "firstDrugPickUpDuringPeriod", EptsReportUtils.map(firstDrugPickUpDuringPeriod, mapping1));
 
     cd.setCompositionString(
-        "earliestArtStartDateBeforePeriod OR (earliestArtStartDateAfterPeriod AND firstDrugPickUpAfterPeriod)");
+        "earliestArtStartDateBeforePeriod OR (earliestArtStartDateAfterPeriod AND firstDrugPickUpDuringPeriod)");
     return cd;
   }
 
