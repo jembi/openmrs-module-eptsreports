@@ -36,8 +36,6 @@ public class TXTBCohortQueries {
 
   @Autowired private GenericCohortQueries genericCohortQueries;
 
-  @Autowired private TxNewCohortQueries txNewCohortQueries;
-
   private final String generalParameterMapping =
       "startDate=${startDate},endDate=${endDate},location=${location}";
 
@@ -1080,10 +1078,7 @@ public class TXTBCohortQueries {
     definition.setName("Patients New on ART: Positive Screening");
     definition.addSearch(
         "denominator", EptsReportUtils.map(getDenominator(), generalParameterMapping));
-    definition.addSearch(
-        "new-on-art",
-        EptsReportUtils.map(
-            txNewCohortQueries.getTxNewCompositionCohort("New on ART"), generalParameterMapping));
+    definition.addSearch("new-on-art", EptsReportUtils.map(getNewOnArt(), generalParameterMapping));
     definition.addSearch(
         "positive-screening", EptsReportUtils.map(positiveScreening(), generalParameterMapping));
     addGeneralParameters(definition);
@@ -1103,10 +1098,7 @@ public class TXTBCohortQueries {
     definition.setName("newOnARTPositiveScreening()");
     definition.addSearch(
         "denominator", EptsReportUtils.map(getDenominator(), generalParameterMapping));
-    definition.addSearch(
-        "new-on-art",
-        EptsReportUtils.map(
-            txNewCohortQueries.getTxNewCompositionCohort("New on ART"), generalParameterMapping));
+    definition.addSearch("new-on-art", EptsReportUtils.map(getNewOnArt(), generalParameterMapping));
     definition.addSearch(
         "positive-screening", EptsReportUtils.map(positiveScreening(), generalParameterMapping));
     addGeneralParameters(definition);
@@ -1126,10 +1118,7 @@ public class TXTBCohortQueries {
     definition.setName("newOnARTPositiveScreening()");
     definition.addSearch(
         "denominator", EptsReportUtils.map(getDenominator(), generalParameterMapping));
-    definition.addSearch(
-        "new-on-art",
-        EptsReportUtils.map(
-            txNewCohortQueries.getTxNewCompositionCohort("New on ART"), generalParameterMapping));
+    definition.addSearch("new-on-art", EptsReportUtils.map(getNewOnArt(), generalParameterMapping));
     definition.addSearch(
         "positive-screening", EptsReportUtils.map(positiveScreening(), generalParameterMapping));
     addGeneralParameters(definition);
@@ -1149,10 +1138,7 @@ public class TXTBCohortQueries {
     definition.setName("previouslyOnARTNegativeScreening()");
     definition.addSearch(
         "denominator", EptsReportUtils.map(getDenominator(), generalParameterMapping));
-    definition.addSearch(
-        "new-on-art",
-        EptsReportUtils.map(
-            txNewCohortQueries.getTxNewCompositionCohort("New on ART"), generalParameterMapping));
+    definition.addSearch("new-on-art", EptsReportUtils.map(getNewOnArt(), generalParameterMapping));
     definition.addSearch(
         "positive-screening", EptsReportUtils.map(positiveScreening(), generalParameterMapping));
     addGeneralParameters(definition);
