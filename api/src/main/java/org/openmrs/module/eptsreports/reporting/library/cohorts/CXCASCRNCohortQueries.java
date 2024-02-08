@@ -1281,4 +1281,122 @@ public class CXCASCRNCohortQueries {
 
     return cd;
   }
+
+  public CohortDefinition getTotalPatientsWithPositiveResult() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Total of Patients With Positive Result");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition a = getTotal();
+    CohortDefinition positiveResult = getPatientsWithPositiveResultForScreeningTest();
+
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "positiveResult",
+        EptsReportUtils.map(
+            positiveResult, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("A AND positiveResult");
+    return cd;
+  }
+
+  public CohortDefinition getPositive1stTimeScreenedPatients() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Positive Patients - 1st Time Screened");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition a = getTotalPatientsWithPositiveResult();
+    CohortDefinition aa1 = getPatientsWithScreeningTestForCervicalCancer(true);
+
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch("AA1", EptsReportUtils.map(aa1, "startDate=${startDate},location=${location}"));
+
+    cd.setCompositionString("A AND NOT AA1");
+
+    return cd;
+  }
+
+  public CohortDefinition getPositivePatentsRescreenedAfterPreviousNegative() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Positive Patients With Rescreened After Previous Negative");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition a = getTotalPatientsWithPositiveResult();
+    CohortDefinition aa = getPatientsWithNegativeResultForScreeningTest(true);
+
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch("AA", EptsReportUtils.map(aa, "startDate=${startDate},location=${location}"));
+
+    cd.setCompositionString("A AND AA");
+    return cd;
+  }
+
+  public CohortDefinition getPositivePatientsWithPostTreatmentFollowUp() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Positive Patients With Post Treatment FollowUp");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition a = getTotalPatientsWithPositiveResult();
+    CohortDefinition postTratmentFollowUp = getPatientsWitPostTratmentFollowUp();
+
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "postTratmentFollowUp",
+        EptsReportUtils.map(postTratmentFollowUp, "startDate=${startDate},location=${location}"));
+
+    cd.setCompositionString("A AND postTratmentFollowUp");
+
+    return cd;
+  }
+
+  public CohortDefinition getPositivePatientsWhoRescreenedAfterPreviousPositive() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Positive Patients With Rescreened After Previous Positive");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition a = getTotalPatientsWithPositiveResult();
+    CohortDefinition firstTimeScreened = get1stTimeScreenedPatients();
+    CohortDefinition rescreenedAfterPreviousNegative = getPatentsRescreenedAfterPreviousNegative();
+    CohortDefinition postTreatmentFollowUp = getPatientsWithPostTreatmentFollowUp();
+
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "firstTimeScreened",
+        EptsReportUtils.map(
+            firstTimeScreened, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "rescreenedAfterPreviousNegative",
+        EptsReportUtils.map(
+            rescreenedAfterPreviousNegative,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "postTreatmentFollowUp",
+        EptsReportUtils.map(
+            postTreatmentFollowUp,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "A AND NOT (firstTimeScreened OR rescreenedAfterPreviousNegative OR postTreatmentFollowUp)");
+    return cd;
+  }
 }
