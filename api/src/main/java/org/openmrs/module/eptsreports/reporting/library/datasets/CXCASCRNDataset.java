@@ -86,8 +86,7 @@ public class CXCASCRNDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "FTSS",
             EptsReportUtils.map(
-                cxcascrnCohortQueries.get1stTimeScreened(
-                    CXCASCRNCohortQueries.CXCASCRNResult.SUSPECTED),
+                cxcascrnCohortQueries.get1stTimeScreenedPatientsWithSuspectedCancerResult(),
                 mappings));
     addRow(
         dsd,

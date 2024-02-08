@@ -327,6 +327,84 @@ public class CXCASCRNCohortQueries {
   }
 
   /**
+   * <b>SCRN_FR9</b> Numerator Disaggregation: Result
+   *
+   * <ul>
+   *   <li>Suspected Cancer
+   *       <ul>
+   *         <li>All screened patients (SCRN_FR4) who have been marked as Suspeita de Cancro on
+   *             Resultado VIA
+   *       </ul>
+   * </ul>
+   *
+   * <p><b>Note:</b> If there are discrepant results registered on the same (most recent) day, the
+   * system will consider the following hierarchy:
+   *
+   * <ul>
+   *   <li>Positive
+   *   <li>Suspected Cancer
+   *   <li>Negative
+   * </ul>
+   */
+  public CohortDefinition getPatientsWithSuspectedCancerResultForScreeningTest() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Disagregation - Patients with Suspected Cancer Result");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("28", hivMetadata.getRastreioDoCancroDoColoUterinoEncounterType().getEncounterTypeId());
+    map.put("2094", hivMetadata.getResultadoViaConcept().getConceptId());
+    map.put("664", hivMetadata.getNegative().getConceptId());
+    map.put("703", hivMetadata.getPositive().getConceptId());
+    map.put("2093", hivMetadata.getSuspectedCancerConcept().getConceptId());
+    map.put("165436", hivMetadata.getHumanPapillomavirusDna().getConceptId());
+
+    String query =
+        "SELECT patient_id "
+            + "FROM   (SELECT suspected.patient_id, "
+            + "               Max(suspected.last_suspected_result_date) AS suspected_result_Date "
+            + "        FROM   (SELECT p.patient_id, "
+            + "                       Max(e.encounter_datetime) AS last_suspected_result_date "
+            + "                FROM   patient p "
+            + "                           INNER JOIN encounter e "
+            + "                                      ON e.patient_id = p.patient_id "
+            + "                           INNER JOIN obs o "
+            + "                                      ON o.encounter_id = e.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                  AND e.voided = 0 "
+            + "                  AND o.voided = 0 "
+            + "                  AND e.encounter_type = ${28} "
+            + "                  AND o.concept_id = ${2094}  "
+            + "                  AND o.value_coded = ${2093} "
+            + "                  AND e.location_id = :location "
+            + "                  AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                GROUP  BY p.patient_id) AS suspected "
+            + "        GROUP  BY patient_id) max_suspected "
+            + "WHERE  NOT EXISTS (SELECT e.patient_id "
+            + "                   FROM   encounter e "
+            + "                              INNER JOIN obs o "
+            + "                                         ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  e.voided = 0 "
+            + "                     AND o.voided = 0 "
+            + "                     AND e.encounter_type = ${28} "
+            + "                     AND o.concept_id = ${2094} "
+            + "                     AND o.value_coded = ${703} "
+            + "                     AND e.location_id = :location "
+            + "                     AND max_suspected.patient_id = e.patient_id "
+            + "                     AND e.encounter_datetime >= "
+            + "                         max_suspected.suspected_result_date "
+            + "                     AND e.encounter_datetime BETWEEN :startDate AND :endDate)";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  /**
    *
    *
    * <ul>
@@ -481,6 +559,29 @@ public class CXCASCRNCohortQueries {
             negativeResult, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("firstTimeScreened AND negativeResult");
+    return cd;
+  }
+
+  public CohortDefinition get1stTimeScreenedPatientsWithSuspectedCancerResult() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("1st Time Screened");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition firstTimeScreened = get1stTimeScreenedPatients();
+    CohortDefinition suspectedResult = getPatientsWithSuspectedCancerResultForScreeningTest();
+
+    cd.addSearch(
+        "firstTimeScreened",
+        EptsReportUtils.map(
+            firstTimeScreened, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "suspectedResult",
+        EptsReportUtils.map(
+            suspectedResult, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("firstTimeScreened AND suspectedResult");
     return cd;
   }
 
