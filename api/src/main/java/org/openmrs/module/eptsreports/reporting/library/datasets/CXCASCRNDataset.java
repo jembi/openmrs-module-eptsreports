@@ -210,9 +210,7 @@ public class CXCASCRNDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "RAPP",
             EptsReportUtils.map(
-                cxcascrnCohortQueries.getRescreenedAfterPreviousPositive(
-                    CXCASCRNCohortQueries.CXCASCRNResult.ALL),
-                mappings));
+                cxcascrnCohortQueries.getPatientsWhoRescreenedAfterPreviousPositive(), mappings));
     dsd.addColumn(
         "RAPP",
         "Rescreened after previous positive",
