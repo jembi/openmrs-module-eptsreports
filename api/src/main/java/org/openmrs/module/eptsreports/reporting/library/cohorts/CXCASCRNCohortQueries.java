@@ -818,6 +818,135 @@ public class CXCASCRNCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>SCRN_FR9</b> Numerator Disaggregation: Result
+   *
+   * <ul>
+   *   <li>Negative
+   *       <ul>
+   *         <li>All screened patients (SCRN_FR4) who have been marked as VIA Negativo on Resultado
+   *             VIA OR have Resultado do Rastreio HPV-DNA marked as Negativo
+   *       </ul>
+   * </ul>
+   *
+   * <p><b>Note:</b> If there is more than one HPV result or VIA result registered during the
+   * reporting period, the system will consider the most recent result.<br>
+   * <br>
+   *
+   * <p><b>Note:</b> If there are discrepant results registered on the same (most recent) day, the
+   * system will consider the following hierarchy:
+   *
+   * <ul>
+   *   <li>Positive
+   *   <li>Suspected Cancer
+   *   <li>Negative
+   * </ul>
+   */
+  public CohortDefinition getPatientsWitPostTratmentFollowUp() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Disagregation - Post Treatment Follow Up");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("28", hivMetadata.getRastreioDoCancroDoColoUterinoEncounterType().getEncounterTypeId());
+    map.put("2094", hivMetadata.getResultadoViaConcept().getConceptId());
+    map.put("703", hivMetadata.getPositive().getConceptId());
+    map.put("1185", hivMetadata.getTreatmentConcept().getConceptId());
+    map.put("2149", hivMetadata.getViaResultOnTheReferenceConcept().getConceptId());
+    map.put("23974", hivMetadata.getCryotherapyConcept().getConceptId());
+    map.put("165439", hivMetadata.getTermoablationConcept().getConceptId());
+    map.put("23972", hivMetadata.getThermocoagulationConcept().getConceptId());
+    map.put("23970", hivMetadata.getLeepConcept().getConceptId());
+    map.put("23973", hivMetadata.getconizationConcept().getConceptId());
+
+    String query =
+        "SELECT final.patient_id "
+            + "FROM   (SELECT p.patient_id, "
+            + "               most_recent.recent_datetime AS recent_datetime "
+            + "        FROM   patient p "
+            + "                   INNER JOIN encounter e "
+            + "                              ON e.patient_id = p.patient_id "
+            + "                   INNER JOIN obs o "
+            + "                              ON o.encounter_id = e.encounter_id "
+            + "                   INNER JOIN (SELECT recent.patient_id, "
+            + "                                      Max(recent.x_datetime) AS recent_datetime "
+            + "                               FROM   (SELECT p.patient_id, "
+            + "                                              Max(e.encounter_datetime) AS "
+            + "                                                  x_datetime "
+            + "                                       FROM   patient p "
+            + "                                                  INNER JOIN encounter e "
+            + "                                                             ON e.patient_id = p.patient_id "
+            + "                                                  INNER JOIN obs o "
+            + "                                                             ON o.encounter_id = "
+            + "                                                                e.encounter_id "
+            + "                                       WHERE  p.voided = 0 "
+            + "                                         AND e.voided = 0 "
+            + "                                         AND o.voided = 0 "
+            + "                                         AND e.encounter_datetime < :startDate "
+            + "                                         AND e.location_id = :location "
+            + "                                         AND e.encounter_type = ${28} "
+            + "                                         AND o.concept_id = ${2094} "
+            + "                                         AND o.value_coded IS NOT NULL "
+            + "                                       GROUP  BY p.patient_id) AS recent "
+            + "                               GROUP  BY recent.patient_id) AS most_recent "
+            + "                              ON most_recent.patient_id = p.patient_id "
+            + "        WHERE  p.voided = 0 "
+            + "          AND e.voided = 0 "
+            + "          AND o.voided = 0 "
+            + "          AND (( e.encounter_type = ${28}  "
+            + "            AND e.encounter_datetime = most_recent.recent_datetime )) "
+            + "          AND e.location_id = :location "
+            + "          AND o.concept_id = ${2094} "
+            + "          AND o.value_coded = ${703} "
+            + "        GROUP  BY p.patient_id) final "
+            + "           INNER JOIN encounter e "
+            + "                      ON e.patient_id = final.patient_id "
+            + "           INNER JOIN obs o1 "
+            + "                      ON o1.encounter_id = e.encounter_id "
+            + "           INNER JOIN obs o2 "
+            + "                      ON o2.encounter_id = e.encounter_id "
+            + "WHERE  e.voided = 0 "
+            + "  AND o1.voided = 0 "
+            + "  AND o2.voided = 0 "
+            + "  AND e.encounter_type = ${28} "
+            + "  AND e.location_id = :location "
+            + "  AND ( ( o1.concept_id = ${1185} "
+            + "    AND o1.value_coded IN ( ${23974}, ${165439} ) "
+            + "    AND o1.obs_datetime >= final.recent_datetime ) "
+            + "    OR ( o2.concept_id = ${2149} "
+            + "        AND o2.value_coded IN ( ${23974}, ${23972}, ${23970}, ${23973} ) "
+            + "        AND o2.obs_datetime >= final.recent_datetime ) ) ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWithPostTreatmentFollowUp() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Post Treatment FollowUp");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition a = getTotal();
+    CohortDefinition postTratmentFollowUp = getPatientsWitPostTratmentFollowUp();
+
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "postTratmentFollowUp",
+        EptsReportUtils.map(postTratmentFollowUp, "startDate=${startDate},location=${location}"));
+
+    cd.setCompositionString("A AND postTratmentFollowUp");
+
+    return cd;
+  }
+
   public CohortDefinition getRescreenedAfterPreviousPositive(CXCASCRNResult cxcascrnResult) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Rescreened After Previous Positive");

@@ -5866,4 +5866,36 @@ public class HivMetadata extends ProgramsMetadata {
             .getGlobalProperty("eptsreports.humanPapillomavirusDnaConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>enconter_type_id = 1185</b>
+   *
+   * <p><b>Name:</b> Treatment
+   *
+   * <p><b>Description:Administration or application of remedies to a patient or for a disease or an
+   * injury; medicinal or surgical management; therapy.</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getTreatmentConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.treatmentConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>enconter_type_id = 165439</b>
+   *
+   * <p><b>Name:</b> Termoablation
+   *
+   * <p><b>THERMOABLATION</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getTermoablationConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.termoablationConceptUuid");
+    return getConcept(uuid);
+  }
 }

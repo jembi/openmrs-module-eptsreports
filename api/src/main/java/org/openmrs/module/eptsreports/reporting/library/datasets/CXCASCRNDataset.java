@@ -155,9 +155,7 @@ public class CXCASCRNDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "PTFU",
             EptsReportUtils.map(
-                cxcascrnCohortQueries.getPostTreatmentFollowUp(
-                    CXCASCRNCohortQueries.CXCASCRNResult.ALL),
-                mappings));
+                cxcascrnCohortQueries.getPatientsWithPostTreatmentFollowUp(), mappings));
     dsd.addColumn(
         "PTFU",
         "Post-Treatment follow-up",
