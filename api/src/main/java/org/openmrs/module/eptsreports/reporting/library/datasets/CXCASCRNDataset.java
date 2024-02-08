@@ -71,9 +71,7 @@ public class CXCASCRNDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "FTSP",
             EptsReportUtils.map(
-                cxcascrnCohortQueries.get1stTimeScreened(
-                    CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE),
-                mappings));
+                cxcascrnCohortQueries.get1stTimeScreenedPatientsWithPositiveResult(), mappings));
     addRow(
         dsd,
         "FTSP",

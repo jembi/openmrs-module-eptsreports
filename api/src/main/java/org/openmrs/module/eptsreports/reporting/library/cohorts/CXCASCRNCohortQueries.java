@@ -405,6 +405,55 @@ public class CXCASCRNCohortQueries {
   }
 
   /**
+   * <b>SCRN_FR9</b> Numerator Disaggregation: Result
+   *
+   * <ul>
+   *   <li>Positive (CXCA_SCRN_POS – SCRN_FR11)
+   *       <ul>
+   *         <li>All screened patients (SCRN_FR4) who have been marked as VIA Positivo on Resultado
+   *             VIA
+   *       </ul>
+   * </ul>
+   */
+  public CohortDefinition getPatientsWithPositiveResultForScreeningTest() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Disagregation - Patients with Positive Result For Screening Test");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("28", hivMetadata.getRastreioDoCancroDoColoUterinoEncounterType().getEncounterTypeId());
+    map.put("2094", hivMetadata.getResultadoViaConcept().getConceptId());
+    map.put("703", hivMetadata.getPositive().getConceptId());
+
+    String query =
+        "SELECT positivo.patient_id "
+            + "        FROM   (SELECT p.patient_id, "
+            + "                       Max(e.encounter_datetime) AS last_positivo_result_date "
+            + "                FROM   patient p "
+            + "                           INNER JOIN encounter e "
+            + "                                      ON e.patient_id = p.patient_id "
+            + "                           INNER JOIN obs o "
+            + "                                      ON o.encounter_id = e.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                  AND e.voided = 0 "
+            + "                  AND o.voided = 0 "
+            + "                  AND e.encounter_type = ${28} "
+            + "                  AND o.concept_id = ${2094}  "
+            + "                  AND o.value_coded = ${703} "
+            + "                  AND e.location_id = :location "
+            + "                  AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                GROUP  BY p.patient_id) positivo ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  /**
    *
    *
    * <ul>
@@ -539,9 +588,32 @@ public class CXCASCRNCohortQueries {
     return cd;
   }
 
+  public CohortDefinition get1stTimeScreenedPatientsWithPositiveResult() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("1st Time Screened With Positive Result");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition firstTimeScreened = get1stTimeScreenedPatients();
+    CohortDefinition positiveResult = getPatientsWithPositiveResultForScreeningTest();
+
+    cd.addSearch(
+        "firstTimeScreened",
+        EptsReportUtils.map(
+            firstTimeScreened, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "positiveResult",
+        EptsReportUtils.map(
+            positiveResult, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("firstTimeScreened AND positiveResult");
+    return cd;
+  }
+
   public CohortDefinition get1stTimeScreenedPatientsWithNegativeResult() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("1st Time Screened");
+    cd.setName("1st Time Screened With Negative Result");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -564,7 +636,7 @@ public class CXCASCRNCohortQueries {
 
   public CohortDefinition get1stTimeScreenedPatientsWithSuspectedCancerResult() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("1st Time Screened");
+    cd.setName("1st Time Screened With Suspected Cancer Result");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
