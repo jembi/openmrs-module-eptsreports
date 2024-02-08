@@ -20,7 +20,6 @@ public class MaxBuilder {
     stringBuilder.append(columnsNames.get(0));
     stringBuilder.append(",MAX( ");
     stringBuilder.append(columnsNames.get(1));
-    //    stringBuilder.append(" ) FROM ( ");
     stringBuilder.append(" ) AS first_date FROM ( ");
     stringBuilder.append(query);
     stringBuilder.append(" ) most_recent ");
