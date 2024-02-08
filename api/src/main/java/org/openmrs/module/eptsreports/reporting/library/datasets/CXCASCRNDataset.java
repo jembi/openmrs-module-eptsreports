@@ -167,8 +167,7 @@ public class CXCASCRNDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "PTFUN",
             EptsReportUtils.map(
-                cxcascrnCohortQueries.getPostTreatmentFollowUp(
-                    CXCASCRNCohortQueries.CXCASCRNResult.NEGATIVE),
+                cxcascrnCohortQueries.getPatientsWithPostTreatmentFollowUpWithNegativeResult(),
                 mappings));
     addRow(
         dsd,
@@ -182,8 +181,7 @@ public class CXCASCRNDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "PTFUP",
             EptsReportUtils.map(
-                cxcascrnCohortQueries.getPostTreatmentFollowUp(
-                    CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE),
+                cxcascrnCohortQueries.getPatientsWithPostTreatmentFollowUpAndHavePositiveResult(),
                 mappings));
     addRow(
         dsd,
@@ -197,8 +195,8 @@ public class CXCASCRNDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "PTFUS",
             EptsReportUtils.map(
-                cxcascrnCohortQueries.getPostTreatmentFollowUp(
-                    CXCASCRNCohortQueries.CXCASCRNResult.SUSPECTED),
+                cxcascrnCohortQueries
+                    .getPatientsWithPostTreatmentFollowUpWithSuspectedCancerResult(),
                 mappings));
     addRow(
         dsd,

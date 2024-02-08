@@ -947,6 +947,82 @@ public class CXCASCRNCohortQueries {
     return cd;
   }
 
+  public CohortDefinition getPatientsWithPostTreatmentFollowUpAndHavePositiveResult() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Post Treatment FollowUp With Positive Result");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition postTreatmentFollowUp = getPatientsWithPostTreatmentFollowUp();
+    CohortDefinition positiveResult = getPatientsWithPositiveResultForScreeningTest();
+
+    cd.addSearch(
+        "postTreatmentFollowUp",
+        EptsReportUtils.map(
+            postTreatmentFollowUp,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "positiveResult",
+        EptsReportUtils.map(
+            positiveResult, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("postTreatmentFollowUp AND positiveResult");
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWithPostTreatmentFollowUpWithNegativeResult() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Post Treatment FollowUp With Negative Result");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition postTreatmentFollowUp = getPatientsWithPostTreatmentFollowUp();
+    CohortDefinition negativeResult = getPatientsWithNegativeResultForScreeningTest(false);
+
+    cd.addSearch(
+        "postTreatmentFollowUp",
+        EptsReportUtils.map(
+            postTreatmentFollowUp,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "negativeResult",
+        EptsReportUtils.map(
+            negativeResult, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("postTreatmentFollowUp AND negativeResult");
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWithPostTreatmentFollowUpWithSuspectedCancerResult() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Post Treatment FollowUp With Suspected Cancer Result");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition postTreatmentFollowUp = getPatientsWithPostTreatmentFollowUp();
+    CohortDefinition suspectedCancerResult = getPatientsWithSuspectedCancerResultForScreeningTest();
+
+    cd.addSearch(
+        "postTreatmentFollowUp",
+        EptsReportUtils.map(
+            postTreatmentFollowUp,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "suspectedCancerResult",
+        EptsReportUtils.map(
+            suspectedCancerResult,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("postTreatmentFollowUp AND suspectedCancerResult");
+
+    return cd;
+  }
+
   public CohortDefinition getRescreenedAfterPreviousPositive(CXCASCRNResult cxcascrnResult) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Rescreened After Previous Positive");
