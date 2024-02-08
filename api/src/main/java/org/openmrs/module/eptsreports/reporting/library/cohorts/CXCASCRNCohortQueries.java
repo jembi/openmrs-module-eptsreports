@@ -268,7 +268,7 @@ public class CXCASCRNCohortQueries {
    *   <li>Negative
    * </ul>
    */
-  public CohortDefinition getPatientsWithNegativeResultForScreeningTest() {
+  public CohortDefinition getPatientsWithNegativeResultForScreeningTest(boolean beforeStartDate) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Disagregation - Patients with Negative Screening Result");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -301,8 +301,14 @@ public class CXCASCRNCohortQueries {
             + "                  AND o.concept_id IN ( ${2094}, ${165436} ) "
             + "                  AND o.value_coded = ${664} "
             + "                  AND e.location_id = :location "
-            + "                  AND e.encounter_datetime BETWEEN :startDate AND :endDate "
-            + "                GROUP  BY p.patient_id) AS negative "
+            + "                  AND e.encounter_datetime ";
+    if (beforeStartDate) {
+      query += (" < :startDate ");
+    } else {
+      query += ("  BETWEEN :startDate AND  :endDate ");
+    }
+    query +=
+        "                GROUP  BY p.patient_id) AS negative "
             + "        GROUP  BY patient_id) max_negative "
             + "WHERE  NOT EXISTS (SELECT e.patient_id "
             + "                   FROM   encounter e "
@@ -317,7 +323,12 @@ public class CXCASCRNCohortQueries {
             + "                     AND max_negative.patient_id = e.patient_id "
             + "                     AND e.encounter_datetime >= "
             + "                         max_negative.negative_result_date "
-            + "                     AND e.encounter_datetime BETWEEN :startDate AND :endDate)";
+            + "                     AND e.encounter_datetime ";
+    if (beforeStartDate) {
+      query += (" < :startDate ) ");
+    } else {
+      query += ("  BETWEEN :startDate AND  :endDate )");
+    }
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -619,7 +630,7 @@ public class CXCASCRNCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition firstTimeScreened = get1stTimeScreenedPatients();
-    CohortDefinition negativeResult = getPatientsWithNegativeResultForScreeningTest();
+    CohortDefinition negativeResult = getPatientsWithNegativeResultForScreeningTest(false);
 
     cd.addSearch(
         "firstTimeScreened",
@@ -678,6 +689,25 @@ public class CXCASCRNCohortQueries {
     cd.addSearch("AA3", EptsReportUtils.map(aa3, "onOrAfter=${startDate},location=${location}"));
 
     cd.setCompositionString("A AND AA AND AA3");
+    return cd;
+  }
+
+  public CohortDefinition getPatentsRescreenedAfterPreviousNegative() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Rescreened After Previous Negative");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition a = getTotal();
+    CohortDefinition aa = getPatientsWithNegativeResultForScreeningTest(true);
+
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch("AA", EptsReportUtils.map(aa, "startDate=${startDate},location=${location}"));
+
+    cd.setCompositionString("A AND AA");
     return cd;
   }
 
