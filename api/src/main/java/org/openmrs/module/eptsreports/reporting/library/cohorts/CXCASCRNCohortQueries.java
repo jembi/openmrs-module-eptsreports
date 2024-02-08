@@ -180,6 +180,153 @@ public class CXCASCRNCohortQueries {
   }
 
   /**
+   * <b>SCRN_FR4</b> Patient with a screening test for Cervical cancer
+   *
+   * <p>The system will identify female patients who received at least one screening test for
+   * cervical cancer during the reporting period as follows:
+   *
+   * <ul>
+   *   <li>Have Resultado VIA with Positivo, Negativo or Suspeita de Cancro result marked on Ficha
+   *       de Registo Individual: Rastreio dos Cancros do Colo do UteroÚtero e da Mama during the
+   *       reporting period or
+   *   <li>Have Resultado do Rastreio HPV-DNA Negativo marked on Ficha de Registo Individual:
+   *       Rastreio dos Cancros do Colo do Útero e da Mama during the reporting period.
+   * </ul>
+   *
+   * <p><b>Note:</b> Patients with registration of tTreatment during the reporting period, but
+   * without VIA Result during the reporting period will not be included in CXCA_SCRN numerator.
+   */
+  public CohortDefinition getPatientsWithScreeningTestForCervicalCancer(boolean beforeStartDate) {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients with Screening Result for Cervical Cancer");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("28", hivMetadata.getRastreioDoCancroDoColoUterinoEncounterType().getEncounterTypeId());
+    map.put("2094", hivMetadata.getResultadoViaConcept().getConceptId());
+    map.put("664", hivMetadata.getNegative().getConceptId());
+    map.put("703", hivMetadata.getPositive().getConceptId());
+    map.put("2093", hivMetadata.getSuspectedCancerConcept().getConceptId());
+    map.put("165436", hivMetadata.getHumanPapillomavirusDna().getConceptId());
+
+    String query =
+        " SELECT     p.patient_id "
+            + "      FROM       patient p "
+            + "                     INNER JOIN encounter e "
+            + "                                ON         e.patient_id = p.patient_id "
+            + "                     INNER JOIN obs o "
+            + "                                ON         o.encounter_id = e.encounter_id "
+            + "                     INNER JOIN obs o2 "
+            + "                                ON         o2.encounter_id = e.encounter_id "
+            + "      WHERE      p.voided = 0 "
+            + "        AND        e.voided = 0 "
+            + "        AND        o.voided = 0 "
+            + "        AND        o2.voided = 0 "
+            + "        AND        e.encounter_type = ${28} "
+            + "        AND        ( ( o.concept_id = ${2094} "
+            + "        AND            o.value_coded IN (${2093}, ${664}, ${703}) ) "
+            + "         OR          (  o2.concept_id = ${165436} "
+            + "        AND             o2.value_coded = ${664} ) )  "
+            + "        AND        e.location_id = :location "
+            + "        AND        e.encounter_datetime  ";
+    if (beforeStartDate) {
+      query += (" < :startDate ");
+    } else {
+      query += ("  BETWEEN :startDate AND  :endDate ");
+    }
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * <b>SCRN_FR9</b> Numerator Disaggregation: Result
+   *
+   * <ul>
+   *   <li>Negative
+   *       <ul>
+   *         <li>All screened patients (SCRN_FR4) who have been marked as VIA Negativo on Resultado
+   *             VIA OR have Resultado do Rastreio HPV-DNA marked as Negativo
+   *       </ul>
+   * </ul>
+   *
+   * <p><b>Note:</b> If there is more than one HPV result or VIA result registered during the
+   * reporting period, the system will consider the most recent result.<br>
+   * <br>
+   *
+   * <p><b>Note:</b> If there are discrepant results registered on the same (most recent) day, the
+   * system will consider the following hierarchy:
+   *
+   * <ul>
+   *   <li>Positive
+   *   <li>Suspected Cancer
+   *   <li>Negative
+   * </ul>
+   */
+  public CohortDefinition getPatientsWithNegativeResultForScreeningTest() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Disagregation - Patients with Negative Screening Result");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("28", hivMetadata.getRastreioDoCancroDoColoUterinoEncounterType().getEncounterTypeId());
+    map.put("2094", hivMetadata.getResultadoViaConcept().getConceptId());
+    map.put("664", hivMetadata.getNegative().getConceptId());
+    map.put("703", hivMetadata.getPositive().getConceptId());
+    map.put("2093", hivMetadata.getSuspectedCancerConcept().getConceptId());
+    map.put("165436", hivMetadata.getHumanPapillomavirusDna().getConceptId());
+
+    String query =
+        "SELECT patient_id "
+            + "FROM   (SELECT negative.patient_id, "
+            + "               Max(negative.last_negative_result_date) AS negative_result_Date "
+            + "        FROM   (SELECT p.patient_id, "
+            + "                       Max(e.encounter_datetime) AS last_negative_result_date "
+            + "                FROM   patient p "
+            + "                           INNER JOIN encounter e "
+            + "                                      ON e.patient_id = p.patient_id "
+            + "                           INNER JOIN obs o "
+            + "                                      ON o.encounter_id = e.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                  AND e.voided = 0 "
+            + "                  AND o.voided = 0 "
+            + "                  AND e.encounter_type = ${28} "
+            + "                  AND o.concept_id IN ( ${2094}, ${165436} ) "
+            + "                  AND o.value_coded = ${664} "
+            + "                  AND e.location_id = :location "
+            + "                  AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                GROUP  BY p.patient_id) AS negative "
+            + "        GROUP  BY patient_id) max_negative "
+            + "WHERE  NOT EXISTS (SELECT e.patient_id "
+            + "                   FROM   encounter e "
+            + "                              INNER JOIN obs o "
+            + "                                         ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  e.voided = 0 "
+            + "                     AND o.voided = 0 "
+            + "                     AND e.encounter_type = ${28} "
+            + "                     AND o.concept_id = ${2094} "
+            + "                     AND o.value_coded IN ( ${703}, ${2093} ) "
+            + "                     AND e.location_id = :location "
+            + "                     AND max_negative.patient_id = e.patient_id "
+            + "                     AND e.encounter_datetime >= "
+            + "                         max_negative.negative_result_date "
+            + "                     AND e.encounter_datetime BETWEEN :startDate AND :endDate)";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  /**
    *
    *
    * <ul>
@@ -292,6 +439,48 @@ public class CXCASCRNCohortQueries {
     cd.addSearch("AA1", EptsReportUtils.map(aa1, "startDate=${startDate},location=${location}"));
 
     cd.setCompositionString("(A AND AA) AND NOT AA1");
+    return cd;
+  }
+
+  public CohortDefinition get1stTimeScreenedPatients() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("1st Time Screened");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition a = getTotal();
+    CohortDefinition aa1 = getPatientsWithScreeningTestForCervicalCancer(true);
+
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch("AA1", EptsReportUtils.map(aa1, "startDate=${startDate},location=${location}"));
+
+    cd.setCompositionString("A AND NOT AA1");
+    return cd;
+  }
+
+  public CohortDefinition get1stTimeScreenedPatientsWithNegativeResult() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("1st Time Screened");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition firstTimeScreened = get1stTimeScreenedPatients();
+    CohortDefinition negativeResult = getPatientsWithNegativeResultForScreeningTest();
+
+    cd.addSearch(
+        "firstTimeScreened",
+        EptsReportUtils.map(
+            firstTimeScreened, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "negativeResult",
+        EptsReportUtils.map(
+            negativeResult, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("firstTimeScreened AND negativeResult");
     return cd;
   }
 
@@ -421,6 +610,29 @@ public class CXCASCRNCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition aa = getPatientsWithScreeningTestForCervicalCancer(cxcascrnResult, false);
+
+    CohortDefinition a = this.getA();
+
+    cd.addSearch("A", EptsReportUtils.map(a, "endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "AA",
+        EptsReportUtils.map(aa, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("A AND AA");
+
+    return cd;
+  }
+
+  public CohortDefinition getTotal() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Total of CXCA SCRN");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition aa = getPatientsWithScreeningTestForCervicalCancer(false);
 
     CohortDefinition a = this.getA();
 

@@ -42,10 +42,7 @@ public class CXCASCRNDataset extends BaseDataSet {
     /** Total */
     CohortIndicator total =
         eptsGeneralIndicator.getIndicator(
-            "TOTAL",
-            EptsReportUtils.map(
-                cxcascrnCohortQueries.getTotal(CXCASCRNCohortQueries.CXCASCRNResult.ALL),
-                mappings));
+            "TOTAL", EptsReportUtils.map(cxcascrnCohortQueries.getTotal(), mappings));
 
     dsd.addColumn("TOTAL", "Total Screeeing", EptsReportUtils.map(total, mappings), "");
 
@@ -53,9 +50,7 @@ public class CXCASCRNDataset extends BaseDataSet {
     CohortIndicator f1rstTimeScreened =
         eptsGeneralIndicator.getIndicator(
             "FTS",
-            EptsReportUtils.map(
-                cxcascrnCohortQueries.get1stTimeScreened(CXCASCRNCohortQueries.CXCASCRNResult.ALL),
-                mappings));
+            EptsReportUtils.map(cxcascrnCohortQueries.get1stTimeScreenedPatients(), mappings));
     dsd.addColumn("FTS", "1st Time Screened", EptsReportUtils.map(f1rstTimeScreened, mappings), "");
 
     // 1st Time Screened (NEGATIVE) - FTSN
@@ -63,9 +58,7 @@ public class CXCASCRNDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "FTSN",
             EptsReportUtils.map(
-                cxcascrnCohortQueries.get1stTimeScreened(
-                    CXCASCRNCohortQueries.CXCASCRNResult.NEGATIVE),
-                mappings));
+                cxcascrnCohortQueries.get1stTimeScreenedPatientsWithNegativeResult(), mappings));
     addRow(
         dsd,
         "FTSN",
