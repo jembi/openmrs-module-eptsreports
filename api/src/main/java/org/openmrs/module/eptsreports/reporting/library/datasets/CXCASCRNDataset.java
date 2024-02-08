@@ -110,8 +110,8 @@ public class CXCASCRNDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "RAPNN",
             EptsReportUtils.map(
-                cxcascrnCohortQueries.getRescreenedAfterPreviousNegative(
-                    CXCASCRNCohortQueries.CXCASCRNResult.NEGATIVE),
+                cxcascrnCohortQueries
+                    .getPatientsRescreenedAfterPreviousNegativeWithNegativeResutOnReportingPeriod(),
                 mappings));
     addRow(
         dsd,
@@ -125,8 +125,8 @@ public class CXCASCRNDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "RAPNP",
             EptsReportUtils.map(
-                cxcascrnCohortQueries.getRescreenedAfterPreviousNegative(
-                    CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE),
+                cxcascrnCohortQueries
+                    .getPatientsRescreenedAfterPreviousNegativeWithPositiveResutOnReportingPeriod(),
                 mappings));
     addRow(
         dsd,
@@ -140,8 +140,8 @@ public class CXCASCRNDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "RAPNS",
             EptsReportUtils.map(
-                cxcascrnCohortQueries.getRescreenedAfterPreviousNegative(
-                    CXCASCRNCohortQueries.CXCASCRNResult.SUSPECTED),
+                cxcascrnCohortQueries
+                    .getPatientsRescreenedAfterPreviousNegativeWithSuspectedCancerResutOnReportingPeriod(),
                 mappings));
     addRow(
         dsd,
