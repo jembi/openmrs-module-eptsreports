@@ -139,11 +139,7 @@ public class CXCASCRNCohortQueries {
       query.append("    AND o.value_coded IN (${2093}, ${664}, ${703}) ");
     }
     query.append("                          AND        e.encounter_datetime  ");
-    if (beforeStartDate) {
-      query.append(" < :startDate ");
-    } else {
-      query.append("  BETWEEN :startDate AND  :endDate ");
-    }
+    query.append(beforeStartDate ? " < :startDate " : "  BETWEEN :startDate AND  :endDate ");
     query.append(
         "                          AND        e.location_id = :location "
             + "                        GROUP BY   p.patient_id "
@@ -162,11 +158,7 @@ public class CXCASCRNCohortQueries {
             + "                          AND        o.concept_id = ${165436} "
             + "                          AND        o.value_coded = ${664} "
             + "                          AND        e.encounter_datetime ");
-    if (beforeStartDate) {
-      query.append(" < :startDate ");
-    } else {
-      query.append("  BETWEEN :startDate AND  :endDate ");
-    }
+    query.append(beforeStartDate ? " < :startDate " : "  BETWEEN :startDate AND  :endDate ");
     query.append(
         "                          AND        e.location_id = :location "
             + "                        GROUP BY   p.patient_id "
@@ -231,11 +223,7 @@ public class CXCASCRNCohortQueries {
             + "        AND             o2.value_coded = ${664} ) )  "
             + "        AND        e.location_id = :location "
             + "        AND        e.encounter_datetime  ";
-    if (beforeStartDate) {
-      query += (" < :startDate ");
-    } else {
-      query += ("  BETWEEN :startDate AND  :endDate ");
-    }
+    query += beforeStartDate ? " < :startDate " : "  BETWEEN :startDate AND  :endDate ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -302,11 +290,7 @@ public class CXCASCRNCohortQueries {
             + "                  AND o.value_coded = ${664} "
             + "                  AND e.location_id = :location "
             + "                  AND e.encounter_datetime ";
-    if (beforeStartDate) {
-      query += (" < :startDate ");
-    } else {
-      query += ("  BETWEEN :startDate AND  :endDate ");
-    }
+    query += beforeStartDate ? " < :startDate " : "  BETWEEN :startDate AND  :endDate ";
     query +=
         "                GROUP  BY p.patient_id) AS negative "
             + "        GROUP  BY patient_id) max_negative "
@@ -324,11 +308,7 @@ public class CXCASCRNCohortQueries {
             + "                     AND e.encounter_datetime >= "
             + "                         max_negative.negative_result_date "
             + "                     AND e.encounter_datetime ";
-    if (beforeStartDate) {
-      query += (" < :startDate ) ");
-    } else {
-      query += ("  BETWEEN :startDate AND  :endDate )");
-    }
+    query += beforeStartDate ? " < :startDate ) " : " <= :endDate ) ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -406,7 +386,7 @@ public class CXCASCRNCohortQueries {
             + "                     AND max_suspected.patient_id = e.patient_id "
             + "                     AND e.encounter_datetime >= "
             + "                         max_suspected.suspected_result_date "
-            + "                     AND e.encounter_datetime BETWEEN :startDate AND :endDate)";
+            + "                     AND e.encounter_datetime <= :endDate)";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
