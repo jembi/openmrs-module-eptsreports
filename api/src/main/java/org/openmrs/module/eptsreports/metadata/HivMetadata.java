@@ -5860,7 +5860,7 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * @return {@link Concept}
    */
-  public Concept getHumanPapillomavirusDna() {
+  public Concept getHumanPapillomavirusDnaConcept() {
     String uuid =
         Context.getAdministrationService()
             .getGlobalProperty("eptsreports.humanPapillomavirusDnaConceptUuid");

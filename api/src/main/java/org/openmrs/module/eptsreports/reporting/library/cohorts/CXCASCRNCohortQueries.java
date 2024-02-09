@@ -108,7 +108,7 @@ public class CXCASCRNCohortQueries {
     map.put("664", hivMetadata.getNegative().getConceptId());
     map.put("703", hivMetadata.getPositive().getConceptId());
     map.put("2093", hivMetadata.getSuspectedCancerConcept().getConceptId());
-    map.put("165436", hivMetadata.getHumanPapillomavirusDna().getConceptId());
+    map.put("165436", hivMetadata.getHumanPapillomavirusDnaConcept().getConceptId());
 
     StringBuilder query =
         new StringBuilder(
@@ -201,7 +201,7 @@ public class CXCASCRNCohortQueries {
     map.put("664", hivMetadata.getNegative().getConceptId());
     map.put("703", hivMetadata.getPositive().getConceptId());
     map.put("2093", hivMetadata.getSuspectedCancerConcept().getConceptId());
-    map.put("165436", hivMetadata.getHumanPapillomavirusDna().getConceptId());
+    map.put("165436", hivMetadata.getHumanPapillomavirusDnaConcept().getConceptId());
 
     String query =
         " SELECT     p.patient_id "
@@ -269,14 +269,14 @@ public class CXCASCRNCohortQueries {
     map.put("664", hivMetadata.getNegative().getConceptId());
     map.put("703", hivMetadata.getPositive().getConceptId());
     map.put("2093", hivMetadata.getSuspectedCancerConcept().getConceptId());
-    map.put("165436", hivMetadata.getHumanPapillomavirusDna().getConceptId());
+    map.put("165436", hivMetadata.getHumanPapillomavirusDnaConcept().getConceptId());
 
     String query =
         "SELECT patient_id "
             + "FROM   (SELECT negative.patient_id, "
-            + "               Max(negative.last_negative_result_date) AS negative_result_Date "
+            + "               Max(negative.negative_result_date) AS last_negative_result_Date "
             + "        FROM   (SELECT p.patient_id, "
-            + "                       Max(e.encounter_datetime) AS last_negative_result_date "
+            + "                       e.encounter_datetime AS negative_result_date "
             + "                FROM   patient p "
             + "                           INNER JOIN encounter e "
             + "                                      ON e.patient_id = p.patient_id "
@@ -306,7 +306,7 @@ public class CXCASCRNCohortQueries {
             + "                     AND e.location_id = :location "
             + "                     AND max_negative.patient_id = e.patient_id "
             + "                     AND e.encounter_datetime >= "
-            + "                         max_negative.negative_result_date "
+            + "                         max_negative.last_negative_result_Date "
             + "                     AND e.encounter_datetime ";
     query += beforeStartDate ? " < :startDate ) " : " <= :endDate ) ";
 
@@ -350,14 +350,14 @@ public class CXCASCRNCohortQueries {
     map.put("664", hivMetadata.getNegative().getConceptId());
     map.put("703", hivMetadata.getPositive().getConceptId());
     map.put("2093", hivMetadata.getSuspectedCancerConcept().getConceptId());
-    map.put("165436", hivMetadata.getHumanPapillomavirusDna().getConceptId());
+    map.put("165436", hivMetadata.getHumanPapillomavirusDnaConcept().getConceptId());
 
     String query =
         "SELECT patient_id "
             + "FROM   (SELECT suspected.patient_id, "
-            + "               Max(suspected.last_suspected_result_date) AS suspected_result_Date "
+            + "               Max(suspected.suspected_result_date) AS last_suspected_result_Date "
             + "        FROM   (SELECT p.patient_id, "
-            + "                       Max(e.encounter_datetime) AS last_suspected_result_date "
+            + "                       e.encounter_datetime AS suspected_result_date "
             + "                FROM   patient p "
             + "                           INNER JOIN encounter e "
             + "                                      ON e.patient_id = p.patient_id "
@@ -385,7 +385,7 @@ public class CXCASCRNCohortQueries {
             + "                     AND e.location_id = :location "
             + "                     AND max_suspected.patient_id = e.patient_id "
             + "                     AND e.encounter_datetime >= "
-            + "                         max_suspected.suspected_result_date "
+            + "                         max_suspected.last_suspected_result_Date "
             + "                     AND e.encounter_datetime <= :endDate)";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -799,27 +799,23 @@ public class CXCASCRNCohortQueries {
   }
 
   /**
-   * <b>SCRN_FR9</b> Numerator Disaggregation: Result
+   * <b>SCRN_FR7</b> Post-Treatment follow-up
+   *
+   * <p>The system will identify patients who are Post-Treatment follow-up as follows:
    *
    * <ul>
-   *   <li>Negative
+   *   <li>All screened patients (SCRN_FR4) who have the last Resultado VIA registered and marked as
+   *       Positive (use the criteria defined on SCRN_FR9) before the reporting period start date
+   *       AND
+   *   <li>With one of the following variables registered on the Ficha de Registo Individual:
+   *       Rastreio dos Cancros do Colo do Utero e da Mama between the last Resultado VIA (marked as
+   *       Positive) before reporting period start date and before the tmost recent VIA screening
+   *       (SCRN_FR4) during the reporting period :
    *       <ul>
-   *         <li>All screened patients (SCRN_FR4) who have been marked as VIA Negativo on Resultado
-   *             VIA OR have Resultado do Rastreio HPV-DNA marked as Negativo
+   *         <li>Tratamento Feito = Crioterapia or Termoablação with Data do Tratamento
+   *         <li>Qual foi o tratamento/avaliação no HdR = Crioterapia Feita or Termocoagulação Feita
+   *             or Leep or Conização Feita marked in a Ficha CCU registered
    *       </ul>
-   * </ul>
-   *
-   * <p><b>Note:</b> If there is more than one HPV result or VIA result registered during the
-   * reporting period, the system will consider the most recent result.<br>
-   * <br>
-   *
-   * <p><b>Note:</b> If there are discrepant results registered on the same (most recent) day, the
-   * system will consider the following hierarchy:
-   *
-   * <ul>
-   *   <li>Positive
-   *   <li>Suspected Cancer
-   *   <li>Negative
    * </ul>
    */
   public CohortDefinition getPatientsWitPostTratmentFollowUp() {
