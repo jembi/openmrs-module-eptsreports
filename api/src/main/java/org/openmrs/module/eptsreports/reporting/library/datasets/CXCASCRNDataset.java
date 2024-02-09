@@ -98,7 +98,7 @@ public class CXCASCRNDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "RAPN",
             EptsReportUtils.map(
-                cxcascrnCohortQueries.getPatentsRescreenedAfterPreviousNegative(), mappings));
+                cxcascrnCohortQueries.getPatientsRescreenedAfterPreviousNegative(), mappings));
     dsd.addColumn(
         "RAPN",
         "Rescreened after previous negative",

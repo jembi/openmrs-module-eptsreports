@@ -680,7 +680,7 @@ public class CXCASCRNCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition rescreenedAfterPreviousNegative = getPatentsRescreenedAfterPreviousNegative();
+    CohortDefinition rescreenedAfterPreviousNegative = getPatientsRescreenedAfterPreviousNegative();
     CohortDefinition positiveResult = getPatientsWithPositiveResultForScreeningTest();
 
     cd.addSearch(
@@ -706,7 +706,7 @@ public class CXCASCRNCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition rescreenedAfterPreviousNegative = getPatentsRescreenedAfterPreviousNegative();
+    CohortDefinition rescreenedAfterPreviousNegative = getPatientsRescreenedAfterPreviousNegative();
     CohortDefinition suspectedCancerResult = getPatientsWithSuspectedCancerResultForScreeningTest();
 
     cd.addSearch(
@@ -732,7 +732,7 @@ public class CXCASCRNCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition rescreenedAfterPreviousNegative = getPatentsRescreenedAfterPreviousNegative();
+    CohortDefinition rescreenedAfterPreviousNegative = getPatientsRescreenedAfterPreviousNegative();
     CohortDefinition negativeResult = getPatientsWithNegativeResultForScreeningTest(false);
 
     cd.addSearch(
@@ -749,7 +749,7 @@ public class CXCASCRNCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getPatentsRescreenedAfterPreviousNegative() {
+  public CohortDefinition getPatientsRescreenedAfterPreviousNegative() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Rescreened After Previous Negative");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -828,6 +828,8 @@ public class CXCASCRNCohortQueries {
     map.put("28", hivMetadata.getRastreioDoCancroDoColoUterinoEncounterType().getEncounterTypeId());
     map.put("2094", hivMetadata.getResultadoViaConcept().getConceptId());
     map.put("703", hivMetadata.getPositive().getConceptId());
+    map.put("2093", hivMetadata.getSuspectedCancerConcept().getConceptId());
+    map.put("664", hivMetadata.getNegative().getConceptId());
     map.put("1185", hivMetadata.getTreatmentConcept().getConceptId());
     map.put("2149", hivMetadata.getViaResultOnTheReferenceConcept().getConceptId());
     map.put("23974", hivMetadata.getCryotherapyConcept().getConceptId());
@@ -863,7 +865,7 @@ public class CXCASCRNCohortQueries {
             + "                                         AND e.location_id = :location "
             + "                                         AND e.encounter_type = ${28} "
             + "                                         AND o.concept_id = ${2094} "
-            + "                                         AND o.value_coded IS NOT NULL "
+            + "                                         AND o.value_coded IN (${703}, ${2093}, ${664}) "
             + "                                       GROUP  BY p.patient_id) AS recent "
             + "                               GROUP  BY recent.patient_id) AS most_recent "
             + "                              ON most_recent.patient_id = p.patient_id "
@@ -1049,7 +1051,7 @@ public class CXCASCRNCohortQueries {
 
     CohortDefinition a = getTotal();
     CohortDefinition firstTimeScreened = get1stTimeScreenedPatients();
-    CohortDefinition rescreenedAfterPreviousNegative = getPatentsRescreenedAfterPreviousNegative();
+    CohortDefinition rescreenedAfterPreviousNegative = getPatientsRescreenedAfterPreviousNegative();
     CohortDefinition postTreatmentFollowUp = getPatientsWithPostTreatmentFollowUp();
 
     cd.addSearch(
@@ -1350,7 +1352,7 @@ public class CXCASCRNCohortQueries {
 
     CohortDefinition a = getTotalPatientsWithPositiveResult();
     CohortDefinition firstTimeScreened = get1stTimeScreenedPatients();
-    CohortDefinition rescreenedAfterPreviousNegative = getPatentsRescreenedAfterPreviousNegative();
+    CohortDefinition rescreenedAfterPreviousNegative = getPatientsRescreenedAfterPreviousNegative();
     CohortDefinition postTreatmentFollowUp = getPatientsWithPostTreatmentFollowUp();
 
     cd.addSearch(
