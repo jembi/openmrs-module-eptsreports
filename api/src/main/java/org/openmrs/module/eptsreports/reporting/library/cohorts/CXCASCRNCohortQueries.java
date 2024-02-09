@@ -115,7 +115,7 @@ public class CXCASCRNCohortQueries {
             "SELECT final.patient_id "
                 + "FROM   ( "
                 + "           SELECT   via_or_hpv.patient_id, "
-                + "                    Max(via_or_hpv.screening_date) AS last_screening_date "
+                + "                    via_or_hpv.screening_date AS the_screening_date "
                 + "           FROM     ( "
                 + "                        SELECT     p.patient_id, "
                 + "                                   Date(e.encounter_datetime) AS screening_date "
