@@ -35,8 +35,7 @@ public class IntensiveMonitoringCohortQueries {
 
   private GenericCohortQueries genericCohortQueries;
 
-  private final String MAPPING2 =
-      "revisionEndDate=${revisionEndDate},location=${location}";
+  private final String MAPPING2 = "revisionEndDate=${revisionEndDate},location=${location}";
 
   private final String MAPPING3 =
       "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}";
@@ -71,7 +70,7 @@ public class IntensiveMonitoringCohortQueries {
    * reporting period Section 7.1 (endDateRevision)
    *
    * @param den indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getCat7DenMI2021Part135Definition(Integer den) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -140,8 +139,6 @@ public class IntensiveMonitoringCohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transferOut = getTranferredOutPatientsForMI7();
-
     cd.addSearch(
         "A",
         EptsReportUtils.map(
@@ -184,16 +181,10 @@ public class IntensiveMonitoringCohortQueries {
             transferredIn,
             "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate},location=${location}"));
 
-    cd.addSearch(
-        "F",
-        EptsReportUtils.map(
-            transferOut,
-                MAPPING2));
-
     if (den == 1 || den == 3) {
-      cd.setCompositionString("A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
+      cd.setCompositionString("A AND NOT (B1 OR B2 OR B3 OR C OR D OR E)");
     } else if (den == 5) {
-      cd.setCompositionString("(A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
+      cd.setCompositionString("(A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E)");
     }
     return cd;
   }
@@ -203,7 +194,7 @@ public class IntensiveMonitoringCohortQueries {
    * reporting period Section 7.1 (endDateRevision)
    *
    * @param den indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getCat7DenMI2021Part246Definition(Integer den) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -267,11 +258,7 @@ public class IntensiveMonitoringCohortQueries {
             transferredIn,
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
 
-    cd.addSearch(
-        "transferredOut",
-        EptsReportUtils.map(
-            transferredOut,
-                MAPPING2));
+    cd.addSearch("transferredOut", EptsReportUtils.map(transferredOut, MAPPING2));
 
     if (den == 2 || den == 4) {
       cd.setCompositionString(
@@ -288,7 +275,7 @@ public class IntensiveMonitoringCohortQueries {
    * and reporting period Section 7 (endDateRevision)
    *
    * @param num indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getCat7NumMI2021Part135Definition(Integer num) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -360,8 +347,6 @@ public class IntensiveMonitoringCohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transferOut = getTranferredOutPatientsForMI7();
-
     CohortDefinition b41 = qualityImprovement2020CohortQueries.getB4And1();
 
     CohortDefinition b42 = qualityImprovement2020CohortQueries.getB4And2();
@@ -413,12 +398,6 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "F",
-        EptsReportUtils.map(
-            transferOut,
-                MAPPING2));
-
-    compositionCohortDefinition.addSearch(
         "B41",
         EptsReportUtils.map(
             b41,
@@ -456,10 +435,10 @@ public class IntensiveMonitoringCohortQueries {
 
     if (num == 1 || num == 3) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND  (B41 OR B42 OR B51 OR B52)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
+          "(A AND  (B41 OR B42 OR B51 OR B52)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E)");
     } else if (num == 5) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND C AND (B41 OR B42 OR B51 OR B52) ) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
+          "(A AND C AND (B41 OR B42 OR B51 OR B52) ) AND NOT (B1 OR B2 OR B3 OR D OR E)");
     }
     return compositionCohortDefinition;
   }
@@ -469,7 +448,7 @@ public class IntensiveMonitoringCohortQueries {
    * and reporting period Section 7 (endDateRevision)
    *
    * @param num indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getCat7NumMI2021Part246Definition(Integer num) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -532,10 +511,7 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "transferredOut",
-        EptsReportUtils.map(
-            transferOut,
-                MAPPING2));
+        "transferredOut", EptsReportUtils.map(transferOut, MAPPING2));
 
     compositionCohortDefinition.addSearch(
         "GNEW",
@@ -566,7 +542,7 @@ public class IntensiveMonitoringCohortQueries {
    *
    * @param level indicator number
    * @param type indicator
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMICat13Part2(Integer level, String type) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -623,7 +599,7 @@ public class IntensiveMonitoringCohortQueries {
    *
    * @param level indicator number
    * @param type indicator flag
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getCat13Den(Integer level, Boolean type) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -897,7 +873,7 @@ public class IntensiveMonitoringCohortQueries {
    * HIV-2021” for the selected location and reporting month (endDateRevision)
    *
    * @param indicatorFlag indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMIC11DEN(int indicatorFlag) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -933,7 +909,7 @@ public class IntensiveMonitoringCohortQueries {
    *
    * @param level indicator number
    * @param type indicator flag
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getCat12P1DenNum(Integer level, Boolean type) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -966,7 +942,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.2 Denominator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13DEN2(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -987,7 +963,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.2 Numerator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13NUM2(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1008,7 +984,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.5 Denominator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13DEN5(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1029,7 +1005,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.5 Numerator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13NUM5(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1050,7 +1026,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.9 Denominator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13DEN9(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1071,7 +1047,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.9 Numerator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13NUM9(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1092,7 +1068,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.10 Denominator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13DEN10(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1113,7 +1089,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.10 Numerator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13NUM10(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1134,7 +1110,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.11 Denominator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13DEN11(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1155,7 +1131,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.11 Numerator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13NUM11(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1176,7 +1152,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.14 Denominator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13DEN14(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1198,7 +1174,7 @@ public class IntensiveMonitoringCohortQueries {
    * HIV-2021” for the selected location and reporting month (endDateRevision)
    *
    * @param indicatorFlag indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMIC11NUM(int indicatorFlag) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1268,7 +1244,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.14 Numerator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13NUM14(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1291,7 +1267,7 @@ public class IntensiveMonitoringCohortQueries {
    *
    * @param level indicator number
    * @param type indicator flag
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMICat13Part4(Integer level, Boolean type) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1320,7 +1296,7 @@ public class IntensiveMonitoringCohortQueries {
    * occurred during the inclusion period (encounter_datetime>= startDateInclusion and <=
    * endDateInclusion
    *
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI15A() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -1499,7 +1475,7 @@ public class IntensiveMonitoringCohortQueries {
    * concept_id 1065) in Ficha Clínica (encounter type 6, encounter_datetime) occurred during the
    * following period (encounter_datetime >= startDate and <= endDate)
    *
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI15D() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
