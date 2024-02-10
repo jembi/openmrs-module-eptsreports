@@ -36,7 +36,7 @@ public class IntensiveMonitoringCohortQueries {
   private GenericCohortQueries genericCohortQueries;
 
   private final String MAPPING2 =
-      "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}";
+      "revisionEndDate=${revisionEndDate},location=${location}";
 
   private final String MAPPING3 =
       "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}";
@@ -140,7 +140,7 @@ public class IntensiveMonitoringCohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition transferOut = getTranferredOutPatientsForMI7();
 
     cd.addSearch(
         "A",
@@ -188,7 +188,7 @@ public class IntensiveMonitoringCohortQueries {
         "F",
         EptsReportUtils.map(
             transferOut,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                MAPPING2));
 
     if (den == 1 || den == 3) {
       cd.setCompositionString("A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
@@ -242,7 +242,7 @@ public class IntensiveMonitoringCohortQueries {
             hivMetadata.getArtStatus().getConceptId());
 
     // DEFINITIONS FROM RF7
-    CohortDefinition transferredOut = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition transferredOut = getTranferredOutPatientsForMI7();
 
     cd.addSearch(
         "rf20Inclusion",
@@ -271,7 +271,7 @@ public class IntensiveMonitoringCohortQueries {
         "transferredOut",
         EptsReportUtils.map(
             transferredOut,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                MAPPING2));
 
     if (den == 2 || den == 4) {
       cd.setCompositionString(
@@ -360,7 +360,7 @@ public class IntensiveMonitoringCohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition transferOut = getTranferredOutPatientsForMI7();
 
     CohortDefinition b41 = qualityImprovement2020CohortQueries.getB4And1();
 
@@ -416,7 +416,7 @@ public class IntensiveMonitoringCohortQueries {
         "F",
         EptsReportUtils.map(
             transferOut,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                MAPPING2));
 
     compositionCohortDefinition.addSearch(
         "B41",
@@ -506,7 +506,7 @@ public class IntensiveMonitoringCohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition transferOut = getTranferredOutPatientsForMI7();
 
     compositionCohortDefinition.addSearch(
         "rf20Inclusion",
@@ -535,7 +535,7 @@ public class IntensiveMonitoringCohortQueries {
         "transferredOut",
         EptsReportUtils.map(
             transferOut,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                MAPPING2));
 
     compositionCohortDefinition.addSearch(
         "GNEW",
@@ -3728,5 +3728,76 @@ public class IntensiveMonitoringCohortQueries {
     cd.setCompositionString("start3hpFichaClinica OR start3hpFichaResumo");
 
     return cd;
+  }
+
+  /**
+   * <b>Utentes Transferidos Para Outra US</b>
+   * <li>Último registo de [“Mudança Estado Permanência TARV” (Coluna 21) = “T” (Transferido Para)
+   *     na “Ficha Clínica” com “Data da Consulta Actual” (Coluna 1, durante a qual se fez o registo
+   *     da mudança do estado de permanência TARV) até a “Data Recolha de Dados” ou
+   * <li>Registados como “Mudança Estado Permanência TARV” = “Transferido Para”, último estado
+   *     registado na “Ficha Resumo” com “Data da Transferência” até a “Data Recolha de Dados”;
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getTranferredOutPatientsForMI7() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes Transferidos Para Outra US");
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+
+    String query =
+        " SELECT max_transferout.patient_id "
+            + "FROM   (SELECT transferout.patient_id, "
+            + "               Max(transferout.transferout_date) transferout_date "
+            + "        FROM   (SELECT p.patient_id, "
+            + "                       Max(e.encounter_datetime) AS transferout_date "
+            + "                FROM   patient p "
+            + "                       JOIN encounter e "
+            + "                         ON p.patient_id = e.patient_id "
+            + "                       JOIN obs o "
+            + "                         ON e.encounter_id = o.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND e.location_id = :location "
+            + "                       AND e.encounter_type = ${6} "
+            + "                       AND e.encounter_datetime <= :revisionEndDate "
+            + "                       AND o.voided = 0 "
+            + "                       AND o.concept_id = ${6273} "
+            + "                       AND o.value_coded = ${1706} "
+            + "                GROUP  BY p.patient_id "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       Max(o.obs_datetime) AS transferout_date "
+            + "                FROM   patient p "
+            + "                       JOIN encounter e "
+            + "                         ON p.patient_id = e.patient_id "
+            + "                       JOIN obs o "
+            + "                         ON e.encounter_id = o.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND e.location_id = :location "
+            + "                       AND e.encounter_type = ${53} "
+            + "                       AND o.obs_datetime <= :revisionEndDate "
+            + "                       AND o.voided = 0 "
+            + "                       AND o.concept_id = ${6272} "
+            + "                       AND o.value_coded = ${1706} "
+            + "                GROUP  BY p.patient_id) transferout "
+            + "        GROUP  BY transferout.patient_id) max_transferout ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
   }
 }
