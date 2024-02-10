@@ -14,6 +14,7 @@ import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
+import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -291,61 +292,16 @@ public class IntensiveMonitoringCohortQueries {
     compositionCohortDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
-    CohortDefinition startedART = qualityImprovement2020CohortQueries.getMOHArtStartDate();
+    CohortDefinition denominator = null;
 
-    CohortDefinition tbActive =
-        commonCohortQueries.getMohMQPatientsOnCondition(
-            false,
-            false,
-            "once",
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            hivMetadata.getActiveTBConcept(),
-            Collections.singletonList(hivMetadata.getYesConcept()),
-            null,
-            null);
-
-    CohortDefinition tbSymptoms =
-        commonCohortQueries.getMohMQPatientsOnCondition(
-            false,
-            false,
-            "once",
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            tbMetadata.getHasTbSymptomsConcept(),
-            Collections.singletonList(hivMetadata.getYesConcept()),
-            null,
-            null);
-
-    CohortDefinition tbTreatment =
-        commonCohortQueries.getMohMQPatientsOnCondition(
-            false,
-            false,
-            "once",
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            tbMetadata.getTBTreatmentPlanConcept(),
-            Arrays.asList(
-                tbMetadata.getStartDrugsConcept(),
-                hivMetadata.getContinueRegimenConcept(),
-                hivMetadata.getCompletedConcept()),
-            null,
-            null);
-
-    CohortDefinition pregnant =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getPregnantConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
-
-    CohortDefinition breastfeeding =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getBreastfeeding().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
-
-    CohortDefinition transferredIn =
-        QualityImprovement2020Queries.getTransferredInPatients(
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-            hivMetadata.getPatientFoundYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId());
+    // CONDITION TO CALL RESPECTIVE DENOMINATOR
+    if (num == 1) {
+      denominator = getCat7DenMI2021Part135Definition(1);
+    } else if (num == 3) {
+      denominator = getCat7DenMI2021Part135Definition(3);
+    } else if (num == 5) {
+      denominator = getCat7DenMI2021Part135Definition(5);
+    }
 
     CohortDefinition b41 = qualityImprovement2020CohortQueries.getB4And1();
 
@@ -354,48 +310,6 @@ public class IntensiveMonitoringCohortQueries {
     CohortDefinition b51 = qualityImprovement2020CohortQueries.getB5And1();
 
     CohortDefinition b52 = qualityImprovement2020CohortQueries.getB5And2();
-
-    compositionCohortDefinition.addSearch(
-        "A",
-        EptsReportUtils.map(
-            startedART,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "B1",
-        EptsReportUtils.map(
-            tbActive,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "B2",
-        EptsReportUtils.map(
-            tbSymptoms,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "B3",
-        EptsReportUtils.map(
-            tbTreatment,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "C",
-        EptsReportUtils.map(
-            pregnant,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "D",
-        EptsReportUtils.map(
-            breastfeeding,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "E",
-        EptsReportUtils.map(
-            transferredIn,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "B41",
@@ -421,25 +335,10 @@ public class IntensiveMonitoringCohortQueries {
             b52,
             "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
 
-    compositionCohortDefinition.addSearch(
-        "GNEW",
-        EptsReportUtils.map(
-            qualityImprovement2020CohortQueries.getGNew(),
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
+    compositionCohortDefinition.addSearch("DENOMINATOR", Mapped.mapStraightThrough(denominator));
 
-    compositionCohortDefinition.addSearch(
-        "L",
-        EptsReportUtils.map(
-            qualityImprovement2020CohortQueries.getGNew3HP(),
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
+    compositionCohortDefinition.setCompositionString("DENOMINATOR AND (B41 OR B42 OR B51 OR B52)");
 
-    if (num == 1 || num == 3) {
-      compositionCohortDefinition.setCompositionString(
-          "(A AND  (B41 OR B42 OR B51 OR B52)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E)");
-    } else if (num == 5) {
-      compositionCohortDefinition.setCompositionString(
-          "(A AND C AND (B41 OR B42 OR B51 OR B52) ) AND NOT (B1 OR B2 OR B3 OR D OR E)");
-    }
     return compositionCohortDefinition;
   }
 
@@ -464,54 +363,16 @@ public class IntensiveMonitoringCohortQueries {
     compositionCohortDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
-    // DEFINITIONS FROM RF20
-    CohortDefinition rf20InclusionComposition = getMI7RF20InclusionComposition();
+    CohortDefinition denominator = null;
 
-    CohortDefinition pregnant =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getPregnantConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
-
-    CohortDefinition breastfeeding =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getBreastfeeding().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
-
-    CohortDefinition transferredIn =
-        QualityImprovement2020Queries.getTransferredInPatients(
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-            hivMetadata.getPatientFoundYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId());
-
-    CohortDefinition transferOut = getTranferredOutPatientsForMI7();
-
-    compositionCohortDefinition.addSearch(
-        "rf20Inclusion",
-        EptsReportUtils.map(
-            rf20InclusionComposition, "revisionEndDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "pregnant",
-        EptsReportUtils.map(
-            pregnant,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "breastfeeding",
-        EptsReportUtils.map(
-            breastfeeding,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "transferredIn",
-        EptsReportUtils.map(
-            transferredIn,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "transferredOut", EptsReportUtils.map(transferOut, MAPPING2));
+    // CONDITION TO CALL RESPECTIVE DENOMINATOR
+    if (num == 2) {
+      denominator = getCat7DenMI2021Part246Definition(2);
+    } else if (num == 4) {
+      denominator = getCat7DenMI2021Part246Definition(4);
+    } else if (num == 6) {
+      denominator = getCat7DenMI2021Part246Definition(6);
+    }
 
     compositionCohortDefinition.addSearch(
         "GNEW",
@@ -525,13 +386,10 @@ public class IntensiveMonitoringCohortQueries {
             qualityImprovement2020CohortQueries.getGNew3HP(),
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    if (num == 2 || num == 4) {
-      compositionCohortDefinition.setCompositionString(
-          "(rf20Inclusion AND (GNEW OR L)) AND NOT (pregnant OR breastfeeding OR transferredIn OR transferredOut)");
-    } else if (num == 6) {
-      compositionCohortDefinition.setCompositionString(
-          "(rf20Inclusion AND pregnant AND (GNEW OR L)) AND NOT (breastfeeding OR transferredIn OR transferredOut)");
-    }
+    compositionCohortDefinition.addSearch("DENOMINATOR", Mapped.mapStraightThrough(denominator));
+
+    compositionCohortDefinition.setCompositionString("DENOMINATOR AND (GNEW OR L)");
+
     return compositionCohortDefinition;
   }
 
