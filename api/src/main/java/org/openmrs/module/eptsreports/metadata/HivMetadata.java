@@ -5856,7 +5856,7 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> HUMAN PAPILLOMAVIRUS - DNA
    *
-   * <p><b>Description: HPV -DNA</b>
+   * <p><b>Description: HPV - DNA</b>
    *
    * @return {@link Concept}
    */

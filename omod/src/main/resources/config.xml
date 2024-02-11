@@ -3886,7 +3886,7 @@
 		<property>eptsreports.bmiConceptUuid</property>
 		<defaultValue>e1da52ba-1d5f-11e0-b929-000c29ad1d07</defaultValue>
 		<description>
-			BMI
+			UUID for the BMI concept
 		</description>
 	</globalProperty>
 
@@ -3894,7 +3894,7 @@
 		<property>eptsreports.muacConceptUuid</property>
 		<defaultValue>1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</defaultValue>
 		<description>
-			MUAC
+			UUID for the MUAC concept
 		</description>
 	</globalProperty>
 
@@ -3975,7 +3975,7 @@
 		<property>eptsreports.treatmentConceptUuid</property>
 		<defaultValue>e1d8f136-1d5f-11e0-b929-000c29ad1d07</defaultValue>
 		<description>
-			TREATMENT
+			UUID for the TREATMENT concept
 		</description>
 	</globalProperty>
 
@@ -3983,7 +3983,7 @@
 		<property>eptsreports.termoablationConceptUuid</property>
 		<defaultValue>9342ff56-6306-4221-a600-a0edc31a7d24</defaultValue>
 		<description>
-			THERMOABLATION
+			UUID for the THERMOABLATION concept
 		</description>
 	</globalProperty>
 
