@@ -1381,7 +1381,9 @@ public class CXCASCRNCohortQueries {
         EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "postTratmentFollowUp",
-        EptsReportUtils.map(postTratmentFollowUp, "startDate=${startDate},location=${location}"));
+        EptsReportUtils.map(
+            postTratmentFollowUp,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("A AND postTratmentFollowUp");
 
