@@ -272,8 +272,8 @@ public class Eri4MonthsCohortQueries {
     cd.addSearch(
         "initiatedArt",
         EptsReportUtils.map(
-            eriCohortQueries.getAllPatientsWhoInitiatedArtNOTTransferredInBeforeReportingEndDate(),
-            "cohortStartDate=${cohortStartDate},cohortEndDate=${cohortEndDate},location=${location}"));
+            eriCohortQueries.getAllPatientsWhoInitiatedArt(),
+            "cohortStartDate=${cohortStartDate},cohortEndDate=${cohortEndDate},reportingEndDate=${reportingEndDate},location=${location}"));
     cd.addSearch(
         "consultation",
         EptsReportUtils.map(
@@ -289,13 +289,7 @@ public class Eri4MonthsCohortQueries {
         EptsReportUtils.map(
             hivCohortQueries.getPatientsTransferredOut(),
             "onOrBefore=${reportingEndDate},location=${location}"));
-    cd.addSearch(
-        "stoppedTreatment",
-        EptsReportUtils.map(
-            hivCohortQueries.getPatientsWhoStoppedTreatment(),
-            "onOrBefore=${reportingEndDate},location=${location}"));
-    cd.setCompositionString(
-        "initiatedArt AND NOT (consultation OR dead OR transfersOut OR stoppedTreatment)");
+    cd.setCompositionString("(initiatedArt AND consultation) AND NOT (dead OR transfersOut)");
     return cd;
   }
 
