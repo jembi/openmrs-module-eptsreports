@@ -46,8 +46,8 @@ public class Eri4MonthsCohortQueries {
   @Autowired private HivCohortQueries hivCohortQueries;
 
   /**
-   * C Get all patients who initiated treatment and had a drug pick up or had a consultation between
-   * 61 and 120 days from the encounter date
+   * Patients who Initiated ART (denominator – IM-ER4_FR2) and who DID NOT return for drugs pick up
+   * (FILA or Ficha Recepção/Levantou ARVs), between 61 and 120 days after ART initiation
    */
   public CohortDefinition
       getAllPatientsWhoHaveEitherClinicalConsultationOrDrugsPickupBetween61And120OfEncounterDate() {
@@ -58,62 +58,48 @@ public class Eri4MonthsCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
-    map.put(
-        "arvPharmaciaEncounter", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    map.put(
-        "arvAdultoSeguimentoEncounter",
-        hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-
-    map.put("arvPlanConcept", hivMetadata.getARVPlanConcept().getConceptId());
-    map.put("startDrugsConcept", hivMetadata.getStartDrugsConcept().getConceptId());
-    map.put(
-        "historicalDrugsConcept", hivMetadata.getHistoricalDrugStartDateConcept().getConceptId());
-    map.put("artProgram", hivMetadata.getARTProgram().getProgramId());
-    map.put("artPickupConcept", hivMetadata.getArtPickupConcept().getConceptId());
-    map.put("yesConcept", hivMetadata.getYesConcept().getConceptId());
-    map.put("artPickupDateConcept", hivMetadata.getArtDatePickupMasterCard().getConceptId());
-    map.put(
-        "mastercardDrugPickupEncounterType",
-        hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-    map.put("artDatePickupMasterCard", hivMetadata.getArtDatePickupMasterCard().getConceptId());
-    map.put(
-        "masterCardEncounterType", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
 
     CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
 
     String sql =
         "SELECT inicio_real.patient_id "
-            + "FROM   (SELECT patient_id, "
-            + "               inicio.first_pickup AS first_pickup  "
-            + "        FROM ( "
+            + "FROM   ( "
             + commonQueries.getARTStartDate(true)
-            + "       ) inicio "
-            + " WHERE  inicio.first_pickup BETWEEN :startDate AND :endDate) inicio_real "
-            + "       INNER JOIN encounter e "
-            + "               ON e.patient_id = inicio_real.patient_id "
-            + "       INNER JOIN obs o "
-            + "               ON e.encounter_id = o.encounter_id "
-            + "WHERE  e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "       AND e.location_id = :location "
-            + "       AND ((e.encounter_type = ${arvPharmaciaEncounter} "
-            + "       AND e.encounter_datetime BETWEEN Date_add(inicio_real.first_pickup, "
-            + "                                        INTERVAL 61 day) "
-            + "                                        AND "
-            + "                                            Date_add( "
-            + "                                            inicio_real.first_pickup, INTERVAL "
-            + "                                            120 day))"
-            + "       OR (e.encounter_type = ${mastercardDrugPickupEncounterType} "
-            + "       AND o.value_coded = ${artDatePickupMasterCard}  "
-            + "       AND o.value_datetime BETWEEN Date_add(inicio_real.first_pickup, "
-            + "                                        INTERVAL 61 day) "
-            + "                                        AND "
-            + "                                            Date_add( "
-            + "                                            inicio_real.first_pickup, INTERVAL "
-            + "                                            120 day)))"
-            + "GROUP  BY inicio_real.patient_id ";
+            + "        ) AS inicio_real "
+            + "WHERE  inicio_real.first_pickup BETWEEN :startDate AND :endDate "
+            + "  AND EXISTS (SELECT e.patient_id "
+            + "              FROM   encounter e "
+            + "                         INNER JOIN obs o "
+            + "                                    ON e.encounter_id = o.encounter_id "
+            + "              WHERE  e.patient_id = inicio_real.patient_id "
+            + "                AND e.voided = 0 "
+            + "                AND o.voided = 0 "
+            + "                AND e.location_id = :location "
+            + "                AND ( ( e.encounter_type = ${18} "
+            + "                  AND e.encounter_datetime BETWEEN "
+            + "                            inicio_real.first_pickup + INTERVAL 61 "
+            + "                                day "
+            + "                            AND "
+            + "                            inicio_real.first_pickup + INTERVAL "
+            + "                                120 "
+            + "                                day ) "
+            + "                  OR ( e.encounter_type = ${52} "
+            + "                      AND o.concept_id = ${23866} "
+            + "                      AND o.value_datetime BETWEEN "
+            + "                           inicio_real.first_pickup "
+            + "                               + "
+            + "                           INTERVAL 61 "
+            + "                               day "
+            + "                           AND "
+            + "                           inicio_real.first_pickup + INTERVAL "
+            + "                               120 "
+            + "                               day ) ))";
 
     StringSubstitutor sb = new StringSubstitutor(map);
+
     String replacedQuery = sb.replace(sql);
 
     cd.setQuery(replacedQuery);
@@ -257,14 +243,16 @@ public class Eri4MonthsCohortQueries {
   }
 
   /**
-   * Get patients who are alive and not on treatment - probably all those who have been on ART for
-   * more than 3 months excluding the dead, transfers or suspended (A AND NOT B) AND C
+   * Alive & Not transferred out and Defaulter: patients who Initiated ART (denominator –
+   * IM-ER4_FR2) and who DID NOT return for drugs pick up (FILA or Ficha Recepção/Levantou ARVs),
+   * between 61 and 120 days after ART initiation excluding dead (IM_ER4_FR8) and transferred out
+   * patients (IM_ER4_FR10) by end of reporting period
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getPatientsWhoAreAliveAndNotOnTreatment() {
+  public CohortDefinition getPatientsWhoAreAliveAndNotTransferredOutAndDefaulter() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Patients who are a live and NOT treatment");
+    cd.setName("Patients who are alive and not transferred out and defaulter");
     cd.addParameter(new Parameter("cohortStartDate", "Cohort Start Date", Date.class));
     cd.addParameter(new Parameter("cohortEndDate", "Cohort End Date", Date.class));
     cd.addParameter(new Parameter("reportingEndDate", "End Date", Date.class));
@@ -289,7 +277,7 @@ public class Eri4MonthsCohortQueries {
         EptsReportUtils.map(
             hivCohortQueries.getPatientsTransferredOut(),
             "onOrBefore=${reportingEndDate},location=${location}"));
-    cd.setCompositionString("(initiatedArt AND consultation) AND NOT (dead OR transfersOut)");
+    cd.setCompositionString("initiatedArt AND NOT (consultation OR dead OR transfersOut)");
     return cd;
   }
 
