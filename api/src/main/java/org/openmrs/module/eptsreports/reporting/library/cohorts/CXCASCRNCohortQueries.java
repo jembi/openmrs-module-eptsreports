@@ -818,7 +818,7 @@ public class CXCASCRNCohortQueries {
    *       </ul>
    * </ul>
    */
-  public CohortDefinition getPatientsWitPostTratmentFollowUp() {
+  public CohortDefinition getPatientsWitPostTreatmentFollowUp() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Disagregation - Post Treatment Follow Up");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -860,11 +860,8 @@ public class CXCASCRNCohortQueries {
             + "                                         ON         o.encounter_id = e.encounter_id "
             + "                              INNER JOIN "
             + "                          ( "
-            + "                              SELECT   previous.patient_id, "
-            + "                                       previous.previous_last_result_date AS previous_datetime "
-            + "                              FROM     ( "
             + "                                           SELECT     p.patient_id, "
-            + "                                                      Max(e.encounter_datetime) AS previous_last_result_date "
+            + "                                                      Max(e.encounter_datetime) AS previous_datetime "
             + "                                           FROM       patient p "
             + "                                                          INNER JOIN encounter e "
             + "                                                                     ON         e.patient_id = p.patient_id "
@@ -880,8 +877,7 @@ public class CXCASCRNCohortQueries {
             + "                                             AND        o.value_coded IN (${703}, "
             + "                                                                          ${2093}, "
             + "                                                                          ${664}) "
-            + "                                           GROUP BY   p.patient_id) AS previous "
-            + "                              GROUP BY previous.patient_id) AS last_previous "
+            + "                              GROUP BY p.patient_id) AS last_previous "
             + "                          ON         last_previous.patient_id = p.patient_id "
             + "               WHERE      p.voided = 0 "
             + "                 AND        e.voided = 0 "
@@ -901,23 +897,17 @@ public class CXCASCRNCohortQueries {
             + "                                         ON         e.patient_id = p.patient_id "
             + "                              INNER JOIN obs o "
             + "                                         ON         o.encounter_id = e.encounter_id "
-            + "                              INNER JOIN obs o2 "
-            + "                                         ON         o2.encounter_id = e.encounter_id "
             + "               WHERE      p.voided = 0 "
             + "                 AND        e.voided = 0 "
             + "                 AND        o.voided = 0 "
-            + "                 AND        o2.voided = 0 "
             + "                 AND        e.encounter_type = ${28} "
             + "                 AND        ( ( "
             + "                                  o.concept_id = ${2094} "
             + "                                      AND        o.value_coded IN ( ${2093}, "
             + "                                                                    ${664}, "
-            + "                                                                    ${703} ) ) "
-            + "                   OR         ( "
-            + "                                  o2.concept_id = ${165436} "
-            + "                                      AND        o2.value_coded = ${664} ) ) "
+            + "                                                                    ${703} ) ) ) "
             + "                 AND        e.location_id = :location "
-            + "                 AND        e.encounter_datetime BETWEEN :startDate AND        :endDate ) last_screening "
+            + "                 AND        e.encounter_datetime BETWEEN :startDate AND :endDate ) last_screening "
             + "WHERE      p.voided = 0 "
             + "  AND        o1.voided = 0 "
             + "  AND        o2.voided = 0 "
@@ -954,18 +944,18 @@ public class CXCASCRNCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition a = getTotal();
-    CohortDefinition postTratmentFollowUp = getPatientsWitPostTratmentFollowUp();
+    CohortDefinition postTreatmentFollowUp = getPatientsWitPostTreatmentFollowUp();
 
     cd.addSearch(
         "A",
         EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
-        "postTratmentFollowUp",
+        "postTreatmentFollowUp",
         EptsReportUtils.map(
-            postTratmentFollowUp,
+            postTreatmentFollowUp,
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("A AND postTratmentFollowUp");
+    cd.setCompositionString("A AND postTreatmentFollowUp");
 
     return cd;
   }
@@ -1374,18 +1364,18 @@ public class CXCASCRNCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition a = getTotalPatientsWithPositiveResult();
-    CohortDefinition postTratmentFollowUp = getPatientsWitPostTratmentFollowUp();
+    CohortDefinition postTreatmentFollowUp = getPatientsWitPostTreatmentFollowUp();
 
     cd.addSearch(
         "A",
         EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
-        "postTratmentFollowUp",
+        "postTreatmentFollowUp",
         EptsReportUtils.map(
-            postTratmentFollowUp,
+            postTreatmentFollowUp,
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("A AND postTratmentFollowUp");
+    cd.setCompositionString("A AND postTreatmentFollowUp");
 
     return cd;
   }
