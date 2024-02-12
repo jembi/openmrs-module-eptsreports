@@ -315,7 +315,7 @@ public class EptsCommonDimension {
     dim.addCohortDefinition(
         "AIT",
         EptsReportUtils.map(
-            eri4MonthsCohortQueries.getPatientsWhoAreAliveAndOnTreatment(),
+            eri4MonthsCohortQueries.getPatientsWhoAreAliveAndNotTransferredOutAndOnTreatment(),
             "cohortStartDate=${cohortStartDate},cohortEndDate=${cohortEndDate},reportingEndDate=${reportingEndDate},location=${location}"));
 
     dim.addCohortDefinition(

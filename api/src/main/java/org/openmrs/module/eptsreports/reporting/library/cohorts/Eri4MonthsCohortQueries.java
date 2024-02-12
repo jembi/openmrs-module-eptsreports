@@ -166,14 +166,25 @@ public class Eri4MonthsCohortQueries {
   }
 
   /**
-   * Get patients who are alive and on treatment - probably all those who have been on ART for more
-   * than 3 months excluding the dead, transfers or suspended (A AND NOT B) AND C
+   * NUMERATOR [Alive & not Transferred out and In Treatment]
+   *
+   * <p>The system will generate IM-ER4 (3 months’ retention) indicator numerator as:
+   *
+   * <p>The patients who initiated the treatment 4 months prior to the reporting period end date
+   * (IM-ER4_FR2) and who have an ART pick-up between 61 and 120 days after ART initiation date.
+   *
+   * <p>The system will exclude the following patients:
+   *
+   * <ul>
+   *   <li>Patients who are transferred out by the end of the reporting period (IM_ER4_FR9);
+   *   <li>Patients who are dead by the end of the reporting period (IM_ER4_FR8);
+   * </ul>
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getPatientsWhoAreAliveAndOnTreatment() {
+  public CohortDefinition getPatientsWhoAreAliveAndNotTransferredOutAndOnTreatment() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Patients who are a live and on treatment");
+    cd.setName("Patients who are alive and not transferred out and on treatment");
     cd.addParameter(new Parameter("cohortStartDate", "Cohort Start Date", Date.class));
     cd.addParameter(new Parameter("cohortEndDate", "Cohort End Date", Date.class));
     cd.addParameter(new Parameter("reportingEndDate", "Reporting End Date", Date.class));
@@ -181,8 +192,8 @@ public class Eri4MonthsCohortQueries {
     cd.addSearch(
         "initiatedArt",
         EptsReportUtils.map(
-            eriCohortQueries.getAllPatientsWhoInitiatedArtNOTTransferredInBeforeReportingEndDate(),
-            "cohortStartDate=${cohortStartDate},cohortEndDate=${cohortEndDate},location=${location}"));
+            eriCohortQueries.getAllPatientsWhoInitiatedArt(),
+            "cohortStartDate=${cohortStartDate},cohortEndDate=${cohortEndDate},reportingEndDate=${reportingEndDate},location=${location}"));
     cd.addSearch(
         "consultation",
         EptsReportUtils.map(
