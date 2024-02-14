@@ -236,17 +236,19 @@ public class TXCXCACohortQueries {
 
     CohortDefinition patientsOnArtWithPositiveScreening =
         this.cxcascrnCohortQueries.getTotalPatientsWithPositiveResult();
-    CohortDefinition bb = this.getBB();
+    CohortDefinition patientsWhoReceivedATreatmentType = getPatientsWhoReceivedATreatmentType();
 
     cd.addSearch(
         "patientsOnArtWithPositiveScreening",
         EptsReportUtils.map(patientsOnArtWithPositiveScreening, MAPPINGS));
     cd.addSearch(
-        "BB",
+        "patientsWhoReceivedATreatmentType",
         EptsReportUtils.map(
-            bb, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            patientsWhoReceivedATreatmentType,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("patientsOnArtWithPositiveScreening AND BB");
+    cd.setCompositionString(
+        "patientsOnArtWithPositiveScreening AND patientsWhoReceivedATreatmentType");
 
     return cd;
   }
@@ -373,6 +375,129 @@ public class TXCXCACohortQueries {
             scd, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.setCompositionString("CCD AND SCD");
+
+    return cd;
+  }
+
+  /**
+   * <b>SCRN_FR7</b> Patient who received a treatment type during the reporting period
+   *
+   * <p>The system will identify female patients who received a treatment type during the period by
+   * selecting all patients who:
+   *
+   * <ul>
+   *   <li>have Tratamento Feito = Crioterapia or Termoablação registered on the Ficha de Registo
+   *       Individual: Rastreio dos Cancros do Colo do Utero e da Mama with a Data do Tratamento
+   *       between the most recent positive VIA result (TX_FR6) and the reporting period end date OR
+   *   <li>have Qual foi o tratamento/avaliação no HdR = Crioterapia Feita” or “Termocoagulação
+   *       Feita” or “Leep Feito” or “Conização Feita”) registered in Ficha de Registo Individual:
+   *       Rastreio dos Cancros do Colo do Útero e da Mama between the most recent positive VIA
+   *       result (TX_FR6) and the reporting period end date.
+   * </ul>
+   *
+   * <p>For patients who have more than one treatment registered during the reporting period, the
+   * system will consider the most recent one among them.
+   *
+   * <p>For two different treatment types registered on the same date, the algorithm will apply the
+   * following hierarchy:
+   *
+   * <ul>
+   *   <li>1 - LEEP / Conização
+   *   <li>2 - Termocoagulação
+   *   <li>3 - Crioterapia
+   * </ul>
+   */
+  public CohortDefinition getPatientsWhoReceivedATreatmentType() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patient who received a treatment type during the reporting period");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("28", hivMetadata.getRastreioDoCancroDoColoUterinoEncounterType().getEncounterTypeId());
+    map.put("2094", hivMetadata.getResultadoViaConcept().getConceptId());
+    map.put("703", hivMetadata.getPositive().getConceptId());
+    map.put("2093", hivMetadata.getSuspectedCancerConcept().getConceptId());
+    map.put("664", hivMetadata.getNegative().getConceptId());
+    map.put("165436", hivMetadata.getHumanPapillomavirusDnaConcept().getConceptId());
+    map.put("1185", hivMetadata.getTreatmentConcept().getConceptId());
+    map.put("2149", hivMetadata.getViaResultOnTheReferenceConcept().getConceptId());
+    map.put("23974", hivMetadata.getCryotherapyConcept().getConceptId());
+    map.put("165439", hivMetadata.getTermoablationConcept().getConceptId());
+    map.put("23972", hivMetadata.getThermocoagulationConcept().getConceptId());
+    map.put("23970", hivMetadata.getLeepConcept().getConceptId());
+    map.put("23973", hivMetadata.getconizationConcept().getConceptId());
+
+    String query =
+        "SELECT     p.patient_id "
+            + "FROM       patient p "
+            + "               INNER JOIN encounter e "
+            + "                          ON         e.patient_id = p.patient_id "
+            + "               INNER JOIN obs o1 "
+            + "                          ON         o1.encounter_id = e.encounter_id "
+            + "               INNER JOIN obs o2 "
+            + "                          ON         o2.encounter_id = e.encounter_id "
+            + "               INNER JOIN "
+            + "           ( "
+            + "               SELECT     p.patient_id, "
+            + "                          last_result.encounter_date AS last_positive_encounter "
+            + "               FROM       patient p "
+            + "                              INNER JOIN encounter e "
+            + "                                         ON         e.patient_id = p.patient_id "
+            + "                              INNER JOIN obs o "
+            + "                                         ON         o.encounter_id = e.encounter_id "
+            + "                              INNER JOIN "
+            + "                          ( "
+            + "                              SELECT     p.patient_id, "
+            + "                                         Max(e.encounter_datetime) AS encounter_date "
+            + "                              FROM       patient p "
+            + "                                             INNER JOIN encounter e "
+            + "                                                        ON         e.patient_id = p.patient_id "
+            + "                                             INNER JOIN obs o "
+            + "                                                        ON         o.encounter_id =e.encounter_id "
+            + "                              WHERE      p.voided = 0 "
+            + "                                AND        e.voided = 0 "
+            + "                                AND        o.voided = 0 "
+            + "                                AND        e.encounter_datetime BETWEEN :startDate AND        :endDate "
+            + "                                AND        e.location_id = :location "
+            + "                                AND        e.encounter_type = ${28} "
+            + "                                AND        o.concept_id = ${2094} "
+            + "                                AND        o.value_coded IN (${703}, "
+            + "                                                             ${2093}, "
+            + "                                                             ${664}) "
+            + "                              GROUP BY   p.patient_id) AS last_result "
+            + "                          ON         last_result.patient_id = p.patient_id "
+            + "               WHERE      p.voided = 0 "
+            + "                 AND        e.voided = 0 "
+            + "                 AND        o.voided = 0 "
+            + "                 AND        e.encounter_type = ${28} "
+            + "                 AND        e.encounter_datetime = last_result.encounter_date "
+            + "                 AND        e.location_id = :location "
+            + "                 AND        o.concept_id = ${2094} "
+            + "                 AND        o.value_coded = ${703} "
+            + "               GROUP BY   p.patient_id ) positive_via "
+            + "WHERE      p.voided = 0 "
+            + "  AND        o1.voided = 0 "
+            + "  AND        o2.voided = 0 "
+            + "  AND        e.encounter_type = ${28} "
+            + "  AND        e.location_id = :location "
+            + "  AND        ( ( "
+            + "                   o1.concept_id = ${1185} "
+            + "                       AND        o1.value_coded IN ( ${23974}, "
+            + "                                                      ${165439} ) "
+            + "                       AND        o1.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate) "
+            + "    OR         ( "
+            + "                   o2.concept_id = ${2149} "
+            + "                       AND        o2.value_coded IN ( ${23974}, "
+            + "                                                      ${23972}, "
+            + "                                                      ${23970}, "
+            + "                                                      ${23973} ) "
+            + "                       AND        o2.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate) )";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
 
     return cd;
   }
