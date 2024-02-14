@@ -834,7 +834,7 @@ public class CXCASCRNCohortQueries {
    *       </ul>
    * </ul>
    */
-  public CohortDefinition getPatientsWitPostTreatmentFollowUp() {
+  public CohortDefinition getPostTreatmentFollowUp() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Disagregation - Post Treatment Follow Up");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -959,19 +959,21 @@ public class CXCASCRNCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition a = getTotal();
-    CohortDefinition postTreatmentFollowUp = getPatientsWitPostTreatmentFollowUp();
+    CohortDefinition totalPatientsCxcaScrn = getTotal();
+    CohortDefinition postTreatmentFollowUp = getPostTreatmentFollowUp();
 
     cd.addSearch(
-        "A",
-        EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "totalPatientsCxcaScrn",
+        EptsReportUtils.map(
+            totalPatientsCxcaScrn,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "postTreatmentFollowUp",
         EptsReportUtils.map(
             postTreatmentFollowUp,
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("A AND postTreatmentFollowUp");
+    cd.setCompositionString("totalPatientsCxcaScrn AND postTreatmentFollowUp");
 
     return cd;
   }
@@ -1380,7 +1382,7 @@ public class CXCASCRNCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition a = getTotalPatientsWithPositiveResult();
-    CohortDefinition postTreatmentFollowUp = getPatientsWitPostTreatmentFollowUp();
+    CohortDefinition postTreatmentFollowUp = getPostTreatmentFollowUp();
 
     cd.addSearch(
         "A",

@@ -172,7 +172,8 @@ public class TXCXCADataset extends BaseDataSet {
     CohortIndicator postTreatmentFollowUp =
         eptsGeneralIndicator.getIndicator(
             "PTFUTX",
-            EptsReportUtils.map(cxcatxCohortQueries.getPostTreatmentFollowUp(), mappings));
+            EptsReportUtils.map(
+                cxcatxCohortQueries.getPatientsWithPostTreatmentFollowUp(), mappings));
     dsd.addColumn(
         "PTFUTX",
         "Post-Treatment follow-up",
@@ -185,7 +186,7 @@ public class TXCXCADataset extends BaseDataSet {
             "PTFUB5TX",
             EptsReportUtils.map(
                 this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getPostTreatmentFollowUp(),
+                    this.cxcatxCohortQueries.getPatientsWithPostTreatmentFollowUp(),
                     this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B5),
                     "TX Post-Treatment follow-up B5 composition"),
                 mappings));
@@ -202,7 +203,7 @@ public class TXCXCADataset extends BaseDataSet {
             "PTFUB6TX",
             EptsReportUtils.map(
                 this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getPostTreatmentFollowUp(),
+                    this.cxcatxCohortQueries.getPatientsWithPostTreatmentFollowUp(),
                     this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B6),
                     "TX Post-Treatment follow-up B6 composition"),
                 mappings));
@@ -219,7 +220,7 @@ public class TXCXCADataset extends BaseDataSet {
             "PTFUB7TX",
             EptsReportUtils.map(
                 this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getPostTreatmentFollowUp(),
+                    this.cxcatxCohortQueries.getPatientsWithPostTreatmentFollowUp(),
                     this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B7),
                     "TX Post-Treatment follow-up B7 composition"),
                 mappings));

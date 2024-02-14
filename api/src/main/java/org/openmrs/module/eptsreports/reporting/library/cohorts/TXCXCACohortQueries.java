@@ -86,32 +86,26 @@ public class TXCXCACohortQueries {
     return cd;
   }
 
-  public CohortDefinition getPostTreatmentFollowUp() {
+  public CohortDefinition getPatientsWithPostTreatmentFollowUp() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.setName("TX Post Treatment Follow Up");
 
-    CohortDefinition b =
-        this.cxcascrnCohortQueries.getTotal(CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE);
-    CohortDefinition bb = this.getBB();
-    CohortDefinition b4 =
-        this.cxcascrnCohortQueries.getAA3OrAA4(CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE);
-    CohortDefinition bb1 = this.getBB1();
+    CohortDefinition totalPatientsCxcaScrnPositiveWithTreatment = getTotal();
+    CohortDefinition postTreatmentFollowUp = this.cxcascrnCohortQueries.getPostTreatmentFollowUp();
 
-    cd.addSearch("B", EptsReportUtils.map(b, MAPPINGS));
     cd.addSearch(
-        "BB",
-        EptsReportUtils.map(
-            bb, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-    cd.addSearch("B4", EptsReportUtils.map(b4, "onOrAfter=${startDate},location=${location}"));
+        "totalPatientsCxcaScrnPositiveWithTreatment",
+        EptsReportUtils.map(totalPatientsCxcaScrnPositiveWithTreatment, MAPPINGS));
     cd.addSearch(
-        "BB1",
+        "postTreatmentFollowUp",
         EptsReportUtils.map(
-            bb1, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            postTreatmentFollowUp,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("B AND BB AND B4 AND BB1");
+    cd.setCompositionString("totalPatientsCxcaScrnPositiveWithTreatment AND postTreatmentFollowUp");
 
     return cd;
   }
@@ -129,7 +123,7 @@ public class TXCXCACohortQueries {
     CohortDefinition bb = this.getBB();
     CohortDefinition f1srtTimeScreened = getFirstTimeScreened();
     CohortDefinition rescreenedAfterPreviousNegative = getRescreenedAfterPreviousNegative();
-    CohortDefinition postTreatmentFollowUp = getPostTreatmentFollowUp();
+    CohortDefinition postTreatmentFollowUp = getPatientsWithPostTreatmentFollowUp();
 
     cd.addSearch("B", EptsReportUtils.map(b, MAPPINGS));
     cd.addSearch(
