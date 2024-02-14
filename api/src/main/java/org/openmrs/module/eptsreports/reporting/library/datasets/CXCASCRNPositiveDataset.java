@@ -44,8 +44,7 @@ public class CXCASCRNPositiveDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "TOTALPP",
             EptsReportUtils.map(
-                cxcascrnCohortQueries.getTotal(CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE),
-                mappings));
+                cxcascrnCohortQueries.getTotalPatientsWithPositiveResult(), mappings));
 
     dsd.addColumn("TOTALPP", "Total Positive", EptsReportUtils.map(total, mappings), "");
 
@@ -54,9 +53,7 @@ public class CXCASCRNPositiveDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "FTSPPP",
             EptsReportUtils.map(
-                cxcascrnCohortQueries.get1stTimeScreened(
-                    CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE),
-                mappings));
+                cxcascrnCohortQueries.getPositive1stTimeScreenedPatients(), mappings));
 
     addRow(
         dsd,
@@ -70,8 +67,7 @@ public class CXCASCRNPositiveDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "RAPNPPP",
             EptsReportUtils.map(
-                cxcascrnCohortQueries.getRescreenedAfterPreviousNegative(
-                    CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE),
+                cxcascrnCohortQueries.getPositivePatentsRescreenedAfterPreviousNegative(),
                 mappings));
     addRow(
         dsd,
@@ -85,9 +81,7 @@ public class CXCASCRNPositiveDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "PTFUPPP",
             EptsReportUtils.map(
-                cxcascrnCohortQueries.getPostTreatmentFollowUp(
-                    CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE),
-                mappings));
+                cxcascrnCohortQueries.getPositivePatientsWithPostTreatmentFollowUp(), mappings));
     addRow(
         dsd,
         "PTFUPPP",
@@ -100,8 +94,7 @@ public class CXCASCRNPositiveDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "RAPPPPP",
             EptsReportUtils.map(
-                cxcascrnCohortQueries.getRescreenedAfterPreviousPositive(
-                    CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE),
+                cxcascrnCohortQueries.getPositivePatientsWhoRescreenedAfterPreviousPositive(),
                 mappings));
     addRow(
         dsd,
