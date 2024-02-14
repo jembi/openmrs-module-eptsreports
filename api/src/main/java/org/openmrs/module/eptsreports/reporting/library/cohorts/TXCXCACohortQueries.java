@@ -962,4 +962,61 @@ public class TXCXCACohortQueries {
     cd.setCompositionString("firstTimeScreened AND leepOrConization");
     return cd;
   }
+
+  public CohortDefinition getRescreenedAfterPreviousNegativePatientsWithCryotherapy() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Rescreened After Previous Negative Patients With Cryotherapy ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition rescreenedAfterPreviousNegative = getRescreenedAfterPreviousNegative();
+    CohortDefinition cryotherapy = getPatientsWhoHaveCryotherapyAsLastTreatmentType();
+
+    cd.addSearch(
+        "rescreenedAfterPreviousNegative",
+        EptsReportUtils.map(rescreenedAfterPreviousNegative, MAPPINGS));
+    cd.addSearch("cryotherapy", EptsReportUtils.map(cryotherapy, MAPPINGS));
+
+    cd.setCompositionString("rescreenedAfterPreviousNegative AND cryotherapy");
+    return cd;
+  }
+
+  public CohortDefinition getRescreenedAfterPreviousNegativePatientsWithThermocoagulation() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Rescreened After Previous Negative Patients With Thermocoagulation ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition rescreenedAfterPreviousNegative = getRescreenedAfterPreviousNegative();
+    CohortDefinition thermocoagulation = getPatientsWhoHaveThermocoagulationAsLastTreatmentType();
+
+    cd.addSearch(
+        "rescreenedAfterPreviousNegative",
+        EptsReportUtils.map(rescreenedAfterPreviousNegative, MAPPINGS));
+    cd.addSearch("thermocoagulation", EptsReportUtils.map(thermocoagulation, MAPPINGS));
+
+    cd.setCompositionString("rescreenedAfterPreviousNegative AND thermocoagulation");
+    return cd;
+  }
+
+  public CohortDefinition getRescreenedAfterPreviousNegativePatientsWithLeepOrConization() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Rescreened After Previous Negative Patients With Leep Or Conization ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition rescreenedAfterPreviousNegative = getRescreenedAfterPreviousNegative();
+    CohortDefinition leepOrConization = getPatientsWhoHaveLeepOrConizationTreatmentType();
+
+    cd.addSearch(
+        "rescreenedAfterPreviousNegative",
+        EptsReportUtils.map(rescreenedAfterPreviousNegative, MAPPINGS));
+    cd.addSearch("leepOrConization", EptsReportUtils.map(leepOrConization, MAPPINGS));
+
+    cd.setCompositionString("rescreenedAfterPreviousNegative AND leepOrConization");
+    return cd;
+  }
 }

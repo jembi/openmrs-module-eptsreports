@@ -107,55 +107,49 @@ public class TXCXCADataset extends BaseDataSet {
         EptsReportUtils.map(rescreenedAfterPreviousNegative, mappings),
         "");
 
-    // Rescreened after previous negative (B5) - RAPNB5
-    CohortIndicator rescreenedAfterPreviousNegativeB5 =
+    // Rescreened after previous negative (B5) - RAPNB5 (Crytherapy)
+    CohortIndicator rescreenedAfterPreviousNegativeWithCrytherapy =
         eptsGeneralIndicator.getIndicator(
             "RAPNB5TX",
             EptsReportUtils.map(
-                this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getRescreenedAfterPreviousNegative(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B5),
-                    "TX Rescreened after previous negative B5 composition"),
+                this.cxcatxCohortQueries
+                    .getRescreenedAfterPreviousNegativePatientsWithCryotherapy(),
                 mappings));
     addRow(
         dsd,
         "RAPNB5TX",
-        "Rescreened after previous negative B5",
-        EptsReportUtils.map(rescreenedAfterPreviousNegativeB5, mappings),
+        "Rescreened after previous negative With Crytherapy",
+        EptsReportUtils.map(rescreenedAfterPreviousNegativeWithCrytherapy, mappings),
         getColumnsForAge());
 
-    // Rescreened after previous negative (B6) - RAPNB6
-    CohortIndicator rescreenedAfterPreviousNegativeB6 =
+    // Rescreened after previous negative (B6) - RAPNB6 (Thermocoagulation)
+    CohortIndicator rescreenedAfterPreviousNegativeWithThermocoagulation =
         eptsGeneralIndicator.getIndicator(
             "RAPNB6TX",
             EptsReportUtils.map(
-                this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getRescreenedAfterPreviousNegative(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B6),
-                    "TX Rescreened after previous negative B6 composition"),
+                this.cxcatxCohortQueries
+                    .getRescreenedAfterPreviousNegativePatientsWithThermocoagulation(),
                 mappings));
     addRow(
         dsd,
         "RAPNB6TX",
-        "Rescreened after previous negative B6",
-        EptsReportUtils.map(rescreenedAfterPreviousNegativeB6, mappings),
+        "Rescreened after previous negative With Thermocoagulation",
+        EptsReportUtils.map(rescreenedAfterPreviousNegativeWithThermocoagulation, mappings),
         getColumnsForAge());
 
-    // Rescreened after previous negative (B7) - RAPNB7
-    CohortIndicator rescreenedAfterPreviousNegativeB7 =
+    // Rescreened after previous negative (B7) - RAPNB7 (LeepOrConization)
+    CohortIndicator rescreenedAfterPreviousNegativeWithLeepOrConization =
         eptsGeneralIndicator.getIndicator(
             "RAPNB7TX",
             EptsReportUtils.map(
-                this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getRescreenedAfterPreviousNegative(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B7),
-                    "TX Rescreened after previous negative B7 composition"),
+                this.cxcatxCohortQueries
+                    .getRescreenedAfterPreviousNegativePatientsWithLeepOrConization(),
                 mappings));
     addRow(
         dsd,
         "RAPNB7TX",
-        "Rescreened after previous negative B7",
-        EptsReportUtils.map(rescreenedAfterPreviousNegativeB7, mappings),
+        "Rescreened after previous negative With Leep Or Conization",
+        EptsReportUtils.map(rescreenedAfterPreviousNegativeWithLeepOrConization, mappings),
         getColumnsForAge());
 
     /** Post-Treatment follow-up - PTFU */
