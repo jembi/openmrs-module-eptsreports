@@ -493,8 +493,8 @@ public class TXCXCACohortQueries {
   /**
    * <b>LEEP</b>
    *
-   * <p>All patients who screened positive and received treatment (TX_FR3) and who have or Qual foi
-   * o tratamento/avaliação no HdR = LEEP Feita” or “Conização Feita.
+   * <p>All patients who screened positive and received treatment (TX_FR3) who have or Qual foi o
+   * tratamento/avaliação no HdR = LEEP Feita” or “Conização Feita.
    *
    * <p>For patients who have more than one treatment registered during the reporting period, the
    * system will consider the most recent one among them.
@@ -583,6 +583,165 @@ public class TXCXCACohortQueries {
             + "  AND        o.value_coded IN ( ${23970}, ${23973} ) "
             + "  AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate "
             + "  GROUP BY p.patient_id ) leep_conization";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * <b>Thermocoagulation</b>
+   *
+   * <p>All patients who screened positive and received treatment (TX_FR3) who have Tratamento Feito
+   * = Termoablação or Qual foi o tratamento/avaliação no HdR = Termocolagulação Feita
+   *
+   * <p>For patients who have more than one treatment registered during the reporting period, the
+   * system will consider the most recent one among them.
+   *
+   * <p>For two different treatment types registered on the same date, the algorithm will apply the
+   * following hierarchy:
+   *
+   * <ul>
+   *   <li>1 - LEEP / Conização
+   *   <li>2 - Termocoagulação
+   *   <li>3 - Crioterapia
+   * </ul>
+   */
+  public CohortDefinition getPatientsWhoHaveThermocoagulationAsLastTreatmentType() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName(
+        "Patients who have Thermocoagulation as last treatment type during the reporting period");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("28", hivMetadata.getRastreioDoCancroDoColoUterinoEncounterType().getEncounterTypeId());
+    map.put("2094", hivMetadata.getResultadoViaConcept().getConceptId());
+    map.put("703", hivMetadata.getPositive().getConceptId());
+    map.put("2093", hivMetadata.getSuspectedCancerConcept().getConceptId());
+    map.put("664", hivMetadata.getNegative().getConceptId());
+    map.put("165436", hivMetadata.getHumanPapillomavirusDnaConcept().getConceptId());
+    map.put("2149", hivMetadata.getViaResultOnTheReferenceConcept().getConceptId());
+    map.put("23970", hivMetadata.getLeepConcept().getConceptId());
+    map.put("23973", hivMetadata.getconizationConcept().getConceptId());
+    map.put("23972", hivMetadata.getThermocoagulationConcept().getConceptId());
+
+    String query =
+        "SELECT thermocoagulation.patient_id "
+            + "FROM   ( "
+            + "           SELECT     p.patient_id, "
+            + "                      Max(o.obs_datetime) AS last_thermocoagulation "
+            + "           FROM       patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                     ON         e.patient_id = p.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                     ON         o.encounter_id = e.encounter_id "
+            + "                          INNER JOIN "
+            + "                      ( "
+            + "                          SELECT     p.patient_id, "
+            + "                                     last_result.encounter_date AS last_positive_encounter "
+            + "                          FROM       patient p "
+            + "                                         INNER JOIN encounter e "
+            + "                                                    ON         e.patient_id = p.patient_id "
+            + "                                         INNER JOIN obs o "
+            + "                                                    ON         o.encounter_id = e.encounter_id "
+            + "                                         INNER JOIN "
+            + "                                     ( "
+            + "                                         SELECT     p.patient_id, "
+            + "                                                    Max(e.encounter_datetime) AS encounter_date "
+            + "                                         FROM       patient p "
+            + "                                                        INNER JOIN encounter e "
+            + "                                                                   ON         e.patient_id = p.patient_id "
+            + "                                                        INNER JOIN obs o "
+            + "                                                                   ON         o.encounter_id =e.encounter_id "
+            + "                                         WHERE      p.voided = 0 "
+            + "                                           AND        e.voided = 0 "
+            + "                                           AND        o.voided = 0 "
+            + "                                           AND        e.encounter_datetime BETWEEN :startDate AND        :endDate "
+            + "                                           AND        e.location_id = :location "
+            + "                                           AND        e.encounter_type = ${28} "
+            + "                                           AND        o.concept_id = ${2094} "
+            + "                                           AND        o.value_coded IN (${703}, "
+            + "                                                                        ${2093}, "
+            + "                                                                        ${664}) "
+            + "                                         GROUP BY   p.patient_id) AS last_result "
+            + "                                     ON         last_result.patient_id = p.patient_id "
+            + "                          WHERE      p.voided = 0 "
+            + "                            AND        e.voided = 0 "
+            + "                            AND        o.voided = 0 "
+            + "                            AND        e.encounter_type = ${28} "
+            + "                            AND        e.encounter_datetime = last_result.encounter_date "
+            + "                            AND        e.location_id = :location "
+            + "                            AND        o.concept_id = ${2094} "
+            + "                            AND        o.value_coded = ${703} "
+            + "                          GROUP BY   p.patient_id ) positive_via "
+            + "           WHERE      p.voided = 0 "
+            + "             AND        o.voided = 0 "
+            + "             AND        e.encounter_type = ${28} "
+            + "             AND        e.location_id = :location "
+            + "             AND        o.concept_id = ${2149} "
+            + "             AND        o.value_coded = ${23972} "
+            + "             AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate "
+            + "           GROUP BY   p.patient_id) thermocoagulation "
+            + "WHERE  NOT EXISTS "
+            + "           ( "
+            + "               SELECT     e.patient_id "
+            + "               FROM       encounter e "
+            + "                              INNER JOIN obs o "
+            + "                                         ON         o.encounter_id = e.encounter_id "
+            + "                              INNER JOIN "
+            + "                          ( "
+            + "                              SELECT     p.patient_id, "
+            + "                                         last_result.encounter_date AS last_positive_encounter "
+            + "                              FROM       patient p "
+            + "                                             INNER JOIN encounter e "
+            + "                                                        ON         e.patient_id = p.patient_id "
+            + "                                             INNER JOIN obs o "
+            + "                                                        ON         o.encounter_id = e.encounter_id "
+            + "                                             INNER JOIN "
+            + "                                         ( "
+            + "                                             SELECT     p.patient_id, "
+            + "                                                        max(e.encounter_datetime) AS encounter_date "
+            + "                                             FROM       patient p "
+            + "                                                            INNER JOIN encounter e "
+            + "                                                                       ON         e.patient_id = p.patient_id "
+            + "                                                            INNER JOIN obs o "
+            + "                                                                       ON         o.encounter_id =e.encounter_id "
+            + "                                             WHERE      p.voided = 0 "
+            + "                                               AND        e.voided = 0 "
+            + "                                               AND        o.voided = 0 "
+            + "                                               AND        e.encounter_datetime BETWEEN :startDate AND        :endDate "
+            + "                                               AND        e.location_id = :location "
+            + "                                               AND        e.encounter_type = ${28} "
+            + "                                               AND        o.concept_id = ${2094} "
+            + "                                               AND        o.value_coded IN (${703}, "
+            + "                                                                            ${2093}, "
+            + "                                                                            ${664}) "
+            + "                                             GROUP BY   p.patient_id) AS last_result "
+            + "                                         ON         last_result.patient_id = p.patient_id "
+            + "                              WHERE      p.voided = 0 "
+            + "                                AND        e.voided = 0 "
+            + "                                AND        o.voided = 0 "
+            + "                                AND        e.encounter_type = ${28} "
+            + "                                AND        e.encounter_datetime = last_result.encounter_date "
+            + "                                AND        e.location_id = :location "
+            + "                                AND        o.concept_id = ${2094} "
+            + "                                AND        o.value_coded = ${703} "
+            + "                              GROUP BY   p.patient_id ) positive_via "
+            + "               WHERE      e.voided = 0 "
+            + "                 AND        o.voided = 0 "
+            + "                 AND        e.encounter_type = ${28} "
+            + "                 AND        e.location_id = :location "
+            + "                 AND        o.concept_id = ${2149} "
+            + "                 AND        o.value_coded IN (${23973}, "
+            + "                                              ${23970}) "
+            + "                 AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate "
+            + "                 AND        thermocoagulation.patient_id = e.patient_id "
+            + "                 AND        e.encounter_datetime >= thermocoagulation.last_thermocoagulation "
+            + "                 AND        e.encounter_datetime <= :endDate );";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
