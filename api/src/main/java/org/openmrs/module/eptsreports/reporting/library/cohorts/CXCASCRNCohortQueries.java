@@ -1102,14 +1102,16 @@ public class CXCASCRNCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition a = getTotal();
+    CohortDefinition totalPatientsCxcaScrn = getTotal();
     CohortDefinition firstTimeScreened = get1stTimeScreenedPatients();
     CohortDefinition rescreenedAfterPreviousNegative = getPatientsRescreenedAfterPreviousNegative();
     CohortDefinition postTreatmentFollowUp = getPatientsWithPostTreatmentFollowUp();
 
     cd.addSearch(
-        "A",
-        EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "totalPatientsCxcaScrn",
+        EptsReportUtils.map(
+            totalPatientsCxcaScrn,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "firstTimeScreened",
         EptsReportUtils.map(
@@ -1126,7 +1128,7 @@ public class CXCASCRNCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "A AND NOT (firstTimeScreened OR rescreenedAfterPreviousNegative OR postTreatmentFollowUp)");
+        "totalPatientsCxcaScrn AND NOT (firstTimeScreened OR rescreenedAfterPreviousNegative OR postTreatmentFollowUp)");
     return cd;
   }
 
