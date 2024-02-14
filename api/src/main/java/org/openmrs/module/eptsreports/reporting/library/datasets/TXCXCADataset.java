@@ -54,55 +54,45 @@ public class TXCXCADataset extends BaseDataSet {
     dsd.addColumn(
         "FTSTX", "1st Time Screened", EptsReportUtils.map(f1rstTimeScreened, mappings), "");
 
-    // 1st Time Screened (B5) - FTSNB5
-    CohortIndicator f1rstTimeScreenedB5 =
+    // 1st Time Screened (B5) - FTSNB5 (Cryotherapy)
+    CohortIndicator firstTimeScreenedWithCryotherapy =
         eptsGeneralIndicator.getIndicator(
             "FTSNB5TX",
             EptsReportUtils.map(
-                this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getFirstTimeScreened(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B5),
-                    "TX 1st Time Screened B5  composition"),
-                mappings));
+                this.cxcatxCohortQueries.get1stTimeScreenedPatientsWithCryotherapy(), mappings));
     addRow(
         dsd,
         "FTSNB5TX",
-        "1st Time Screened B5",
-        EptsReportUtils.map(f1rstTimeScreenedB5, mappings),
+        "1st Time Screened B5 - Cryotherapy",
+        EptsReportUtils.map(firstTimeScreenedWithCryotherapy, mappings),
         getColumnsForAge());
 
-    // 1st Time Screened (B6) - FTSB6
-    CohortIndicator f1rstTimeScreenedB6 =
+    // 1st Time Screened (B6) - FTSB6 (Thermocoagulation)
+    CohortIndicator firstTimeScreenedWithThermocoagulation =
         eptsGeneralIndicator.getIndicator(
             "FTSB6TX",
             EptsReportUtils.map(
-                this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getFirstTimeScreened(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B6),
-                    "TX 1st Time Screened B6  composition"),
+                this.cxcatxCohortQueries.get1stTimeScreenedPatientsWithThermocoagulation(),
                 mappings));
     addRow(
         dsd,
         "FTSB6TX",
-        "1st Time Screened B6",
-        EptsReportUtils.map(f1rstTimeScreenedB6, mappings),
+        "1st Time Screened B6 -Thermocoagulation",
+        EptsReportUtils.map(firstTimeScreenedWithThermocoagulation, mappings),
         getColumnsForAge());
 
-    // 1st Time Screened (B7) - FTSB7
-    CohortIndicator f1rstTimeScreenedB7 =
+    // 1st Time Screened (B7) - FTSB7 (LEEP/Conization)
+    CohortIndicator f1rstTimeScreenedWithLeepOrConization =
         eptsGeneralIndicator.getIndicator(
             "FTSB7TX",
             EptsReportUtils.map(
-                this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getFirstTimeScreened(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B7),
-                    "TX 1st Time Screened B7  composition"),
+                this.cxcatxCohortQueries.get1stTimeScreenedPatientsWithLeepOrConization(),
                 mappings));
     addRow(
         dsd,
         "FTSB7TX",
-        "1st Time Screened B7",
-        EptsReportUtils.map(f1rstTimeScreenedB7, mappings),
+        "1st Time Screened B7 - LEEP/Conization",
+        EptsReportUtils.map(f1rstTimeScreenedWithLeepOrConization, mappings),
         getColumnsForAge());
 
     /** Rescreened after previous negative - RAPN */

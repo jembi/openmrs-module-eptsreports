@@ -911,4 +911,55 @@ public class TXCXCACohortQueries {
 
     return cd;
   }
+
+  public CohortDefinition get1stTimeScreenedPatientsWithCryotherapy() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("1st Time Screened With Cryotherapy ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition firstTimeScreened = getFirstTimeScreened();
+    CohortDefinition cryotherapy = getPatientsWhoHaveCryotherapyAsLastTreatmentType();
+
+    cd.addSearch("firstTimeScreened", EptsReportUtils.map(firstTimeScreened, MAPPINGS));
+    cd.addSearch("cryotherapy", EptsReportUtils.map(cryotherapy, MAPPINGS));
+
+    cd.setCompositionString("firstTimeScreened AND cryotherapy");
+    return cd;
+  }
+
+  public CohortDefinition get1stTimeScreenedPatientsWithThermocoagulation() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("1st Time Screened With Thermocoagulation ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition firstTimeScreened = getFirstTimeScreened();
+    CohortDefinition thermocoagulation = getPatientsWhoHaveThermocoagulationAsLastTreatmentType();
+
+    cd.addSearch("firstTimeScreened", EptsReportUtils.map(firstTimeScreened, MAPPINGS));
+    cd.addSearch("thermocoagulation", EptsReportUtils.map(thermocoagulation, MAPPINGS));
+
+    cd.setCompositionString("firstTimeScreened AND thermocoagulation");
+    return cd;
+  }
+
+  public CohortDefinition get1stTimeScreenedPatientsWithLeepOrConization() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("1st Time Screened With Leep Or Conization ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition firstTimeScreened = getFirstTimeScreened();
+    CohortDefinition leepOrConization = getPatientsWhoHaveLeepOrConizationTreatmentType();
+
+    cd.addSearch("firstTimeScreened", EptsReportUtils.map(firstTimeScreened, MAPPINGS));
+    cd.addSearch("leepOrConization", EptsReportUtils.map(leepOrConization, MAPPINGS));
+
+    cd.setCompositionString("firstTimeScreened AND leepOrConization");
+    return cd;
+  }
 }
