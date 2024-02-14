@@ -234,17 +234,19 @@ public class TXCXCACohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition b =
-        this.cxcascrnCohortQueries.getTotal(CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE);
+    CohortDefinition patientsOnArtWithPositiveScreening =
+        this.cxcascrnCohortQueries.getTotalPatientsWithPositiveResult();
     CohortDefinition bb = this.getBB();
 
-    cd.addSearch("B", EptsReportUtils.map(b, MAPPINGS));
+    cd.addSearch(
+        "patientsOnArtWithPositiveScreening",
+        EptsReportUtils.map(patientsOnArtWithPositiveScreening, MAPPINGS));
     cd.addSearch(
         "BB",
         EptsReportUtils.map(
             bb, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
-    cd.setCompositionString("B AND BB");
+    cd.setCompositionString("patientsOnArtWithPositiveScreening AND BB");
 
     return cd;
   }
