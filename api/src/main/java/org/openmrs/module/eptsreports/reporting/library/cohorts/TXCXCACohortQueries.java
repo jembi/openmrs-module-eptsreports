@@ -67,20 +67,21 @@ public class TXCXCACohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.setName("TX Rescreened After Previous Negative");
 
-    CohortDefinition b =
-        this.cxcascrnCohortQueries.getTotal(CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE);
-    CohortDefinition bb = this.getBB();
-    CohortDefinition b3 =
-        this.cxcascrnCohortQueries.getAA3OrAA4(CXCASCRNCohortQueries.CXCASCRNResult.NEGATIVE);
+    CohortDefinition totalPatientsCxcaScrnPositiveWithTreatment = getTotal();
+    CohortDefinition patientsWithNegativeResultForScreeningTestBeforeReportingPeriod =
+        this.cxcascrnCohortQueries.getPatientsWithNegativeResultForScreeningTest(true);
 
-    cd.addSearch("B", EptsReportUtils.map(b, MAPPINGS));
     cd.addSearch(
-        "BB",
+        "totalPatientsCxcaScrnPositiveWithTreatment",
+        EptsReportUtils.map(totalPatientsCxcaScrnPositiveWithTreatment, MAPPINGS));
+    cd.addSearch(
+        "patientsWithNegativeResultForScreeningTestBeforeReportingPeriod",
         EptsReportUtils.map(
-            bb, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-    cd.addSearch("B3", EptsReportUtils.map(b3, "onOrAfter=${startDate},location=${location}"));
+            patientsWithNegativeResultForScreeningTestBeforeReportingPeriod,
+            "startDate=${startDate},location=${location}"));
 
-    cd.setCompositionString("B AND BB AND B3");
+    cd.setCompositionString(
+        "totalPatientsCxcaScrnPositiveWithTreatment AND patientsWithNegativeResultForScreeningTestBeforeReportingPeriod");
 
     return cd;
   }
