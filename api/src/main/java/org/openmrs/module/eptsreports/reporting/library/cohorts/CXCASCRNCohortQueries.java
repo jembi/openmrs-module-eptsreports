@@ -567,15 +567,23 @@ public class CXCASCRNCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition a = getTotal();
-    CohortDefinition aa1 = getPatientsWithScreeningTestForCervicalCancer(true);
+    CohortDefinition totalPatientsCxcaScrn = getTotal();
+    CohortDefinition patientsWithScreeningTestForCervicalCancerBeforeReportingPeriod =
+        getPatientsWithScreeningTestForCervicalCancer(true);
 
     cd.addSearch(
-        "A",
-        EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch("AA1", EptsReportUtils.map(aa1, "startDate=${startDate},location=${location}"));
+        "totalPatientsCxcaScrn",
+        EptsReportUtils.map(
+            totalPatientsCxcaScrn,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "patientsWithScreeningTestForCervicalCancerBeforeReportingPeriod",
+        EptsReportUtils.map(
+            patientsWithScreeningTestForCervicalCancerBeforeReportingPeriod,
+            "startDate=${startDate},location=${location}"));
 
-    cd.setCompositionString("A AND NOT AA1");
+    cd.setCompositionString(
+        "totalPatientsCxcaScrn AND NOT patientsWithScreeningTestForCervicalCancerBeforeReportingPeriod");
     return cd;
   }
 

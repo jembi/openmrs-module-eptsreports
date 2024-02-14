@@ -50,7 +50,7 @@ public class TXCXCADataset extends BaseDataSet {
     /** 1st Time Screened - FTS */
     CohortIndicator f1rstTimeScreened =
         eptsGeneralIndicator.getIndicator(
-            "FTSTX", EptsReportUtils.map(cxcatxCohortQueries.getf1srtTimeScreened(), mappings));
+            "FTSTX", EptsReportUtils.map(cxcatxCohortQueries.getFirstTimeScreened(), mappings));
     dsd.addColumn(
         "FTSTX", "1st Time Screened", EptsReportUtils.map(f1rstTimeScreened, mappings), "");
 
@@ -60,7 +60,7 @@ public class TXCXCADataset extends BaseDataSet {
             "FTSNB5TX",
             EptsReportUtils.map(
                 this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getf1srtTimeScreened(),
+                    this.cxcatxCohortQueries.getFirstTimeScreened(),
                     this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B5),
                     "TX 1st Time Screened B5  composition"),
                 mappings));
@@ -77,7 +77,7 @@ public class TXCXCADataset extends BaseDataSet {
             "FTSB6TX",
             EptsReportUtils.map(
                 this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getf1srtTimeScreened(),
+                    this.cxcatxCohortQueries.getFirstTimeScreened(),
                     this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B6),
                     "TX 1st Time Screened B6  composition"),
                 mappings));
@@ -94,7 +94,7 @@ public class TXCXCADataset extends BaseDataSet {
             "FTSB7TX",
             EptsReportUtils.map(
                 this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getf1srtTimeScreened(),
+                    this.cxcatxCohortQueries.getFirstTimeScreened(),
                     this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B7),
                     "TX 1st Time Screened B7  composition"),
                 mappings));

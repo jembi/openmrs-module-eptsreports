@@ -35,28 +35,28 @@ public class TXCXCACohortQueries {
     this.hivMetadata = hivMetadata;
   }
 
-  public CohortDefinition getf1srtTimeScreened() {
+  public CohortDefinition getFirstTimeScreened() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.setName("TX f1srt Time Screened");
 
-    CohortDefinition b =
-        this.cxcascrnCohortQueries.getTotal(CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE);
-    CohortDefinition bb = this.getBB();
-    CohortDefinition b1 =
-        this.cxcascrnCohortQueries.getAA1OrAA2(
-            CXCASCRNCohortQueries.CXCASCRNResult.ANY, true, false);
+    CohortDefinition totalPatientsCxcaScrnPositiveWithTreatment = getTotal();
+    CohortDefinition patientsWithScreeningTestForCervicalCancerBeforeStartDate =
+        this.cxcascrnCohortQueries.getPatientsWithScreeningTestForCervicalCancer(true);
 
-    cd.addSearch("B", EptsReportUtils.map(b, MAPPINGS));
     cd.addSearch(
-        "BB",
+        "totalPatientsCxcaScrnPositiveWithTreatment",
+        EptsReportUtils.map(totalPatientsCxcaScrnPositiveWithTreatment, MAPPINGS));
+    cd.addSearch(
+        "patientsWithScreeningTestForCervicalCancerBeforeStartDate",
         EptsReportUtils.map(
-            bb, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-    cd.addSearch("B1", EptsReportUtils.map(b1, "onOrAfter=${startDate},location=${location}"));
+            patientsWithScreeningTestForCervicalCancerBeforeStartDate,
+            "startDate=${startDate},location=${location}"));
 
-    cd.setCompositionString("B AND BB AND NOT B1");
+    cd.setCompositionString(
+        "totalPatientsCxcaScrnPositiveWithTreatment AND NOT patientsWithScreeningTestForCervicalCancerBeforeStartDate");
     return cd;
   }
 
@@ -126,7 +126,7 @@ public class TXCXCACohortQueries {
     CohortDefinition b =
         this.cxcascrnCohortQueries.getTotal(CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE);
     CohortDefinition bb = this.getBB();
-    CohortDefinition f1srtTimeScreened = getf1srtTimeScreened();
+    CohortDefinition f1srtTimeScreened = getFirstTimeScreened();
     CohortDefinition rescreenedAfterPreviousNegative = getRescreenedAfterPreviousNegative();
     CohortDefinition postTreatmentFollowUp = getPostTreatmentFollowUp();
 
@@ -229,7 +229,7 @@ public class TXCXCACohortQueries {
   public CohortDefinition getTotal() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Total of  TX CXCA SCRN");
+    cd.setName("Total of  TX CXCA SCRN Positive With a Treatment Type");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
