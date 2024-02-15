@@ -617,7 +617,7 @@ public class TXCXCACohortQueries {
   public CohortDefinition getPatientsWhoHaveTermoablationORThermocoagulationAsLastTreatmentType() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName(
-        "Patients who have Thermocoagulation as last treatment type during the reporting period");
+        "Patients who have Termoablation OR Thermocoagulation as last treatment type during the reporting period");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -791,6 +791,7 @@ public class TXCXCACohortQueries {
     map.put("664", hivMetadata.getNegative().getConceptId());
     map.put("165436", hivMetadata.getHumanPapillomavirusDnaConcept().getConceptId());
     map.put("1185", hivMetadata.getTreatmentConcept().getConceptId());
+    map.put("165439", hivMetadata.getTermoablationConcept().getConceptId());
     map.put("2149", hivMetadata.getViaResultOnTheReferenceConcept().getConceptId());
     map.put("23970", hivMetadata.getLeepConcept().getConceptId());
     map.put("23973", hivMetadata.getconizationConcept().getConceptId());
@@ -902,16 +903,17 @@ public class TXCXCACohortQueries {
             + "                                        GROUP BY   p.patient_id ) positive_via "
             + "                  WHERE      e.voided = 0 "
             + "                  AND        o.voided = 0 "
+            + "                  AND        cryotherapy.patient_id = e.patient_id "
             + "                  AND        e.encounter_type = ${28} "
             + "                  AND        e.location_id = :location "
-            + "                  AND        o.concept_id = ${2149} "
-            + "                  AND        o.value_coded IN (${23970}, "
+            + "                  AND        ( (o.concept_id = ${1185} "
+            + "                  AND           o.value_coded = ${165439}) "
+            + "                   OR          (o.concept_id = ${2149} "
+            + "                  AND           o.value_coded IN (${23970}, "
             + "                                               ${23972}, "
-            + "                                               ${23973}) "
+            + "                                               ${23973})) ) "
             + "                  AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate "
-            + "                  AND        cryotherapy.patient_id = e.patient_id "
-            + "                  AND        e.encounter_datetime >= cryotherapy.last_cryotherapy "
-            + "                  AND        e.encounter_datetime <= :endDate )";
+            + "                  AND        o.obs_datetime >= cryotherapy.last_cryotherapy ) ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
