@@ -421,7 +421,10 @@ public class TXCXCACohortQueries {
     map.put("23973", hivMetadata.getconizationConcept().getConceptId());
 
     String query =
-        "SELECT     p.patient_id "
+        "SELECT     treatment.patient_id "
+            + "FROM ( "
+            + "SELECT     p.patient_id, "
+            + "     MAX(o.obs_datetime) AS last_treatment_result_date "
             + "FROM       patient p "
             + "               INNER JOIN encounter e "
             + "                          ON         e.patient_id = p.patient_id "
@@ -481,7 +484,9 @@ public class TXCXCACohortQueries {
             + "                                                      ${23972}, "
             + "                                                      ${23970}, "
             + "                                                      ${23973} ) "
-            + "                       AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate) )";
+            + "                       AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate) ) "
+            + "GROUP BY p.patient_id "
+            + "           ) treatment";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
