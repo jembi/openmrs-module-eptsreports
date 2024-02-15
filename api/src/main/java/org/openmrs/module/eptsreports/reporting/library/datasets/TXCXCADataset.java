@@ -217,8 +217,8 @@ public class TXCXCADataset extends BaseDataSet {
         EptsReportUtils.map(rescreenedAfterPreviousPositive, mappings),
         "");
 
-    // Rescreened after previous positive (B5) - RAPPB5
-    CohortIndicator rescreenedAfterPreviousPositiveB5 =
+    // Rescreened after previous positive (B5) - RAPPB5 (Cryotherapy)
+    CohortIndicator rescreenedAfterPreviousPositiveWithCryotherapy =
         eptsGeneralIndicator.getIndicator(
             "RAPPB5TX",
             EptsReportUtils.map(
@@ -227,11 +227,11 @@ public class TXCXCADataset extends BaseDataSet {
         dsd,
         "RAPPB5TX",
         "Rescreened after previous positive B5",
-        EptsReportUtils.map(rescreenedAfterPreviousPositiveB5, mappings),
+        EptsReportUtils.map(rescreenedAfterPreviousPositiveWithCryotherapy, mappings),
         getColumnsForAge());
 
-    // Rescreened after previous positive (B6) - RAPPB6
-    CohortIndicator rescreenedAfterPreviousPositiveB6 =
+    // Rescreened after previous positive (B6) - RAPPB6 (Thermocoagulation)
+    CohortIndicator rescreenedAfterPreviousPositiveWithThermocoagulation =
         eptsGeneralIndicator.getIndicator(
             "RAPPB6TX",
             EptsReportUtils.map(
@@ -241,11 +241,11 @@ public class TXCXCADataset extends BaseDataSet {
         dsd,
         "RAPPB6TX",
         "Rescreened after previous positive B6",
-        EptsReportUtils.map(rescreenedAfterPreviousPositiveB6, mappings),
+        EptsReportUtils.map(rescreenedAfterPreviousPositiveWithThermocoagulation, mappings),
         getColumnsForAge());
 
-    // Rescreened after previous positive (B7) - RAPPB7
-    CohortIndicator rescreenedAfterPreviousPositiveB7 =
+    // Rescreened after previous positive (B7) - RAPPB7 (LeepOrConization)
+    CohortIndicator rescreenedAfterPreviousPositiveWithLeepOrConization =
         eptsGeneralIndicator.getIndicator(
             "RAPPB7TX",
             EptsReportUtils.map(
@@ -256,7 +256,7 @@ public class TXCXCADataset extends BaseDataSet {
         dsd,
         "RAPPB7TX",
         "Rescreened after previous positive B7",
-        EptsReportUtils.map(rescreenedAfterPreviousPositiveB7, mappings),
+        EptsReportUtils.map(rescreenedAfterPreviousPositiveWithLeepOrConization, mappings),
         getColumnsForAge());
 
     return dsd;
