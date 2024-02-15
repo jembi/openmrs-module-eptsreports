@@ -164,55 +164,46 @@ public class TXCXCADataset extends BaseDataSet {
         EptsReportUtils.map(postTreatmentFollowUp, mappings),
         "");
 
-    // Post-Treatment follow-up (B5) - PTFUB5
-    CohortIndicator postTreatmentFollowUpB5 =
+    // Post-Treatment follow-up (B5) - PTFUB5 (Crytherapy)
+    CohortIndicator postTreatmentFollowUpWithCrytherapy =
         eptsGeneralIndicator.getIndicator(
             "PTFUB5TX",
             EptsReportUtils.map(
-                this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getPatientsWithPostTreatmentFollowUp(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B5),
-                    "TX Post-Treatment follow-up B5 composition"),
+                this.cxcatxCohortQueries.getPostTreatmentFollowUpPatientsWithCryotherapy(),
                 mappings));
     addRow(
         dsd,
         "PTFUB5TX",
         "Post-Treatment follow-up B5",
-        EptsReportUtils.map(postTreatmentFollowUpB5, mappings),
+        EptsReportUtils.map(postTreatmentFollowUpWithCrytherapy, mappings),
         getColumnsForAge());
 
-    // Post-Treatment follow-up (B6) - PTFUB6
-    CohortIndicator postTreatmentFollowUpB6 =
+    // Post-Treatment follow-up (B6) - PTFUB6 (Thermocoagulation)
+    CohortIndicator postTreatmentFollowUpWithThermocoagulation =
         eptsGeneralIndicator.getIndicator(
             "PTFUB6TX",
             EptsReportUtils.map(
-                this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getPatientsWithPostTreatmentFollowUp(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B6),
-                    "TX Post-Treatment follow-up B6 composition"),
+                this.cxcatxCohortQueries.getPostTreatmentFollowUpPatientsWithThermocoagulation(),
                 mappings));
     addRow(
         dsd,
         "PTFUB6TX",
         "Post-Treatment follow-up B6",
-        EptsReportUtils.map(postTreatmentFollowUpB6, mappings),
+        EptsReportUtils.map(postTreatmentFollowUpWithThermocoagulation, mappings),
         getColumnsForAge());
 
-    // Post-Treatment follow-up (B7) - PTFUB7
-    CohortIndicator postTreatmentFollowUpB7 =
+    // Post-Treatment follow-up (B7) - PTFUB7 (LeepOrConization)
+    CohortIndicator postTreatmentFollowUpWithLeepOrConization =
         eptsGeneralIndicator.getIndicator(
             "PTFUB7TX",
             EptsReportUtils.map(
-                this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getPatientsWithPostTreatmentFollowUp(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B7),
-                    "TX Post-Treatment follow-up B7 composition"),
+                this.cxcatxCohortQueries.getPostTreatmentFollowUpPatientsWithLeepOrConization(),
                 mappings));
     addRow(
         dsd,
         "PTFUB7TX",
         "Post-Treatment follow-up B7",
-        EptsReportUtils.map(postTreatmentFollowUpB7, mappings),
+        EptsReportUtils.map(postTreatmentFollowUpWithLeepOrConization, mappings),
         getColumnsForAge());
 
     /** Rescreened after previous positive - RAPP */

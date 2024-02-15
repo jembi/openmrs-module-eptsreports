@@ -1019,4 +1019,55 @@ public class TXCXCACohortQueries {
     cd.setCompositionString("rescreenedAfterPreviousNegative AND leepOrConization");
     return cd;
   }
+
+  public CohortDefinition getPostTreatmentFollowUpPatientsWithCryotherapy() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Post Treatment Follow-Up Patients With Cryotherapy ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition postTreatmentFollowUp = getPatientsWithPostTreatmentFollowUp();
+    CohortDefinition cryotherapy = getPatientsWhoHaveCryotherapyAsLastTreatmentType();
+
+    cd.addSearch("postTreatmentFollowUp", EptsReportUtils.map(postTreatmentFollowUp, MAPPINGS));
+    cd.addSearch("cryotherapy", EptsReportUtils.map(cryotherapy, MAPPINGS));
+
+    cd.setCompositionString("postTreatmentFollowUp AND cryotherapy");
+    return cd;
+  }
+
+  public CohortDefinition getPostTreatmentFollowUpPatientsWithThermocoagulation() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("PostTreatmentFollowUp Patients With Thermocoagulation ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition postTreatmentFollowUp = getPatientsWithPostTreatmentFollowUp();
+    CohortDefinition thermocoagulation = getPatientsWhoHaveThermocoagulationAsLastTreatmentType();
+
+    cd.addSearch("postTreatmentFollowUp", EptsReportUtils.map(postTreatmentFollowUp, MAPPINGS));
+    cd.addSearch("thermocoagulation", EptsReportUtils.map(thermocoagulation, MAPPINGS));
+
+    cd.setCompositionString("postTreatmentFollowUp AND thermocoagulation");
+    return cd;
+  }
+
+  public CohortDefinition getPostTreatmentFollowUpPatientsWithLeepOrConization() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Post Treatment Follow-Up Patients With Leep Or Conization ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition postTreatmentFollowUp = getPatientsWithPostTreatmentFollowUp();
+    CohortDefinition leepOrConization = getPatientsWhoHaveLeepOrConizationTreatmentType();
+
+    cd.addSearch("postTreatmentFollowUp", EptsReportUtils.map(postTreatmentFollowUp, MAPPINGS));
+    cd.addSearch("leepOrConization", EptsReportUtils.map(leepOrConization, MAPPINGS));
+
+    cd.setCompositionString("postTreatmentFollowUp AND leepOrConization");
+    return cd;
+  }
 }
