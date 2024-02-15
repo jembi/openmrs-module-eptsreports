@@ -614,7 +614,7 @@ public class TXCXCACohortQueries {
    *   <li>3 - Crioterapia
    * </ul>
    */
-  public CohortDefinition getPatientsWhoHaveThermocoagulationAsLastTreatmentType() {
+  public CohortDefinition getPatientsWhoHaveTermoablationORThermocoagulationAsLastTreatmentType() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName(
         "Patients who have Thermocoagulation as last treatment type during the reporting period");
@@ -629,16 +629,18 @@ public class TXCXCACohortQueries {
     map.put("2093", hivMetadata.getSuspectedCancerConcept().getConceptId());
     map.put("664", hivMetadata.getNegative().getConceptId());
     map.put("165436", hivMetadata.getHumanPapillomavirusDnaConcept().getConceptId());
+    map.put("1185", hivMetadata.getTreatmentConcept().getConceptId());
+    map.put("165439", hivMetadata.getTermoablationConcept().getConceptId());
     map.put("2149", hivMetadata.getViaResultOnTheReferenceConcept().getConceptId());
     map.put("23970", hivMetadata.getLeepConcept().getConceptId());
     map.put("23973", hivMetadata.getconizationConcept().getConceptId());
     map.put("23972", hivMetadata.getThermocoagulationConcept().getConceptId());
 
     String query =
-        "SELECT thermocoagulation.patient_id "
+        "SELECT termoablation_or_thermocoagulation.patient_id "
             + "FROM   ( "
             + "           SELECT     p.patient_id, "
-            + "                      Max(o.obs_datetime) AS last_thermocoagulation "
+            + "                      Max(o.obs_datetime) AS last_termoablation_or_thermocoagulation "
             + "           FROM       patient p "
             + "                          INNER JOIN encounter e "
             + "                                     ON         e.patient_id = p.patient_id "
@@ -687,10 +689,12 @@ public class TXCXCACohortQueries {
             + "             AND        o.voided = 0 "
             + "             AND        e.encounter_type = ${28} "
             + "             AND        e.location_id = :location "
-            + "             AND        o.concept_id = ${2149} "
-            + "             AND        o.value_coded = ${23972} "
+            + "             AND      ( (o.concept_id = ${1185} "
+            + "             AND         o.value_coded = ${165439}) "
+            + "              OR        (o.concept_id = ${2149} "
+            + "             AND        o.value_coded = ${23972}) )  "
             + "             AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate "
-            + "           GROUP BY   p.patient_id) thermocoagulation "
+            + "           GROUP BY   p.patient_id) termoablation_or_thermocoagulation "
             + "WHERE  NOT EXISTS "
             + "           ( "
             + "               SELECT     e.patient_id "
@@ -743,10 +747,9 @@ public class TXCXCACohortQueries {
             + "                 AND        o.concept_id = ${2149} "
             + "                 AND        o.value_coded IN (${23973}, "
             + "                                              ${23970}) "
+            + "                 AND        termoablation_or_thermocoagulation.patient_id = e.patient_id "
             + "                 AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate "
-            + "                 AND        thermocoagulation.patient_id = e.patient_id "
-            + "                 AND        e.encounter_datetime >= thermocoagulation.last_thermocoagulation "
-            + "                 AND        e.encounter_datetime <= :endDate )";
+            + "                 AND        o.obs_datetime >= termoablation_or_thermocoagulation.last_termoablation_or_thermocoagulation )";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -917,9 +920,9 @@ public class TXCXCACohortQueries {
     return cd;
   }
 
-  public CohortDefinition get1stTimeScreenedPatientsWithCryotherapy() {
+  public CohortDefinition getFirstTimeScreenedPatientsWithCryotherapy() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("1st Time Screened With Cryotherapy ");
+    cd.setName("First Time Screened With Cryotherapy");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -934,15 +937,16 @@ public class TXCXCACohortQueries {
     return cd;
   }
 
-  public CohortDefinition get1stTimeScreenedPatientsWithThermocoagulation() {
+  public CohortDefinition getFirstTimeScreenedPatientsWithThermocoagulation() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("1st Time Screened With Thermocoagulation ");
+    cd.setName("First Time Screened With Thermocoagulation ");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition firstTimeScreened = getFirstTimeScreened();
-    CohortDefinition thermocoagulation = getPatientsWhoHaveThermocoagulationAsLastTreatmentType();
+    CohortDefinition thermocoagulation =
+        getPatientsWhoHaveTermoablationORThermocoagulationAsLastTreatmentType();
 
     cd.addSearch("firstTimeScreened", EptsReportUtils.map(firstTimeScreened, MAPPINGS));
     cd.addSearch("thermocoagulation", EptsReportUtils.map(thermocoagulation, MAPPINGS));
@@ -951,9 +955,9 @@ public class TXCXCACohortQueries {
     return cd;
   }
 
-  public CohortDefinition get1stTimeScreenedPatientsWithLeepOrConization() {
+  public CohortDefinition getFirstTimeScreenedPatientsWithLeepOrConization() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("1st Time Screened With Leep Or Conization ");
+    cd.setName("First Time Screened With Leep Or Conization ");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -995,7 +999,8 @@ public class TXCXCACohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition rescreenedAfterPreviousNegative = getRescreenedAfterPreviousNegative();
-    CohortDefinition thermocoagulation = getPatientsWhoHaveThermocoagulationAsLastTreatmentType();
+    CohortDefinition thermocoagulation =
+        getPatientsWhoHaveTermoablationORThermocoagulationAsLastTreatmentType();
 
     cd.addSearch(
         "rescreenedAfterPreviousNegative",
@@ -1050,7 +1055,8 @@ public class TXCXCACohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition postTreatmentFollowUp = getPatientsWithPostTreatmentFollowUp();
-    CohortDefinition thermocoagulation = getPatientsWhoHaveThermocoagulationAsLastTreatmentType();
+    CohortDefinition thermocoagulation =
+        getPatientsWhoHaveTermoablationORThermocoagulationAsLastTreatmentType();
 
     cd.addSearch("postTreatmentFollowUp", EptsReportUtils.map(postTreatmentFollowUp, MAPPINGS));
     cd.addSearch("thermocoagulation", EptsReportUtils.map(thermocoagulation, MAPPINGS));
@@ -1103,7 +1109,8 @@ public class TXCXCACohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition rescreenedAfterPreviousPositive = getRescreenedAfterPreviousPositive();
-    CohortDefinition thermocoagulation = getPatientsWhoHaveThermocoagulationAsLastTreatmentType();
+    CohortDefinition thermocoagulation =
+        getPatientsWhoHaveTermoablationORThermocoagulationAsLastTreatmentType();
 
     cd.addSearch(
         "rescreenedAfterPreviousPositive",
