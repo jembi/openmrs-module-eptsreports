@@ -2,7 +2,6 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 
 import java.util.Arrays;
 import java.util.List;
-import org.openmrs.module.eptsreports.reporting.calculation.cxcascrn.TreatmentType;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TXCXCACohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
@@ -223,11 +222,7 @@ public class TXCXCADataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "RAPPB5TX",
             EptsReportUtils.map(
-                cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getRescreenedAfterPreviousPositive(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B5),
-                    "TX Rescreened after previous positive B6"),
-                mappings));
+                cxcatxCohortQueries.getRescreenedAfterPreviousPositiveWithCryotherapy(), mappings));
     addRow(
         dsd,
         "RAPPB5TX",
@@ -240,10 +235,7 @@ public class TXCXCADataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "RAPPB6TX",
             EptsReportUtils.map(
-                cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getRescreenedAfterPreviousPositive(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B6),
-                    "TX Rescreened after previous positive B6"),
+                cxcatxCohortQueries.getRescreenedAfterPreviousPositiveWithThermocoagulation(),
                 mappings));
     addRow(
         dsd,
@@ -257,10 +249,8 @@ public class TXCXCADataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "RAPPB7TX",
             EptsReportUtils.map(
-                cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getRescreenedAfterPreviousPositive(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B7),
-                    "TX Rescreened after previous positive B7"),
+                cxcatxCohortQueries
+                    .getRescreenedAfterPreviousPositivePatientsWithLeepOrConization(),
                 mappings));
     addRow(
         dsd,
