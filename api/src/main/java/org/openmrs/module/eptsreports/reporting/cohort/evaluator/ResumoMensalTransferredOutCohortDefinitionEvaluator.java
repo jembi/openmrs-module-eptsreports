@@ -219,7 +219,7 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
       q.append("                              UNION");
       q.append("                              SELECT p.patient_id,");
       q.append(
-          "                                     date_add(max(o.value_datetime), INTERVAL 30 day) AS result_value ");
+          "                                     TIMESTAMPADD(DAY,30, MAX(o.value_datetime)) AS result_value ");
       q.append("                              FROM patient p ");
       q.append(
           "                              INNER JOIN encounter e ON p.patient_id = e.patient_id ");
@@ -361,7 +361,7 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
       q.append("                              UNION ");
       q.append("                              SELECT p.patient_id, ");
       q.append(
-          "                                     date_add(max(o.value_datetime), INTERVAL 30 day) AS result_value ");
+          "                                   TIMESTAMPADD(DAY,30,MAX(o.value_datetime)) AS result_value ");
       q.append("                              FROM patient p ");
       q.append(
           "                              INNER JOIN encounter e ON p.patient_id = e.patient_id ");
