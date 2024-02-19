@@ -4467,21 +4467,21 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition transferredOut = commonCohortQueries.getTranferredOutPatients();
 
-    comp.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
+    comp.addSearch("startedART", EptsReportUtils.map(startedART, MAPPING));
 
-    comp.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
+    comp.addSearch("pregnant", EptsReportUtils.map(pregnant, MAPPING));
 
-    comp.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
+    comp.addSearch("breastfeeding", EptsReportUtils.map(breastfeeding, MAPPING));
 
     comp.addSearch(
-        "E",
+        "transferredIn",
         EptsReportUtils.map(
             transferredIn,
             "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
-    comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
+    comp.addSearch("transferredOut", EptsReportUtils.map(transferredOut, MAPPING1));
 
     comp.addSearch(
         "ADULT",
@@ -4490,12 +4490,15 @@ public class QualityImprovement2020CohortQueries {
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     if (den == 1 || den == 2) {
-      comp.setCompositionString("A AND NOT (C OR D OR E OR F) AND ADULT");
+      comp.setCompositionString(
+          "(startedART AND breastfeeding AND ADULT) NOT (pregnant OR transferredIn OR transferredOut)");
     }
     if (den == 5 || den == 6) {
-      comp.setCompositionString("A AND NOT (C OR D OR E OR F)");
+      comp.setCompositionString(
+          "startedART AND NOT (pregnant OR breastfeeding OR transferredIn OR transferredOut)");
     } else if (den == 9 || den == 10) {
-      comp.setCompositionString("(A AND C) AND NOT (D OR E OR F)");
+      comp.setCompositionString(
+          "(startedART AND pregnant) AND NOT (breastfeeding OR transferredIn OR transferredOut)");
     }
     return comp;
   }
@@ -4922,7 +4925,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition transferredOut = commonCohortQueries.getTranferredOutPatients();
 
     CohortDefinition returnedForAnyConsultationOrPickup =
         QualityImprovement2020Queries.getMQ12NumH(
@@ -4972,19 +4975,19 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getArtPickupConcept().getConceptId(),
             hivMetadata.getArtDatePickupMasterCard().getConceptId());
 
-    comp.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
+    comp.addSearch("startedART", EptsReportUtils.map(startedART, MAPPING));
 
-    comp.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
+    comp.addSearch("pregnant", EptsReportUtils.map(pregnant, MAPPING));
 
-    comp.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
+    comp.addSearch("breastfeeding", EptsReportUtils.map(breastfeeding, MAPPING));
 
     comp.addSearch(
-        "E",
+        "transferredIn",
         EptsReportUtils.map(
             transferredIn,
             "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
-    comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
+    comp.addSearch("transferredOut", EptsReportUtils.map(transferredOut, MAPPING1));
 
     comp.addSearch(
         "H",
@@ -5022,17 +5025,23 @@ public class QualityImprovement2020CohortQueries {
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     if (den == 1) {
-      comp.setCompositionString("(A AND NOT (C OR D OR E OR F)) AND H AND ADULT");
+      comp.setCompositionString(
+          "((startedART AND breastfeeding AND ADULT) NOT (pregnant OR transferredIn OR transferredOut)) AND H");
     } else if (den == 2) {
-      comp.setCompositionString("(A AND NOT (C OR D OR E OR F)) AND I AND II AND III AND ADULT");
+      comp.setCompositionString(
+          "((startedART AND breastfeeding AND ADULT) NOT (pregnant OR transferredIn OR transferredOut)) AND I AND II AND III");
     } else if (den == 5) {
-      comp.setCompositionString("(A AND NOT (C OR D OR E OR F)) AND H");
+      comp.setCompositionString(
+          "(startedART AND NOT (pregnant OR breastfeeding OR transferredIn OR transferredOut)) AND H");
     } else if (den == 6) {
-      comp.setCompositionString("(A AND NOT (C OR D OR E OR F)) AND I AND II AND III");
+      comp.setCompositionString(
+          "(startedART AND NOT (pregnant OR breastfeeding OR transferredIn OR transferredOut)) AND I AND II AND III");
     } else if (den == 9) {
-      comp.setCompositionString("((A AND C) AND NOT (D OR E OR F)) AND H ");
+      comp.setCompositionString(
+          "((startedART AND pregnant) AND NOT (breastfeeding OR transferredIn OR transferredOut)) AND H ");
     } else if (den == 10) {
-      comp.setCompositionString("((A AND C) AND NOT (D OR E OR F)) AND I AND II AND III ");
+      comp.setCompositionString(
+          "((startedART AND pregnant) AND NOT (breastfeeding OR transferredIn OR transferredOut)) AND I AND II AND III ");
     }
     return comp;
   }
