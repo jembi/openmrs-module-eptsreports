@@ -4498,7 +4498,7 @@ public class QualityImprovement2020CohortQueries {
           "startedART AND NOT (pregnant OR breastfeeding OR transferredIn OR transferredOut)");
     } else if (den == 9 || den == 10) {
       comp.setCompositionString(
-          "(startedART AND pregnant) AND NOT (breastfeeding OR transferredIn OR transferredOut)");
+          "(startedART AND pregnant) AND NOT (transferredIn OR transferredOut)");
     }
     return comp;
   }
@@ -5038,10 +5038,10 @@ public class QualityImprovement2020CohortQueries {
           "(startedART AND NOT (pregnant OR breastfeeding OR transferredIn OR transferredOut)) AND I AND II AND III");
     } else if (den == 9) {
       comp.setCompositionString(
-          "((startedART AND pregnant) AND NOT (breastfeeding OR transferredIn OR transferredOut)) AND H ");
+          "((startedART AND pregnant) AND NOT (transferredIn OR transferredOut)) AND H ");
     } else if (den == 10) {
       comp.setCompositionString(
-          "((startedART AND pregnant) AND NOT (breastfeeding OR transferredIn OR transferredOut)) AND I AND II AND III ");
+          "((startedART AND pregnant) AND NOT (transferredIn OR transferredOut)) AND I AND II AND III ");
     }
     return comp;
   }
