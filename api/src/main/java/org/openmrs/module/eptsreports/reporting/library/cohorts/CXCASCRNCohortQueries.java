@@ -567,15 +567,23 @@ public class CXCASCRNCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition a = getTotal();
-    CohortDefinition aa1 = getPatientsWithScreeningTestForCervicalCancer(true);
+    CohortDefinition totalPatientsCxcaScrn = getTotal();
+    CohortDefinition patientsWithScreeningTestForCervicalCancerBeforeReportingPeriod =
+        getPatientsWithScreeningTestForCervicalCancer(true);
 
     cd.addSearch(
-        "A",
-        EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch("AA1", EptsReportUtils.map(aa1, "startDate=${startDate},location=${location}"));
+        "totalPatientsCxcaScrn",
+        EptsReportUtils.map(
+            totalPatientsCxcaScrn,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "patientsWithScreeningTestForCervicalCancerBeforeReportingPeriod",
+        EptsReportUtils.map(
+            patientsWithScreeningTestForCervicalCancerBeforeReportingPeriod,
+            "startDate=${startDate},location=${location}"));
 
-    cd.setCompositionString("A AND NOT AA1");
+    cd.setCompositionString(
+        "totalPatientsCxcaScrn AND NOT patientsWithScreeningTestForCervicalCancerBeforeReportingPeriod");
     return cd;
   }
 
@@ -756,15 +764,23 @@ public class CXCASCRNCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition a = getTotal();
-    CohortDefinition aa = getPatientsWithNegativeResultForScreeningTest(true);
+    CohortDefinition totalPatientsCxcaScrn = getTotal();
+    CohortDefinition patientsWithNegativeResultForScreeningTestBeforeReportingPeriod =
+        getPatientsWithNegativeResultForScreeningTest(true);
 
     cd.addSearch(
-        "A",
-        EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch("AA", EptsReportUtils.map(aa, "startDate=${startDate},location=${location}"));
+        "totalPatientsCxcaScrn",
+        EptsReportUtils.map(
+            totalPatientsCxcaScrn,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "patientsWithNegativeResultForScreeningTestBeforeReportingPeriod",
+        EptsReportUtils.map(
+            patientsWithNegativeResultForScreeningTestBeforeReportingPeriod,
+            "startDate=${startDate},location=${location}"));
 
-    cd.setCompositionString("A AND AA");
+    cd.setCompositionString(
+        "totalPatientsCxcaScrn AND patientsWithNegativeResultForScreeningTestBeforeReportingPeriod");
     return cd;
   }
 
@@ -818,7 +834,7 @@ public class CXCASCRNCohortQueries {
    *       </ul>
    * </ul>
    */
-  public CohortDefinition getPatientsWitPostTreatmentFollowUp() {
+  public CohortDefinition getPostTreatmentFollowUp() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Disagregation - Post Treatment Follow Up");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -943,19 +959,21 @@ public class CXCASCRNCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition a = getTotal();
-    CohortDefinition postTreatmentFollowUp = getPatientsWitPostTreatmentFollowUp();
+    CohortDefinition totalPatientsCxcaScrn = getTotal();
+    CohortDefinition postTreatmentFollowUp = getPostTreatmentFollowUp();
 
     cd.addSearch(
-        "A",
-        EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "totalPatientsCxcaScrn",
+        EptsReportUtils.map(
+            totalPatientsCxcaScrn,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "postTreatmentFollowUp",
         EptsReportUtils.map(
             postTreatmentFollowUp,
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("A AND postTreatmentFollowUp");
+    cd.setCompositionString("totalPatientsCxcaScrn AND postTreatmentFollowUp");
 
     return cd;
   }
@@ -1084,14 +1102,16 @@ public class CXCASCRNCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition a = getTotal();
+    CohortDefinition totalPatientsCxcaScrn = getTotal();
     CohortDefinition firstTimeScreened = get1stTimeScreenedPatients();
     CohortDefinition rescreenedAfterPreviousNegative = getPatientsRescreenedAfterPreviousNegative();
     CohortDefinition postTreatmentFollowUp = getPatientsWithPostTreatmentFollowUp();
 
     cd.addSearch(
-        "A",
-        EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "totalPatientsCxcaScrn",
+        EptsReportUtils.map(
+            totalPatientsCxcaScrn,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "firstTimeScreened",
         EptsReportUtils.map(
@@ -1108,7 +1128,7 @@ public class CXCASCRNCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "A AND NOT (firstTimeScreened OR rescreenedAfterPreviousNegative OR postTreatmentFollowUp)");
+        "totalPatientsCxcaScrn AND NOT (firstTimeScreened OR rescreenedAfterPreviousNegative OR postTreatmentFollowUp)");
     return cd;
   }
 
@@ -1364,7 +1384,7 @@ public class CXCASCRNCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition a = getTotalPatientsWithPositiveResult();
-    CohortDefinition postTreatmentFollowUp = getPatientsWitPostTreatmentFollowUp();
+    CohortDefinition postTreatmentFollowUp = getPostTreatmentFollowUp();
 
     cd.addSearch(
         "A",

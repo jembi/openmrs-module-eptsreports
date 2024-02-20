@@ -35,28 +35,28 @@ public class TXCXCACohortQueries {
     this.hivMetadata = hivMetadata;
   }
 
-  public CohortDefinition getf1srtTimeScreened() {
+  public CohortDefinition getFirstTimeScreened() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.setName("TX f1srt Time Screened");
 
-    CohortDefinition b =
-        this.cxcascrnCohortQueries.getTotal(CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE);
-    CohortDefinition bb = this.getBB();
-    CohortDefinition b1 =
-        this.cxcascrnCohortQueries.getAA1OrAA2(
-            CXCASCRNCohortQueries.CXCASCRNResult.ANY, true, false);
+    CohortDefinition totalPatientsCxcaScrnPositiveWithTreatment = getTotal();
+    CohortDefinition patientsWithScreeningTestForCervicalCancerBeforeStartDate =
+        this.cxcascrnCohortQueries.getPatientsWithScreeningTestForCervicalCancer(true);
 
-    cd.addSearch("B", EptsReportUtils.map(b, MAPPINGS));
     cd.addSearch(
-        "BB",
+        "totalPatientsCxcaScrnPositiveWithTreatment",
+        EptsReportUtils.map(totalPatientsCxcaScrnPositiveWithTreatment, MAPPINGS));
+    cd.addSearch(
+        "patientsWithScreeningTestForCervicalCancerBeforeStartDate",
         EptsReportUtils.map(
-            bb, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-    cd.addSearch("B1", EptsReportUtils.map(b1, "onOrAfter=${startDate},location=${location}"));
+            patientsWithScreeningTestForCervicalCancerBeforeStartDate,
+            "startDate=${startDate},location=${location}"));
 
-    cd.setCompositionString("B AND BB AND NOT B1");
+    cd.setCompositionString(
+        "totalPatientsCxcaScrnPositiveWithTreatment AND NOT patientsWithScreeningTestForCervicalCancerBeforeStartDate");
     return cd;
   }
 
@@ -67,50 +67,45 @@ public class TXCXCACohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.setName("TX Rescreened After Previous Negative");
 
-    CohortDefinition b =
-        this.cxcascrnCohortQueries.getTotal(CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE);
-    CohortDefinition bb = this.getBB();
-    CohortDefinition b3 =
-        this.cxcascrnCohortQueries.getAA3OrAA4(CXCASCRNCohortQueries.CXCASCRNResult.NEGATIVE);
+    CohortDefinition totalPatientsCxcaScrnPositiveWithTreatment = getTotal();
+    CohortDefinition patientsWithNegativeResultForScreeningTestBeforeReportingPeriod =
+        this.cxcascrnCohortQueries.getPatientsWithNegativeResultForScreeningTest(true);
 
-    cd.addSearch("B", EptsReportUtils.map(b, MAPPINGS));
     cd.addSearch(
-        "BB",
+        "totalPatientsCxcaScrnPositiveWithTreatment",
+        EptsReportUtils.map(totalPatientsCxcaScrnPositiveWithTreatment, MAPPINGS));
+    cd.addSearch(
+        "patientsWithNegativeResultForScreeningTestBeforeReportingPeriod",
         EptsReportUtils.map(
-            bb, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-    cd.addSearch("B3", EptsReportUtils.map(b3, "onOrAfter=${startDate},location=${location}"));
+            patientsWithNegativeResultForScreeningTestBeforeReportingPeriod,
+            "startDate=${startDate},location=${location}"));
 
-    cd.setCompositionString("B AND BB AND B3");
+    cd.setCompositionString(
+        "totalPatientsCxcaScrnPositiveWithTreatment AND patientsWithNegativeResultForScreeningTestBeforeReportingPeriod");
 
     return cd;
   }
 
-  public CohortDefinition getPostTreatmentFollowUp() {
+  public CohortDefinition getPatientsWithPostTreatmentFollowUp() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.setName("TX Post Treatment Follow Up");
 
-    CohortDefinition b =
-        this.cxcascrnCohortQueries.getTotal(CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE);
-    CohortDefinition bb = this.getBB();
-    CohortDefinition b4 =
-        this.cxcascrnCohortQueries.getAA3OrAA4(CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE);
-    CohortDefinition bb1 = this.getBB1();
+    CohortDefinition totalPatientsCxcaScrnPositiveWithTreatment = getTotal();
+    CohortDefinition postTreatmentFollowUp = this.cxcascrnCohortQueries.getPostTreatmentFollowUp();
 
-    cd.addSearch("B", EptsReportUtils.map(b, MAPPINGS));
     cd.addSearch(
-        "BB",
-        EptsReportUtils.map(
-            bb, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-    cd.addSearch("B4", EptsReportUtils.map(b4, "onOrAfter=${startDate},location=${location}"));
+        "totalPatientsCxcaScrnPositiveWithTreatment",
+        EptsReportUtils.map(totalPatientsCxcaScrnPositiveWithTreatment, MAPPINGS));
     cd.addSearch(
-        "BB1",
+        "postTreatmentFollowUp",
         EptsReportUtils.map(
-            bb1, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            postTreatmentFollowUp,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("B AND BB AND B4 AND BB1");
+    cd.setCompositionString("totalPatientsCxcaScrnPositiveWithTreatment AND postTreatmentFollowUp");
 
     return cd;
   }
@@ -123,18 +118,14 @@ public class TXCXCACohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.setName("TX Rescreened after previous positive");
 
-    CohortDefinition b =
-        this.cxcascrnCohortQueries.getTotal(CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE);
-    CohortDefinition bb = this.getBB();
-    CohortDefinition f1srtTimeScreened = getf1srtTimeScreened();
+    CohortDefinition totalPatientsCxcaScrnPositiveWithTreatment = getTotal();
+    CohortDefinition f1srtTimeScreened = getFirstTimeScreened();
     CohortDefinition rescreenedAfterPreviousNegative = getRescreenedAfterPreviousNegative();
-    CohortDefinition postTreatmentFollowUp = getPostTreatmentFollowUp();
+    CohortDefinition postTreatmentFollowUp = getPatientsWithPostTreatmentFollowUp();
 
-    cd.addSearch("B", EptsReportUtils.map(b, MAPPINGS));
     cd.addSearch(
-        "BB",
-        EptsReportUtils.map(
-            bb, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+        "totalPatientsCxcaScrnPositiveWithTreatment",
+        EptsReportUtils.map(totalPatientsCxcaScrnPositiveWithTreatment, MAPPINGS));
     cd.addSearch("f1srtTimeScreened", EptsReportUtils.map(f1srtTimeScreened, MAPPINGS));
     cd.addSearch(
         "rescreenedAfterPreviousNegative",
@@ -142,7 +133,7 @@ public class TXCXCACohortQueries {
     cd.addSearch("postTreatmentFollowUp", EptsReportUtils.map(postTreatmentFollowUp, MAPPINGS));
 
     cd.setCompositionString(
-        "B AND BB AND NOT (postTreatmentFollowUp OR rescreenedAfterPreviousNegative OR f1srtTimeScreened)");
+        "totalPatientsCxcaScrnPositiveWithTreatment AND NOT (postTreatmentFollowUp OR rescreenedAfterPreviousNegative OR f1srtTimeScreened)");
 
     return cd;
   }
@@ -229,22 +220,26 @@ public class TXCXCACohortQueries {
   public CohortDefinition getTotal() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Total of  TX CXCA SCRN");
+    cd.setName("Total of  TX CXCA SCRN Positive With a Treatment Type");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition b =
-        this.cxcascrnCohortQueries.getTotal(CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE);
-    CohortDefinition bb = this.getBB();
+    CohortDefinition patientsOnArtWithPositiveScreening =
+        this.cxcascrnCohortQueries.getTotalPatientsWithPositiveResult();
+    CohortDefinition patientsWhoReceivedATreatmentType = getPatientsWhoReceivedATreatmentType();
 
-    cd.addSearch("B", EptsReportUtils.map(b, MAPPINGS));
     cd.addSearch(
-        "BB",
+        "patientsOnArtWithPositiveScreening",
+        EptsReportUtils.map(patientsOnArtWithPositiveScreening, MAPPINGS));
+    cd.addSearch(
+        "patientsWhoReceivedATreatmentType",
         EptsReportUtils.map(
-            bb, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            patientsWhoReceivedATreatmentType,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("B AND BB");
+    cd.setCompositionString(
+        "patientsOnArtWithPositiveScreening AND patientsWhoReceivedATreatmentType");
 
     return cd;
   }
@@ -372,6 +367,778 @@ public class TXCXCACohortQueries {
 
     cd.setCompositionString("CCD AND SCD");
 
+    return cd;
+  }
+
+  /**
+   * <b>SCRN_FR7</b> Patient who received a treatment type during the reporting period
+   *
+   * <p>The system will identify female patients who received a treatment type during the period by
+   * selecting all patients who:
+   *
+   * <ul>
+   *   <li>have Tratamento Feito = Crioterapia or Termoablação registered on the Ficha de Registo
+   *       Individual: Rastreio dos Cancros do Colo do Utero e da Mama with a Data do Tratamento
+   *       between the most recent positive VIA result (TX_FR6) and the reporting period end date OR
+   *   <li>have Qual foi o tratamento/avaliação no HdR = Crioterapia Feita” or “Termocoagulação
+   *       Feita” or “Leep Feito” or “Conização Feita”) registered in Ficha de Registo Individual:
+   *       Rastreio dos Cancros do Colo do Útero e da Mama between the most recent positive VIA
+   *       result (TX_FR6) and the reporting period end date.
+   * </ul>
+   *
+   * <p>For patients who have more than one treatment registered during the reporting period, the
+   * system will consider the most recent one among them.
+   *
+   * <p>For two different treatment types registered on the same date, the algorithm will apply the
+   * following hierarchy:
+   *
+   * <ul>
+   *   <li>1 - LEEP / Conização
+   *   <li>2 - Termocoagulação
+   *   <li>3 - Crioterapia
+   * </ul>
+   */
+  public CohortDefinition getPatientsWhoReceivedATreatmentType() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patient who received a treatment type during the reporting period");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("28", hivMetadata.getRastreioDoCancroDoColoUterinoEncounterType().getEncounterTypeId());
+    map.put("2094", hivMetadata.getResultadoViaConcept().getConceptId());
+    map.put("703", hivMetadata.getPositive().getConceptId());
+    map.put("2093", hivMetadata.getSuspectedCancerConcept().getConceptId());
+    map.put("664", hivMetadata.getNegative().getConceptId());
+    map.put("165436", hivMetadata.getHumanPapillomavirusDnaConcept().getConceptId());
+    map.put("1185", hivMetadata.getTreatmentConcept().getConceptId());
+    map.put("2149", hivMetadata.getViaResultOnTheReferenceConcept().getConceptId());
+    map.put("23974", hivMetadata.getCryotherapyConcept().getConceptId());
+    map.put("165439", hivMetadata.getTermoablationConcept().getConceptId());
+    map.put("23972", hivMetadata.getThermocoagulationConcept().getConceptId());
+    map.put("23970", hivMetadata.getLeepConcept().getConceptId());
+    map.put("23973", hivMetadata.getconizationConcept().getConceptId());
+
+    String query =
+        "SELECT     treatment.patient_id "
+            + "FROM ( "
+            + "SELECT     p.patient_id, "
+            + "     MAX(o.obs_datetime) AS last_treatment_result_date "
+            + "FROM       patient p "
+            + "               INNER JOIN encounter e "
+            + "                          ON         e.patient_id = p.patient_id "
+            + "               INNER JOIN obs o "
+            + "                          ON         o.encounter_id = e.encounter_id "
+            + "               INNER JOIN "
+            + "           ( "
+            + "               SELECT     p.patient_id, "
+            + "                          last_result.encounter_date AS last_positive_encounter "
+            + "               FROM       patient p "
+            + "                              INNER JOIN encounter e "
+            + "                                         ON         e.patient_id = p.patient_id "
+            + "                              INNER JOIN obs o "
+            + "                                         ON         o.encounter_id = e.encounter_id "
+            + "                              INNER JOIN "
+            + "                          ( "
+            + "                              SELECT     p.patient_id, "
+            + "                                         Max(e.encounter_datetime) AS encounter_date "
+            + "                              FROM       patient p "
+            + "                                             INNER JOIN encounter e "
+            + "                                                        ON         e.patient_id = p.patient_id "
+            + "                                             INNER JOIN obs o "
+            + "                                                        ON         o.encounter_id =e.encounter_id "
+            + "                              WHERE      p.voided = 0 "
+            + "                                AND        e.voided = 0 "
+            + "                                AND        o.voided = 0 "
+            + "                                AND        e.encounter_datetime BETWEEN :startDate AND        :endDate "
+            + "                                AND        e.location_id = :location "
+            + "                                AND        e.encounter_type = ${28} "
+            + "                                AND        o.concept_id = ${2094} "
+            + "                                AND        o.value_coded IN (${703}, "
+            + "                                                             ${2093}, "
+            + "                                                             ${664}) "
+            + "                              GROUP BY   p.patient_id) AS last_result "
+            + "                          ON         last_result.patient_id = p.patient_id "
+            + "               WHERE      p.voided = 0 "
+            + "                 AND        e.voided = 0 "
+            + "                 AND        o.voided = 0 "
+            + "                 AND        e.encounter_type = ${28} "
+            + "                 AND        e.encounter_datetime = last_result.encounter_date "
+            + "                 AND        e.location_id = :location "
+            + "                 AND        o.concept_id = ${2094} "
+            + "                 AND        o.value_coded = ${703} "
+            + "               GROUP BY   p.patient_id ) positive_via "
+            + "WHERE      p.voided = 0 "
+            + "  AND        o.voided = 0 "
+            + "  AND        e.encounter_type = ${28} "
+            + "  AND        e.location_id = :location "
+            + "  AND        ( ( "
+            + "                   o.concept_id = ${1185} "
+            + "                       AND        o.value_coded IN ( ${23974}, "
+            + "                                                      ${165439} ) "
+            + "                       AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate) "
+            + "    OR         ( "
+            + "                   o.concept_id = ${2149} "
+            + "                       AND        o.value_coded IN ( ${23974}, "
+            + "                                                      ${23972}, "
+            + "                                                      ${23970}, "
+            + "                                                      ${23973} ) "
+            + "                       AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate) ) "
+            + "GROUP BY p.patient_id "
+            + "           ) treatment";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * <b>LEEP</b>
+   *
+   * <p>All patients who screened positive and received treatment (TX_FR3) who have or Qual foi o
+   * tratamento/avaliação no HdR = "LEEP Feita” or “Conização Feita."
+   *
+   * <p>For patients who have more than one treatment registered during the reporting period, the
+   * system will consider the most recent one among them.
+   *
+   * <p>For two different treatment types registered on the same date, the algorithm will apply the
+   * following hierarchy:
+   *
+   * <ul>
+   *   <li>1 - LEEP / Conização
+   *   <li>2 - Termocoagulação
+   *   <li>3 - Crioterapia
+   * </ul>
+   */
+  public CohortDefinition getPatientsWhoHaveLeepOrConizationTreatmentType() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients who have Leep or Conization treatment type during the reporting period");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("28", hivMetadata.getRastreioDoCancroDoColoUterinoEncounterType().getEncounterTypeId());
+    map.put("2094", hivMetadata.getResultadoViaConcept().getConceptId());
+    map.put("703", hivMetadata.getPositive().getConceptId());
+    map.put("2093", hivMetadata.getSuspectedCancerConcept().getConceptId());
+    map.put("664", hivMetadata.getNegative().getConceptId());
+    map.put("165436", hivMetadata.getHumanPapillomavirusDnaConcept().getConceptId());
+    map.put("2149", hivMetadata.getViaResultOnTheReferenceConcept().getConceptId());
+    map.put("23970", hivMetadata.getLeepConcept().getConceptId());
+    map.put("23973", hivMetadata.getconizationConcept().getConceptId());
+
+    String query =
+        "SELECT leep_conization.patient_id "
+            + "FROM   ( "
+            + "           SELECT     p.patient_id, "
+            + "                      Max(o.obs_datetime) "
+            + "           FROM       patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                     ON         e.patient_id = p.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                     ON         o.encounter_id = e.encounter_id "
+            + "                          INNER JOIN "
+            + "                      ( "
+            + "                          SELECT     p.patient_id, "
+            + "                                     last_result.encounter_date AS last_positive_encounter "
+            + "                          FROM       patient p "
+            + "                                         INNER JOIN encounter e "
+            + "                                                    ON         e.patient_id = p.patient_id "
+            + "                                         INNER JOIN obs o "
+            + "                                                    ON         o.encounter_id = e.encounter_id "
+            + "                                         INNER JOIN "
+            + "                                     ( "
+            + "                                         SELECT     p.patient_id, "
+            + "                                                    Max(e.encounter_datetime) AS encounter_date "
+            + "                                         FROM       patient p "
+            + "                                                        INNER JOIN encounter e "
+            + "                                                                   ON         e.patient_id = p.patient_id "
+            + "                                                        INNER JOIN obs o "
+            + "                                                                   ON         o.encounter_id =e.encounter_id "
+            + "                                         WHERE      p.voided = 0 "
+            + "                                           AND        e.voided = 0 "
+            + "                                           AND        o.voided = 0 "
+            + "                                           AND        e.encounter_datetime BETWEEN :startDate AND        :endDate "
+            + "                                           AND        e.location_id = :location "
+            + "                                           AND        e.encounter_type = ${28} "
+            + "                                           AND        o.concept_id = ${2094} "
+            + "                                           AND        o.value_coded IN (${703}, "
+            + "                                                                        ${2093}, "
+            + "                                                                        ${664}) "
+            + "                                         GROUP BY   p.patient_id) AS last_result "
+            + "                                     ON         last_result.patient_id = p.patient_id "
+            + "                          WHERE      p.voided = 0 "
+            + "                            AND        e.voided = 0 "
+            + "                            AND        o.voided = 0 "
+            + "                            AND        e.encounter_type = ${28} "
+            + "                            AND        e.encounter_datetime = last_result.encounter_date "
+            + "                            AND        e.location_id = :location "
+            + "                            AND        o.concept_id = ${2094} "
+            + "                            AND        o.value_coded = ${703} "
+            + "                          GROUP BY   p.patient_id ) positive_via "
+            + "WHERE      p.voided = 0 "
+            + "  AND        o.voided = 0 "
+            + "  AND        e.encounter_type = ${28} "
+            + "  AND        e.location_id = :location "
+            + "  AND        o.concept_id = ${2149} "
+            + "  AND        o.value_coded IN ( ${23970}, ${23973} ) "
+            + "  AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate "
+            + "  GROUP BY p.patient_id ) leep_conization";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * <b>Thermocoagulation</b>
+   *
+   * <p>All patients who screened positive and received treatment (TX_FR3) who have Tratamento Feito
+   * = Termoablação or Qual foi o tratamento/avaliação no HdR = "Termocolagulação Feita."
+   *
+   * <p>For patients who have more than one treatment registered during the reporting period, the
+   * system will consider the most recent one among them.
+   *
+   * <p>For two different treatment types registered on the same date, the algorithm will apply the
+   * following hierarchy:
+   *
+   * <ul>
+   *   <li>1 - LEEP / Conização
+   *   <li>2 - Termocoagulação
+   *   <li>3 - Crioterapia
+   * </ul>
+   */
+  public CohortDefinition getPatientsWhoHaveTermoablationORThermocoagulationAsLastTreatmentType() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName(
+        "Patients who have Termoablation OR Thermocoagulation as last treatment type during the reporting period");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("28", hivMetadata.getRastreioDoCancroDoColoUterinoEncounterType().getEncounterTypeId());
+    map.put("2094", hivMetadata.getResultadoViaConcept().getConceptId());
+    map.put("703", hivMetadata.getPositive().getConceptId());
+    map.put("2093", hivMetadata.getSuspectedCancerConcept().getConceptId());
+    map.put("664", hivMetadata.getNegative().getConceptId());
+    map.put("165436", hivMetadata.getHumanPapillomavirusDnaConcept().getConceptId());
+    map.put("1185", hivMetadata.getTreatmentConcept().getConceptId());
+    map.put("165439", hivMetadata.getTermoablationConcept().getConceptId());
+    map.put("2149", hivMetadata.getViaResultOnTheReferenceConcept().getConceptId());
+    map.put("23970", hivMetadata.getLeepConcept().getConceptId());
+    map.put("23973", hivMetadata.getconizationConcept().getConceptId());
+    map.put("23972", hivMetadata.getThermocoagulationConcept().getConceptId());
+
+    String query =
+        "SELECT termoablation_or_thermocoagulation.patient_id "
+            + "FROM   ( "
+            + "           SELECT     p.patient_id, "
+            + "                      Max(o.obs_datetime) AS last_termoablation_or_thermocoagulation "
+            + "           FROM       patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                     ON         e.patient_id = p.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                     ON         o.encounter_id = e.encounter_id "
+            + "                          INNER JOIN "
+            + "                      ( "
+            + "                          SELECT     p.patient_id, "
+            + "                                     last_result.encounter_date AS last_positive_encounter "
+            + "                          FROM       patient p "
+            + "                                         INNER JOIN encounter e "
+            + "                                                    ON         e.patient_id = p.patient_id "
+            + "                                         INNER JOIN obs o "
+            + "                                                    ON         o.encounter_id = e.encounter_id "
+            + "                                         INNER JOIN "
+            + "                                     ( "
+            + "                                         SELECT     p.patient_id, "
+            + "                                                    Max(e.encounter_datetime) AS encounter_date "
+            + "                                         FROM       patient p "
+            + "                                                        INNER JOIN encounter e "
+            + "                                                                   ON         e.patient_id = p.patient_id "
+            + "                                                        INNER JOIN obs o "
+            + "                                                                   ON         o.encounter_id =e.encounter_id "
+            + "                                         WHERE      p.voided = 0 "
+            + "                                           AND        e.voided = 0 "
+            + "                                           AND        o.voided = 0 "
+            + "                                           AND        e.encounter_datetime BETWEEN :startDate AND        :endDate "
+            + "                                           AND        e.location_id = :location "
+            + "                                           AND        e.encounter_type = ${28} "
+            + "                                           AND        o.concept_id = ${2094} "
+            + "                                           AND        o.value_coded IN (${703}, "
+            + "                                                                        ${2093}, "
+            + "                                                                        ${664}) "
+            + "                                         GROUP BY   p.patient_id) AS last_result "
+            + "                                     ON         last_result.patient_id = p.patient_id "
+            + "                          WHERE      p.voided = 0 "
+            + "                            AND        e.voided = 0 "
+            + "                            AND        o.voided = 0 "
+            + "                            AND        e.encounter_type = ${28} "
+            + "                            AND        e.encounter_datetime = last_result.encounter_date "
+            + "                            AND        e.location_id = :location "
+            + "                            AND        o.concept_id = ${2094} "
+            + "                            AND        o.value_coded = ${703} "
+            + "                          GROUP BY   p.patient_id ) positive_via "
+            + "           WHERE      p.voided = 0 "
+            + "             AND        o.voided = 0 "
+            + "             AND        e.encounter_type = ${28} "
+            + "             AND        e.location_id = :location "
+            + "             AND      ( (o.concept_id = ${1185} "
+            + "             AND         o.value_coded = ${165439}) "
+            + "              OR        (o.concept_id = ${2149} "
+            + "             AND        o.value_coded = ${23972}) )  "
+            + "             AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate "
+            + "           GROUP BY   p.patient_id) termoablation_or_thermocoagulation "
+            + "WHERE  NOT EXISTS "
+            + "           ( "
+            + "               SELECT     e.patient_id "
+            + "               FROM       encounter e "
+            + "                              INNER JOIN obs o "
+            + "                                         ON         o.encounter_id = e.encounter_id "
+            + "                              INNER JOIN "
+            + "                          ( "
+            + "                              SELECT     p.patient_id, "
+            + "                                         last_result.encounter_date AS last_positive_encounter "
+            + "                              FROM       patient p "
+            + "                                             INNER JOIN encounter e "
+            + "                                                        ON         e.patient_id = p.patient_id "
+            + "                                             INNER JOIN obs o "
+            + "                                                        ON         o.encounter_id = e.encounter_id "
+            + "                                             INNER JOIN "
+            + "                                         ( "
+            + "                                             SELECT     p.patient_id, "
+            + "                                                        max(e.encounter_datetime) AS encounter_date "
+            + "                                             FROM       patient p "
+            + "                                                            INNER JOIN encounter e "
+            + "                                                                       ON         e.patient_id = p.patient_id "
+            + "                                                            INNER JOIN obs o "
+            + "                                                                       ON         o.encounter_id =e.encounter_id "
+            + "                                             WHERE      p.voided = 0 "
+            + "                                               AND        e.voided = 0 "
+            + "                                               AND        o.voided = 0 "
+            + "                                               AND        e.encounter_datetime BETWEEN :startDate AND        :endDate "
+            + "                                               AND        e.location_id = :location "
+            + "                                               AND        e.encounter_type = ${28} "
+            + "                                               AND        o.concept_id = ${2094} "
+            + "                                               AND        o.value_coded IN (${703}, "
+            + "                                                                            ${2093}, "
+            + "                                                                            ${664}) "
+            + "                                             GROUP BY   p.patient_id) AS last_result "
+            + "                                         ON         last_result.patient_id = p.patient_id "
+            + "                              WHERE      p.voided = 0 "
+            + "                                AND        e.voided = 0 "
+            + "                                AND        o.voided = 0 "
+            + "                                AND        e.encounter_type = ${28} "
+            + "                                AND        e.encounter_datetime = last_result.encounter_date "
+            + "                                AND        e.location_id = :location "
+            + "                                AND        o.concept_id = ${2094} "
+            + "                                AND        o.value_coded = ${703} "
+            + "                              GROUP BY   p.patient_id ) positive_via "
+            + "               WHERE      e.voided = 0 "
+            + "                 AND        o.voided = 0 "
+            + "                 AND        e.encounter_type = ${28} "
+            + "                 AND        e.location_id = :location "
+            + "                 AND        o.concept_id = ${2149} "
+            + "                 AND        o.value_coded IN (${23973}, "
+            + "                                              ${23970}) "
+            + "                 AND        termoablation_or_thermocoagulation.patient_id = e.patient_id "
+            + "                 AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate "
+            + "                 AND        o.obs_datetime >= termoablation_or_thermocoagulation.last_termoablation_or_thermocoagulation )";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * <b>Cryotherapy</b>
+   *
+   * <p>All patients who screened positive and received treatment (TX_FR3) who have Tratamento Feito
+   * = Crioterapia or Qual foi o tratamento/avaliação no HdR= "criotherapia Feita."
+   *
+   * <p>For patients who have more than one treatment registered during the reporting period, the
+   * system will consider the most recent one among them.
+   *
+   * <p>For two different treatment types registered on the same date, the algorithm will apply the
+   * following hierarchy:
+   *
+   * <ul>
+   *   <li>1 - LEEP / Conização
+   *   <li>2 - Termocoagulação
+   *   <li>3 - Crioterapia
+   * </ul>
+   */
+  public CohortDefinition getPatientsWhoHaveCryotherapyAsLastTreatmentType() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients who have Cryotherapy as last treatment type during the reporting period");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("28", hivMetadata.getRastreioDoCancroDoColoUterinoEncounterType().getEncounterTypeId());
+    map.put("2094", hivMetadata.getResultadoViaConcept().getConceptId());
+    map.put("703", hivMetadata.getPositive().getConceptId());
+    map.put("2093", hivMetadata.getSuspectedCancerConcept().getConceptId());
+    map.put("664", hivMetadata.getNegative().getConceptId());
+    map.put("165436", hivMetadata.getHumanPapillomavirusDnaConcept().getConceptId());
+    map.put("1185", hivMetadata.getTreatmentConcept().getConceptId());
+    map.put("165439", hivMetadata.getTermoablationConcept().getConceptId());
+    map.put("2149", hivMetadata.getViaResultOnTheReferenceConcept().getConceptId());
+    map.put("23970", hivMetadata.getLeepConcept().getConceptId());
+    map.put("23973", hivMetadata.getconizationConcept().getConceptId());
+    map.put("23972", hivMetadata.getThermocoagulationConcept().getConceptId());
+    map.put("23974", hivMetadata.getCryotherapyConcept().getConceptId());
+
+    String query =
+        "SELECT cryotherapy.patient_id "
+            + "FROM   ( "
+            + "                  SELECT     p.patient_id, "
+            + "                             Max(o.obs_datetime) AS last_cryotherapy "
+            + "                  FROM       patient p "
+            + "                  INNER JOIN encounter e "
+            + "                  ON         e.patient_id = p.patient_id "
+            + "                  INNER JOIN obs o "
+            + "                  ON         o.encounter_id = e.encounter_id "
+            + "                  INNER JOIN "
+            + "                             ( "
+            + "                                        SELECT     p.patient_id, "
+            + "                                                   last_result.encounter_date AS last_positive_encounter "
+            + "                                        FROM       patient p "
+            + "                                        INNER JOIN encounter e "
+            + "                                        ON         e.patient_id = p.patient_id "
+            + "                                        INNER JOIN obs o "
+            + "                                        ON         o.encounter_id = e.encounter_id "
+            + "                                        INNER JOIN "
+            + "                                                   ( "
+            + "                                                              SELECT     p.patient_id, "
+            + "                                                                         Max(e.encounter_datetime) AS encounter_date "
+            + "                                                              FROM       patient p "
+            + "                                                              INNER JOIN encounter e "
+            + "                                                              ON         e.patient_id = p.patient_id "
+            + "                                                              INNER JOIN obs o "
+            + "                                                              ON         o.encounter_id =e.encounter_id "
+            + "                                                              WHERE      p.voided = 0 "
+            + "                                                              AND        e.voided = 0 "
+            + "                                                              AND        o.voided = 0 "
+            + "                                                              AND        e.encounter_datetime BETWEEN :startDate AND        :endDate "
+            + "                                                              AND        e.location_id = :location "
+            + "                                                              AND        e.encounter_type = ${28} "
+            + "                                                              AND        o.concept_id = ${2094} "
+            + "                                                              AND        o.value_coded IN (${703}, "
+            + "                                                                                           ${2093}, "
+            + "                                                                                           ${664}) "
+            + "                                                              GROUP BY   p.patient_id) AS last_result "
+            + "                                        ON         last_result.patient_id = p.patient_id "
+            + "                                        WHERE      p.voided = 0 "
+            + "                                        AND        e.voided = 0 "
+            + "                                        AND        o.voided = 0 "
+            + "                                        AND        e.encounter_type = ${28} "
+            + "                                        AND        e.encounter_datetime = last_result.encounter_date "
+            + "                                        AND        e.location_id = :location "
+            + "                                        AND        o.concept_id = ${2094} "
+            + "                                        AND        o.value_coded = ${703} "
+            + "                                        GROUP BY   p.patient_id ) positive_via "
+            + "                  WHERE      p.voided = 0 "
+            + "                  AND        o.voided = 0 "
+            + "                  AND        e.encounter_type = ${28} "
+            + "                  AND        e.location_id = :location "
+            + "                  AND        o.concept_id IN ( ${1185}, "
+            + "                                              ${2149} ) "
+            + "                  AND        o.value_coded = ${23974} "
+            + "                  AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate "
+            + "                  GROUP BY   p.patient_id) cryotherapy "
+            + "WHERE  NOT EXISTS "
+            + "       ( "
+            + "                  SELECT     e.patient_id "
+            + "                  FROM       encounter e "
+            + "                  INNER JOIN obs o "
+            + "                  ON         o.encounter_id = e.encounter_id "
+            + "                  INNER JOIN "
+            + "                             ( "
+            + "                                        SELECT     p.patient_id, "
+            + "                                                   last_result.encounter_date AS last_positive_encounter "
+            + "                                        FROM       patient p "
+            + "                                        INNER JOIN encounter e "
+            + "                                        ON         e.patient_id = p.patient_id "
+            + "                                        INNER JOIN obs o "
+            + "                                        ON         o.encounter_id = e.encounter_id "
+            + "                                        INNER JOIN "
+            + "                                                   ( "
+            + "                                                              SELECT     p.patient_id, "
+            + "                                                                         max(e.encounter_datetime) AS encounter_date "
+            + "                                                              FROM       patient p "
+            + "                                                              INNER JOIN encounter e "
+            + "                                                              ON         e.patient_id = p.patient_id "
+            + "                                                              INNER JOIN obs o "
+            + "                                                              ON         o.encounter_id =e.encounter_id "
+            + "                                                              WHERE      p.voided = 0 "
+            + "                                                              AND        e.voided = 0 "
+            + "                                                              AND        o.voided = 0 "
+            + "                                                              AND        e.encounter_datetime BETWEEN :startDate AND        :endDate "
+            + "                                                              AND        e.location_id = :location "
+            + "                                                              AND        e.encounter_type = ${28} "
+            + "                                                              AND        o.concept_id = ${2094} "
+            + "                                                              AND        o.value_coded IN (${703}, "
+            + "                                                                                           ${2093}, "
+            + "                                                                                           ${664}) "
+            + "                                                              GROUP BY   p.patient_id) AS last_result "
+            + "                                        ON         last_result.patient_id = p.patient_id "
+            + "                                        WHERE      p.voided = 0 "
+            + "                                        AND        e.voided = 0 "
+            + "                                        AND        o.voided = 0 "
+            + "                                        AND        e.encounter_type = ${28} "
+            + "                                        AND        e.encounter_datetime = last_result.encounter_date "
+            + "                                        AND        e.location_id = :location "
+            + "                                        AND        o.concept_id = ${2094} "
+            + "                                        AND        o.value_coded = ${703} "
+            + "                                        GROUP BY   p.patient_id ) positive_via "
+            + "                  WHERE      e.voided = 0 "
+            + "                  AND        o.voided = 0 "
+            + "                  AND        cryotherapy.patient_id = e.patient_id "
+            + "                  AND        e.encounter_type = ${28} "
+            + "                  AND        e.location_id = :location "
+            + "                  AND        ( (o.concept_id = ${1185} "
+            + "                  AND           o.value_coded = ${165439}) "
+            + "                   OR          (o.concept_id = ${2149} "
+            + "                  AND           o.value_coded IN (${23970}, "
+            + "                                               ${23972}, "
+            + "                                               ${23973})) ) "
+            + "                  AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate "
+            + "                  AND        o.obs_datetime >= cryotherapy.last_cryotherapy ) ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  public CohortDefinition getFirstTimeScreenedPatientsWithCryotherapy() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("First Time Screened With Cryotherapy");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition firstTimeScreened = getFirstTimeScreened();
+    CohortDefinition cryotherapy = getPatientsWhoHaveCryotherapyAsLastTreatmentType();
+
+    cd.addSearch("firstTimeScreened", EptsReportUtils.map(firstTimeScreened, MAPPINGS));
+    cd.addSearch("cryotherapy", EptsReportUtils.map(cryotherapy, MAPPINGS));
+
+    cd.setCompositionString("firstTimeScreened AND cryotherapy");
+    return cd;
+  }
+
+  public CohortDefinition getFirstTimeScreenedPatientsWithThermocoagulation() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("First Time Screened With Thermocoagulation ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition firstTimeScreened = getFirstTimeScreened();
+    CohortDefinition thermocoagulation =
+        getPatientsWhoHaveTermoablationORThermocoagulationAsLastTreatmentType();
+
+    cd.addSearch("firstTimeScreened", EptsReportUtils.map(firstTimeScreened, MAPPINGS));
+    cd.addSearch("thermocoagulation", EptsReportUtils.map(thermocoagulation, MAPPINGS));
+
+    cd.setCompositionString("firstTimeScreened AND thermocoagulation");
+    return cd;
+  }
+
+  public CohortDefinition getFirstTimeScreenedPatientsWithLeepOrConization() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("First Time Screened With Leep Or Conization ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition firstTimeScreened = getFirstTimeScreened();
+    CohortDefinition leepOrConization = getPatientsWhoHaveLeepOrConizationTreatmentType();
+
+    cd.addSearch("firstTimeScreened", EptsReportUtils.map(firstTimeScreened, MAPPINGS));
+    cd.addSearch("leepOrConization", EptsReportUtils.map(leepOrConization, MAPPINGS));
+
+    cd.setCompositionString("firstTimeScreened AND leepOrConization");
+    return cd;
+  }
+
+  public CohortDefinition getRescreenedAfterPreviousNegativePatientsWithCryotherapy() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Rescreened After Previous Negative Patients With Cryotherapy ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition rescreenedAfterPreviousNegative = getRescreenedAfterPreviousNegative();
+    CohortDefinition cryotherapy = getPatientsWhoHaveCryotherapyAsLastTreatmentType();
+
+    cd.addSearch(
+        "rescreenedAfterPreviousNegative",
+        EptsReportUtils.map(rescreenedAfterPreviousNegative, MAPPINGS));
+    cd.addSearch("cryotherapy", EptsReportUtils.map(cryotherapy, MAPPINGS));
+
+    cd.setCompositionString("rescreenedAfterPreviousNegative AND cryotherapy");
+    return cd;
+  }
+
+  public CohortDefinition getRescreenedAfterPreviousNegativePatientsWithThermocoagulation() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Rescreened After Previous Negative Patients With Thermocoagulation ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition rescreenedAfterPreviousNegative = getRescreenedAfterPreviousNegative();
+    CohortDefinition thermocoagulation =
+        getPatientsWhoHaveTermoablationORThermocoagulationAsLastTreatmentType();
+
+    cd.addSearch(
+        "rescreenedAfterPreviousNegative",
+        EptsReportUtils.map(rescreenedAfterPreviousNegative, MAPPINGS));
+    cd.addSearch("thermocoagulation", EptsReportUtils.map(thermocoagulation, MAPPINGS));
+
+    cd.setCompositionString("rescreenedAfterPreviousNegative AND thermocoagulation");
+    return cd;
+  }
+
+  public CohortDefinition getRescreenedAfterPreviousNegativePatientsWithLeepOrConization() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Rescreened After Previous Negative Patients With Leep Or Conization ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition rescreenedAfterPreviousNegative = getRescreenedAfterPreviousNegative();
+    CohortDefinition leepOrConization = getPatientsWhoHaveLeepOrConizationTreatmentType();
+
+    cd.addSearch(
+        "rescreenedAfterPreviousNegative",
+        EptsReportUtils.map(rescreenedAfterPreviousNegative, MAPPINGS));
+    cd.addSearch("leepOrConization", EptsReportUtils.map(leepOrConization, MAPPINGS));
+
+    cd.setCompositionString("rescreenedAfterPreviousNegative AND leepOrConization");
+    return cd;
+  }
+
+  public CohortDefinition getPostTreatmentFollowUpPatientsWithCryotherapy() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Post Treatment Follow-Up Patients With Cryotherapy ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition postTreatmentFollowUp = getPatientsWithPostTreatmentFollowUp();
+    CohortDefinition cryotherapy = getPatientsWhoHaveCryotherapyAsLastTreatmentType();
+
+    cd.addSearch("postTreatmentFollowUp", EptsReportUtils.map(postTreatmentFollowUp, MAPPINGS));
+    cd.addSearch("cryotherapy", EptsReportUtils.map(cryotherapy, MAPPINGS));
+
+    cd.setCompositionString("postTreatmentFollowUp AND cryotherapy");
+    return cd;
+  }
+
+  public CohortDefinition getPostTreatmentFollowUpPatientsWithThermocoagulation() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("PostTreatmentFollowUp Patients With Thermocoagulation ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition postTreatmentFollowUp = getPatientsWithPostTreatmentFollowUp();
+    CohortDefinition thermocoagulation =
+        getPatientsWhoHaveTermoablationORThermocoagulationAsLastTreatmentType();
+
+    cd.addSearch("postTreatmentFollowUp", EptsReportUtils.map(postTreatmentFollowUp, MAPPINGS));
+    cd.addSearch("thermocoagulation", EptsReportUtils.map(thermocoagulation, MAPPINGS));
+
+    cd.setCompositionString("postTreatmentFollowUp AND thermocoagulation");
+    return cd;
+  }
+
+  public CohortDefinition getPostTreatmentFollowUpPatientsWithLeepOrConization() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Post Treatment Follow-Up Patients With Leep Or Conization ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition postTreatmentFollowUp = getPatientsWithPostTreatmentFollowUp();
+    CohortDefinition leepOrConization = getPatientsWhoHaveLeepOrConizationTreatmentType();
+
+    cd.addSearch("postTreatmentFollowUp", EptsReportUtils.map(postTreatmentFollowUp, MAPPINGS));
+    cd.addSearch("leepOrConization", EptsReportUtils.map(leepOrConization, MAPPINGS));
+
+    cd.setCompositionString("postTreatmentFollowUp AND leepOrConization");
+    return cd;
+  }
+
+  public CohortDefinition getRescreenedAfterPreviousPositiveWithCryotherapy() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Rescreened After Previous Positive Patients With Cryotherapy ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition rescreenedAfterPreviousPositive = getRescreenedAfterPreviousPositive();
+    CohortDefinition cryotherapy = getPatientsWhoHaveCryotherapyAsLastTreatmentType();
+
+    cd.addSearch(
+        "rescreenedAfterPreviousPositive",
+        EptsReportUtils.map(rescreenedAfterPreviousPositive, MAPPINGS));
+    cd.addSearch("cryotherapy", EptsReportUtils.map(cryotherapy, MAPPINGS));
+
+    cd.setCompositionString("rescreenedAfterPreviousPositive AND cryotherapy");
+    return cd;
+  }
+
+  public CohortDefinition getRescreenedAfterPreviousPositiveWithThermocoagulation() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Rescreened After Previous Positive Patients With Thermocoagulation ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition rescreenedAfterPreviousPositive = getRescreenedAfterPreviousPositive();
+    CohortDefinition thermocoagulation =
+        getPatientsWhoHaveTermoablationORThermocoagulationAsLastTreatmentType();
+
+    cd.addSearch(
+        "rescreenedAfterPreviousPositive",
+        EptsReportUtils.map(rescreenedAfterPreviousPositive, MAPPINGS));
+    cd.addSearch("thermocoagulation", EptsReportUtils.map(thermocoagulation, MAPPINGS));
+
+    cd.setCompositionString("rescreenedAfterPreviousPositive AND thermocoagulation");
+    return cd;
+  }
+
+  public CohortDefinition getRescreenedAfterPreviousPositivePatientsWithLeepOrConization() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Rescreened After Previous Positive Patients With Leep Or Conization ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition rescreenedAfterPreviousPositive = getRescreenedAfterPreviousPositive();
+    CohortDefinition leepOrConization = getPatientsWhoHaveLeepOrConizationTreatmentType();
+
+    cd.addSearch(
+        "rescreenedAfterPreviousPositive",
+        EptsReportUtils.map(rescreenedAfterPreviousPositive, MAPPINGS));
+    cd.addSearch("leepOrConization", EptsReportUtils.map(leepOrConization, MAPPINGS));
+
+    cd.setCompositionString("rescreenedAfterPreviousPositive AND leepOrConization");
     return cd;
   }
 }
