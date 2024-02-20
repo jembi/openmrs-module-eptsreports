@@ -419,9 +419,14 @@ public class CXCASCRNCohortQueries {
     map.put("703", hivMetadata.getPositive().getConceptId());
 
     String query =
-        "SELECT positivo.patient_id "
-            + "        FROM   (SELECT p.patient_id, "
-            + "                       Max(e.encounter_datetime) AS last_positivo_result_date "
+        "SELECT p.patient_id "
+            + " FROM patient p "
+            + "        INNER JOIN encounter e "
+            + "                   ON e.patient_id = p.patient_id "
+            + "        INNER JOIN obs o "
+            + "                   ON o.encounter_id = e.encounter_id "
+            + "        INNER JOIN (SELECT p.patient_id, "
+            + "                       Max(e.encounter_datetime) AS last_via_result_date "
             + "                FROM   patient p "
             + "                           INNER JOIN encounter e "
             + "                                      ON e.patient_id = p.patient_id "
@@ -432,10 +437,18 @@ public class CXCASCRNCohortQueries {
             + "                  AND o.voided = 0 "
             + "                  AND e.encounter_type = ${28} "
             + "                  AND o.concept_id = ${2094}  "
-            + "                  AND o.value_coded = ${703} "
             + "                  AND e.location_id = :location "
             + "                  AND e.encounter_datetime BETWEEN :startDate AND :endDate "
-            + "                GROUP  BY p.patient_id) positivo ";
+            + "                GROUP  BY p.patient_id) last_via "
+            + "                       ON last_via.patient_id = p.patient_id "
+            + " WHERE  p.voided = 0 "
+            + "   AND e.voided = 0 "
+            + "   AND o.voided = 0 "
+            + "   AND e.encounter_datetime = last_via.last_via_result_date "
+            + "   AND e.encounter_type = ${28} "
+            + "   AND o.concept_id = ${2094}  "
+            + "   AND o.value_coded = ${703} "
+            + "   AND e.location_id = :location ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
