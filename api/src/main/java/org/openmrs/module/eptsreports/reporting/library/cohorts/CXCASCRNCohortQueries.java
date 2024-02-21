@@ -417,6 +417,8 @@ public class CXCASCRNCohortQueries {
     map.put("28", hivMetadata.getRastreioDoCancroDoColoUterinoEncounterType().getEncounterTypeId());
     map.put("2094", hivMetadata.getResultadoViaConcept().getConceptId());
     map.put("703", hivMetadata.getPositive().getConceptId());
+    map.put("2093", hivMetadata.getSuspectedCancerConcept().getConceptId());
+    map.put("664", hivMetadata.getNegative().getConceptId());
 
     String query =
         "SELECT p.patient_id "
@@ -437,6 +439,9 @@ public class CXCASCRNCohortQueries {
             + "                  AND o.voided = 0 "
             + "                  AND e.encounter_type = ${28} "
             + "                  AND o.concept_id = ${2094}  "
+            + "                  AND o.value_coded IN (${703}, "
+            + "                                        ${2093}, "
+            + "                                        ${664}) "
             + "                  AND e.location_id = :location "
             + "                  AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "                GROUP  BY p.patient_id) last_via "
