@@ -273,10 +273,9 @@ public class CXCASCRNCohortQueries {
 
     String query =
         "SELECT patient_id "
-            + "FROM   (SELECT negative.patient_id, "
-            + "               Max(negative.negative_result_date) AS last_negative_result_Date "
-            + "        FROM   (SELECT p.patient_id, "
-            + "                       e.encounter_datetime AS negative_result_date "
+            + "FROM   ( "
+            + "               SELECT p.patient_id, "
+            + "                       MAX(e.encounter_datetime) AS last_negative_result_Date "
             + "                FROM   patient p "
             + "                           INNER JOIN encounter e "
             + "                                      ON e.patient_id = p.patient_id "
@@ -292,8 +291,7 @@ public class CXCASCRNCohortQueries {
             + "                  AND e.encounter_datetime ";
     query += beforeStartDate ? " < :startDate " : "  BETWEEN :startDate AND  :endDate ";
     query +=
-        "                GROUP  BY p.patient_id) AS negative "
-            + "        GROUP  BY patient_id) max_negative "
+        "                GROUP  BY p.patient_id) AS max_negative "
             + "WHERE  NOT EXISTS (SELECT e.patient_id "
             + "                   FROM   encounter e "
             + "                              INNER JOIN obs o "
