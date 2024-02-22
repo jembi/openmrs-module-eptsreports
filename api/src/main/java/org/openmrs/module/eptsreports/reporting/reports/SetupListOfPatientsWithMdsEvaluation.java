@@ -75,7 +75,7 @@ public class SetupListOfPatientsWithMdsEvaluation extends EptsDataExportManager 
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Template_Relatório_Avaliação_de_MDS_v2.0.1.xls",
+              "Template_MDS_v2.0.1.xls",
               "Lista De Pacientes com Avaliação da Implementação de MDS",
               getExcelDesignUuid(),
               null);
