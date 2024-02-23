@@ -315,7 +315,7 @@ public class EptsCommonDimension {
     dim.addCohortDefinition(
         "AIT",
         EptsReportUtils.map(
-            eri4MonthsCohortQueries.getPatientsWhoAreAliveAndOnTreatment(),
+            eri4MonthsCohortQueries.getPatientsWhoAreAliveAndNotTransferredOutAndOnTreatment(),
             "cohortStartDate=${cohortStartDate},cohortEndDate=${cohortEndDate},reportingEndDate=${reportingEndDate},location=${location}"));
 
     dim.addCohortDefinition(
@@ -346,7 +346,7 @@ public class EptsCommonDimension {
     dim.addCohortDefinition(
         "ANIT",
         EptsReportUtils.map(
-            eri4MonthsCohortQueries.getPatientsWhoAreAliveAndNotOnTreatment(),
+            eri4MonthsCohortQueries.getPatientsWhoAreAliveAndNotTransferredOutAndDefaulter(),
             "cohortStartDate=${cohortStartDate},cohortEndDate=${cohortEndDate},reportingEndDate=${reportingEndDate},location=${location}"));
     return dim;
   }
@@ -371,12 +371,14 @@ public class EptsCommonDimension {
     dim.addCohortDefinition(
         "DNPUD",
         EptsReportUtils.map(
-            eri2MonthsCohortQueries.getPatientsWhoDidNotPickDrugsOnTheirSecondVisit(),
+            eri2MonthsCohortQueries
+                .getPatientsWhoAreAliveAndNotTransferredOutAndDidNotPickUpDrugsBetween5to33DaysAfterArtStartDate(),
             "cohortStartDate=${cohortStartDate},cohortEndDate=${cohortEndDate},reportingEndDate=${reportingEndDate},location=${location}"));
     dim.addCohortDefinition(
         "PUD",
         EptsReportUtils.map(
-            eri2MonthsCohortQueries.getPatientsWhoPickedUpDrugsOnTheirSecondVisit(),
+            eri2MonthsCohortQueries
+                .getPatientsWhoAreAliveAndNoteTransferredOutAndPickedUpDrugsBetween5to33DaysAfterArtStartDate(),
             "cohortStartDate=${cohortStartDate},cohortEndDate=${cohortEndDate},reportingEndDate=${reportingEndDate},location=${location}"));
     dim.addCohortDefinition(
         "DP",

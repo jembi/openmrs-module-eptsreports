@@ -9,6 +9,7 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.IntensiveMonitoringQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.QualityImprovement2020Queries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportConstants;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition;
@@ -16,6 +17,7 @@ import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.common.SetComparator;
+import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,8 +41,7 @@ public class IntensiveMonitoringCohortQueries {
 
   private final EriDSDCohortQueries eriDSDCohortQueries;
 
-  private final String MAPPING2 =
-      "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}";
+  private final String MAPPING2 = "revisionEndDate=${revisionEndDate},location=${location}";
 
   private final String MAPPING3 =
       "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}";
@@ -77,7 +78,7 @@ public class IntensiveMonitoringCohortQueries {
    * reporting period Section 7.1 (endDateRevision)
    *
    * @param den indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getCat7DenMI2021Part135Definition(Integer den) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -146,8 +147,6 @@ public class IntensiveMonitoringCohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
-
     cd.addSearch(
         "A",
         EptsReportUtils.map(
@@ -190,16 +189,10 @@ public class IntensiveMonitoringCohortQueries {
             transferredIn,
             "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate},location=${location}"));
 
-    cd.addSearch(
-        "F",
-        EptsReportUtils.map(
-            transferOut,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}"));
-
     if (den == 1 || den == 3) {
-      cd.setCompositionString("A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
+      cd.setCompositionString("A AND NOT (B1 OR B2 OR B3 OR C OR D OR E)");
     } else if (den == 5) {
-      cd.setCompositionString("(A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
+      cd.setCompositionString("(A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E)");
     }
     return cd;
   }
@@ -209,7 +202,7 @@ public class IntensiveMonitoringCohortQueries {
    * reporting period Section 7.1 (endDateRevision)
    *
    * @param den indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getCat7DenMI2021Part246Definition(Integer den) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -248,7 +241,7 @@ public class IntensiveMonitoringCohortQueries {
             hivMetadata.getArtStatus().getConceptId());
 
     // DEFINITIONS FROM RF7
-    CohortDefinition transferredOut = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition transferredOut = getTranferredOutPatientsForMI7();
 
     cd.addSearch(
         "rf20Inclusion",
@@ -273,11 +266,7 @@ public class IntensiveMonitoringCohortQueries {
             transferredIn,
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
 
-    cd.addSearch(
-        "transferredOut",
-        EptsReportUtils.map(
-            transferredOut,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    cd.addSearch("transferredOut", EptsReportUtils.map(transferredOut, MAPPING2));
 
     if (den == 2 || den == 4) {
       cd.setCompositionString(
@@ -294,7 +283,7 @@ public class IntensiveMonitoringCohortQueries {
    * and reporting period Section 7 (endDateRevision)
    *
    * @param num indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getCat7NumMI2021Part135Definition(Integer num) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -310,63 +299,16 @@ public class IntensiveMonitoringCohortQueries {
     compositionCohortDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
-    CohortDefinition startedART = qualityImprovement2020CohortQueries.getMOHArtStartDate();
+    CohortDefinition denominator = null;
 
-    CohortDefinition tbActive =
-        commonCohortQueries.getMohMQPatientsOnCondition(
-            false,
-            false,
-            "once",
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            hivMetadata.getActiveTBConcept(),
-            Collections.singletonList(hivMetadata.getYesConcept()),
-            null,
-            null);
-
-    CohortDefinition tbSymptoms =
-        commonCohortQueries.getMohMQPatientsOnCondition(
-            false,
-            false,
-            "once",
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            tbMetadata.getHasTbSymptomsConcept(),
-            Collections.singletonList(hivMetadata.getYesConcept()),
-            null,
-            null);
-
-    CohortDefinition tbTreatment =
-        commonCohortQueries.getMohMQPatientsOnCondition(
-            false,
-            false,
-            "once",
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            tbMetadata.getTBTreatmentPlanConcept(),
-            Arrays.asList(
-                tbMetadata.getStartDrugsConcept(),
-                hivMetadata.getContinueRegimenConcept(),
-                hivMetadata.getCompletedConcept()),
-            null,
-            null);
-
-    CohortDefinition pregnant =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getPregnantConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
-
-    CohortDefinition breastfeeding =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getBreastfeeding().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
-
-    CohortDefinition transferredIn =
-        QualityImprovement2020Queries.getTransferredInPatients(
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-            hivMetadata.getPatientFoundYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId());
-
-    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
+    // CONDITION TO CALL RESPECTIVE DENOMINATOR
+    if (num == 1) {
+      denominator = getCat7DenMI2021Part135Definition(1);
+    } else if (num == 3) {
+      denominator = getCat7DenMI2021Part135Definition(3);
+    } else if (num == 5) {
+      denominator = getCat7DenMI2021Part135Definition(5);
+    }
 
     CohortDefinition b41 = qualityImprovement2020CohortQueries.getB4And1();
 
@@ -375,54 +317,6 @@ public class IntensiveMonitoringCohortQueries {
     CohortDefinition b51 = qualityImprovement2020CohortQueries.getB5And1();
 
     CohortDefinition b52 = qualityImprovement2020CohortQueries.getB5And2();
-
-    compositionCohortDefinition.addSearch(
-        "A",
-        EptsReportUtils.map(
-            startedART,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "B1",
-        EptsReportUtils.map(
-            tbActive,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "B2",
-        EptsReportUtils.map(
-            tbSymptoms,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "B3",
-        EptsReportUtils.map(
-            tbTreatment,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "C",
-        EptsReportUtils.map(
-            pregnant,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "D",
-        EptsReportUtils.map(
-            breastfeeding,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "E",
-        EptsReportUtils.map(
-            transferredIn,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "F",
-        EptsReportUtils.map(
-            transferOut,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "B41",
@@ -448,25 +342,10 @@ public class IntensiveMonitoringCohortQueries {
             b52,
             "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
 
-    compositionCohortDefinition.addSearch(
-        "GNEW",
-        EptsReportUtils.map(
-            qualityImprovement2020CohortQueries.getGNew(),
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
+    compositionCohortDefinition.addSearch("DENOMINATOR", Mapped.mapStraightThrough(denominator));
 
-    compositionCohortDefinition.addSearch(
-        "L",
-        EptsReportUtils.map(
-            qualityImprovement2020CohortQueries.getGNew3HP(),
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
+    compositionCohortDefinition.setCompositionString("DENOMINATOR AND (B41 OR B42 OR B51 OR B52)");
 
-    if (num == 1 || num == 3) {
-      compositionCohortDefinition.setCompositionString(
-          "(A AND  (B41 OR B42 OR B51 OR B52)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
-    } else if (num == 5) {
-      compositionCohortDefinition.setCompositionString(
-          "(A AND C AND (B41 OR B42 OR B51 OR B52) ) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
-    }
     return compositionCohortDefinition;
   }
 
@@ -475,7 +354,7 @@ public class IntensiveMonitoringCohortQueries {
    * and reporting period Section 7 (endDateRevision)
    *
    * @param num indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getCat7NumMI2021Part246Definition(Integer num) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -491,57 +370,16 @@ public class IntensiveMonitoringCohortQueries {
     compositionCohortDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
-    // DEFINITIONS FROM RF20
-    CohortDefinition rf20InclusionComposition = getMI7RF20InclusionComposition();
+    CohortDefinition denominator = null;
 
-    CohortDefinition pregnant =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getPregnantConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
-
-    CohortDefinition breastfeeding =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getBreastfeeding().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
-
-    CohortDefinition transferredIn =
-        QualityImprovement2020Queries.getTransferredInPatients(
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-            hivMetadata.getPatientFoundYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId());
-
-    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
-
-    compositionCohortDefinition.addSearch(
-        "rf20Inclusion",
-        EptsReportUtils.map(
-            rf20InclusionComposition, "revisionEndDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "pregnant",
-        EptsReportUtils.map(
-            pregnant,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "breastfeeding",
-        EptsReportUtils.map(
-            breastfeeding,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "transferredIn",
-        EptsReportUtils.map(
-            transferredIn,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "transferredOut",
-        EptsReportUtils.map(
-            transferOut,
-            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    // CONDITION TO CALL RESPECTIVE DENOMINATOR
+    if (num == 2) {
+      denominator = getCat7DenMI2021Part246Definition(2);
+    } else if (num == 4) {
+      denominator = getCat7DenMI2021Part246Definition(4);
+    } else if (num == 6) {
+      denominator = getCat7DenMI2021Part246Definition(6);
+    }
 
     compositionCohortDefinition.addSearch(
         "GNEW",
@@ -555,13 +393,10 @@ public class IntensiveMonitoringCohortQueries {
             qualityImprovement2020CohortQueries.getGNew3HP(),
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    if (num == 2 || num == 4) {
-      compositionCohortDefinition.setCompositionString(
-          "(rf20Inclusion AND (GNEW OR L)) AND NOT (pregnant OR breastfeeding OR transferredIn OR transferredOut)");
-    } else if (num == 6) {
-      compositionCohortDefinition.setCompositionString(
-          "(rf20Inclusion AND pregnant AND (GNEW OR L)) AND NOT (breastfeeding OR transferredIn OR transferredOut)");
-    }
+    compositionCohortDefinition.addSearch("DENOMINATOR", Mapped.mapStraightThrough(denominator));
+
+    compositionCohortDefinition.setCompositionString("DENOMINATOR AND (GNEW OR L)");
+
     return compositionCohortDefinition;
   }
 
@@ -572,7 +407,7 @@ public class IntensiveMonitoringCohortQueries {
    *
    * @param level indicator number
    * @param type indicator
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMICat13Part2(Integer level, String type) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -629,7 +464,7 @@ public class IntensiveMonitoringCohortQueries {
    *
    * @param level indicator number
    * @param type indicator flag
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getCat13Den(Integer level, Boolean type) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -903,7 +738,7 @@ public class IntensiveMonitoringCohortQueries {
    * HIV-2021” for the selected location and reporting month (endDateRevision)
    *
    * @param indicatorFlag indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMIC11DEN(int indicatorFlag) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -939,7 +774,7 @@ public class IntensiveMonitoringCohortQueries {
    *
    * @param level indicator number
    * @param type indicator flag
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getCat12P1DenNum(Integer level, Boolean type) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -972,7 +807,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.2 Denominator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13DEN2(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -993,7 +828,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.2 Numerator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13NUM2(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1014,7 +849,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.5 Denominator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13DEN5(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1035,7 +870,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.5 Numerator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13NUM5(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1056,7 +891,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.9 Denominator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13DEN9(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1077,7 +912,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.9 Numerator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13NUM9(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1098,7 +933,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.10 Denominator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13DEN10(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1119,7 +954,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.10 Numerator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13NUM10(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1140,7 +975,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.11 Denominator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13DEN11(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1161,7 +996,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.11 Numerator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13NUM11(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1182,7 +1017,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.14 Denominator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13DEN14(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1204,7 +1039,7 @@ public class IntensiveMonitoringCohortQueries {
    * HIV-2021” for the selected location and reporting month (endDateRevision)
    *
    * @param indicatorFlag indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMIC11NUM(int indicatorFlag) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1274,7 +1109,7 @@ public class IntensiveMonitoringCohortQueries {
    * Section 13.14 Numerator (endDateRevision)
    *
    * @param indicator indicator number
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI13NUM14(Integer indicator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1297,7 +1132,7 @@ public class IntensiveMonitoringCohortQueries {
    *
    * @param level indicator number
    * @param type indicator flag
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMICat13Part4(Integer level, Boolean type) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1326,7 +1161,7 @@ public class IntensiveMonitoringCohortQueries {
    * occurred during the inclusion period (encounter_datetime>= startDateInclusion and <=
    * endDateInclusion
    *
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI15A() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -1505,7 +1340,7 @@ public class IntensiveMonitoringCohortQueries {
    * concept_id 1065) in Ficha Clínica (encounter type 6, encounter_datetime) occurred during the
    * following period (encounter_datetime >= startDate and <= endDate)
    *
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   * @return @{@link CohortDefinition}
    */
   public CohortDefinition getMI15D() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -3217,51 +3052,55 @@ public class IntensiveMonitoringCohortQueries {
     map.put("answer", answer);
 
     String query =
-        "SELECT   pregnant.person_id "
-            + "FROM     ( "
-            + "                  SELECT   p.person_id, "
-            + "                           Min(e.encounter_datetime) AS first_pregnancy "
-            + "                  FROM     person p "
-            + "                  JOIN     encounter e "
-            + "                  ON       e.patient_id = p.person_id "
-            + "                  JOIN     obs o "
-            + "                  ON       o.encounter_id = e.encounter_id "
-            + "                  AND      encounter_type = ${6} "
-            + "                  AND      o.concept_id = ${question} "
-            + "                  AND      o.value_coded = ${answer} "
-            + "                  AND      e.location_id = :location "
-            + "                  AND      e.encounter_datetime >= :startDate "
-            + "                  AND      e.encounter_datetime <= :endDate "
-            + "                  AND      p.gender = 'F' "
-            + "                  AND      e.voided = 0 "
-            + "                  AND      o.voided = 0 "
-            + "                  AND      p.voided = 0 "
-            + "                  GROUP BY p.person_id) pregnant "
-            + "WHERE   pregnant.person_id NOT IN "
-            + "         ( "
-            + "                SELECT p.person_id "
-            + "                FROM   person p "
-            + "                JOIN   encounter e "
-            + "                ON     e.patient_id = p.person_id "
-            + "                JOIN   obs o "
-            + "                ON     o.encounter_id = e.encounter_id "
-            + "                WHERE    encounter_type = ${6} "
-            + "                AND    o.concept_id = ${question} "
-            + "                AND    o.value_coded = ${answer} "
-            + "                AND    e.location_id = :location "
-            + "                AND    e.encounter_datetime >= date_sub(pregnant.first_pregnancy, interval 3 month ) "
-            + "                AND    e.encounter_datetime < pregnant.first_pregnancy "
-            + "                AND    p.gender = 'F' "
-            + "                AND    e.voided = 0 "
-            + "                AND    o.voided = 0 "
-            + "                AND    p.voided = 0 ) "
-            + "GROUP BY pregnant.person_id";
+        new EptsQueriesUtil().patientIdQueryBuilder(getPregnantOrBreastfeedingQuery()).getQuery();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
+  }
+
+  protected static String getPregnantOrBreastfeedingQuery() {
+    return " SELECT   pregnant.person_id, pregnant.first_pregnancy AS first_consultation "
+        + "FROM     ( "
+        + "                  SELECT   p.person_id, "
+        + "                           Min(e.encounter_datetime) AS first_pregnancy "
+        + "                  FROM     person p "
+        + "                  JOIN     encounter e "
+        + "                  ON       e.patient_id = p.person_id "
+        + "                  JOIN     obs o "
+        + "                  ON       o.encounter_id = e.encounter_id "
+        + "                  AND      encounter_type = ${6} "
+        + "                  AND      o.concept_id = ${question} "
+        + "                  AND      o.value_coded = ${answer} "
+        + "                  AND      e.location_id = :location "
+        + "                  AND      e.encounter_datetime >= :startDate "
+        + "                  AND      e.encounter_datetime <= :endDate "
+        + "                  AND      p.gender = 'F' "
+        + "                  AND      e.voided = 0 "
+        + "                  AND      o.voided = 0 "
+        + "                  AND      p.voided = 0 "
+        + "                  GROUP BY p.person_id) pregnant "
+        + "WHERE   pregnant.person_id NOT IN "
+        + "         ( "
+        + "                SELECT p.person_id "
+        + "                FROM   person p "
+        + "                JOIN   encounter e "
+        + "                ON     e.patient_id = p.person_id "
+        + "                JOIN   obs o "
+        + "                ON     o.encounter_id = e.encounter_id "
+        + "                WHERE    encounter_type = ${6} "
+        + "                AND    o.concept_id = ${question} "
+        + "                AND    o.value_coded = ${answer} "
+        + "                AND    e.location_id = :location "
+        + "                AND    e.encounter_datetime >= date_sub(pregnant.first_pregnancy, interval 3 month ) "
+        + "                AND    e.encounter_datetime < pregnant.first_pregnancy "
+        + "                AND    p.gender = 'F' "
+        + "                AND    e.voided = 0 "
+        + "                AND    o.voided = 0 "
+        + "                AND    p.voided = 0 ) "
+        + "GROUP BY pregnant.person_id";
   }
 
   /**
@@ -3367,12 +3206,12 @@ public class IntensiveMonitoringCohortQueries {
       cd.setName(
           "Pedido de CD4 = “% de MG HIV+ que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra”");
       inclusionPeriodMappings =
-          "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}";
+          "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}";
     } else if (flag == 6) {
       cd.setName(
           "Resultado de CD4 = “% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez”");
       inclusionPeriodMappings =
-          "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}";
+          "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}";
     }
 
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -3381,10 +3220,9 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch(
         "pregnantOnPeriod",
         EptsReportUtils.map(
-            qualityImprovement2020CohortQueries
-                .getFirstPregnancyORBreastfeedingOnClinicalConsultation(
-                    commonMetadata.getPregnantConcept().getConceptId(),
-                    hivMetadata.getYesConcept().getConceptId()),
+            getFirstPregnancyORBreastfeedingOnClinicalConsultation(
+                commonMetadata.getPregnantConcept().getConceptId(),
+                hivMetadata.getYesConcept().getConceptId()),
             inclusionPeriodMappings));
 
     cd.addSearch(
@@ -3407,7 +3245,7 @@ public class IntensiveMonitoringCohortQueries {
                     hivMetadata.getYesConcept().getConceptId(),
                     hivMetadata.getApplicationForLaboratoryResearch().getConceptId(),
                     hivMetadata.getCD4AbsoluteOBSConcept().getConceptId()),
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
 
     cd.addSearch(
         "resultCd4ForPregnant",
@@ -4046,5 +3884,76 @@ public class IntensiveMonitoringCohortQueries {
 
     cd.setCompositionString("MQ15Den13 AND MDS");
     return cd;
+  }
+
+  /**
+   * <b>Utentes Transferidos Para Outra US</b>
+   * <li>Último registo de [“Mudança Estado Permanência TARV” (Coluna 21) = “T” (Transferido Para)
+   *     na “Ficha Clínica” com “Data da Consulta Actual” (Coluna 1, durante a qual se fez o registo
+   *     da mudança do estado de permanência TARV) até a “Data Recolha de Dados” ou
+   * <li>Registados como “Mudança Estado Permanência TARV” = “Transferido Para”, último estado
+   *     registado na “Ficha Resumo” com “Data da Transferência” até a “Data Recolha de Dados”;
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getTranferredOutPatientsForMI7() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes Transferidos Para Outra US");
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+
+    String query =
+        " SELECT max_transferout.patient_id "
+            + "FROM   (SELECT transferout.patient_id, "
+            + "               Max(transferout.transferout_date) transferout_date "
+            + "        FROM   (SELECT p.patient_id, "
+            + "                       Max(e.encounter_datetime) AS transferout_date "
+            + "                FROM   patient p "
+            + "                       JOIN encounter e "
+            + "                         ON p.patient_id = e.patient_id "
+            + "                       JOIN obs o "
+            + "                         ON e.encounter_id = o.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND e.location_id = :location "
+            + "                       AND e.encounter_type = ${6} "
+            + "                       AND e.encounter_datetime <= :revisionEndDate "
+            + "                       AND o.voided = 0 "
+            + "                       AND o.concept_id = ${6273} "
+            + "                       AND o.value_coded = ${1706} "
+            + "                GROUP  BY p.patient_id "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       Max(o.obs_datetime) AS transferout_date "
+            + "                FROM   patient p "
+            + "                       JOIN encounter e "
+            + "                         ON p.patient_id = e.patient_id "
+            + "                       JOIN obs o "
+            + "                         ON e.encounter_id = o.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND e.location_id = :location "
+            + "                       AND e.encounter_type = ${53} "
+            + "                       AND o.obs_datetime <= :revisionEndDate "
+            + "                       AND o.voided = 0 "
+            + "                       AND o.concept_id = ${6272} "
+            + "                       AND o.value_coded = ${1706} "
+            + "                GROUP  BY p.patient_id) transferout "
+            + "        GROUP  BY transferout.patient_id) max_transferout ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
   }
 }

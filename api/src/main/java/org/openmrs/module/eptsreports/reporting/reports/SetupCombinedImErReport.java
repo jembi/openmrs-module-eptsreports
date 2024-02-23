@@ -102,7 +102,7 @@ public class SetupCombinedImErReport extends EptsDataExportManager {
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Template_IM-ER_v3.0_OptionA.xls",
+              "Template_IM-ER_v3.1.xls",
               "IM_ER-Report",
               getExcelDesignUuid(),
               null);

@@ -2,7 +2,6 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 
 import java.util.Arrays;
 import java.util.List;
-import org.openmrs.module.eptsreports.reporting.calculation.cxcascrn.TreatmentType;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TXCXCACohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
@@ -47,62 +46,52 @@ public class TXCXCADataset extends BaseDataSet {
 
     dsd.addColumn("TOTALTX", "Total TX", EptsReportUtils.map(total, mappings), "");
 
-    /** 1st Time Screened - FTS */
+    /** First Time Screened - FTS */
     CohortIndicator f1rstTimeScreened =
         eptsGeneralIndicator.getIndicator(
-            "FTSTX", EptsReportUtils.map(cxcatxCohortQueries.getf1srtTimeScreened(), mappings));
+            "FTSTX", EptsReportUtils.map(cxcatxCohortQueries.getFirstTimeScreened(), mappings));
     dsd.addColumn(
-        "FTSTX", "1st Time Screened", EptsReportUtils.map(f1rstTimeScreened, mappings), "");
+        "FTSTX", "First Time Screened", EptsReportUtils.map(f1rstTimeScreened, mappings), "");
 
-    // 1st Time Screened (B5) - FTSNB5
-    CohortIndicator f1rstTimeScreenedB5 =
+    // First Time Screened (B5) - FTSNB5 (Cryotherapy)
+    CohortIndicator firstTimeScreenedWithCryotherapy =
         eptsGeneralIndicator.getIndicator(
             "FTSNB5TX",
             EptsReportUtils.map(
-                this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getf1srtTimeScreened(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B5),
-                    "TX 1st Time Screened B5  composition"),
-                mappings));
+                this.cxcatxCohortQueries.getFirstTimeScreenedPatientsWithCryotherapy(), mappings));
     addRow(
         dsd,
         "FTSNB5TX",
-        "1st Time Screened B5",
-        EptsReportUtils.map(f1rstTimeScreenedB5, mappings),
+        "First Time Screened B5 - Cryotherapy",
+        EptsReportUtils.map(firstTimeScreenedWithCryotherapy, mappings),
         getColumnsForAge());
 
-    // 1st Time Screened (B6) - FTSB6
-    CohortIndicator f1rstTimeScreenedB6 =
+    // First Time Screened (B6) - FTSB6 (Thermocoagulation)
+    CohortIndicator firstTimeScreenedWithThermocoagulation =
         eptsGeneralIndicator.getIndicator(
             "FTSB6TX",
             EptsReportUtils.map(
-                this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getf1srtTimeScreened(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B6),
-                    "TX 1st Time Screened B6  composition"),
+                this.cxcatxCohortQueries.getFirstTimeScreenedPatientsWithThermocoagulation(),
                 mappings));
     addRow(
         dsd,
         "FTSB6TX",
-        "1st Time Screened B6",
-        EptsReportUtils.map(f1rstTimeScreenedB6, mappings),
+        "First Time Screened B6 -Thermocoagulation",
+        EptsReportUtils.map(firstTimeScreenedWithThermocoagulation, mappings),
         getColumnsForAge());
 
-    // 1st Time Screened (B7) - FTSB7
-    CohortIndicator f1rstTimeScreenedB7 =
+    // First Time Screened (B7) - FTSB7 (LEEP/Conization)
+    CohortIndicator f1rstTimeScreenedWithLeepOrConization =
         eptsGeneralIndicator.getIndicator(
             "FTSB7TX",
             EptsReportUtils.map(
-                this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getf1srtTimeScreened(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B7),
-                    "TX 1st Time Screened B7  composition"),
+                this.cxcatxCohortQueries.getFirstTimeScreenedPatientsWithLeepOrConization(),
                 mappings));
     addRow(
         dsd,
         "FTSB7TX",
-        "1st Time Screened B7",
-        EptsReportUtils.map(f1rstTimeScreenedB7, mappings),
+        "First Time Screened B7 - LEEP/Conization",
+        EptsReportUtils.map(f1rstTimeScreenedWithLeepOrConization, mappings),
         getColumnsForAge());
 
     /** Rescreened after previous negative - RAPN */
@@ -117,117 +106,103 @@ public class TXCXCADataset extends BaseDataSet {
         EptsReportUtils.map(rescreenedAfterPreviousNegative, mappings),
         "");
 
-    // Rescreened after previous negative (B5) - RAPNB5
-    CohortIndicator rescreenedAfterPreviousNegativeB5 =
+    // Rescreened after previous negative (B5) - RAPNB5 (Crytherapy)
+    CohortIndicator rescreenedAfterPreviousNegativeWithCrytherapy =
         eptsGeneralIndicator.getIndicator(
             "RAPNB5TX",
             EptsReportUtils.map(
-                this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getRescreenedAfterPreviousNegative(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B5),
-                    "TX Rescreened after previous negative B5 composition"),
+                this.cxcatxCohortQueries
+                    .getRescreenedAfterPreviousNegativePatientsWithCryotherapy(),
                 mappings));
     addRow(
         dsd,
         "RAPNB5TX",
-        "Rescreened after previous negative B5",
-        EptsReportUtils.map(rescreenedAfterPreviousNegativeB5, mappings),
+        "Rescreened after previous negative With Crytherapy",
+        EptsReportUtils.map(rescreenedAfterPreviousNegativeWithCrytherapy, mappings),
         getColumnsForAge());
 
-    // Rescreened after previous negative (B6) - RAPNB6
-    CohortIndicator rescreenedAfterPreviousNegativeB6 =
+    // Rescreened after previous negative (B6) - RAPNB6 (Thermocoagulation)
+    CohortIndicator rescreenedAfterPreviousNegativeWithThermocoagulation =
         eptsGeneralIndicator.getIndicator(
             "RAPNB6TX",
             EptsReportUtils.map(
-                this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getRescreenedAfterPreviousNegative(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B6),
-                    "TX Rescreened after previous negative B6 composition"),
+                this.cxcatxCohortQueries
+                    .getRescreenedAfterPreviousNegativePatientsWithThermocoagulation(),
                 mappings));
     addRow(
         dsd,
         "RAPNB6TX",
-        "Rescreened after previous negative B6",
-        EptsReportUtils.map(rescreenedAfterPreviousNegativeB6, mappings),
+        "Rescreened after previous negative With Thermocoagulation",
+        EptsReportUtils.map(rescreenedAfterPreviousNegativeWithThermocoagulation, mappings),
         getColumnsForAge());
 
-    // Rescreened after previous negative (B7) - RAPNB7
-    CohortIndicator rescreenedAfterPreviousNegativeB7 =
+    // Rescreened after previous negative (B7) - RAPNB7 (LeepOrConization)
+    CohortIndicator rescreenedAfterPreviousNegativeWithLeepOrConization =
         eptsGeneralIndicator.getIndicator(
             "RAPNB7TX",
             EptsReportUtils.map(
-                this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getRescreenedAfterPreviousNegative(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B7),
-                    "TX Rescreened after previous negative B7 composition"),
+                this.cxcatxCohortQueries
+                    .getRescreenedAfterPreviousNegativePatientsWithLeepOrConization(),
                 mappings));
     addRow(
         dsd,
         "RAPNB7TX",
-        "Rescreened after previous negative B7",
-        EptsReportUtils.map(rescreenedAfterPreviousNegativeB7, mappings),
+        "Rescreened after previous negative With Leep Or Conization",
+        EptsReportUtils.map(rescreenedAfterPreviousNegativeWithLeepOrConization, mappings),
         getColumnsForAge());
 
     /** Post-Treatment follow-up - PTFU */
     CohortIndicator postTreatmentFollowUp =
         eptsGeneralIndicator.getIndicator(
             "PTFUTX",
-            EptsReportUtils.map(cxcatxCohortQueries.getPostTreatmentFollowUp(), mappings));
+            EptsReportUtils.map(
+                cxcatxCohortQueries.getPatientsWithPostTreatmentFollowUp(), mappings));
     dsd.addColumn(
         "PTFUTX",
         "Post-Treatment follow-up",
         EptsReportUtils.map(postTreatmentFollowUp, mappings),
         "");
 
-    // Post-Treatment follow-up (B5) - PTFUB5
-    CohortIndicator postTreatmentFollowUpB5 =
+    // Post-Treatment follow-up (B5) - PTFUB5 (Crytherapy)
+    CohortIndicator postTreatmentFollowUpWithCrytherapy =
         eptsGeneralIndicator.getIndicator(
             "PTFUB5TX",
             EptsReportUtils.map(
-                this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getPostTreatmentFollowUp(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B5),
-                    "TX Post-Treatment follow-up B5 composition"),
+                this.cxcatxCohortQueries.getPostTreatmentFollowUpPatientsWithCryotherapy(),
                 mappings));
     addRow(
         dsd,
         "PTFUB5TX",
         "Post-Treatment follow-up B5",
-        EptsReportUtils.map(postTreatmentFollowUpB5, mappings),
+        EptsReportUtils.map(postTreatmentFollowUpWithCrytherapy, mappings),
         getColumnsForAge());
 
-    // Post-Treatment follow-up (B6) - PTFUB6
-    CohortIndicator postTreatmentFollowUpB6 =
+    // Post-Treatment follow-up (B6) - PTFUB6 (Thermocoagulation)
+    CohortIndicator postTreatmentFollowUpWithThermocoagulation =
         eptsGeneralIndicator.getIndicator(
             "PTFUB6TX",
             EptsReportUtils.map(
-                this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getPostTreatmentFollowUp(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B6),
-                    "TX Post-Treatment follow-up B6 composition"),
+                this.cxcatxCohortQueries.getPostTreatmentFollowUpPatientsWithThermocoagulation(),
                 mappings));
     addRow(
         dsd,
         "PTFUB6TX",
         "Post-Treatment follow-up B6",
-        EptsReportUtils.map(postTreatmentFollowUpB6, mappings),
+        EptsReportUtils.map(postTreatmentFollowUpWithThermocoagulation, mappings),
         getColumnsForAge());
 
-    // Post-Treatment follow-up (B7) - PTFUB7
-    CohortIndicator postTreatmentFollowUpB7 =
+    // Post-Treatment follow-up (B7) - PTFUB7 (LeepOrConization)
+    CohortIndicator postTreatmentFollowUpWithLeepOrConization =
         eptsGeneralIndicator.getIndicator(
             "PTFUB7TX",
             EptsReportUtils.map(
-                this.cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getPostTreatmentFollowUp(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B7),
-                    "TX Post-Treatment follow-up B7 composition"),
+                this.cxcatxCohortQueries.getPostTreatmentFollowUpPatientsWithLeepOrConization(),
                 mappings));
     addRow(
         dsd,
         "PTFUB7TX",
         "Post-Treatment follow-up B7",
-        EptsReportUtils.map(postTreatmentFollowUpB7, mappings),
+        EptsReportUtils.map(postTreatmentFollowUpWithLeepOrConization, mappings),
         getColumnsForAge());
 
     /** Rescreened after previous positive - RAPP */
@@ -242,55 +217,46 @@ public class TXCXCADataset extends BaseDataSet {
         EptsReportUtils.map(rescreenedAfterPreviousPositive, mappings),
         "");
 
-    // Rescreened after previous positive (B5) - RAPPB5
-    CohortIndicator rescreenedAfterPreviousPositiveB5 =
+    // Rescreened after previous positive (B5) - RAPPB5 (Cryotherapy)
+    CohortIndicator rescreenedAfterPreviousPositiveWithCryotherapy =
         eptsGeneralIndicator.getIndicator(
             "RAPPB5TX",
             EptsReportUtils.map(
-                cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getRescreenedAfterPreviousPositive(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B5),
-                    "TX Rescreened after previous positive B6"),
-                mappings));
+                cxcatxCohortQueries.getRescreenedAfterPreviousPositiveWithCryotherapy(), mappings));
     addRow(
         dsd,
         "RAPPB5TX",
         "Rescreened after previous positive B5",
-        EptsReportUtils.map(rescreenedAfterPreviousPositiveB5, mappings),
+        EptsReportUtils.map(rescreenedAfterPreviousPositiveWithCryotherapy, mappings),
         getColumnsForAge());
 
-    // Rescreened after previous positive (B6) - RAPPB6
-    CohortIndicator rescreenedAfterPreviousPositiveB6 =
+    // Rescreened after previous positive (B6) - RAPPB6 (Thermocoagulation)
+    CohortIndicator rescreenedAfterPreviousPositiveWithThermocoagulation =
         eptsGeneralIndicator.getIndicator(
             "RAPPB6TX",
             EptsReportUtils.map(
-                cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getRescreenedAfterPreviousPositive(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B6),
-                    "TX Rescreened after previous positive B6"),
+                cxcatxCohortQueries.getRescreenedAfterPreviousPositiveWithThermocoagulation(),
                 mappings));
     addRow(
         dsd,
         "RAPPB6TX",
         "Rescreened after previous positive B6",
-        EptsReportUtils.map(rescreenedAfterPreviousPositiveB6, mappings),
+        EptsReportUtils.map(rescreenedAfterPreviousPositiveWithThermocoagulation, mappings),
         getColumnsForAge());
 
-    // Rescreened after previous positive (B7) - RAPPB7
-    CohortIndicator rescreenedAfterPreviousPositiveB7 =
+    // Rescreened after previous positive (B7) - RAPPB7 (LeepOrConization)
+    CohortIndicator rescreenedAfterPreviousPositiveWithLeepOrConization =
         eptsGeneralIndicator.getIndicator(
             "RAPPB7TX",
             EptsReportUtils.map(
-                cxcatxCohortQueries.getFinalComposition(
-                    this.cxcatxCohortQueries.getRescreenedAfterPreviousPositive(),
-                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B7),
-                    "TX Rescreened after previous positive B7"),
+                cxcatxCohortQueries
+                    .getRescreenedAfterPreviousPositivePatientsWithLeepOrConization(),
                 mappings));
     addRow(
         dsd,
         "RAPPB7TX",
         "Rescreened after previous positive B7",
-        EptsReportUtils.map(rescreenedAfterPreviousPositiveB7, mappings),
+        EptsReportUtils.map(rescreenedAfterPreviousPositiveWithLeepOrConization, mappings),
         getColumnsForAge());
 
     return dsd;
