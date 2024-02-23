@@ -23,22 +23,14 @@ public class SetupIntensiveMonitoringReport extends EptsDataExportManager {
 
   private GenericCohortQueries genericCohortQueries;
 
-  private QualityImprovement2020DataSet initQltyImpDataSet;
-
   private IntensiveMonitoringDataSet intensiveMonitoringDataSet;
-
-  private ViralLoadIntensiveMonitoringDataSet viralLoadIntensiveMonitoringDataSet;
 
   @Autowired
   public SetupIntensiveMonitoringReport(
       GenericCohortQueries genericCohortQueries,
-      QualityImprovement2020DataSet initQltyImpDataSet,
-      IntensiveMonitoringDataSet intensiveMonitoringDataSet,
-      ViralLoadIntensiveMonitoringDataSet viralLoadIntensiveMonitoringDataSet) {
+      IntensiveMonitoringDataSet intensiveMonitoringDataSet) {
     this.genericCohortQueries = genericCohortQueries;
-    this.initQltyImpDataSet = initQltyImpDataSet;
     this.intensiveMonitoringDataSet = intensiveMonitoringDataSet;
-    this.viralLoadIntensiveMonitoringDataSet = viralLoadIntensiveMonitoringDataSet;
   }
 
   @Override

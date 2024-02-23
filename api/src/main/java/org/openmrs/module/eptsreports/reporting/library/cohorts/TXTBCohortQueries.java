@@ -13,6 +13,7 @@ import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
+import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.TXTBQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition.TimeModifier;
@@ -35,6 +36,8 @@ public class TXTBCohortQueries {
   @Autowired private CommonMetadata commonMetadata;
 
   @Autowired private GenericCohortQueries genericCohortQueries;
+
+  @Autowired private CommonQueries commonQueries;
 
   private final String generalParameterMapping =
       "startDate=${startDate},endDate=${endDate},location=${location}";
@@ -635,14 +638,14 @@ public class TXTBCohortQueries {
     cd.addSearch(
         "started-art-on-period-including-transferred-in",
         EptsReportUtils.map(
-            genericCohortQueries.getStartedArtOnPeriod(true, true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            getPatientsArtStartDateBeforeOrDuringPeriod(true),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "started-art-before-startDate-including-transferred-in",
         EptsReportUtils.map(
-            genericCohortQueries.getStartedArtBeforeDateTxTb(true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            getPatientsArtStartDateBeforeOrDuringPeriod(false),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
         "started-art-on-period-including-transferred-in OR started-art-before-startDate-including-transferred-in");
@@ -1160,8 +1163,8 @@ public class TXTBCohortQueries {
     cd.addSearch(
         "started-during-reporting-period",
         EptsReportUtils.map(
-            genericCohortQueries.getStartedArtOnPeriod(false, true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            getPatientsArtStartDateBeforeOrDuringPeriod(true),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.setCompositionString("NUM AND started-during-reporting-period");
     addGeneralParameters(cd);
     return cd;
@@ -1181,8 +1184,8 @@ public class TXTBCohortQueries {
     cd.addSearch(
         "started-before-start-reporting-period",
         EptsReportUtils.map(
-            genericCohortQueries.getStartedArtBeforeDateTxTb(false),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            getPatientsArtStartDateBeforeOrDuringPeriod(false),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.setCompositionString("NUM AND started-before-start-reporting-period");
     addGeneralParameters(cd);
     return cd;
@@ -1719,13 +1722,13 @@ public class TXTBCohortQueries {
     definition.addSearch(
         "started-on-period",
         EptsReportUtils.map(
-            genericCohortQueries.getStartedArtOnPeriod(false, true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            getPatientsArtStartDateBeforeOrDuringPeriod(true),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     definition.addSearch(
         "started-before-start-reporting-period",
         EptsReportUtils.map(
-            genericCohortQueries.getStartedArtBeforeDateTxTb(false),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            getPatientsArtStartDateBeforeOrDuringPeriod(false),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     definition.setCompositionString(
         "started-on-period AND NOT started-before-start-reporting-period");
 
@@ -2649,6 +2652,44 @@ public class TXTBCohortQueries {
 
     cd.setQuery(replaceQuery);
 
+    return cd;
+  }
+
+  /**
+   * <b>Patients on ART TXTB </b>
+   * <li>The system will identify patients on ART, as those who initiated the treatment,
+   *     independently of the HF where the treatment initiated, during/before the reporting period
+   *     as follows:
+   * <li>All patients who have their first drug pick-up date set in Pharmacy form (FILA) during the
+   *     reporting period;
+   * <li>All patients who have initiated the drugs (ARV PLAN = START DRUGS) during the pharmacy or
+   *     clinical visits during the reporting period;
+   * <li>All patients who have the first historical start drugs date set during the reporting period
+   *     in Pharmacy Tool (FILA) or Clinical tools (Ficha Clínica and Ficha Resumo - Mastercard,
+   *     Ficha de Seguimento Adulto and Ficha de Seguimento Pediatria);
+   * <li>All patients who have picked up drugs (Recepção Levantou ARV) – Master Card during the
+   *     reporting period
+   * <li>All patients enrolled in ART Program during the reporting period;
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsArtStartDateBeforeOrDuringPeriod(boolean duringPeriod) {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patient’s earliest ART start date from pick-up and clinical sources TXTB");
+    addGeneralParameters(cd);
+
+    String query =
+        " SELECT patient_id "
+            + " FROM ( "
+            + commonQueries.getARTStartDate(true)
+            + "       ) start "
+            + " WHERE "
+                .concat(
+                    duringPeriod
+                        ? " start.first_pickup BETWEEN :startDate AND :endDate "
+                        : " start.first_pickup < :startDate ");
+
+    cd.setQuery(query);
     return cd;
   }
 }
