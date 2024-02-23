@@ -9,6 +9,7 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.IntensiveMonitoringQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.QualityImprovement2020Queries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportConstants;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -3045,51 +3046,55 @@ public class IntensiveMonitoringCohortQueries {
     map.put("answer", answer);
 
     String query =
-        "SELECT   pregnant.person_id "
-            + "FROM     ( "
-            + "                  SELECT   p.person_id, "
-            + "                           Min(e.encounter_datetime) AS first_pregnancy "
-            + "                  FROM     person p "
-            + "                  JOIN     encounter e "
-            + "                  ON       e.patient_id = p.person_id "
-            + "                  JOIN     obs o "
-            + "                  ON       o.encounter_id = e.encounter_id "
-            + "                  AND      encounter_type = ${6} "
-            + "                  AND      o.concept_id = ${question} "
-            + "                  AND      o.value_coded = ${answer} "
-            + "                  AND      e.location_id = :location "
-            + "                  AND      e.encounter_datetime >= :startDate "
-            + "                  AND      e.encounter_datetime <= :endDate "
-            + "                  AND      p.gender = 'F' "
-            + "                  AND      e.voided = 0 "
-            + "                  AND      o.voided = 0 "
-            + "                  AND      p.voided = 0 "
-            + "                  GROUP BY p.person_id) pregnant "
-            + "WHERE   pregnant.person_id NOT IN "
-            + "         ( "
-            + "                SELECT p.person_id "
-            + "                FROM   person p "
-            + "                JOIN   encounter e "
-            + "                ON     e.patient_id = p.person_id "
-            + "                JOIN   obs o "
-            + "                ON     o.encounter_id = e.encounter_id "
-            + "                WHERE    encounter_type = ${6} "
-            + "                AND    o.concept_id = ${question} "
-            + "                AND    o.value_coded = ${answer} "
-            + "                AND    e.location_id = :location "
-            + "                AND    e.encounter_datetime >= date_sub(pregnant.first_pregnancy, interval 3 month ) "
-            + "                AND    e.encounter_datetime < pregnant.first_pregnancy "
-            + "                AND    p.gender = 'F' "
-            + "                AND    e.voided = 0 "
-            + "                AND    o.voided = 0 "
-            + "                AND    p.voided = 0 ) "
-            + "GROUP BY pregnant.person_id";
+        new EptsQueriesUtil().patientIdQueryBuilder(getPregnantOrBreastfeedingQuery()).getQuery();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
+  }
+
+  protected static String getPregnantOrBreastfeedingQuery() {
+    return " SELECT   pregnant.person_id, pregnant.first_pregnancy AS first_consultation "
+        + "FROM     ( "
+        + "                  SELECT   p.person_id, "
+        + "                           Min(e.encounter_datetime) AS first_pregnancy "
+        + "                  FROM     person p "
+        + "                  JOIN     encounter e "
+        + "                  ON       e.patient_id = p.person_id "
+        + "                  JOIN     obs o "
+        + "                  ON       o.encounter_id = e.encounter_id "
+        + "                  AND      encounter_type = ${6} "
+        + "                  AND      o.concept_id = ${question} "
+        + "                  AND      o.value_coded = ${answer} "
+        + "                  AND      e.location_id = :location "
+        + "                  AND      e.encounter_datetime >= :startDate "
+        + "                  AND      e.encounter_datetime <= :endDate "
+        + "                  AND      p.gender = 'F' "
+        + "                  AND      e.voided = 0 "
+        + "                  AND      o.voided = 0 "
+        + "                  AND      p.voided = 0 "
+        + "                  GROUP BY p.person_id) pregnant "
+        + "WHERE   pregnant.person_id NOT IN "
+        + "         ( "
+        + "                SELECT p.person_id "
+        + "                FROM   person p "
+        + "                JOIN   encounter e "
+        + "                ON     e.patient_id = p.person_id "
+        + "                JOIN   obs o "
+        + "                ON     o.encounter_id = e.encounter_id "
+        + "                WHERE    encounter_type = ${6} "
+        + "                AND    o.concept_id = ${question} "
+        + "                AND    o.value_coded = ${answer} "
+        + "                AND    e.location_id = :location "
+        + "                AND    e.encounter_datetime >= date_sub(pregnant.first_pregnancy, interval 3 month ) "
+        + "                AND    e.encounter_datetime < pregnant.first_pregnancy "
+        + "                AND    p.gender = 'F' "
+        + "                AND    e.voided = 0 "
+        + "                AND    o.voided = 0 "
+        + "                AND    p.voided = 0 ) "
+        + "GROUP BY pregnant.person_id";
   }
 
   /**
@@ -3195,12 +3200,12 @@ public class IntensiveMonitoringCohortQueries {
       cd.setName(
           "Pedido de CD4 = “% de MG HIV+ que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra”");
       inclusionPeriodMappings =
-          "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}";
+          "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}";
     } else if (flag == 6) {
       cd.setName(
           "Resultado de CD4 = “% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez”");
       inclusionPeriodMappings =
-          "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}";
+          "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}";
     }
 
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -3209,10 +3214,9 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch(
         "pregnantOnPeriod",
         EptsReportUtils.map(
-            qualityImprovement2020CohortQueries
-                .getFirstPregnancyORBreastfeedingOnClinicalConsultation(
-                    commonMetadata.getPregnantConcept().getConceptId(),
-                    hivMetadata.getYesConcept().getConceptId()),
+            getFirstPregnancyORBreastfeedingOnClinicalConsultation(
+                commonMetadata.getPregnantConcept().getConceptId(),
+                hivMetadata.getYesConcept().getConceptId()),
             inclusionPeriodMappings));
 
     cd.addSearch(
@@ -3235,7 +3239,7 @@ public class IntensiveMonitoringCohortQueries {
                     hivMetadata.getYesConcept().getConceptId(),
                     hivMetadata.getApplicationForLaboratoryResearch().getConceptId(),
                     hivMetadata.getCD4AbsoluteOBSConcept().getConceptId()),
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
 
     cd.addSearch(
         "resultCd4ForPregnant",

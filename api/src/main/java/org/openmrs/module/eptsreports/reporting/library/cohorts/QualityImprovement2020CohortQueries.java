@@ -12470,14 +12470,12 @@ public class QualityImprovement2020CohortQueries {
         " “Pedido de CD4” na mesma consulta clínica na qual tiveram o primeiro registo de Gravidez");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(
-        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("pregnantConcept", pregnantConcept);
-    map.put("yesConcept", yesConcept);
+    map.put("question", pregnantConcept);
+    map.put("answer", yesConcept);
     map.put("labResearchConcept", labResearchConcept);
     map.put("cd4", cd4);
 
@@ -12491,45 +12489,7 @@ public class QualityImprovement2020CohortQueries {
             + "                                ON o2.encounter_id = enc.encounter_id "
             + "                     INNER JOIN "
             + "                 ( "
-            + "                     SELECT pregnant.person_id, pregnant.first_pregnancy as first_consultation FROM ( "
-            + "                                                                                                        SELECT p.person_id, MIN(e.encounter_datetime) as first_pregnancy "
-            + "                                                                                                        FROM   person p "
-            + "                                                                                                                   JOIN encounter e "
-            + "                                                                                                                        ON e.patient_id = p.person_id "
-            + "                                                                                                                   JOIN obs o "
-            + "                                                                                                                        ON o.encounter_id = e.encounter_id "
-            + "                                                                                                                            AND encounter_type = ${6} "
-            + "                                                                                                                            AND o.concept_id = ${pregnantConcept} "
-            + "                                                                                                                            AND o.value_coded = ${yesConcept} "
-            + "                                                                                                                            AND e.location_id = :location "
-            + "                                                                                                                            AND e.encounter_datetime <= :revisionEndDate "
-            + "                                                                                                                            AND p.gender = 'F' "
-            + "                                                                                                                            AND e.voided = 0 "
-            + "                                                                                                                            AND o.voided = 0 "
-            + "                                                                                                                            AND p.voided = 0 "
-            + "                                                                                                        GROUP BY p.person_id) pregnant "
-            + "                     WHERE "
-            + "                             pregnant.first_pregnancy >=  :startDate "
-            + "                       AND pregnant.first_pregnancy <= :endDate "
-            + "                       AND   pregnant.person_id NOT IN ( "
-            + "                             SELECT p.person_id "
-            + "                             FROM   person p "
-            + "                                        JOIN encounter e "
-            + "                                             ON e.patient_id = p.person_id "
-            + "                                        JOIN obs o "
-            + "                                             ON o.encounter_id = e.encounter_id "
-            + "                                                 AND encounter_type = ${6} "
-            + "                                                 AND o.concept_id = ${pregnantConcept} "
-            + "                                                 AND o.value_coded = ${yesConcept} "
-            + "                                                 AND e.location_id = :location "
-            + "                                                 AND e.encounter_datetime >= date_sub(:startDate, interval 9 month )  "
-            + "                                                 AND e.encounter_datetime < :startDate "
-            + "                                                 AND p.gender = 'F' "
-            + "                                                 AND e.voided = 0 "
-            + "                                                 AND o.voided = 0 "
-            + "                                                 AND p.voided = 0 "
-            + "                         ) "
-            + "                     GROUP BY pregnant.person_id "
+            + IntensiveMonitoringCohortQueries.getPregnantOrBreastfeedingQuery()
             + "                 ) final ON final.person_id = pa.patient_id "
             + "             WHERE pa.voided = 0 "
             + "               AND enc.voided = 0 "
@@ -12574,8 +12534,8 @@ public class QualityImprovement2020CohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
     map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
-    map.put("pregnantConcept", pregnantConcept);
-    map.put("yesConcept", yesConcept);
+    map.put("question", pregnantConcept);
+    map.put("answer", yesConcept);
 
     String query =
         "SELECT pa.patient_id "
@@ -12589,45 +12549,7 @@ public class QualityImprovement2020CohortQueries {
             + "                   ON o2.encounter_id = enc.encounter_id "
             + "        INNER JOIN "
             + "    ( "
-            + "                     SELECT pregnant.person_id, pregnant.first_pregnancy as first_consultation FROM ( "
-            + "                                                                                                        SELECT p.person_id, MIN(e.encounter_datetime) as first_pregnancy "
-            + "                                                                                                        FROM   person p "
-            + "                                                                                                                   JOIN encounter e "
-            + "                                                                                                                        ON e.patient_id = p.person_id "
-            + "                                                                                                                   JOIN obs o "
-            + "                                                                                                                        ON o.encounter_id = e.encounter_id "
-            + "                                                                                                                            AND encounter_type = ${6} "
-            + "                                                                                                                            AND o.concept_id = ${pregnantConcept} "
-            + "                                                                                                                            AND o.value_coded = ${yesConcept} "
-            + "                                                                                                                            AND e.location_id = :location "
-            + "                                                                                                                            AND e.encounter_datetime <= :revisionEndDate "
-            + "                                                                                                                            AND p.gender = 'F' "
-            + "                                                                                                                            AND e.voided = 0 "
-            + "                                                                                                                            AND o.voided = 0 "
-            + "                                                                                                                            AND p.voided = 0 "
-            + "                                                                                                        GROUP BY p.person_id) pregnant "
-            + "                     WHERE "
-            + "                             pregnant.first_pregnancy >=  :startDate "
-            + "                       AND pregnant.first_pregnancy <= :endDate "
-            + "                       AND   pregnant.person_id NOT IN ( "
-            + "                             SELECT p.person_id "
-            + "                             FROM   person p "
-            + "                                        JOIN encounter e "
-            + "                                             ON e.patient_id = p.person_id "
-            + "                                        JOIN obs o "
-            + "                                             ON o.encounter_id = e.encounter_id "
-            + "                                                 AND encounter_type = ${6} "
-            + "                                                 AND o.concept_id = ${pregnantConcept} "
-            + "                                                 AND o.value_coded = ${yesConcept} "
-            + "                                                 AND e.location_id = :location "
-            + "                                                 AND e.encounter_datetime >= date_sub(:startDate, interval 9 month )  "
-            + "                                                 AND e.encounter_datetime < :startDate "
-            + "                                                 AND p.gender = 'F' "
-            + "                                                 AND e.voided = 0 "
-            + "                                                 AND o.voided = 0 "
-            + "                                                 AND p.voided = 0 "
-            + "                         ) "
-            + "                     GROUP BY pregnant.person_id "
+            + IntensiveMonitoringCohortQueries.getPregnantOrBreastfeedingQuery()
             + "    ) consultation_date ON consultation_date.person_id = pa.patient_id "
             + "WHERE  pa.voided = 0 "
             + "  AND enc.voided = 0 "
