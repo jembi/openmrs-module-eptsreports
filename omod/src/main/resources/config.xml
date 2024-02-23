@@ -3886,7 +3886,7 @@
 		<property>eptsreports.bmiConceptUuid</property>
 		<defaultValue>e1da52ba-1d5f-11e0-b929-000c29ad1d07</defaultValue>
 		<description>
-			BMI
+			UUID for the BMI concept
 		</description>
 	</globalProperty>
 
@@ -3894,7 +3894,7 @@
 		<property>eptsreports.muacConceptUuid</property>
 		<defaultValue>1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</defaultValue>
 		<description>
-			MUAC
+			UUID for the MUAC concept
 		</description>
 	</globalProperty>
 
@@ -3960,6 +3960,30 @@
 		<defaultValue>e1d8e10a-1d5f-11e0-b929-000c29ad1d07</defaultValue>
 		<description>
 			UUID for the NOT APPLICABLE concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.humanPapillomavirusDnaConceptUuid</property>
+		<defaultValue>527d62e2-b43e-4523-835f-2f0919ef46c5</defaultValue>
+		<description>
+			UUID for the HUMAN PAPILLOMAVIRUS - DNA concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.treatmentConceptUuid</property>
+		<defaultValue>e1d8f136-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for the TREATMENT concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.termoablationConceptUuid</property>
+		<defaultValue>9342ff56-6306-4221-a600-a0edc31a7d24</defaultValue>
+		<description>
+			UUID for the THERMOABLATION concept
 		</description>
 	</globalProperty>
 
