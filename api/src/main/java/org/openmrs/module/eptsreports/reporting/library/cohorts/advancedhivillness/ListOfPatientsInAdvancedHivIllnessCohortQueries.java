@@ -1393,6 +1393,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
                         false,
                         false))
             .union(listOfPatientsOnAdvancedHivIllnessQueries.getPatientsActiveOnTarv())
+            .union(listOfPatientsOnAdvancedHivIllnessQueries.getPatientsWhoRestartedTreatment())
             .buildQuery();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
