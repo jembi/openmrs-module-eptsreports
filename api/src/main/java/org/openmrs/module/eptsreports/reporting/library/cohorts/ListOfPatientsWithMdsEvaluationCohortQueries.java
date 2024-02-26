@@ -1,7 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,14 +62,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
         new Parameter("evaluationYear", "evaluationYear", Integer.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
-    String query = getCoort12Or24Query(numberOfYearsStartDate, numberOfYearsEndDate, coortName);
+    String query = getCoort12Or24Or36Query(numberOfYearsStartDate, numberOfYearsEndDate, coortName);
 
     sqlCohortDefinition.setQuery(query);
 
     return sqlCohortDefinition;
   }
 
-  public CohortDefinition getCoort12Or24() {
+  public CohortDefinition getCoort12Or24Or36() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Patients who initiated the ART between the cohort period");
     cd.addParameter(new Parameter("evaluationYear", "evaluationYear", Integer.class));
@@ -79,16 +77,18 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     CohortDefinition twelveMonths = getCoort(2, 1, false);
     CohortDefinition twentyFourMonths = getCoort(3, 2, false);
+    CohortDefinition thirtySixMonths = getCoort(4, 3, false);
 
     cd.addSearch("twelveMonths", Mapped.mapStraightThrough(twelveMonths));
     cd.addSearch("twentyFourMonths", Mapped.mapStraightThrough(twentyFourMonths));
+    cd.addSearch("thirtySixMonths", Mapped.mapStraightThrough(thirtySixMonths));
 
-    cd.setCompositionString("twelveMonths OR twentyFourMonths");
+    cd.setCompositionString("twelveMonths OR twentyFourMonths OR thirtySixMonths");
 
     return cd;
   }
 
-  private String getCoort12Or24Query(
+  private String getCoort12Or24Or36Query(
       int numberOfYearsStartDate, int numberOfYearsEndDate, boolean coortName) {
 
     String query = "";
@@ -121,6 +121,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     if (coortName && numberOfYearsEndDate == 2) {
       query = "SELECT art_patient.patient_id, '24 Meses' ".concat(fromQuery);
     }
+    if (coortName && numberOfYearsEndDate == 3) {
+      query = "SELECT art_patient.patient_id, '36 Meses' ".concat(fromQuery);
+    }
     if (!coortName) {
       query = "SELECT art_patient.patient_id ".concat(fromQuery);
     }
@@ -137,7 +140,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {DataDefinition}
    */
-  public DataDefinition getCoort12Or24Months() {
+  public DataDefinition getCoort12Or24Or36Months() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("A.2 - Coorte: – Resposta = 12 meses ou Resposta = 24 meses.");
@@ -145,10 +148,12 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
         new Parameter("evaluationYear", "evaluationYear", Integer.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    String query12month = getCoort12Or24Query(2, 1, true);
-    String query24month = getCoort12Or24Query(3, 2, true);
+    String query12month = getCoort12Or24Or36Query(2, 1, true);
+    String query24month = getCoort12Or24Or36Query(3, 2, true);
+    String query36month = getCoort12Or24Or36Query(4, 3, true);
 
-    String query = new UnionBuilder(query12month).union(query24month).buildQuery();
+    String query =
+        new UnionBuilder(query12month).union(query24month).union(query36month).buildQuery();
 
     sqlPatientDataDefinition.setQuery(query);
 

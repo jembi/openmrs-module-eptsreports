@@ -43,7 +43,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.setParameters(getParameters());
 
     pdd.addRowFilter(
-        listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24Or36(),
         "evaluationYear=${evaluationYear},location=${location}");
 
     //  SECÇÃO A
@@ -58,7 +58,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // A2- Coorte: (coluna B)
     pdd.addColumn(
         "coort",
-        listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24Months(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24Or36Months(),
         "evaluationYear=${evaluationYear},location=${location}");
 
     // A3- Sexo: (coluna C)
