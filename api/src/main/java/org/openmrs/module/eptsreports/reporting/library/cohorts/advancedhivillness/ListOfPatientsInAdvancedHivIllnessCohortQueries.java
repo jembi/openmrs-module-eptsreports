@@ -1236,9 +1236,9 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
    *     programa Pré-TARV) com “Data de Transferência” <= “Data Fim”; ou
    * <li>inscrito como “Transferido de” (1o estado de inscrição) no serviço TARV-TRATAMENTO
    *     (inscrição programa TARV) com “Data de Transferência” <= “Data Fim”; ou
-   * <li>registado no formulário “Ficha de Resumo” como “Transferido de outra US”, opção “Pré-TARV”
-   *     ou “TARV” selecionada; e com “Data de Abertura da Ficha na US” “<= “Data Fim”; Resposta=
-   *     Não, se o utente não está nos criterios acima
+   * <li>registado no formulário “Ficha de Resumo” como “Transferido de outra US”, e com “Data de
+   *     Abertura da Ficha na US” “<= “Data Fim”; Resposta= Não, se o utente não está nos criterios
+   *     acima
    *
    * @return {@link DataDefinition}
    */
@@ -1265,9 +1265,6 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
     map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
-    map.put("6275", hivMetadata.getPreTarvConcept().getConceptId());
-    map.put("6276", hivMetadata.getArtStatus().getConceptId());
-    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
     map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
@@ -1301,20 +1298,16 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "        GROUP  BY p.patient_id "
             + "        UNION "
             + "        SELECT e.patient_id, "
-            + "               o3.obs_datetime AS transferred_date "
+            + "               o2.obs_datetime AS transferred_date "
             + "        FROM   encounter e "
             + "               INNER JOIN obs o  ON o.encounter_id = e.encounter_id "
             + "               INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
-            + "               INNER JOIN obs o3 ON o3.encounter_id = e.encounter_id "
             + "        WHERE  e.voided = 0 "
             + "               AND o.voided = 0 "
             + "               AND o2.voided = 0 "
-            + "               AND o3.voided = 0 "
             + "               AND e.encounter_type = ${53} "
             + "               AND ( o.concept_id = ${1369} AND o.value_coded = ${1065} ) "
-            + "               AND ( o2.concept_id = ${6300} "
-            + "                     AND o2.value_coded IN ( ${6275}, ${6276} ) ) "
-            + "               AND ( o3.concept_id = ${23891} AND o3.obs_datetime <= :endDate ) "
+            + "               AND ( o2.concept_id = ${23891} AND o2.obs_datetime <= :endDate ) "
             + "               AND e.location_id = :location "
             + "        GROUP  BY e.patient_id) transferred_in "
             + "GROUP  BY transferred_in.patient_id";
