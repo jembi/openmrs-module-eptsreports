@@ -157,6 +157,26 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "   SELECT transferred_out.patient_id, "
             + "       transferred_out.last_transfer AS last_transfer_date "
             + "   FROM   ( "
+            + "             SELECT     p.patient_id, "
+            + "                        Max(ps.start_date) AS last_transfer "
+            + "             FROM       patient p "
+            + "                            INNER JOIN patient_program pg "
+            + "                                       ON         pg.patient_id = p.patient_id "
+            + "                            INNER JOIN patient_state ps "
+            + "                                       ON         ps.patient_program_id = pg.patient_program_id "
+            + "             WHERE      p.voided = 0 "
+            + "               AND        pg.voided = 0 "
+            + "               AND        ps.voided = 0 "
+            + "               AND        pg.program_id = ${2} "
+            + "               AND        ps.state = ${7} "
+            + "               AND        pg.location_id = :location "
+            + "               AND        ps.start_date <= DATE_SUB(CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + "        ), INTERVAL "
+            + coortendYear
+            + " YEAR) "
+            + "             GROUP BY   p.patient_id "
+            + " UNION "
             + "				SELECT p.patient_id, "
             + "                     MAX(e.encounter_datetime) AS last_transfer "
             + "				FROM   patient p "
@@ -169,7 +189,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "				AND e.encounter_type = ${6} "
             + "				AND o.concept_id = ${6273} "
             + "				AND o.value_coded = ${1706} "
-            + "				AND e.encounter_datetime < DATE_SUB(CONCAT(:evaluationYear,"
+            + "				AND e.encounter_datetime <= DATE_SUB(CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
             + "        ), INTERVAL "
             + coortendYear
@@ -188,7 +208,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "					   AND e.encounter_type = ${53} "
             + "                  AND        o.concept_id = ${6272} "
             + "                  AND        o.value_coded = ${1706} "
-            + "				     AND o.obs_datetime < DATE_SUB(CONCAT(:evaluationYear,"
+            + "				     AND o.obs_datetime <= DATE_SUB(CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
             + "        ), INTERVAL "
             + coortendYear
@@ -235,6 +255,12 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + ") ";
 
     Map<String, Integer> map = new HashMap<>();
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put(
+        "7",
+        hivMetadata
+            .getTransferredOutToAnotherHealthFacilityWorkflowState()
+            .getProgramWorkflowStateId());
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
