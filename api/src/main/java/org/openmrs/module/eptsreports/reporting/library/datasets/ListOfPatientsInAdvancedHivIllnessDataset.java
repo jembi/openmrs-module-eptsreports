@@ -416,7 +416,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
             "ELIGIBLE_MDS",
             EptsReportUtils.map(
                 listOfPatientsInAdvancedHivIllnessCohortQueries
-                    .getTotalOfPatientsWithCriteriaToStartFollowupOfDAH(),
+                    .getPatientsOnFollowupOrWithCriteriaToStartFollowupOfDAH(),
                 mappings));
 
     dataSetDefinition.addColumn(

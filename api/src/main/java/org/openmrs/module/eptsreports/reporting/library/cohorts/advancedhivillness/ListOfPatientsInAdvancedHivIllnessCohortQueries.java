@@ -119,56 +119,6 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   }
 
   /**
-   * <b>Total de Utentes Eligiveis a MDS de DAH</b>
-   * <li>Utentes com critério de CD4 para início de seguimento no Modelo de DAH OR
-   * <li>Utentes com critério de Estadiamento para início de seguimento do Modelo de DAH
-   * <li>Excluindo todos os utentes que:
-   * <li>tenham iniciado um Modelo de DAH antes da data de início do período de avaliação
-   * <li>tenham sido transferidos para outra unidade sanitária até o fim do período de avaliação
-   *
-   * @see #getPatientsWithCD4CriteriaToStartFollowupOnDAH()
-   *     getPatientsWithCD4CriteriaToStartFollowupOnDAH
-   * @see #getPatientsWithCriterioEstadiamentoInicioSeguimento()
-   *     getPatientsWithCriterioEstadiamentoInicioSeguimento
-   * @return {@link CohortDefinition}
-   */
-  public CohortDefinition getTotalOfPatientsWithCriteriaToStartFollowupOfDAH() {
-
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-
-    cd.setName("Lista de Utentes com critérios para iniciar o seguimento do Modelo de DAH");
-    cd.addParameters(getCohortParameters());
-
-    cd.addSearch(
-        "CD4", EptsReportUtils.map(getPatientsWithCD4CriteriaToStartFollowupOnDAH(), mappings));
-
-    cd.addSearch(
-        "ESTADIO",
-        EptsReportUtils.map(getPatientsWithCriterioEstadiamentoInicioSeguimento(), mappings));
-
-    cd.addSearch(
-        "BASECOHORT",
-        EptsReportUtils.map(
-            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
-
-    // EXCLUSIONS
-    cd.addSearch(
-        "FOLLOWUPBEFORESTARTDATE",
-        EptsReportUtils.map(getPatientsWhoStartedFollowupOnDAH(false), mappings));
-
-    cd.addSearch(
-        "TRANSFERREDOUT",
-        EptsReportUtils.map(
-            getPatientsTransferredOutByTheEndOfPeriod(),
-            "endDate=${endDate},location=${location}"));
-
-    cd.setCompositionString(
-        "((CD4 OR ESTADIO) AND BASECOHORT) AND NOT (FOLLOWUPBEFORESTARTDATE OR TRANSFERREDOUT)");
-
-    return cd;
-  }
-
-  /**
    * <b>Total de utentes em MDS de DAH </b>
    * <li>Utentes que iniciaram o seguimento do Modelo de DAH OR
    * <li>Excluindo todos os utentes que:
