@@ -8,7 +8,7 @@ public class ViralLoadQualitativeLabelConverter implements DataConverter {
   @Override
   public Object convert(Object obj) {
     if (obj == null) {
-      return "";
+      return "N/A";
     }
 
     switch (obj.toString()) {

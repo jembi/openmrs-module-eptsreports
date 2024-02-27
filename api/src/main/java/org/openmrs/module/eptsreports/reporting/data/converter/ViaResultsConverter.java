@@ -8,7 +8,7 @@ public class ViaResultsConverter implements DataConverter {
   @Override
   public Object convert(Object original) {
     if (original == null) {
-      return "";
+      return "N/A";
     }
 
     switch (original.toString()) {
