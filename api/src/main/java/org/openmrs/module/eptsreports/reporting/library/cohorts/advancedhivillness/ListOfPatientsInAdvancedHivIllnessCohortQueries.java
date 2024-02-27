@@ -1338,15 +1338,17 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
    * <li>Resposta = “Óbito”, os utentes em TARV que foram óbito
    * <li>Resposta = “Suspenso”, os utentes em TARV que suspenderam o tratamento
    * <li>Resposta = “Activo”, os utentes activos em TARV
+   * <li>Resposta = “Reinício”, os utentes marcados como Reinício
    *
    * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsWhoAbandonedTarvQuery(boolean)
-   *     getPatientsWhoAbandonedTarvQuery
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsWhoDied(boolean) getPatientsWhoDied
+   *     Definition of patients who Abandoned Tarv
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsWhoDied(boolean) Definition of patients Died
    * @see
    *     ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsWhoSuspendedTarvOrAreTransferredOut(int,
-   *     int, boolean, boolean) getPatientsWhoSuspendedTarvOrAreTransferredOut
+   *     int, boolean, boolean) Definition of patients who Suspended Tarv Or Are Transferred Out
    * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsActiveOnTarv()
-   *     getPatientsActiveOnTarv
+   *     Definition of patients who Suspended Tarv Or Are Active on Art
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsWhoRestartedTreatment() Definition of patients who restarted
    * @return {@link DataDefinition}
    */
   public DataDefinition getLastStateOfStayOnTarv() {

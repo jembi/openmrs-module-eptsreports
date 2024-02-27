@@ -1027,11 +1027,13 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * <li>Transferidos Para Outra US
    * <li>Suspensos em TARV
    * <li>Óbitos
+   * <li>Reinícios
    *
-   * @see #getPatientsWhoAbandonedTarvQuery(boolean) getPatientsWhoAbandonedTarvQuery
+   * @see #getPatientsWhoAbandonedTarvQuery(boolean) Definition of patients who Abandoned Tarv
    * @see #getPatientsWhoSuspendedTarvOrAreTransferredOut(int, int, boolean, boolean)
-   *     getPatientsWhoSuspendedTarvOrAreTransferredOut
-   * @see #getPatientsWhoDied(boolean) getPatientsWhoDied
+   *     Definition of patients who Suspended Tarv Or Are Transferred Out
+   * @see #getPatientsWhoDied(boolean) Definition of patients Died
+   * @see #getPatientsWhoRestartedTreatment() Definition of patients who restarted
    * @return {@link String}
    */
   public String getPatientsActiveOnTarv() {
@@ -1056,6 +1058,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
                     false,
                     true))
             .union(getPatientsWhoDied(false))
+            .union(getPatientsWhoRestartedTreatment())
             .buildQuery()
         + "     ) "
         + "GROUP BY final.patient_id ";
