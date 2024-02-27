@@ -1186,9 +1186,18 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
    * <li>utentes com último registo de “Mudança Estado Permanência TARV” = “Transferido Para” na
    *     Ficha Resumo com “Data da Transferência” <= “Data Fim”;
    *
-   *     <p>excepto os utentes que tenham tido uma consulta clínica (Ficha Clínica) ou levantamento
+   *     <p>excepto os utentes que tenham tido uma consulta levantamento
    *     de ARV (FILA) após a “Data de Transferência” (a data mais recente entre os critérios acima
    *     identificados) e até “Data Fim”;
+   *     <p>
+   *         excepto os utentes que tenham a data mais recente entre:
+   *         <li>
+   *             a “Data Próximo Levantamento” registado no último FILA antes da “Data Fim” e
+   *         </li>
+   *         <li>
+   *             a última “Data de Levantamento” registada até a “Data Fim” na Ficha Recepção/Levantou ARV, adicionando 30 dias
+   *         </li>
+   *     </p>
    *
    * @return {@link CohortDefinition}
    */
