@@ -1172,14 +1172,11 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * @return {@link String}
    */
   public String getPatientsWhoRestartedTreatment(boolean isForDataDefinition) {
-    return isForDataDefinition
-        ? "SELECT  final.patient_id, 'Reinício' "
-        : " SELECT  final.patient_id "
-            + "FROM "
-            + "    ( "
-            + getPatientsWhoRestartedArtTreatnentQuery()
+    String fromSQL =
+        " FROM ( "
+            + getPatientsWhoRestartedArtTreatmentQuery()
             + " ) final "
-            + "WHERE final.patient_id NOT IN ("
+            + "WHERE final.patient_id NOT IN ( "
             + new EptsQueriesUtil()
                 .unionBuilder(getPatientsWhoAbandonedTarvQuery(false))
                 .union(
@@ -1192,11 +1189,15 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
                         true))
                 .union(getPatientsWhoDied(false))
                 .buildQuery()
-            + "     ) final "
+            + "     ) "
             + "GROUP BY final.patient_id ";
+
+    return isForDataDefinition
+        ? "  SELECT final.patient_id, 'Reinício'  ".concat(fromSQL)
+        : " SELECT final.patient_id ".concat(fromSQL);
   }
 
-  public String getPatientsWhoRestartedArtTreatnentQuery() {
+  public String getPatientsWhoRestartedArtTreatmentQuery() {
     return " SELECT p.patient_id, o.value_coded "
         + "FROM   patient p "
         + "           INNER JOIN encounter e "

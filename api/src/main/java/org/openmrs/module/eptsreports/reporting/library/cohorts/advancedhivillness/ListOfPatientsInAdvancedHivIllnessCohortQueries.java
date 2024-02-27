@@ -1295,8 +1295,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
    *     int, boolean, boolean) Definition of patients who Suspended Tarv Or Are Transferred Out
    * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsActiveOnTarv() Definition of patients
    *     who Suspended Tarv Or Are Active on Art
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsWhoRestartedTreatment(boolean) Definition of
-   *     patients who restarted
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsWhoRestartedTreatment(boolean)
+   *     Definition of patients who restarted
    * @return {@link DataDefinition}
    */
   public DataDefinition getLastStateOfStayOnTarv() {
