@@ -1136,18 +1136,14 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
    * <li>utentes com último registo de “Mudança Estado Permanência TARV” = “Transferido Para” na
    *     Ficha Resumo com “Data da Transferência” <= “Data Fim”;
    *
-   *     <p>excepto os utentes que tenham tido uma consulta levantamento
-   *     de ARV (FILA) após a “Data de Transferência” (a data mais recente entre os critérios acima
-   *     identificados) e até “Data Fim”;
-   *     <p>
-   *         excepto os utentes que tenham a data mais recente entre:
-   *         <li>
-   *             a “Data Próximo Levantamento” registado no último FILA antes da “Data Fim” e
-   *         </li>
-   *         <li>
-   *             a última “Data de Levantamento” registada até a “Data Fim” na Ficha Recepção/Levantou ARV, adicionando 30 dias
-   *         </li>
-   *     </p>
+   *     <p>excepto os utentes que tenham tido uma consulta levantamento de ARV (FILA) após a “Data
+   *     de Transferência” (a data mais recente entre os critérios acima identificados) e até “Data
+   *     Fim”;
+   *
+   *     <p>excepto os utentes que tenham a data mais recente entre:
+   * <li>a “Data Próximo Levantamento” registado no último FILA antes da “Data Fim” e
+   * <li>a última “Data de Levantamento” registada até a “Data Fim” na Ficha Recepção/Levantou ARV,
+   *     adicionando 30 dias
    *
    * @return {@link CohortDefinition}
    */
@@ -1292,13 +1288,15 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
    *
    * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsWhoAbandonedTarvQuery(boolean)
    *     Definition of patients who Abandoned Tarv
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsWhoDied(boolean) Definition of patients Died
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsWhoDied(boolean) Definition of
+   *     patients Died
    * @see
    *     ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsWhoSuspendedTarvOrAreTransferredOut(int,
    *     int, boolean, boolean) Definition of patients who Suspended Tarv Or Are Transferred Out
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsActiveOnTarv()
-   *     Definition of patients who Suspended Tarv Or Are Active on Art
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsWhoRestartedTreatment() Definition of patients who restarted
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsActiveOnTarv() Definition of patients
+   *     who Suspended Tarv Or Are Active on Art
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsWhoRestartedTreatment(boolean) Definition of
+   *     patients who restarted
    * @return {@link DataDefinition}
    */
   public DataDefinition getLastStateOfStayOnTarv() {
@@ -1340,6 +1338,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     map.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("1709", hivMetadata.getSuspendedTreatmentConcept().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
 
     String query =
         new EptsQueriesUtil()
@@ -1356,7 +1355,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
                         false,
                         false))
             .union(listOfPatientsOnAdvancedHivIllnessQueries.getPatientsActiveOnTarv())
-            .union(listOfPatientsOnAdvancedHivIllnessQueries.getPatientsWhoRestartedTreatment())
+            .union(listOfPatientsOnAdvancedHivIllnessQueries.getPatientsWhoRestartedTreatment(true))
             .buildQuery();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);

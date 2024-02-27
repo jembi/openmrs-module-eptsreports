@@ -1030,10 +1030,10 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * <li>Reinícios
    *
    * @see #getPatientsWhoAbandonedTarvQuery(boolean) Definition of patients who Abandoned Tarv
-   * @see #getPatientsWhoSuspendedTarvOrAreTransferredOut(int, int, boolean, boolean)
-   *     Definition of patients who Suspended Tarv Or Are Transferred Out
+   * @see #getPatientsWhoSuspendedTarvOrAreTransferredOut(int, int, boolean, boolean) Definition of
+   *     patients who Suspended Tarv Or Are Transferred Out
    * @see #getPatientsWhoDied(boolean) Definition of patients Died
-   * @see #getPatientsWhoRestartedTreatment() Definition of patients who restarted
+   * @see #getPatientsWhoRestartedTreatment(boolean) Definition of patients who restarted
    * @return {@link String}
    */
   public String getPatientsActiveOnTarv() {
@@ -1058,7 +1058,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
                     false,
                     true))
             .union(getPatientsWhoDied(false))
-            .union(getPatientsWhoRestartedTreatment())
+            .union(getPatientsWhoRestartedTreatment(false))
             .buildQuery()
         + "     ) "
         + "GROUP BY final.patient_id ";
@@ -1171,25 +1171,29 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * @see #getPatientsWhoDied(boolean) getPatientsWhoDied
    * @return {@link String}
    */
-  public String getPatientsWhoRestartedTreatment() {
-    return "SELECT  final.patient_id, 'Reinício' "
-        + "FROM "
-        + "    ( "
-        + getPatientsWhoRestartedArtTreatnentQuery()
-        + " ) final "
-        + "WHERE final.patient_id NOT IN ("
-        + new EptsQueriesUtil()
-            .unionBuilder(getPatientsWhoAbandonedTarvQuery(false))
-            .union(
-                getPatientsWhoSuspendedTarvOrAreTransferredOut(
-                    hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId(),
-                    hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
-                    true,
-                    true))
-            .union(getPatientsWhoDied(false))
-            .buildQuery()
-        + "     ) "
-        + "GROUP BY final.patient_id ";
+  public String getPatientsWhoRestartedTreatment(boolean isForDataDefinition) {
+    return isForDataDefinition
+        ? "SELECT  final.patient_id, 'Reinício' "
+        : " SELECT  final.patient_id "
+            + "FROM "
+            + "    ( "
+            + getPatientsWhoRestartedArtTreatnentQuery()
+            + " ) final "
+            + "WHERE final.patient_id NOT IN ("
+            + new EptsQueriesUtil()
+                .unionBuilder(getPatientsWhoAbandonedTarvQuery(false))
+                .union(
+                    getPatientsWhoSuspendedTarvOrAreTransferredOut(
+                        hivMetadata
+                            .getSuspendedTreatmentWorkflowState()
+                            .getProgramWorkflowStateId(),
+                        hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
+                        true,
+                        true))
+                .union(getPatientsWhoDied(false))
+                .buildQuery()
+            + "     ) final "
+            + "GROUP BY final.patient_id ";
   }
 
   public String getPatientsWhoRestartedArtTreatnentQuery() {
