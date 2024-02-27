@@ -157,7 +157,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B9- Data de inscrição no MDS: (coluna R) - Resposta = Data de Inscrição (RF24)
     pdd.addColumn(
         "mds_date",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(3, 9, true),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(0, 12, true),
         endDateMappings,
         new GeneralDateConverter());
 

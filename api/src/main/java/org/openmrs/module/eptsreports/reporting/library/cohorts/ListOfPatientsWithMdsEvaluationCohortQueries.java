@@ -706,7 +706,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * <br>
    *
    * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
-   * na coorte de 24 meses, conforme definido no RF4.
+   * na coorte de 24 meses ou na coorte de 36 meses conforme definido no RF4.
    *
    * @return {DataDefinition}
    */
@@ -880,7 +880,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * <br>
    *
    * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
-   * na coorte de 24 meses, conforme definido no RF4.
+   * na coorte de 24 meses ou na coorte de 36 meses conforme definido no RF4.
    *
    * @return {DataDefinition}
    */
@@ -1024,7 +1024,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * <br>
    *
    * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
-   * na coorte de 24 meses, conforme definido no RF4.
+   * na coorte de 24 meses ou na coorte de 36 meses conforme definido no RF4.
    *
    * @return {DataDefinition}
    */
@@ -1155,7 +1155,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * <br>
    *
    * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
-   * na coorte de 24 meses, conforme definido no RF4.
+   * na coorte de 24 meses ou na coorte de 36 meses conforme definido no RF4.
    *
    * @return {DataDefinition}
    */
@@ -1344,11 +1344,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * Não, o sistema não irá preencher nenhuma informação. * <br>
    * <br>
    *
-   * <p>Nota 2: A “Data Início TARV” é definida no RF46. <br>
+   * <p>Nota 2: A “Data Início TARV” é definida no RF61. <br>
    * <br>
    *
    * <p>Nota 3: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
-   * na coorte de 24 meses, conforme definido no RF4.
+   * na coorte de 24 meses ou na coorte de 36 meses conforme definido no RF4.
    *
    * @return {DataDefinition}
    */
@@ -1500,7 +1500,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * Não, o sistema não irá preencher nenhuma informação. <br>
    * <br>
    *
-   * <p>Nota 2: A “Data Início TARV” é definida no RF46 <br>
+   * <p>Nota 2: A “Data Início TARV” é definida no RF61 <br>
    * <br>
    *
    * @return {DataDefinition}
@@ -1714,11 +1714,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * informação.<br>
    * <br>
    *
-   * <p>Nota 3: A “Data Início TARV” é definida no RF46 <br>
+   * <p>Nota 3: A “Data Início TARV” é definida no RF61 <br>
    * <br>
    *
    * <p>Nota 4: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
-   * na coorte de 24 meses, conforme definido no RF4. <br>
+   * na coorte de 24 meses ou na coorte de 36 meses conforme definido no RF4. <br>
    * <br>
    *
    * @return {DataDefinition}
