@@ -644,7 +644,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
   }
 
   /**
-   * <b>Abandonos em Tarv</b>
+   * <b>Abandonos em Tarv/ Transferidos Para</b>
    *
    * @param stateOnProgram State on Program concept
    * @param stateOnEncounters State on encounter types concept
@@ -724,18 +724,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
 
     if (transferredOut) {
       query +=
-          " SELECT p.patient_id  "
-              + "      FROM   patient p  "
-              + "             JOIN encounter e  "
-              + "               ON p.patient_id = e.patient_id  "
-              + "      WHERE  p.voided = 0  "
-              + "             AND e.voided = 0  "
-              + "             AND e.encounter_type = ${6}   "
-              + "             AND e.location_id = :location  "
-              + "             AND e.encounter_datetime > lastest.last_date  "
-              + "             AND e.encounter_datetime <= :endDate  "
-              + "                 UNION"
-              + "  SELECT p.patient_id"
+          "  SELECT p.patient_id"
               + "      FROM   patient p"
               + "            JOIN encounter e ON p.patient_id = e.patient_id "
               + "            JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -745,7 +734,57 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
               + "        AND e.location_id =  :location  "
               + "            AND e.encounter_type = ${18}   "
               + "              AND e.encounter_datetime > lastest.last_date   "
-              + "              AND e.encounter_datetime <= :endDate ";
+              + "              AND e.encounter_datetime <= :endDate "
+              + " UNION "
+              + " SELECT final.patient_id FROM  ( "
+              + "       SELECT considered_transferred.patient_id, MAX(considered_transferred.value_datetime) as max_date "
+              + "         FROM ( "
+              + "               SELECT     p.patient_id, "
+              + "                          MAX(o.value_datetime) AS value_datetime "
+              + "               FROM       patient p "
+              + "                              INNER JOIN encounter e "
+              + "                                         ON         e.patient_id=p.patient_id "
+              + "                              INNER JOIN obs o "
+              + "                                         ON         o.encounter_id=e.encounter_id "
+              + "                              INNER JOIN ( "
+              + "                              SELECT p.patient_id, MAX(e.encounter_datetime) AS most_recent "
+              + "                                 FROM patient p "
+              + "                                   INNER JOIN encounter e ON e.patient_id = p.patient_id "
+              + "                              WHERE e.encounter_type = ${18} "
+              + "                                   AND e.encounter_datetime <= :endDate "
+              + "                                   AND e.voided = 0 "
+              + "                                   AND p.voided = 0 "
+              + "                                   AND e.location_id = :location "
+              + "                              GROUP BY p.patient_id "
+              + "                             ) last_fila ON last_fila.patient_id = p.patient_id "
+              + "               WHERE      p.voided = 0 "
+              + "                 AND        e.voided = 0 "
+              + "                 AND        o.voided = 0 "
+              + "                 AND        e.encounter_type = ${18} "
+              + "                 AND        o.concept_id = ${5096} "
+              + "                 AND        e.encounter_datetime = last_fila.most_recent "
+              + "                 AND        o.value_datetime <= :endDate "
+              + "                 AND        e.location_id = :location "
+              + "               GROUP BY   p.patient_id "
+              + "               UNION "
+              + "               SELECT     p.patient_id, "
+              + "                          TIMESTAMPADD(DAY, 30, MAX(o.value_datetime)) AS value_datetime "
+              + "               FROM       patient p "
+              + "                              INNER JOIN encounter e "
+              + "                                         ON  e.patient_id=p.patient_id "
+              + "                              INNER JOIN obs o "
+              + "                                         ON  o.encounter_id=e.encounter_id "
+              + "               WHERE      p.voided = 0 "
+              + "                 AND        e.voided = 0 "
+              + "                 AND        o.voided = 0 "
+              + "                 AND        e.encounter_type = ${52} "
+              + "                 AND        o.concept_id = ${23866} "
+              + "                 AND        o.value_datetime <= :endDate "
+              + "                 AND        e.location_id = :location "
+              + "               GROUP BY   p.patient_id "
+              + "         )  considered_transferred "
+              + " GROUP BY considered_transferred.patient_id "
+              + " ) final ";
     } else {
       query +=
           "  SELECT p.patient_id"
@@ -1142,7 +1181,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
                 getPatientsWhoSuspendedTarvOrAreTransferredOut(
                     hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId(),
                     hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
-                    false,
+                    true,
                     true))
             .union(getPatientsWhoDied(false))
             .buildQuery()
