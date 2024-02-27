@@ -297,7 +297,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B18 - Estado de permanência no 12˚ mês de TARV: (coluna AO)
     pdd.addColumn(
         "permanence_state_b",
-        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastStateOfStayOnTarv(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(),
         b18Mappings);
 
     // C1 - Data do pedido da CV de seguimento: (coluna AP)
@@ -489,7 +489,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C18 - Estado de permanência no 24˚ mês de TARV: (coluna BU)
     pdd.addColumn(
         "permanence_state_c",
-        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastStateOfStayOnTarv(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(),
         c18Mappings);
 
     return pdd;

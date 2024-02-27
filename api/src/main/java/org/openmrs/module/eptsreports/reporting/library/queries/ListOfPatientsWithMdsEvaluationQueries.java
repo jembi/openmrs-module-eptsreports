@@ -8,7 +8,9 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCohortQueries;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ListOfPatientsWithMdsEvaluationQueries {
   private static HivMetadata hivMetadata = new HivMetadata();
   private static TbMetadata tbMetadata = new TbMetadata();
@@ -115,6 +117,8 @@ public class ListOfPatientsWithMdsEvaluationQueries {
    * inclusão, selecionando os utentes registados com:
    *
    * <ul>
+   *   <li>utentes inscritos como “Transferido para” (último estado de inscrição) no programa
+   *       SERVIÇO TARV TRATAMENTO com “Data de Transferência” <= “Data Fim Inclusão”; ou
    *   <li>[“Mudança Estado Permanência TARV” (Coluna 21) = “T” (Transferido Para) na “Ficha
    *       Clínica” com “Data da Consulta Actual” (Coluna 1, durante a qual se fez o registo da
    *       mudança do estado de permanência TARV) até o fim do período de inclusão ou
@@ -123,16 +127,43 @@ public class ListOfPatientsWithMdsEvaluationQueries {
    * </ul>
    *
    * <br>
-   * <b>Excluindo os utentes que tenham tido uma consulta clínica (Ficha Clínica) ou Levantamento
-   * (FILA) após a “Data de Transferência” (a data mais recente entre os critérios acima
-   * identificados) e até o fim do período de inclusão.</b><br>
-   * <b>Nota: </b> O fim do período de inclusão deverá ser definido da seguinte forma:
+   * <b>Excluindo os utentes que tenham tido Levantamento de ARV (FILA) após a “Data de
+   * Transferência” (a data mais recente entre os critérios acima identificados) e até o fim do
+   * período de inclusão.
+   *
+   * <p>excepto os utentes que tenham a data mais recente entre:
    *
    * <ul>
-   *   <li>Utentes que iniciaram TARV na coorte de 12 meses: Data Fim Inclusão = “20 de Junho” de
-   *       “Ano de Avaliação” menos (-) 1 ano.
-   *   <li>Utentes que iniciaram TARV na coorte de 24 meses: Data Fim Inclusão = “20 de Junho” de
-   *       “Ano de Avaliação” menos (-) 2 anos
+   *   <li>a “Data Próximo Levantamento” registado no último FILA antes do fim do período de
+   *       inclusão e
+   *   <li>a última “Data de Levantamento” registada até o fim do período de inclusão na Ficha
+   *       Recepção/Levantou ARV, adicionando 30 dias.
+   *       <p>e sendo essa data posterior ao fim do período de inclusão. Ou seja, o utente só será
+   *       considerado como Transferido Para outra US depois de terminar a sua última medicação.
+   * </ul>
+   *
+   * </b><br>
+   * <b>Nota: </b> Sendo a “Data Fim de Inclusão” definida da seguinte forma:
+   *
+   * <ul>
+   *   <li>Coluna “Estado de Permanência no 12º Mês” (RF30)
+   *       <ul>
+   *         <li>Data Fim Inclusão = “20 de Junho” de “Ano de Avaliação” menos (-) 1 ano
+   *       </ul>
+   *   <li>Coluna “Estado de Permanência no 24º Mês” (RF45)
+   *       <ul>
+   *         <li>Data Fim Inclusão = “20 de Junho” de “Ano de Avaliação” menos (-) 2 anos
+   *       </ul>
+   *   <li>Coluna “Estado de Permanência no 36º Mês” (RF60) *
+   *       <ul>
+   *         *
+   *         <li>Data Fim Inclusão = “20 de Junho” de “Ano de Avaliação” menos (-) 3 anos *
+   *       </ul>
+   *   <li>Exclusão do Relatório (RF4) *
+   *       <ul>
+   *         *
+   *         <li>Data Fim Inclusão = “20 de Junho” de “Ano de Avaliação” *
+   *       </ul>
    * </ul>
    *
    * @param inclusionEndMonthAndDay = '-06-20'
@@ -217,42 +248,62 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + " ) transferred_out "
             + " GROUP BY transferred_out.patient_id "
             + " ) max_transferred_out "
-            + "WHERE max_transferred_out.patient_id NOT IN (SELECT p.patient_id "
-            + "                                          FROM   patient p "
-            + "                                                 JOIN encounter e "
-            + "                                                   ON p.patient_id = "
-            + "                                                      e.patient_id "
-            + "                                          WHERE  p.voided = 0 "
-            + "                                                 AND e.voided = 0 "
-            + "                                                 AND e.encounter_type = ${6} "
-            + "                                                 AND e.location_id = :location "
-            + "                                                 AND "
-            + "              e.encounter_datetime > last_transfer_date "
-            + "                                                 AND "
-            + "				 e.encounter_datetime < DATE_SUB(CONCAT(:evaluationYear,"
+            + "WHERE max_transferred_out.patient_id NOT IN (SELECT patient_id "
+            + " FROM   (SELECT patient_id, Max(recent_datetime) recent_datetime "
+            + "        FROM   (SELECT p.patient_id, Max(o.value_datetime) recent_datetime "
+            + "                FROM   patient p "
+            + "                       INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                       INNER JOIN (SELECT p.patient_id, Max(e.encounter_datetime) encounter_date "
+            + "                                   FROM   patient p "
+            + "                                          INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                   WHERE  e.encounter_type = ${18} "
+            + "                                          AND e.encounter_datetime <= DATE_SUB(CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
             + "        ), INTERVAL "
             + coortendYear
             + " YEAR) "
-            + "                                             UNION "
-            + "                                         SELECT p.patient_id "
-            + "                                          FROM   patient p "
-            + "                                                 JOIN encounter e "
-            + "                                                   ON p.patient_id = "
-            + "                                                      e.patient_id "
-            + "                                          WHERE  p.voided = 0 "
-            + "                                                 AND e.voided = 0 "
-            + "                                                 AND e.encounter_type = ${18} "
-            + "                                                 AND e.location_id = :location "
-            + "                                                 AND "
-            + "              e.encounter_datetime > last_transfer_date "
-            + "                                                 AND "
-            + "				 e.encounter_datetime < DATE_SUB(CONCAT(:evaluationYear,"
+            + "                                          AND e.voided = 0 "
+            + "                                          AND p.voided = 0 "
+            + "                                   GROUP  BY p.patient_id) most_recent ON most_recent.patient_id = p.patient_id "
+            + "                WHERE  most_recent.encounter_date = e.encounter_datetime "
+            + "                       AND e.encounter_type = ${18} "
+            + "                       AND e.encounter_datetime <= DATE_SUB(CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
             + "        ), INTERVAL "
             + coortendYear
             + " YEAR) "
-            + ") ";
+            + "                       AND e.location_id = :location "
+            + "                       AND e.voided = 0 "
+            + "                       AND p.voided = 0 "
+            + "                       AND o.voided = 0 "
+            + "                       AND o.concept_id = ${5096} "
+            + "                GROUP  BY p.patient_id "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       Max(Date_add(ovalue.value_datetime, INTERVAL 30 day)) recent_datetime "
+            + "                FROM   patient p "
+            + "                       INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                       INNER JOIN obs ovalue ON ovalue.encounter_id = e.encounter_id "
+            + "                WHERE  e.encounter_type = ${52} "
+            + "                       AND e.location_id = :location "
+            + "                       AND ovalue.concept_id = ${23866} "
+            + "                       AND ovalue.value_datetime <= DATE_SUB(CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + "        ), INTERVAL "
+            + coortendYear
+            + " YEAR) "
+            + "                       AND p.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND ovalue.voided = 0 "
+            + "                GROUP  BY patient_id) recent_pickup "
+            + "        GROUP  BY recent_pickup.patient_id) max_schedule "
+            + "WHERE  max_schedule.recent_datetime BETWEEN last_transfer_date AND DATE_SUB(CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + "        ), INTERVAL "
+            + coortendYear
+            + " YEAR) "
+            + " ) ";
 
     Map<String, Integer> map = new HashMap<>();
     map.put("2", hivMetadata.getARTProgram().getProgramId());
@@ -271,6 +322,185 @@ public class ListOfPatientsWithMdsEvaluationQueries {
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
     map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    return stringSubstitutor.replace(query);
+  }
+
+  /**
+   * * <b>Utentes Transferidos Para</b><br>
+   * * O sistema irá identificar utentes “Transferido Para” outras US em TARV até o fim do período
+   * de inclusão, selecionando os utentes registados com:
+   *
+   * <ul>
+   *   <li>utentes inscritos como “Transferido para” (último estado de inscrição) no programa *
+   *       SERVIÇO TARV TRATAMENTO com “Data de Transferência” <= “Data Fim Inclusão”; ou *
+   *   <li>[“Mudança Estado Permanência TARV” (Coluna 21) = “T” (Transferido Para) na “Ficha *
+   *       Clínica” com “Data da Consulta Actual” (Coluna 1, durante a qual se fez o registo da *
+   *       mudança do estado de permanência TARV) até o fim do período de inclusão ou *
+   *   <li>[“Mudança Estado Permanência TARV”] = “Transferido Para”, último estado registado na *
+   *       “Ficha Resumo” com “Data da Transferência” ocorrida até o fim do período de inclusão; *
+   * </ul>
+   *
+   * <br>
+   * <b>Excluindo os utentes que tenham tido Levantamento de ARV (FILA) após a “Data de
+   * Transferência” (a data mais recente entre os critérios acima identificados) e até o fim do
+   * período de inclusão.
+   *
+   * <p>excepto os utentes que tenham a data mais recente entre:
+   *
+   * <ul>
+   *   <li>a “Data Próximo Levantamento” registado no último FILA antes do fim do período de
+   *       inclusão e
+   *   <li>a última “Data de Levantamento” registada até o fim do período de inclusão na Ficha
+   *       Recepção/Levantou ARV, adicionando 30 dias.
+   *       <p>e sendo essa data posterior ao fim do período de inclusão. Ou seja, o utente só será
+   *       considerado como Transferido Para outra US depois de terminar a sua última medicação.
+   * </ul>
+   *
+   * </b><br>
+   * <b>Nota: </b> Sendo a “Data Fim de Inclusão” definida da seguinte forma:
+   *
+   * <ul>
+   *   <li>Coluna “Estado de Permanência no 12º Mês” (RF30)
+   *       <ul>
+   *         <li>Data Fim Inclusão = “20 de Junho” de “Ano de Avaliação” menos (-) 1 ano
+   *       </ul>
+   *   <li>Coluna “Estado de Permanência no 24º Mês” (RF45)
+   *       <ul>
+   *         <li>Data Fim Inclusão = “20 de Junho” de “Ano de Avaliação” menos (-) 2 anos
+   *       </ul>
+   *   <li>Coluna “Estado de Permanência no 36º Mês” (RF60)
+   *       <ul>
+   *         <li>Data Fim Inclusão = “20 de Junho” de “Ano de Avaliação” menos (-) 3 anos
+   *       </ul>
+   *   <li>Exclusão do Relatório (RF4)
+   *       <ul>
+   *         <li>Data Fim Inclusão = “20 de Junho” de “Ano de Avaliação”
+   *       </ul>
+   *
+   * @return String
+   */
+  public String getPatientsWhoHaveTransferredOutAsPermananceState() {
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put(
+        "7",
+        hivMetadata
+            .getTransferredOutToAnotherHealthFacilityWorkflowState()
+            .getProgramWorkflowStateId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
+    map.put("6276", hivMetadata.getArtStatus().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+
+    String query =
+        " SELECT patient_id, "
+            + " 'Transferido Para' "
+            + " FROM ( "
+            + "   SELECT transferred_out.patient_id, "
+            + " transferred_out.last_transfer AS last_transfer_date "
+            + "   FROM   ( "
+            + "             SELECT     p.patient_id, "
+            + "                        Max(ps.start_date) AS last_transfer "
+            + "             FROM       patient p "
+            + "                            INNER JOIN patient_program pg "
+            + "                                       ON         pg.patient_id = p.patient_id "
+            + "                            INNER JOIN patient_state ps "
+            + "                                       ON         ps.patient_program_id = pg.patient_program_id "
+            + "             WHERE      p.voided = 0 "
+            + "               AND        pg.voided = 0 "
+            + "               AND        ps.voided = 0 "
+            + "               AND        pg.program_id = ${2} "
+            + "               AND        ps.state = ${7} "
+            + "               AND        pg.location_id = :location "
+            + "               AND        ps.start_date <= :endDate "
+            + "             GROUP BY   p.patient_id "
+            + " UNION "
+            + "				SELECT p.patient_id, "
+            + "                     MAX(e.encounter_datetime) AS last_transfer "
+            + "				FROM   patient p "
+            + "					   INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "					   INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "				WHERE  p.voided = 0 "
+            + "				AND e.voided = 0 "
+            + "				AND o.voided = 0 "
+            + "				AND e.location_id = :location "
+            + "				AND e.encounter_type = ${6} "
+            + "				AND o.concept_id = ${6273} "
+            + "				AND o.value_coded = ${1706} "
+            + "				AND e.encounter_datetime <= :endDate "
+            + "              GROUP BY p.patient_id "
+            + " UNION "
+            + "				SELECT p.patient_id, "
+            + "				  	   MAX(o.obs_datetime) AS last_transfer "
+            + "				FROM   patient p "
+            + "							  INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "							  INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "					   WHERE  p.voided = 0 "
+            + "					   AND e.voided = 0 "
+            + "					   AND o.voided = 0 "
+            + "					   AND e.location_id = :location "
+            + "					   AND e.encounter_type = ${53} "
+            + "                  AND        o.concept_id = ${6272} "
+            + "                  AND        o.value_coded = ${1706} "
+            + "				     AND o.obs_datetime <= :endDate "
+            + "                  GROUP BY   p.patient_id "
+            + " ) transferred_out "
+            + " GROUP BY transferred_out.patient_id "
+            + " ) max_transferred_out "
+            + "WHERE max_transferred_out.patient_id NOT IN (SELECT patient_id "
+            + " FROM   (SELECT patient_id, Max(recent_datetime) recent_datetime "
+            + "        FROM   (SELECT p.patient_id, Max(o.value_datetime) recent_datetime "
+            + "                FROM   patient p "
+            + "                       INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                       INNER JOIN (SELECT p.patient_id, Max(e.encounter_datetime) encounter_date "
+            + "                                   FROM   patient p "
+            + "                                          INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                   WHERE  e.encounter_type = ${18} "
+            + "                                          AND e.encounter_datetime <= :endDate "
+            + "                                          AND e.voided = 0 "
+            + "                                          AND p.voided = 0 "
+            + "                                   GROUP  BY p.patient_id) most_recent ON most_recent.patient_id = p.patient_id "
+            + "                WHERE  most_recent.encounter_date = e.encounter_datetime "
+            + "                       AND e.encounter_type = ${18} "
+            + "                       AND e.encounter_datetime <= :endDate "
+            + "                       AND e.location_id = :location "
+            + "                       AND e.voided = 0 "
+            + "                       AND p.voided = 0 "
+            + "                       AND o.voided = 0 "
+            + "                       AND o.concept_id = ${5096} "
+            + "                GROUP  BY p.patient_id "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       Max(Date_add(ovalue.value_datetime, INTERVAL 30 day)) recent_datetime "
+            + "                FROM   patient p "
+            + "                       INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                       INNER JOIN obs ovalue ON ovalue.encounter_id = e.encounter_id "
+            + "                WHERE  e.encounter_type = ${52} "
+            + "                       AND e.location_id = :location "
+            + "                       AND ovalue.concept_id = ${23866} "
+            + "                       AND ovalue.value_datetime <= :endDate "
+            + "                       AND p.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND ovalue.voided = 0 "
+            + "                GROUP  BY patient_id) recent_pickup "
+            + "        GROUP  BY recent_pickup.patient_id) max_schedule "
+            + "WHERE  max_schedule.recent_datetime BETWEEN last_transfer_date AND :endDate ) ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     return stringSubstitutor.replace(query);

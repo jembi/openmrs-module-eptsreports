@@ -9,6 +9,7 @@ import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.ListOfPatientsWithMdsEvaluationQueries;
+import org.openmrs.module.eptsreports.reporting.library.queries.advancedhivillness.ListOfPatientsOnAdvancedHivIllnessQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.eptsreports.reporting.utils.queries.UnionBuilder;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -32,16 +33,24 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   private final ResumoMensalCohortQueries resumoMensalCohortQueries;
 
+  private final ListOfPatientsWithMdsEvaluationQueries listOfPatientsWithMdsEvaluationQueries;
+
+  private final ListOfPatientsOnAdvancedHivIllnessQueries listOfPatientsOnAdvancedHivIllnessQueries;
+
   @Autowired
   public ListOfPatientsWithMdsEvaluationCohortQueries(
       HivMetadata hivMetadata,
       TbMetadata tbMetadata,
       CommonMetadata commonMetadata,
-      ResumoMensalCohortQueries resumoMensalCohortQueries) {
+      ResumoMensalCohortQueries resumoMensalCohortQueries,
+      ListOfPatientsWithMdsEvaluationQueries listOfPatientsWithMdsEvaluationQueries,
+      ListOfPatientsOnAdvancedHivIllnessQueries listOfPatientsOnAdvancedHivIllnessQueries) {
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
     this.commonMetadata = commonMetadata;
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
+    this.listOfPatientsWithMdsEvaluationQueries = listOfPatientsWithMdsEvaluationQueries;
+    this.listOfPatientsOnAdvancedHivIllnessQueries = listOfPatientsOnAdvancedHivIllnessQueries;
   }
 
   /**
@@ -248,7 +257,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *       TARV” + 33 dias. <br>
    * </ul>
    *
-   * <p>Nota 1: A “Data Início TARV” é definida no RF46.
+   * <p>Nota 1: A “Data Início TARV” é definida no RF61.
    *
    * @return {DataDefinition}
    */
@@ -271,7 +280,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * <p>Nota 1: A idade será calculada em anos.
    *
-   * <p>Nota 2: A “Data Início TARV” é definida no RF46
+   * <p>Nota 2: A “Data Início TARV” é definida no RF61
    *
    * @return DataDefinition
    */
@@ -321,7 +330,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * registada em 33 dias do Início TARV, ou seja, entre “Data Início TARV” e “Data Início TARV” +
    * 33 dias.
    *
-   * <p>Nota 1: A “Data Início TARV” é definida no RF46.
+   * <p>Nota 1: A “Data Início TARV” é definida no RF61.
    *
    * @return {DataDefinition}
    */
@@ -580,7 +589,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * <p>Nota 1: no caso de existir mais de uma consulta clínica com resultado do CD4 o sistema vai
    * considerar o primeiro registo.
    *
-   * <p>Nota 2: A “Data Início TARV” é definida no RF46.
+   * <p>Nota 2: A “Data Início TARV” é definida no RF61.
    *
    * @return {DataDefinition}
    */
@@ -702,7 +711,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * foi efectuado o registo do Pedido de Carga Viral.<br>
    * <br>
    *
-   * <p>Nota 1: A “Data Início TARV” é definida no RF46. <br>
+   * <p>Nota 1: A “Data Início TARV” é definida no RF61. <br>
    * <br>
    *
    * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
@@ -778,7 +787,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * Início TARV”.<br>
    * <br>
    *
-   * <p>Nota A “Data Início TARV” é definida no RF46 <br>
+   * <p>Nota A “Data Início TARV” é definida no RF61 <br>
    * <br>
    *
    * <p>Nota 2: No caso de existirem mais de um registo de Pedido da CV após o primeiro resultado de
@@ -876,7 +885,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * qual foi efectuado o registo de resultado da Carga Viral. <br>
    * <br>
    *
-   * <p>Nota 1: A “Data Início TARV” é definida no RF46. <br>
+   * <p>Nota 1: A “Data Início TARV” é definida no RF61. <br>
    * <br>
    *
    * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
@@ -952,7 +961,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * efectuado o registo de segundo resultado da Carga Viral. <br>
    * <br>
    *
-   * <p>Nota 1: A “Data Início TARV” é definida no RF46. <br>
+   * <p>Nota 1: A “Data Início TARV” é definida no RF61. <br>
    * <br>
    *
    * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
@@ -1020,7 +1029,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * TARV (Data Início TARV). <br>
    * <br>
    *
-   * <p>Nota 1: A “Data Início TARV” é definida no RF46. <br>
+   * <p>Nota 1: A “Data Início TARV” é definida no RF61. <br>
    * <br>
    *
    * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
@@ -1087,7 +1096,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * Início TARV). <br>
    * <br>
    *
-   * <p>Nota 1: A “Data Início TARV” é definida no RF46. <br>
+   * <p>Nota 1: A “Data Início TARV” é definida no RF61. <br>
    * <br>
    *
    * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
@@ -1151,7 +1160,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * e 12 meses do Início TARV (“Data da Consulta com resultado CD4” >= “Data Início TARV” + 33 dias
    * e <= “Data Início TARV” + 12 meses).
    *
-   * <p>Nota 1: A “Data Início TARV” é definida no RF46. <br>
+   * <p>Nota 1: A “Data Início TARV” é definida no RF61. <br>
    * <br>
    *
    * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
@@ -1238,7 +1247,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * recente registado na consulta Clínica (Ficha Clínica) entre 12 e 24 meses do Início TARV (“Data
    * da Consulta” <= “Data Início TARV” + 12 meses e >= “Data Início TARV” + 24 meses). .
    *
-   * <p>Nota 1: Nota 1: A “Data Início TARV” é definida no RF46. <br>
+   * <p>Nota 1: Nota 1: A “Data Início TARV” é definida no RF61. <br>
    * <br>
    *
    * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
@@ -4239,7 +4248,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * <p>Resposta= N/A, se o utente não teve registo do início do MDS; <br>
    * <br>
    *
-   * <p>Nota 1: A “Data Início TARV” é definida no RF46<br>
+   * <p>Nota 1: A “Data Início TARV” é definida no RF61<br>
    * <br>
    *
    * <p>Nota 2: A “Data Início MDS” (RF24) é a data mais antiga (primeira) entre as “Data Início 1º
@@ -4528,7 +4537,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * Consulta <= “Data Início TARV” + 6 meses e >= “Data Início TARV” + 12 meses); <br>
    * <br>
    *
-   * <p>Nota 1: A “Data Início TARV” é definida no RF46<br>
+   * <p>Nota 1: A “Data Início TARV” é definida no RF61<br>
    * <br>
    * <br>
    *
@@ -4599,7 +4608,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * Consulta <= “Data Início TARV” + 6 meses e >= “Data Início TARV” + 12 meses); <br>
    * <br>
    *
-   * <p>Nota 1: A “Data Início TARV” é definida no RF46<br>
+   * <p>Nota 1: A “Data Início TARV” é definida no RF61<br>
    * <br>
    * <br>
    *
@@ -4654,6 +4663,83 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + maxNumberOfMonths
             + " MONTH ) "
             + "                  GROUP BY   p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b> Estado de permanência no 12˚ mês de TARV- B.18 </b>
+   * <li>Resposta = “Abandono”, os utentes em TARV que abandonaram o tratamento
+   * <li>Resposta = “Óbito”, os utentes em TARV que foram óbito
+   * <li>Resposta = “Suspenso”, os utentes em TARV que suspenderam o tratamento
+   * <li>Resposta = “Transferido Para”, os utentes em TARV que foram transferidos para outra US
+   * <li>Resposta = “Activo”, os utentes activos em TARV
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getLastStateOfStayOnTarv() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+
+    sqlPatientDataDefinition.setName("Get the Last State of stay ");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("1", hivMetadata.getHIVCareProgram().getProgramId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("10", hivMetadata.getArtDeadWorkflowState().getProgramWorkflowStateId());
+    map.put("8", hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put(
+        "28",
+        hivMetadata
+            .getArtCareTransferredFromOtherHealthFacilityWorkflowState()
+            .getProgramWorkflowStateId());
+    map.put(
+        "29",
+        hivMetadata
+            .getTransferredFromOtherHealthFacilityWorkflowState()
+            .getProgramWorkflowStateId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
+    map.put("6275", hivMetadata.getPreTarvConcept().getConceptId());
+    map.put("6276", hivMetadata.getArtStatus().getConceptId());
+    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("1709", hivMetadata.getSuspendedTreatmentConcept().getConceptId());
+
+    String query =
+        new EptsQueriesUtil()
+            .unionBuilder(
+                listOfPatientsOnAdvancedHivIllnessQueries.getPatientsWhoAbandonedTarvQuery(true))
+            .union(listOfPatientsOnAdvancedHivIllnessQueries.getPatientsWhoDied(true))
+            .union(
+                listOfPatientsOnAdvancedHivIllnessQueries
+                    .getPatientsWhoSuspendedTarvOrAreTransferredOut(
+                        hivMetadata
+                            .getSuspendedTreatmentWorkflowState()
+                            .getProgramWorkflowStateId(),
+                        hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
+                        false,
+                        false))
+            .union(
+                listOfPatientsWithMdsEvaluationQueries
+                    .getPatientsWhoHaveTransferredOutAsPermananceState())
+            .union(listOfPatientsOnAdvancedHivIllnessQueries.getPatientsActiveOnTarv())
+            .buildQuery();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
