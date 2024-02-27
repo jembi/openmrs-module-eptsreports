@@ -757,7 +757,7 @@ public class ResumoMensalCohortQueriesTest extends DefinitionsTest {
 
   @Test
   public void getNumberOfPatientsTransferredInOnPeriodShouldReturn() throws EvaluationException {
-    CohortDefinition cd = resumoMensalCohortQueries.getTransferredInPatients(false);
+    CohortDefinition cd = resumoMensalCohortQueries.getPatientsWhoAreTransferredIn(false);
 
     HashMap<Parameter, Object> parameters = new HashMap<>();
     parameters.put(new Parameter("onOrAfter", "Start Date", Date.class), this.getStartDate());
