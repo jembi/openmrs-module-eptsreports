@@ -918,7 +918,6 @@ public class APSSResumoTrimestralCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
     cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.setB10Flag(true);
 
     return cd;
   }

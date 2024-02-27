@@ -607,7 +607,6 @@ public class ResumoMensalCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
     cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.setB10Flag(new Boolean("false"));
     return cd;
   }
 
@@ -836,13 +835,11 @@ public class ResumoMensalCohortQueries {
     EptsTransferredInCohortDefinition cd = new EptsTransferredInCohortDefinition();
 
     cd.setName("Number of patients transferred-in from another HFs during the current month");
-    cd.setTypeOfPatientTransferredFromAnswer(hivMetadata.getArtStatus());
     cd.setPatientState(hivMetadata.getTransferredFromOtherHealthFacilityWorkflowState());
     cd.setProgramEnrolled(hivMetadata.getARTProgram());
     cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
     cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.setB10Flag(new Boolean("true"));
     return cd;
   }
 
@@ -877,7 +874,7 @@ public class ResumoMensalCohortQueries {
 
     String mapping = "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}";
 
-    cd.addSearch("B2", map(getTransferredInPatients(false), mapping));
+    cd.addSearch("B2", map(getPatientsWhoAreTransferredIn(false), mapping));
 
     cd.addSearch(
         "B12",
@@ -1062,8 +1059,8 @@ public class ResumoMensalCohortQueries {
    *          Patient_State.state = 7 (Transferred-out) or
    *          Patient_State.start_date >= startDate and <= endDate
    *          Patient_State.end_date = null -> deve se selecionar a max (start_date)</code>
-   *   <li>Except all patients who after the most recent date from 1 to 3 have a drugs pick up or
-   *       consultation by reporting endDate: <code>Encounter Type ID= 6, 9, 18 and
+   *   <li>Except all patients who after the most recent date from 1 to 3 have a drugs pick up by
+   *       reporting endDate: <code>Encounter Type ID= 18 and
    *          encounter_datetime> the most recent date and <=endDate
    *          or
    *          Encounter Type ID = 52 and “Data de Levantamento” (Concept Id 23866 value_datetime) > the most recent date and <=endDate
@@ -1653,7 +1650,6 @@ public class ResumoMensalCohortQueries {
     cd.setPatientState(hivMetadata.getArtTransferredFromOtherHealthFacilityWorkflowState());
     cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.setB10Flag(true);
 
     return cd;
   }
@@ -2843,7 +2839,7 @@ public class ResumoMensalCohortQueries {
    * recebeu um resultado de Carga Viral (CV) durante o mês (Notificação anual) B13=B12+B4-B9)
    *
    * <ul>
-   *   <li>B13: {@link ResumoMensalCohortQueries#getActivePatientsInARTByEndOfCurrentMonth()}
+   *   <li>B13: {@link ResumoMensalCohortQueries# getActivePatientsInARTByEndOfCurrentMonth()}
    *       <b>AND</b>
    *   <li>Filter all patients registered in encounter “S.TARV – Adulto Seguimento” (encounter id 6)
    *       with the following information:
@@ -3255,8 +3251,6 @@ public class ResumoMensalCohortQueries {
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId(),
             hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId(),
             hivMetadata.getARTProgram().getProgramId(),
             hivMetadata
@@ -3615,7 +3609,6 @@ public class ResumoMensalCohortQueries {
     cd.setPatientState2(hivMetadata.getArtTransferredFromOtherHealthFacilityWorkflowState());
     cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.setB10Flag(new Boolean("false"));
 
     return cd;
   }
@@ -3745,25 +3738,33 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Number of patients transferred-In
+   * <b>Relatório - Secção B – Entradas:</b>
+   *
+   * <p>O sistema irá produzir B.2) Nº de transferidos de outras US em TARV durante o mês incluindo
+   * os utentes que estão:
+   *
+   * <ul>
+   *   <li>inscritos como “Transferido de” no serviço TARV-TRATAMENTO (inscrição programa TARV) com
+   *       “Data de Transferência” >= “Data Início do Relatório” e “<= “Data Fim do Relatório”; ou
+   *   <li>registados no formulário “Ficha de Resumo” como “Transferido de outra US”, com “Data de
+   *       Abertura de Ficha na US”>= “Data Início do Relatório” e “<= “Data Fim do Relatório”;
+   * </ul>
    *
    * @param
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getTransferredInPatients(boolean isExclusion) {
+  public CohortDefinition getPatientsWhoAreTransferredIn(boolean isExclusion) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Transferred-in patients");
     cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
     cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.setQuery(
-        ResumoMensalQueries.getTransferredIn(
+        ResumoMensalQueries.getPatientsWhoAreTransferredIn(
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId(),
             hivMetadata.getARTProgram().getProgramId(),
             hivMetadata
                 .getTransferredFromOtherHealthFacilityWorkflowState()
