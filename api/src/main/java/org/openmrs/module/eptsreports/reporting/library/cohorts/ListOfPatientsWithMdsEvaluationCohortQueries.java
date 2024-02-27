@@ -1805,8 +1805,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   /**
    * MDS1 - Coluna S - Primeiro MDS marcado como "Início" numa consulta clínica (Ficha Clínica)
-   * ocorrida entre 33 dias e 12 meses do início TARV (Data da Consulta >= “Data Início TARV” + 33
-   * dias e <= “Data Início TARV” + 12 meses)
+   * ocorrida entre data do início TARV e 12 meses do início TARV (Data da Consulta >= “Data Início
+   * TARV” e <= “Data Início TARV” + 12 meses)
    *
    * @return {@link DataDefinition}
    */
@@ -1870,7 +1870,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        ostate.voided = 0 "
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
-            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        e.encounter_datetime >= art.art_encounter "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -1904,8 +1904,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   /**
    * Coluna T - Data da consulta (Ficha Clínica) em que o primeiro MDS foi marcado como "Início",
-   * ocorrido entre 33 dias e 12 meses do início TARV (Data da Consulta >= “Data Início TARV” + 33
-   * dias e <= “Data Início TARV” + 12 meses)
+   * ocorrido entre data do início TARV e 12 meses do início TARV (Data da Consulta >= “Data Início
+   * TARV” e <= “Data Início TARV” + 12 meses)
    *
    * @return {@link DataDefinition}
    */
@@ -1959,7 +1959,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        ostate.voided = 0 "
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
-            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        e.encounter_datetime >= art.art_encounter "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfYears
             + " MONTH ) "
@@ -1979,8 +1979,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   /**
    * MDS2 - Coluna W - Data da consulta (Ficha Clínica) em que o segundo MDS foi marcado como
-   * "Início", ocorrido entre 33 dias e 12 meses do início TARV (Data da Consulta >= “Data Início
-   * TARV” + 33 dias e <= “Data Início TARV” + 12 meses)
+   * "Início", ocorrido entre data do início TARV e 12 meses do início TARV (Data da Consulta >=
+   * “Data Início TARV” e <= “Data Início TARV” + 12 meses)
    *
    * @return {@link DataDefinition}
    */
@@ -2053,7 +2053,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        ostate.voided = 0 "
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
-            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        e.encounter_datetime >= art.art_encounter "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -2068,7 +2068,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND enc2.voided = 0 "
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
-            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime >= art.art_encounter "
             + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -2091,8 +2091,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   /**
    * MDS2 - Coluna X - Data da consulta (Ficha Clínica) em que o segundo MDS foi marcado como “Fim”,
-   * ocorrido entre 33 dias e 12 meses do início TARV (Data da Consulta >= “Data Início TARV” + 33
-   * dias e <= “Data Início TARV” + 12 meses)
+   * ocorrido entre data do início TARV e 12 meses do início TARV (Data da Consulta >= “Data Início
+   * TARV” e <= “Data Início TARV” + 12 meses)
    *
    * @return {@link DataDefinition}
    */
@@ -2185,7 +2185,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        ostate.voided = 0 "
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
-            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        e.encounter_datetime >= art.art_encounter "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -2201,7 +2201,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
-            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime >= art.art_encounter "
             + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -2219,7 +2219,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND ot22.voided = 0 "
             + "                  AND os22.voided = 0 "
             + "                  AND ee22.encounter_datetime > mds_2nd.second_mds_date "
-            + "                  AND        ee22.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        ee22.encounter_datetime >= art.art_encounter "
             + "                  AND        ee22.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -2241,8 +2241,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   /**
    * Coluna U - Data da consulta (Ficha Clínica) em que o primeiro MDS foi marcado como “Fim”,
-   * ocorrido entre 33 dias e 12 meses do início TARV (Data da Consulta >= “Data Início TARV” + 33
-   * dias e <= “Data Início TARV” + 12 meses)
+   * ocorrido entre data do início TARV e 12 meses do início TARV (Data da Consulta >= “Data Início
+   * TARV” e <= “Data Início TARV” + 12 meses)
    *
    * @return {@link DataDefinition}
    */
@@ -2300,7 +2300,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        os.voided = 0 "
             + "                  AND        ee.encounter_type = ${6} "
             + "                  AND        ee.location_id = :location "
-            + "                  AND        ee.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        ee.encounter_datetime >= art.art_encounter "
             + "                  AND        ee.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -2321,8 +2321,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   /**
    * MDS2 - Coluna V - Segundo MDS marcado como "Início" numa consulta clínica (Ficha Clínica)
-   * ocorrida entre 33 dias e 12 meses do início TARV (Data da Consulta >= “Data Início TARV” + 33
-   * dias e <= “Data Início TARV” + 12 meses)
+   * ocorrida entre data do início TARV e 12 meses do início TARV (Data da Consulta >= “Data Início
+   * TARV” e <= “Data Início TARV” + 12 meses)
    *
    * @return {@link DataDefinition}
    */
@@ -2395,7 +2395,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        ostate.voided = 0 "
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
-            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        e.encounter_datetime >= art.art_encounter "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -2411,7 +2411,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
-            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime >= art.art_encounter "
             + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -2433,8 +2433,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   /**
    * MDS3 - Coluna Y - Terceiro MDS marcado como "Início" numa consulta clínica (Ficha Clínica)
-   * ocorrida entre 33 dias e 12 meses do início TARV (Data da Consulta >= “Data Início TARV” + 33
-   * dias e <= “Data Início TARV” + 12 meses)
+   * ocorrida entre data do início TARV e 12 meses do início TARV (Data da Consulta >= “Data Início
+   * TARV” e <= “Data Início TARV” + 12 meses)
    *
    * @return {@link DataDefinition}
    */
@@ -2526,7 +2526,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        ostate.voided = 0 "
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
-            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        e.encounter_datetime >= art.art_encounter "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -2542,7 +2542,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
-            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime >= art.art_encounter "
             + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -2560,7 +2560,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype3.voided = 0 "
             + "                  AND ostate3.voided = 0 "
             + "                  AND enc3.encounter_datetime > mds_2nd.second_mds_date "
-            + "                  AND        enc3.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc3.encounter_datetime >= art.art_encounter "
             + "                  AND        enc3.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -2582,8 +2582,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   /**
    * MDS3 - Coluna Z - Data da consulta (Ficha Clínica) em que o terceiro MDS foi marcado como
-   * "Início", ocorrido entre 33 dias e 12 meses do início TARV (Data da Consulta >= “Data Início
-   * TARV” + 33 dias e <= “Data Início TARV” + 12 meses)
+   * "Início", ocorrido entre data do início TARV e 12 meses do início TARV (Data da Consulta >=
+   * “Data Início TARV” e <= “Data Início TARV” + 12 meses)
    *
    * @return {@link DataDefinition}
    */
@@ -2675,7 +2675,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        ostate.voided = 0 "
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
-            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        e.encounter_datetime >= art.art_encounter "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -2691,7 +2691,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
-            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime >= art.art_encounter "
             + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -2709,7 +2709,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype3.voided = 0 "
             + "                  AND ostate3.voided = 0 "
             + "                  AND enc3.encounter_datetime > mds_2nd.second_mds_date "
-            + "                  AND        enc3.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc3.encounter_datetime >= art.art_encounter "
             + "                  AND        enc3.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -2731,8 +2731,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   /**
    * MDS3 - Coluna AA - Data da consulta (Ficha Clínica) em que o terceiro MDS foi marcado como
-   * “Fim”, ocorrido entre 33 dias e 12 meses do início TARV (Data da Consulta >= “Data Início TARV”
-   * + 33 dias e <= “Data Início TARV” + 12 meses)
+   * “Fim”, ocorrido entre data do início TARV e 12 meses do início TARV (Data da Consulta >= “Data
+   * Início TARV” e <= “Data Início TARV” + 12 meses)
    *
    * @return {@link DataDefinition}
    */
@@ -2843,7 +2843,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        ostate.voided = 0 "
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
-            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        e.encounter_datetime >= art.art_encounter "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -2859,7 +2859,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
-            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime >= art.art_encounter "
             + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -2877,7 +2877,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype3.voided = 0 "
             + "                  AND ostate3.voided = 0 "
             + "                  AND enc3.encounter_datetime > mds_2nd.second_mds_date "
-            + "                  AND        enc3.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc3.encounter_datetime >= art.art_encounter "
             + "                  AND        enc3.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -2895,7 +2895,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND ot33.voided = 0 "
             + "                  AND os33.voided = 0 "
             + "                  AND ee33.encounter_datetime > mds_3rd.third_mds_date "
-            + "                  AND        ee33.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        ee33.encounter_datetime >= art.art_encounter "
             + "                  AND        ee33.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -2917,8 +2917,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   /**
    * MDS4 - Coluna AB - Quarto MDS marcado como "Início" numa consulta clínica (Ficha Clínica)
-   * ocorrida entre 33 dias e 12 meses do início TARV (Data da Consulta >= “Data Início TARV” + 33
-   * dias e <= “Data Início TARV” + 12 meses)
+   * ocorrida entre data do início TARV e 12 meses do início TARV (Data da Consulta >= “Data Início
+   * TARV” e <= “Data Início TARV” + 12 meses)
    *
    * @return {@link DataDefinition}
    */
@@ -3029,7 +3029,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        ostate.voided = 0 "
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
-            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        e.encounter_datetime >= art.art_encounter "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3045,7 +3045,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
-            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime >= art.art_encounter "
             + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3063,7 +3063,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype3.voided = 0 "
             + "                  AND ostate3.voided = 0 "
             + "                  AND enc3.encounter_datetime > mds_2nd.second_mds_date "
-            + "                  AND        enc3.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc3.encounter_datetime >= art.art_encounter "
             + "                  AND        enc3.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3081,7 +3081,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype4.voided = 0 "
             + "                  AND ostate4.voided = 0 "
             + "                  AND enc4.encounter_datetime > mds_3rd.third_mds_date "
-            + "                  AND        enc4.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc4.encounter_datetime >= art.art_encounter "
             + "                  AND        enc4.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3103,8 +3103,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   /**
    * MDS4 - Coluna AC - Data da consulta (Ficha Clínica) em que o quarto MDS foi marcado como
-   * "Início", ocorrido entre 33 dias e 12 meses do início TARV (Data da Consulta >= “Data Início
-   * TARV” + 33 dias e <= “Data Início TARV” + 12 meses)
+   * "Início", ocorrido entre data do início TARV e 12 meses do início TARV (Data da Consulta >=
+   * “Data Início TARV” e <= “Data Início TARV” + 12 meses)
    *
    * @return {@link DataDefinition}
    */
@@ -3215,7 +3215,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        ostate.voided = 0 "
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
-            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        e.encounter_datetime >= art.art_encounter "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3231,7 +3231,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
-            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime >= art.art_encounter "
             + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3249,7 +3249,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype3.voided = 0 "
             + "                  AND ostate3.voided = 0 "
             + "                  AND enc3.encounter_datetime > mds_2nd.second_mds_date "
-            + "                  AND        enc3.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc3.encounter_datetime >= art.art_encounter "
             + "                  AND        enc3.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3267,7 +3267,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype4.voided = 0 "
             + "                  AND ostate4.voided = 0 "
             + "                  AND enc4.encounter_datetime > mds_3rd.third_mds_date "
-            + "                  AND        enc4.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc4.encounter_datetime >= art.art_encounter "
             + "                  AND        enc4.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3289,8 +3289,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   /**
    * MDS4 - Coluna AD - Data da consulta (Ficha Clínica) em que o quarto MDS foi marcado como “Fim”,
-   * ocorrido entre 33 dias e 12 meses do início TARV (Data da Consulta >= “Data Início TARV” + 33
-   * dias e <= “Data Início TARV” + 12 meses)
+   * ocorrido entre data do início TARV e 12 meses do início TARV (Data da Consulta >= “Data Início
+   * TARV” e <= “Data Início TARV” + 12 meses)
    *
    * @return {@link DataDefinition}
    */
@@ -3421,7 +3421,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        ostate.voided = 0 "
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
-            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        e.encounter_datetime >= art.art_encounter "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3437,7 +3437,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
-            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime >= art.art_encounter "
             + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3455,7 +3455,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype3.voided = 0 "
             + "                  AND ostate3.voided = 0 "
             + "                  AND enc3.encounter_datetime > mds_2nd.second_mds_date "
-            + "                  AND        enc3.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc3.encounter_datetime >= art.art_encounter "
             + "                  AND        enc3.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3473,7 +3473,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype4.voided = 0 "
             + "                  AND ostate4.voided = 0 "
             + "                  AND enc4.encounter_datetime > mds_3rd.third_mds_date "
-            + "                  AND        enc4.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc4.encounter_datetime >= art.art_encounter "
             + "                  AND        enc4.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3491,7 +3491,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND ot44.voided = 0 "
             + "                  AND os44.voided = 0 "
             + "                  AND ee44.encounter_datetime > mds_4th.fourth_mds_date "
-            + "                  AND        ee44.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        ee44.encounter_datetime >= art.art_encounter "
             + "                  AND        ee44.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3512,8 +3512,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   /**
    * MDS5 - Coluna AE - Quinto MDS marcado como "Início" numa consulta clínica (Ficha Clínica)
-   * ocorrida entre 33 dias e 12 meses do início TARV (Data da Consulta >= “Data Início TARV” + 33
-   * dias e <= “Data Início TARV” + 12 meses)
+   * ocorrida entre data do início TARV e 12 meses do início TARV (Data da Consulta >= “Data Início
+   * TARV” e <= “Data Início TARV” + 12 meses)
    *
    * @return {@link DataDefinition}
    */
@@ -3643,7 +3643,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        ostate.voided = 0 "
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
-            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        e.encounter_datetime >= art.art_encounter "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3659,7 +3659,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
-            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime >= art.art_encounter "
             + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3677,7 +3677,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype3.voided = 0 "
             + "                  AND ostate3.voided = 0 "
             + "                  AND enc3.encounter_datetime > mds_2nd.second_mds_date "
-            + "                  AND        enc3.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc3.encounter_datetime >= art.art_encounter "
             + "                  AND        enc3.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3695,7 +3695,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype4.voided = 0 "
             + "                  AND ostate4.voided = 0 "
             + "                  AND enc4.encounter_datetime > mds_3rd.third_mds_date "
-            + "                  AND        enc4.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc4.encounter_datetime >= art.art_encounter "
             + "                  AND        enc4.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3713,7 +3713,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype5.voided = 0 "
             + "                  AND ostate5.voided = 0 "
             + "                  AND enc5.encounter_datetime > mds_4th.fourth_mds_date "
-            + "                  AND        enc5.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc5.encounter_datetime >= art.art_encounter "
             + "                  AND        enc5.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3735,8 +3735,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   /**
    * MDS5 - Coluna AF - Data da consulta (Ficha Clínica) em que o quinto MDS foi marcado como
-   * "Início"ocorrido entre 33 dias e 12 meses do início TARV (Data da Consulta >= “Data Início
-   * TARV” + 33 dias e <= “Data Início TARV” + 12 meses).
+   * "Início"ocorrido entre data do início TARV e 12 meses do início TARV (Data da Consulta >= “Data
+   * Início TARV” e <= “Data Início TARV” + 12 meses).
    *
    * @return {@link DataDefinition}
    */
@@ -3866,7 +3866,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        ostate.voided = 0 "
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
-            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        e.encounter_datetime >= art.art_encounter "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3882,7 +3882,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
-            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime >= art.art_encounter "
             + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3900,7 +3900,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype3.voided = 0 "
             + "                  AND ostate3.voided = 0 "
             + "                  AND enc3.encounter_datetime > mds_2nd.second_mds_date "
-            + "                  AND        enc3.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc3.encounter_datetime >= art.art_encounter "
             + "                  AND        enc3.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3918,7 +3918,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype4.voided = 0 "
             + "                  AND ostate4.voided = 0 "
             + "                  AND enc4.encounter_datetime > mds_3rd.third_mds_date "
-            + "                  AND        enc4.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc4.encounter_datetime >= art.art_encounter "
             + "                  AND        enc4.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3936,7 +3936,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype5.voided = 0 "
             + "                  AND ostate5.voided = 0 "
             + "                  AND enc5.encounter_datetime > mds_4th.fourth_mds_date "
-            + "                  AND        enc5.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc5.encounter_datetime >= art.art_encounter "
             + "                  AND        enc5.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonths
             + " MONTH ) "
@@ -3958,8 +3958,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   /**
    * MDS5 - Coluna AG - Data da consulta (Ficha Clínica) em que o quinto MDS foi marcado como “Fim”,
-   * ocorrido entre 33 dias e 12 meses do início TARV (Data da Consulta >= “Data Início TARV” + 33
-   * dias e <= “Data Início TARV” + 12 meses).
+   * ocorrido entre data do início TARV e 12 meses do início TARV (Data da Consulta >= “Data Início
+   * TARV” e <= “Data Início TARV” + 12 meses).
    *
    * @return {@link DataDefinition}
    */
@@ -4109,7 +4109,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        ostate.voided = 0 "
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
-            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        e.encounter_datetime >= art.art_encounter "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonthss
             + " MONTH ) "
@@ -4125,7 +4125,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
-            + "                  AND        enc2.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc2.encounter_datetime >= art.art_encounter "
             + "                  AND        enc2.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonthss
             + " MONTH ) "
@@ -4143,7 +4143,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype3.voided = 0 "
             + "                  AND ostate3.voided = 0 "
             + "                  AND enc3.encounter_datetime > mds_2nd.second_mds_date "
-            + "                  AND        enc3.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc3.encounter_datetime >= art.art_encounter "
             + "                  AND        enc3.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonthss
             + " MONTH ) "
@@ -4161,7 +4161,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype4.voided = 0 "
             + "                  AND ostate4.voided = 0 "
             + "                  AND enc4.encounter_datetime > mds_3rd.third_mds_date "
-            + "                  AND        enc4.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc4.encounter_datetime >= art.art_encounter "
             + "                  AND        enc4.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonthss
             + " MONTH ) "
@@ -4179,7 +4179,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND otype5.voided = 0 "
             + "                  AND ostate5.voided = 0 "
             + "                  AND enc5.encounter_datetime > mds_4th.fourth_mds_date "
-            + "                  AND        enc5.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        enc5.encounter_datetime >= art.art_encounter "
             + "                  AND        enc5.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonthss
             + " MONTH ) "
@@ -4197,7 +4197,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND ot55.voided = 0 "
             + "                  AND os55.voided = 0 "
             + "                  AND ee55.encounter_datetime > mds_5th.fifth_mds_date "
-            + "                  AND        ee55.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        ee55.encounter_datetime >= art.art_encounter "
             + "                  AND        ee55.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + numberOfMonthss
             + " MONTH ) "
