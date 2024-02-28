@@ -548,6 +548,111 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         endDateMappings,
         new GeneralDateConverter());
 
+    // D10.1 -Tipo de MDS: (MDS1) Coluna CE
+    pdd.addColumn(
+        "mds_one_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1(36),
+        endDateMappings,
+        new DispensationTypeMdcConverter());
+
+    // D10.2 - Data Início de MDS1: Coluna CF
+    pdd.addColumn(
+        "mds_one_start_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1StartDate(36),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D10.3 - Data Fim de MDS1: Coluna CG
+    pdd.addColumn(
+        "mds_one_end_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1EndDate(36),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D10.4 - Tipo de MDS: (MDS2) Coluna CH
+    pdd.addColumn(
+        "mds_two_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2(36),
+        endDateMappings,
+        new DispensationTypeMdcConverter());
+
+    // D10.5 - Data Início de MDS2: Coluna CI
+    pdd.addColumn(
+        "mds_two_start_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2StartDate(36),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D10.6 - Data Fim de MDS2: Coluna CJ
+    pdd.addColumn(
+        "mds_two_end_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2EndDate(36),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D10.7 - Tipo de MDS: (MDS3) Coluna CK
+    pdd.addColumn(
+        "mds_three_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3(36),
+        endDateMappings,
+        new DispensationTypeMdcConverter());
+
+    // D10.8 - Data Início de MDS3: Coluna CL
+    pdd.addColumn(
+        "mds_three_start_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3StartDate(36),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D10.9 - Data Fim de MDS3: Coluna CM
+    pdd.addColumn(
+        "mds_three_end_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3EndDate(36),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D10.10 - Tipo de MDS: (MDS4) Coluna CN
+    pdd.addColumn(
+        "mds_four_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4(36),
+        endDateMappings,
+        new DispensationTypeMdcConverter());
+
+    // D10.11 - Data Início de MDS4: Coluna CO
+    pdd.addColumn(
+        "mds_four_start_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4StartDate(36),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D10.12 - Data Fim de MDS4: Coluna CP
+    pdd.addColumn(
+        "mds_four_end_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4EndDate(36),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D10.13 - Tipo de MDS: (MDS5) Coluna CQ
+    pdd.addColumn(
+        "mds_five_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5(36),
+        endDateMappings,
+        new DispensationTypeMdcConverter());
+
+    // D10.14 - Data Início de MDS5: Coluna CR
+    pdd.addColumn(
+        "mds_five_start_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5StartDate(36),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D10.15 - Data Fim de MDS5: Coluna CS
+    pdd.addColumn(
+        "mds_five_end_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5EndDate(36),
+        endDateMappings,
+        new GeneralDateConverter());
+
     // D18 - Estado de permanência no 36˚ mês de TARV: (coluna DA)
     pdd.addColumn(
         "permanence_state_d",
