@@ -421,7 +421,7 @@ public class IntensiveMonitoringCohortQueries {
           "MI13DEN15",
           EptsReportUtils.map(
               qualityImprovement2020CohortQueries.getgetMQC13P2DenMGInIncluisionPeriod(),
-              "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},revisionEndDate=${revisionEndDate},location=${location}"));
+              "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
     } else if (level == 16) {
       cd.addSearch(
           "MI13DEN16", EptsReportUtils.map(getMQC13P2DenMGInIncluisionPeriod33Month(), MAPPING));
@@ -435,7 +435,7 @@ public class IntensiveMonitoringCohortQueries {
           "MI13NUM15",
           EptsReportUtils.map(
               qualityImprovement2020CohortQueries.getMQC13P2Num1(),
-              "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},revisionEndDate=${revisionEndDate},location=${location}"));
+              "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
     } else if (level == 16) {
       cd.addSearch("MI13NUM16", EptsReportUtils.map(getMQC13P2Num2(), MAPPING));
     } else if (level == 17) {
