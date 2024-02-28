@@ -154,17 +154,25 @@ public class ResumoMensalQueries {
   }
 
   /**
-   * <b>Description:</b> Get transferred-in patients as specified in Resumo Mensal
+   * <b>Relatório - Secção B – Entradas:</b>
+   *
+   * <p>O sistema irá produzir B.2) Nº de transferidos de outras US em TARV durante o mês incluindo
+   * os utentes que estão:
+   *
+   * <ul>
+   *   <li>inscritos como “Transferido de” no serviço TARV-TRATAMENTO (inscrição programa TARV) com
+   *       “Data de Transferência” >= “Data Início do Relatório” e “<= “Data Fim do Relatório”; ou
+   *   <li>registados no formulário “Ficha de Resumo” como “Transferido de outra US”, com “Data de
+   *       Abertura de Ficha na US”>= “Data Início do Relatório” e “<= “Data Fim do Relatório”;
+   * </ul>
    *
    * @return {@link String}
    */
-  public static String getTransferredIn(
+  public static String getPatientsWhoAreTransferredIn(
       int mastercard,
       int transferFromOther,
       int yes,
       int dateOfMasterCardFileOpening,
-      int typeOfPatient,
-      int tarv,
       int programEnrolled,
       int transferredInState,
       boolean isExclusion) {
@@ -196,8 +204,6 @@ public class ResumoMensalQueries {
     query =
         query
             + "        AND type.voided = 0 "
-            + "        AND type.concept_id = ${typeOfPatient} "
-            + "        AND type.value_coded in (${tarv}) "
             + "UNION "
             + "SELECT p.patient_id "
             + "FROM patient p   "
@@ -220,8 +226,6 @@ public class ResumoMensalQueries {
     valuesMap.put("transferFromOther", transferFromOther);
     valuesMap.put("yes", yes);
     valuesMap.put("dateOfMasterCardFileOpening", dateOfMasterCardFileOpening);
-    valuesMap.put("typeOfPatient", typeOfPatient);
-    valuesMap.put("tarv", tarv);
     valuesMap.put("programEnrolled", programEnrolled);
     valuesMap.put("transferredInState", transferredInState);
     StringSubstitutor sub = new StringSubstitutor(valuesMap);
@@ -809,8 +813,6 @@ public class ResumoMensalQueries {
       int mastercard,
       int transferFromOther,
       int yes,
-      int typeOfPatient,
-      int answer,
       int masteCardFileOpenDate,
       int programEnrolled,
       int transferredInState) {
@@ -819,8 +821,6 @@ public class ResumoMensalQueries {
     map.put("mastercard", mastercard);
     map.put("transferFromOther", transferFromOther);
     map.put("yes", yes);
-    map.put("typeOfPatient", typeOfPatient);
-    map.put("answer", answer);
     map.put("masteCardFileOpenDate", masteCardFileOpenDate);
     map.put("programEnrolled", programEnrolled);
     map.put("transferredInState", transferredInState);
@@ -846,9 +846,6 @@ public class ResumoMensalQueries {
             + "           AND transf.concept_id = ${transferFromOther}  "
             + "           AND transf.value_coded = ${yes}  "
             + "     "
-            + "           AND type.voided = 0  "
-            + "           AND type.concept_id = ${typeOfPatient}  "
-            + "           AND type.value_coded = ${answer}  "
             + "          AND mastercardFile.voided = 0 "
             + "           AND mastercardFile.concept_id = ${masteCardFileOpenDate}"
             + "	         AND mastercardFile.value_datetime BETWEEN  "
