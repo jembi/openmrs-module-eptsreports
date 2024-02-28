@@ -3623,6 +3623,7 @@ public class IntensiveMonitoringCohortQueries {
     CohortDefinition onTB = commonCohortQueries.getPatientsOnTbTreatment();
     CohortDefinition onSK = qualityImprovement2020CohortQueries.getPatientsWithSarcomaKarposi();
     CohortDefinition restartedTreatment = getPatientsWhoRestartedTreatment();
+    CohortDefinition finishedTbTreatment = getPatientsWhoFinishedTbTreatmentInLessThan30days();
 
     cd.addSearch(
         "A",
@@ -3691,8 +3692,14 @@ public class IntensiveMonitoringCohortQueries {
             genericCohortQueries.getAgeOnLastClinicalConsultation(2, null),
             "onOrAfter=${revisionEndDate-2m+1d},onOrBefore=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
 
+    cd.addSearch(
+        "finishedTbTreatment",
+        EptsReportUtils.map(
+            finishedTbTreatment,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
     cd.setCompositionString(
-        "A AND B1 AND NOT (C OR D OR F OR G OR MDS OR onTB OR adverseReaction OR onSK OR restartedTreatment) AND AGE");
+        "A AND B1 AND NOT (C OR D OR F OR G OR MDS OR onTB OR adverseReaction OR onSK OR restartedTreatment OR finishedTbTreatment) AND AGE");
 
     return cd;
   }
@@ -3743,72 +3750,6 @@ public class IntensiveMonitoringCohortQueries {
 
     cd.setCompositionString(
         "(B13 and treatmentInterruption AND filaOrDrugPickup) AND NOT transferredIn");
-    return cd;
-  }
-
-  /**
-   * <b>Utentes Transferidos de Outra US</b>
-   * <li>Todos os utentes inscritos no “Serviço TARV- Tratamento” com o 1º estado igual a
-   *     “Transferido De” antes da data fim de avaliação
-   * <li>Todos os utentes “Transferido de outra US” na Ficha Resumo– Master Card, com “Data de
-   *     Abertura da Ficha” ocorrida antes da “Data Fim avaliação”<br>
-   *     Nota 1: não há verificação se foi em “Pré-TARV” ou “TARV”.
-   *
-   * @return {@link CohortDefinition}
-   */
-  public CohortDefinition getTranferredInPatients() {
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-
-    cd.setName("Transferred in patients");
-    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put("1369", hivMetadata.getTransferredFromOtherFacilityConcept().getConceptId());
-    valuesMap.put("1065", hivMetadata.getYesConcept().getConceptId());
-    valuesMap.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
-    valuesMap.put("2", hivMetadata.getARTProgram().getProgramId());
-    valuesMap.put(
-        "29",
-        hivMetadata
-            .getArtTransferredFromOtherHealthFacilityWorkflowState()
-            .getProgramWorkflowStateId());
-
-    String query =
-        "SELECT p.patient_id "
-            + "    FROM   patient p "
-            + "           JOIN encounter e ON p.patient_id = e.patient_id "
-            + "           JOIN obs transf ON transf.encounter_id = e.encounter_id "
-            + "           JOIN obs opening ON opening.encounter_id = e.encounter_id "
-            + "    WHERE  p.voided = 0 "
-            + "           AND e.voided = 0 "
-            + "           AND e.encounter_type = ${53} "
-            + "           AND e.location_id = :location "
-            + "           AND transf.voided = 0 "
-            + "           AND transf.concept_id = ${1369} "
-            + "           AND transf.value_coded = ${1065} "
-            + "           AND opening.voided = 0 "
-            + "           AND opening.concept_id = ${23891} "
-            + "           AND opening.value_datetime BETWEEN :onOrAfter AND :onOrBefore "
-            + "	UNION "
-            + "          SELECT p.patient_id "
-            + "			FROM patient p "
-            + "          JOIN patient_program pp on p.patient_id=pp.patient_id "
-            + "          JOIN patient_state ps on pp.patient_program_id=ps.patient_program_id "
-            + "          WHERE  pp.voided=0 "
-            + "			  AND ps.voided=0 "
-            + "			  AND p.voided=0 "
-            + "			  AND pp.program_id=${2} "
-            + "	          AND ps.state = ${29} "
-            + "			  AND location_id= :location "
-            + "			  AND ps.start_date BETWEEN :onOrAfter AND :onOrBefore ";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-
-    cd.setQuery(stringSubstitutor.replace(query));
-
     return cd;
   }
 
@@ -3949,6 +3890,77 @@ public class IntensiveMonitoringCohortQueries {
             + "                       AND o.value_coded = ${1706} "
             + "                GROUP  BY p.patient_id) transferout "
             + "        GROUP  BY transferout.patient_id) max_transferout ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Utentes que terminaram tratamento de TB há menos de 30 dias(Exclusão)</b>
+   * <li>Todos os utentes com último registo de Tratamento TB= Fim (F), com respectiva data de fim
+   *     de tratamento (“Data Fim TB”) numa consulta clínica (Ficha Clínica- MasterCard) ocorrida
+   *     até a “Data Recolha Dados” e
+   * <li>Sendo esta “Data Fim TB” ocorrida há menos de 30 dias da última consulta do período de
+   *     avaliação (“Data Última Consulta”), ou seja, “Data Última Consulta” menos (-) “Última
+   *     Consulta Fim TB” <= 30 dias.
+   *
+   *     <p><strong>Nota:</strong> A “Data Última Consulta” é a última “Data de Consulta” no período
+   *     compreendido entre: “Data Início Avaliação” = “Data de Recolha Dados” menos (-) 2 meses
+   *     mais (+) 1 dia “Data Fim Avaliação” = “Data de Recolha Dados” menos (-) 1 mês
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoFinishedTbTreatmentInLessThan30days() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes  que terminaram o Tratamento de TB há menos de 30 dias");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "end Date", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1268", hivMetadata.getTBTreatmentPlanConcept().getConceptId());
+    map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN (SELECT e.patient_id, "
+            + "                          MAX(e.encounter_datetime) AS most_recent "
+            + "                   FROM   encounter e "
+            + "                   WHERE  e.voided = 0 "
+            + "                          AND e.location_id = :location "
+            + "                          AND e.encounter_type = ${6} "
+            + "                          AND e.encounter_datetime >= :startDate "
+            + "                          AND e.encounter_datetime <= :endDate "
+            + "                   GROUP  BY e.patient_id) last_consultation "
+            + "               ON last_consultation.patient_id = p.patient_id "
+            + "       INNER JOIN (SELECT p.patient_id, "
+            + "                          MAX(o.obs_datetime) AS last_tb_treatment "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                  ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.location_id = :location "
+            + "                          AND e.encounter_type = ${6} "
+            + "                          AND o.concept_id = ${1268} "
+            + "                          AND o.value_coded = ${1267} "
+            + "                          AND e.encounter_datetime <= :revisionEndDate "
+            + "                   GROUP  BY p.patient_id) finished_treatment "
+            + "               ON finished_treatment.patient_id = p.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND TIMESTAMPDIFF(DAY, finished_treatment.last_tb_treatment, "
+            + "               last_consultation.most_recent) <= 30";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
