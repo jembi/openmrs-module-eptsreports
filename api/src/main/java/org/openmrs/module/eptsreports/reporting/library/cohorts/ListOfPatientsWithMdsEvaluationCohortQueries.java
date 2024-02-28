@@ -1255,7 +1255,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {DataDefinition}
    */
-  public DataDefinition getCd4ResultSectionC() {
+  public DataDefinition getCd4ResultSectionC(int minNumberOfMonths, int maxNumberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Resultado do CD4 feito entre 12˚ e 24˚ mês de TARV");
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -1310,8 +1310,12 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "       AND enc.location_id = :location "
             + "       AND obs.concept_id = ${1695} "
             + "       AND obs.value_numeric IS NOT NULL "
-            + "       AND enc.encounter_datetime >= DATE_ADD(art.art_encounter, INTERVAL 12 MONTH) "
-            + "       AND enc.encounter_datetime <= DATE_ADD(art.art_encounter, INTERVAL 24 MONTH) "
+            + "       AND enc.encounter_datetime >= DATE_ADD(art.art_encounter, INTERVAL "
+            + minNumberOfMonths
+            + " MONTH ) "
+            + "       AND enc.encounter_datetime <= DATE_ADD(art.art_encounter, INTERVAL "
+            + maxNumberOfMonths
+            + " MONTH ) "
             + "       GROUP  BY pa.patient_id) most_recent_cd4 "
             + "       ON most_recent_cd4.patient_id = cd4.patient_id "
             + "       WHERE  cd4.voided = 0 "
@@ -1361,7 +1365,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {DataDefinition}
    */
-  public DataDefinition getPatientsWithGoodAdhesion(boolean b5Orc5) {
+  public DataDefinition getPatientsWithGoodAdhesion(
+      boolean b5Orc5, int minNumberOfMonths, int maxNumberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "Teve registo de boa adesão em TODAS consultas entre 1˚ e 3˚ mês de TARV?; (coluna N) – Resposta = Sim ou Não");
@@ -1412,12 +1417,17 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                         AND e.encounter_type = ${35} "
             + "                         AND e.location_id =:location ";
 
-    query +=
+    String b5OrC5 =
         b5Orc5
             ? "                         AND e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL 33 DAY) "
                 + "                         AND e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL 3 MONTH) "
-            : " AND        e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL 12 MONTH) "
-                + " AND        e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL 24 MONTH) ";
+            : " AND        e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL "
+                + minNumberOfMonths
+                + " MONTH ) "
+                + " AND        e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL "
+                + maxNumberOfMonths
+                + " MONTH ) ";
+    query += b5OrC5;
 
     query +=
         "                       GROUP  BY e.patient_id) consultation_tb "
@@ -1437,12 +1447,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                         AND o.voided = 0 "
             + "                         AND e.encounter_type = ${35} "
             + "                         AND e.location_id = :location ";
-    query +=
-        b5Orc5
-            ? "                         AND e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL 33 DAY) "
-                + "                         AND e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL 3 MONTH) "
-            : " AND        e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL 12 MONTH) "
-                + " AND        e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL 24 MONTH) ";
+    query += b5OrC5;
 
     query +=
         "                         AND        o.concept_id = ${6223} "
@@ -1464,12 +1469,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                         AND o.voided = 0 "
             + "                         AND e.encounter_type = ${35} "
             + "                         AND e.location_id = :location ";
-    query +=
-        b5Orc5
-            ? "                         AND e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL 33 DAY) "
-                + "                         AND e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL 3 MONTH) "
-            : " AND        e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL 12 MONTH) "
-                + " AND        e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL 24 MONTH) ";
+    query += b5OrC5;
 
     query +=
         "                         AND        o.concept_id = ${6223} "

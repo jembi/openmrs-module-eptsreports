@@ -137,7 +137,9 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B5- Teve registo de boa adesão em TODAS consultas entre 1˚ e 3˚ mês de TARV?
     pdd.addColumn(
         "good_adherence_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(true),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(true, 1, 3),
+        // minNumberOfMonths and MaxNumberOfMonths has no effect here because the boolean b5OrC5 is
+        // set to true
         endDateMappings);
 
     // B6- Esteve grávida ou foi lactante entre 3˚ e 9º mês de TARV?: (coluna M)- Resposta = Sim ou
@@ -324,13 +326,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C4 - Resultado do CD4 feito entre 12˚ e 24˚ mês de TARV- C.4 (Coluna AS)
     pdd.addColumn(
         "cd4_result_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getCd4ResultSectionC(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getCd4ResultSectionC(12, 24),
         endDateMappings);
 
     // C5- Teve registo de boa adesão em TODAS consultas entre 12˚ e 24˚ mês de TARV?
     pdd.addColumn(
         "good_adherence_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(false),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(false, 12, 24),
         endDateMappings);
 
     // C6 - Esteve grávida ou foi lactante entre 12˚ e 24º mês de TARV?: (coluna AU) - Resposta =
@@ -491,6 +493,59 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "permanence_state_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(),
         c18Mappings);
+
+    // D.1 - Data do pedido da CV de seguimento - D.1 (coluna BV)
+    pdd.addColumn(
+        "cv_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getSecondViralLoad(),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D.2 - Data de registo do resultado da CV de Seguimento - D.2 (coluna BV)
+    pdd.addColumn(
+        "cv_result_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getSecondViralLoadResultDate(),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D.3 - Resultado da CV de Seguimento - D.3 (coluna BX)
+    pdd.addColumn(
+        "cv_result_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getSecondViralLoadResult(),
+        endDateMappings,
+        new ViralLoadQualitativeLabelConverter());
+
+    // D.4 - Resultado do CD4 feito entre 24˚ e 36˚ mês de TARV- D.4 (Coluna BY)
+    pdd.addColumn(
+        "cd4_result_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getCd4ResultSectionC(24, 36),
+        endDateMappings);
+
+    // D.5- Teve registo de boa adesão em TODAS consultas entre 24˚ e 36˚ mês de TARV?
+    pdd.addColumn(
+        "good_adherence_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(false, 24, 36),
+        endDateMappings);
+
+    // D.6 - Esteve grávida ou foi lactante entre 24˚ e 36º mês de TARV?: (coluna CA)
+    pdd.addColumn(
+        "pregnant_breastfeeding_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsPregnantBreastfeeding3MonthsTarv(
+            24, 36),
+        endDateMappings);
+
+    // D.8 - Teve TB entre 24˚ e 36 ˚ meses de TARV: (coluna CC)
+    pdd.addColumn(
+        "tb_tarv_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithTbThirdToNineMonth(24, 36),
+        endDateMappings);
+
+    // D.9 - Data de inscrição no MDS entre 24º e 36º mês de TARV: (coluna CD)
+    pdd.addColumn(
+        "mds_tarv_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(24, 36, false),
+        endDateMappings,
+        new GeneralDateConverter());
 
     return pdd;
   }
