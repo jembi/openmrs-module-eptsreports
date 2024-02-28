@@ -65,7 +65,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
    * <li>Utentes com critério de CD4 para início de seguimento no Modelo de DAH OR
    * <li>Utentes com critério de Estadiamento para início de seguimento do Modelo dee DAH Excluindo
    *     todos os utentes que:
-   * <li>tenham iniciado um Modelo de DAH antes da data de início do período de avaliação
+   * <li>tenham iniciado um Modelo de DAH ate 12 meses antes da data de início do período de
+   *     avaliação
    * <li>tenham sido transferidos para outra unidade sanitária até o fim do período de avaliação
    *
    * @see #getPatientsWhoStartedFollowupOnDAH(boolean) getPatientsWhoStartedFollowupOnDAH
@@ -166,6 +167,11 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
    * - encounter_datetime) na Ficha de DAH (encounter type = 90) durante o período de avaliação, ou
    * seja, “Data Início DAH” >= “Data Início Avaliação” e “Data Início DAH” <= “Data Fim Avaliação”
    *
+   * <p>Utentes com registo do “Início de Seguimento no Modelo de Doença Avançada” (Data Início DAH
+   * * - encounter_datetime) na Ficha de DAH (encounter type = 90) ate 12 meses antes da data de
+   * início, ou * seja, “Data Início DAH” >= “Data Início Avaliação” - 12 meses e “Data Início DAH”
+   * < “Data Início Avaliação”
+   *
    * @param duringThePeriod Flag to change the evaluation period
    * @return {@link CohortDefinition}
    */
@@ -188,7 +194,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
         duringThePeriod
             ? "  AND e.encounter_datetime >= :startDate "
                 + "  AND e.encounter_datetime <= :endDate "
-            : " AND e.encounter_datetime <= :startDate ";
+            : "  AND e.encounter_datetime >= DATE_SUB(:startDate, INTERVAL 12 MONTH) "
+                + " AND e.encounter_datetime < :startDate ";
 
     query += "  AND e.location_id = :location " + "GROUP BY p.patient_id";
 
