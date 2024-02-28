@@ -21,6 +21,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
   private String endDateMappings = "endDate=${evaluationYear}-06-20,location=${location}";
   private String b18Mappings = "endDate=${evaluationYear-1}-06-20,location=${location}";
   private String c18Mappings = "endDate=${evaluationYear-2}-06-20,location=${location}";
+  private String d18Mappings = "endDate=${evaluationYear-3}-06-20,location=${location}";
 
   private final ListOfPatientsInAdvancedHivIllnessCohortQueries
       listOfPatientsInAdvancedHivIllnessCohortQueries;
@@ -546,6 +547,12 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(24, 36, false),
         endDateMappings,
         new GeneralDateConverter());
+
+    // D18 - Estado de permanência no 36˚ mês de TARV: (coluna DA)
+    pdd.addColumn(
+        "permanence_state_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(),
+        d18Mappings);
 
     return pdd;
   }
