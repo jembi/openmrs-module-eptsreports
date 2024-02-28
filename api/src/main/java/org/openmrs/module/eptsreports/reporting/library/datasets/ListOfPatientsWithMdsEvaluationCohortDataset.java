@@ -666,6 +666,18 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         endDateMappings,
         new NotApplicableIfNullConverter());
 
+    // D16 - N˚ de consultas clínicas entre 24˚ e 36˚ mês de TARV- D.16 (Coluna CY)
+    pdd.addColumn(
+        "clinical_consultations_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(24, 36),
+        endDateMappings);
+
+    // D17 - N˚ de consultas de APSS/PP tre 24˚ e 36˚ mês de TARV- D.18 (Coluna CZ)
+    pdd.addColumn(
+        "apss_pp_consultations_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(24, 36),
+        endDateMappings);
+
     // D18 - Estado de permanência no 36˚ mês de TARV: (coluna DA)
     pdd.addColumn(
         "permanence_state_d",
