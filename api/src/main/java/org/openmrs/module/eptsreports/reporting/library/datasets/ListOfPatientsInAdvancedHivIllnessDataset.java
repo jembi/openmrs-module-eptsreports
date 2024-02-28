@@ -147,7 +147,8 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
     pdd.addColumn(
         "last_state",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getLastStateOfStayOnTarv(),
-        "endDate=${endDate},location=${location}");
+        "endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
 
     // 11 - Situação TARV no Início do Seguimento de DAH Sheet 1: K
     pdd.addColumn(
@@ -172,7 +173,10 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
 
     // 14 - Resultado de CD4 – Sheet 1: Column N
     pdd.addColumn(
-        "cd4_result", listOfPatientsInAdvancedHivIllnessCohortQueries.getCd4Result(), mappings);
+        "cd4_result",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getCd4Result(),
+        mappings,
+        new NotApplicableIfNullConverter());
 
     //     15 - Data de Registo de Estadio – Sheet 1: Column O
     pdd.addColumn(
@@ -206,7 +210,8 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
     pdd.addColumn(
         "last_cd4_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4Result(),
-        mappings);
+        mappings,
+        new NotApplicableIfNullConverter());
 
     // 20 - Data do Último CD4 – Sheet 1: Column T
     pdd.addColumn(
@@ -219,7 +224,8 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
     pdd.addColumn(
         "second_cd4_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultBeforeMostRecentCd4(),
-        mappings);
+        mappings,
+        new NotApplicableIfNullConverter());
 
     // 22 - Data do Penúltimo CD4 – Sheet 1: Column V
     pdd.addColumn(
@@ -416,7 +422,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
             "ELIGIBLE_MDS",
             EptsReportUtils.map(
                 listOfPatientsInAdvancedHivIllnessCohortQueries
-                    .getTotalOfPatientsWithCriteriaToStartFollowupOfDAH(),
+                    .getPatientsOnFollowupOrWithCriteriaToStartFollowupOfDAH(),
                 mappings));
 
     dataSetDefinition.addColumn(
