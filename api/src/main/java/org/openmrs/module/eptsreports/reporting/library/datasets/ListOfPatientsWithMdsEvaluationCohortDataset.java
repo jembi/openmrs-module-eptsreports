@@ -466,14 +466,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C11 - Rastreado para TB em TODAS as consultas entre 12˚ e 24˚ mês de TARV?- C.11 (Coluna BN)
     pdd.addColumn(
         "tb_screening_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(true),
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(true, 12, 24),
         endDateMappings);
 
     // C14 - PB/IMC registado em TODAS as consultas entre o 12˚ a 24º mês de TARV? (coluna BQ) -
     // Resposta = Sim ou Não ou N/A (RF27)
     pdd.addColumn(
         "pb_imc_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(false),
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(false, 12, 24),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -652,6 +652,19 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         listOfPatientsWithMdsEvaluationCohortQueries.getMds5EndDate(36),
         endDateMappings,
         new GeneralDateConverter());
+
+    // D11 - Rastreado para TB em TODAS as consultas entre 24˚ e 36˚ mês de TARV?- D.11 (Coluna CT)
+    pdd.addColumn(
+        "tb_screening_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(true, 24, 36),
+        endDateMappings);
+
+    // D14 - PB/IMC registado em TODAS as consultas entre o 24˚ a 36º mês de TARV?- D.14 (Coluna CW)
+    pdd.addColumn(
+        "pb_imc_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(false, 24, 36),
+        endDateMappings,
+        new NotApplicableIfNullConverter());
 
     // D18 - Estado de permanência no 36˚ mês de TARV: (coluna DA)
     pdd.addColumn(

@@ -4429,7 +4429,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     return sqlPatientDataDefinition;
   }
 
-  public DataDefinition getTbScreeningSectionC(boolean tbScreeningOrPbImc) {
+  public DataDefinition getTbScreeningSectionC(
+      boolean tbScreeningOrPbImc, int minNumberOfMonths, int maxNumberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "B11 - Identificação de Utente Rastreado para TB em TODAS as consultas entre a data de inscrição no MDS e 12˚ mês de TARV");
@@ -4485,10 +4486,12 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "AND o.voided = 0 "
             + "AND e.encounter_type = ${6} "
             + "AND e.location_id = :location "
-            + "AND e.encounter_datetime >= Date_add(tarv.art_encounter, "
-            + "INTERVAL 12 month) "
-            + "AND e.encounter_datetime <= Date_add(tarv.art_encounter, "
-            + "INTERVAL 24 month) ";
+            + "AND e.encounter_datetime >= Date_add(tarv.art_encounter, INTERVAL "
+            + minNumberOfMonths
+            + " MONTH ) "
+            + "AND e.encounter_datetime <= Date_add(tarv.art_encounter, INTERVAL "
+            + maxNumberOfMonths
+            + " MONTH ) ";
 
     query +=
         tbScreeningOrPbImc
@@ -4513,10 +4516,12 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "WHERE  e.voided = 0 "
             + "AND e.encounter_type = ${6} "
             + "AND e.location_id = :location "
-            + "AND e.encounter_datetime >= Date_add(tarv.art_encounter, "
-            + "INTERVAL 12 month) "
-            + "AND e.encounter_datetime <= Date_add(tarv.art_encounter, "
-            + "INTERVAL 24 month) "
+            + "AND e.encounter_datetime >= Date_add(tarv.art_encounter, INTERVAL "
+            + minNumberOfMonths
+            + " MONTH ) "
+            + "AND e.encounter_datetime <= Date_add(tarv.art_encounter, INTERVAL "
+            + maxNumberOfMonths
+            + " MONTH ) "
             + "GROUP  BY e.patient_id) consultations "
             + "ON consultations.patient_id = p.patient_id "
             + "WHERE  p.voided = 0";
