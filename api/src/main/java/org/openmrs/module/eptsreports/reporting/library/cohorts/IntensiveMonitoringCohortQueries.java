@@ -3725,6 +3725,14 @@ public class IntensiveMonitoringCohortQueries {
     cd.setName("Patients who returned to treatment");
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
     cd.addSearch(
         "B13",
         EptsReportUtils.map(
@@ -3745,8 +3753,8 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch(
         "transferredIn",
         EptsReportUtils.map(
-            getTranferredInPatients(),
-            "onOrAfter=${endDate-3m},onOrBefore=${endDate},location=${location}"));
+            transferredIn,
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.setCompositionString(
         "(B13 and treatmentInterruption AND filaOrDrugPickup) AND NOT transferredIn");
