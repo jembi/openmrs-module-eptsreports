@@ -6538,10 +6538,10 @@ public class QualityImprovement2020CohortQueries {
   /**
    * 13.15. % de MG elegíveis a CV com registo de pedido de CV feito pelo clínico (MG que iniciaram
    * TARV na CPN) Denominator: # de MG com registo de início do TARV na CPN dentro do período de
-   * inclusão. (Line 90,Column F in the Template) as following: <code>
-   * (A and B1) and NOT (D or F) and Age >= 15*</code>
+   * inclusão. as following: <code>
+   * (startedART AND pregnant) AND NOT (abandoned OR transferredOut </code>
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getgetMQC13P2DenMGInIncluisionPeriod() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -6553,48 +6553,21 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition startedART = getMOHArtStartDate();
 
-    CohortDefinition transferOut = getTranferredOutPatients();
-
-    CohortDefinition breastfeeding =
-        commonCohortQueries.getMohMQPatientsOnCondition(
-            true,
-            false,
-            "once",
-            hivMetadata.getMasterCardEncounterType(),
-            commonMetadata.getBreastfeeding(),
-            Collections.singletonList(hivMetadata.getYesConcept()),
-            null,
-            null);
-
+    CohortDefinition transferredOut = getTranferredOutPatients();
     CohortDefinition pregnant =
         commonCohortQueries.getMOHPregnantORBreastfeeding(
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
 
-    CohortDefinition transferredIn =
-        QualityImprovement2020Queries.getTransferredInPatients(
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-            hivMetadata.getPatientFoundYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId());
-
     CohortDefinition pregnantAbandonedDuringPeriod =
         getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt();
 
-    cd.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
-    cd.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
-    cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
-    cd.addSearch(
-        "E",
-        EptsReportUtils.map(
-            transferredIn,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
-    cd.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
+    cd.addSearch("startedART", EptsReportUtils.map(startedART, MAPPING));
+    cd.addSearch("pregnant", EptsReportUtils.map(pregnant, MAPPING));
+    cd.addSearch("transferredOut", EptsReportUtils.map(transferredOut, MAPPING1));
+    cd.addSearch("abandoned", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING1));
 
-    cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING1));
-
-    cd.setCompositionString("((A AND C) AND NOT (ABANDONED OR E OR F))");
+    cd.setCompositionString("((startedART AND pregnant) AND NOT (abandoned OR transferredOut))");
 
     return cd;
   }
@@ -7169,12 +7142,13 @@ public class QualityImprovement2020CohortQueries {
   /**
    * 13.15. % de MG elegíveis a CV com registo de pedido de CV feito pelo clínico (MG que iniciaram
    * TARV na CPN) (Line 90 in the template) Numerator (Column E in the Template) as following:
-   * <code>(A and B1 and H) and NOT (D or F) and Age >= 15*</code>
+   * <code>(startedART AND pregnant AND investLab) AND NOT (abandoned OR transferredOut)</code>
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getMQC13P2Num1() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("13.15 - MG elegíveis a CV com registo de pedido de CV");
     cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
     cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -7185,43 +7159,19 @@ public class QualityImprovement2020CohortQueries {
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
 
-    CohortDefinition transfOut = getTranferredOutPatients();
-
-    CohortDefinition breastfeeding =
-        commonCohortQueries.getMohMQPatientsOnCondition(
-            true,
-            false,
-            "once",
-            hivMetadata.getMasterCardEncounterType(),
-            commonMetadata.getBreastfeeding(),
-            Collections.singletonList(hivMetadata.getYesConcept()),
-            null,
-            null);
-
-    CohortDefinition transferredIn =
-        QualityImprovement2020Queries.getTransferredInPatients(
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-            hivMetadata.getPatientFoundYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId());
+    CohortDefinition transferredOut = getTranferredOutPatients();
 
     CohortDefinition pregnantAbandonedDuringPeriod =
         getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt();
 
-    cd.addSearch("A", EptsReportUtils.map(getMOHArtStartDate(), MAPPING));
-    cd.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
-    cd.addSearch(
-        "E",
-        EptsReportUtils.map(
-            transferredIn,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
-    cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
-    cd.addSearch("H", EptsReportUtils.map(getMQC13P2DenB3(), MAPPING));
+    cd.addSearch("startedART", EptsReportUtils.map(getMOHArtStartDate(), MAPPING));
+    cd.addSearch("pregnant", EptsReportUtils.map(pregnant, MAPPING));
+    cd.addSearch("transferredOut", EptsReportUtils.map(transferredOut, MAPPING1));
+    cd.addSearch("investLab", EptsReportUtils.map(getMQC13P2DenB3(), MAPPING));
+    cd.addSearch("abandoned", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING1));
 
-    cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING1));
-
-    cd.setCompositionString("((A AND C AND H) AND NOT (ABANDONED OR E OR F))");
+    cd.setCompositionString(
+        "((startedART AND pregnant AND investLab) AND NOT (abandoned OR transferredOut))");
     return cd;
   }
 
