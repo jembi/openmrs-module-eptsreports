@@ -144,15 +144,16 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * <b>RF9 - Relatório – Informação do utente - Secção A1 a A9</b>
    *
    * <p>A2- Coorte: (coluna B) – Resposta = 12 meses, caso o utente tenha iniciado TARV na coorte de
-   * 12 meses, ou Resposta = 24 meses, caso o utente tenha iniciado TARV na coorte de 24 meses
-   * (RF4).
+   * 12 meses, ou Resposta = 24 meses, caso o utente tenha iniciado TARV na coorte de 24 meses ou
+   * Resposta = 36 meses, caso o utente tenha iniciado TARV na coorte de 36 meses (RF4).
    *
    * @return {DataDefinition}
    */
   public DataDefinition getCoort12Or24Or36Months() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("A.2 - Coorte: – Resposta = 12 meses ou Resposta = 24 meses.");
+    sqlPatientDataDefinition.setName(
+        "A.2 - Coorte: – Resposta = 12 meses ou Resposta = 24 meses ou Resposta = 36 meses.");
     sqlPatientDataDefinition.addParameter(
         new Parameter("evaluationYear", "evaluationYear", Integer.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
