@@ -536,10 +536,7 @@ public class TXCXCACohortQueries {
     map.put("23972", hivMetadata.getThermocoagulationConcept().getConceptId());
 
     String query =
-        "SELECT leep_conization.patient_id "
-            + "FROM   ( "
-            + "           SELECT     p.patient_id, "
-            + "                      Max(o.obs_datetime) AS last_treatment_result_date "
+        " SELECT     p.patient_id "
             + "           FROM       patient p "
             + "                          INNER JOIN encounter e "
             + "                                     ON         e.patient_id = p.patient_id "
@@ -617,8 +614,7 @@ public class TXCXCACohortQueries {
             + "             AND        e.encounter_datetime = last_treatment_type.last_result_date "
             + "             AND        o.concept_id = ${2149} "
             + "             AND        o.value_coded IN (${23970}, "
-            + "                                          ${23973}) "
-            + "           GROUP BY   p.patient_id ) leep_conization";
+            + "                                          ${23973}) ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
