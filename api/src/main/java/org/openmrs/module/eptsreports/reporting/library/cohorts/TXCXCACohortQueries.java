@@ -659,7 +659,7 @@ public class TXCXCACohortQueries {
             + "             AND        o.voided = 0 "
             + "             AND        e.encounter_type = ${28} "
             + "             AND        e.location_id = :location "
-            + "             AND        e.encounter_datetime = last_treatment_type.last_result_date "
+            + "             AND        o.obs_datetime = last_treatment_type.last_result_date "
             + "             AND        o.concept_id = ${2149} "
             + "             AND        o.value_coded IN (${23970}, "
             + "                                          ${23973}) ";
