@@ -1860,14 +1860,15 @@ public class TXTBCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getSmearMicroscopyOnlyPositiveResult() {
+  public CohortDefinition getSmearMicroscopyOnlyPositiveResult(boolean txTbOrTb4) {
     CohortDefinition cd =
         getSmearMicroscopyOnlyPositve(
             hivMetadata.getMisauLaboratorioEncounterType(),
             hivMetadata.getAdultoSeguimentoEncounterType(),
             hivMetadata.getApplicationForLaboratoryResearch(),
             hivMetadata.getResultForBasiloscopia(),
-            commonMetadata.getPositive());
+            commonMetadata.getPositive(),
+            txTbOrTb4);
     return cd;
   }
 
@@ -1878,14 +1879,15 @@ public class TXTBCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getSmearMicroscopyOnlyNegativeResult() {
+  public CohortDefinition getSmearMicroscopyOnlyNegativeResult(boolean txTbOrTb) {
     CohortDefinition cd =
         getSmearMicroscopyOnlyPositve(
             hivMetadata.getMisauLaboratorioEncounterType(),
             hivMetadata.getAdultoSeguimentoEncounterType(),
             hivMetadata.getApplicationForLaboratoryResearch(),
             hivMetadata.getResultForBasiloscopia(),
-            commonMetadata.getNegative());
+            commonMetadata.getNegative(),
+            txTbOrTb);
     return cd;
   }
 
@@ -2300,7 +2302,8 @@ public class TXTBCohortQueries {
       EncounterType fichaClinica,
       Concept applicationForLaboratoryResearch,
       Concept basiloscopiaExam,
-      Concept positive) {
+      Concept positive,
+      Boolean txtbOrTb4) {
 
     CohortDefinition basiloscopiaCohort =
         genericCohortQueries.generalSql(
@@ -2337,7 +2340,10 @@ public class TXTBCohortQueries {
         EptsReportUtils.map(applicationForLaboratoryResearchCohort, generalParameterMapping));
 
     definition.setCompositionString(
-        "basiloscopiaCohort OR basiloscopiaLabCohort OR applicationForLaboratoryResearchCohort");
+        txtbOrTb4
+            ? "basiloscopiaCohort OR basiloscopiaLabCohort"
+            : "basiloscopiaCohort OR basiloscopiaLabCohort OR applicationForLaboratoryResearchCohort");
+
     return definition;
   }
 
