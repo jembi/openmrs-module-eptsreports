@@ -40,15 +40,11 @@ public class TXCXCACohortQueries {
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
-    cd.setName("TX f1srt Time Screened");
+    cd.setName("TX fisrt Time Screened");
 
     CohortDefinition totalPatientsCxcaScrnPositiveWithTreatment = getTotal();
     CohortDefinition patientsWithScreeningTestForCervicalCancerBeforeStartDate =
         this.cxcascrnCohortQueries.getPatientsWithScreeningTestForCervicalCancer(true);
-    CohortDefinition cryotherapy = getPatientsWhoHaveCryotherapyAsLastTreatmentType();
-    CohortDefinition thermocoagulation =
-        getPatientsWhoHaveTermoablationORThermocoagulationAsLastTreatmentType();
-    CohortDefinition leepOrConization = getPatientsWhoHaveLeepOrConizationTreatmentType();
 
     cd.addSearch(
         "totalPatientsCxcaScrnPositiveWithTreatment",
@@ -58,13 +54,9 @@ public class TXCXCACohortQueries {
         EptsReportUtils.map(
             patientsWithScreeningTestForCervicalCancerBeforeStartDate,
             "startDate=${startDate},location=${location}"));
-    cd.addSearch("cryotherapy", EptsReportUtils.map(cryotherapy, MAPPINGS));
-    cd.addSearch("thermocoagulation", EptsReportUtils.map(thermocoagulation, MAPPINGS));
-    cd.addSearch("leepOrConization", EptsReportUtils.map(leepOrConization, MAPPINGS));
 
     cd.setCompositionString(
-        "totalPatientsCxcaScrnPositiveWithTreatment AND NOT patientsWithScreeningTestForCervicalCancerBeforeStartDate "
-            + "AND (cryotherapy OR thermocoagulation OR leepOrConization)");
+        "totalPatientsCxcaScrnPositiveWithTreatment AND NOT patientsWithScreeningTestForCervicalCancerBeforeStartDate");
     return cd;
   }
 
@@ -78,10 +70,6 @@ public class TXCXCACohortQueries {
     CohortDefinition totalPatientsCxcaScrnPositiveWithTreatment = getTotal();
     CohortDefinition patientsWithNegativeResultForScreeningTestBeforeReportingPeriod =
         this.cxcascrnCohortQueries.getPatientsWithNegativeResultForScreeningTest(true);
-    CohortDefinition cryotherapy = getPatientsWhoHaveCryotherapyAsLastTreatmentType();
-    CohortDefinition thermocoagulation =
-        getPatientsWhoHaveTermoablationORThermocoagulationAsLastTreatmentType();
-    CohortDefinition leepOrConization = getPatientsWhoHaveLeepOrConizationTreatmentType();
 
     cd.addSearch(
         "totalPatientsCxcaScrnPositiveWithTreatment",
@@ -91,14 +79,8 @@ public class TXCXCACohortQueries {
         EptsReportUtils.map(
             patientsWithNegativeResultForScreeningTestBeforeReportingPeriod,
             "startDate=${startDate},location=${location}"));
-    cd.addSearch("cryotherapy", EptsReportUtils.map(cryotherapy, MAPPINGS));
-    cd.addSearch("thermocoagulation", EptsReportUtils.map(thermocoagulation, MAPPINGS));
-    cd.addSearch("leepOrConization", EptsReportUtils.map(leepOrConization, MAPPINGS));
-
     cd.setCompositionString(
-        "totalPatientsCxcaScrnPositiveWithTreatment "
-            + "AND patientsWithNegativeResultForScreeningTestBeforeReportingPeriod "
-            + "AND (cryotherapy OR thermocoagulation OR leepOrConization)");
+        "totalPatientsCxcaScrnPositiveWithTreatment AND patientsWithNegativeResultForScreeningTestBeforeReportingPeriod");
 
     return cd;
   }
@@ -112,26 +94,13 @@ public class TXCXCACohortQueries {
 
     CohortDefinition totalPatientsCxcaScrnPositiveWithTreatment = getTotal();
     CohortDefinition postTreatmentFollowUp = this.cxcascrnCohortQueries.getPostTreatmentFollowUp();
-    CohortDefinition cryotherapy = getPatientsWhoHaveCryotherapyAsLastTreatmentType();
-    CohortDefinition thermocoagulation =
-        getPatientsWhoHaveTermoablationORThermocoagulationAsLastTreatmentType();
-    CohortDefinition leepOrConization = getPatientsWhoHaveLeepOrConizationTreatmentType();
 
     cd.addSearch(
         "totalPatientsCxcaScrnPositiveWithTreatment",
         EptsReportUtils.map(totalPatientsCxcaScrnPositiveWithTreatment, MAPPINGS));
-    cd.addSearch(
-        "postTreatmentFollowUp",
-        EptsReportUtils.map(
-            postTreatmentFollowUp,
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch("cryotherapy", EptsReportUtils.map(cryotherapy, MAPPINGS));
-    cd.addSearch("thermocoagulation", EptsReportUtils.map(thermocoagulation, MAPPINGS));
-    cd.addSearch("leepOrConization", EptsReportUtils.map(leepOrConization, MAPPINGS));
+    cd.addSearch("postTreatmentFollowUp", EptsReportUtils.map(postTreatmentFollowUp, MAPPINGS));
 
-    cd.setCompositionString(
-        "totalPatientsCxcaScrnPositiveWithTreatment AND postTreatmentFollowUp "
-            + "AND (cryotherapy OR thermocoagulation OR leepOrConization)");
+    cd.setCompositionString("totalPatientsCxcaScrnPositiveWithTreatment AND postTreatmentFollowUp");
 
     return cd;
   }
@@ -148,10 +117,6 @@ public class TXCXCACohortQueries {
     CohortDefinition f1srtTimeScreened = getFirstTimeScreened();
     CohortDefinition rescreenedAfterPreviousNegative = getRescreenedAfterPreviousNegative();
     CohortDefinition postTreatmentFollowUp = getPatientsWithPostTreatmentFollowUp();
-    CohortDefinition cryotherapy = getPatientsWhoHaveCryotherapyAsLastTreatmentType();
-    CohortDefinition thermocoagulation =
-        getPatientsWhoHaveTermoablationORThermocoagulationAsLastTreatmentType();
-    CohortDefinition leepOrConization = getPatientsWhoHaveLeepOrConizationTreatmentType();
 
     cd.addSearch(
         "totalPatientsCxcaScrnPositiveWithTreatment",
@@ -161,14 +126,9 @@ public class TXCXCACohortQueries {
         "rescreenedAfterPreviousNegative",
         EptsReportUtils.map(rescreenedAfterPreviousNegative, MAPPINGS));
     cd.addSearch("postTreatmentFollowUp", EptsReportUtils.map(postTreatmentFollowUp, MAPPINGS));
-    cd.addSearch("cryotherapy", EptsReportUtils.map(cryotherapy, MAPPINGS));
-    cd.addSearch("thermocoagulation", EptsReportUtils.map(thermocoagulation, MAPPINGS));
-    cd.addSearch("leepOrConization", EptsReportUtils.map(leepOrConization, MAPPINGS));
 
     cd.setCompositionString(
-        "totalPatientsCxcaScrnPositiveWithTreatment "
-            + "AND NOT (postTreatmentFollowUp OR rescreenedAfterPreviousNegative OR f1srtTimeScreened) "
-            + "AND (cryotherapy OR thermocoagulation OR leepOrConization)");
+        "totalPatientsCxcaScrnPositiveWithTreatment AND NOT (postTreatmentFollowUp OR rescreenedAfterPreviousNegative OR f1srtTimeScreened)");
 
     return cd;
   }
@@ -263,31 +223,16 @@ public class TXCXCACohortQueries {
     CohortDefinition patientsOnArtWithPositiveScreening =
         this.cxcascrnCohortQueries.getTotalPatientsWithPositiveResult();
     CohortDefinition patientsWhoReceivedATreatmentType = getPatientsWhoReceivedATreatmentType();
-    CohortDefinition firstTimeScreened = getFirstTimeScreened();
-    CohortDefinition rescreenedAfterPreviousNegative = getRescreenedAfterPreviousNegative();
-    CohortDefinition postTreatmentFollowUp = getPatientsWithPostTreatmentFollowUp();
-    CohortDefinition rescreenedAfterPreviousPositive = getRescreenedAfterPreviousPositive();
 
     cd.addSearch(
         "patientsOnArtWithPositiveScreening",
         EptsReportUtils.map(patientsOnArtWithPositiveScreening, MAPPINGS));
     cd.addSearch(
         "patientsWhoReceivedATreatmentType",
-        EptsReportUtils.map(
-            patientsWhoReceivedATreatmentType,
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch("firstTimeScreened", EptsReportUtils.map(firstTimeScreened, MAPPINGS));
-    cd.addSearch(
-        "rescreenedAfterPreviousNegative",
-        EptsReportUtils.map(rescreenedAfterPreviousNegative, MAPPINGS));
-    cd.addSearch("postTreatmentFollowUp", EptsReportUtils.map(postTreatmentFollowUp, MAPPINGS));
-    cd.addSearch(
-        "rescreenedAfterPreviousPositive",
-        EptsReportUtils.map(rescreenedAfterPreviousPositive, MAPPINGS));
+        EptsReportUtils.map(patientsWhoReceivedATreatmentType, MAPPINGS));
 
     cd.setCompositionString(
-        "patientsOnArtWithPositiveScreening AND patientsWhoReceivedATreatmentType "
-            + "AND (firstTimeScreened OR rescreenedAfterPreviousNegative OR postTreatmentFollowUp OR rescreenedAfterPreviousPositive)");
+        "patientsOnArtWithPositiveScreening AND patientsWhoReceivedATreatmentType");
 
     return cd;
   }
