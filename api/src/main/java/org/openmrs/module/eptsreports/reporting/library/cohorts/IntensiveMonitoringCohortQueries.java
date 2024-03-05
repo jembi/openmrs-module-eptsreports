@@ -3946,4 +3946,75 @@ public class IntensiveMonitoringCohortQueries {
         + "                   GROUP  BY p.patient_id) transferout "
         + "           GROUP  BY transferout.patient_id ";
   }
+
+  /**
+   * <b>Utentes que terminaram tratamento de TB há menos de 30 dias(Exclusão)</b>
+   * <li>Todos os utentes com último registo de Tratamento TB= Fim (F), com respectiva data de fim
+   *     de tratamento (“Data Fim TB”) numa consulta clínica (Ficha Clínica- MasterCard) ocorrida
+   *     até a “Data Recolha Dados” e
+   * <li>Sendo esta “Data Fim TB” ocorrida há menos de 30 dias da última consulta do período de
+   *     avaliação (“Data Última Consulta”), ou seja, “Data Última Consulta” menos (-) “Última
+   *     Consulta Fim TB” <= 30 dias.
+   *
+   *     <p><strong>Nota:</strong> A “Data Última Consulta” é a última “Data de Consulta” no período
+   *     compreendido entre: “Data Início Avaliação” = “Data de Recolha Dados” menos (-) 2 meses
+   *     mais (+) 1 dia “Data Fim Avaliação” = “Data de Recolha Dados” menos (-) 1 mês
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoFinishedTbTreatmentInLessThan30days() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes  que terminaram o Tratamento de TB há menos de 30 dias");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "end Date", Date.class));
+    sqlCohortDefinition.addParameter(
+            new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1268", hivMetadata.getTBTreatmentPlanConcept().getConceptId());
+    map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
+
+    String query =
+            "SELECT p.patient_id "
+                    + "FROM   patient p "
+                    + "       INNER JOIN (SELECT e.patient_id, "
+                    + "                          MAX(e.encounter_datetime) AS most_recent "
+                    + "                   FROM   encounter e "
+                    + "                   WHERE  e.voided = 0 "
+                    + "                          AND e.location_id = :location "
+                    + "                          AND e.encounter_type = ${6} "
+                    + "                          AND e.encounter_datetime >= :startDate "
+                    + "                          AND e.encounter_datetime <= :endDate "
+                    + "                   GROUP  BY e.patient_id) last_consultation "
+                    + "               ON last_consultation.patient_id = p.patient_id "
+                    + "       INNER JOIN (SELECT p.patient_id, "
+                    + "                          MAX(o.obs_datetime) AS last_tb_treatment "
+                    + "                   FROM   patient p "
+                    + "                          INNER JOIN encounter e "
+                    + "                                  ON e.patient_id = p.patient_id "
+                    + "                          INNER JOIN obs o "
+                    + "                                  ON o.encounter_id = e.encounter_id "
+                    + "                   WHERE  p.voided = 0 "
+                    + "                          AND e.voided = 0 "
+                    + "                          AND o.voided = 0 "
+                    + "                          AND e.location_id = :location "
+                    + "                          AND e.encounter_type = ${6} "
+                    + "                          AND o.concept_id = ${1268} "
+                    + "                          AND o.value_coded = ${1267} "
+                    + "                          AND e.encounter_datetime <= :revisionEndDate "
+                    + "                   GROUP  BY p.patient_id) finished_treatment "
+                    + "               ON finished_treatment.patient_id = p.patient_id "
+                    + "WHERE  p.voided = 0 "
+                    + "       AND TIMESTAMPDIFF(DAY, finished_treatment.last_tb_treatment, "
+                    + "               last_consultation.most_recent) <= 30";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
 }
