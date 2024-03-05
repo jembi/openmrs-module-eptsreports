@@ -3678,7 +3678,7 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * H2- Another consultation (Encounter_datetime (from encounter type 35)) > “1st consultation”
+   * H2- Another consultation (Encounter_datetime (from encounter type 35)) >= “1st consultation”
    * (oldest date from H1)+20 days and <=“1st consultation” (oldest date from H1)+33days
    *
    * @param vlQuantity Quantity of viral load to evaluate
@@ -3734,7 +3734,7 @@ public class QualityImprovement2020CohortQueries {
             + " WHERE p.voided = 0  "
             + "    AND e.voided = 0 "
             + "    AND e.encounter_type = ${35} "
-            + "    AND e.encounter_datetime > DATE_ADD(h1.encounter_datetime, INTERVAL 20 DAY)  "
+            + "    AND e.encounter_datetime >= DATE_ADD(h1.encounter_datetime, INTERVAL 20 DAY)  "
             + "         AND e.encounter_datetime <= DATE_ADD(h1.encounter_datetime, INTERVAL 33 DAY) "
             + "    AND e.location_id = :location ";
 
@@ -3745,7 +3745,7 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * H3- Another consultation (Encounter_datetime (from encounter type 35)) > “2nd consultation”
+   * H3- Another consultation (Encounter_datetime (from encounter type 35)) >= “2nd consultation”
    * (oldest date from H2)+20 days and <=“2nd consultation” (oldest date from H2)+33days
    *
    * @param vlQuantity Quantity of viral load to evaluate
@@ -3806,14 +3806,14 @@ public class QualityImprovement2020CohortQueries {
             + "                     WHERE p.voided = 0  "
             + "                        AND e.voided = 0 "
             + "                        AND e.encounter_type = ${35} "
-            + "                        AND e.encounter_datetime > DATE_ADD(h1.encounter_datetime, INTERVAL 20 DAY)  "
+            + "                        AND e.encounter_datetime >= DATE_ADD(h1.encounter_datetime, INTERVAL 20 DAY)  "
             + "                             AND e.encounter_datetime <= DATE_ADD(h1.encounter_datetime, INTERVAL 33 DAY) "
             + "                        AND e.location_id = :location "
             + "                ) h2 ON h2.patient_id = p.patient_id "
             + " WHERE p.voided = 0  "
             + "    AND e.voided = 0 "
             + "    AND e.encounter_type = ${35} "
-            + "    AND e.encounter_datetime > DATE_ADD(h2.encounter_datetime, INTERVAL 20 DAY)  "
+            + "    AND e.encounter_datetime >= DATE_ADD(h2.encounter_datetime, INTERVAL 20 DAY)  "
             + "         AND e.encounter_datetime <= DATE_ADD(h2.encounter_datetime, INTERVAL 33 DAY) "
             + "    AND e.location_id = :location ";
 
@@ -4014,45 +4014,26 @@ public class QualityImprovement2020CohortQueries {
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition b1 = getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsFirstLine_B1();
-
-    CohortDefinition b2 = getB2_13(useE53);
-
-    CohortDefinition b4 =
-        QualityImprovement2020Queries.getMQ13DenB4_P4(
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getHivViralLoadConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId(),
-            commonMetadata.getPregnantConcept().getConceptId());
-
-    CohortDefinition b5 =
-        QualityImprovement2020Queries.getMQ13DenB5_P4(
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getHivViralLoadConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId(),
-            commonMetadata.getBreastfeeding().getConceptId());
-
-    CohortDefinition f = getTranferredOutPatients();
-    CohortDefinition h = getMQC11NH();
-
     if (reportSource.equals(EptsReportConstants.MIMQ.MQ)) {
-      compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(b1, MAPPING1));
-      compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(b2, MAPPING1));
-      compositionCohortDefinition.addSearch("B4", EptsReportUtils.map(b4, MAPPING));
-      compositionCohortDefinition.addSearch("B5", EptsReportUtils.map(b5, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
-      compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING));
+
+      compositionCohortDefinition.addSearch(
+          "DENOMINATOR",
+          EptsReportUtils.map(getMQC11DEN(2, EptsReportConstants.MIMQ.MQ), MAPPING1));
+
+      compositionCohortDefinition.addSearch("H", EptsReportUtils.map(getMQC11NH(), MAPPING));
+
     } else if (reportSource.equals(EptsReportConstants.MIMQ.MI)) {
-      compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(b1, MAPPING5));
-      compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(b2, MAPPING8));
-      compositionCohortDefinition.addSearch("B4", EptsReportUtils.map(b4, MAPPING8));
-      compositionCohortDefinition.addSearch("B5", EptsReportUtils.map(b5, MAPPING8));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING9));
-      compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING8));
+
+      compositionCohortDefinition.addSearch(
+          "DENOMINATOR",
+          EptsReportUtils.map(
+              getMQC11DEN(2, EptsReportConstants.MIMQ.MI),
+              "revisionEndDate=${revisionEndDate},location=${location}"));
+
+      compositionCohortDefinition.addSearch("H", EptsReportUtils.map(getMQC11NH(), MAPPING8));
     }
 
-    compositionCohortDefinition.setCompositionString(
-        "((B2 AND H AND (B1 OR B5)) AND NOT (B4 OR F))");
+    compositionCohortDefinition.setCompositionString("DENOMINATOR AND H");
 
     return compositionCohortDefinition;
   }
