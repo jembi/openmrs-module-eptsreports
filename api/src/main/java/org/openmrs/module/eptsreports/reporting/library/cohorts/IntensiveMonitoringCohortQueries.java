@@ -3623,6 +3623,7 @@ public class IntensiveMonitoringCohortQueries {
     CohortDefinition onTB = commonCohortQueries.getPatientsOnTbTreatment();
     CohortDefinition onSK = qualityImprovement2020CohortQueries.getPatientsWithSarcomaKarposi();
     CohortDefinition restartedTreatment = getPatientsWhoRestartedTreatment();
+    CohortDefinition finishedTbTreatment = getPatientsWhoFinishedTbTreatmentInLessThan30days();
 
     cd.addSearch(
         "A",
@@ -3691,8 +3692,14 @@ public class IntensiveMonitoringCohortQueries {
             genericCohortQueries.getAgeOnLastClinicalConsultation(2, null),
             "onOrAfter=${revisionEndDate-2m+1d},onOrBefore=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
 
+    cd.addSearch(
+        "finishedTbTreatment",
+        EptsReportUtils.map(
+            finishedTbTreatment,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
     cd.setCompositionString(
-        "A AND B1 AND NOT (C OR D OR F OR G OR MDS OR onTB OR adverseReaction OR onSK OR restartedTreatment) AND AGE");
+        "A AND B1 AND NOT (C OR D OR F OR G OR MDS OR onTB OR adverseReaction OR onSK OR restartedTreatment OR finishedTbTreatment) AND AGE");
 
     return cd;
   }
@@ -3718,6 +3725,14 @@ public class IntensiveMonitoringCohortQueries {
     cd.setName("Patients who returned to treatment");
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
     cd.addSearch(
         "B13",
         EptsReportUtils.map(
@@ -3738,77 +3753,11 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch(
         "transferredIn",
         EptsReportUtils.map(
-            getTranferredInPatients(),
-            "onOrAfter=${endDate-3m},onOrBefore=${endDate},location=${location}"));
+            transferredIn,
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.setCompositionString(
         "(B13 and treatmentInterruption AND filaOrDrugPickup) AND NOT transferredIn");
-    return cd;
-  }
-
-  /**
-   * <b>Utentes Transferidos de Outra US</b>
-   * <li>Todos os utentes inscritos no “Serviço TARV- Tratamento” com o 1º estado igual a
-   *     “Transferido De” antes da data fim de avaliação
-   * <li>Todos os utentes “Transferido de outra US” na Ficha Resumo– Master Card, com “Data de
-   *     Abertura da Ficha” ocorrida antes da “Data Fim avaliação”<br>
-   *     Nota 1: não há verificação se foi em “Pré-TARV” ou “TARV”.
-   *
-   * @return {@link CohortDefinition}
-   */
-  public CohortDefinition getTranferredInPatients() {
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-
-    cd.setName("Transferred in patients");
-    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put("1369", hivMetadata.getTransferredFromOtherFacilityConcept().getConceptId());
-    valuesMap.put("1065", hivMetadata.getYesConcept().getConceptId());
-    valuesMap.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
-    valuesMap.put("2", hivMetadata.getARTProgram().getProgramId());
-    valuesMap.put(
-        "29",
-        hivMetadata
-            .getArtTransferredFromOtherHealthFacilityWorkflowState()
-            .getProgramWorkflowStateId());
-
-    String query =
-        "SELECT p.patient_id "
-            + "    FROM   patient p "
-            + "           JOIN encounter e ON p.patient_id = e.patient_id "
-            + "           JOIN obs transf ON transf.encounter_id = e.encounter_id "
-            + "           JOIN obs opening ON opening.encounter_id = e.encounter_id "
-            + "    WHERE  p.voided = 0 "
-            + "           AND e.voided = 0 "
-            + "           AND e.encounter_type = ${53} "
-            + "           AND e.location_id = :location "
-            + "           AND transf.voided = 0 "
-            + "           AND transf.concept_id = ${1369} "
-            + "           AND transf.value_coded = ${1065} "
-            + "           AND opening.voided = 0 "
-            + "           AND opening.concept_id = ${23891} "
-            + "           AND opening.value_datetime BETWEEN :onOrAfter AND :onOrBefore "
-            + "	UNION "
-            + "          SELECT p.patient_id "
-            + "			FROM patient p "
-            + "          JOIN patient_program pp on p.patient_id=pp.patient_id "
-            + "          JOIN patient_state ps on pp.patient_program_id=ps.patient_program_id "
-            + "          WHERE  pp.voided=0 "
-            + "			  AND ps.voided=0 "
-            + "			  AND p.voided=0 "
-            + "			  AND pp.program_id=${2} "
-            + "	          AND ps.state = ${29} "
-            + "			  AND location_id= :location "
-            + "			  AND ps.start_date BETWEEN :onOrAfter AND :onOrBefore ";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-
-    cd.setQuery(stringSubstitutor.replace(query));
-
     return cd;
   }
 

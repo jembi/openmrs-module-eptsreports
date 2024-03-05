@@ -21,6 +21,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
   private String endDateMappings = "endDate=${evaluationYear}-06-20,location=${location}";
   private String b18Mappings = "endDate=${evaluationYear-1}-06-20,location=${location}";
   private String c18Mappings = "endDate=${evaluationYear-2}-06-20,location=${location}";
+  private String d18Mappings = "endDate=${evaluationYear-3}-06-20,location=${location}";
 
   private final ListOfPatientsInAdvancedHivIllnessCohortQueries
       listOfPatientsInAdvancedHivIllnessCohortQueries;
@@ -43,7 +44,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.setParameters(getParameters());
 
     pdd.addRowFilter(
-        listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24Or36(),
         "evaluationYear=${evaluationYear},location=${location}");
 
     //  SECÇÃO A
@@ -58,7 +59,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // A2- Coorte: (coluna B)
     pdd.addColumn(
         "coort",
-        listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24Months(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24Or36Months(),
         "evaluationYear=${evaluationYear},location=${location}");
 
     // A3- Sexo: (coluna C)
@@ -137,7 +138,9 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B5- Teve registo de boa adesão em TODAS consultas entre 1˚ e 3˚ mês de TARV?
     pdd.addColumn(
         "good_adherence_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(true),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(true, 1, 3),
+        // minNumberOfMonths and MaxNumberOfMonths has no effect here because the boolean b5OrC5 is
+        // set to true
         endDateMappings);
 
     // B6- Esteve grávida ou foi lactante entre 3˚ e 9º mês de TARV?: (coluna M)- Resposta = Sim ou
@@ -157,7 +160,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B9- Data de inscrição no MDS: (coluna R) - Resposta = Data de Inscrição (RF24)
     pdd.addColumn(
         "mds_date",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(3, 9, true),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(0, 12, true),
         endDateMappings,
         new GeneralDateConverter());
 
@@ -297,7 +300,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B18 - Estado de permanência no 12˚ mês de TARV: (coluna AO)
     pdd.addColumn(
         "permanence_state_b",
-        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastStateOfStayOnTarv(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(),
         b18Mappings);
 
     // C1 - Data do pedido da CV de seguimento: (coluna AP)
@@ -324,13 +327,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C4 - Resultado do CD4 feito entre 12˚ e 24˚ mês de TARV- C.4 (Coluna AS)
     pdd.addColumn(
         "cd4_result_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getCd4ResultSectionC(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getCd4ResultSectionC(12, 24),
         endDateMappings);
 
     // C5- Teve registo de boa adesão em TODAS consultas entre 12˚ e 24˚ mês de TARV?
     pdd.addColumn(
         "good_adherence_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(false),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(false, 12, 24),
         endDateMappings);
 
     // C6 - Esteve grávida ou foi lactante entre 12˚ e 24º mês de TARV?: (coluna AU) - Resposta =
@@ -463,14 +466,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C11 - Rastreado para TB em TODAS as consultas entre 12˚ e 24˚ mês de TARV?- C.11 (Coluna BN)
     pdd.addColumn(
         "tb_screening_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(true),
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(true, 12, 24),
         endDateMappings);
 
     // C14 - PB/IMC registado em TODAS as consultas entre o 12˚ a 24º mês de TARV? (coluna BQ) -
     // Resposta = Sim ou Não ou N/A (RF27)
     pdd.addColumn(
         "pb_imc_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(false),
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(false, 12, 24),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -489,8 +492,197 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C18 - Estado de permanência no 24˚ mês de TARV: (coluna BU)
     pdd.addColumn(
         "permanence_state_c",
-        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastStateOfStayOnTarv(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(),
         c18Mappings);
+
+    // D.1 - Data do pedido da CV de seguimento - D.1 (coluna BV)
+    pdd.addColumn(
+        "cv_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getSecondViralLoad(),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D.2 - Data de registo do resultado da CV de Seguimento - D.2 (coluna BV)
+    pdd.addColumn(
+        "cv_result_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getSecondViralLoadResultDate(),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D.3 - Resultado da CV de Seguimento - D.3 (coluna BX)
+    pdd.addColumn(
+        "cv_result_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getSecondViralLoadResult(),
+        endDateMappings,
+        new ViralLoadQualitativeLabelConverter());
+
+    // D.4 - Resultado do CD4 feito entre 24˚ e 36˚ mês de TARV- D.4 (Coluna BY)
+    pdd.addColumn(
+        "cd4_result_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getCd4ResultSectionC(24, 36),
+        endDateMappings);
+
+    // D.5- Teve registo de boa adesão em TODAS consultas entre 24˚ e 36˚ mês de TARV?
+    pdd.addColumn(
+        "good_adherence_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(false, 24, 36),
+        endDateMappings);
+
+    // D.6 - Esteve grávida ou foi lactante entre 24˚ e 36º mês de TARV?: (coluna CA)
+    pdd.addColumn(
+        "pregnant_breastfeeding_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsPregnantBreastfeeding3MonthsTarv(
+            24, 36),
+        endDateMappings);
+
+    // D.8 - Teve TB entre 24˚ e 36 ˚ meses de TARV: (coluna CC)
+    pdd.addColumn(
+        "tb_tarv_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithTbThirdToNineMonth(24, 36),
+        endDateMappings);
+
+    // D.9 - Data de inscrição no MDS entre 24º e 36º mês de TARV: (coluna CD)
+    pdd.addColumn(
+        "mds_tarv_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(24, 36, false),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D10.1 -Tipo de MDS: (MDS1) Coluna CE
+    pdd.addColumn(
+        "mds_one_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1(36),
+        endDateMappings,
+        new DispensationTypeMdcConverter());
+
+    // D10.2 - Data Início de MDS1: Coluna CF
+    pdd.addColumn(
+        "mds_one_start_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1StartDate(36),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D10.3 - Data Fim de MDS1: Coluna CG
+    pdd.addColumn(
+        "mds_one_end_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1EndDate(36),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D10.4 - Tipo de MDS: (MDS2) Coluna CH
+    pdd.addColumn(
+        "mds_two_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2(36),
+        endDateMappings,
+        new DispensationTypeMdcConverter());
+
+    // D10.5 - Data Início de MDS2: Coluna CI
+    pdd.addColumn(
+        "mds_two_start_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2StartDate(36),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D10.6 - Data Fim de MDS2: Coluna CJ
+    pdd.addColumn(
+        "mds_two_end_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2EndDate(36),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D10.7 - Tipo de MDS: (MDS3) Coluna CK
+    pdd.addColumn(
+        "mds_three_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3(36),
+        endDateMappings,
+        new DispensationTypeMdcConverter());
+
+    // D10.8 - Data Início de MDS3: Coluna CL
+    pdd.addColumn(
+        "mds_three_start_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3StartDate(36),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D10.9 - Data Fim de MDS3: Coluna CM
+    pdd.addColumn(
+        "mds_three_end_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3EndDate(36),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D10.10 - Tipo de MDS: (MDS4) Coluna CN
+    pdd.addColumn(
+        "mds_four_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4(36),
+        endDateMappings,
+        new DispensationTypeMdcConverter());
+
+    // D10.11 - Data Início de MDS4: Coluna CO
+    pdd.addColumn(
+        "mds_four_start_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4StartDate(36),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D10.12 - Data Fim de MDS4: Coluna CP
+    pdd.addColumn(
+        "mds_four_end_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4EndDate(36),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D10.13 - Tipo de MDS: (MDS5) Coluna CQ
+    pdd.addColumn(
+        "mds_five_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5(36),
+        endDateMappings,
+        new DispensationTypeMdcConverter());
+
+    // D10.14 - Data Início de MDS5: Coluna CR
+    pdd.addColumn(
+        "mds_five_start_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5StartDate(36),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D10.15 - Data Fim de MDS5: Coluna CS
+    pdd.addColumn(
+        "mds_five_end_date_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5EndDate(36),
+        endDateMappings,
+        new GeneralDateConverter());
+
+    // D11 - Rastreado para TB em TODAS as consultas entre 24˚ e 36˚ mês de TARV?- D.11 (Coluna CT)
+    pdd.addColumn(
+        "tb_screening_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(true, 24, 36),
+        endDateMappings);
+
+    // D14 - PB/IMC registado em TODAS as consultas entre o 24˚ a 36º mês de TARV?- D.14 (Coluna CW)
+    pdd.addColumn(
+        "pb_imc_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(false, 24, 36),
+        endDateMappings,
+        new NotApplicableIfNullConverter());
+
+    // D16 - N˚ de consultas clínicas entre 24˚ e 36˚ mês de TARV- D.16 (Coluna CY)
+    pdd.addColumn(
+        "clinical_consultations_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(24, 36),
+        endDateMappings);
+
+    // D17 - N˚ de consultas de APSS/PP tre 24˚ e 36˚ mês de TARV- D.18 (Coluna CZ)
+    pdd.addColumn(
+        "apss_pp_consultations_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(24, 36),
+        endDateMappings);
+
+    // D18 - Estado de permanência no 36˚ mês de TARV: (coluna DA)
+    pdd.addColumn(
+        "permanence_state_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(),
+        d18Mappings);
 
     return pdd;
   }

@@ -79,115 +79,128 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
   }
 
   /**
-   *
+   * <b>registo do resultado de CD4 (absoluto) durante o período de avaliação </b>
    * <li>Utentes com registo do resultado de CD4 (absoluto) na “Ficha Clínica – Ficha Mestra” ou
    *     “Ficha Resumo – Ficha Mestra” ou “Ficha e-Lab” ou “Ficha de Laboratório” ou “Ficha de
    *     Doença Avançada por HIV”, durante o período de avaliação (“Data Resultado CD4” >= “Data
    *     Início Avaliação” e “Data Resultado CD4” <= “Data Fim Avaliação”) e com resultado CD4
-   *     (absoluto) < 200 e idade do utente >= 5 anos ou
+   *     (absoluto) ( < 200 e idade do utente >= 5 anos) ou ( < 500 e idade do utente >=1 ano e <5
+   *     anos ) ou (<750 e idade do utente <1 ano)
    *
    *     <p>Idade = Data Fim de Avaliação - Data de Nascimento
    *
+   * @param absoluteCd4Amount Amount of cd4 based on the age
+   * @param mostRecentDateOrCd4Result Flag to return Most Recent date or Cd4 Result
+   * @param minAge minimum age to check
+   * @param maxAge maximum age to check
    * @return {@link String}
    */
-  public String getCd4ResultOverOrEqualTo5years() {
-    return getPatientsWithCD4AbsoluteResultOnPeriodQuery(200, true)
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=5 "
-        + "  GROUP BY ps.person_id "
-        + " UNION "
-        + getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(200, true)
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=5 "
-        + "  GROUP BY ps.person_id ";
+  public String getCd4ResultDatesBasedOnAgesAndCd4Amounts(
+      Integer absoluteCd4Amount,
+      boolean mostRecentDateOrCd4Result,
+      Integer minAge,
+      Integer maxAge) {
+
+    String query =
+        getPatientsWithCD4AbsoluteResultOnPeriodQuery(absoluteCd4Amount, mostRecentDateOrCd4Result);
+
+    query = getAgeVerificationString(minAge, maxAge, query);
+
+    query += "  GROUP BY ps.person_id " + " UNION ";
+
+    query +=
+        getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(
+            absoluteCd4Amount, mostRecentDateOrCd4Result);
+
+    query = getAgeVerificationString(minAge, maxAge, query);
+
+    query += "  GROUP BY ps.person_id ";
+
+    return query;
   }
 
   /**
+   * <b>Adds the Age Calculation Based on the Age Bands</b>
    *
-   * <li>Utentes com registo do resultado de CD4 (absoluto) na “Ficha Clínica – Ficha Mestra” ou
-   *     “Ficha Resumo – Ficha Mestra” ou “Ficha e-Lab” ou “Ficha de Laboratório” ou “Ficha de
-   *     Doença Avançada por HIV”, durante o período de avaliação (“Data Resultado CD4” >= “Data
-   *     Início Avaliação” e “Data Resultado CD4” <= “Data Fim Avaliação”) e com resultado CD4
-   *     (absoluto) < 500 e idade do utente >= 1 ano e < 5 ou
-   *
-   *     <p>Idade = Data Fim de Avaliação - Data de Nascimento
-   *
+   * @param minAge minimum age to check
+   * @param maxAge maximum age to check
+   * @param query the SQL String to add age verification based on the age
    * @return {@link String}
    */
-  public String getCd4ResultBetweenOneAnd5years() {
-    return getPatientsWithCD4AbsoluteResultOnPeriodQuery(500, true)
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=1 "
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <5 "
-        + "  GROUP BY ps.person_id "
-        + " UNION "
-        + getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(500, true)
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=1 "
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <5 "
-        + "  GROUP BY ps.person_id ";
+  private String getAgeVerificationString(Integer minAge, Integer maxAge, String query) {
+    if (minAge != null && maxAge != null) {
+      query +=
+          " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >= "
+              + minAge
+              + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) < "
+              + maxAge;
+
+    } else if (minAge == null && maxAge != null) {
+      query += "  AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) < " + maxAge;
+    } else if (minAge != null && maxAge == null) {
+      query += " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >= " + minAge;
+    }
+    return query;
   }
 
   /**
+   * <b>Resultado de CD4 (absoluto) durante o período de avaliação</b>
    *
-   * <li>Utentes com registo do resultado de CD4 (absoluto) na “Ficha Clínica – Ficha Mestra” ou
-   *     “Ficha Resumo – Ficha Mestra” ou “Ficha e-Lab” ou “Ficha de Laboratório” ou “Ficha de
-   *     Doença Avançada por HIV”, durante o período de avaliação (“Data Resultado CD4” >= “Data
-   *     Início Avaliação” e “Data Resultado CD4” <= “Data Fim Avaliação”) e com resultado CD4
-   *     (absoluto) < 750 e idade do utente < 1 ou
-   *
-   *     <p>Idade = Data Fim de Avaliação - Data de Nascimento
-   *
+   * @param absoluteCd4Amount Amount of cd4 based on the age
+   * @param minAge minimum age to check
+   * @param maxAge maximum age to check
    * @return {@link String}
    */
-  public String getCd4ResultBellowOneYear() {
-    return getPatientsWithCD4AbsoluteResultOnPeriodQuery(750, true)
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <1 "
-        + "  GROUP BY ps.person_id "
-        + " UNION "
-        + getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(750, true)
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <1 "
-        + "  GROUP BY ps.person_id ";
-  }
+  public String getCd4ResultBasedOnAgesAndCd4Amounts(
+      Integer absoluteCd4Amount, Integer minAge, Integer maxAge) {
 
-  /**
-   * @see #getCd4ResultOverOrEqualTo5years()
-   * @return {@link String}
-   */
-  public String getCd4ResultOverOrEqualTo5y() {
-    return getPatientsWithCD4AbsoluteResultOnPeriodQuery(200, false)
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=5 "
-        + "  GROUP BY ps.person_id "
-        + " UNION "
-        + getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(200, false)
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=5 "
-        + "  GROUP BY ps.person_id ";
-  }
+    String query =
+        " SELECT ps.person_id, o.value_numeric as cd4  "
+            + "FROM   person ps  "
+            + "           INNER JOIN encounter e  "
+            + "                      ON ps.person_id = e.patient_id  "
+            + "           INNER JOIN obs o  "
+            + "                      ON e.encounter_id = o.encounter_id  "
+            + "INNER JOIN ( "
+            + getLastCd4ResultDateQueries()
+            + " ) last_cd4 ON last_cd4.person_id = ps.person_id  "
+            + " WHERE  ps.voided = 0  "
+            + "  AND e.voided = 0   "
+            + "  AND o.voided = 0  "
+            + "  AND e.encounter_type IN ( ${6}, ${13}, ${51} )  "
+            + "  AND o.concept_id = ${1695}  "
+            + "  AND o.value_numeric <  "
+            + absoluteCd4Amount
+            + "  AND Date(e.encounter_datetime) = last_cd4.most_recent  "
+            + "  AND e.location_id = :location ";
 
-  /**
-   * @see #getCd4ResultBetweenOneAnd5years()
-   * @return {@link String}
-   */
-  public String getCd4ResultBetweenOneAnd5y() {
-    return getPatientsWithCD4AbsoluteResultOnPeriodQuery(500, false)
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=1 "
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <5 "
-        + "  GROUP BY ps.person_id "
-        + " UNION "
-        + getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(500, false)
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=1 "
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <5 "
-        + "  GROUP BY ps.person_id ";
-  }
+    query = getAgeVerificationString(minAge, maxAge, query);
 
-  /**
-   * @see #getCd4ResultBellowOneYear()
-   * @return {@link String}
-   */
-  public String getCd4ResultBellow1y() {
-    return getPatientsWithCD4AbsoluteResultOnPeriodQuery(750, false)
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <1 "
-        + "  GROUP BY ps.person_id "
-        + " UNION "
-        + getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(750, false)
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <1 "
-        + "  GROUP BY ps.person_id ";
+    query += "  GROUP BY ps.person_id " + " UNION ";
+
+    query +=
+        "  SELECT ps.person_id, o.value_numeric as cd4  "
+            + "FROM   person ps  "
+            + "           INNER JOIN encounter e  "
+            + "                      ON ps.person_id = e.patient_id  "
+            + "           INNER JOIN obs o  "
+            + "                      ON e.encounter_id = o.encounter_id  "
+            + "INNER JOIN ( "
+            + getLastCd4ResultDateQueries()
+            + " ) last_cd4 ON last_cd4.person_id = ps.person_id  "
+            + " WHERE  ps.voided = 0  "
+            + " AND e.voided = 0  "
+            + "  AND o.voided = 0  "
+            + "  AND e.encounter_type IN ( ${53}, ${90} )  "
+            + "  AND o.concept_id = ${1695}  "
+            + "  AND o.value_numeric <  "
+            + absoluteCd4Amount
+            + "  AND o.obs_datetime = last_cd4.most_recent  "
+            + "  AND e.location_id = :location ";
+
+    query = getAgeVerificationString(minAge, maxAge, query);
+    query += "  GROUP BY ps.person_id ";
+    return query;
   }
 
   /**
@@ -341,7 +354,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
   public String getVLoadResultAndMostRecent() {
     return "SELECT p.patient_id, "
         + "       last_vl.most_recent, "
-        + " IF(o.value_numeric IS NOT NULL, o.value_numeric, IF(o2.value_coded = 165331, CONCAT('MENOR QUE ',o2.comments), o2.value_coded)) AS viral_load "
+        + " IF(o.concept_id = 856, o.value_numeric, IF(o2.value_coded = 165331, CONCAT('MENOR QUE ',o2.comments), o2.value_coded)) AS viral_load "
         + "FROM   patient p "
         + "       INNER JOIN encounter e "
         + "               ON p.patient_id = e.patient_id "
@@ -370,7 +383,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "UNION "
         + "SELECT p.patient_id, "
         + "       last_vl.most_recent, "
-        + "  IF(o.value_numeric IS NOT NULL, o.value_numeric, (IF(o2.value_coded = 165331, CONCAT('MENOR QUE ',o2.comments), (IF(e.encounter_type = 51 and o2.value_coded=1306, 'NIVEL DE DETECÇÃO BAIXO',(IF(e.encounter_type in (6,9) and o2.value_coded=1306, 'NIVEL BAIXO DE DETECÇÃO',o2.value_coded)))) )) ) AS "
+        + "  IF(o.concept_id = 856, o.value_numeric, (IF(o2.value_coded = 165331, CONCAT('MENOR QUE ',o2.comments), (IF(e.encounter_type = 51 and o2.value_coded=1306, 'NIVEL DE DETECÇÃO BAIXO',(IF(e.encounter_type in (6,9) and o2.value_coded=1306, 'NIVEL BAIXO DE DETECÇÃO',o2.value_coded)))) )) ) AS "
         + "                          viral_load "
         + "FROM   patient p "
         + "       INNER JOIN encounter e "
@@ -442,7 +455,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
   public String getSecondVLResultOrResultDateBeforeMostRecent() {
     return "SELECT p.patient_id, "
         + "       last_vl.last_vl AS second_vl, "
-        + " IF(o.value_numeric IS NOT NULL, o.value_numeric, IF(o.value_coded = 165331, CONCAT('MENOR QUE ',o.comments), o.value_coded)) AS viral_load  "
+        + " IF(o.concept_id = 856, o.value_numeric, IF(o.value_coded = 165331, CONCAT('MENOR QUE ',o.comments), o.value_coded)) AS viral_load  "
         + "FROM   patient p "
         + "       INNER JOIN encounter e "
         + "               ON p.patient_id = e.patient_id "
@@ -468,7 +481,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "UNION "
         + "SELECT p.patient_id, "
         + "       last_vl.last_vl AS second_vl, "
-        + "  IF(o.value_numeric IS NOT NULL, o.value_numeric, (IF(o.value_coded = 165331, CONCAT('MENOR QUE ',o.comments), (IF(e.encounter_type = 51 and o.value_coded=1306, 'NIVEL DE DETECÇÃO BAIXO',(IF(e.encounter_type in (6,9) and o.value_coded=1306, 'NIVEL BAIXO DE DETECÇÃO',o.value_coded)))) )) ) AS "
+        + "  IF(o.concept_id = 856, o.value_numeric, (IF(o.value_coded = 165331, CONCAT('MENOR QUE ',o.comments), (IF(e.encounter_type = 51 and o.value_coded=1306, 'NIVEL DE DETECÇÃO BAIXO',(IF(e.encounter_type in (6,9) and o.value_coded=1306, 'NIVEL BAIXO DE DETECÇÃO',o.value_coded)))) )) ) AS "
         + "                          viral_load "
         + "FROM   patient p "
         + "       INNER JOIN encounter e "
@@ -547,7 +560,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
   }
 
   /**
-   * <b>Abandonos em Tarv</b>
+   * <b>Abandonos em Tarv/ Transferidos Para</b>
    *
    * @param stateOnProgram State on Program concept
    * @param stateOnEncounters State on encounter types concept
@@ -627,18 +640,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
 
     if (transferredOut) {
       query +=
-          " SELECT p.patient_id  "
-              + "      FROM   patient p  "
-              + "             JOIN encounter e  "
-              + "               ON p.patient_id = e.patient_id  "
-              + "      WHERE  p.voided = 0  "
-              + "             AND e.voided = 0  "
-              + "             AND e.encounter_type = ${6}   "
-              + "             AND e.location_id = :location  "
-              + "             AND e.encounter_datetime > lastest.last_date  "
-              + "             AND e.encounter_datetime <= :endDate  "
-              + "                 UNION"
-              + "  SELECT p.patient_id"
+          "  SELECT p.patient_id"
               + "      FROM   patient p"
               + "            JOIN encounter e ON p.patient_id = e.patient_id "
               + "            JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -648,7 +650,57 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
               + "        AND e.location_id =  :location  "
               + "            AND e.encounter_type = ${18}   "
               + "              AND e.encounter_datetime > lastest.last_date   "
-              + "              AND e.encounter_datetime <= :endDate ";
+              + "              AND e.encounter_datetime <= :endDate "
+              + " UNION "
+              + " SELECT final.patient_id FROM  ( "
+              + "       SELECT considered_transferred.patient_id, MAX(considered_transferred.value_datetime) as max_date "
+              + "         FROM ( "
+              + "               SELECT     p.patient_id, "
+              + "                          MAX(o.value_datetime) AS value_datetime "
+              + "               FROM       patient p "
+              + "                              INNER JOIN encounter e "
+              + "                                         ON         e.patient_id=p.patient_id "
+              + "                              INNER JOIN obs o "
+              + "                                         ON         o.encounter_id=e.encounter_id "
+              + "                              INNER JOIN ( "
+              + "                              SELECT p.patient_id, MAX(e.encounter_datetime) AS most_recent "
+              + "                                 FROM patient p "
+              + "                                   INNER JOIN encounter e ON e.patient_id = p.patient_id "
+              + "                              WHERE e.encounter_type = ${18} "
+              + "                                   AND e.encounter_datetime <= :endDate "
+              + "                                   AND e.voided = 0 "
+              + "                                   AND p.voided = 0 "
+              + "                                   AND e.location_id = :location "
+              + "                              GROUP BY p.patient_id "
+              + "                             ) last_fila ON last_fila.patient_id = p.patient_id "
+              + "               WHERE      p.voided = 0 "
+              + "                 AND        e.voided = 0 "
+              + "                 AND        o.voided = 0 "
+              + "                 AND        e.encounter_type = ${18} "
+              + "                 AND        o.concept_id = ${5096} "
+              + "                 AND        e.encounter_datetime = last_fila.most_recent "
+              + "                 AND        o.value_datetime <= :endDate "
+              + "                 AND        e.location_id = :location "
+              + "               GROUP BY   p.patient_id "
+              + "               UNION "
+              + "               SELECT     p.patient_id, "
+              + "                          TIMESTAMPADD(DAY, 30, MAX(o.value_datetime)) AS value_datetime "
+              + "               FROM       patient p "
+              + "                              INNER JOIN encounter e "
+              + "                                         ON  e.patient_id=p.patient_id "
+              + "                              INNER JOIN obs o "
+              + "                                         ON  o.encounter_id=e.encounter_id "
+              + "               WHERE      p.voided = 0 "
+              + "                 AND        e.voided = 0 "
+              + "                 AND        o.voided = 0 "
+              + "                 AND        e.encounter_type = ${52} "
+              + "                 AND        o.concept_id = ${23866} "
+              + "                 AND        o.value_datetime <= :endDate "
+              + "                 AND        e.location_id = :location "
+              + "               GROUP BY   p.patient_id "
+              + "         )  considered_transferred "
+              + " GROUP BY considered_transferred.patient_id "
+              + " ) final ";
     } else {
       query +=
           "  SELECT p.patient_id"
@@ -891,11 +943,13 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * <li>Transferidos Para Outra US
    * <li>Suspensos em TARV
    * <li>Óbitos
+   * <li>Reinícios
    *
-   * @see #getPatientsWhoAbandonedTarvQuery(boolean) getPatientsWhoAbandonedTarvQuery
-   * @see #getPatientsWhoSuspendedTarvOrAreTransferredOut(int, int, boolean, boolean)
-   *     getPatientsWhoSuspendedTarvOrAreTransferredOut
-   * @see #getPatientsWhoDied(boolean) getPatientsWhoDied
+   * @see #getPatientsWhoAbandonedTarvQuery(boolean) Definition of patients who Abandoned Tarv
+   * @see #getPatientsWhoSuspendedTarvOrAreTransferredOut(int, int, boolean, boolean) Definition of
+   *     patients who Suspended Tarv Or Are Transferred Out
+   * @see #getPatientsWhoDied(boolean) Definition of patients Died
+   * @see #getPatientsWhoRestartedTreatment(boolean) Definition of patients who restarted
    * @return {@link String}
    */
   public String getPatientsActiveOnTarv() {
@@ -920,6 +974,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
                     false,
                     true))
             .union(getPatientsWhoDied(false))
+            .union(getPatientsWhoRestartedTreatment(false))
             .buildQuery()
         + "     ) "
         + "GROUP BY final.patient_id ";
@@ -998,5 +1053,179 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "                                    AND e.encounter_datetime = first_consultation.consultation_date "
         + "                                    AND e.location_id = :location "
         + "                             GROUP  BY p.patient_id ";
+  }
+
+  public String getLastCd4ResultDateQueries() {
+    String unionQuery =
+        new EptsQueriesUtil()
+            .unionBuilder(getCd4ResultDatesBasedOnAgesAndCd4Amounts(200, true, 5, null))
+            .union(getCd4ResultDatesBasedOnAgesAndCd4Amounts(500, true, 1, 5))
+            .union(getCd4ResultDatesBasedOnAgesAndCd4Amounts(750, true, null, 1))
+            .buildQuery();
+
+    return " SELECT absolute_cd4.person_id, max(absolute_cd4.most_recent) AS most_recent FROM ( "
+        + unionQuery
+        + " ) absolute_cd4 GROUP BY absolute_cd4.person_id ";
+  }
+
+  /**
+   * <b>Utentes que reiniciaram TARV</b>
+   * <li>Utentes com registo do último estado [“Mudança Estado Permanência TARV” (Coluna 21) = “R”
+   *     (Reinicio) na Ficha Clínica com “Data da Consulta Actual” (Coluna 1, durante a qual se fez
+   *     o registo da mudança do estado de permanência TARV) <= “Data Fim”; ou
+   * <li>Utentes com último registo de “Mudança Estado Permanência TARV” = “Reinício” na Ficha
+   *     Resumo com “Data de Reinício” <= “Data Fim”;
+   *
+   *     <p>Excluindo todos os utentes:
+   * <li>Abandonos em TARV
+   * <li>Transferidos Para Outra US
+   * <li>Óbitos
+   *
+   * @see #getPatientsWhoAbandonedTarvQuery(boolean) getPatientsWhoAbandonedTarvQuery
+   * @see #getPatientsWhoSuspendedTarvOrAreTransferredOut(int, int, boolean, boolean)
+   *     getPatientsWhoSuspendedTarvOrAreTransferredOut
+   * @see #getPatientsWhoDied(boolean) getPatientsWhoDied
+   * @return {@link String}
+   */
+  public String getPatientsWhoRestartedTreatment(boolean isForDataDefinition) {
+    String fromSQL =
+        " FROM ( "
+            + getPatientsWhoRestartedArtTreatmentQuery()
+            + " ) final "
+            + "WHERE final.patient_id NOT IN ( "
+            + new EptsQueriesUtil()
+                .unionBuilder(getPatientsWhoAbandonedTarvQuery(false))
+                .union(
+                    getPatientsWhoSuspendedTarvOrAreTransferredOut(
+                        hivMetadata
+                            .getSuspendedTreatmentWorkflowState()
+                            .getProgramWorkflowStateId(),
+                        hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
+                        true,
+                        true))
+                .union(getPatientsWhoDied(false))
+                .buildQuery()
+            + "     ) "
+            + "GROUP BY final.patient_id ";
+
+    return isForDataDefinition
+        ? "  SELECT final.patient_id, 'Reinício'  ".concat(fromSQL)
+        : " SELECT final.patient_id ".concat(fromSQL);
+  }
+
+  public String getPatientsWhoRestartedArtTreatmentQuery() {
+    return " SELECT p.patient_id, o.value_coded "
+        + "FROM   patient p "
+        + "           INNER JOIN encounter e "
+        + "                      ON e.patient_id = p.patient_id "
+        + "           INNER JOIN obs o "
+        + "                      ON o.encounter_id = e.encounter_id "
+        + "INNER JOIN ( "
+        + "    SELECT max_state.patient_id, max_state.recent_date AS first_date "
+        + "    FROM ( "
+        + "             SELECT p.patient_id, "
+        + "                    Max(e.encounter_datetime) AS recent_date "
+        + "             FROM   patient p "
+        + "                        INNER JOIN encounter e "
+        + "                                   ON e.patient_id = p.patient_id "
+        + "                        INNER JOIN obs o "
+        + "                                   ON o.encounter_id = e.encounter_id "
+        + "             WHERE "
+        + "                 p.voided = 0 "
+        + "               AND e.voided = 0 "
+        + "               AND o.voided = 0 "
+        + "               AND e.encounter_type = ${6} "
+        + "               AND e.location_id = :location "
+        + "               AND o.concept_id = ${6273} "
+        + "               AND o.value_coded IS NOT NULL "
+        + "               AND e.encounter_datetime <= :endDate "
+        + "             GROUP  BY p.patient_id "
+        + "             UNION "
+        + "             SELECT p.patient_id, "
+        + "                    Max(o.obs_datetime) AS recent_date "
+        + "             FROM   patient p "
+        + "                        INNER JOIN encounter e "
+        + "                                   ON e.patient_id = p.patient_id "
+        + "                        INNER JOIN obs o "
+        + "                                   ON o.encounter_id = e.encounter_id "
+        + "             WHERE "
+        + "                 p.voided = 0 "
+        + "               AND e.voided = 0 "
+        + "               AND o.voided = 0 "
+        + "               AND e.encounter_type = ${53} "
+        + "               AND e.location_id = :location "
+        + "               AND o.concept_id = ${6272} "
+        + "               AND o.value_coded IS NOT NULL "
+        + "               AND o.obs_datetime <= :endDate "
+        + "             GROUP  BY p.patient_id "
+        + "         ) max_state "
+        + "    GROUP BY max_state.patient_id "
+        + ") last_state ON last_state.patient_id = p.patient_id "
+        + "WHERE   p.voided = 0 "
+        + "  AND e.voided = 0 "
+        + "  AND o.voided = 0 "
+        + "  AND e.encounter_type = ${6} "
+        + "  AND e.location_id = :location "
+        + "  AND o.concept_id = ${6273} "
+        + "  AND o.value_coded = ${1706} "
+        + "  AND e.encounter_datetime = last_state.first_date "
+        + "GROUP  BY p.patient_id "
+        + "UNION "
+        + "SELECT p.patient_id, o.value_coded "
+        + "FROM   patient p "
+        + "           INNER JOIN encounter e "
+        + "                      ON e.patient_id = p.patient_id "
+        + "           INNER JOIN obs o "
+        + "                      ON o.encounter_id = e.encounter_id "
+        + "           INNER JOIN ( "
+        + "    SELECT max_state.patient_id, max_state.recent_date AS first_date "
+        + "    FROM ( "
+        + "             SELECT p.patient_id, "
+        + "                    Max(e.encounter_datetime) AS recent_date "
+        + "             FROM   patient p "
+        + "                        INNER JOIN encounter e "
+        + "                                   ON e.patient_id = p.patient_id "
+        + "                        INNER JOIN obs o "
+        + "                                   ON o.encounter_id = e.encounter_id "
+        + "             WHERE "
+        + "                 p.voided = 0 "
+        + "               AND e.voided = 0 "
+        + "               AND o.voided = 0 "
+        + "               AND e.encounter_type = ${6} "
+        + "               AND e.location_id = :location "
+        + "               AND o.concept_id = ${6273} "
+        + "               AND o.value_coded IS NOT NULL "
+        + "               AND e.encounter_datetime <= :endDate "
+        + "             GROUP  BY p.patient_id "
+        + "             UNION "
+        + "             SELECT p.patient_id, "
+        + "                    Max(o.obs_datetime) AS recent_date "
+        + "             FROM   patient p "
+        + "                        INNER JOIN encounter e "
+        + "                                   ON e.patient_id = p.patient_id "
+        + "                        INNER JOIN obs o "
+        + "                                   ON o.encounter_id = e.encounter_id "
+        + "             WHERE "
+        + "                 p.voided = 0 "
+        + "               AND e.voided = 0 "
+        + "               AND o.voided = 0 "
+        + "               AND e.encounter_type = ${53} "
+        + "               AND e.location_id = :location "
+        + "               AND o.concept_id = ${6272} "
+        + "               AND o.value_coded IS NOT NULL "
+        + "               AND o.obs_datetime <= :endDate "
+        + "             GROUP  BY p.patient_id "
+        + "         ) max_state "
+        + "    GROUP BY max_state.patient_id "
+        + ") last_state ON last_state.patient_id = p.patient_id "
+        + "WHERE   p.voided = 0 "
+        + "  AND e.voided = 0 "
+        + "  AND o.voided = 0 "
+        + "  AND e.encounter_type = ${53} "
+        + "  AND e.location_id = :location "
+        + "  AND o.concept_id = ${6272} "
+        + "  AND o.value_coded = ${1706} "
+        + "  AND e.encounter_datetime = last_state.first_date "
+        + "GROUP  BY p.patient_id";
   }
 }

@@ -3987,4 +3987,12 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.noteDoneConceptUuid</property>
+		<defaultValue>e1d85e2e-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for the NOT DONE concept
+		</description>
+	</globalProperty>
+
 </module>
