@@ -12,11 +12,9 @@ import org.openmrs.module.eptsreports.reporting.library.queries.QualityImproveme
 import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportConstants;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
-import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
-import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -3668,23 +3666,8 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch(
         "adverseReaction",
         EptsReportUtils.map(
-            genericCohortQueries.hasCodedObs(
-                hivMetadata.getAdverseReaction(),
-                BaseObsCohortDefinition.TimeModifier.ANY,
-                SetComparator.IN,
-                Arrays.asList(
-                    hivMetadata.getAdultoSeguimentoEncounterType(),
-                    hivMetadata.getPediatriaSeguimentoEncounterType()),
-                Arrays.asList(
-                    hivMetadata.getCytopeniaConcept(),
-                    hivMetadata.getPancreatitis(),
-                    hivMetadata.getNephrotoxicityConcept(),
-                    hivMetadata.getHepatitisConcept(),
-                    hivMetadata.getStevensJonhsonSyndromeConcept(),
-                    hivMetadata.getHypersensitivityToAbcOrRailConcept(),
-                    hivMetadata.getLacticAcidosis(),
-                    hivMetadata.getHepaticSteatosisWithHyperlactataemiaConcept())),
-            "onOrAfter=${revisionEndDate-6m},onOrBefore=${revisionEndDate},locationList=${location}"));
+            getPatientsWithAdverseReactionToMedication(),
+            "startDate=${revisionEndDate-6m},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
         "AGE",
@@ -3969,6 +3952,72 @@ public class IntensiveMonitoringCohortQueries {
             + "WHERE  p.voided = 0 "
             + "       AND TIMESTAMPDIFF(DAY, finished_treatment.last_tb_treatment, "
             + "               last_consultation.most_recent) <= 30";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Utentes que tiveram alguma reacção a medicação nos últimos 6 meses</b>
+   *
+   * <p>O sistema irá identificar os utentes que tiveram alguma reacção à medicação, nos últimos 6
+   * meses, selecionando os utentes com registo dos seguintes efeitos secundários na consulta
+   * clínica (Ficha Clinica - MasterCard) decorrida nos últimos 6 meses (“Data Recolha Dados” menos
+   * (-) 6 meses e “Data Recolha Dados”):
+   * <li>Citopenia
+   * <li>Pancreatite
+   * <li>Nefrotoxicidade
+   * <li>Hepatite
+   * <li>Síndrome de Stevens Johnson
+   * <li>Hipersensibilidade a ABC/RAL
+   * <li>Acidose láctica
+   * <li>Esteatose hepática c/ hiperlactemia
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithAdverseReactionToMedication() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "Utentes  que tiveram alguma reacção à medicação, nos últimos 6 meses ");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "end Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("2015", hivMetadata.getAdverseReaction().getConceptId());
+    map.put("23748", hivMetadata.getCytopeniaConcept().getConceptId());
+    map.put("6293", hivMetadata.getPancreatitis().getConceptId());
+    map.put("23749", hivMetadata.getNephrotoxicityConcept().getConceptId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23750", hivMetadata.getStevensJonhsonSyndromeConcept().getConceptId());
+    map.put("23751", hivMetadata.getHypersensitivityToAbcOrRailConcept().getConceptId());
+    map.put("6299", hivMetadata.getLacticAcidosis().getConceptId());
+    map.put("23752", hivMetadata.getHepaticSteatosisWithHyperlactataemiaConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  e.encounter_type IN ( ${6}, ${9}) "
+            + "       AND p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND o.voided = 0 "
+            + "       AND o.concept_id = ${2015}"
+            + "       AND o.value_coded IN ( ${23748}, ${6293}, ${23749}, ${29}, "
+            + "                              ${23750}, ${23751}, ${6299}, ${23752}) "
+            + "       AND e.encounter_datetime >= :startDate "
+            + "       AND e.encounter_datetime <= :endDate "
+            + "GROUP  BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
