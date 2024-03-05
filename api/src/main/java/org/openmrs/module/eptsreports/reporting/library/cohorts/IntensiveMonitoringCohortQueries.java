@@ -12,9 +12,11 @@ import org.openmrs.module.eptsreports.reporting.library.queries.QualityImproveme
 import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportConstants;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
+import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
+import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,8 @@ public class IntensiveMonitoringCohortQueries {
 
   private GenericCohortQueries genericCohortQueries;
 
+  private final EriDSDCohortQueries eriDSDCohortQueries;
+
   private final String MAPPING2 = "revisionEndDate=${revisionEndDate},location=${location}";
 
   private final String MAPPING3 =
@@ -52,7 +56,8 @@ public class IntensiveMonitoringCohortQueries {
       CommonMetadata commonMetadata,
       TbMetadata tbMetadata,
       GenericCohortQueries genericCohortQueries,
-      ResumoMensalCohortQueries resumoMensalCohortQueries) {
+      ResumoMensalCohortQueries resumoMensalCohortQueries,
+      EriDSDCohortQueries eriDSDCohortQueries) {
     this.qualityImprovement2020CohortQueries = qualityImprovement2020CohortQueries;
     this.hivMetadata = hivMetadata;
     this.commonCohortQueries = commonCohortQueries;
@@ -60,6 +65,7 @@ public class IntensiveMonitoringCohortQueries {
     this.tbMetadata = tbMetadata;
     this.genericCohortQueries = genericCohortQueries;
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
+    this.eriDSDCohortQueries = eriDSDCohortQueries;
   }
 
   @PostConstruct
@@ -3569,6 +3575,267 @@ public class IntensiveMonitoringCohortQueries {
   }
 
   /**
+   * <b>Categoria 15 Indicador 15.13 Denominador – Oferta / Início MDS</b>
+   * <li>incluindo todos os utentes que tiveram pelo menos uma consulta clínica (selecionar a
+   *     última) durante o período de avaliação.
+   * <li>filtrando os utentes com idade >= 2 anos (seguindo o critério definido no RF10) e que
+   *     iniciaram TARV há mais de 3 meses
+   * <li>excluindo mulheres grávidas durante o período de avaliação (seguindo os critérios definidos
+   *     no RF8)
+   * <li>excluindo mulheres lactantes durante o período de avaliação (seguindo os critérios
+   *     definidos no RF9)
+   * <li>excluindo os utentes com último resultado de CD4 (se existir) registado na “Ficha Clínica”
+   *     (coluna 15) abaixo de 200, ou seja, último “Resultado CD4” <= 200 excepto os utentes que
+   *     têm um registo de CV disponível na Ficha Clinica (último até “Data Fim de Avaliação”)
+   * <li>excluindo os utentes com último resultado de Carga Viral (se existir) registado na “Ficha
+   *     Clínica” (coluna 15) maior ou igual a 1000 cópias, ou seja, último “Resultado Carga Viral”
+   *     >= 1000
+   * <li>excluindo os utentes que já estejam em MDS para utente estável (seguindo os critérios
+   *     definidos no RF44)
+   * <li>excluindo os utentes que estão em tratamento de TB (seguindo os critérios definifod no RF45
+   * <li>excluindo os utentes que tiveram alguma reacção a medicação nos últimos 6 meses (seguindo
+   *     os critérios definidos no RF46)
+   * <li>excluindo os utentes que tiveram alguma vez Sarcoma de Kaposi (SK) (seguindo os critérios
+   *     definidos no RF47)
+   * <li>excluindo os utentes que reiniciaram o TARV nos últimos 3 meses (seguindo os critérios
+   *     definidos no RF48)
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getMI15Den13() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Denominator 15 - Pacientes elegíveis a MDS");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "end Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition Mq15A = getMI15A();
+    CohortDefinition Mq15B1 = getMI15B1();
+    CohortDefinition Mq15C = qualityImprovement2020CohortQueries.getMQ15CPatientsMarkedAsPregnant();
+    CohortDefinition Mq15D =
+        qualityImprovement2020CohortQueries.getMQ15DPatientsMarkedAsBreastfeeding();
+    CohortDefinition Mq15F = getMI15F();
+    CohortDefinition Mq15G = getMI15G();
+    CohortDefinition alreadyMds =
+        qualityImprovement2020CohortQueries.getPatientsAlreadyEnrolledInTheMdc();
+    CohortDefinition onTB = commonCohortQueries.getPatientsOnTbTreatment();
+    CohortDefinition onSK = qualityImprovement2020CohortQueries.getPatientsWithSarcomaKarposi();
+    CohortDefinition restartedTreatment = getPatientsWhoRestartedTreatment();
+    CohortDefinition finishedTbTreatment = getPatientsWhoFinishedTbTreatmentInLessThan30days();
+
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(
+            Mq15A, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "B1",
+        EptsReportUtils.map(
+            Mq15B1, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "C",
+        EptsReportUtils.map(
+            Mq15C,
+            "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-2m},location=${location}"));
+    cd.addSearch(
+        "D",
+        EptsReportUtils.map(
+            Mq15D,
+            "startDate=${revisionEndDate-20m+1d},endDate=${revisionEndDate-2m},location=${location}"));
+    cd.addSearch(
+        "F",
+        EptsReportUtils.map(
+            Mq15F, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch("G", EptsReportUtils.map(Mq15G, "endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "MDS",
+        EptsReportUtils.map(
+            alreadyMds, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "onTB", EptsReportUtils.map(onTB, "endDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "onSK", EptsReportUtils.map(onSK, "endDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "restartedTreatment",
+        EptsReportUtils.map(restartedTreatment, "endDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "adverseReaction",
+        EptsReportUtils.map(
+            genericCohortQueries.hasCodedObs(
+                hivMetadata.getAdverseReaction(),
+                BaseObsCohortDefinition.TimeModifier.ANY,
+                SetComparator.IN,
+                Arrays.asList(
+                    hivMetadata.getAdultoSeguimentoEncounterType(),
+                    hivMetadata.getPediatriaSeguimentoEncounterType()),
+                Arrays.asList(
+                    hivMetadata.getCytopeniaConcept(),
+                    hivMetadata.getPancreatitis(),
+                    hivMetadata.getNephrotoxicityConcept(),
+                    hivMetadata.getHepatitisConcept(),
+                    hivMetadata.getStevensJonhsonSyndromeConcept(),
+                    hivMetadata.getHypersensitivityToAbcOrRailConcept(),
+                    hivMetadata.getLacticAcidosis(),
+                    hivMetadata.getHepaticSteatosisWithHyperlactataemiaConcept())),
+            "onOrAfter=${revisionEndDate-6m},onOrBefore=${revisionEndDate},locationList=${location}"));
+
+    cd.addSearch(
+        "AGE",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnLastClinicalConsultation(2, null),
+            "onOrAfter=${revisionEndDate-2m+1d},onOrBefore=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "finishedTbTreatment",
+        EptsReportUtils.map(
+            finishedTbTreatment,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.setCompositionString(
+        "A AND B1 AND NOT (C OR D OR F OR G OR MDS OR onTB OR adverseReaction OR onSK OR restartedTreatment OR finishedTbTreatment) AND AGE");
+
+    return cd;
+  }
+
+  /**
+   * <b>Utentes que reiniciaram o TARV nos últimos 3 meses</b>
+   * <li>De todos os utentes activos em TARV “Data Fim avaliação” seguindo os critérios definidos no
+   *     “Resumo Mensal” Indicador B13, o sistema irá filtrar utentes que
+   * <li>tiveram interrupção no tratamento 3 meses antes do fim do período de avaliação (“Data fim
+   *     de avaliação” menos (-) 3 meses) (FR49) e
+   * <li>tiveram pelo menos 1 registo de levantamento no “FILA” ou na “Ficha Recepção - Levantou
+   *     ARV” nos últimos 3 meses do fim do períodio (“Data de levantamento ” >= “Data Fim de
+   *     Avaliação” menos (–) 3 meses e <= “Data Fim de Avaliação”)
+   * <li>O sistema irá excluir: Utentes Transferidos de outras Unidades Sanitárias nos últimos 3
+   *     meses (Data de transferência >= “Data Fim de Avaliação” menos(–) 3 meses e <= “Data Fim de
+   *     Avaliação”) (RF50)
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoRestartedTreatment() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Patients who returned to treatment");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
+    cd.addSearch(
+        "B13",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13(),
+            "endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "treatmentInterruption",
+        EptsReportUtils.map(
+            eriDSDCohortQueries.getPatientsWhoExperiencedInterruptionInTreatment(),
+            "endDate=${endDate-3m},location=${location}"));
+
+    cd.addSearch(
+        "filaOrDrugPickup",
+        EptsReportUtils.map(
+            eriDSDCohortQueries.getFilaOrDrugPickup(), "endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "transferredIn",
+        EptsReportUtils.map(
+            transferredIn,
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    cd.setCompositionString(
+        "(B13 and treatmentInterruption AND filaOrDrugPickup) AND NOT transferredIn");
+    return cd;
+  }
+
+  /**
+   * <b>Categoria 15 Indicador 15.13 Numerador – Oferta/Início MDS</b>
+   * <li>Incluindo todos os utentes seleccionados no Indicador 15.13 Denominador definido no RF35
+   *     (Categoria 15 Indicador 15.13 – Denominador Oferta/Início) e
+   * <li>Filtrando os utentes que têm o registo de início do MDS para utente estável na última
+   *     consulta decorrida há 12 meses (última “Data Consulta Clínica” >= “Data Fim de Avaliação” –
+   *     12 meses + 1dia e <= “Data Fim de Avaliação”), ou seja, registo de um MDC (MDC1 ou MDC2 ou
+   *     MDC3 ou MDC4 ou MDC5) como: “GA” e o respectivo “Estado” = “Início” ou “DT” e o respectivo
+   *     “Estado” = “Início” ou “DS” e o respectivo “Estado” = “Início” ou “APE” e o respectivo
+   *     “Estado” = “Início” ou “FR” e o respectivo “Estado” = “Início” ou “DD” e o respectivo
+   *     “Estado” = “Início” ou “DA” e o respectivo “Estado” = “Início”
+   * <li>Filtrando os utentes que têm o registo de “Tipo de Dispensa” = “DT” na última consulta
+   *     (“Ficha Clínica”) decorrida há 12 meses (última “Data Consulta Clínica” >= “Data Fim de
+   *     Avaliação” –12 meses+1dia e <= “Data Fim de Avaliação”) ou
+   * <li>Filtrando os utentes com registo de “Tipo de Dispensa” = “DS” na última consulta (“Ficha
+   *     Clínica”) decorrida há 12 meses (última “Data Consulta Clínica” >= “Data Fim de Avaliação”
+   *     –12 meses+1dia e <= “Data Fim de Avaliação”) ou
+   * <li>Filtrando os utentes com registo de “Tipo de Dispensa” = “DA” na última consulta (“Ficha
+   *     Clínica”) decorrida há 12 meses (última “Data Consulta Clínica” >= “Data Fim de Avaliação”
+   *     –12 meses+1dia e <= “Data Fim de Avaliação”) ou
+   * <li>Filtrando os utentes com registo de último levantamento na farmácia (FILA) há 12 meses
+   *     (última “Data Levantamento”>= “Data Fim de Avaliação” – 12 meses+1dia e <= “Data Fim de
+   *     Avaliação”) com próximo levantamento agendado para 83 a 97 dias (“Data Próximo
+   *     Levantamento” menos “Data Levantamento”>= 83 dias e <= 97 dias)
+   * <li>Filtrando os utentes com registo de último levantamento na farmácia (FILA) há 12 meses
+   *     (última “Data Levantamento”>= “Data Fim de Avaliação” – 12 meses+1dia e <= “Data Fim de
+   *     Avaliação”) com próximo levantamento agendado para 173 a 187 dias (“Data Próximo
+   *     Levantamento” menos “Data Levantamento”>= 173 dias e <= 187 dias).
+   * <li>Filtrando os utentes com registo de último levantamento na farmácia (FILA) há 12 meses
+   *     (última “Data Levantamento”>= “Data Fim de Avaliação” –12 meses+1dia e <= “Data Fim de
+   *     Avaliação”) com próximo levantamento agendado para 335 a 395 dias (“Data Próximo
+   *     Levantamento” menos “Data Levantamento”>= 335 dias e <= 395 dias)
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getMI15Nume13() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Numerator MQ 15 - Pacientes elegíveis a MDS");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "end Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition Mi15Den13 = getMI15Den13();
+
+    List<Integer> mdsConcepts =
+        Arrays.asList(
+            hivMetadata.getGaac().getConceptId(),
+            hivMetadata.getQuarterlyDispensation().getConceptId(),
+            hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
+            hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
+            hivMetadata.getRapidFlow().getConceptId(),
+            hivMetadata.getSemiannualDispensation().getConceptId());
+
+    List<Integer> states = Arrays.asList(hivMetadata.getStartDrugs().getConceptId());
+
+    CohortDefinition mds =
+        qualityImprovement2020CohortQueries
+            .getPatientsWhoHadMdsOnMostRecentClinicalAndPickupOnFilaFR36(mdsConcepts, states);
+
+    cd.addSearch(
+        "MQ15Den13",
+        EptsReportUtils.map(
+            Mi15Den13,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "MDS",
+        EptsReportUtils.map(mds, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("MQ15Den13 AND MDS");
+    return cd;
+  }
+
+  /**
    * <b>Utentes Transferidos Para Outra US</b>
    * <li>Último registo de [“Mudança Estado Permanência TARV” (Coluna 21) = “T” (Transferido Para)
    *     na “Ficha Clínica” com “Data da Consulta Actual” (Coluna 1, durante a qual se fez o registo
@@ -3631,6 +3898,77 @@ public class IntensiveMonitoringCohortQueries {
             + "                       AND o.value_coded = ${1706} "
             + "                GROUP  BY p.patient_id) transferout "
             + "        GROUP  BY transferout.patient_id) max_transferout ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Utentes que terminaram tratamento de TB há menos de 30 dias(Exclusão)</b>
+   * <li>Todos os utentes com último registo de Tratamento TB= Fim (F), com respectiva data de fim
+   *     de tratamento (“Data Fim TB”) numa consulta clínica (Ficha Clínica- MasterCard) ocorrida
+   *     até a “Data Recolha Dados” e
+   * <li>Sendo esta “Data Fim TB” ocorrida há menos de 30 dias da última consulta do período de
+   *     avaliação (“Data Última Consulta”), ou seja, “Data Última Consulta” menos (-) “Última
+   *     Consulta Fim TB” <= 30 dias.
+   *
+   *     <p><strong>Nota:</strong> A “Data Última Consulta” é a última “Data de Consulta” no período
+   *     compreendido entre: “Data Início Avaliação” = “Data de Recolha Dados” menos (-) 2 meses
+   *     mais (+) 1 dia “Data Fim Avaliação” = “Data de Recolha Dados” menos (-) 1 mês
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoFinishedTbTreatmentInLessThan30days() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes  que terminaram o Tratamento de TB há menos de 30 dias");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "end Date", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1268", hivMetadata.getTBTreatmentPlanConcept().getConceptId());
+    map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN (SELECT e.patient_id, "
+            + "                          MAX(e.encounter_datetime) AS most_recent "
+            + "                   FROM   encounter e "
+            + "                   WHERE  e.voided = 0 "
+            + "                          AND e.location_id = :location "
+            + "                          AND e.encounter_type = ${6} "
+            + "                          AND e.encounter_datetime >= :startDate "
+            + "                          AND e.encounter_datetime <= :endDate "
+            + "                   GROUP  BY e.patient_id) last_consultation "
+            + "               ON last_consultation.patient_id = p.patient_id "
+            + "       INNER JOIN (SELECT p.patient_id, "
+            + "                          MAX(o.obs_datetime) AS last_tb_treatment "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                  ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.location_id = :location "
+            + "                          AND e.encounter_type = ${6} "
+            + "                          AND o.concept_id = ${1268} "
+            + "                          AND o.value_coded = ${1267} "
+            + "                          AND e.encounter_datetime <= :revisionEndDate "
+            + "                   GROUP  BY p.patient_id) finished_treatment "
+            + "               ON finished_treatment.patient_id = p.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND TIMESTAMPDIFF(DAY, finished_treatment.last_tb_treatment, "
+            + "               last_consultation.most_recent) <= 30";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 

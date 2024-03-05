@@ -209,12 +209,15 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   /**
    * <b>DAH FR4 - Utentes com critério de CD4 para início de seguimento no Modelo de DAH </b>
    *
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultOverOrEqualTo5years()
-   *     getCd4ResultOverOrEqualTo5years OR
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBetweenOneAnd5years()
-   *     getCd4ResultBetweenOneAnd5years OR
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBellowOneYear()
-   *     getCd4ResultBellowOneYear
+   * @see
+   *     ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultDatesBasedOnAgesAndCd4Amounts(Integer,
+   *     boolean, Integer, Integer) getCd4ResultOverOrEqualTo5years OR
+   * @see
+   *     ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultDatesBasedOnAgesAndCd4Amounts(Integer,
+   *     boolean, Integer, Integer) getCd4ResultBetweenOneAnd5years OR
+   * @see
+   *     ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultDatesBasedOnAgesAndCd4Amounts(Integer,
+   *     boolean, Integer, Integer) getCd4ResultBellowOneYear
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithCD4CriteriaToStartFollowupOnDAH() {
@@ -229,19 +232,22 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     String Cd4ResultOverOrEqualTo5yearsPid =
         new EptsQueriesUtil()
             .patientIdQueryBuilder(
-                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultOverOrEqualTo5years())
+                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultDatesBasedOnAgesAndCd4Amounts(
+                    200, true, 5, null))
             .getQuery();
 
     String getCd4ResultBetweenOneAnd5yearsPid =
         new EptsQueriesUtil()
             .patientIdQueryBuilder(
-                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBetweenOneAnd5years())
+                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultDatesBasedOnAgesAndCd4Amounts(
+                    500, true, 1, 5))
             .getQuery();
 
     String getCd4ResultBellowOneYearPid =
         new EptsQueriesUtil()
             .patientIdQueryBuilder(
-                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBellowOneYear())
+                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultDatesBasedOnAgesAndCd4Amounts(
+                    750, true, null, 1))
             .getQuery();
 
     String query =
@@ -526,13 +532,11 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   /**
    * <b> A data do registo do resultado de CD4 (absoluto) durante o período de avaliação </b>
    *
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultOverOrEqualTo5years()
-   *     getCd4ResultOverOrEqualTo5years OR
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBetweenOneAnd5years()
-   *     getCd4ResultBetweenOneAnd5years OR
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBellowOneYear()
-   *     getCd4ResultBellowOneYear
-   * @return {@link CohortDefinition}
+   * @see
+   *     ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultDatesBasedOnAgesAndCd4Amounts(Integer,
+   *     boolean, Integer, Integer) getCd4ResultOverOrEqualTo5years OR
+   *     getCd4ResultBetweenOneAnd5years OR getCd4ResultBellowOneYear
+   * @return {@link DataDefinition}
    */
   public DataDefinition getCd4ResultDate() {
 
@@ -554,13 +558,11 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   /**
    * <b> Resultado de CD4 (absoluto) durante o período de avaliação </b>
    *
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultOverOrEqualTo5years()
-   *     getCd4ResultOverOrEqualTo5years OR
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBetweenOneAnd5years()
-   *     getCd4ResultBetweenOneAnd5years OR
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBellowOneYear()
-   *     getCd4ResultBellowOneYear
-   * @return {@link CohortDefinition}
+   * @see
+   *     ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultDatesBasedOnAgesAndCd4Amounts(Integer,
+   *     boolean, Integer, Integer) getCd4ResultOverOrEqualTo5years OR
+   *     getCd4ResultBetweenOneAnd5years OR getCd4ResultBellowOneYearss
+   * @return {@link DataDefinition}
    */
   public DataDefinition getCd4Result() {
 
@@ -572,9 +574,15 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
     String query =
         new EptsQueriesUtil()
-            .unionBuilder(listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultOverOrEqualTo5y())
-            .union(listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBetweenOneAnd5y())
-            .union(listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBellow1y())
+            .unionBuilder(
+                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBasedOnAgesAndCd4Amounts(
+                    200, 5, null))
+            .union(
+                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBasedOnAgesAndCd4Amounts(
+                    500, 1, 5))
+            .union(
+                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBasedOnAgesAndCd4Amounts(
+                    750, null, 1))
             .buildQuery();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);

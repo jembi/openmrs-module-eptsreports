@@ -79,212 +79,128 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
   }
 
   /**
-   *
+   * <b>registo do resultado de CD4 (absoluto) durante o período de avaliação </b>
    * <li>Utentes com registo do resultado de CD4 (absoluto) na “Ficha Clínica – Ficha Mestra” ou
    *     “Ficha Resumo – Ficha Mestra” ou “Ficha e-Lab” ou “Ficha de Laboratório” ou “Ficha de
    *     Doença Avançada por HIV”, durante o período de avaliação (“Data Resultado CD4” >= “Data
    *     Início Avaliação” e “Data Resultado CD4” <= “Data Fim Avaliação”) e com resultado CD4
-   *     (absoluto) < 200 e idade do utente >= 5 anos ou
+   *     (absoluto) ( < 200 e idade do utente >= 5 anos) ou ( < 500 e idade do utente >=1 ano e <5
+   *     anos ) ou (<750 e idade do utente <1 ano)
    *
    *     <p>Idade = Data Fim de Avaliação - Data de Nascimento
    *
+   * @param absoluteCd4Amount Amount of cd4 based on the age
+   * @param mostRecentDateOrCd4Result Flag to return Most Recent date or Cd4 Result
+   * @param minAge minimum age to check
+   * @param maxAge maximum age to check
    * @return {@link String}
    */
-  public String getCd4ResultOverOrEqualTo5years() {
-    return getPatientsWithCD4AbsoluteResultOnPeriodQuery(200, true)
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=5 "
-        + "  GROUP BY ps.person_id "
-        + " UNION "
-        + getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(200, true)
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=5 "
-        + "  GROUP BY ps.person_id ";
+  public String getCd4ResultDatesBasedOnAgesAndCd4Amounts(
+      Integer absoluteCd4Amount,
+      boolean mostRecentDateOrCd4Result,
+      Integer minAge,
+      Integer maxAge) {
+
+    String query =
+        getPatientsWithCD4AbsoluteResultOnPeriodQuery(absoluteCd4Amount, mostRecentDateOrCd4Result);
+
+    query = getAgeVerificationString(minAge, maxAge, query);
+
+    query += "  GROUP BY ps.person_id " + " UNION ";
+
+    query +=
+        getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(
+            absoluteCd4Amount, mostRecentDateOrCd4Result);
+
+    query = getAgeVerificationString(minAge, maxAge, query);
+
+    query += "  GROUP BY ps.person_id ";
+
+    return query;
   }
 
   /**
+   * <b>Adds the Age Calculation Based on the Age Bands</b>
    *
-   * <li>Utentes com registo do resultado de CD4 (absoluto) na “Ficha Clínica – Ficha Mestra” ou
-   *     “Ficha Resumo – Ficha Mestra” ou “Ficha e-Lab” ou “Ficha de Laboratório” ou “Ficha de
-   *     Doença Avançada por HIV”, durante o período de avaliação (“Data Resultado CD4” >= “Data
-   *     Início Avaliação” e “Data Resultado CD4” <= “Data Fim Avaliação”) e com resultado CD4
-   *     (absoluto) < 500 e idade do utente >= 1 ano e < 5 ou
-   *
-   *     <p>Idade = Data Fim de Avaliação - Data de Nascimento
-   *
+   * @param minAge minimum age to check
+   * @param maxAge maximum age to check
+   * @param query the SQL String to add age verification based on the age
    * @return {@link String}
    */
-  public String getCd4ResultBetweenOneAnd5years() {
-    return getPatientsWithCD4AbsoluteResultOnPeriodQuery(500, true)
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=1 "
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <5 "
-        + "  GROUP BY ps.person_id "
-        + " UNION "
-        + getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(500, true)
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=1 "
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <5 "
-        + "  GROUP BY ps.person_id ";
+  private String getAgeVerificationString(Integer minAge, Integer maxAge, String query) {
+    if (minAge != null && maxAge != null) {
+      query +=
+          " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >= "
+              + minAge
+              + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) < "
+              + maxAge;
+
+    } else if (minAge == null && maxAge != null) {
+      query += "  AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) < " + maxAge;
+    } else if (minAge != null && maxAge == null) {
+      query += " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >= " + minAge;
+    }
+    return query;
   }
 
   /**
+   * <b>Resultado de CD4 (absoluto) durante o período de avaliação</b>
    *
-   * <li>Utentes com registo do resultado de CD4 (absoluto) na “Ficha Clínica – Ficha Mestra” ou
-   *     “Ficha Resumo – Ficha Mestra” ou “Ficha e-Lab” ou “Ficha de Laboratório” ou “Ficha de
-   *     Doença Avançada por HIV”, durante o período de avaliação (“Data Resultado CD4” >= “Data
-   *     Início Avaliação” e “Data Resultado CD4” <= “Data Fim Avaliação”) e com resultado CD4
-   *     (absoluto) < 750 e idade do utente < 1 ou
-   *
-   *     <p>Idade = Data Fim de Avaliação - Data de Nascimento
-   *
+   * @param absoluteCd4Amount Amount of cd4 based on the age
+   * @param minAge minimum age to check
+   * @param maxAge maximum age to check
    * @return {@link String}
    */
-  public String getCd4ResultBellowOneYear() {
-    return getPatientsWithCD4AbsoluteResultOnPeriodQuery(750, true)
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <1 "
-        + "  GROUP BY ps.person_id "
-        + " UNION "
-        + getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(750, true)
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <1 "
-        + "  GROUP BY ps.person_id ";
-  }
+  public String getCd4ResultBasedOnAgesAndCd4Amounts(
+      Integer absoluteCd4Amount, Integer minAge, Integer maxAge) {
 
-  /**
-   * @see #getCd4ResultOverOrEqualTo5years()
-   * @return {@link String}
-   */
-  public String getCd4ResultOverOrEqualTo5y() {
-    return " SELECT ps.person_id, o.value_numeric as cd4  "
-        + "FROM   person ps  "
-        + "           INNER JOIN encounter e  "
-        + "                      ON ps.person_id = e.patient_id  "
-        + "           INNER JOIN obs o  "
-        + "                      ON e.encounter_id = o.encounter_id  "
-        + "INNER JOIN ( "
-        + getLastCd4ResultDateQueries()
-        + " ) last_cd4 ON last_cd4.person_id = ps.person_id  "
-        + " WHERE  ps.voided = 0  "
-        + "  AND e.voided = 0   "
-        + "  AND o.voided = 0  "
-        + "  AND e.encounter_type IN ( ${6}, ${13}, ${51} )  "
-        + "  AND o.concept_id = ${1695}  "
-        + "  AND o.value_numeric < 200  "
-        + "  AND Date(e.encounter_datetime) = last_cd4.most_recent  "
-        + "  AND e.location_id = :location "
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=5 "
-        + "  GROUP BY ps.person_id "
-        + " UNION "
-        + "  SELECT ps.person_id, o.value_numeric as cd4  "
-        + "FROM   person ps  "
-        + "           INNER JOIN encounter e  "
-        + "                      ON ps.person_id = e.patient_id  "
-        + "           INNER JOIN obs o  "
-        + "                      ON e.encounter_id = o.encounter_id  "
-        + "INNER JOIN ( "
-        + getLastCd4ResultDateQueries()
-        + " ) last_cd4 ON last_cd4.person_id = ps.person_id  "
-        + " WHERE  ps.voided = 0  "
-        + " AND e.voided = 0  "
-        + "  AND o.voided = 0  "
-        + "  AND e.encounter_type IN ( ${53}, ${90} )  "
-        + "  AND o.concept_id = ${1695}  "
-        + "  AND o.value_numeric < 200  "
-        + "  AND o.obs_datetime = last_cd4.most_recent  "
-        + "  AND e.location_id = :location "
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=5 "
-        + "  GROUP BY ps.person_id ";
-  }
+    String query =
+        " SELECT ps.person_id, o.value_numeric as cd4  "
+            + "FROM   person ps  "
+            + "           INNER JOIN encounter e  "
+            + "                      ON ps.person_id = e.patient_id  "
+            + "           INNER JOIN obs o  "
+            + "                      ON e.encounter_id = o.encounter_id  "
+            + "INNER JOIN ( "
+            + getLastCd4ResultDateQueries()
+            + " ) last_cd4 ON last_cd4.person_id = ps.person_id  "
+            + " WHERE  ps.voided = 0  "
+            + "  AND e.voided = 0   "
+            + "  AND o.voided = 0  "
+            + "  AND e.encounter_type IN ( ${6}, ${13}, ${51} )  "
+            + "  AND o.concept_id = ${1695}  "
+            + "  AND o.value_numeric <  "
+            + absoluteCd4Amount
+            + "  AND Date(e.encounter_datetime) = last_cd4.most_recent  "
+            + "  AND e.location_id = :location ";
 
-  /**
-   * @see #getCd4ResultBetweenOneAnd5years()
-   * @return {@link String}
-   */
-  public String getCd4ResultBetweenOneAnd5y() {
+    query = getAgeVerificationString(minAge, maxAge, query);
 
-    return " SELECT ps.person_id, o.value_numeric as cd4  "
-        + "FROM   person ps  "
-        + "           INNER JOIN encounter e  "
-        + "                      ON ps.person_id = e.patient_id  "
-        + "           INNER JOIN obs o  "
-        + "                      ON e.encounter_id = o.encounter_id  "
-        + "INNER JOIN ( "
-        + getLastCd4ResultDateQueries()
-        + " ) last_cd4 ON last_cd4.person_id = ps.person_id  "
-        + " WHERE  ps.voided = 0  "
-        + "  AND e.voided = 0   "
-        + "  AND o.voided = 0  "
-        + "  AND e.encounter_type IN ( ${6}, ${13}, ${51} )  "
-        + "  AND o.concept_id = ${1695}  "
-        + "  AND o.value_numeric < 500  "
-        + "  AND Date(e.encounter_datetime) = last_cd4.most_recent  "
-        + "  AND e.location_id = :location "
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=5 "
-        + "  GROUP BY ps.person_id "
-        + " UNION "
-        + "  SELECT ps.person_id, o.value_numeric as cd4  "
-        + "FROM   person ps  "
-        + "           INNER JOIN encounter e  "
-        + "                      ON ps.person_id = e.patient_id  "
-        + "           INNER JOIN obs o  "
-        + "                      ON e.encounter_id = o.encounter_id  "
-        + "INNER JOIN ( "
-        + getLastCd4ResultDateQueries()
-        + " ) last_cd4 ON last_cd4.person_id = ps.person_id  "
-        + " WHERE  ps.voided = 0  "
-        + " AND e.voided = 0  "
-        + "  AND o.voided = 0  "
-        + "  AND e.encounter_type IN ( ${53}, ${90} )  "
-        + "  AND o.concept_id = ${1695}  "
-        + "  AND o.value_numeric < 500  "
-        + "  AND o.obs_datetime = last_cd4.most_recent  "
-        + "  AND e.location_id = :location "
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) >=1 "
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <5 "
-        + "  GROUP BY ps.person_id ";
-  }
+    query += "  GROUP BY ps.person_id " + " UNION ";
 
-  /**
-   * @see #getCd4ResultBellowOneYear()
-   * @return {@link String}
-   */
-  public String getCd4ResultBellow1y() {
+    query +=
+        "  SELECT ps.person_id, o.value_numeric as cd4  "
+            + "FROM   person ps  "
+            + "           INNER JOIN encounter e  "
+            + "                      ON ps.person_id = e.patient_id  "
+            + "           INNER JOIN obs o  "
+            + "                      ON e.encounter_id = o.encounter_id  "
+            + "INNER JOIN ( "
+            + getLastCd4ResultDateQueries()
+            + " ) last_cd4 ON last_cd4.person_id = ps.person_id  "
+            + " WHERE  ps.voided = 0  "
+            + " AND e.voided = 0  "
+            + "  AND o.voided = 0  "
+            + "  AND e.encounter_type IN ( ${53}, ${90} )  "
+            + "  AND o.concept_id = ${1695}  "
+            + "  AND o.value_numeric <  "
+            + absoluteCd4Amount
+            + "  AND o.obs_datetime = last_cd4.most_recent  "
+            + "  AND e.location_id = :location ";
 
-    return " SELECT ps.person_id, o.value_numeric as cd4  "
-        + "FROM   person ps  "
-        + "           INNER JOIN encounter e  "
-        + "                      ON ps.person_id = e.patient_id  "
-        + "           INNER JOIN obs o  "
-        + "                      ON e.encounter_id = o.encounter_id  "
-        + "INNER JOIN ( "
-        + getLastCd4ResultDateQueries()
-        + " ) last_cd4 ON last_cd4.person_id = ps.person_id  "
-        + " WHERE  ps.voided = 0  "
-        + "  AND e.voided = 0   "
-        + "  AND o.voided = 0  "
-        + "  AND e.encounter_type IN ( ${6}, ${13}, ${51} )  "
-        + "  AND o.concept_id = ${1695}  "
-        + "  AND o.value_numeric < 750  "
-        + "  AND Date(e.encounter_datetime) = last_cd4.most_recent  "
-        + "  AND e.location_id = :location "
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <1 "
-        + "  GROUP BY ps.person_id "
-        + " UNION "
-        + "  SELECT ps.person_id, o.value_numeric as cd4  "
-        + "FROM   person ps  "
-        + "           INNER JOIN encounter e  "
-        + "                      ON ps.person_id = e.patient_id  "
-        + "           INNER JOIN obs o  "
-        + "                      ON e.encounter_id = o.encounter_id  "
-        + "INNER JOIN ( "
-        + getLastCd4ResultDateQueries()
-        + " ) last_cd4 ON last_cd4.person_id = ps.person_id  "
-        + " WHERE  ps.voided = 0  "
-        + " AND e.voided = 0  "
-        + "  AND o.voided = 0  "
-        + "  AND e.encounter_type IN ( ${53}, ${90} )  "
-        + "  AND o.concept_id = ${1695}  "
-        + "  AND o.value_numeric < 750  "
-        + "  AND o.obs_datetime = last_cd4.most_recent  "
-        + "  AND e.location_id = :location "
-        + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <1 "
-        + "  GROUP BY ps.person_id ";
+    query = getAgeVerificationString(minAge, maxAge, query);
+    query += "  GROUP BY ps.person_id ";
+    return query;
   }
 
   /**
@@ -1142,9 +1058,9 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
   public String getLastCd4ResultDateQueries() {
     String unionQuery =
         new EptsQueriesUtil()
-            .unionBuilder(getCd4ResultOverOrEqualTo5years())
-            .union(getCd4ResultBetweenOneAnd5years())
-            .union(getCd4ResultBellowOneYear())
+            .unionBuilder(getCd4ResultDatesBasedOnAgesAndCd4Amounts(200, true, 5, null))
+            .union(getCd4ResultDatesBasedOnAgesAndCd4Amounts(500, true, 1, 5))
+            .union(getCd4ResultDatesBasedOnAgesAndCd4Amounts(750, true, null, 1))
             .buildQuery();
 
     return " SELECT absolute_cd4.person_id, max(absolute_cd4.most_recent) AS most_recent FROM ( "

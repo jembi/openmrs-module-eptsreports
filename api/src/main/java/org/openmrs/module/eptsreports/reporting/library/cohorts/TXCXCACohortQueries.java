@@ -40,7 +40,7 @@ public class TXCXCACohortQueries {
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
-    cd.setName("TX f1srt Time Screened");
+    cd.setName("TX fisrt Time Screened");
 
     CohortDefinition totalPatientsCxcaScrnPositiveWithTreatment = getTotal();
     CohortDefinition patientsWithScreeningTestForCervicalCancerBeforeStartDate =
@@ -79,7 +79,6 @@ public class TXCXCACohortQueries {
         EptsReportUtils.map(
             patientsWithNegativeResultForScreeningTestBeforeReportingPeriod,
             "startDate=${startDate},location=${location}"));
-
     cd.setCompositionString(
         "totalPatientsCxcaScrnPositiveWithTreatment AND patientsWithNegativeResultForScreeningTestBeforeReportingPeriod");
 
@@ -99,11 +98,7 @@ public class TXCXCACohortQueries {
     cd.addSearch(
         "totalPatientsCxcaScrnPositiveWithTreatment",
         EptsReportUtils.map(totalPatientsCxcaScrnPositiveWithTreatment, MAPPINGS));
-    cd.addSearch(
-        "postTreatmentFollowUp",
-        EptsReportUtils.map(
-            postTreatmentFollowUp,
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch("postTreatmentFollowUp", EptsReportUtils.map(postTreatmentFollowUp, MAPPINGS));
 
     cd.setCompositionString("totalPatientsCxcaScrnPositiveWithTreatment AND postTreatmentFollowUp");
 
@@ -234,9 +229,7 @@ public class TXCXCACohortQueries {
         EptsReportUtils.map(patientsOnArtWithPositiveScreening, MAPPINGS));
     cd.addSearch(
         "patientsWhoReceivedATreatmentType",
-        EptsReportUtils.map(
-            patientsWhoReceivedATreatmentType,
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(patientsWhoReceivedATreatmentType, MAPPINGS));
 
     cd.setCompositionString(
         "patientsOnArtWithPositiveScreening AND patientsWhoReceivedATreatmentType");
@@ -530,12 +523,13 @@ public class TXCXCACohortQueries {
     map.put("2149", hivMetadata.getViaResultOnTheReferenceConcept().getConceptId());
     map.put("23970", hivMetadata.getLeepConcept().getConceptId());
     map.put("23973", hivMetadata.getconizationConcept().getConceptId());
+    map.put("1185", hivMetadata.getTreatmentConcept().getConceptId());
+    map.put("23974", hivMetadata.getCryotherapyConcept().getConceptId());
+    map.put("165439", hivMetadata.getTermoablationConcept().getConceptId());
+    map.put("23972", hivMetadata.getThermocoagulationConcept().getConceptId());
 
     String query =
-        "SELECT leep_conization.patient_id "
-            + "FROM   ( "
-            + "           SELECT     p.patient_id, "
-            + "                      Max(o.obs_datetime) "
+        " SELECT     p.patient_id "
             + "           FROM       patient p "
             + "                          INNER JOIN encounter e "
             + "                                     ON         e.patient_id = p.patient_id "
@@ -544,7 +538,7 @@ public class TXCXCACohortQueries {
             + "                          INNER JOIN "
             + "                      ( "
             + "                          SELECT     p.patient_id, "
-            + "                                     last_result.encounter_date AS last_positive_encounter "
+            + "                                     Max(o.obs_datetime) AS last_result_date "
             + "                          FROM       patient p "
             + "                                         INNER JOIN encounter e "
             + "                                                    ON         e.patient_id = p.patient_id "
@@ -553,41 +547,67 @@ public class TXCXCACohortQueries {
             + "                                         INNER JOIN "
             + "                                     ( "
             + "                                         SELECT     p.patient_id, "
-            + "                                                    Max(e.encounter_datetime) AS encounter_date "
+            + "                                                    last_result.encounter_date AS last_positive_encounter "
             + "                                         FROM       patient p "
             + "                                                        INNER JOIN encounter e "
             + "                                                                   ON         e.patient_id = p.patient_id "
             + "                                                        INNER JOIN obs o "
-            + "                                                                   ON         o.encounter_id =e.encounter_id "
+            + "                                                                   ON         o.encounter_id = e.encounter_id "
+            + "                                                        INNER JOIN "
+            + "                                                    ( "
+            + "                                                        SELECT     p.patient_id, "
+            + "                                                                   Max(e.encounter_datetime) AS encounter_date "
+            + "                                                        FROM       patient p "
+            + "                                                                       INNER JOIN encounter e "
+            + "                                                                                  ON         e.patient_id = p.patient_id "
+            + "                                                                       INNER JOIN obs o "
+            + "                                                                                  ON         o.encounter_id =e.encounter_id "
+            + "                                                        WHERE      p.voided = 0 "
+            + "                                                          AND        e.voided = 0 "
+            + "                                                          AND        o.voided = 0 "
+            + "                                                          AND        e.encounter_datetime BETWEEN :startDate AND        :endDate "
+            + "                                                          AND        e.location_id = :location "
+            + "                                                          AND        e.encounter_type = ${28} "
+            + "                                                          AND        o.concept_id = ${2094} "
+            + "                                                          AND        o.value_coded IN (${703}, "
+            + "                                                                                       ${2093}, "
+            + "                                                                                       ${664}) "
+            + "                                                        GROUP BY   p.patient_id) AS last_result "
+            + "                                                    ON         last_result.patient_id = p.patient_id "
             + "                                         WHERE      p.voided = 0 "
             + "                                           AND        e.voided = 0 "
             + "                                           AND        o.voided = 0 "
-            + "                                           AND        e.encounter_datetime BETWEEN :startDate AND        :endDate "
-            + "                                           AND        e.location_id = :location "
             + "                                           AND        e.encounter_type = ${28} "
+            + "                                           AND        e.encounter_datetime = last_result.encounter_date "
+            + "                                           AND        e.location_id = :location "
             + "                                           AND        o.concept_id = ${2094} "
-            + "                                           AND        o.value_coded IN (${703}, "
-            + "                                                                        ${2093}, "
-            + "                                                                        ${664}) "
-            + "                                         GROUP BY   p.patient_id) AS last_result "
-            + "                                     ON         last_result.patient_id = p.patient_id "
-            + "                          WHERE      p.voided = 0 "
-            + "                            AND        e.voided = 0 "
+            + "                                           AND        o.value_coded = ${703} "
+            + "                                         GROUP BY   p.patient_id ) positive_via "
+            + "                          where      p.voided = 0 "
             + "                            AND        o.voided = 0 "
             + "                            AND        e.encounter_type = ${28} "
-            + "                            AND        e.encounter_datetime = last_result.encounter_date "
             + "                            AND        e.location_id = :location "
-            + "                            AND        o.concept_id = ${2094} "
-            + "                            AND        o.value_coded = ${703} "
-            + "                          GROUP BY   p.patient_id ) positive_via "
-            + "WHERE      p.voided = 0 "
-            + "  AND        o.voided = 0 "
-            + "  AND        e.encounter_type = ${28} "
-            + "  AND        e.location_id = :location "
-            + "  AND        o.concept_id = ${2149} "
-            + "  AND        o.value_coded IN ( ${23970}, ${23973} ) "
-            + "  AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate "
-            + "  GROUP BY p.patient_id ) leep_conization";
+            + "                            AND        ( ( "
+            + "                                             o.concept_id = ${2149} "
+            + "                                                 AND        o.value_coded IN ( ${23974}, "
+            + "                                                                               ${23972}, "
+            + "                                                                               ${23970}, "
+            + "                                                                               ${23973} ) ) "
+            + "                              OR         ( "
+            + "                                             o.concept_id = ${1185} "
+            + "                                                 AND        o.value_coded IN ( ${23974}, "
+            + "                                                                               ${165439} ) ) ) "
+            + "                            AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate "
+            + "                          GROUP BY   p.patient_id ) last_treatment_type "
+            + "                      ON         last_treatment_type.patient_id = p.patient_id "
+            + "           WHERE      p.voided = 0 "
+            + "             AND        o.voided = 0 "
+            + "             AND        e.encounter_type = ${28} "
+            + "             AND        e.location_id = :location "
+            + "             AND        o.obs_datetime = last_treatment_type.last_result_date "
+            + "             AND        o.concept_id = ${2149} "
+            + "             AND        o.value_coded IN (${23970}, "
+            + "                                          ${23973}) ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
