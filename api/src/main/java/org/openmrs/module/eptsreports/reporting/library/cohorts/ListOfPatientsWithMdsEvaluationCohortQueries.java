@@ -746,7 +746,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     String query =
         "SELECT p.patient_id, "
-            + "                    Min(e.encounter_datetime) AS encounter_date "
+            + "                    MAX(e.encounter_datetime) AS encounter_date "
             + "             FROM   patient p "
             + "                    INNER JOIN encounter e "
             + "                            ON e.patient_id = p.patient_id "
@@ -767,7 +767,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "       AND o.concept_id = ${23722} "
             + "       AND o.value_coded = ${856} "
             + "       AND e.encounter_datetime >= art.art_encounter "
-            + "       AND e.encounter_datetime <= :endDate "
+            + "       AND e.encounter_datetime <= DATE_ADD(art.art_encounter, INTERVAL 12 MONTH) "
             + "             GROUP  BY p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -909,7 +909,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
 
-    String query = getFirstVlDateQuery();
+    String query = getLastVlDateQuery();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -918,9 +918,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     return sqlPatientDataDefinition;
   }
 
-  private String getFirstVlDateQuery() {
+  private String getLastVlDateQuery() {
     return "SELECT     p.patient_id, "
-        + "           MIN(e.encounter_datetime) AS first_vl_date  "
+        + "           MAX(e.encounter_datetime) AS last_vl_date  "
         + "FROM       patient p "
         + "INNER JOIN encounter e "
         + "ON         e.patient_id = p.patient_id "
@@ -946,7 +946,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
         + "                      AND        o.value_coded IS NOT NULL)) "
         + "AND        e.location_id = :location "
         + "AND        e.encounter_datetime >= art.art_encounter "
-        + "AND        e.encounter_datetime <= :endDate "
+        + "AND        e.encounter_datetime <= DATE_ADD(art.art_encounter, INTERVAL 12 MONTH) "
         + "AND        p.voided = 0 "
         + "AND        e.voided = 0 "
         + "AND        o.voided = 0 "
@@ -1004,7 +1004,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
         + "INNER JOIN obs oo "
         + "ON         oo.encounter_id = ee.encounter_id "
         + "INNER JOIN ( "
-        + getFirstVlDateQuery()
+        + getLastVlDateQuery()
         + " ) first_vl "
         + " ON first_vl.patient_id = second_vl.patient_id "
         + "WHERE second_vl.voided = 0 "
@@ -1023,7 +1023,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   }
 
   /**
-   * <b>RF18 - Data do resultado da 1a CV- B.2 (Coluna K)</b>
+   * <b>RF18 - Data do resultado da ultima CV- B.2 (Coluna K)</b>
    *
    * <p>O sistema irá determinar o Resultado da 1ª Carga Viral do utente seleccionando o primeiro
    * resultado de Carga Viral registado na primeira consulta clínica (Ficha Clínica) após o início
@@ -1040,7 +1040,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    */
   public DataDefinition getFirstViralLoadResult() {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("B3- Resultado da 1ª CV");
+    sqlPatientDataDefinition.setName("B3- Resultado da ultima CV");
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> map = new HashMap<>();
@@ -1063,8 +1063,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "ON         o.encounter_id = e.encounter_id "
             + "INNER JOIN "
             + "           ( "
-            + getFirstVlDateQuery()
-            + "                     ) first_vl ON first_vl.patient_id = p.patient_id "
+            + getLastVlDateQuery()
+            + "                     ) last_vl ON last_vl.patient_id = p.patient_id "
             + "       WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
@@ -1076,7 +1076,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                 o.concept_id = ${1305} "
             + "                      AND        o.value_coded IS NOT NULL)) "
             + "AND        e.location_id = :location "
-            + "AND        e.encounter_datetime = first_vl.first_vl_date "
+            + "AND        e.encounter_datetime = last_vl.last_vl_date "
             + "AND        p.voided = 0 "
             + "AND        e.voided = 0 "
             + "AND        o.voided = 0 "
