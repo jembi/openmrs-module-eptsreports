@@ -174,7 +174,7 @@ public class GenericCohortQueries {
         EptsReportUtils.map(
             generalSql(
                 "persons",
-                "SELECT p.patient_id FROM patient p JOIN person pn ON p.patient_id=pn.person_id WHERE p.voided=0 AND pn.voided=0 "),
+                "SELECT p.patient_id FROM patient p WHERE p.voided=0"),
             ""));
     cd.setCompositionString("base AND persons");
     return cd;
