@@ -375,8 +375,7 @@ public class TXCXCACohortQueries {
    *       between the most recent positive VIA result (TX_FR6) and the reporting period end date OR
    *   <li>have Qual foi o tratamento/avaliação no HdR = Crioterapia Feita” or “Termocoagulação
    *       Feita” or “Leep Feito” or “Conização Feita”) registered in Ficha de Registo Individual:
-   *       Rastreio dos Cancros do Colo do Útero e da Mama between the most recent positive VIA
-   *       result (TX_FR6) and the reporting period end date.
+   *       Rastreio dos Cancros do Colo do Útero e da Mama
    * </ul>
    *
    * <p>For patients who have more than one treatment registered during the reporting period, the
@@ -412,17 +411,17 @@ public class TXCXCACohortQueries {
     map.put("23972", hivMetadata.getThermocoagulationConcept().getConceptId());
     map.put("23970", hivMetadata.getLeepConcept().getConceptId());
     map.put("23973", hivMetadata.getconizationConcept().getConceptId());
+    map.put("23967", hivMetadata.getCryotherapyDateConcept().getConceptId());
 
     String query =
-        "SELECT     treatment.patient_id "
-            + "FROM ( "
-            + "SELECT     p.patient_id, "
-            + "     MAX(o.obs_datetime) AS last_treatment_result_date "
+        "SELECT     p.patient_id "
             + "FROM       patient p "
             + "               INNER JOIN encounter e "
             + "                          ON         e.patient_id = p.patient_id "
             + "               INNER JOIN obs o "
             + "                          ON         o.encounter_id = e.encounter_id "
+            + "               INNER JOIN obs o2 "
+            + "                          ON         o2.encounter_id = e.encounter_id "
             + "               INNER JOIN "
             + "           ( "
             + "               SELECT     p.patient_id, "
@@ -464,22 +463,15 @@ public class TXCXCACohortQueries {
             + "               GROUP BY   p.patient_id ) positive_via "
             + "WHERE      p.voided = 0 "
             + "  AND        o.voided = 0 "
+            + "  AND        o2.voided = 0 "
             + "  AND        e.encounter_type = ${28} "
             + "  AND        e.location_id = :location "
-            + "  AND        ( ( "
-            + "                   o.concept_id = ${1185} "
-            + "                       AND        o.value_coded IN ( ${23974}, "
-            + "                                                      ${165439} ) "
-            + "                       AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate) "
-            + "    OR         ( "
-            + "                   o.concept_id = ${2149} "
-            + "                       AND        o.value_coded IN ( ${23974}, "
-            + "                                                      ${23972}, "
-            + "                                                      ${23970}, "
-            + "                                                      ${23973} ) "
-            + "                       AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate) ) "
-            + "GROUP BY p.patient_id "
-            + "           ) treatment";
+            + "  AND        ( "
+            + "            ( (o.concept_id = ${1185} AND  o.value_coded IN ( ${23974}, ${165439} ) ) "
+            + "        AND           ( o2.concept_id = ${23967} and o2.value_datetime BETWEEN positive_via.last_positive_encounter AND  :endDate) ) "
+            + "    OR         ( o.concept_id = ${2149}  AND   o.value_coded IN ( ${23974},  ${23972},  ${23970}, ${23973} ) ) "
+            + "             ) "
+            + "GROUP BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
