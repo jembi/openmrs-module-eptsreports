@@ -108,21 +108,21 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     //  SECÇÃO B
     //  12 MESES DEPOIS DO INÍCIO DO TARV: ELIGIBILIDADE A MDS
 
-    // B.1 - Data do pedido da 1ª CV - Sheet 1: Column J
+    // B.1 - Data do ultima CV - Sheet 1: Column J
     pdd.addColumn(
         "first_cv_date",
         listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoad(),
         endDateMappings,
         new GeneralDateConverter());
 
-    // B.2 - Data de registo do resultado da 1ª CV - Sheet 1: Column K
+    // B.2 - Data de registo do resultado da última CV - Sheet 1: Column K
     pdd.addColumn(
         "first_cv_result_date",
         listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoadResultDate(),
         endDateMappings,
         new GeneralDateConverter());
 
-    // B.3 - Resultado da 1ª CV - Sheet 1: Column L
+    // B.3 - Resultado da última CV - Sheet 1: Column L
     pdd.addColumn(
         "first_cv_result",
         listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoadResult(),
@@ -273,7 +273,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // TARV?: Coluna AH
     pdd.addColumn(
         "tb_screening_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionB(3, 9, true),
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionB(0, 12, true),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
