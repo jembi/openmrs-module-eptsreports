@@ -4019,7 +4019,7 @@ public class ResumoMensalCohortQueries {
             + "                                                                 GROUP  BY last_next_pick_up.patient_id) AS "
             + "                                              last_next_scheduled_pick_up "
             + "                                                                ON last_next_scheduled_pick_up.patient_id = p.patient_id "
-            + "                                          WHERE  last_next_scheduled_pick_up.max_datetame < :onOrBefore ) "
+            + "                                          WHERE  last_next_scheduled_pick_up.max_datetame > :onOrBefore ) "
             + "GROUP  BY transferred_out.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
