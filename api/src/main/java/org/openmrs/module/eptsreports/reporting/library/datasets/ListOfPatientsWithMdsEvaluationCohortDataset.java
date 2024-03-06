@@ -281,7 +281,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // ao 12˚ mês de TARV Coluna AK
     pdd.addColumn(
         "pb_imc_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionB(3, 9, false),
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionB(0, 12, false),
         endDateMappings,
         new NotApplicableIfNullConverter());
 

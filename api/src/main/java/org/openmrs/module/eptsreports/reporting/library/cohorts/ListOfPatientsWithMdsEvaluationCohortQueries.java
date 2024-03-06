@@ -780,12 +780,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   /**
    * <b>Data do pedido da CV de seguimento- C.1 (coluna AP)</b>
    *
-   * <p>O sistema irá determinar a Data do Pedido da CV de seguimento do utente identificando a data
-   * da consulta clínica (Ficha Clínica), após o início TARV (Data Início TARV), na qual foi
-   * efectuado o registo registo do Pedido de Carga Viral, após o registo do primeiro resultado de
-   * carga viral, na consulta clínica (Ficha Clínica) ocorrida após o início TARV. Ou seja, “Data
-   * Pedido CV Seguimento”> “Data Primeiro Resultado CV”, sendo “Data Primeiro Resultado CV>”Data
-   * Início TARV”.<br>
+   * <p>O sistema irá determinar a Data do Pedido da CV da  CV entre 12º e 24º mês de TARV
+   * identificando a consulta clínica (Ficha Clínica), com registo do Pedido de Carga Viral,
+   * e ocorrida entre 12º e 24º mês de TARV ou seja, “Data Consulta Pedido CV ” > “Data Início TARV” + 12 meses e
+   * <= “Data Início TARV” + 24 meses <br>
    * <br>
    *
    * <p>Nota A “Data Início TARV” é definida no RF61 <br>
@@ -829,44 +827,25 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     String query =
         "                   SELECT p.patient_id, "
-            + "                          Min(ee.encounter_datetime) AS encounter_date "
+            + "                          MAX(ee.encounter_datetime) AS encounter_date "
             + "                   FROM   patient p "
             + "                            INNER JOIN encounter ee "
             + "                              ON ee.patient_id = p.patient_id "
             + "                            INNER JOIN obs o "
             + "                              ON o.encounter_id = ee.encounter_id "
-            + "                          INNER JOIN (SELECT pa.patient_id, "
-            + "                                             Min(enc.encounter_datetime) AS "
-            + "                                             encounter_date "
-            + "                                      FROM   patient pa "
-            + "                                             INNER JOIN encounter enc "
-            + "                                                     ON enc.patient_id = "
-            + "                                                        pa.patient_id "
-            + "                                             INNER JOIN obs "
-            + "                                                     ON obs.encounter_id = "
-            + "                                                        enc.encounter_id "
-            + "                                             INNER JOIN ( "
+            + "                          INNER JOIN ( "
             + "                           SELECT art_patient.patient_id, "
             + "                                  art_patient.first_pickup AS art_encounter "
             + "                           FROM   ( "
             + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
             + "                           ) art_patient "
             + " ) art ON art.patient_id = pa.patient_id "
-            + "       WHERE  pa.voided = 0 "
-            + "       AND enc.voided = 0 "
-            + "       AND obs.voided = 0 "
-            + "       AND enc.encounter_type = ${6} "
-            + "       AND enc.location_id = :location "
-            + "       AND  ( (obs.concept_id = ${856} AND obs.value_numeric IS NOT NULL)  "
-            + "               OR (obs.concept_id = ${1305}  AND obs.value_coded IS NOT NULL) ) "
-            + "       AND enc.encounter_datetime > art.art_encounter "
-            + "       GROUP  BY pa.patient_id) first_encounter "
-            + "       ON first_encounter.patient_id = p.patient_id "
             + "       WHERE  p.voided = 0 "
             + "       AND  ee.voided = 0 "
             + "       AND  o.voided = 0 "
             + "       AND  ee.encounter_type = ${6} "
-            + "       AND  ee.encounter_datetime > first_encounter.encounter_date "
+            + "       AND  ee.encounter_datetime > DATE_ADD(art.art_encounter, INTERVAL 12 MONTH ) "
+            + "       AND  ee.encounter_datetime <= DATE_ADD(art.art_encounter, INTERVAL 24 MONTH ) "
             + "       AND o.concept_id = ${23722} "
             + "       AND o.value_coded = ${856} "
             + "       GROUP BY p.patient_id";
@@ -954,12 +933,12 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   }
 
   /**
-   * <b>RF33 - Data de registo do resultado da CV de Seguimento: (coluna AQ) - Resposta= Data do
-   * resultado da 1ª Carga Viral</b>
+   * <b>RF33 - Data de registo Registo do Resultado da  CV entre 12º e 24º mês do TARV</b>
    *
    * <p>O sistema irá determinar a Data do Resultado da CV de seguimento do utente identificando a
-   * data da consulta clínica (Ficha Clínica), após o início TARV (Data Início TARV), na qual foi
-   * efectuado o registo de segundo resultado da Carga Viral. <br>
+   * data da consulta clínica (Ficha Clínica), na qual foi efectuado o registo do
+   * resultado da Carga Viral, e ocorrida entre 12º e 24º mês de TARV, ou seja, “Data Consulta
+   * Resultado CV” > “Data Início TARV” + 12 meses e <= “Data Início TARV” + 24 meses.<br>
    * <br>
    *
    * <p>Nota 1: A “Data Início TARV” é definida no RF61. <br>
@@ -986,7 +965,35 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
 
-    String query = getSecondVlResultDateQuery();
+    String query =
+            " SELECT     second_vl.patient_id, "
+                    + "           MAX(ee.encounter_datetime) AS vl_date  "
+                    + "FROM       patient second_vl "
+                    + "INNER JOIN encounter ee "
+                    + "ON         ee.patient_id = second_vl.patient_id "
+                    + "INNER JOIN obs o "
+                    + "ON         o.encounter_id = ee.encounter_id "
+                    + "                          INNER JOIN ( "
+                    + "                           SELECT art_patient.patient_id, "
+                    + "                                  art_patient.first_pickup AS art_encounter "
+                    + "                           FROM   ( "
+                    + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
+                    + "                           ) art_patient "
+                    + " ) art ON art.patient_id = pa.patient_id "
+                    + "       WHERE  p.voided = 0 "
+                    + "       AND  ee.voided = 0 "
+                    + "       AND  o.voided = 0 "
+                    + "       AND  ee.encounter_type = ${6} "
+                    + "       AND  ee.encounter_datetime > DATE_ADD(art.art_encounter, INTERVAL 12 MONTH ) "
+                    + "       AND  ee.encounter_datetime <= DATE_ADD(art.art_encounter, INTERVAL 24 MONTH ) "
+                    + "AND        ee.location_id = :location "
+                    + "AND        ( ( "
+                    + "                                 o.concept_id= ${856} "
+                    + "                         AND     o.value_numeric IS NOT NULL ) "
+                    + "           OR         ( "
+                    + "                                 o.concept_id = ${1305} "
+                    + "                      AND        o.value_coded IS NOT NULL)) "
+                    + "GROUP BY   second_vl.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
