@@ -436,7 +436,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11DEN(6),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageInMonths54=9m-");
+        "ageBasedOnArt54=<2");
     // 11.7
     dataSetDefinition.addColumn(
         "MI11DEN7",
@@ -508,7 +508,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11NUM(6),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageInMonths54=9m-");
+        "ageBasedOnArt54=<2");
     // 11.7
     dataSetDefinition.addColumn(
         "MI11NUM7",
