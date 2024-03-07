@@ -1297,7 +1297,7 @@ public class TXTBCohortQueries {
         "(art-list AND (tb-screening OR tb-investigation OR tb-investigation-negative OR started-tb-treatment OR in-tb-program OR pulmonary-tb OR marked-as-tb-treatment-start "
             + "OR (tuberculosis-symptomys OR active-tuberculosis OR tb-observations OR application-for-laboratory-research OR tb-genexpert-test OR tb-genexpert-lab-test OR tb-xpert-mtb OR culture-test OR culture-test-lab "
             + "OR test-tb-lam OR test-tb-lam-lab OR test-bk OR x-ray-chest) OR result-for-basiloscopia)) "
-            + "NOT ((transferred-out NOT (started-tb-treatment OR in-tb-program)) OR started-tb-treatment-previous-period OR in-tb-program-previous-period OR pulmonary-tb-date OR marked-as-tratamento-tb-inicio)");
+            + "NOT ((transferred-out NOT (marked-as-tb-treatment-start OR started-tb-treatment OR pulmonary-tb OR in-tb-program)) OR started-tb-treatment-previous-period OR in-tb-program-previous-period OR pulmonary-tb-date OR marked-as-tratamento-tb-inicio)");
 
     return definition;
   }
@@ -1860,14 +1860,15 @@ public class TXTBCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getSmearMicroscopyOnlyPositiveResult() {
+  public CohortDefinition getSmearMicroscopyOnlyPositiveResult(boolean txTbOrTb4) {
     CohortDefinition cd =
         getSmearMicroscopyOnlyPositve(
             hivMetadata.getMisauLaboratorioEncounterType(),
             hivMetadata.getAdultoSeguimentoEncounterType(),
             hivMetadata.getApplicationForLaboratoryResearch(),
             hivMetadata.getResultForBasiloscopia(),
-            commonMetadata.getPositive());
+            commonMetadata.getPositive(),
+            txTbOrTb4);
     return cd;
   }
 
@@ -1878,14 +1879,15 @@ public class TXTBCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getSmearMicroscopyOnlyNegativeResult() {
+  public CohortDefinition getSmearMicroscopyOnlyNegativeResult(boolean txTbOrTb) {
     CohortDefinition cd =
         getSmearMicroscopyOnlyPositve(
             hivMetadata.getMisauLaboratorioEncounterType(),
             hivMetadata.getAdultoSeguimentoEncounterType(),
             hivMetadata.getApplicationForLaboratoryResearch(),
             hivMetadata.getResultForBasiloscopia(),
-            commonMetadata.getNegative());
+            commonMetadata.getNegative(),
+            txTbOrTb);
     return cd;
   }
 
@@ -2300,7 +2302,8 @@ public class TXTBCohortQueries {
       EncounterType fichaClinica,
       Concept applicationForLaboratoryResearch,
       Concept basiloscopiaExam,
-      Concept positive) {
+      Concept positive,
+      Boolean txtbOrTb4) {
 
     CohortDefinition basiloscopiaCohort =
         genericCohortQueries.generalSql(
@@ -2337,7 +2340,10 @@ public class TXTBCohortQueries {
         EptsReportUtils.map(applicationForLaboratoryResearchCohort, generalParameterMapping));
 
     definition.setCompositionString(
-        "basiloscopiaCohort OR basiloscopiaLabCohort OR applicationForLaboratoryResearchCohort");
+        txtbOrTb4
+            ? "basiloscopiaCohort OR basiloscopiaLabCohort"
+            : "basiloscopiaCohort OR basiloscopiaLabCohort OR applicationForLaboratoryResearchCohort");
+
     return definition;
   }
 
@@ -2445,7 +2451,7 @@ public class TXTBCohortQueries {
       Concept mtbTest,
       Concept positive,
       Concept yes) {
-
+    // genxpert both sources
     CohortDefinition genexpertTestCohort =
         genericCohortQueries.generalSql(
             "genexpertTestCohort",
@@ -2460,8 +2466,7 @@ public class TXTBCohortQueries {
                 laboratory, genexpertTest, Arrays.asList(positive)));
     addGeneralParameters(genexpertLabTestCohort);
 
-    CohortDefinition basiloscopiaExamCohort = getSmearMicroscopyOnlyPositiveResult();
-
+    CohortDefinition basiloscopiaExamCohort = getSmearMicroscopyOnlyPositiveResult(true);
     CohortDefinition tbLamTestCohort =
         genericCohortQueries.generalSql(
             "tbLamTestCohort",

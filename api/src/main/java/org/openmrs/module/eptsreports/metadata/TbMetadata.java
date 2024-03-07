@@ -723,4 +723,19 @@ public class TbMetadata extends ProgramsMetadata {
             .getGlobalProperty("eptsreports.extraPulmonaryTbConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 1118</b> NOT DONE
+   *
+   * <p><b>Name:</b> NOT DONE
+   *
+   * <p><b>Description:</b> NOT DONE Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getNotDoneConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.noteDoneConceptUuid");
+    return getConcept(uuid);
+  }
 }

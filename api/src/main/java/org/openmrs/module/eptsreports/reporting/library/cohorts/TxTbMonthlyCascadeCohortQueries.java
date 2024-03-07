@@ -588,7 +588,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     CohortDefinition dontHaveApplication4LaboratoryResearchOnOnthers =
         getPatientsDontHaveApplication4LaboratoryResearchOnOnthers();
     CohortDefinition dontHaveGeneXpertOnOnthers = getPatientsDontHaveGeneXpertOnOnthers();
-    CohortDefinition semearPositive = txtbCohortQueries.getSmearMicroscopyOnlyPositiveResult();
+    CohortDefinition semearPositive = txtbCohortQueries.getSmearMicroscopyOnlyPositiveResult(false);
     CohortDefinition tbLam = getPetientsHaveTBLAM();
     CohortDefinition mwrdPositive = getPatientsGeneXpertMtbRif(tbMetadata.getPositiveConcept());
     CohortDefinition mwrdNegative = getPatientsGeneXpertMtbRif(tbMetadata.getNegativeConcept());
@@ -653,7 +653,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     CohortDefinition dontHaveApplication4LaboratoryResearchOnOnthers =
         getPatientsDontHaveApplication4LaboratoryResearchOnOnthers();
     CohortDefinition dontHaveGeneXpertOnOnthers = getPatientsDontHaveGeneXpertOnOnthers();
-    CohortDefinition semearNegative = txtbCohortQueries.getSmearMicroscopyOnlyNegativeResult();
+    CohortDefinition semearNegative = txtbCohortQueries.getSmearMicroscopyOnlyNegativeResult(false);
     CohortDefinition tbLam = getPetientsHaveTBLAM();
     CohortDefinition mwrdNegative = getPatientsGeneXpertMtbRif(tbMetadata.getNegativeConcept());
 

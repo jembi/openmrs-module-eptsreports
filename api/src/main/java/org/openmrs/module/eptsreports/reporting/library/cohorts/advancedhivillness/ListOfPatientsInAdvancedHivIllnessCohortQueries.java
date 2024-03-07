@@ -65,7 +65,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
    * <li>Utentes com critério de CD4 para início de seguimento no Modelo de DAH OR
    * <li>Utentes com critério de Estadiamento para início de seguimento do Modelo dee DAH Excluindo
    *     todos os utentes que:
-   * <li>tenham iniciado um Modelo de DAH antes da data de início do período de avaliação
+   * <li>tenham iniciado um Modelo de DAH ate 12 meses antes da data de início do período de
+   *     avaliação
    * <li>tenham sido transferidos para outra unidade sanitária até o fim do período de avaliação
    *
    * @see #getPatientsWhoStartedFollowupOnDAH(boolean) getPatientsWhoStartedFollowupOnDAH
@@ -119,56 +120,6 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   }
 
   /**
-   * <b>Total de Utentes Eligiveis a MDS de DAH</b>
-   * <li>Utentes com critério de CD4 para início de seguimento no Modelo de DAH OR
-   * <li>Utentes com critério de Estadiamento para início de seguimento do Modelo de DAH
-   * <li>Excluindo todos os utentes que:
-   * <li>tenham iniciado um Modelo de DAH antes da data de início do período de avaliação
-   * <li>tenham sido transferidos para outra unidade sanitária até o fim do período de avaliação
-   *
-   * @see #getPatientsWithCD4CriteriaToStartFollowupOnDAH()
-   *     getPatientsWithCD4CriteriaToStartFollowupOnDAH
-   * @see #getPatientsWithCriterioEstadiamentoInicioSeguimento()
-   *     getPatientsWithCriterioEstadiamentoInicioSeguimento
-   * @return {@link CohortDefinition}
-   */
-  public CohortDefinition getTotalOfPatientsWithCriteriaToStartFollowupOfDAH() {
-
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-
-    cd.setName("Lista de Utentes com critérios para iniciar o seguimento do Modelo de DAH");
-    cd.addParameters(getCohortParameters());
-
-    cd.addSearch(
-        "CD4", EptsReportUtils.map(getPatientsWithCD4CriteriaToStartFollowupOnDAH(), mappings));
-
-    cd.addSearch(
-        "ESTADIO",
-        EptsReportUtils.map(getPatientsWithCriterioEstadiamentoInicioSeguimento(), mappings));
-
-    cd.addSearch(
-        "BASECOHORT",
-        EptsReportUtils.map(
-            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
-
-    // EXCLUSIONS
-    cd.addSearch(
-        "FOLLOWUPBEFORESTARTDATE",
-        EptsReportUtils.map(getPatientsWhoStartedFollowupOnDAH(false), mappings));
-
-    cd.addSearch(
-        "TRANSFERREDOUT",
-        EptsReportUtils.map(
-            getPatientsTransferredOutByTheEndOfPeriod(),
-            "endDate=${endDate},location=${location}"));
-
-    cd.setCompositionString(
-        "((CD4 OR ESTADIO) AND BASECOHORT) AND NOT (FOLLOWUPBEFORESTARTDATE OR TRANSFERREDOUT)");
-
-    return cd;
-  }
-
-  /**
    * <b>Total de utentes em MDS de DAH </b>
    * <li>Utentes que iniciaram o seguimento do Modelo de DAH OR
    * <li>Excluindo todos os utentes que:
@@ -216,6 +167,11 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
    * - encounter_datetime) na Ficha de DAH (encounter type = 90) durante o período de avaliação, ou
    * seja, “Data Início DAH” >= “Data Início Avaliação” e “Data Início DAH” <= “Data Fim Avaliação”
    *
+   * <p>Utentes com registo do “Início de Seguimento no Modelo de Doença Avançada” (Data Início DAH
+   * * - encounter_datetime) na Ficha de DAH (encounter type = 90) ate 12 meses antes da data de
+   * início, ou * seja, “Data Início DAH” >= “Data Início Avaliação” - 12 meses e “Data Início DAH”
+   * < “Data Início Avaliação”
+   *
    * @param duringThePeriod Flag to change the evaluation period
    * @return {@link CohortDefinition}
    */
@@ -238,7 +194,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
         duringThePeriod
             ? "  AND e.encounter_datetime >= :startDate "
                 + "  AND e.encounter_datetime <= :endDate "
-            : " AND e.encounter_datetime <= :startDate ";
+            : "  AND e.encounter_datetime >= DATE_SUB(:startDate, INTERVAL 12 MONTH) "
+                + " AND e.encounter_datetime < :startDate ";
 
     query += "  AND e.location_id = :location " + "GROUP BY p.patient_id";
 
@@ -252,12 +209,15 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   /**
    * <b>DAH FR4 - Utentes com critério de CD4 para início de seguimento no Modelo de DAH </b>
    *
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultOverOrEqualTo5years()
-   *     getCd4ResultOverOrEqualTo5years OR
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBetweenOneAnd5years()
-   *     getCd4ResultBetweenOneAnd5years OR
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBellowOneYear()
-   *     getCd4ResultBellowOneYear
+   * @see
+   *     ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultDatesBasedOnAgesAndCd4Amounts(Integer,
+   *     boolean, Integer, Integer) getCd4ResultOverOrEqualTo5years OR
+   * @see
+   *     ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultDatesBasedOnAgesAndCd4Amounts(Integer,
+   *     boolean, Integer, Integer) getCd4ResultBetweenOneAnd5years OR
+   * @see
+   *     ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultDatesBasedOnAgesAndCd4Amounts(Integer,
+   *     boolean, Integer, Integer) getCd4ResultBellowOneYear
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithCD4CriteriaToStartFollowupOnDAH() {
@@ -272,19 +232,22 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     String Cd4ResultOverOrEqualTo5yearsPid =
         new EptsQueriesUtil()
             .patientIdQueryBuilder(
-                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultOverOrEqualTo5years())
+                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultDatesBasedOnAgesAndCd4Amounts(
+                    200, true, 5, null))
             .getQuery();
 
     String getCd4ResultBetweenOneAnd5yearsPid =
         new EptsQueriesUtil()
             .patientIdQueryBuilder(
-                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBetweenOneAnd5years())
+                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultDatesBasedOnAgesAndCd4Amounts(
+                    500, true, 1, 5))
             .getQuery();
 
     String getCd4ResultBellowOneYearPid =
         new EptsQueriesUtil()
             .patientIdQueryBuilder(
-                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBellowOneYear())
+                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultDatesBasedOnAgesAndCd4Amounts(
+                    750, true, null, 1))
             .getQuery();
 
     String query =
@@ -569,13 +532,11 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   /**
    * <b> A data do registo do resultado de CD4 (absoluto) durante o período de avaliação </b>
    *
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultOverOrEqualTo5years()
-   *     getCd4ResultOverOrEqualTo5years OR
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBetweenOneAnd5years()
-   *     getCd4ResultBetweenOneAnd5years OR
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBellowOneYear()
-   *     getCd4ResultBellowOneYear
-   * @return {@link CohortDefinition}
+   * @see
+   *     ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultDatesBasedOnAgesAndCd4Amounts(Integer,
+   *     boolean, Integer, Integer) getCd4ResultOverOrEqualTo5years OR
+   *     getCd4ResultBetweenOneAnd5years OR getCd4ResultBellowOneYear
+   * @return {@link DataDefinition}
    */
   public DataDefinition getCd4ResultDate() {
 
@@ -585,13 +546,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
     Map<String, Integer> map = getStringIntegerMap();
 
-    String query =
-        new EptsQueriesUtil()
-            .unionBuilder(
-                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultOverOrEqualTo5years())
-            .union(listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBetweenOneAnd5years())
-            .union(listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBellowOneYear())
-            .buildQuery();
+    String query = listOfPatientsOnAdvancedHivIllnessQueries.getLastCd4ResultDateQueries();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -603,13 +558,11 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   /**
    * <b> Resultado de CD4 (absoluto) durante o período de avaliação </b>
    *
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultOverOrEqualTo5years()
-   *     getCd4ResultOverOrEqualTo5years OR
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBetweenOneAnd5years()
-   *     getCd4ResultBetweenOneAnd5years OR
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBellowOneYear()
-   *     getCd4ResultBellowOneYear
-   * @return {@link CohortDefinition}
+   * @see
+   *     ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultDatesBasedOnAgesAndCd4Amounts(Integer,
+   *     boolean, Integer, Integer) getCd4ResultOverOrEqualTo5years OR
+   *     getCd4ResultBetweenOneAnd5years OR getCd4ResultBellowOneYearss
+   * @return {@link DataDefinition}
    */
   public DataDefinition getCd4Result() {
 
@@ -621,9 +574,15 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
     String query =
         new EptsQueriesUtil()
-            .unionBuilder(listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultOverOrEqualTo5y())
-            .union(listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBetweenOneAnd5y())
-            .union(listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBellow1y())
+            .unionBuilder(
+                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBasedOnAgesAndCd4Amounts(
+                    200, 5, null))
+            .union(
+                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBasedOnAgesAndCd4Amounts(
+                    500, 1, 5))
+            .union(
+                listOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBasedOnAgesAndCd4Amounts(
+                    750, null, 1))
             .buildQuery();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -796,7 +755,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "WHERE  ps.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
-            + " AND e.encounter_type IN ( ${6}, ${13}, ${51}, ${90} ) "
+            + " AND e.encounter_type IN ( ${6}, ${13}, ${51} ) "
             + "                 AND o.concept_id = ${1695} "
             + "             AND o.value_numeric IS NOT NULL "
             + "             AND DATE(e.encounter_datetime) = last_cd4.most_recent "
@@ -819,7 +778,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + " ) result GROUP BY result.person_id "
             + " ) last_cd4 ON last_cd4.person_id = ps.person_id "
             + "WHERE ps.voided = 0 AND e.voided = 0 AND o.voided = 0 "
-            + "  AND e.encounter_type = ${53} "
+            + "  AND e.encounter_type IN (${53}, ${90}) "
             + "  AND o.concept_id = ${1695} "
             + "  AND o.value_numeric IS NOT NULL "
             + "  AND o.obs_datetime = last_cd4.most_recent "
@@ -1192,9 +1151,14 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
    * <li>utentes com último registo de “Mudança Estado Permanência TARV” = “Transferido Para” na
    *     Ficha Resumo com “Data da Transferência” <= “Data Fim”;
    *
-   *     <p>excepto os utentes que tenham tido uma consulta clínica (Ficha Clínica) ou levantamento
-   *     de ARV (FILA) após a “Data de Transferência” (a data mais recente entre os critérios acima
-   *     identificados) e até “Data Fim”;
+   *     <p>excepto os utentes que tenham tido uma consulta levantamento de ARV (FILA) após a “Data
+   *     de Transferência” (a data mais recente entre os critérios acima identificados) e até “Data
+   *     Fim”;
+   *
+   *     <p>excepto os utentes que tenham a data mais recente entre:
+   * <li>a “Data Próximo Levantamento” registado no último FILA antes da “Data Fim” e
+   * <li>a última “Data de Levantamento” registada até a “Data Fim” na Ficha Recepção/Levantou ARV,
+   *     adicionando 30 dias
    *
    * @return {@link CohortDefinition}
    */
@@ -1219,6 +1183,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             .getProgramWorkflowStateId());
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
 
     String query =
         listOfPatientsOnAdvancedHivIllnessQueries.getPatientsWhoSuspendedTarvOrAreTransferredOut(
@@ -1242,9 +1208,9 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
    *     programa Pré-TARV) com “Data de Transferência” <= “Data Fim”; ou
    * <li>inscrito como “Transferido de” (1o estado de inscrição) no serviço TARV-TRATAMENTO
    *     (inscrição programa TARV) com “Data de Transferência” <= “Data Fim”; ou
-   * <li>registado no formulário “Ficha de Resumo” como “Transferido de outra US”, opção “Pré-TARV”
-   *     ou “TARV” selecionada; e com “Data de Abertura da Ficha na US” “<= “Data Fim”; Resposta=
-   *     Não, se o utente não está nos criterios acima
+   * <li>registado no formulário “Ficha de Resumo” como “Transferido de outra US”, e com “Data de
+   *     Abertura da Ficha na US” “<= “Data Fim”; Resposta= Não, se o utente não está nos criterios
+   *     acima
    *
    * @return {@link DataDefinition}
    */
@@ -1271,9 +1237,6 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
     map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
-    map.put("6275", hivMetadata.getPreTarvConcept().getConceptId());
-    map.put("6276", hivMetadata.getArtStatus().getConceptId());
-    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
     map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
@@ -1307,20 +1270,16 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "        GROUP  BY p.patient_id "
             + "        UNION "
             + "        SELECT e.patient_id, "
-            + "               o3.obs_datetime AS transferred_date "
+            + "               o2.obs_datetime AS transferred_date "
             + "        FROM   encounter e "
             + "               INNER JOIN obs o  ON o.encounter_id = e.encounter_id "
             + "               INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
-            + "               INNER JOIN obs o3 ON o3.encounter_id = e.encounter_id "
             + "        WHERE  e.voided = 0 "
             + "               AND o.voided = 0 "
             + "               AND o2.voided = 0 "
-            + "               AND o3.voided = 0 "
             + "               AND e.encounter_type = ${53} "
             + "               AND ( o.concept_id = ${1369} AND o.value_coded = ${1065} ) "
-            + "               AND ( o2.concept_id = ${6300} "
-            + "                     AND o2.value_coded IN ( ${6275}, ${6276} ) ) "
-            + "               AND ( o3.concept_id = ${23891} AND o3.obs_datetime <= :endDate ) "
+            + "               AND ( o2.concept_id = ${23891} AND o2.obs_datetime <= :endDate ) "
             + "               AND e.location_id = :location "
             + "        GROUP  BY e.patient_id) transferred_in "
             + "GROUP  BY transferred_in.patient_id";
@@ -1340,15 +1299,19 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
    * <li>Resposta = “Óbito”, os utentes em TARV que foram óbito
    * <li>Resposta = “Suspenso”, os utentes em TARV que suspenderam o tratamento
    * <li>Resposta = “Activo”, os utentes activos em TARV
+   * <li>Resposta = “Reinício”, os utentes marcados como Reinício
    *
    * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsWhoAbandonedTarvQuery(boolean)
-   *     getPatientsWhoAbandonedTarvQuery
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsWhoDied(boolean) getPatientsWhoDied
+   *     Definition of patients who Abandoned Tarv
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsWhoDied(boolean) Definition of
+   *     patients Died
    * @see
    *     ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsWhoSuspendedTarvOrAreTransferredOut(int,
-   *     int, boolean, boolean) getPatientsWhoSuspendedTarvOrAreTransferredOut
-   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsActiveOnTarv()
-   *     getPatientsActiveOnTarv
+   *     int, boolean, boolean) Definition of patients who Suspended Tarv Or Are Transferred Out
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsActiveOnTarv() Definition of patients
+   *     who Suspended Tarv Or Are Active on Art
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getPatientsWhoRestartedTreatment(boolean)
+   *     Definition of patients who restarted
    * @return {@link DataDefinition}
    */
   public DataDefinition getLastStateOfStayOnTarv() {
@@ -1390,6 +1353,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     map.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("1709", hivMetadata.getSuspendedTreatmentConcept().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
 
     String query =
         new EptsQueriesUtil()
@@ -1406,6 +1370,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
                         false,
                         false))
             .union(listOfPatientsOnAdvancedHivIllnessQueries.getPatientsActiveOnTarv())
+            .union(listOfPatientsOnAdvancedHivIllnessQueries.getPatientsWhoRestartedTreatment(true))
             .buildQuery();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
