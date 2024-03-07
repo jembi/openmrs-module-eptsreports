@@ -2615,7 +2615,12 @@ public class TXTBCohortQueries {
             genericCohortQueries.getAgeOnReportEndDate(10, 200),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
-    cd.setCompositionString("XRAY AND AGE");
+    cd.addSearch(
+        "DENOMINATOR",
+        EptsReportUtils.map(
+            getDenominator(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("DENOMINATOR AND XRAY AND AGE");
     return cd;
   }
 
