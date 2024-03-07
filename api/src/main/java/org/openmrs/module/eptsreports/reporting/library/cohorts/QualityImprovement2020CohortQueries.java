@@ -3678,7 +3678,7 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * H2- Another consultation (Encounter_datetime (from encounter type 35)) > “1st consultation”
+   * H2- Another consultation (Encounter_datetime (from encounter type 35)) >= “1st consultation”
    * (oldest date from H1)+20 days and <=“1st consultation” (oldest date from H1)+33days
    *
    * @param vlQuantity Quantity of viral load to evaluate
@@ -3734,7 +3734,7 @@ public class QualityImprovement2020CohortQueries {
             + " WHERE p.voided = 0  "
             + "    AND e.voided = 0 "
             + "    AND e.encounter_type = ${35} "
-            + "    AND e.encounter_datetime > DATE_ADD(h1.encounter_datetime, INTERVAL 20 DAY)  "
+            + "    AND e.encounter_datetime >= DATE_ADD(h1.encounter_datetime, INTERVAL 20 DAY)  "
             + "         AND e.encounter_datetime <= DATE_ADD(h1.encounter_datetime, INTERVAL 33 DAY) "
             + "    AND e.location_id = :location ";
 
@@ -3745,7 +3745,7 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * H3- Another consultation (Encounter_datetime (from encounter type 35)) > “2nd consultation”
+   * H3- Another consultation (Encounter_datetime (from encounter type 35)) >= “2nd consultation”
    * (oldest date from H2)+20 days and <=“2nd consultation” (oldest date from H2)+33days
    *
    * @param vlQuantity Quantity of viral load to evaluate
@@ -3806,14 +3806,14 @@ public class QualityImprovement2020CohortQueries {
             + "                     WHERE p.voided = 0  "
             + "                        AND e.voided = 0 "
             + "                        AND e.encounter_type = ${35} "
-            + "                        AND e.encounter_datetime > DATE_ADD(h1.encounter_datetime, INTERVAL 20 DAY)  "
+            + "                        AND e.encounter_datetime >= DATE_ADD(h1.encounter_datetime, INTERVAL 20 DAY)  "
             + "                             AND e.encounter_datetime <= DATE_ADD(h1.encounter_datetime, INTERVAL 33 DAY) "
             + "                        AND e.location_id = :location "
             + "                ) h2 ON h2.patient_id = p.patient_id "
             + " WHERE p.voided = 0  "
             + "    AND e.voided = 0 "
             + "    AND e.encounter_type = ${35} "
-            + "    AND e.encounter_datetime > DATE_ADD(h2.encounter_datetime, INTERVAL 20 DAY)  "
+            + "    AND e.encounter_datetime >= DATE_ADD(h2.encounter_datetime, INTERVAL 20 DAY)  "
             + "         AND e.encounter_datetime <= DATE_ADD(h2.encounter_datetime, INTERVAL 33 DAY) "
             + "    AND e.location_id = :location ";
 
@@ -4014,45 +4014,26 @@ public class QualityImprovement2020CohortQueries {
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition b1 = getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsFirstLine_B1();
-
-    CohortDefinition b2 = getB2_13(useE53);
-
-    CohortDefinition b4 =
-        QualityImprovement2020Queries.getMQ13DenB4_P4(
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getHivViralLoadConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId(),
-            commonMetadata.getPregnantConcept().getConceptId());
-
-    CohortDefinition b5 =
-        QualityImprovement2020Queries.getMQ13DenB5_P4(
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getHivViralLoadConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId(),
-            commonMetadata.getBreastfeeding().getConceptId());
-
-    CohortDefinition f = getTranferredOutPatients();
-    CohortDefinition h = getMQC11NH();
-
     if (reportSource.equals(EptsReportConstants.MIMQ.MQ)) {
-      compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(b1, MAPPING1));
-      compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(b2, MAPPING1));
-      compositionCohortDefinition.addSearch("B4", EptsReportUtils.map(b4, MAPPING));
-      compositionCohortDefinition.addSearch("B5", EptsReportUtils.map(b5, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
-      compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING));
+
+      compositionCohortDefinition.addSearch(
+          "DENOMINATOR",
+          EptsReportUtils.map(getMQC11DEN(2, EptsReportConstants.MIMQ.MQ), MAPPING1));
+
+      compositionCohortDefinition.addSearch("H", EptsReportUtils.map(getMQC11NH(), MAPPING));
+
     } else if (reportSource.equals(EptsReportConstants.MIMQ.MI)) {
-      compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(b1, MAPPING5));
-      compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(b2, MAPPING8));
-      compositionCohortDefinition.addSearch("B4", EptsReportUtils.map(b4, MAPPING8));
-      compositionCohortDefinition.addSearch("B5", EptsReportUtils.map(b5, MAPPING8));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING9));
-      compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING8));
+
+      compositionCohortDefinition.addSearch(
+          "DENOMINATOR",
+          EptsReportUtils.map(
+              getMQC11DEN(2, EptsReportConstants.MIMQ.MI),
+              "revisionEndDate=${revisionEndDate},location=${location}"));
+
+      compositionCohortDefinition.addSearch("H", EptsReportUtils.map(getMQC11NH(), MAPPING8));
     }
 
-    compositionCohortDefinition.setCompositionString(
-        "((B2 AND H AND (B1 OR B5)) AND NOT (B4 OR F))");
+    compositionCohortDefinition.setCompositionString("DENOMINATOR AND H");
 
     return compositionCohortDefinition;
   }
@@ -4491,7 +4472,7 @@ public class QualityImprovement2020CohortQueries {
 
     if (den == 1 || den == 2) {
       comp.setCompositionString(
-          "(startedART AND breastfeeding AND ADULT) NOT (pregnant OR transferredIn OR transferredOut)");
+          "startedART AND (breastfeeding OR ADULT) NOT (pregnant OR transferredIn OR transferredOut)");
     }
     if (den == 5 || den == 6) {
       comp.setCompositionString(
@@ -4905,28 +4886,6 @@ public class QualityImprovement2020CohortQueries {
     comp.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     comp.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition startedART = getMOHArtStartDate();
-
-    CohortDefinition pregnant =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getPregnantConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
-
-    CohortDefinition breastfeeding =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getBreastfeeding().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
-
-    CohortDefinition transferredIn =
-        QualityImprovement2020Queries.getTransferredInPatients(
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-            hivMetadata.getPatientFoundYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId());
-
-    CohortDefinition transferredOut = commonCohortQueries.getTranferredOutPatients();
-
     CohortDefinition returnedForAnyConsultationOrPickup =
         QualityImprovement2020Queries.getMQ12NumH(
             20,
@@ -4975,19 +4934,12 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getArtPickupConcept().getConceptId(),
             hivMetadata.getArtDatePickupMasterCard().getConceptId());
 
-    comp.addSearch("startedART", EptsReportUtils.map(startedART, MAPPING));
-
-    comp.addSearch("pregnant", EptsReportUtils.map(pregnant, MAPPING));
-
-    comp.addSearch("breastfeeding", EptsReportUtils.map(breastfeeding, MAPPING));
-
-    comp.addSearch(
-        "transferredIn",
-        EptsReportUtils.map(
-            transferredIn,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
-
-    comp.addSearch("transferredOut", EptsReportUtils.map(transferredOut, MAPPING1));
+    CohortDefinition mi12Den1 = getMQ12DEN(1);
+    CohortDefinition mi12Den2 = getMQ12DEN(2);
+    CohortDefinition mi12Den5 = getMQ12DEN(5);
+    CohortDefinition mi12Den6 = getMQ12DEN(6);
+    CohortDefinition mi12Den9 = getMQ12DEN(9);
+    CohortDefinition mi12Den10 = getMQ12DEN(10);
 
     comp.addSearch(
         "H",
@@ -5013,35 +4965,53 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
-        "CHILDREN",
+        "mi12Den1",
         EptsReportUtils.map(
-            genericCohortQueries.getAgeOnMOHArtStartDate(0, 14, true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            mi12Den1,
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
-        "ADULT",
+        "mi12Den2",
         EptsReportUtils.map(
-            genericCohortQueries.getAgeOnMOHArtStartDate(15, null, false),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            mi12Den2,
+            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    comp.addSearch(
+        "mi12Den5",
+        EptsReportUtils.map(
+            mi12Den5,
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    comp.addSearch(
+        "mi12Den6",
+        EptsReportUtils.map(
+            mi12Den6,
+            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    comp.addSearch(
+        "mi12Den9",
+        EptsReportUtils.map(
+            mi12Den9,
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    comp.addSearch(
+        "mi12Den10",
+        EptsReportUtils.map(
+            mi12Den10,
+            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     if (den == 1) {
-      comp.setCompositionString(
-          "((startedART AND breastfeeding AND ADULT) NOT (pregnant OR transferredIn OR transferredOut)) AND H");
+      comp.setCompositionString("mi12Den1 AND H");
     } else if (den == 2) {
-      comp.setCompositionString(
-          "((startedART AND breastfeeding AND ADULT) NOT (pregnant OR transferredIn OR transferredOut)) AND I AND II AND III");
+      comp.setCompositionString("mi12Den2 AND I AND II AND III");
     } else if (den == 5) {
-      comp.setCompositionString(
-          "(startedART AND NOT (pregnant OR breastfeeding OR transferredIn OR transferredOut)) AND H");
+      comp.setCompositionString("mi12Den5 AND H");
     } else if (den == 6) {
-      comp.setCompositionString(
-          "(startedART AND NOT (pregnant OR breastfeeding OR transferredIn OR transferredOut)) AND I AND II AND III");
+      comp.setCompositionString("mi12Den6 AND I AND II AND III");
     } else if (den == 9) {
-      comp.setCompositionString(
-          "((startedART AND pregnant) AND NOT (transferredIn OR transferredOut)) AND H ");
+      comp.setCompositionString("mi12Den9 AND H ");
     } else if (den == 10) {
-      comp.setCompositionString(
-          "((startedART AND pregnant) AND NOT (transferredIn OR transferredOut)) AND I AND II AND III ");
+      comp.setCompositionString("mi12Den10 AND I AND II AND III");
     }
     return comp;
   }
@@ -6538,10 +6508,10 @@ public class QualityImprovement2020CohortQueries {
   /**
    * 13.15. % de MG elegíveis a CV com registo de pedido de CV feito pelo clínico (MG que iniciaram
    * TARV na CPN) Denominator: # de MG com registo de início do TARV na CPN dentro do período de
-   * inclusão. (Line 90,Column F in the Template) as following: <code>
-   * (A and B1) and NOT (D or F) and Age >= 15*</code>
+   * inclusão. as following: <code>
+   * (startedART AND pregnant) AND NOT (abandoned OR transferredOut </code>
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getgetMQC13P2DenMGInIncluisionPeriod() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -6553,48 +6523,21 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition startedART = getMOHArtStartDate();
 
-    CohortDefinition transferOut = getTranferredOutPatients();
-
-    CohortDefinition breastfeeding =
-        commonCohortQueries.getMohMQPatientsOnCondition(
-            true,
-            false,
-            "once",
-            hivMetadata.getMasterCardEncounterType(),
-            commonMetadata.getBreastfeeding(),
-            Collections.singletonList(hivMetadata.getYesConcept()),
-            null,
-            null);
-
+    CohortDefinition transferredOut = getTranferredOutPatients();
     CohortDefinition pregnant =
         commonCohortQueries.getMOHPregnantORBreastfeeding(
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
 
-    CohortDefinition transferredIn =
-        QualityImprovement2020Queries.getTransferredInPatients(
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-            hivMetadata.getPatientFoundYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId());
-
     CohortDefinition pregnantAbandonedDuringPeriod =
         getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt();
 
-    cd.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
-    cd.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
-    cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
-    cd.addSearch(
-        "E",
-        EptsReportUtils.map(
-            transferredIn,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
-    cd.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
+    cd.addSearch("startedART", EptsReportUtils.map(startedART, MAPPING));
+    cd.addSearch("pregnant", EptsReportUtils.map(pregnant, MAPPING));
+    cd.addSearch("transferredOut", EptsReportUtils.map(transferredOut, MAPPING1));
+    cd.addSearch("abandoned", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING1));
 
-    cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING1));
-
-    cd.setCompositionString("((A AND C) AND NOT (ABANDONED OR E OR F))");
+    cd.setCompositionString("((startedART AND pregnant) AND NOT (abandoned OR transferredOut))");
 
     return cd;
   }
@@ -7169,12 +7112,13 @@ public class QualityImprovement2020CohortQueries {
   /**
    * 13.15. % de MG elegíveis a CV com registo de pedido de CV feito pelo clínico (MG que iniciaram
    * TARV na CPN) (Line 90 in the template) Numerator (Column E in the Template) as following:
-   * <code>(A and B1 and H) and NOT (D or F) and Age >= 15*</code>
+   * <code>(startedART AND pregnant AND investLab) AND NOT (abandoned OR transferredOut)</code>
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getMQC13P2Num1() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("13.15 - MG elegíveis a CV com registo de pedido de CV");
     cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
     cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -7185,43 +7129,19 @@ public class QualityImprovement2020CohortQueries {
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
 
-    CohortDefinition transfOut = getTranferredOutPatients();
-
-    CohortDefinition breastfeeding =
-        commonCohortQueries.getMohMQPatientsOnCondition(
-            true,
-            false,
-            "once",
-            hivMetadata.getMasterCardEncounterType(),
-            commonMetadata.getBreastfeeding(),
-            Collections.singletonList(hivMetadata.getYesConcept()),
-            null,
-            null);
-
-    CohortDefinition transferredIn =
-        QualityImprovement2020Queries.getTransferredInPatients(
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-            hivMetadata.getPatientFoundYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId());
+    CohortDefinition transferredOut = getTranferredOutPatients();
 
     CohortDefinition pregnantAbandonedDuringPeriod =
         getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt();
 
-    cd.addSearch("A", EptsReportUtils.map(getMOHArtStartDate(), MAPPING));
-    cd.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
-    cd.addSearch(
-        "E",
-        EptsReportUtils.map(
-            transferredIn,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
-    cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
-    cd.addSearch("H", EptsReportUtils.map(getMQC13P2DenB3(), MAPPING));
+    cd.addSearch("startedART", EptsReportUtils.map(getMOHArtStartDate(), MAPPING));
+    cd.addSearch("pregnant", EptsReportUtils.map(pregnant, MAPPING));
+    cd.addSearch("transferredOut", EptsReportUtils.map(transferredOut, MAPPING1));
+    cd.addSearch("investLab", EptsReportUtils.map(getMQC13P2DenB3(), MAPPING));
+    cd.addSearch("abandoned", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING1));
 
-    cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING1));
-
-    cd.setCompositionString("((A AND C AND H) AND NOT (ABANDONED OR E OR F))");
+    cd.setCompositionString(
+        "((startedART AND pregnant AND investLab) AND NOT (abandoned OR transferredOut))");
     return cd;
   }
 
@@ -9197,99 +9117,6 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
-  public CohortDefinition getMI15Den13() {
-
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Denominator 15 - Pacientes elegíveis a MDS");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "end Date", Date.class));
-    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    CohortDefinition Mq15A = intensiveMonitoringCohortQueries.getMI15A();
-    CohortDefinition Mq15B1 = intensiveMonitoringCohortQueries.getMI15B1();
-    CohortDefinition Mq15C = getMQ15CPatientsMarkedAsPregnant();
-    CohortDefinition Mq15D = getMQ15DPatientsMarkedAsBreastfeeding();
-    CohortDefinition Mq15F = intensiveMonitoringCohortQueries.getMI15F();
-    CohortDefinition Mq15G = intensiveMonitoringCohortQueries.getMI15G();
-    CohortDefinition alreadyMds = getPatientsAlreadyEnrolledInTheMdc();
-    CohortDefinition onTB = commonCohortQueries.getPatientsOnTbTreatment();
-    CohortDefinition onSK = getPatientsWithSarcomaKarposi();
-    CohortDefinition returned = eriDSDCohortQueries.getPatientsWhoReturned();
-
-    cd.addSearch(
-        "A",
-        EptsReportUtils.map(
-            Mq15A, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "B1",
-        EptsReportUtils.map(
-            Mq15B1, "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "C",
-        EptsReportUtils.map(
-            Mq15C,
-            "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-2m},location=${location}"));
-    cd.addSearch(
-        "D",
-        EptsReportUtils.map(
-            Mq15D,
-            "startDate=${revisionEndDate-20m+1d},endDate=${revisionEndDate-2m},location=${location}"));
-    cd.addSearch(
-        "F",
-        EptsReportUtils.map(
-            Mq15F, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch("G", EptsReportUtils.map(Mq15G, "endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "MDS",
-        EptsReportUtils.map(
-            alreadyMds, "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "onTB", EptsReportUtils.map(onTB, "endDate=${revisionEndDate},location=${location}"));
-
-    cd.addSearch(
-        "onSK", EptsReportUtils.map(onSK, "endDate=${revisionEndDate},location=${location}"));
-
-    cd.addSearch(
-        "returned",
-        EptsReportUtils.map(returned, "endDate=${revisionEndDate},location=${location}"));
-
-    cd.addSearch(
-        "adverseReaction",
-        EptsReportUtils.map(
-            genericCohortQueries.hasCodedObs(
-                hivMetadata.getAdverseReaction(),
-                BaseObsCohortDefinition.TimeModifier.ANY,
-                SetComparator.IN,
-                Arrays.asList(
-                    hivMetadata.getAdultoSeguimentoEncounterType(),
-                    hivMetadata.getPediatriaSeguimentoEncounterType()),
-                Arrays.asList(
-                    hivMetadata.getCytopeniaConcept(),
-                    hivMetadata.getPancreatitis(),
-                    hivMetadata.getNephrotoxicityConcept(),
-                    hivMetadata.getHepatitisConcept(),
-                    hivMetadata.getStevensJonhsonSyndromeConcept(),
-                    hivMetadata.getHypersensitivityToAbcOrRailConcept(),
-                    hivMetadata.getLacticAcidosis(),
-                    hivMetadata.getHepaticSteatosisWithHyperlactataemiaConcept())),
-            "onOrAfter=${revisionEndDate-6m},onOrBefore=${revisionEndDate},locationList=${location}"));
-
-    cd.addSearch(
-        "AGE",
-        EptsReportUtils.map(
-            genericCohortQueries.getAgeOnLastClinicalConsultation(2, null),
-            "onOrAfter=${revisionEndDate-2m+1d},onOrBefore=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
-
-    cd.setCompositionString(
-        "A AND B1 AND NOT (C OR D OR F OR G OR MDS OR onTB OR adverseReaction OR onSK OR returned) AND AGE");
-
-    return cd;
-  }
-
   public CohortDefinition getMQ15NumeratorMDS() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Numerator MQ 15 - Pacientes elegíveis a MDS");
@@ -9334,44 +9161,6 @@ public class QualityImprovement2020CohortQueries {
             ageCohortQueries.createXtoYAgeCohort("Ages", 2, 200), "effectiveDate=${endDate}"));
 
     cd.setCompositionString("MQ15DenMDS AND MDS AND AGE");
-    return cd;
-  }
-
-  public CohortDefinition getMI15Nume13() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Numerator MQ 15 - Pacientes elegíveis a MDS");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "end Date", Date.class));
-    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    CohortDefinition Mi15Den13 = getMI15Den13();
-
-    List<Integer> mdsConcepts =
-        Arrays.asList(
-            hivMetadata.getGaac().getConceptId(),
-            hivMetadata.getQuarterlyDispensation().getConceptId(),
-            hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
-            hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
-            hivMetadata.getRapidFlow().getConceptId(),
-            hivMetadata.getSemiannualDispensation().getConceptId());
-
-    List<Integer> states = Arrays.asList(hivMetadata.getStartDrugs().getConceptId());
-
-    CohortDefinition mds =
-        getPatientsWhoHadMdsOnMostRecentClinicalAndPickupOnFilaFR36(mdsConcepts, states);
-
-    cd.addSearch(
-        "MQ15Den13",
-        EptsReportUtils.map(
-            Mi15Den13,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-
-    cd.addSearch(
-        "MDS",
-        EptsReportUtils.map(mds, "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.setCompositionString("MQ15Den13 AND MDS");
     return cd;
   }
 
@@ -12814,7 +12603,6 @@ public class QualityImprovement2020CohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("21190", commonMetadata.getRegimenAlternativeToFirstLineConcept().getConceptId());
-    map.put("23898", commonMetadata.getAlternativeLineConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id "
@@ -12823,14 +12611,12 @@ public class QualityImprovement2020CohortQueries {
             + "               ON e.patient_id = p.patient_id "
             + "       INNER JOIN obs o "
             + "               ON o.encounter_id = e.encounter_id "
-            + "       INNER JOIN obs o2 "
-            + "               ON o2.encounter_id = e.encounter_id "
             + "       INNER JOIN (SELECT p.patient_id, "
             + "                          Max(e.encounter_datetime) AS encounter_datetime "
             + "                   FROM   patient p "
             + "                          INNER JOIN encounter e "
             + "                                  ON e.patient_id = p.patient_id "
-            + "                          JOIN obs o "
+            + "                          INNER JOIN obs o "
             + "                            ON o.encounter_id = e.encounter_id "
             + "                   WHERE  e.encounter_type = ${6} "
             + "                          AND p.voided = 0 "
@@ -12842,37 +12628,30 @@ public class QualityImprovement2020CohortQueries {
             + "                   GROUP  BY p.patient_id) last_consultation "
             + "               ON p.patient_id = last_consultation.patient_id "
             + "       INNER JOIN (SELECT p.patient_id, "
-            + "                          Max(o2.obs_datetime) first_line_date "
+            + "                          Max(o.obs_datetime) first_line_date "
             + "                   FROM   patient p "
             + "                          INNER JOIN encounter e "
             + "                                  ON p.patient_id = e.patient_id "
             + "                          INNER JOIN obs o "
             + "                                  ON e.encounter_id = o.encounter_id "
-            + "                          INNER JOIN obs o2 "
-            + "                                  ON e.encounter_id = o2.encounter_id "
             + "                   WHERE  p.voided = 0 "
             + "                          AND e.voided = 0 "
             + "                          AND o.voided = 0 "
-            + "                          AND o2.voided = 0 "
             + "                          AND e.encounter_type = ${53} "
-            + "                          AND ( ( o.concept_id = ${23898} ) "
-            + "                                AND ( o2.concept_id = ${21190} "
-            + "                                      AND o2.value_coded IS NOT NULL ) "
-            + "                                AND o.obs_datetime <= :endDate ) "
-            + "                          AND o2.obs_group_id = o.obs_id "
+            + "                          AND o.concept_id = ${21190} "
+            + "                          AND o.value_coded IS NOT NULL  "
+            + "                          AND o.obs_datetime <= :endDate  "
             + "                          AND e.location_id = :location "
             + "                   GROUP  BY p.patient_id) regimen_change "
             + "               ON regimen_change.patient_id = p.patient_id "
             + "WHERE  e.encounter_type = ${53} "
-            + "       AND ( o.concept_id = ${23898} "
-            + "       AND ( o2.concept_id = ${21190} "
-            + "             AND o2.value_coded IS NOT NULL ) ) "
-            + "       AND o2.obs_datetime = regimen_change.first_line_date "
+            + "       AND o.concept_id = ${21190} "
+            + "       AND o.value_coded IS NOT NULL "
+            + "       AND o.obs_datetime = regimen_change.first_line_date "
             + "       AND e.location_id = :location "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
-            + "       AND o2.voided = 0 "
-            + "       AND Timestampdiff(month, o2.obs_datetime, "
+            + "       AND Timestampdiff(month, o.obs_datetime, "
             + "           last_consultation.encounter_datetime) >= 6";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);

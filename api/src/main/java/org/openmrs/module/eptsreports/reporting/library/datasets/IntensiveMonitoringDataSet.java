@@ -436,7 +436,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11DEN(6),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageInMonths54=9m-");
+        "ageBasedOnArt54=<2");
     // 11.7
     dataSetDefinition.addColumn(
         "MI11DEN7",
@@ -508,7 +508,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11NUM(6),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageInMonths54=9m-");
+        "ageBasedOnArt54=<2");
     // 11.7
     dataSetDefinition.addColumn(
         "MI11NUM7",
@@ -1008,7 +1008,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMICat13Part4(3, true),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "miAge=MqAdults");
+        "");
 
     // 13.12 P4 Num
     dataSetDefinition.addColumn(
@@ -1225,7 +1225,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MI15DEN13",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMI15Den13(),
+                intensiveMonitoringCohortQueries.getMI15Den13(),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI15DEN13.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -1242,7 +1242,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MI15NUM13",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMI15Nume13(),
+                intensiveMonitoringCohortQueries.getMI15Nume13(),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI15NUM13.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
