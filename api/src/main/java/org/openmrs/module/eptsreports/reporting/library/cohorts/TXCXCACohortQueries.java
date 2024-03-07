@@ -460,7 +460,7 @@ public class TXCXCACohortQueries {
             + "                 AND        e.location_id = :location "
             + "                 AND        o.concept_id = ${2094} "
             + "                 AND        o.value_coded = ${703} "
-            + "               GROUP BY   p.patient_id ) positive_via "
+            + "               GROUP BY   p.patient_id ) positive_via ON positive_via.patient_id = p.patient_id "
             + "WHERE      p.voided = 0 "
             + "  AND        o.voided = 0 "
             + "  AND        o2.voided = 0 "
