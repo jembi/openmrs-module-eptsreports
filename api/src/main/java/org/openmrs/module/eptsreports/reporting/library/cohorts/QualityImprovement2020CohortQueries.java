@@ -4057,46 +4057,22 @@ public class QualityImprovement2020CohortQueries {
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition a = getMOHArtStartDate();
-
-    CohortDefinition c =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getPregnantConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
-
-    CohortDefinition d =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getBreastfeeding().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
-
-    CohortDefinition e =
-        QualityImprovement2020Queries.getTransferredInPatients(
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-            hivMetadata.getPatientFoundYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId());
-    CohortDefinition f = getTranferredOutPatients();
-
     CohortDefinition g = getPatientsWith3MonthlyApssConsultationsWithin99Days();
 
     if (reportSource.equals(EptsReportConstants.MIMQ.MQ)) {
-      compositionCohortDefinition.addSearch("A", EptsReportUtils.map(a, MAPPING));
-      compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
-      compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
-      compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
+      compositionCohortDefinition.addSearch(
+          "DENOMINATOR", EptsReportUtils.map(getMQC11DEN(3, EptsReportConstants.MIMQ.MQ), MAPPING));
       compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING1));
     } else if (reportSource.equals(EptsReportConstants.MIMQ.MI)) {
-      compositionCohortDefinition.addSearch("A", EptsReportUtils.map(a, MAPPING4));
-      compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING6));
-      compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING6));
-      compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING6));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING5));
+      compositionCohortDefinition.addSearch(
+          "DENOMINATOR",
+          EptsReportUtils.map(
+              getMQC11DEN(3, EptsReportConstants.MIMQ.MI),
+              "revisionEndDate=${revisionEndDate},location=${location}"));
       compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING10));
     }
 
-    compositionCohortDefinition.setCompositionString("A AND C AND NOT D AND NOT E AND NOT F AND G");
+    compositionCohortDefinition.setCompositionString("DENOMINATOR AND G");
 
     return compositionCohortDefinition;
   }
