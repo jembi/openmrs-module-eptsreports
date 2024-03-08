@@ -303,7 +303,7 @@ public class Eri4MonthsCohortQueries {
         "Patients who are lost to follow up and not dead, transferred out or stopped treatment");
 
     cd.addSearch(
-        "ltfu", mapStraightThrough(genericCohortQueries.getPatientsWhoToLostToFollowUp(60)));
+        "ltfu", mapStraightThrough(genericCohortQueries.getPatientsWhoToLostToFollowUp(59)));
     cd.addSearch("dead", mapStraightThrough(genericCohortQueries.getDeceasedPatients()));
     cd.addSearch("transferOut", mapStraightThrough(hivCohortQueries.getPatientsTransferredOut()));
     cd.addSearch(
