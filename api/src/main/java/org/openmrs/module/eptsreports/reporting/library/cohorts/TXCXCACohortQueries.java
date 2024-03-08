@@ -464,9 +464,10 @@ public class TXCXCACohortQueries {
             + "  AND        e.encounter_type = ${28} "
             + "  AND        e.location_id = :location "
             + "  AND        ( "
-            + "             (o.concept_id = ${1185} AND  o.value_coded IN ( ${23974}, ${165439} ) ) "
-            + "    OR         ( o.concept_id = ${2149}  AND   o.value_coded IN ( ${23974},  ${23972},  ${23970}, ${23973} )) "
-            + " AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND :endDate "
+            + "             (o.concept_id = ${1185} AND  o.value_coded IN ( ${23974}, ${165439} ) "
+            + " AND o.obs_datetime BETWEEN positive_via.last_positive_encounter AND :endDate ) "
+            + "    OR         ( o.concept_id = ${2149}  AND   o.value_coded IN ( ${23974},  ${23972},  ${23970}, ${23973} ) "
+            + " AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND :endDate ) "
             + "             ) "
             + "GROUP BY p.patient_id ";
 
