@@ -242,7 +242,7 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
       q.append("                          GROUP BY last_next_pick_up.patient_id ");
       q.append(
           "                      ) AS last_next_scheduled_pick_up ON last_next_scheduled_pick_up.patient_id = p.patient_id ");
-      q.append("          WHERE last_next_scheduled_pick_up.max_datetame < :onOrBefore ");
+      q.append("          WHERE last_next_scheduled_pick_up.max_datetame > :onOrBefore ");
 
       q.append("                 )");
       q.append("      GROUP BY transferred_out.patient_id");
@@ -384,7 +384,7 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
       q.append("                          GROUP BY last_next_pick_up.patient_id ");
       q.append(
           "                      ) AS last_next_scheduled_pick_up ON last_next_scheduled_pick_up.patient_id = p.patient_id ");
-      q.append("          WHERE last_next_scheduled_pick_up.max_datetame < :onOrBefore ");
+      q.append("          WHERE last_next_scheduled_pick_up.max_datetame > :onOrBefore ");
       q.append("                                                 ) ");
     }
     q.addParameter("art", hivMetadata.getARTProgram().getProgramId());

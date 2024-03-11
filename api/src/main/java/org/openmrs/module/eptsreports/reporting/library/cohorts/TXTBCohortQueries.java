@@ -447,7 +447,7 @@ public class TXTBCohortQueries {
             TXTBQueries.rxTorax(
                 encounterType,
                 tbMetadata.getXRayChest().getConceptId(),
-                commonMetadata.getPositive().getConceptId(),
+                commonMetadata.getSugestive().getConceptId(),
                 commonMetadata.getNegative().getConceptId(),
                 commonMetadata.getIndeterminate().getConceptId()));
     addGeneralParameters(cd);
@@ -1441,16 +1441,40 @@ public class TXTBCohortQueries {
             + "                                                       ON         p.patient_id=pg.patient_id "
             + "                                                       INNER JOIN patient_state ps "
             + "                                                       ON         pg.patient_program_id=ps.patient_program_id "
+            + "                                                      INNER JOIN ( "
+            + "                                                       SELECT     p.patient_id , "
+            + "                                                                  Max(ps.start_date) AS last_date "
+            + "                                                       FROM       patient p "
+            + "                                                       INNER JOIN patient_program pg "
+            + "                                                       ON         p.patient_id=pg.patient_id "
+            + "                                                       INNER JOIN patient_state ps "
+            + "                                                       ON         pg.patient_program_id=ps.patient_program_id "
+            + "                                                       WHERE      pg.voided=0 "
+            + "                                                       AND        ps.voided=0 "
+            + "                                                       AND        p.voided=0 "
+            + "                                                       AND        pg.program_id= ${artProgram} "
+            + "                                                       AND        ps.state IS NOT NULL "
+            + "                                                       AND        ps.start_date <= :endDate "
+            + "                                                       AND        pg.location_id= :location "
+            + "                                                       GROUP BY   p.patient_id ) last_state on last_state.patient_id = p.patient_id"
             + "                                                       WHERE      pg.voided=0 "
             + "                                                       AND        ps.voided=0 "
             + "                                                       AND        p.voided=0 "
             + "                                                       AND        pg.program_id= ${artProgram} "
             + "                                                       AND        ps.state = ${transferredOutToAnotherHealthFacilityWorkflowState} "
-            + "                                                       AND        ps.start_date <= :endDate "
+            + "                                                       AND        ps.start_date = last_state.last_date "
             + "                                                       AND        pg.location_id= :location "
             + "                                                       GROUP BY   p.patient_id "
             + "                                                       UNION "
             + "                                                       SELECT     p.patient_id, "
+            + "                                                                  max(o.obs_datetime) AS last_date "
+            + "                                                       FROM       patient p "
+            + "                                                       INNER JOIN encounter e "
+            + "                                                       ON         e.patient_id=p.patient_id "
+            + "                                                       INNER JOIN obs o "
+            + "                                                       ON         o.encounter_id=e.encounter_id "
+            + "                                                     INNER JOIN ( "
+            + "                                                      SELECT     p.patient_id, "
             + "                                                                  max(o.obs_datetime) AS last_date "
             + "                                                       FROM       patient p "
             + "                                                       INNER JOIN encounter e "
@@ -1462,12 +1486,29 @@ public class TXTBCohortQueries {
             + "                                                       AND        o.voided = 0 "
             + "                                                       AND        e.encounter_type = ${masterCardEncounterType} "
             + "                                                       AND        o.concept_id = ${stateOfStayOfPreArtPatient} "
+            + "                                                       AND        o.value_coded IS NOT NULL "
+            + "                                                       AND        o.obs_datetime <= :endDate "
+            + "                                                       AND        e.location_id = :location "
+            + "                                                       GROUP BY   p.patient_id ) last_state on last_state.last_date "
+            + "                                                       WHERE      p.voided = 0 "
+            + "                                                       AND        e.voided = 0 "
+            + "                                                       AND        o.voided = 0 "
+            + "                                                       AND        e.encounter_type = ${masterCardEncounterType} "
+            + "                                                       AND        o.concept_id = ${stateOfStayOfPreArtPatient} "
             + "                                                       AND        o.value_coded = ${transferredOutConcept} "
-            + "                                                       AND        o.obs_datetime BETWEEN :startDate AND        :endDate "
+            + "                                                       AND        o.obs_datetime = last_state.last_date "
             + "                                                       AND        e.location_id = :location "
             + "                                                       GROUP BY   p.patient_id "
             + "                                                       UNION "
             + "                                                       SELECT     p.patient_id , "
+            + "                                                                  max(e.encounter_datetime) AS last_date "
+            + "                                                       FROM       patient p "
+            + "                                                       INNER JOIN encounter e "
+            + "                                                       ON         e.patient_id=p.patient_id "
+            + "                                                       INNER JOIN obs o "
+            + "                                                       ON         o.encounter_id=e.encounter_id "
+            + "                                                     INNER JOIN ( "
+            + "                                                         SELECT     p.patient_id , "
             + "                                                                  max(e.encounter_datetime) AS last_date "
             + "                                                       FROM       patient p "
             + "                                                       INNER JOIN encounter e "
@@ -1479,8 +1520,17 @@ public class TXTBCohortQueries {
             + "                                                       AND        o.voided = 0 "
             + "                                                       AND        e.encounter_type = ${adultoSeguimentoEncounterType} "
             + "                                                       AND        o.concept_id = ${stateOfStayOfArtPatient} "
+            + "                                                       AND        o.value_coded IS NOT NULL "
+            + "                                                       AND        e.encounter_datetime <= :endDate "
+            + "                                                       AND        e.location_id = :location "
+            + "                                                       GROUP BY   p.patient_id ) last_state on last_state.last_date "
+            + "                                                       WHERE      p.voided = 0 "
+            + "                                                       AND        e.voided = 0 "
+            + "                                                       AND        o.voided = 0 "
+            + "                                                       AND        e.encounter_type = ${adultoSeguimentoEncounterType} "
+            + "                                                       AND        o.concept_id = ${stateOfStayOfArtPatient} "
             + "                                                       AND        o.value_coded = ${transferredOutConcept} "
-            + "                                                       AND        e.encounter_datetime BETWEEN :startDate AND        :endDate "
+            + "                                                       AND        e.encounter_datetime = last_state.last_date "
             + "                                                       AND        e.location_id = :location "
             + "                                                       GROUP BY   p.patient_id "
             + "                                                       UNION "
@@ -1494,7 +1544,7 @@ public class TXTBCohortQueries {
             + "                                                       WHERE      o.concept_id = ${defaultingMotiveConcept} "
             + "                                                       AND        e.location_id = :location "
             + "                                                       AND        e.encounter_type= ${buscaActivaEncounterType} "
-            + "                                                       AND        e.encounter_datetime BETWEEN :startDate AND        :endDate "
+            + "                                                       AND        e.encounter_datetime <= :endDate "
             + "                                                       AND        o.value_coded IN (${transferredOutConcept}, "
             + "                                                                                    ${autoTransferConcept}) "
             + "                                                       AND        e.voided=0 "
@@ -2615,7 +2665,12 @@ public class TXTBCohortQueries {
             genericCohortQueries.getAgeOnReportEndDate(10, 200),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
-    cd.setCompositionString("XRAY AND AGE");
+    cd.addSearch(
+        "DENOMINATOR",
+        EptsReportUtils.map(
+            getDenominator(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("DENOMINATOR AND XRAY AND AGE");
     return cd;
   }
 
