@@ -1402,7 +1402,6 @@ public class ResumoMensalDAHCohortQueries {
    *     menos (–) 2 meses e “Data Fim”.
    *
    * @param rmDefinition Resumo mensal definition to be checked
-   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getRMDefinitionsIfPatientDontHaveTarvSituationOnDah(
@@ -1417,7 +1416,8 @@ public class ResumoMensalDAHCohortQueries {
         "RM",
         map(rmDefinition, "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
 
-    cd.addSearch("tarvSituation", mapStraightThrough(getPatientsWithAnyArtSituationOnDAH()));
+    cd.addSearch(
+        "tarvSituation", mapStraightThrough(getPatientsWithAnyArtSituationOrWithoutFichaDAH()));
 
     cd.setCompositionString("RM AND NOT tarvSituation");
     return cd;
@@ -1428,9 +1428,10 @@ public class ResumoMensalDAHCohortQueries {
    * <li>Caso não exista o registo da “Situação do TARV no Início do Seguimento” na Ficha de DAH que
    *     tem o registo de “Data de Início no Modelo de DAH” ocorrida durante o período (“Data de
    *     Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”), considerar os utentes incluídos
-   *     no indicador <rmDefinition> </>de utentes que iniciaram TARV nesta unidade sanitária durante o mês, do
-   *     relatório “Resumo Mensal de HIV/SIDA” durante o período de compreendido entre “Data Início”
-   *     menos (–) 2 meses e “Data Fim”.
+   *     no indicador <rmDefinition> </>de utentes que iniciaram TARV nesta unidade sanitária
+   *     durante o mês, do relatório “Resumo Mensal de HIV/SIDA” durante o período de compreendido
+   *     entre “Data Início” menos (–) 2 meses e “Data Fim”.
+   *
    * @param rmDefinition Resumo mensal definition to be checked
    * @return {@link CohortDefinition}
    */
@@ -1453,7 +1454,7 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "tarvSituation",
         map(
-            getPatientsWithAnyArtSituationOnDAH(),
+            getPatientsWithAnyArtSituationOrWithoutFichaDAH(),
             "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
 
     cd.setCompositionString("RM AND NOT tarvSituation");
@@ -1512,16 +1513,16 @@ public class ResumoMensalDAHCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsWithAnyArtSituationOnDAH() {
+  public CohortDefinition getPatientsWithAnyArtSituationOrWithoutFichaDAH() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Patients who do not have Situacao de Tarv Marked on DAH”");
+    sqlCohortDefinition.setName(
+        "Patients who do not have Situacao de Tarv Marked on DAH or Do not have Ficha de DAH”");
     sqlCohortDefinition.addParameters(getCohortParameters());
 
     Map<String, Integer> map = new HashMap<>();
     map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
     map.put("1255", hivMetadata.getARVPlanConcept().getConceptId());
-    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
 
     String query =
         "    SELECT p.patient_id  "
@@ -1548,7 +1549,18 @@ public class ResumoMensalDAHCohortQueries {
             + "      AND o.value_coded IS NOT NULL  "
             + "      AND e.encounter_datetime = last_dah.last_date  "
             + "      AND e.location_id = :location  "
-            + "    GROUP BY p.patient_id  ";
+            + "    GROUP BY p.patient_id  "
+            + "  UNION "
+            + " SELECT p.patient_id FROM "
+            + "                        patient p "
+            + " WHERE p.patient_id NOT IN "
+            + "                        ( "
+            + "            SELECT e.patient_id  "
+            + "            FROM  "
+            + "                 encounter e "
+            + "            WHERE  e.voided = 0  "
+            + "              AND e.encounter_type = ${90}  "
+            + "              AND e.location_id = :location ) ";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
 
