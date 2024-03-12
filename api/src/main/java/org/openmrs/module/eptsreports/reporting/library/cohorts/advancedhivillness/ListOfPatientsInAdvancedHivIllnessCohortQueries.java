@@ -1127,7 +1127,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "                    AND e.voided = 0 "
             + "                    AND o.voided = 0 "
             + "                  GROUP BY p.patient_id,o.value_coded) exam_max "
-            + "         GROUP BY   exam_max.patient_id,exam_max.value_coded ) exam_result ";
+            + "         GROUP BY   exam_max.patient_id,exam_max.value_coded ) exam_result "
+            + "GROUP BY exam_result.patient_id ";
 
     String query =
         examResult
