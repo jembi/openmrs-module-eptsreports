@@ -1295,6 +1295,8 @@ public class ResumoMensalDAHCohortQueries {
     cd.setName("utentes Reinícios TARV, para desagregação dos indicadores 8 a 19");
     cd.addParameters(getCohortParameters());
 
+    CohortDefinition rmB3 = resumoMensalCohortQueries.getPatientsRestartedTarvtB3();
+
     cd.addSearch(
         "restartedArt",
         map(
@@ -1304,20 +1306,23 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "B3P1",
         map(
-            resumoMensalCohortQueries.getPatientsRestartedTarvtB3(),
-            "startDate=${startDate-2m},endDate=${endDate-2m},location=${location}"));
+            getRMDefinitionsIfPatientDontHaveTarvSituationOnDahForRestartedAndActiveDisaggregation(
+                rmB3),
+            "startDate=${startDate-2m},endDate=${endDate-2m},onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch(
         "B3P2",
         map(
-            resumoMensalCohortQueries.getPatientsRestartedTarvtB3(),
-            "startDate=${startDate-1m},endDate=${endDate-1m},location=${location}"));
+            getRMDefinitionsIfPatientDontHaveTarvSituationOnDahForRestartedAndActiveDisaggregation(
+                rmB3),
+            "startDate=${startDate-1m},endDate=${endDate-1m},onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch(
         "B3P3",
         map(
-            resumoMensalCohortQueries.getPatientsRestartedTarvtB3(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            getRMDefinitionsIfPatientDontHaveTarvSituationOnDahForRestartedAndActiveDisaggregation(
+                rmB3),
+            "startDate=${startDate},endDate=${endDate},onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch(
         "PREGNANT",
@@ -1357,6 +1362,9 @@ public class ResumoMensalDAHCohortQueries {
     cd.setName("utentes Activos em TARV, para desagregação dos indicadores 8 a 19");
     cd.addParameters(getCohortParameters());
 
+    CohortDefinition rmb12 =
+        resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfPreviousMonthB12();
+
     cd.addSearch(
         "onArt",
         map(
@@ -1366,8 +1374,9 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "B12",
         map(
-            resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfPreviousMonthB12(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            getRMDefinitionsIfPatientDontHaveTarvSituationOnDahForRestartedAndActiveDisaggregation(
+                rmb12),
+            "startDate=${startDate},endDate=${endDate},onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch(
         "PREGNANT",
@@ -1392,6 +1401,8 @@ public class ResumoMensalDAHCohortQueries {
    *     relatório “Resumo Mensal de HIV/SIDA” durante o período de compreendido entre “Data Início”
    *     menos (–) 2 meses e “Data Fim”.
    *
+   * @param rmDefinition Resumo mensal definition to be checked
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getRMDefinitionsIfPatientDontHaveTarvSituationOnDah(
@@ -1407,6 +1418,43 @@ public class ResumoMensalDAHCohortQueries {
         map(rmDefinition, "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
 
     cd.addSearch("tarvSituation", mapStraightThrough(getPatientsWithAnyArtSituationOnDAH()));
+
+    cd.setCompositionString("RM AND NOT tarvSituation");
+    return cd;
+  }
+
+  /**
+   *
+   * <li>Caso não exista o registo da “Situação do TARV no Início do Seguimento” na Ficha de DAH que
+   *     tem o registo de “Data de Início no Modelo de DAH” ocorrida durante o período (“Data de
+   *     Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”), considerar os utentes incluídos
+   *     no indicador <rmDefinition> </>de utentes que iniciaram TARV nesta unidade sanitária durante o mês, do
+   *     relatório “Resumo Mensal de HIV/SIDA” durante o período de compreendido entre “Data Início”
+   *     menos (–) 2 meses e “Data Fim”.
+   * @param rmDefinition Resumo mensal definition to be checked
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition
+      getRMDefinitionsIfPatientDontHaveTarvSituationOnDahForRestartedAndActiveDisaggregation(
+          CohortDefinition rmDefinition) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName(
+        "Patients Who dont have Situacao de Tarv On Ficha de DAH and Are from Resumo mensal");
+    cd.addParameter(new Parameter("startDate", "Data Início", Date.class));
+    cd.addParameter(new Parameter("endDate", "Data Fim", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "Data Fim", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "Data Fim", Date.class));
+    cd.addParameter(new Parameter("location", "Unidade Sanitária", Location.class));
+
+    cd.addSearch(
+        "RM", map(rmDefinition, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "tarvSituation",
+        map(
+            getPatientsWithAnyArtSituationOnDAH(),
+            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
 
     cd.setCompositionString("RM AND NOT tarvSituation");
     return cd;
@@ -1497,7 +1545,7 @@ public class ResumoMensalDAHCohortQueries {
             + "      AND o.voided = 0  "
             + "      AND e.encounter_type = ${90}  "
             + "      AND o.concept_id = ${1255}  "
-            + "      AND o.value_coded = ${1256}  "
+            + "      AND o.value_coded IS NOT NULL  "
             + "      AND e.encounter_datetime = last_dah.last_date  "
             + "      AND e.location_id = :location  "
             + "    GROUP BY p.patient_id  ";
