@@ -9268,7 +9268,7 @@ public class QualityImprovement2020CohortQueries {
             hadFilaAfterClinical,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    cd.setCompositionString("Mq15DenMds14 AND (MdsFimNum14 OR FAC)");
+    cd.setCompositionString("Mq15DenMds14 AND FAC");
 
     return cd;
   }

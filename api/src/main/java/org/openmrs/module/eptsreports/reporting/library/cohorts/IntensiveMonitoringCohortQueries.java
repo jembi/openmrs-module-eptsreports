@@ -3735,7 +3735,8 @@ public class IntensiveMonitoringCohortQueries {
 
     cd.addSearch(
         "pickUpsOnPreviousPeriod",
-        EptsReportUtils.map(PatientsWithPickUpsOnPreviousPeriod(), "endDate=${endDate-3m},location=${location}"));
+        EptsReportUtils.map(
+            PatientsWithPickUpsOnPreviousPeriod(), "endDate=${endDate-3m},location=${location}"));
 
     cd.addSearch(
         "transferredIn",
