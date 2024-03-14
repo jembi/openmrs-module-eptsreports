@@ -656,7 +656,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
               + "       SELECT considered_transferred.patient_id, MAX(considered_transferred.value_datetime) as max_date "
               + "         FROM ( "
               + "               SELECT     p.patient_id, "
-              + "                          MAX(o.value_datetime) AS value_datetime "
+              + "                         TIMESTAMPADD(DAY, 1, MAX(o.value_datetime)) AS value_datetime "
               + "               FROM       patient p "
               + "                              INNER JOIN encounter e "
               + "                                         ON         e.patient_id=p.patient_id "
@@ -684,7 +684,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
               + "               GROUP BY   p.patient_id "
               + "               UNION "
               + "               SELECT     p.patient_id, "
-              + "                          TIMESTAMPADD(DAY, 30, MAX(o.value_datetime)) AS value_datetime "
+              + "                          TIMESTAMPADD(DAY, 31, MAX(o.value_datetime)) AS value_datetime "
               + "               FROM       patient p "
               + "                              INNER JOIN encounter e "
               + "                                         ON  e.patient_id=p.patient_id "
@@ -700,6 +700,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
               + "               GROUP BY   p.patient_id "
               + "         )  considered_transferred "
               + " GROUP BY considered_transferred.patient_id "
+              + " HAVING max_date > :endDate "
               + " ) final ";
     } else {
       query +=
