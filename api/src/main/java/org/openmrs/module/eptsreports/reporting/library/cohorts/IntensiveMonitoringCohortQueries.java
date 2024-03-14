@@ -4088,8 +4088,8 @@ public class IntensiveMonitoringCohortQueries {
             + "                   GROUP  BY p.patient_id) finished_treatment "
             + "               ON finished_treatment.patient_id = p.patient_id "
             + "WHERE  p.voided = 0 "
-            + "       AND TIMESTAMPDIFF(DAY, finished_treatment.last_tb_treatment, "
-            + "               last_consultation.most_recent) <= 30";
+            + "       AND TIMESTAMPDIFF(DAY, last_consultation.most_recent, "
+            + "            +  finished_treatment.last_tb_treatment) <= 30";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
