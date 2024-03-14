@@ -824,7 +824,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "                                      AND        e.location_id =  :location "
             + "                                      GROUP BY   p.patient_id) most_recent "
             + "                  GROUP BY most_recent.patient_id "
-            + "                  HAVING   final_encounter_date <= :endDate ) final "
+            + "                  HAVING   final_encounter_date < :endDate ) final "
             + "WHERE    final.patient_id NOT IN ( "
             + new EptsQueriesUtil()
                 .unionBuilder(
