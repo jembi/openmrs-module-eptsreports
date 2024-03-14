@@ -919,8 +919,7 @@ public class ResumoMensalCohortQueries {
         "D", map(getPatientsWhoDied(false), "onOrBefore=${startDate-1d},locationList=${location}"));
 
     cd.addSearch(
-        "T",
-        map(getPatientsTransferredOutB5(true), "onOrBefore=${startDate-1d},location=${location}"));
+        "T", map(getTranferredOutPatients(), "onOrBefore=${startDate-1d},location=${location}"));
 
     cd.addSearch(
         "B7",
@@ -3770,6 +3769,245 @@ public class ResumoMensalCohortQueries {
                 .getTransferredFromOtherHealthFacilityWorkflowState()
                 .getProgramWorkflowStateId(),
             isExclusion));
+    return cd;
+  }
+
+  /**
+   * <b>Utentes Transferidos Para</b><br>
+   * O sistema irá identificar utentes “Transferido Para” outras US em TARV até o fim do período de
+   * inclusão, selecionando os utentes registados com:
+   *
+   * <ul>
+   *   <li>inscritos como “Transferido para” (último estado de inscrição) no programa SERVIÇO TARV
+   *       TRATAMENTO com “Data de Transferência” <= “Data Fim do Relatório” menos 1 mês; ou
+   *   <li>registados como último estado [“Mudança Estado Permanência TARV” (Coluna 21) = “T”
+   *       (Transferido Para) na Ficha Clínica com “Data da Consulta Actual” (Coluna 1, durante a
+   *       qual se fez o registo da mudança do estado de permanência TARV) <= “Data Fim do
+   *       Relatório” menos 1 mês; ou
+   *   <li>como “Mudança Estado Permanência TARV” = “Transferido Para” na Ficha Resumo com “Data da
+   *       Transferência” <= “Data Fim do Relatório” menos 1 mês;
+   * </ul>
+   *
+   * excluindo os utentes que tenham tido um levantamento de ARV (FILA) após a “Data de
+   * Transferência” (a data mais recente entre os critérios acima identificados) e até “Data Fim do
+   * Relatório” menos 1 mês; excluindo os utentes que tenham a data mais recente entre:
+   *
+   * <ul>
+   *   <li>a “Data Próximo Levantamento” registado no último FILA antes da “Data Fim do Relatório”
+   *       menos 1 mês e
+   *   <li>a última “Data de Levantamento” registada até a “Data Fim do Relatório” menos 1 mês, na
+   *       Ficha Recepção/Levantou ARV, adicionando 30 dias.
+   * </ul>
+   *
+   * @return String
+   */
+  public CohortDefinition getTranferredOutPatients() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Transferred Out Patients");
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put(
+        "7",
+        hivMetadata
+            .getTransferredOutToAnotherHealthFacilityWorkflowState()
+            .getProgramWorkflowStateId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+
+    String query =
+        "SELECT transferred_out.patient_id "
+            + "FROM   (SELECT latest.patient_id, "
+            + "               Max(latest.last_date) AS last_date "
+            + "        FROM   (SELECT p.patient_id, "
+            + "                       laststate.last_date AS last_date "
+            + "                FROM   patient p "
+            + "                           INNER JOIN patient_program pg "
+            + "                                      ON p.patient_id = pg.patient_id "
+            + "                           INNER JOIN patient_state ps "
+            + "                                      ON pg.patient_program_id = ps.patient_program_id "
+            + "                           INNER JOIN (SELECT p.patient_id, "
+            + "                                              Max(ps.start_date) AS last_date "
+            + "                                       FROM   patient p "
+            + "                                                  INNER JOIN patient_program pg "
+            + "                                                             ON "
+            + "                                                                 p.patient_id = pg.patient_id "
+            + "                                                  INNER JOIN patient_state ps "
+            + "                                                             ON "
+            + "                                                                 pg.patient_program_id = ps.patient_program_id "
+            + "                                       WHERE  pg.voided = 0 "
+            + "                                         AND ps.voided = 0 "
+            + "                                         AND p.voided = 0 "
+            + "                                         AND pg.program_id = ${2} "
+            + "                                         AND ps.state IS NOT NULL "
+            + "                                         AND ps.start_date <= :onOrBefore "
+            + "                                         AND pg.location_id = :location "
+            + "                                       GROUP  BY p.patient_id) laststate "
+            + "                                      ON laststate.patient_id = p.patient_id "
+            + "                WHERE  pg.voided = 0 "
+            + "                  AND ps.voided = 0 "
+            + "                  AND p.voided = 0 "
+            + "                  AND pg.program_id = ${2} "
+            + "                  AND ps.state = ${7} "
+            + "                  AND ps.start_date = laststate.last_date "
+            + "                  AND pg.location_id = :location "
+            + "                GROUP  BY p.patient_id "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       Max(o.obs_datetime) AS last_date "
+            + "                FROM   patient p "
+            + "                           INNER JOIN encounter e "
+            + "                                      ON e.patient_id = p.patient_id "
+            + "                           INNER JOIN obs o "
+            + "                                      ON e.encounter_id = o.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                  AND e.voided = 0 "
+            + "                  AND o.voided = 0 "
+            + "                  AND e.encounter_type = ${53} "
+            + "                  AND o.concept_id = ${6272} "
+            + "                  AND o.value_coded = ${1706} "
+            + "                  AND o.obs_datetime <= :onOrBefore "
+            + "                  AND e.location_id = :location "
+            + "                GROUP  BY p.patient_id "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       max_seg.last_date AS last_date "
+            + "                FROM   patient p "
+            + "                           INNER JOIN encounter e "
+            + "                                      ON e.patient_id = p.patient_id "
+            + "                           INNER JOIN obs o "
+            + "                                      ON o.encounter_id = e.encounter_id "
+            + "                           INNER JOIN (SELECT p.patient_id, "
+            + "                                              Max(e.encounter_datetime) AS last_date "
+            + "                                       FROM   patient p "
+            + "                                                  INNER JOIN encounter e "
+            + "                                                             ON e.patient_id = p.patient_id "
+            + "                                                  INNER JOIN obs o "
+            + "                                                             ON o.encounter_id = e.encounter_id "
+            + "                                       WHERE  p.voided = 0 "
+            + "                                         AND e.voided = 0 "
+            + "                                         AND o.voided = 0 "
+            + "                                         AND e.encounter_type = ${6} "
+            + "                                         AND e.encounter_datetime <= :onOrBefore "
+            + "                                         AND e.location_id = :location "
+            + "                                       GROUP  BY p.patient_id) max_seg "
+            + "                                      ON max_seg.patient_id = p.patient_id "
+            + "                WHERE  p.voided = 0 "
+            + "                  AND e.voided = 0 "
+            + "                  AND o.voided = 0 "
+            + "                  AND e.encounter_type = ${6} "
+            + "                  AND o.concept_id = ${6273} "
+            + "                  AND o.value_coded = ${1706} "
+            + "                  AND e.encounter_datetime = max_seg.last_date "
+            + "                  AND e.location_id = :location "
+            + "                GROUP  BY p.patient_id) latest "
+            + "        GROUP  BY latest.patient_id) transferred_out "
+            + "WHERE  transferred_out.patient_id NOT IN (SELECT p.patient_id "
+            + "                                          FROM   patient p "
+            + "                                                     INNER JOIN encounter e "
+            + "                                                                ON "
+            + "                                                                    e.patient_id = p.patient_id "
+            + "                                          WHERE  p.voided = 0 "
+            + "                                            AND e.voided = 0 "
+            + "                                            AND p.patient_id = "
+            + "                                                transferred_out.patient_id "
+            + "                                            AND e.encounter_type = ${18} "
+            + "                                            AND "
+            + "                                              e.encounter_datetime > transferred_out.last_date "
+            + "                                            AND "
+            + "                                              e.encounter_datetime <= :onOrBefore "
+            + "                                            AND e.location_id = :location "
+            + "                                          UNION "
+            + "                                          SELECT p.patient_id "
+            + "                                          FROM   patient p "
+            + "                                                     INNER JOIN (SELECT "
+            + "                                                                     last_next_pick_up.patient_id, "
+            + "                                                                     Max(last_next_pick_up.result_value) AS "
+            + "                                                                         max_datetame "
+            + "                                                                 FROM "
+            + "                                                                     (SELECT p.patient_id, "
+            + "                                                                             o.value_datetime AS "
+            + "                                                                                 result_value "
+            + "                                                                      FROM   patient p "
+            + "                                                                                 INNER JOIN encounter e "
+            + "                                                                                            ON p.patient_id = "
+            + "                                                                                               e.patient_id "
+            + "                                                                                 INNER JOIN obs o "
+            + "                                                                                            ON e.encounter_id = "
+            + "                                                                                               o.encounter_id "
+            + "                                                                                 INNER JOIN "
+            + "                                                                             (SELECT p.patient_id, "
+            + "                                                                                     Max(e.encounter_datetime) "
+            + "                                                                                         AS "
+            + "                                                                                         e_datetime "
+            + "                                                                              FROM   patient p "
+            + "                                                                                         INNER JOIN encounter e "
+            + "                                                                                                    ON p.patient_id = "
+            + "                                                                                                       e.patient_id "
+            + "                                                                              WHERE  p.voided = 0 "
+            + "                                                                                AND e.voided = 0 "
+            + "                                                                                AND e.location_id = :location "
+            + "                                                                                AND e.encounter_type = ${18} "
+            + "                                                                                AND e.encounter_datetime "
+            + "                                                                                  <= "
+            + "                                                                                    :onOrBefore "
+            + "                                                                              GROUP  BY p.patient_id) "
+            + "                                                                                 most_recent "
+            + "                                                                             ON p.patient_id = "
+            + "                                                                                most_recent.patient_id "
+            + "                                                                      WHERE  p.voided = 0 "
+            + "                                                                        AND e.voided = 0 "
+            + "                                                                        AND o.voided = 0 "
+            + "                                                                        AND e.location_id = :location "
+            + "                                                                        AND e.encounter_type = ${18} "
+            + "                                                                        AND o.concept_id = ${5096} "
+            + "                                                                        AND e.encounter_datetime = "
+            + "                                                                            most_recent.e_datetime "
+            + "                                                                      GROUP  BY p.patient_id "
+            + "                                                                      UNION "
+            + "                                                                      SELECT p.patient_id, "
+            + "                                                                             Timestampadd(day, 30, Max(o.value_datetime)) "
+            + "                                                                                 AS "
+            + "                                                                                 result_value "
+            + "                                                                      FROM   patient p "
+            + "                                                                                 INNER JOIN encounter e "
+            + "                                                                                            ON p.patient_id = e.patient_id "
+            + "                                                                                 INNER JOIN obs o "
+            + "                                                                                            ON e.encounter_id = o.encounter_id "
+            + "                                                                                 INNER JOIN obs o2 "
+            + "                                                                                            ON e.encounter_id = o2.encounter_id "
+            + "                                                                      WHERE  p.voided = 0 "
+            + "                                                                        AND e.voided = 0 "
+            + "                                                                        AND o.voided = 0 "
+            + "                                                                        AND o2.voided = 0 "
+            + "                                                                        AND e.location_id = :location "
+            + "                                                                        AND e.encounter_type = ${52} "
+            + "                                                                        AND ( o.concept_id = ${23866} "
+            + "                                                                          AND o.value_datetime <= :onOrBefore ) "
+            + "                                                                        AND ( o2.concept_id = ${23865} "
+            + "                                                                          AND o2.value_coded = ${1065} ) "
+            + "                                                                      GROUP  BY p.patient_id) AS last_next_pick_up "
+            + "                                                                 GROUP  BY last_next_pick_up.patient_id) AS "
+            + "                                              last_next_scheduled_pick_up "
+            + "                                                                ON last_next_scheduled_pick_up.patient_id = p.patient_id "
+            + "                                          WHERE  last_next_scheduled_pick_up.max_datetame > :onOrBefore ) "
+            + "GROUP  BY transferred_out.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    cd.setQuery(sb.replace(query));
     return cd;
   }
 }
