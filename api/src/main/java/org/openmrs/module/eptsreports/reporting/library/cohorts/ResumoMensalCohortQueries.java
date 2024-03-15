@@ -1119,7 +1119,7 @@ public class ResumoMensalCohortQueries {
     String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
     if (useBothDates) {
-      cd.addSearch("T", map(getTranferredOutPatients(), mapping2));
+      cd.addSearch("T", map(getPatientsTransferredOutB5(true), mapping2));
     } else {
       cd.addSearch(
           "T",
