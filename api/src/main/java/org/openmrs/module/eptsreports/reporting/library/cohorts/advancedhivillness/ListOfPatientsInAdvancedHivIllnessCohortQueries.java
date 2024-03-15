@@ -1354,7 +1354,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     map.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("1709", hivMetadata.getSuspendedTreatmentConcept().getConceptId());
-    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
 
     String query =
         new EptsQueriesUtil()

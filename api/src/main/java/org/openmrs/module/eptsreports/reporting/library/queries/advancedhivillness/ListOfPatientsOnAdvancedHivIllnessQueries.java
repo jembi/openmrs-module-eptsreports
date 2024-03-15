@@ -1191,7 +1191,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "  AND e.encounter_type = ${6} "
         + "  AND e.location_id = :location "
         + "  AND o.concept_id = ${6273} "
-        + "  AND o.value_coded = ${1706} "
+        + "  AND o.value_coded = ${1705} "
         + "  AND e.encounter_datetime = last_state.first_date "
         + "GROUP  BY p.patient_id "
         + "UNION "
@@ -1248,7 +1248,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "  AND e.encounter_type = ${53} "
         + "  AND e.location_id = :location "
         + "  AND o.concept_id = ${6272} "
-        + "  AND o.value_coded = ${1706} "
+        + "  AND o.value_coded = ${1705} "
         + "  AND e.encounter_datetime = last_state.first_date "
         + "GROUP  BY p.patient_id";
   }
