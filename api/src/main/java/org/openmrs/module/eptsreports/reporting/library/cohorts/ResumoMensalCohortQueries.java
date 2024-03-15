@@ -1119,7 +1119,7 @@ public class ResumoMensalCohortQueries {
     String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
     if (useBothDates) {
-      cd.addSearch("T", map(getPatientsTransferredOutB5(true), mapping2));
+      cd.addSearch("T", map(getTranferredOutPatients(), mapping2));
     } else {
       cd.addSearch(
           "T",
@@ -1724,8 +1724,7 @@ public class ResumoMensalCohortQueries {
             "endDate=${startDate-1d},location=${location}"));
 
     cd.addSearch(
-        "B5A",
-        map(getPatientsTransferredOutB5(true), "onOrBefore=${startDate-1d},location=${location}"));
+        "B5A", map(getTranferredOutPatients(), "onOrBefore=${startDate-1d},location=${location}"));
 
     cd.addSearch(
         "B6A",
@@ -1757,8 +1756,7 @@ public class ResumoMensalCohortQueries {
             "endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        "B5A",
-        map(getPatientsTransferredOutB5(true), "onOrBefore=${endDate},location=${location}"));
+        "B5A", map(getTranferredOutPatients(), "onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch(
         "B6A",
@@ -3703,7 +3701,7 @@ public class ResumoMensalCohortQueries {
     CohortDefinition masterCardPickup =
         getPatientsWhoHavePickedUpDrugsMasterCardByEndReporingPeriod();
 
-    CohortDefinition B5E = getPatientsTransferredOutB5(true);
+    CohortDefinition B5E = getTranferredOutPatients();
 
     CohortDefinition B6E = getPatientsWhoSuspendedTreatmentB6(false);
 
@@ -3793,11 +3791,13 @@ public class ResumoMensalCohortQueries {
    * Relatório” menos 1 mês; excluindo os utentes que tenham a data mais recente entre:
    *
    * <ul>
-   *   <li>a “Data Próximo Levantamento” registado no último FILA antes da “Data Fim do Relatório”
-   *       menos 1 mês e
+   *   <li>a “Data Próximo Levantamento” registado no último FILA, antes da “Data Fim do Relatório”
+   *       menos 1 mês, adicionando 1 dia e
    *   <li>a última “Data de Levantamento” registada até a “Data Fim do Relatório” menos 1 mês, na
-   *       Ficha Recepção/Levantou ARV, adicionando 30 dias.
+   *       Ficha Recepção/Levantou ARV, adicionando 31 dias.
    * </ul>
+   *
+   * e sendo essa data posterior a “Data Fim do Relatório” menos 1 mês.
    *
    * @return String
    */
@@ -3939,7 +3939,7 @@ public class ResumoMensalCohortQueries {
             + "                                                                         max_datetame "
             + "                                                                 FROM "
             + "                                                                     (SELECT p.patient_id, "
-            + "                                                                             o.value_datetime AS "
+            + "                                                                             Timestampadd(day, 1, o.value_datetime)  AS "
             + "                                                                                 result_value "
             + "                                                                      FROM   patient p "
             + "                                                                                 INNER JOIN encounter e "
@@ -3979,7 +3979,7 @@ public class ResumoMensalCohortQueries {
             + "                                                                      GROUP  BY p.patient_id "
             + "                                                                      UNION "
             + "                                                                      SELECT p.patient_id, "
-            + "                                                                             Timestampadd(day, 30, Max(o.value_datetime)) "
+            + "                                                                             Timestampadd(day, 31, Max(o.value_datetime)) "
             + "                                                                                 AS "
             + "                                                                                 result_value "
             + "                                                                      FROM   patient p "
