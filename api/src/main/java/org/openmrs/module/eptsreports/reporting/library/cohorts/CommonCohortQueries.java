@@ -49,8 +49,7 @@ public class CommonCohortQueries {
    * <p>Have TB treatment End Date <b>((concept_id = 6120)</b> null or > reporting_end_date)
    *
    * <p>Enrolled in TB program <b>(program_id = 5 and patient_state_id =6269)</b>, with Start_date
-   * >= (reporting end date - 6 months) and <= reporting end date and endDate is null or is >
-   * reporting end date
+   * >= (reporting end date - 6 months) and <= reporting end date
    *
    * <p>Active TB <b>(concept_id = 23761)</b> value_coded "Yes <b>(concept_id = 1065)</b>" or
    * treatment plan in ficha clinica MasterCard and encounter_datetime between reporting_end_date
