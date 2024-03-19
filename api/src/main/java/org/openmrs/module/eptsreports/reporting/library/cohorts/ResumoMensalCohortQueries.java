@@ -1108,7 +1108,7 @@ public class ResumoMensalCohortQueries {
    *       (“Data Fim do Relatório”)
    * </ul>
    */
-  public CohortDefinition getPatientsTransferedOutRF13B5(boolean useBothDates) {
+  public CohortDefinition getPatientsTransferedOutRF13B5() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("B5 - Nº de transferidos para outras US em TARV durante o mês");
@@ -1118,15 +1118,9 @@ public class ResumoMensalCohortQueries {
     String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
     String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
-    if (useBothDates) {
-      cd.addSearch("T", map(getPatientsTransferredOutB5(true), mapping2));
-    } else {
-      cd.addSearch(
-          "T",
-          map(
-              getPatientsTransferredOutB5(false),
-              "onOrBefore=${startDate-1d},location=${location}"));
-    }
+    cd.addSearch(
+        "T", map(getTranferredOutPatients(), "onOrBefore=${endDate},location=${location}"));
+
     cd.addSearch("B12", map(getPatientsWhoWereActiveByEndOfPreviousMonthB12(), mapping));
     cd.addSearch(
         "B1", map(getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1(), mapping));
@@ -1537,7 +1531,7 @@ public class ResumoMensalCohortQueries {
     cd.addSearch(
         "B5",
         map(
-            getPatientsTransferedOutRF13B5(true),
+            getPatientsTransferedOutRF13B5(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "B6",
@@ -3349,7 +3343,7 @@ public class ResumoMensalCohortQueries {
     ccd.addSearch(
         "B5",
         map(
-            getPatientsTransferedOutRF13B5(true),
+            getPatientsTransferedOutRF13B5(),
             "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
 
     ccd.setCompositionString("(B7I AND B12) NOT (B6 OR B8 OR B5)");
