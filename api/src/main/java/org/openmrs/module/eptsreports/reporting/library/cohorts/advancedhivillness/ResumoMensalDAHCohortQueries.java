@@ -1553,14 +1553,15 @@ public class ResumoMensalDAHCohortQueries {
             + "  UNION "
             + " SELECT p.patient_id FROM "
             + "                        patient p "
-            + " WHERE p.patient_id NOT IN "
+            + " WHERE p.voided = 0 AND p.patient_id NOT IN "
             + "                        ( "
             + "            SELECT e.patient_id  "
             + "            FROM  "
             + "                 encounter e "
             + "            WHERE  e.voided = 0  "
             + "              AND e.encounter_type = ${90}  "
-            + "              AND e.location_id = :location ) ";
+            + "              AND e.location_id = :location "
+            + "            AND e.patient_id = p.patient_id ) ";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
 
