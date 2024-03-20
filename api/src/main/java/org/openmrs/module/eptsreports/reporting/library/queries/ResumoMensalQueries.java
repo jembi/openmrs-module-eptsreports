@@ -1079,7 +1079,7 @@ public class ResumoMensalQueries {
             + "                        AND pp.date_enrolled <= :endDate ) no_program "
             + "              ON no_program.patient_id = p.patient_id "
             + "WHERE  p.voided = 0 "
-            + "       AND p.voided = 0 "
+            + "       AND o.voided = 0 "
             + "       AND e.location_id = :location "
             + "       AND e.encounter_type = ${53} "
             + "       AND o.concept_id = ${1190} "
