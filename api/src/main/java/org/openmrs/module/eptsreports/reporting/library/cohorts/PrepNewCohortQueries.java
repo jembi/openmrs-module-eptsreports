@@ -56,7 +56,7 @@ public class PrepNewCohortQueries {
             genericCohortQueries.getPatientAgeBasedOnPrepStartDate(15, 200),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(A AND C) AND NOT B");
+    cd.setCompositionString("A AND NOT B");
 
     return cd;
   }
