@@ -1,6 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
 import java.util.*;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
 import org.openmrs.Location;
@@ -10,6 +11,7 @@ import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
+import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -206,18 +208,28 @@ public class TxTbMonthlyCascadeCohortQueries {
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition sent = txtbCohortQueries.specimenSent();
-    CohortDefinition positiveResult = positiveResultsReturned();
-    CohortDefinition negativeTbTestWithoutExclusions = getPatientsFrom6bWithoutExclusions();
+    CohortDefinition sixa = getSixaComposition();
+    CohortDefinition sixb = getSixbComposition();
+    CohortDefinition mwrd = txtbCohortQueries.getmWRD();
+    CohortDefinition semear = txtbCohortQueries.getSmearMicroscopyOnly();
     CohortDefinition tbLam = getPetientsHaveTBLAM();
     CohortDefinition others = getPatientsInOthersWithoutGenexPert();
 
-    CohortDefinition semear = txtbCohortQueries.getSmearMicroscopyOnly();
+    cd.addSearch(
+        SemearTbLamGXPertComposition.SIXA.getKey(),
+        EptsReportUtils.map(
+            sixa, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        SemearTbLamGXPertComposition.FIVE.getKey(),
+        SemearTbLamGXPertComposition.SIXB.getKey(),
         EptsReportUtils.map(
-            sent, "startDate=${startDate},endDate=${endDate},location=${location}"));
+            sixb, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        SemearTbLamGXPertComposition.MWRD.getKey(),
+        EptsReportUtils.map(
+            mwrd, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
     cd.addSearch(
         SemearTbLamGXPertComposition.SEMEAR.getKey(),
         EptsReportUtils.map(
@@ -233,30 +245,159 @@ public class TxTbMonthlyCascadeCohortQueries {
         EptsReportUtils.map(
             others, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.addSearch(
-        SemearTbLamGXPertComposition.MWRD.getKey(),
-        EptsReportUtils.map(
-            txtbCohortQueries.getmWRD(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
-        SemearTbLamGXPertComposition.SIXA.getKey(),
-        EptsReportUtils.map(
-            positiveResult, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        SemearTbLamGXPertComposition.NEGATIVEWITHOUTEXCLUSIONS.getKey(),
-        EptsReportUtils.map(
-            negativeTbTestWithoutExclusions,
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
-        TxTbComposition.NUMERATOR.getKey(),
-        EptsReportUtils.map(
-            patientsPreviouslyOnARTNumerator(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
     cd.setCompositionString(semearTbLamGXPertComposition.getCompositionString());
     return cd;
+  }
+
+  public CohortDefinition getSixaComposition() {
+
+    CompositionCohortDefinition composition = new CompositionCohortDefinition();
+    composition.setName("Composition to return positive results for specific tests");
+    composition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    composition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    composition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition mwrd =
+        getPositiveResultsComposition(txtbCohortQueries.getmWRD(), tbMetadata.getPositiveConcept());
+    CohortDefinition semear =
+        getPositiveResultsSmearComposition(txtbCohortQueries.getSmearMicroscopyOnly(), true);
+    CohortDefinition tbLam =
+        getPositiveResultsTblamComposition(getPetientsHaveTBLAM(), tbMetadata.getPositiveConcept());
+    CohortDefinition others = getPatientsInOthersWithoutGenexPert();
+
+    composition.addSearch(
+        SemearTbLamGXPertComposition.SEMEAR.getKey(),
+        EptsReportUtils.map(
+            semear, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    composition.addSearch(
+        SemearTbLamGXPertComposition.TBLAM.getKey(),
+        EptsReportUtils.map(
+            tbLam, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    composition.addSearch(
+        SemearTbLamGXPertComposition.OTHER.getKey(),
+        EptsReportUtils.map(
+            others, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    composition.addSearch(
+        SemearTbLamGXPertComposition.MWRD.getKey(),
+        EptsReportUtils.map(
+            mwrd, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    composition.setCompositionString("MWRD OR SEMEAR OR TBLAM OR OTHER");
+
+    return composition;
+  }
+
+  public CohortDefinition getSixbComposition() {
+
+    CompositionCohortDefinition composition = new CompositionCohortDefinition();
+    composition.setName("Composition to return negative results for specific tests");
+    composition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    composition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    composition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition mwrd =
+        getPositiveResultsComposition(txtbCohortQueries.getmWRD(), tbMetadata.getNegative());
+    CohortDefinition semear =
+        getPositiveResultsSmearComposition(txtbCohortQueries.getSmearMicroscopyOnly(), false);
+    CohortDefinition tbLam =
+        getPositiveResultsTblamComposition(getPetientsHaveTBLAM(), tbMetadata.getNegative());
+    CohortDefinition others = getPatientsInOthersWithoutGenexPert();
+    CohortDefinition sixa = getSixaComposition();
+
+    composition.addSearch(
+        SemearTbLamGXPertComposition.SEMEAR.getKey(),
+        EptsReportUtils.map(
+            semear, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    composition.addSearch(
+        SemearTbLamGXPertComposition.TBLAM.getKey(),
+        EptsReportUtils.map(
+            tbLam, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    composition.addSearch(
+        SemearTbLamGXPertComposition.OTHER.getKey(),
+        EptsReportUtils.map(
+            others, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    composition.addSearch(
+        SemearTbLamGXPertComposition.MWRD.getKey(),
+        EptsReportUtils.map(
+            mwrd, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    composition.addSearch(
+        SemearTbLamGXPertComposition.SIXA.getKey(),
+        EptsReportUtils.map(
+            sixa, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    composition.setCompositionString("(MWRD OR SEMEAR OR TBLAM OR OTHER) AND NOT SIXA");
+
+    return composition;
+  }
+
+  public CohortDefinition getPositiveResultsComposition(
+      CohortDefinition definition, Concept resultConcept) {
+
+    CompositionCohortDefinition composition = new CompositionCohortDefinition();
+    composition.setName("Composition to return positive results for specific tests");
+    composition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    composition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    composition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition positiveOrNegavtiveResults = getPatientsGeneXpertMtbRif(resultConcept);
+
+    composition.addSearch("EXAMS", Mapped.mapStraightThrough(definition));
+    composition.addSearch("POSNEG", Mapped.mapStraightThrough(positiveOrNegavtiveResults));
+
+    composition.setCompositionString("EXAMS AND POSNEG");
+
+    return composition;
+  }
+
+  public CohortDefinition getPositiveResultsSmearComposition(
+      CohortDefinition definition, boolean positiveOrNegative) {
+
+    CompositionCohortDefinition composition = new CompositionCohortDefinition();
+    composition.setName("Composition to return positive results for specific tests");
+    composition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    composition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    composition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition positiveOrNegativeresults;
+    if (positiveOrNegative) {
+      positiveOrNegativeresults = txtbCohortQueries.getSmearMicroscopyOnlyPositiveResult(false);
+    } else {
+      positiveOrNegativeresults = txtbCohortQueries.getSmearMicroscopyOnlyNegativeResult(false);
+    }
+
+    composition.addSearch("EXAMS", Mapped.mapStraightThrough(definition));
+    composition.addSearch("POSNEG", Mapped.mapStraightThrough(positiveOrNegativeresults));
+
+    composition.setCompositionString("EXAMS AND POSNEG");
+
+    return composition;
+  }
+
+  public CohortDefinition getPositiveResultsTblamComposition(
+      CohortDefinition definition, Concept positiveOrNegative) {
+
+    CompositionCohortDefinition composition = new CompositionCohortDefinition();
+    composition.setName("Composition to return positive results for specific tests");
+    composition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    composition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    composition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition positiveOrNegativeResults =
+        getPatientsHaveTBLAMTestRequestOrResult(Collections.singletonList(positiveOrNegative));
+
+    composition.addSearch("EXAMS", Mapped.mapStraightThrough(definition));
+    composition.addSearch("POSNEG", Mapped.mapStraightThrough(positiveOrNegativeResults));
+
+    composition.setCompositionString("EXAMS AND POSNEG");
+
+    return composition;
   }
 
   /**
@@ -506,7 +647,11 @@ public class TxTbMonthlyCascadeCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition haveTbLamTestResultOrRequestOrResult =
-        getPatientsHaveTBLAMTestRequestOrResult();
+        getPatientsHaveTBLAMTestRequestOrResult(
+            Arrays.asList(
+                tbMetadata.getPositiveConcept(),
+                tbMetadata.getNegativeConcept(),
+                tbMetadata.getIndeterminate()));
 
     cd.addSearch(
         "haveTbLamTestResultOrRequestOrResult",
@@ -1146,16 +1291,14 @@ public class TxTbMonthlyCascadeCohortQueries {
    * clínica – mastercard: * Encounter Type ID = 6 ● TB GENEXPERT TEST (concept id 23723) value
    * coded Positive (concept id 703) ● encounter_datetime >= startDate and <=endDate; or ■ have a
    * ‘GeneXpert Negativo ’ registered in the investigações – resultados laboratoriais - ficha
-   * clínica – mastercard: ● Encounter Type ID = 6 ● TB GENEXPERT TEST (concept id 23723) Answer
-   * Negative (concept id 664) ● encounter_datetime >= startDate and <=endDate; or ■ Have a
-   * GeneXpert request registered in the investigacoes –ficha clinica – mastercard; ● Encounter Type
-   * ID = 6 ● APPLICATION FOR LABORATORY RESEARCH (concept id 23722) value coded TB GENEXPERT TEST
-   * (concept id 23723) ● encounter_datetime >= startDate and <=endDate; or ■ have a GENEXPERT
-   * Result registered in the laboratory form ● Encounter Type ID = 13 ● Teste TB GENEXPERT (concept
-   * id 23723) Value_coded (concept id 664 – Negative, concept id 703 – Positive) ●
-   * encounter_datetime >= startDate and <=endDate ■ have a XpertMTB Result registered in the
-   * laboratory form ● Encounter Type ID = 13 ● Teste XpertMTB (concept id 165189) Value_coded
-   * (concept id 1065 – yes, concept id 1066 – no) ● encounter_datetime >= startDate and
+   * clínica – mastercard or ■ Have a GeneXpert request registered in the investigacoes –ficha
+   * clinica – mastercard; ● Encounter Type ID = 6 ● APPLICATION FOR LABORATORY RESEARCH (concept id
+   * 23722) value coded TB GENEXPERT TEST (concept id 23723) ● encounter_datetime >= startDate and
+   * <=endDate; or ■ have a GENEXPERT Result registered in the laboratory form ● Encounter Type ID =
+   * 13 ● Teste TB GENEXPERT (concept id 23723) Value_coded (concept id 664 – Negative, concept id
+   * 703 – Positive) ● encounter_datetime >= startDate and <=endDate ■ have a XpertMTB Result
+   * registered in the laboratory form ● Encounter Type ID = 13 ● Teste XpertMTB (concept id 165189)
+   * Value_coded (concept id 1065 – yes, concept id 1066 – no) ● encounter_datetime >= startDate and
    *
    * @return
    */
@@ -1192,22 +1335,6 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${23723} "
             + "       AND o.value_coded = ${703} "
-            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
-            + "GROUP  BY p.patient_id "
-            + "UNION "
-            + "SELECT p.patient_id "
-            + "FROM   patient p "
-            + "       INNER JOIN encounter e "
-            + "               ON e.patient_id = p.patient_id "
-            + "       INNER JOIN obs o "
-            + "               ON o.encounter_id = e.encounter_id "
-            + "WHERE  p.voided = 0 "
-            + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "       AND e.encounter_type = ${6} "
-            + "       AND e.location_id = :location "
-            + "       AND o.concept_id = ${23723} "
-            + "       AND o.value_coded = ${664} "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP  BY p.patient_id "
             + "UNION "
@@ -1277,24 +1404,14 @@ public class TxTbMonthlyCascadeCohortQueries {
    *
    * @return
    */
-  public CohortDefinition getPatientsHaveTBLAMTestRequestOrResult() {
+  public CohortDefinition getPatientsHaveTBLAMTestRequestOrResult(List<Concept> results) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("GeneXpert MTB/RIF");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
-    Map<String, Integer> map = new HashMap<>();
-    map.put("23723", tbMetadata.getTBGenexpertTestConcept().getConceptId());
-    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
-    map.put("703", tbMetadata.getPositiveConcept().getConceptId());
-    map.put("664", tbMetadata.getNegativeConcept().getConceptId());
-    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
-    map.put("1066", hivMetadata.getNoConcept().getConceptId());
-    map.put("23951", tbMetadata.getTestTBLAM().getConceptId());
-    map.put("1138", tbMetadata.getIndeterminate().getConceptId());
+    Map<String, String> map = getStringMap(results);
 
     String query =
         "SELECT p.patient_id "
@@ -1325,7 +1442,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND e.encounter_type = ${6} "
             + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${23951} "
-            + "       AND o.value_coded IN ( ${703}, ${664} ) "
+            + "       AND o.value_coded IN (${results} ) "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP  BY p.patient_id "
             + "UNION "
@@ -1341,12 +1458,32 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND e.encounter_type = ${13} "
             + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${23951} "
-            + "       AND o.value_coded IN ( ${703}, ${664}, ${1138} ) "
+            + "       AND o.value_coded IN ( ${results} ) "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP  BY p.patient_id";
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(sb.replace(query));
     return sqlCohortDefinition;
+  }
+
+  private Map<String, String> getStringMap(List<Concept> results) {
+    List<Integer> answerIds = new ArrayList<>();
+
+    for (Concept concept : results) {
+      answerIds.add(concept.getConceptId());
+    }
+
+    Map<String, String> map = new HashMap<>();
+    map.put("23723", String.valueOf(tbMetadata.getTBGenexpertTestConcept().getConceptId()));
+    map.put(
+        "23722", String.valueOf(hivMetadata.getApplicationForLaboratoryResearch().getConceptId()));
+    map.put(
+        "6", String.valueOf(hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()));
+    map.put(
+        "13", String.valueOf(hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId()));
+    map.put("23951", String.valueOf(tbMetadata.getTestTBLAM().getConceptId()));
+    map.put("results", StringUtils.join(answerIds, ','));
+    return map;
   }
 
   /**
@@ -2684,16 +2821,12 @@ public class TxTbMonthlyCascadeCohortQueries {
     SIXB {
       @Override
       public String getKey() {
-        return "";
+        return "SIXB";
       }
 
       @Override
       public String getCompositionString() {
-        return NEGATIVEWITHOUTEXCLUSIONS.getKey()
-            + " AND "
-            + FIVE.getKey()
-            + " AND NOT "
-            + SIXA.getKey();
+        return getKey();
       }
 
       @Override
@@ -2709,13 +2842,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return NEGATIVEWITHOUTEXCLUSIONS.getKey()
-            + " AND "
-            + FIVE.getKey()
-            + " AND NOT "
-            + SIXA.getKey()
-            + " AND "
-            + SEMEAR.getKey();
+        return SIXB.getKey() + " AND " + SEMEAR.getKey();
       }
 
       @Override
@@ -2731,13 +2858,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return NEGATIVEWITHOUTEXCLUSIONS.getKey()
-            + " AND "
-            + FIVE.getKey()
-            + " AND NOT "
-            + SIXA.getKey()
-            + " AND "
-            + MWRD.getKey();
+        return SIXB.getKey() + " AND " + MWRD.getKey();
       }
 
       @Override
@@ -2754,13 +2875,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return NEGATIVEWITHOUTEXCLUSIONS.getKey()
-            + " AND "
-            + FIVE.getKey()
-            + " AND NOT "
-            + SIXA.getKey()
-            + " AND "
-            + TBLAM.getKey();
+        return SIXB.getKey() + " AND " + TBLAM.getKey();
       }
 
       @Override
@@ -2776,13 +2891,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return NEGATIVEWITHOUTEXCLUSIONS.getKey()
-            + " AND "
-            + FIVE.getKey()
-            + " AND NOT "
-            + SIXA.getKey()
-            + " AND "
-            + OTHER.getKey();
+        return SIXB.getKey() + " AND " + OTHER.getKey();
       }
 
       @Override
