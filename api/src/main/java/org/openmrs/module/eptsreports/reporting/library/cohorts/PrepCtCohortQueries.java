@@ -405,8 +405,8 @@ public class PrepCtCohortQueries {
   public CohortDefinition getPatientsWhoAreKeypopulation(List<Concept> answers) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patients who are Key population ");
-    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
-    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -429,9 +429,9 @@ public class PrepCtCohortQueries {
             + "               ON e.patient_id = p.patient_id "
             + "       INNER JOIN obs o "
             + "               ON o.encounter_id = e.encounter_id "
-            + "WHERE  e.voided = 0 "
-            + "       AND p.voided = 0 "
+            + "WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
             + "       AND e.encounter_type IN (${80}, ${81}) "
             + "       AND o.concept_id = ${23703} "
             + "       AND o.value_coded IN ( "
@@ -496,8 +496,8 @@ public class PrepCtCohortQueries {
   public CohortDefinition getPatientsWhoAreHomosexual() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Homosexuals");
-    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
-    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition HSM =
@@ -531,8 +531,8 @@ public class PrepCtCohortQueries {
   public CohortDefinition getPatientsWhoArePrisoner() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Prisoners");
-    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
-    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition prisoner =
@@ -563,8 +563,8 @@ public class PrepCtCohortQueries {
   public CohortDefinition getPatientsWhoAreTransgender() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Transgender");
-    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
-    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition trans =
@@ -591,8 +591,8 @@ public class PrepCtCohortQueries {
   public CohortDefinition getPatientsWhoAreOutro() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Outro");
-    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
-    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition outro =
@@ -624,8 +624,8 @@ public class PrepCtCohortQueries {
   public CohortDefinition getFemalePatientsWhoAreSexWorker() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Sex Worker");
-    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
-    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition SW =
@@ -1005,8 +1005,8 @@ public class PrepCtCohortQueries {
   public CohortDefinition getMalePatientsWhoAreSexWorker() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Male Sex Workers");
-    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
-    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition SW =
