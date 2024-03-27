@@ -1201,7 +1201,7 @@ public class TPTEligiblePatientListCohortQueries {
         " SELECT p.patient_id   "
             + "            FROM   patient p   "
             + "            INNER JOIN(   "
-            + unionQuery
+            + getPatientWithInhFromY1to3Query()
             + " ) AS tabela  ON tabela.patient_id = p.patient_id    "
             + "                    WHERE p.voided = 0 "
             + "       AND( SELECT count(patient_id) "
