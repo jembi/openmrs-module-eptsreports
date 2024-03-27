@@ -208,6 +208,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
+    CohortDefinition sent = txtbCohortQueries.specimenSent();
     CohortDefinition sixa = getSixaComposition();
     CohortDefinition sixb = getSixbComposition();
     CohortDefinition mwrd = txtbCohortQueries.getmWRD();
@@ -219,6 +220,11 @@ public class TxTbMonthlyCascadeCohortQueries {
         SemearTbLamGXPertComposition.SIXA.getKey(),
         EptsReportUtils.map(
             sixa, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        SemearTbLamGXPertComposition.FIVE.getKey(),
+        EptsReportUtils.map(
+            sent, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         SemearTbLamGXPertComposition.SIXB.getKey(),
@@ -244,6 +250,12 @@ public class TxTbMonthlyCascadeCohortQueries {
         SemearTbLamGXPertComposition.OTHER.getKey(),
         EptsReportUtils.map(
             others, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        TxTbComposition.NUMERATOR.getKey(),
+        EptsReportUtils.map(
+            patientsPreviouslyOnARTNumerator(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(semearTbLamGXPertComposition.getCompositionString());
     return cd;
@@ -2671,23 +2683,6 @@ public class TxTbMonthlyCascadeCohortQueries {
       @Override
       public String getName() {
         return "Select all patients from TX CURR";
-      }
-    },
-
-    NEGATIVEWITHOUTEXCLUSIONS {
-      @Override
-      public String getKey() {
-        return "NEGATIVEWITHOUTEXCLUSIONS";
-      }
-
-      @Override
-      public String getCompositionString() {
-        return getKey();
-      }
-
-      @Override
-      public String getName() {
-        return "NEGATIVEWITHOUTEXCLUSIONS";
       }
     },
     FIVE_AND_OTHER {
