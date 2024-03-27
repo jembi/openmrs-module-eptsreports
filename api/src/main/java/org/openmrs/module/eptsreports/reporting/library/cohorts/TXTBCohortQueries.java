@@ -2034,7 +2034,7 @@ public class TXTBCohortQueries {
         "specimen-sent", EptsReportUtils.map(getSpecimenSent(), generalParameterMapping));
     addGeneralParameters(definition);
     definition.setCompositionString(
-        "denominator AND specimen-sent"); // ! confirmar positive-screening
+        "denominator AND specimen-sent");
     return definition;
   }
 

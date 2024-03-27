@@ -276,6 +276,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     CohortDefinition tbLam =
         getPositiveResultsTblamComposition(getPetientsHaveTBLAM(), tbMetadata.getPositiveConcept());
     CohortDefinition others = getPatientsInOthersWithoutGenexPert();
+    CohortDefinition sent = txtbCohortQueries.specimenSent();
 
     composition.addSearch(
         SemearTbLamGXPertComposition.SEMEAR.getKey(),
@@ -297,7 +298,12 @@ public class TxTbMonthlyCascadeCohortQueries {
         EptsReportUtils.map(
             mwrd, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    composition.setCompositionString("MWRD OR SEMEAR OR TBLAM OR OTHER");
+    composition.addSearch(
+        SemearTbLamGXPertComposition.FIVE.getKey(),
+        EptsReportUtils.map(
+            sent, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    composition.setCompositionString("FIVE AND (MWRD OR SEMEAR OR TBLAM OR OTHER)");
 
     return composition;
   }
@@ -318,6 +324,8 @@ public class TxTbMonthlyCascadeCohortQueries {
         getPositiveResultsTblamComposition(getPetientsHaveTBLAM(), tbMetadata.getNegative());
     CohortDefinition others = getPatientsInOthersWithoutGenexPert();
     CohortDefinition sixa = getSixaComposition();
+
+    CohortDefinition sent = txtbCohortQueries.specimenSent();
 
     composition.addSearch(
         SemearTbLamGXPertComposition.SEMEAR.getKey(),
@@ -344,7 +352,12 @@ public class TxTbMonthlyCascadeCohortQueries {
         EptsReportUtils.map(
             sixa, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    composition.setCompositionString("(MWRD OR SEMEAR OR TBLAM OR OTHER) AND NOT SIXA");
+    composition.addSearch(
+        SemearTbLamGXPertComposition.FIVE.getKey(),
+        EptsReportUtils.map(
+            sent, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    composition.setCompositionString("(FIVE AND (MWRD OR SEMEAR OR TBLAM OR OTHER)) AND NOT SIXA");
 
     return composition;
   }
