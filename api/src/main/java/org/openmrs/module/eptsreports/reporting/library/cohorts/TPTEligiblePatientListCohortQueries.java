@@ -1276,31 +1276,10 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
-    EptsQueriesUtil unionBuilder = new EptsQueriesUtil();
-
-    // this will generate one union separated query based on the given queries
-    String unionQuery =
-        unionBuilder
-            .unionBuilder(TPTEligiblePatientsQueries.getY1QueryWithPatientIdForB5())
-            .union(TPTEligiblePatientsQueries.getY2QueryWithPatientIdForB5())
-            .union(TPTEligiblePatientsQueries.getY3QueryWithPatientIdForB5())
-            .buildQuery();
-
     String query =
         "   SELECT result.patient_id    "
-            + "                FROM (SELECT p.patient_id,tabela.start_date    "
-            + "                   FROM   patient p    "
-            + "                   INNER JOIN encounter e  "
-            + "                           ON e.patient_id = p.patient_id  "
-            + "                   INNER JOIN obs o    "
-            + "                           ON o.encounter_id = e.encounter_id  "
-            + "                   INNER JOIN(  "
-            + unionQuery
-            + "  ) AS tabela "
-            + "                           ON tabela.patient_id = p.patient_id "
-            + "                           WHERE e.location_id= :location AND e.encounter_type IN (${6}, ${9}, ${53}) AND e.voided=0 AND o.voided=0    "
-            + "                           ) result   "
-            + "               WHERE   ( (SELECT Count(*)  "
+                + "FROM   (" + getPatientWithInhFromY1to3Query() + ") result "
+                + "               WHERE   ( (SELECT Count(*)  "
             + "                          FROM   patient pp    "
             + "                                 JOIN encounter ee "
             + "                                   ON pp.patient_id = ee.patient_id    "
@@ -1388,8 +1367,74 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     String query =
-        "SELECT result.patient_id "
-            + "FROM   (SELECT p.patient_id, "
+            "SELECT result.patient_id "
+                    + "FROM   (" + getPatientWithInhFromY1to3Query() + ") result "
+                    + "WHERE  ( (SELECT Count(e.encounter_id) "
+                    + "          FROM   encounter e "
+                    + "                 join obs o "
+                    + "                   ON o.encounter_id = e.encounter_id "
+                    + "                 join (SELECT o.encounter_id "
+                    + "                       FROM   encounter e "
+                    + "                              join obs o "
+                    + "                                ON o.encounter_id = e.encounter_id "
+                    + "                       WHERE  e.encounter_type = 6 "
+                    + "                              AND o.voided = 0 "
+                    + "                              AND e.voided = 0 "
+                    + "                              AND e.location_id = :location "
+                    + "                              AND o.concept_id = ${23985} "
+                    + "                              AND o.value_coded = ${656} "
+                    + "                       GROUP  BY e.encounter_id) AS inh "
+                    + "                   ON inh.encounter_id = o.encounter_id "
+                    + "          WHERE  o.voided = 0 "
+                    + "                 AND o.concept_id = ${165308} "
+                    + "                 AND o.value_coded IN ( ${1256}, ${1257} ) "
+                    + "                 AND e.patient_id = result.patient_id "
+                    + "                 AND o.obs_datetime BETWEEN result.start_date AND "
+                    + "                                            Date_add(result.start_date, "
+                    + "                                            interval 7 month) "
+                    + "                 AND e.encounter_datetime <=:endDate) >= 3 "
+                    + "         AND (SELECT Count(e.encounter_id) "
+                    + "              FROM   encounter e "
+                    + "                     join obs o "
+                    + "                       ON o.encounter_id = e.encounter_id "
+                    + "                     join (SELECT o.encounter_id AS encounter_id "
+                    + "                           FROM   obs o "
+                    + "                                  join (SELECT e.encounter_id "
+                    + "                                        FROM   encounter e "
+                    + "                                               join obs o "
+                    + "                                                 ON o.encounter_id = "
+                    + "                                                    e.encounter_id "
+                    + "                                        WHERE  e.encounter_type = 6 "
+                    + "                                               AND o.voided = 0 "
+                    + "                                               AND e.voided = 0 "
+                    + "                                               AND e.location_id = :location "
+                    + "                                               AND o.concept_id = ${23985} "
+                    + "                                               AND o.value_coded = ${656} "
+                    + "                                        GROUP  BY e.encounter_id) AS inh "
+                    + "                                    ON inh.encounter_id = o.encounter_id "
+                    + "                           WHERE  o.voided = 0 "
+                    + "                                  AND o.concept_id = ${165308} "
+                    + "                                  AND o.value_coded IN ( ${1256}, ${1257} ) "
+                    + "                           GROUP  BY o.encounter_id) AS continua "
+                    + "                       ON continua.encounter_id = e.encounter_id "
+                    + "              WHERE  o.concept_id = ${1719} "
+                    + "                     AND o.value_coded = ${23955} "
+                    + "                     AND result.patient_id = e.patient_id "
+                    + "                     AND e.encounter_datetime BETWEEN result.start_date AND "
+                    + "Date_add(result.start_date, "
+                    + "interval 7 month) "
+                    + "AND e.encounter_datetime <= :endDate) >= 1 ) "
+                    + "GROUP  BY result.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  private static String getPatientWithInhFromY1to3Query() {
+    return "SELECT p.patient_id, "
             + "               tabela.start_date "
             + "        FROM   patient p "
             + "               inner join (SELECT o.person_id    AS patient_id, "
@@ -1455,69 +1500,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                  AND o.value_coded = ${1256} "
             + "                                  AND o.obs_datetime <= :endDate) AS tabela "
             + "                       ON tabela.patient_id = p.patient_id "
-            + "        WHERE  p.voided = 0) result "
-            + "WHERE  ( (SELECT Count(e.encounter_id) "
-            + "          FROM   encounter e "
-            + "                 join obs o "
-            + "                   ON o.encounter_id = e.encounter_id "
-            + "                 join (SELECT o.encounter_id "
-            + "                       FROM   encounter e "
-            + "                              join obs o "
-            + "                                ON o.encounter_id = e.encounter_id "
-            + "                       WHERE  e.encounter_type = 6 "
-            + "                              AND o.voided = 0 "
-            + "                              AND e.voided = 0 "
-            + "                              AND e.location_id = :location "
-            + "                              AND o.concept_id = ${23985} "
-            + "                              AND o.value_coded = ${656} "
-            + "                       GROUP  BY e.encounter_id) AS inh "
-            + "                   ON inh.encounter_id = o.encounter_id "
-            + "          WHERE  o.voided = 0 "
-            + "                 AND o.concept_id = ${165308} "
-            + "                 AND o.value_coded IN ( ${1256}, ${1257} ) "
-            + "                 AND e.patient_id = result.patient_id "
-            + "                 AND o.obs_datetime BETWEEN result.start_date AND "
-            + "                                            Date_add(result.start_date, "
-            + "                                            interval 7 month) "
-            + "                 AND e.encounter_datetime <=:endDate) >= 3 "
-            + "         AND (SELECT Count(e.encounter_id) "
-            + "              FROM   encounter e "
-            + "                     join obs o "
-            + "                       ON o.encounter_id = e.encounter_id "
-            + "                     join (SELECT o.encounter_id AS encounter_id "
-            + "                           FROM   obs o "
-            + "                                  join (SELECT e.encounter_id "
-            + "                                        FROM   encounter e "
-            + "                                               join obs o "
-            + "                                                 ON o.encounter_id = "
-            + "                                                    e.encounter_id "
-            + "                                        WHERE  e.encounter_type = 6 "
-            + "                                               AND o.voided = 0 "
-            + "                                               AND e.voided = 0 "
-            + "                                               AND e.location_id = :location "
-            + "                                               AND o.concept_id = ${23985} "
-            + "                                               AND o.value_coded = ${656} "
-            + "                                        GROUP  BY e.encounter_id) AS inh "
-            + "                                    ON inh.encounter_id = o.encounter_id "
-            + "                           WHERE  o.voided = 0 "
-            + "                                  AND o.concept_id = ${165308} "
-            + "                                  AND o.value_coded IN ( ${1256}, ${1257} ) "
-            + "                           GROUP  BY o.encounter_id) AS continua "
-            + "                       ON continua.encounter_id = e.encounter_id "
-            + "              WHERE  o.concept_id = ${1719} "
-            + "                     AND o.value_coded = ${23955} "
-            + "                     AND result.patient_id = e.patient_id "
-            + "                     AND e.encounter_datetime BETWEEN result.start_date AND "
-            + "Date_add(result.start_date, "
-            + "interval 7 month) "
-            + "AND e.encounter_datetime <= :endDate) >= 1 ) "
-            + "GROUP  BY result.patient_id";
-
-    StringSubstitutor sb = new StringSubstitutor(map);
-
-    sqlCohortDefinition.setQuery(sb.replace(query));
-
-    return sqlCohortDefinition;
+            + "        WHERE  p.voided = 0";
   }
 
   /**
