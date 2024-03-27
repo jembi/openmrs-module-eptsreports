@@ -2033,8 +2033,7 @@ public class TXTBCohortQueries {
     definition.addSearch(
         "specimen-sent", EptsReportUtils.map(getSpecimenSent(), generalParameterMapping));
     addGeneralParameters(definition);
-    definition.setCompositionString(
-        "denominator AND specimen-sent");
+    definition.setCompositionString("denominator AND specimen-sent");
     return definition;
   }
 
@@ -2371,26 +2370,13 @@ public class TXTBCohortQueries {
     definition.setName("haveBasiloscopia()");
     addGeneralParameters(definition);
 
-    CohortDefinition applicationForLaboratoryResearchCohort =
-        genericCohortQueries.generalSql(
-            "applicationForLaboratoryResearchCohort",
-            genericCohortQueries.getPatientsWithObsBetweenDates(
-                fichaClinica, applicationForLaboratoryResearch, Arrays.asList(basiloscopiaExam)));
-    addGeneralParameters(applicationForLaboratoryResearchCohort);
-
     definition.addSearch(
         "basiloscopiaCohort", EptsReportUtils.map(basiloscopiaCohort, generalParameterMapping));
     definition.addSearch(
         "basiloscopiaLabCohort",
         EptsReportUtils.map(basiloscopiaLabCohort, generalParameterMapping));
-    definition.addSearch(
-        "applicationForLaboratoryResearchCohort",
-        EptsReportUtils.map(applicationForLaboratoryResearchCohort, generalParameterMapping));
 
-    definition.setCompositionString(
-        txtbOrTb4
-            ? "basiloscopiaCohort OR basiloscopiaLabCohort"
-            : "basiloscopiaCohort OR basiloscopiaLabCohort OR applicationForLaboratoryResearchCohort");
+    definition.setCompositionString("basiloscopiaCohort OR basiloscopiaLabCohort");
 
     return definition;
   }
