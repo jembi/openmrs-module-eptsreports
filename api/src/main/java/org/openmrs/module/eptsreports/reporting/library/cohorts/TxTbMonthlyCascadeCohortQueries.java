@@ -1443,22 +1443,6 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND o.voided = 0 "
             + "       AND e.encounter_type = ${6} "
             + "       AND e.location_id = :location "
-            + "       AND o.concept_id = ${23722} "
-            + "       AND o.value_coded = ${23951} "
-            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
-            + "GROUP  BY p.patient_id "
-            + "UNION "
-            + "SELECT p.patient_id "
-            + "FROM   patient p "
-            + "       INNER JOIN encounter e "
-            + "               ON e.patient_id = p.patient_id "
-            + "       INNER JOIN obs o "
-            + "               ON o.encounter_id = e.encounter_id "
-            + "WHERE  p.voided = 0 "
-            + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "       AND e.encounter_type = ${6} "
-            + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${23951} "
             + "       AND o.value_coded IN (${results} ) "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
@@ -1492,7 +1476,6 @@ public class TxTbMonthlyCascadeCohortQueries {
     }
 
     Map<String, String> map = new HashMap<>();
-    map.put("23723", String.valueOf(tbMetadata.getTBGenexpertTestConcept().getConceptId()));
     map.put(
         "23722", String.valueOf(hivMetadata.getApplicationForLaboratoryResearch().getConceptId()));
     map.put(
