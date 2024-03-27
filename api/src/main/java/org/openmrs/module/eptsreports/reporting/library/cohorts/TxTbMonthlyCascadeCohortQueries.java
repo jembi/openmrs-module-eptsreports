@@ -1333,6 +1333,14 @@ public class TxTbMonthlyCascadeCohortQueries {
     map.put("1066", hivMetadata.getNoConcept().getConceptId());
     map.put("positiveOrNegativeResult", positiveOrNegativeResult.getConceptId());
 
+    String valueCodedForLab = "";
+
+    if (positiveOrNegativeResult != null && positiveOrNegativeResult.getConceptId() == 703) {
+      valueCodedForLab = " ${1065} ";
+    } else if (positiveOrNegativeResult != null && positiveOrNegativeResult.getConceptId() == 664) {
+      valueCodedForLab = " ${1066} ";
+    }
+
     String query =
         "SELECT p.patient_id "
             + "FROM   patient p "
@@ -1378,7 +1386,8 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND e.encounter_type = ${13} "
             + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${165189} "
-            + "       AND o.value_coded IN( ${1065}, ${1066} ) "
+            + "       AND o.value_coded = "
+            + valueCodedForLab
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP  BY p.patient_id";
 
