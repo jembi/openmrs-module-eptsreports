@@ -4731,6 +4731,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("1709", hivMetadata.getSuspendedTreatmentConcept().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
 
     String query =
         new EptsQueriesUtil()
