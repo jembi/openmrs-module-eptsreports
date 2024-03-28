@@ -214,7 +214,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     CohortDefinition mwrd = txtbCohortQueries.getmWRD();
     CohortDefinition semear = txtbCohortQueries.getSmearMicroscopyOnly();
     CohortDefinition tbLam = getPetientsHaveTBLAM();
-    CohortDefinition others = getPatientsInOthersWithoutGenexPert();
+    CohortDefinition others = txtbCohortQueries.getAdditionalTest();
 
     cd.addSearch(
         SemearTbLamGXPertComposition.SIXA.getKey(),
@@ -275,7 +275,7 @@ public class TxTbMonthlyCascadeCohortQueries {
         getPositiveResultsSmearComposition(txtbCohortQueries.getSmearMicroscopyOnly(), true);
     CohortDefinition tbLam =
         getPositiveResultsTblamComposition(getPetientsHaveTBLAM(), tbMetadata.getPositiveConcept());
-    CohortDefinition others = getPatientsInOthersWithoutGenexPert();
+    CohortDefinition others = getPatientsInOthersWithoutGenexPert(tbMetadata.getPositiveConcept());
     CohortDefinition sent = txtbCohortQueries.specimenSent();
 
     composition.addSearch(
@@ -322,7 +322,7 @@ public class TxTbMonthlyCascadeCohortQueries {
         getPositiveResultsSmearComposition(txtbCohortQueries.getSmearMicroscopyOnly(), false);
     CohortDefinition tbLam =
         getPositiveResultsTblamComposition(getPetientsHaveTBLAM(), tbMetadata.getNegative());
-    CohortDefinition others = getPatientsInOthersWithoutGenexPert();
+    CohortDefinition others = getPatientsInOthersWithoutGenexPert(tbMetadata.getNegative());
     CohortDefinition sixa = getSixaComposition();
 
     CohortDefinition sent = txtbCohortQueries.specimenSent();
@@ -703,37 +703,27 @@ public class TxTbMonthlyCascadeCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getPatientsInOthersWithoutGenexPert() {
+  public CohortDefinition getPatientsInOthersWithoutGenexPert(Concept positiveOrNegative) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Other (No GeneXpert)");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition others = txtbCohortQueries.specimenSent();
-    CohortDefinition semear = txtbCohortQueries.getSmearMicroscopyOnly();
-    CohortDefinition tbLam = getPetientsHaveTBLAM();
-    CohortDefinition mWRD = txtbCohortQueries.getmWRD();
+    CohortDefinition others = txtbCohortQueries.getAdditionalTest();
+    CohortDefinition othersPositive = getPatientsWithCultureTestResultPositive(positiveOrNegative);
 
     cd.addSearch(
         "others",
         EptsReportUtils.map(
             others, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "semear",
-        EptsReportUtils.map(
-            semear, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "tbLam",
-        EptsReportUtils.map(
-            tbLam, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        "mWRD",
+        "othersPositive",
         EptsReportUtils.map(
-            mWRD, "startDate=${startDate},endDate=${endDate},location=${location}"));
+            othersPositive, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("others AND NOT (semear OR mWRD OR tbLam)");
+    cd.setCompositionString("(others AND othersPositive)");
 
     return cd;
   }
@@ -2027,6 +2017,54 @@ public class TxTbMonthlyCascadeCohortQueries {
     StringSubstitutor sb = new StringSubstitutor(valuesMap);
 
     return sb.replace(query);
+  }
+
+  public CohortDefinition getPatientsWithCultureTestResultPositive(Concept positiveOrNegative) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients with Culture test Result positive");
+    sqlCohortDefinition.addParameters(getParameters());
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("23774", tbMetadata.getCultureTest().getConceptId());
+    map.put("positiveOrNegative", positiveOrNegative.getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${23774} "
+            + "       AND o.value_coded =${positiveOrNegative} "
+            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "GROUP  BY p.patient_id "
+            + "UNION "
+            + "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${13} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${23774} "
+            + "       AND o.value_coded = ${positiveOrNegative} "
+            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "GROUP  BY p.patient_id";
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+    return sqlCohortDefinition;
   }
 
   public enum TxCurrComposition {
