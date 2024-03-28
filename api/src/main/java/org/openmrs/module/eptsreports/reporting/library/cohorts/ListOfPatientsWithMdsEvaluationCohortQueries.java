@@ -841,7 +841,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                           FROM   ( "
             + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
             + "                           ) art_patient "
-            + " ) art ON art.patient_id = pa.patient_id "
+            + " ) art ON art.patient_id = p.patient_id "
             + "       WHERE  p.voided = 0 "
             + "       AND  e.voided = 0 "
             + "       AND  o.voided = 0 "
@@ -990,7 +990,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   private String getLastVlDateBetweenPeriods(int minNumberOfMonths, int maxNumberOfMonths) {
     return " SELECT     p.patient_id, "
-        + "           MAX(e.encounter_datetime) AS vl_date  "
+        + "           MAX(e.encounter_datetime) AS last_vl_date  "
         + "FROM       patient p "
         + "INNER JOIN encounter e "
         + "ON         e.patient_id = p.patient_id "
