@@ -336,29 +336,6 @@ public class TPTEligiblePatientsQueries {
   }
 
   /**
-   * @see #getY1Query()
-   * @return {@link String}
-   */
-  public static String getY1QueryWithPatientIdForB5() {
-    return "SELECT ee.patient_id, o3.obs_datetime AS start_date "
-        + "FROM   encounter ee "
-        + "       JOIN obs o2 "
-        + "         ON o2.encounter_id = ee.encounter_id "
-        + "       JOIN obs o3 "
-        + "         ON o3.encounter_id = ee.encounter_id "
-        + "WHERE  ee.encounter_type = ${53} "
-        + "       AND o2.voided = 0 "
-        + "       AND o3.voided = 0 "
-        + "       AND ee.voided = 0 "
-        + "       AND ee.location_id = :location "
-        + "       AND ((o2.concept_id = ${23985} "
-        + "        AND o2.value_coded = ${656}) "
-        + "       AND (o3.concept_id = ${165308} "
-        + "        AND o3.value_coded = ${1256} "
-        + "        AND o3.obs_datetime <= :endDate)) ";
-  }
-
-  /**
    * <b>K. Patients IPT Start Dates as:</b>
    *
    * <p>Y2: Select Encounter Datetime from Ficha clinica (encounter type 6) with Profilaxia TPT
@@ -371,31 +348,6 @@ public class TPTEligiblePatientsQueries {
     return "SELECT ee.patient_id, o3.obs_datetime start_date "
         + "FROM encounter ee "
         + "    JOIN obs o2 ON o2.encounter_id = ee.encounter_id "
-        + "    JOIN obs o3 ON o3.encounter_id = ee.encounter_id "
-        + "WHERE "
-        + "        ee.encounter_type = ${6} "
-        + "  AND o2.voided = 0 "
-        + "  AND o3.voided = 0 "
-        + "  AND ee.voided = 0 "
-        + "  AND ee.location_id = :location "
-        + "  AND (( o2.concept_id = ${23985} "
-        + "    AND o2.value_coded = ${656} ) "
-        + "  AND ( o3.concept_id = ${165308} "
-        + "    AND o3.value_coded = ${1256} "
-        + "    AND o3.obs_datetime <= :endDate )) ";
-  }
-
-  /**
-   * @see #getY2Query()
-   * @return {@link String}
-   */
-  public static String getY2QueryWithPatientIdForB5() {
-    return "SELECT "
-        + "    ee.patient_id, o3.obs_datetime AS start_date "
-        + "FROM "
-        + "    encounter ee "
-        + "        JOIN "
-        + "    obs o2 ON o2.encounter_id = ee.encounter_id "
         + "    JOIN obs o3 ON o3.encounter_id = ee.encounter_id "
         + "WHERE "
         + "        ee.encounter_type = ${6} "
@@ -434,29 +386,6 @@ public class TPTEligiblePatientsQueries {
         + "    AND oo.voided = 0 "
         + "    AND ee.voided = 0 "
         + "    AND ee.location_id = :location ";
-  }
-
-  /**
-   * @see #getY3Query()
-   * @return {@link String}
-   */
-  public static String getY3QueryWithPatientIdForB5() {
-    return "SELECT ee.patient_id, oo2.obs_datetime AS start_date "
-        + "FROM   encounter ee "
-        + "           JOIN obs oo "
-        + "                ON oo.encounter_id = ee.encounter_id "
-        + "           JOIN obs oo2 "
-        + "                ON oo2.encounter_id = ee.encounter_id "
-        + "WHERE  ee.encounter_type = ${9} "
-        + "    AND oo.voided = 0 "
-        + "    AND oo2.voided = 0 "
-        + "    AND ee.voided = 0 "
-        + "    AND ee.location_id = :location "
-        + "    AND ((oo.concept_id = ${23985} "
-        + "    AND oo.value_coded = ${656}) "
-        + "    AND (oo2.concept_id = ${165308} "
-        + "    AND oo2.value_coded = ${1256} "
-        + "    AND oo2.obs_datetime <= :endDate)) ";
   }
 
   /**
