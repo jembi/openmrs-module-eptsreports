@@ -1187,16 +1187,6 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
     map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
-    EptsQueriesUtil unionBuilder = new EptsQueriesUtil();
-
-    // this will generate one union separated query based on the given queries
-    String unionQuery =
-        unionBuilder
-            .unionBuilder(TPTEligiblePatientsQueries.getY1QueryWithPatientIdForB5())
-            .union(TPTEligiblePatientsQueries.getY2QueryWithPatientIdForB5())
-            .union(TPTEligiblePatientsQueries.getY3QueryWithPatientIdForB5())
-            .buildQuery();
-
     String query =
         " SELECT p.patient_id   "
             + "            FROM   patient p   "
@@ -1278,9 +1268,9 @@ public class TPTEligiblePatientListCohortQueries {
 
     String query =
         "   SELECT result.patient_id    "
-            + "FROM   ("
+            + "FROM   ( "
             + getPatientWithInhFromY1to3Query()
-            + ") result "
+            + " ) result "
             + "               WHERE   ( "
             + " ( SELECT Count(e.encounter_id) AS consultations "
             + "FROM   encounter e "
@@ -1366,9 +1356,9 @@ public class TPTEligiblePatientListCohortQueries {
 
     String query =
         "SELECT result.patient_id "
-            + "FROM   ("
+            + "FROM   ( "
             + getPatientWithInhFromY1to3Query()
-            + ") result "
+            + " ) result "
             + "WHERE  ( (SELECT Count(e.encounter_id) "
             + "          FROM   encounter e "
             + "                 join obs o "
@@ -1456,7 +1446,7 @@ public class TPTEligiblePatientListCohortQueries {
         + "                           WHERE  o.voided = 0 "
         + "                                  AND o.concept_id = ${165308} "
         + "                                  AND o.value_coded = ${1256} "
-        + "                                  AND o.obs_datetime <= :endDate' "
+        + "                                  AND o.obs_datetime <= :endDate "
         + "                           UNION "
         + "                           SELECT o.person_id    AS patient_id, "
         + "                                  o.obs_datetime AS start_date "
