@@ -394,7 +394,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     if (positiveOrNegative) {
       positiveOrNegativeresults = txtbCohortQueries.getSmearMicroscopyOnlyPositiveResult(false);
     } else {
-      positiveOrNegativeresults = txtbCohortQueries.getSmearMicroscopyOnlyNegativeResult(false);
+      positiveOrNegativeresults = getSmearMicroscopyOnlyNegative();
     }
 
     composition.addSearch("EXAMS", Mapped.mapStraightThrough(definition));
@@ -415,7 +415,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     composition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition positiveOrNegativeResults =
-        getPatientsHaveTBLAMTestRequestOrResult(Collections.singletonList(positiveOrNegative));
+        getPatientsHaveTBLAMpositiveOrNegativeResult(Collections.singletonList(positiveOrNegative));
 
     composition.addSearch("EXAMS", Mapped.mapStraightThrough(definition));
     composition.addSearch("POSNEG", Mapped.mapStraightThrough(positiveOrNegativeResults));
@@ -672,11 +672,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition haveTbLamTestResultOrRequestOrResult =
-        getPatientsHaveTBLAMTestRequestOrResult(
-            Arrays.asList(
-                tbMetadata.getPositiveConcept(),
-                tbMetadata.getNegativeConcept(),
-                tbMetadata.getIndeterminate()));
+        getPatientsHaveTBLAMTestRequestOrResult();
 
     cd.addSearch(
         "haveTbLamTestResultOrRequestOrResult",
@@ -1412,9 +1408,90 @@ public class TxTbMonthlyCascadeCohortQueries {
    *
    * @return
    */
-  public CohortDefinition getPatientsHaveTBLAMTestRequestOrResult(List<Concept> results) {
+  public CohortDefinition getPatientsHaveTBLAMTestRequestOrResult() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("GeneXpert MTB/RIF");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("23723", tbMetadata.getTBGenexpertTestConcept().getConceptId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("703", tbMetadata.getPositiveConcept().getConceptId());
+    map.put("664", tbMetadata.getNegativeConcept().getConceptId());
+    map.put("23951", tbMetadata.getTestTBLAM().getConceptId());
+    map.put("1138", tbMetadata.getIndeterminate().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${23722} "
+            + "       AND o.value_coded = ${23951} "
+            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "GROUP  BY p.patient_id "
+            + "UNION "
+            + "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${23951} "
+            + "       AND o.value_coded IN (${703}, ${664}, ${1138} ) "
+            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "GROUP  BY p.patient_id "
+            + "UNION "
+            + "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${13} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${23951} "
+            + "       AND o.value_coded IN ( ${703}, ${664}, ${1138} ) "
+            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "GROUP  BY p.patient_id";
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>TB LAM: patients will be included who during the reporting period:</b>
+   * <li>have Investigações - Pedidos Laboratoriais request marked for ‘TB LAM’ in Ficha Clínica –
+   *     Mastercard or
+   * <li>have Investigações - Resultados Laboratoriais results (ANY RESULT) recorded for ‘TB LAM’ in
+   *     Ficha Clínica – Mastercard or
+   * <li>have a TB LAM result ANY VALUE registered in the Laboratory Form
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsHaveTBLAMpositiveOrNegativeResult(List<Concept> results) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "TB LAM: patients will be included who during the reporting period");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
@@ -2065,6 +2142,45 @@ public class TxTbMonthlyCascadeCohortQueries {
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(sb.replace(query));
     return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Get patients who have a Basiloscopia Negative registered</b>
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getSmearMicroscopyOnlyNegative() {
+    CompositionCohortDefinition definition = new CompositionCohortDefinition();
+    definition.setName("haveBasiloscopia()");
+    definition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    definition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    definition.addParameter(new Parameter("location", "location", Location.class));
+
+    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+
+    CohortDefinition basiloscopiaCohort =
+        genericCohortQueries.generalSql(
+            "basiloscopiaCohort",
+            genericCohortQueries.getPatientsWithObsBetweenDates(
+                hivMetadata.getAdultoSeguimentoEncounterType(),
+                hivMetadata.getResultForBasiloscopia(),
+                Collections.singletonList(tbMetadata.getNegativeConcept())));
+
+    CohortDefinition basiloscopiaLabCohort =
+        genericCohortQueries.generalSql(
+            "basiloscopiaLabCohort",
+            genericCohortQueries.getPatientsWithObsBetweenDates(
+                hivMetadata.getMisauLaboratorioEncounterType(),
+                hivMetadata.getResultForBasiloscopia(),
+                Arrays.asList(
+                    tbMetadata.getNegativeConcept(), tbMetadata.getNotFoundTestResultConcept())));
+
+    definition.addSearch("basiloscopiaCohort", EptsReportUtils.map(basiloscopiaCohort, mappings));
+    definition.addSearch(
+        "basiloscopiaLabCohort", EptsReportUtils.map(basiloscopiaLabCohort, mappings));
+
+    definition.setCompositionString("basiloscopiaCohort OR basiloscopiaLabCohort");
+
+    return definition;
   }
 
   public enum TxCurrComposition {
