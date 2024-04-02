@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.TXTBCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TxTbMonthlyCascadeCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.DimensionKeyForAge;
@@ -28,8 +27,6 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
 
   @Autowired private EptsGeneralIndicator eptsGeneralIndicator;
   @Autowired private EptsCommonDimension eptsCommonDimension;
-
-  @Autowired private TXTBCohortQueries txtbCohortQueries;
 
   @Autowired
   @Qualifier("commonAgeDimensionCohort")
