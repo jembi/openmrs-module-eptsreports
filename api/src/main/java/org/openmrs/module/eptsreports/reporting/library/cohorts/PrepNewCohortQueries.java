@@ -32,6 +32,22 @@ public class PrepNewCohortQueries {
     this.genericCohortQueries = genericCohortQueries;
   }
 
+  /**
+   * The system will generate the PrEP_NEW indicator numerator as the number of clients (>=15 years)
+   * newly enrolled on PrEP during the reporting period (PREP_NEW_FR10) with the specified
+   * disaggregation (PREP_NEW_FR3).
+   *
+   * <p>The clients included are the adults (>=15 years old) who initiated the treatment
+   * (PREP_NEW_FR4) during the reporting period.
+   *
+   * <p>The system will exclude the following clients:
+   *
+   * <ul>
+   *   <li>Clients who were transferred in from another facility (PREP_NEW_FR5).
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getClientsWhoNewlyInitiatedPrep() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Clients Who Newly Initiated PrEP");
