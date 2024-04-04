@@ -315,7 +315,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "cv_result_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries
-            .getLastViralLoadResultDateBetweenPeriodsInMonthsAfterTarv(12, 36),
+            .getLastViralLoadResultDateBetweenPeriodsInMonthsAfterTarv(12, 24),
         endDateMappings,
         new GeneralDateConverter());
 
