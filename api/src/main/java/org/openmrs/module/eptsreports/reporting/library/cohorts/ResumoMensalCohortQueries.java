@@ -513,6 +513,17 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>excluindo os utentes</b>
+   *
+   * <ul>
+   *   <li>com o registo de "Diagnóstico TB Activa (S/ N)" (Coluna 10) = "S" numa consulta clínica
+   *       (Ficha Clínica) que ocorreu no período anterior do relatório e após o início Pré-TARV
+   *       (“Data Consulta” >= “Data Início Pre-TARV” e < “Data Início do Relatório”,
+   * </ul>
+   *
+   * @return
+   */
   public CohortDefinition getPatientsWhoHadTbDiagnosticAfterPreArt() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
