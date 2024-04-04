@@ -100,7 +100,7 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "Total de Utentes que iniciaram PrEP pela 1ª vez durante o período de reporte",
                 EptsReportUtils.map(
-                    prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
+                    rmprepCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
             mappings),
         "");
 
@@ -112,7 +112,7 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "Age and Gender",
                 EptsReportUtils.map(
-                    prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
+                    rmprepCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
             mappings),
         getColumnsDisaggregations());
 
