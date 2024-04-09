@@ -3363,9 +3363,28 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: B7</b>
+   * <b>RF31</b>
    *
-   * <p><b>Description:</b> Number of patients who abandoned ART during previous month
+   * <p><b>Abandonos até o fim do mês anterior</b>
+   *
+   * <p>O sistema irá identificar os utentes que abandonaram o TARV até o fim do mês anterior da
+   * seguinte forma:
+   *
+   * <ul>
+   *   <li><b>incluindo os utentes:</b>
+   *       <ul>
+   *         <li>com a data mais recente entre
+   *             <ul>
+   *               <li>a Data do Último Levantamento registada, até o fim do mês anterior (“Data Fim
+   *                   do Relatório” menos 1 mês), na “Ficha Recepção/Levantou ARVs?” com “Levantou
+   *                   ARV” = “S”, adicionando 30 dias, e
+   *               <li>a Data do Último Agendamento de Levantamento registado no FILA até o fim do
+   *                   mês anterior (“Data Fim do Relatório” menos 1 mês);
+   *             </ul>
+   *         <li>Esta data adicionando 59 dias deve ser menor que a “Data Fim do Relatório” menos 1
+   *             mês;
+   *       </ul>
+   * </ul>
    *
    * @return {@link CohortDefinition}
    */
