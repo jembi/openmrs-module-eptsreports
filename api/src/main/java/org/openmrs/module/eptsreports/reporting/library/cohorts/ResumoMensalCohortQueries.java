@@ -56,6 +56,28 @@ public class ResumoMensalCohortQueries {
     this.genericCohortQueries = genericCohortQueries;
   }
 
+  public String getPatientsWhoInitiatedPreTarv() {
+
+    ResumoMensalQueries rmq = new ResumoMensalQueries();
+
+    String unionQuery =
+        new EptsQueriesUtil()
+            .unionBuilder(rmq.getClinicalFileEnrollmentDate())
+            .union(rmq.getMastercardEnrollmentDate())
+            .union(rmq.getProgramEnrollmentDate())
+            .union(rmq.getMastercardArtStartWithoutPickupDate())
+            .union(rmq.getEnrollmentOnTarvProgramDate())
+            .union(rmq.getEnrollmentOnMastercardWithoutPreTarvAndPickupDate())
+            .union(rmq.getEnrollmentOnTarvWithoutFileAndPreTarvDate())
+            .buildQuery();
+
+    return "      SELECT min_enrollment.patient_id, MIN(enrollment_date ) date_enrolled "
+        + "      FROM ( "
+        + unionQuery
+        + "           ) min_enrollment  "
+        + "      GROUP BY min_enrollment.patient_id ";
+  }
+
   /**
    * <b>Name: A1</b>
    *
@@ -105,27 +127,10 @@ public class ResumoMensalCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    ResumoMensalQueries rmq = new ResumoMensalQueries();
-
-    String unionQuery =
-        new EptsQueriesUtil()
-            .unionBuilder(rmq.getClinicalFileEnrollmentDate())
-            .union(rmq.getMastercardEnrollmentDate())
-            .union(rmq.getProgramEnrollmentDate())
-            .union(rmq.getMastercardArtStartWithoutPickupDate())
-            .union(rmq.getEnrollmentOnTarvProgramDate())
-            .union(rmq.getEnrollmentOnMastercardWithoutPreTarvAndPickupDate())
-            .union(rmq.getEnrollmentOnTarvWithoutFileAndPreTarvDate())
-            .buildQuery();
-
     String sql =
         "SELECT earliest.patient_id "
             + "FROM ( "
-            + "      SELECT min_enrollment.patient_id, MIN(enrollment_date ) date_enrolled "
-            + "      FROM ( "
-            + unionQuery
-            + "           ) min_enrollment  "
-            + "      GROUP BY min_enrollment.patient_id "
+            + getPatientsWhoInitiatedPreTarv()
             + "     ) earliest "
             + "WHERE  "
                 .concat(
