@@ -527,7 +527,8 @@ public class ResumoMensalCohortQueries {
    *       (“Data Consulta” >= “Data Início Pre-TARV” e < “Data Início do Relatório”,
    * </ul>
    *
-   * @return
+   * @see #getNumberOfPatientsWhoInitiatedPreTarv(boolean) getPatientsWhoInitiatedPreTarv
+   *     <p>return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWhoHadTbDiagnosticAfterPreArt() {
 
@@ -550,41 +551,10 @@ public class ResumoMensalCohortQueries {
 
     String query =
         "SELECT res.patient_id "
-            + "FROM   (SELECT results.patient_id, MIN(results.enrollment_date) enrollment_date "
-            + "        FROM   (SELECT p.patient_id, o.value_datetime AS enrollment_date "
-            + "                FROM   patient p "
-            + "                       INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "                       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                WHERE  p.voided = 0 "
-            + "                       AND e.voided = 0 "
-            + "                       AND o.voided = 0 "
-            + "                       AND e.encounter_type = ${53} "
-            + "                       AND e.location_id = :location "
-            + "                       AND o.value_datetime IS NOT NULL "
-            + "                       AND o.concept_id = ${23808} "
-            + "                UNION "
-            + "                SELECT p.patient_id, "
-            + "                       date_enrolled AS enrollment_date "
-            + "                FROM   patient_program pp "
-            + "                       JOIN patient p "
-            + "                         ON pp.patient_id = p.patient_id "
-            + "                WHERE  p.voided = 0 "
-            + "                       AND pp.voided = 0 "
-            + "                       AND pp.program_id = ${1} "
-            + "                       AND pp.location_id = :location "
-            + "                UNION "
-            + "                SELECT p.patient_id, "
-            + "                       enc.encounter_datetime AS enrollment_date "
-            + "                FROM   encounter enc "
-            + "                       JOIN patient p "
-            + "                         ON p.patient_id = enc.patient_id "
-            + "                WHERE  p.voided = 0 "
-            + "                       AND enc.encounter_type IN ( ${5}, ${7} ) "
-            + "                       AND enc.location_id = :location "
-            + "                       AND enc.voided = 0 "
-            + "                ) results "
-            + "        GROUP  BY results.patient_id) res "
-            + "       INNER JOIN (SELECT p.patient_id, encounter_datetime tb_date "
+            + "FROM   ( "
+            + getPatientsWhoInitiatedPreTarv()
+            + "       ) res "
+            + "       INNER JOIN (SELECT p.patient_id, Min(e.encounter_datetime) AS tb_date "
             + "                   FROM   patient p "
             + "                          INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -592,10 +562,12 @@ public class ResumoMensalCohortQueries {
             + "                          AND e.voided = 0 "
             + "                          AND o.voided = 0 "
             + "                          AND e.encounter_type = ${6} "
-            + "                          AND e.encounter_datetime <= DATE_SUB(:endDate, INTERVAL 1 MONTH) "
+            + "                          AND e.encounter_datetime < DATE_SUB(:endDate, INTERVAL 1 MONTH) "
             + "                          AND o.concept_id = ${23761} AND o.value_coded = ${1065}  "
+            + "                   GROUP BY p.patient_id  "
             + "       ) tb ON tb.patient_id = res.patient_id "
-            + " WHERE  res.enrollment_date BETWEEN :startDate AND :endDate AND tb.tb_date >= res.enrollment_date"
+            + " WHERE  res.date_enrolled BETWEEN :startDate AND :endDate "
+            + "   AND  tb.tb_date >= res.date_enrolled "
             + " GROUP BY res.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
