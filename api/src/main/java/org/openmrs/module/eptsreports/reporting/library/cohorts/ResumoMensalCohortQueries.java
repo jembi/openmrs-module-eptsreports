@@ -527,6 +527,11 @@ public class ResumoMensalCohortQueries {
    *       (“Data Consulta” >= “Data Início Pre-TARV” e < “Data Início do Relatório”,
    * </ul>
    *
+   * <ul>
+   *   <li>A2:{@link
+   *       ResumoMensalCohortQueries#getPatientsWhoInitiatedPreTarvAtAfacilityDuringCurrentMonthA2()}
+   * </ul>
+   *
    * @see #getNumberOfPatientsWhoInitiatedPreTarv(boolean) getPatientsWhoInitiatedPreTarv
    *     <p>return {@link CohortDefinition}
    */
