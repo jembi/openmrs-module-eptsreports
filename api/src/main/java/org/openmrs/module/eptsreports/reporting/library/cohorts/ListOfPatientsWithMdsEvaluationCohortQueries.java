@@ -1056,7 +1056,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     String query =
         "SELECT     p.patient_id, "
-            + "     IF(o.value_numeric IS NOT NULL, o.value_numeric, IF(o.value_coded = 165331, CONCAT('MENOR QUE ',o.comments), o.value_coded)) AS first_vl_result  "
+            + "     IF(concept_id= ${856}, o.value_numeric, IF(o.value_coded = 165331, CONCAT('MENOR QUE ',o.comments), o.value_coded)) AS first_vl_result  "
             + "FROM       patient p "
             + "INNER JOIN encounter e "
             + "ON         e.patient_id = p.patient_id "
@@ -1124,7 +1124,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     String query =
         "SELECT     p.patient_id, "
-            + "     IF(o.value_numeric IS NOT NULL, o.value_numeric, IF(o.value_coded = 165331, CONCAT('MENOR QUE ',o.comments), o.value_coded)) AS first_vl_result  "
+            + "     IF(o.concept_id= ${856}, o.value_numeric, IF(o.value_coded = 165331, CONCAT('MENOR QUE ',o.comments), o.value_coded)) AS first_vl_result  "
             + "FROM       patient p "
             + "INNER JOIN encounter e "
             + "ON         e.patient_id = p.patient_id "
@@ -1328,6 +1328,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "       AND enc.voided = 0 "
             + "       AND obs.voided = 0 "
             + "       AND enc.encounter_type = ${6} "
+            + "       AND enc.encounter_datetime = most_recent_cd4.encounter_date "
             + "       AND obs.concept_id = ${1695} "
             + "       AND obs.value_numeric IS NOT NULL "
             + "       GROUP BY cd4.patient_id ";
