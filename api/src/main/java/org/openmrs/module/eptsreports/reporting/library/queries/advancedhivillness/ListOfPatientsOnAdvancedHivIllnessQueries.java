@@ -1249,7 +1249,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "  AND e.location_id = :location "
         + "  AND o.concept_id = ${6272} "
         + "  AND o.value_coded = ${1705} "
-        + "  AND e.encounter_datetime = last_state.first_date "
+        + "  AND o.obs_datetime = last_state.first_date "
         + "GROUP  BY p.patient_id";
   }
 }
