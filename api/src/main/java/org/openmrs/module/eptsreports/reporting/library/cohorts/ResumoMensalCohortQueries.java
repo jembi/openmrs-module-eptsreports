@@ -912,7 +912,10 @@ public class ResumoMensalCohortQueries {
         "D", map(getPatientsWhoDied(false), "onOrBefore=${startDate-1d},locationList=${location}"));
 
     cd.addSearch(
-        "T", map(getTranferredOutPatients(), "onOrBefore=${startDate-1d},location=${location}"));
+        "T",
+        map(
+            getTranferredOutPatients(),
+            "startDate=${startDate},endDate=${endDate},onOrBefore=${startDate-1d},location=${location}"));
 
     cd.addSearch(
         "B7",
@@ -1112,7 +1115,10 @@ public class ResumoMensalCohortQueries {
     String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
     cd.addSearch(
-        "T", map(getTranferredOutPatients(), "onOrBefore=${endDate},location=${location}"));
+        "T",
+        map(
+            getTranferredOutPatients(),
+            "startDate=${startDate},endDate=${endDate},onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch("B12", map(getPatientsWhoWereActiveByEndOfPreviousMonthB12(), mapping));
     cd.addSearch(
@@ -1711,7 +1717,10 @@ public class ResumoMensalCohortQueries {
             "endDate=${startDate-1d},location=${location}"));
 
     cd.addSearch(
-        "B5A", map(getTranferredOutPatients(), "onOrBefore=${startDate-1d},location=${location}"));
+        "B5A",
+        map(
+            getTranferredOutPatients(),
+            "startDate=${startDate},endDate=${endDate},onOrBefore=${startDate-1d},location=${location}"));
 
     cd.addSearch(
         "B6A",
@@ -1743,7 +1752,10 @@ public class ResumoMensalCohortQueries {
             "endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        "B5A", map(getTranferredOutPatients(), "onOrBefore=${endDate},location=${location}"));
+        "B5A",
+        map(
+            getTranferredOutPatients(),
+            "startDate=${startDate},endDate=${endDate},onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch(
         "B6A",
@@ -2042,13 +2054,30 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: C3</b>
-   *
-   * <p><b>Description:</b> Number of patients who initiated Pre-TARV during the current month and
-   * was diagnosed for active TB
+   * O sistema irá produzir C.3) Dos inícios Pré-TARV durante o mês ou no mês anterior, subgrupo que
+   * foi diagnosticado como TB activa:
    *
    * <ul>
-   *   <li>
+   *   <li>Incluindo os utentes
+   *       <ul>
+   *         <li>que iniciaram Pré-TARV durante o mês ou no mês anterior (seguindo os requisitos
+   *             definidos no RF7) e
+   *         <li>que tiveram um registo de "Diagnóstico TB Activa (S/ N)" (Coluna 10) = "S" na
+   *             “Ficha Clínica” durante <b>1ª ou 2ª Consulta</b> que decorreu no período de
+   *             relatório, após o início Pré-TARV (“Data da Consulta Actual” (Coluna 1- durante a
+   *             qual se fez o registo) >= “Data Início do Relatório” e <= “Data Fim do Relatório” e
+   *             >= “Data Início Pré-TARV”
+   *       </ul>
+   *   <li>excluindo os utentes
+   *       <ul>
+   *         <li>com o registo de "Diagnóstico TB Activa (S/ N)" (Coluna 10) = "S" numa consulta
+   *             clínica (Ficha Clínica) que ocorreu no período anterior do relatório e após o
+   *             início Pré-TARV (“Data Consulta” >= “Data Início Pre-TARV” e < “Data Início do
+   *             Relatório”,
+   *       </ul>
+   * </ul>
+   *
+   * <ul>
    *   <li>A2:{@link
    *       ResumoMensalCohortQueries#getPatientsWhoInitiatedPreTarvAtAfacilityDuringCurrentMonthA2()}
    *       <b>AND</b>
@@ -3733,7 +3762,11 @@ public class ResumoMensalCohortQueries {
     }
     cd.addSearch("fila", map(fila, mappingsOnDate));
     cd.addSearch("masterCardPickup", map(masterCardPickup, mappingsOnDate));
-    cd.addSearch("B5E", map(B5E, mappingsOnDate));
+    cd.addSearch(
+        "B5E",
+        map(
+            B5E,
+            "startDate=${startDate},endDate=${endDate},onOrBefore=${endDate},location=${location}"));
     cd.addSearch("B6E", map(B6E, mappingsOnDate));
     cd.addSearch("B7E", map(B7E, "date=${endDate},location=${location}"));
     cd.addSearch(
@@ -3808,7 +3841,8 @@ public class ResumoMensalCohortQueries {
    *       Ficha Recepção/Levantou ARV, adicionando 31 dias.
    * </ul>
    *
-   * e sendo essa data posterior a “Data Fim do Relatório” menos 1 mês.
+   * e sendo essa data ocorrida durante o período de reporte (entre “Data Início do Relatório” e
+   * “Data Fim do Relatório”).
    *
    * @return String
    */
@@ -3816,6 +3850,8 @@ public class ResumoMensalCohortQueries {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Transferred Out Patients");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
@@ -4014,7 +4050,7 @@ public class ResumoMensalCohortQueries {
             + "                                                                 GROUP  BY last_next_pick_up.patient_id) AS "
             + "                                              last_next_scheduled_pick_up "
             + "                                                                ON last_next_scheduled_pick_up.patient_id = p.patient_id "
-            + "                                          WHERE  last_next_scheduled_pick_up.max_datetame > :onOrBefore ) "
+            + "                                          WHERE  last_next_scheduled_pick_up.max_datetame BETWEEN :startDate AND :endDate ) "
             + "GROUP  BY transferred_out.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
