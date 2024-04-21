@@ -11785,15 +11785,32 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * Utentes que têm o registo de início do MDS para utente estável na última consulta decorrida há
-   * 12 meses (última “Data Consulta Clínica” >= “Data Fim Revisão” – 12 meses+1dia e <= “Data Fim
-   * Revisão”), ou seja, registo de um MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como:
+   * O sistema identificará os utentes registados num MDS para utentes estáveis para desagregação de
+   * Denominador (FR4) e Numerador (FR5) da seguinte forma:
    *
-   * <p>“GA” e o respectivo “Estado” = “Início” “DT” e o respectivo “Estado” = “Início” “DS” e o
-   * respectivo “Estado” = “Início” “APE” e o respectivo “Estado” = “Início” “FR” e o respectivo
-   * “Estado” = “Início” “DD” e o respectivo “Estado” = “Início”
+   * <ul>
+   *   <li>Todos os utentes com registo mais recente de MDS na Ficha Clínica (MDC1 ou MDC2 ou MDC3
+   *       ou MDC4 ou MDC5) nos últimos 12 meses antesda data do resultado da CV mais recente (“Data
+   *       Última CV”), como um dos seguintes:
+   *       <ul>
+   *         <li>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “GA” e o
+   *             respectivo “Estado” = “Início” ou “Continua”, ou
+   *         <li>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “DT” e o
+   *             respectivo “Estado” = “Início” ou “Continua”, ou último registo do “Tipo de
+   *             Dispensa” = “DT” na Ficha Clínica ou
+   *         <li>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “DS” e o
+   *             respectivo “Estado” = “Início” ou “Continua”, ou último registo do “Tipo de
+   *             Dispensa” = “DS” na Ficha Clínica ou
+   *         <li>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “FR” e o
+   *             respectivo “Estado” = “Início” ou “Continua”, ou
+   *         <li>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “DD” e o
+   *             respectivo “Estado” = “Início” ou “Continua”, ou
+   *         <li>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “DCA” e o
+   *             respectivo “Estado” = “Início” ou “Continua”,
+   *       </ul>
+   * </ul>
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition
       getPatientsWithMdcOnMostRecentClinicalFormWithFollowingDispensationTypesAndStateBasedOnLastVl12Months(
@@ -11858,7 +11875,8 @@ public class QualityImprovement2020CohortQueries {
             + "                                                 AND e.location_id = :location) max_vl_date "
             + "                                                 GROUP  BY patient_id "
             + "                   ) vl_date_tbl ON pp.patient_id = vl_date_tbl.patient_id "
-            + "                 WHERE  ee.encounter_datetime BETWEEN Date_add( vl_date_tbl.vl_max_date, INTERVAL - 12 MONTH) AND  vl_date_tbl.vl_max_date "
+            + "                 WHERE  ee.encounter_datetime >= Date_add( vl_date_tbl.vl_max_date, INTERVAL - 12 MONTH) "
+            + "                 AND ee.encounter_datetime < vl_date_tbl.vl_max_date "
             + "                 AND oo.concept_id = ${165174} "
             + "                 AND oo.voided = 0 "
             + "                 AND ee.voided = 0 "
