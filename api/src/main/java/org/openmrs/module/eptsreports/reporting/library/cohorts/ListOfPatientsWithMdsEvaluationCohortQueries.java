@@ -1712,18 +1712,19 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   }
 
   /**
-   * <b>RF24 - Data de inscrição no MDS - B.9 (Coluna R)</b><br>
+   * <b>Inscrito em algum MDS entre 24˚ a 36˚ mês de TARV? - D.9 (RF54)</b><br>
    * <br>
    *
-   * <p>O sistema irá determinar a “Data de inscrição no MDS” seleccionando a data de consulta com
-   * registo de pelo menos um campo de “Modelos diferenciados de Cuidados - MDS” (MDS 1, MDS 2, MDS
-   * 3, MDS 4 ou MDS 5) com resposta = “INICIO”, numa consulta clínica decorrida entre 3 a 9 meses
-   * do Início TARV (Data da Consulta >= “Data Início TARV” e <= “Data Início TARV” + 12 meses).
-   * <br>
+   * <p>O sistema irá determinar a “Data de inscrição no MDS entre 24º e 36º mês do TARV”,
+   * seleccionando a data de consulta (Ficha Clínica) com registo de pelo menos um campo de “Modelos
+   * diferenciados de Cuidados - MDS” (MDS 1, MDS 2, MDS 3, MDS 4 ou MDS 5) com resposta = “INICIO”
+   * numa consulta clínica decorrida entre 24 a 36 meses do Início TARV (Data da Consulta >= “Data
+   * Início TARV” + 24 meses e <= “Data Início TARV” + 36 meses) <br>
    * <br>
    *
    * <p>Nota 1: Nota 1: caso exista mais que uma consulta clínica com registo do início no MDS, o
-   * sistema irá considerar o registo mais antigo<br>
+   * sistema irá considerar o registo mais antigo, ou seja, o primeiro registo durante o período de
+   * avaliação<br>
    * <br>
    *
    * <p>Nota 2: caso o utente não satisfaça o critério definido, o sistema não irá preencher nenhuma
@@ -1737,12 +1738,12 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * na coorte de 24 meses ou na coorte de 36 meses conforme definido no RF4. <br>
    * <br>
    *
-   * @return {DataDefinition}
+   * @return {@link DataDefinition}
    */
   public DataDefinition getMdsDate(int minNumberOfMonths, int maxNumberOfMonths, boolean b9Orc9) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
-        "B9- Data de inscrição no MDS: (coluna R) - Resposta = Data de Inscrição (RF24)");
+        "D9- Data de inscrição no MDS: (coluna CD) - Resposta = Data de Inscrição (RF54)");
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> map = new HashMap<>();
@@ -1767,13 +1768,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
 
-    String query = "                  SELECT     p.patient_id, ";
-    query +=
-        b9Orc9
-            ? "                             MIN(e.encounter_datetime) AS encounter_date "
-            : "                             MAX(e.encounter_datetime) AS encounter_date ";
-    query +=
-        "                  FROM       patient p "
+    String query =
+        "  SELECT     p.patient_id, MIN(e.encounter_datetime) AS encounter_date "
+            + "                  FROM       patient p "
             + "                  INNER JOIN encounter e "
             + "                  ON         e.patient_id = p.patient_id "
             + "                  INNER JOIN obs otype "

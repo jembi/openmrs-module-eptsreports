@@ -546,7 +546,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithTbThirdToNineMonth(24, 36),
         endDateMappings);
 
-    // D.9 - Data de inscrição no MDS entre 24º e 36º mês de TARV: (coluna CD)
+    // D.9 - Data de inscrição em algum MDS entre 24º e 36º mês de TARV: (coluna CD)
     pdd.addColumn(
         "mds_tarv_d",
         listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(24, 36, false),
