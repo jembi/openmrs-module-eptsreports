@@ -5,7 +5,6 @@ import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.data.converter.*;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
 import org.openmrs.module.reporting.data.person.definition.*;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
@@ -23,18 +22,11 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
   private String c18Mappings = "endDate=${evaluationYear-2}-06-20,location=${location}";
   private String d18Mappings = "endDate=${evaluationYear-3}-06-20,location=${location}";
 
-  private final ListOfPatientsInAdvancedHivIllnessCohortQueries
-      listOfPatientsInAdvancedHivIllnessCohortQueries;
-
   @Autowired
   public ListOfPatientsWithMdsEvaluationCohortDataset(
-      ListOfPatientsWithMdsEvaluationCohortQueries listOfPatientsWithMdsEvaluationCohortQueries,
-      ListOfPatientsInAdvancedHivIllnessCohortQueries
-          listOfPatientsInAdvancedHivIllnessCohortQueries) {
+      ListOfPatientsWithMdsEvaluationCohortQueries listOfPatientsWithMdsEvaluationCohortQueries) {
     this.listOfPatientsWithMdsEvaluationCohortQueries =
         listOfPatientsWithMdsEvaluationCohortQueries;
-    this.listOfPatientsInAdvancedHivIllnessCohortQueries =
-        listOfPatientsInAdvancedHivIllnessCohortQueries;
   }
 
   public DataSetDefinition contructDataset() {
