@@ -2446,6 +2446,7 @@ public class TPTCompletionCohortQueries {
             + "                   WHERE  oo.voided = 0 "
             + "                          AND ee.voided = 0 "
             + "                          AND ee.encounter_type = ${60} "
+            + "                          AND ee.location_id = :location "
             + "                          AND oo.concept_id = ${23985} "
             + "                          AND oo.value_coded IN ( ${656}, ${23982} ) "
             + "                   GROUP  BY ee.encounter_id) start "
