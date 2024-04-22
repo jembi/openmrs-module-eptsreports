@@ -31,6 +31,14 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "               ON ps.person_id = e.patient_id "
             + "       INNER JOIN obs o "
             + "               ON e.encounter_id = o.encounter_id "
+            + " INNER JOIN ( "
+            + " SELECT result.person_id, Max(result.most_recent) AS most_recent FROM ( "
+            + new EptsQueriesUtil()
+                .unionBuilder(getPatientsWithCD4AbsoluteResultOnPeriodQuery(true, true))
+                .union(getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true, true))
+                .buildQuery()
+            + " ) result GROUP BY result.person_id "
+            + " ) last_cd4_result on last_cd4_result.person_id = ps.person_id "
             + "WHERE  ps.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
@@ -38,8 +46,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "       AND o.concept_id = ${1695}  "
             + "       AND o.value_numeric < "
             + valueNumeric
-            + "       AND DATE(e.encounter_datetime) >= :startDate "
-            + "       AND DATE(e.encounter_datetime) <= :endDate "
+            + "       AND DATE(e.encounter_datetime) = last_cd4_result.most_recent "
             + "       AND e.location_id = :location";
 
     return mostRecentDateOrCd4Result
@@ -64,13 +71,20 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         " FROM "
             + "    person ps INNER JOIN encounter e ON ps.person_id= e.patient_id "
             + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + " INNER JOIN ( "
+            + " SELECT result.person_id, Max(result.most_recent) AS most_recent FROM ( "
+            + new EptsQueriesUtil()
+                .unionBuilder(getPatientsWithCD4AbsoluteResultOnPeriodQuery(true, true))
+                .union(getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true, true))
+                .buildQuery()
+            + " ) result GROUP BY result.person_id "
+            + " ) last_cd4_result on last_cd4_result.person_id = ps.person_id "
             + "WHERE ps.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "  AND e.encounter_type IN ( ${53}, ${90} ) "
             + "  AND o.concept_id = ${1695} "
             + "  AND o.value_numeric < "
             + valueNumeric
-            + "  and o.obs_datetime >= :startDate "
-            + "  AND o.obs_datetime <= :endDate "
+            + "  AND o.obs_datetime = last_cd4_result.most_recent "
             + "  AND e.location_id = :location";
 
     return mostRecentDateOrCd4Result
@@ -212,7 +226,8 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * @param mostRecentDateOrCd4Result Flag to return Most Recent date or Cd4 Result
    * @return {@link String}
    */
-  public String getPatientsWithCD4AbsoluteResultOnPeriodQuery(boolean mostRecentDateOrCd4Result) {
+  public String getPatientsWithCD4AbsoluteResultOnPeriodQuery(
+      boolean mostRecentDateOrCd4Result, boolean duringThePeriod) {
 
     String fromSQL =
         " FROM   person ps "
@@ -224,11 +239,15 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
             + "       AND e.encounter_type IN ( ${6}, ${13}, ${51} ) "
-            + "                 AND o.concept_id = ${1695} "
-            + "             AND o.value_numeric IS NOT NULL "
-            + "             AND DATE(e.encounter_datetime) <= :endDate "
-            + "       AND e.location_id = :location "
-            + " GROUP BY ps.person_id ";
+            + "       AND o.concept_id = ${1695} "
+            + "       AND o.value_numeric IS NOT NULL ";
+    fromSQL +=
+        duringThePeriod
+            ? "  AND DATE(e.encounter_datetime) >= :startDate "
+                + "  AND DATE(e.encounter_datetime) <= :endDate "
+            : "  AND DATE(e.encounter_datetime) <= :endDate ";
+
+    fromSQL += "AND e.location_id = :location " + " GROUP BY ps.person_id ";
 
     return mostRecentDateOrCd4Result
         ? " SELECT ps.person_id, Max(DATE(e.encounter_datetime)) AS most_recent ".concat(fromSQL)
@@ -244,7 +263,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * @return {@link String}
    */
   public String getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(
-      boolean mostRecentDateOrCd4Result) {
+      boolean mostRecentDateOrCd4Result, boolean duringThePeriod) {
 
     String fromSQL =
         " FROM "
@@ -253,10 +272,14 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "WHERE ps.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "  AND e.encounter_type IN (${53}, ${90}) "
             + "  AND o.concept_id = ${1695} "
-            + "  AND o.value_numeric IS NOT NULL "
-            + "  AND o.obs_datetime <= :endDate "
-            + "  AND e.location_id = :location "
-            + " GROUP BY ps.person_id";
+            + "  AND o.value_numeric IS NOT NULL ";
+
+    fromSQL +=
+        duringThePeriod
+            ? "  AND o.obs_datetime >= :startDate " + "  AND o.obs_datetime <= :endDate "
+            : " AND o.obs_datetime <= :endDate ";
+
+    fromSQL += "  AND e.location_id = :location " + " GROUP BY ps.person_id";
 
     return mostRecentDateOrCd4Result
         ? " SELECT ps.person_id, max(o.obs_datetime) as most_recent ".concat(fromSQL)
@@ -314,8 +337,8 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "  SELECT max.person_id, "
         + "           Max(max.most_recent) AS most_recent FROM ( "
         + new EptsQueriesUtil()
-            .unionBuilder(getPatientsWithCD4AbsoluteResultOnPeriodQuery(true))
-            .union(getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true))
+            .unionBuilder(getPatientsWithCD4AbsoluteResultOnPeriodQuery(true, false))
+            .union(getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true, false))
             .buildQuery()
         + " ) max group by max.person_id ) "
         + " last_cd4 ON last_cd4.person_id = ps.person_id "
@@ -337,8 +360,8 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "  SELECT max.person_id, "
         + "           Max(max.most_recent) AS most_recent FROM ( "
         + new EptsQueriesUtil()
-            .unionBuilder(getPatientsWithCD4AbsoluteResultOnPeriodQuery(true))
-            .union(getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true))
+            .unionBuilder(getPatientsWithCD4AbsoluteResultOnPeriodQuery(true, false))
+            .union(getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true, false))
             .buildQuery()
         + " ) max group by max.person_id ) "
         + " last_cd4 ON last_cd4.person_id = ps.person_id "
@@ -656,7 +679,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
               + "       SELECT considered_transferred.patient_id, MAX(considered_transferred.value_datetime) as max_date "
               + "         FROM ( "
               + "               SELECT     p.patient_id, "
-              + "                          MAX(o.value_datetime) AS value_datetime "
+              + "                         TIMESTAMPADD(DAY, 1, MAX(o.value_datetime)) AS value_datetime "
               + "               FROM       patient p "
               + "                              INNER JOIN encounter e "
               + "                                         ON         e.patient_id=p.patient_id "
@@ -684,7 +707,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
               + "               GROUP BY   p.patient_id "
               + "               UNION "
               + "               SELECT     p.patient_id, "
-              + "                          TIMESTAMPADD(DAY, 30, MAX(o.value_datetime)) AS value_datetime "
+              + "                          TIMESTAMPADD(DAY, 31, MAX(o.value_datetime)) AS value_datetime "
               + "               FROM       patient p "
               + "                              INNER JOIN encounter e "
               + "                                         ON  e.patient_id=p.patient_id "
@@ -700,6 +723,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
               + "               GROUP BY   p.patient_id "
               + "         )  considered_transferred "
               + " GROUP BY considered_transferred.patient_id "
+              + " HAVING max_date > :endDate "
               + " ) final ";
     } else {
       query +=
@@ -800,7 +824,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "                                      AND        e.location_id =  :location "
             + "                                      GROUP BY   p.patient_id) most_recent "
             + "                  GROUP BY most_recent.patient_id "
-            + "                  HAVING   final_encounter_date <= :endDate ) final "
+            + "                  HAVING   final_encounter_date < :endDate ) final "
             + "WHERE    final.patient_id NOT IN ( "
             + new EptsQueriesUtil()
                 .unionBuilder(
@@ -1167,7 +1191,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "  AND e.encounter_type = ${6} "
         + "  AND e.location_id = :location "
         + "  AND o.concept_id = ${6273} "
-        + "  AND o.value_coded = ${1706} "
+        + "  AND o.value_coded = ${1705} "
         + "  AND e.encounter_datetime = last_state.first_date "
         + "GROUP  BY p.patient_id "
         + "UNION "
@@ -1224,7 +1248,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "  AND e.encounter_type = ${53} "
         + "  AND e.location_id = :location "
         + "  AND o.concept_id = ${6272} "
-        + "  AND o.value_coded = ${1706} "
+        + "  AND o.value_coded = ${1705} "
         + "  AND e.encounter_datetime = last_state.first_date "
         + "GROUP  BY p.patient_id";
   }

@@ -625,7 +625,26 @@ public class ResumoMensalQueries {
   }
 
   /**
-   * <b>Description:</b> Number of patients who abandoned ART by specified date
+   * <b>Abandonos até o fim do mês anterior</b>
+   *
+   * <p>O sistema irá identificar os utentes que abandonaram o TARV até o fim do mês anterior da
+   * seguinte forma:
+   *
+   * <ul>
+   *   <li><b>incluindo os utentes:</b>
+   *       <ul>
+   *         <li>com a data mais recente entre
+   *             <ul>
+   *               <li>a Data do Último Levantamento registada, até o fim do mês anterior (“Data Fim
+   *                   do Relatório” menos 1 mês), na “Ficha Recepção/Levantou ARVs?” com “Levantou
+   *                   ARV” = “S”, adicionando 30 dias, e
+   *               <li>a Data do Último Agendamento de Levantamento registado no FILA até o fim do
+   *                   mês anterior (“Data Fim do Relatório” menos 1 mês);
+   *             </ul>
+   *         <li>Esta data adicionando 59 dias deve ser menor que a “Data Fim do Relatório” menos 1
+   *             mês;
+   *       </ul>
+   * </ul>
    *
    * @return {@link String}
    */
@@ -650,7 +669,7 @@ public class ResumoMensalQueries {
     query.append("             from(   ");
     query.append("                 SELECT   ");
     query.append(
-        "                     most_recent.patient_id, Date_add(Max(most_recent.value_datetime), interval 60 day) final_encounter_date   ");
+        "                     most_recent.patient_id, Date_add(Max(most_recent.value_datetime), interval 59 day) final_encounter_date   ");
     query.append("                 FROM   (SELECT fila.patient_id, o.value_datetime from (  ");
     query.append("                             SELECT enc.patient_id,   ");
     query.append(
@@ -1079,7 +1098,7 @@ public class ResumoMensalQueries {
             + "                        AND pp.date_enrolled <= :endDate ) no_program "
             + "              ON no_program.patient_id = p.patient_id "
             + "WHERE  p.voided = 0 "
-            + "       AND p.voided = 0 "
+            + "       AND o.voided = 0 "
             + "       AND e.location_id = :location "
             + "       AND e.encounter_type = ${53} "
             + "       AND o.concept_id = ${1190} "

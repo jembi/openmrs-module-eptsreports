@@ -88,8 +88,6 @@ public class CommonQueries {
             + "WHERE pp.program_id=${5} "
             + "  AND pp.location_id=  :location  "
             + "  AND pp.date_enrolled BETWEEN   date_sub(:endDate, INTERVAL 7 MONTH) AND   :endDate "
-            + "  AND (pp.date_completed IS NULL "
-            + "       OR pp.date_completed >   :endDate) "
             + "  AND p.voided=0 "
             + "  AND pp.voided=0 "
             + "GROUP BY p.patient_id "

@@ -4057,46 +4057,22 @@ public class QualityImprovement2020CohortQueries {
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition a = getMOHArtStartDate();
-
-    CohortDefinition c =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getPregnantConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
-
-    CohortDefinition d =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getBreastfeeding().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
-
-    CohortDefinition e =
-        QualityImprovement2020Queries.getTransferredInPatients(
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-            hivMetadata.getPatientFoundYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId());
-    CohortDefinition f = getTranferredOutPatients();
-
     CohortDefinition g = getPatientsWith3MonthlyApssConsultationsWithin99Days();
 
     if (reportSource.equals(EptsReportConstants.MIMQ.MQ)) {
-      compositionCohortDefinition.addSearch("A", EptsReportUtils.map(a, MAPPING));
-      compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
-      compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
-      compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
+      compositionCohortDefinition.addSearch(
+          "DENOMINATOR", EptsReportUtils.map(getMQC11DEN(3, EptsReportConstants.MIMQ.MQ), MAPPING));
       compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING1));
     } else if (reportSource.equals(EptsReportConstants.MIMQ.MI)) {
-      compositionCohortDefinition.addSearch("A", EptsReportUtils.map(a, MAPPING4));
-      compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING6));
-      compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING6));
-      compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING6));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING5));
+      compositionCohortDefinition.addSearch(
+          "DENOMINATOR",
+          EptsReportUtils.map(
+              getMQC11DEN(3, EptsReportConstants.MIMQ.MI),
+              "revisionEndDate=${revisionEndDate},location=${location}"));
       compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING10));
     }
 
-    compositionCohortDefinition.setCompositionString("A AND C AND NOT D AND NOT E AND NOT F AND G");
+    compositionCohortDefinition.setCompositionString("DENOMINATOR AND G");
 
     return compositionCohortDefinition;
   }
@@ -9268,7 +9244,7 @@ public class QualityImprovement2020CohortQueries {
             hadFilaAfterClinical,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    cd.setCompositionString("Mq15DenMds14 AND (MdsFimNum14 OR FAC)");
+    cd.setCompositionString("Mq15DenMds14 AND FAC");
 
     return cd;
   }
@@ -12603,7 +12579,6 @@ public class QualityImprovement2020CohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("21190", commonMetadata.getRegimenAlternativeToFirstLineConcept().getConceptId());
-    map.put("23898", commonMetadata.getAlternativeLineConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id "
@@ -12612,14 +12587,12 @@ public class QualityImprovement2020CohortQueries {
             + "               ON e.patient_id = p.patient_id "
             + "       INNER JOIN obs o "
             + "               ON o.encounter_id = e.encounter_id "
-            + "       INNER JOIN obs o2 "
-            + "               ON o2.encounter_id = e.encounter_id "
             + "       INNER JOIN (SELECT p.patient_id, "
             + "                          Max(e.encounter_datetime) AS encounter_datetime "
             + "                   FROM   patient p "
             + "                          INNER JOIN encounter e "
             + "                                  ON e.patient_id = p.patient_id "
-            + "                          JOIN obs o "
+            + "                          INNER JOIN obs o "
             + "                            ON o.encounter_id = e.encounter_id "
             + "                   WHERE  e.encounter_type = ${6} "
             + "                          AND p.voided = 0 "
@@ -12631,37 +12604,30 @@ public class QualityImprovement2020CohortQueries {
             + "                   GROUP  BY p.patient_id) last_consultation "
             + "               ON p.patient_id = last_consultation.patient_id "
             + "       INNER JOIN (SELECT p.patient_id, "
-            + "                          Max(o2.obs_datetime) first_line_date "
+            + "                          Max(o.obs_datetime) first_line_date "
             + "                   FROM   patient p "
             + "                          INNER JOIN encounter e "
             + "                                  ON p.patient_id = e.patient_id "
             + "                          INNER JOIN obs o "
             + "                                  ON e.encounter_id = o.encounter_id "
-            + "                          INNER JOIN obs o2 "
-            + "                                  ON e.encounter_id = o2.encounter_id "
             + "                   WHERE  p.voided = 0 "
             + "                          AND e.voided = 0 "
             + "                          AND o.voided = 0 "
-            + "                          AND o2.voided = 0 "
             + "                          AND e.encounter_type = ${53} "
-            + "                          AND ( ( o.concept_id = ${23898} ) "
-            + "                                AND ( o2.concept_id = ${21190} "
-            + "                                      AND o2.value_coded IS NOT NULL ) "
-            + "                                AND o.obs_datetime <= :endDate ) "
-            + "                          AND o2.obs_group_id = o.obs_id "
+            + "                          AND o.concept_id = ${21190} "
+            + "                          AND o.value_coded IS NOT NULL  "
+            + "                          AND o.obs_datetime <= :endDate  "
             + "                          AND e.location_id = :location "
             + "                   GROUP  BY p.patient_id) regimen_change "
             + "               ON regimen_change.patient_id = p.patient_id "
             + "WHERE  e.encounter_type = ${53} "
-            + "       AND ( o.concept_id = ${23898} "
-            + "       AND ( o2.concept_id = ${21190} "
-            + "             AND o2.value_coded IS NOT NULL ) ) "
-            + "       AND o2.obs_datetime = regimen_change.first_line_date "
+            + "       AND o.concept_id = ${21190} "
+            + "       AND o.value_coded IS NOT NULL "
+            + "       AND o.obs_datetime = regimen_change.first_line_date "
             + "       AND e.location_id = :location "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
-            + "       AND o2.voided = 0 "
-            + "       AND Timestampdiff(month, o2.obs_datetime, "
+            + "       AND Timestampdiff(month, o.obs_datetime, "
             + "           last_consultation.encounter_datetime) >= 6";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);

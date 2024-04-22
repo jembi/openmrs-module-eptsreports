@@ -745,10 +745,10 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + new EptsQueriesUtil()
                 .unionBuilder(
                     listOfPatientsOnAdvancedHivIllnessQueries
-                        .getPatientsWithCD4AbsoluteResultOnPeriodQuery(true))
+                        .getPatientsWithCD4AbsoluteResultOnPeriodQuery(true, false))
                 .union(
                     listOfPatientsOnAdvancedHivIllnessQueries
-                        .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true))
+                        .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true, false))
                 .buildQuery()
             + " ) result GROUP BY result.person_id "
             + " ) last_cd4 ON last_cd4.person_id = ps.person_id "
@@ -770,10 +770,10 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + new EptsQueriesUtil()
                 .unionBuilder(
                     listOfPatientsOnAdvancedHivIllnessQueries
-                        .getPatientsWithCD4AbsoluteResultOnPeriodQuery(true))
+                        .getPatientsWithCD4AbsoluteResultOnPeriodQuery(true, false))
                 .union(
                     listOfPatientsOnAdvancedHivIllnessQueries
-                        .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true))
+                        .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true, false))
                 .buildQuery()
             + " ) result GROUP BY result.person_id "
             + " ) last_cd4 ON last_cd4.person_id = ps.person_id "
@@ -812,10 +812,10 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + new EptsQueriesUtil()
                 .unionBuilder(
                     listOfPatientsOnAdvancedHivIllnessQueries
-                        .getPatientsWithCD4AbsoluteResultOnPeriodQuery(true))
+                        .getPatientsWithCD4AbsoluteResultOnPeriodQuery(true, false))
                 .union(
                     listOfPatientsOnAdvancedHivIllnessQueries
-                        .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true))
+                        .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true, false))
                 .buildQuery()
             + " ) result GROUP BY result.person_id ";
 
@@ -1127,7 +1127,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "                    AND e.voided = 0 "
             + "                    AND o.voided = 0 "
             + "                  GROUP BY p.patient_id,o.value_coded) exam_max "
-            + "         GROUP BY   exam_max.patient_id,exam_max.value_coded ) exam_result ";
+            + "         GROUP BY   exam_max.patient_id,exam_max.value_coded ORDER BY exam_max.recent_date DESC) exam_result "
+            + "GROUP BY exam_result.patient_id ";
 
     String query =
         examResult
@@ -1353,7 +1354,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     map.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("1709", hivMetadata.getSuspendedTreatmentConcept().getConceptId());
-    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
 
     String query =
         new EptsQueriesUtil()

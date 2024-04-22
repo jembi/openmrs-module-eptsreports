@@ -87,24 +87,17 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
       q.append("                           AND        pg.location_id= :location");
       q.append("                         GROUP BY   p.patient_id");
       q.append("            UNION");
-      q.append("                      SELECT     p.patient_id,");
-      q.append("                                 max_master.last_date AS last_date");
-      q.append("                      FROM       patient p");
-      q.append("                                     INNER JOIN encounter e");
-      q.append("                                    ON         e.patient_id=p.patient_id");
-      q.append("                                     INNER JOIN obs o");
-      q.append("                                    ON         o.encounter_id=e.encounter_id");
-      q.append("                         INNER JOIN (SELECT     p.patient_id,");
-      q.append("                                                max(o.obs_datetime) AS last_date");
-      q.append("                                           FROM       patient p");
-      q.append("                                                    INNER JOIN encounter e");
-      q.append(
-          "                                              ON         e.patient_id=p.patient_id");
+      q.append("                         SELECT     p.patient_id,");
+      q.append("                                max(o.obs_datetime) AS last_date");
+      q.append("                           FROM       patient p");
+      q.append("                                    INNER JOIN encounter e");
+      q.append("                              ON         e.patient_id=p.patient_id");
       q.append("                         INNER JOIN obs o");
       q.append("                              ON         e.encounter_id=o.encounter_id");
       q.append("                             WHERE      p.voided = 0");
       q.append("                                 AND        e.voided = 0");
       q.append("                       AND        o.concept_id =   :preArtStateOfStay  ");
+      q.append("                       AND        o.value_coded =   :transfOutConcept  ");
       q.append("                                AND        e.encounter_type =   :masterCard  ");
       if (cd.getOnOrAfter() == null) {
         q.append("            AND o.obs_datetime <= :onOrBefore ");
@@ -112,17 +105,7 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
         q.append("            AND o.obs_datetime BETWEEN :onOrAfter AND :onOrBefore ");
       }
       q.append("              AND        e.location_id = :location");
-      q.append(
-          "                      GROUP BY   p.patient_id ) max_master ON max_master.patient_id=p.patient_id");
-      q.append("            WHERE      p.voided = 0");
-      q.append("                       AND        e.voided = 0");
-      q.append("                       AND        o.voided = 0");
-      q.append("                       AND        e.encounter_type =   :masterCard  ");
-      q.append("                       AND        o.concept_id =   :preArtStateOfStay  ");
-      q.append("                       AND        o.value_coded =   :transfOutConcept  ");
-      q.append("                       AND        o.obs_datetime = max_master.last_date");
-      q.append("                       AND        e.location_id = :location");
-      q.append("                                  GROUP BY   p.patient_id");
+      q.append("                      GROUP BY   p.patient_id ");
       q.append("           UNION");
       q.append("                  SELECT     p.patient_id ,");
       q.append("                             max_seg.last_date AS last_date");
@@ -188,7 +171,8 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
           "                                 Max(last_next_pick_up.result_value) AS max_datetame ");
       q.append("                          FROM (");
       q.append("                              SELECT p.patient_id, ");
-      q.append("                                     o.value_datetime AS result_value ");
+      q.append(
+          "                                     Timestampadd(day, 1, o.value_datetime) AS result_value ");
       q.append("                              FROM patient p ");
       q.append(
           "                              INNER JOIN encounter e ON p.patient_id = e.patient_id ");
@@ -219,7 +203,7 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
       q.append("                              UNION");
       q.append("                              SELECT p.patient_id,");
       q.append(
-          "                                     TIMESTAMPADD(DAY,30, MAX(o.value_datetime)) AS result_value ");
+          "                                     TIMESTAMPADD(DAY,31, MAX(o.value_datetime)) AS result_value ");
       q.append("                              FROM patient p ");
       q.append(
           "                              INNER JOIN encounter e ON p.patient_id = e.patient_id ");
@@ -242,7 +226,7 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
       q.append("                          GROUP BY last_next_pick_up.patient_id ");
       q.append(
           "                      ) AS last_next_scheduled_pick_up ON last_next_scheduled_pick_up.patient_id = p.patient_id ");
-      q.append("          WHERE last_next_scheduled_pick_up.max_datetame < :onOrBefore ");
+      q.append("          WHERE last_next_scheduled_pick_up.max_datetame > :onOrBefore ");
 
       q.append("                 )");
       q.append("      GROUP BY transferred_out.patient_id");
@@ -329,7 +313,8 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
           "                                 Max(last_next_pick_up.result_value) AS max_datetame ");
       q.append("                          FROM (");
       q.append("                              SELECT p.patient_id, ");
-      q.append("                                     o.value_datetime AS result_value ");
+      q.append(
+          "                                    TIMESTAMPADD(DAY, 1, o.value_datetime) AS result_value ");
       q.append("                              FROM patient p");
       q.append(
           "                              INNER JOIN encounter e ON p.patient_id = e.patient_id ");
@@ -361,7 +346,7 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
       q.append("                              UNION ");
       q.append("                              SELECT p.patient_id, ");
       q.append(
-          "                                   TIMESTAMPADD(DAY,30,MAX(o.value_datetime)) AS result_value ");
+          "                                   TIMESTAMPADD(DAY,31,MAX(o.value_datetime)) AS result_value ");
       q.append("                              FROM patient p ");
       q.append(
           "                              INNER JOIN encounter e ON p.patient_id = e.patient_id ");
@@ -384,7 +369,7 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
       q.append("                          GROUP BY last_next_pick_up.patient_id ");
       q.append(
           "                      ) AS last_next_scheduled_pick_up ON last_next_scheduled_pick_up.patient_id = p.patient_id ");
-      q.append("          WHERE last_next_scheduled_pick_up.max_datetame < :onOrBefore ");
+      q.append("          WHERE last_next_scheduled_pick_up.max_datetame > :onOrBefore ");
       q.append("                                                 ) ");
     }
     q.addParameter("art", hivMetadata.getARTProgram().getProgramId());
