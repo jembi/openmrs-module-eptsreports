@@ -2452,7 +2452,6 @@ public class TPTCompletionCohortQueries {
             + "               ON start.encounter_id = e2.encounter_id "
             + "WHERE e2.voided = 0 "
             + "       AND e2.patient_id = p.patient_id "
-            + "       AND e2.encounter_type = ${60} "
             + "       AND oo.concept_id = ${23986} "
             + "       AND oo.value_coded = ${23720} "
             + "       AND e2.encounter_datetime BETWEEN tabela.start_date AND Date_add(tabela.start_date, INTERVAL 5 month) "
