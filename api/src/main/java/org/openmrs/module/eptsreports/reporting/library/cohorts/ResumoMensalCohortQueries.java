@@ -567,7 +567,7 @@ public class ResumoMensalCohortQueries {
             + "                          AND e.voided = 0 "
             + "                          AND o.voided = 0 "
             + "                          AND e.encounter_type = ${6} "
-            + "                          AND e.encounter_datetime < DATE_SUB(:endDate, INTERVAL 1 MONTH) "
+            + "                          AND e.encounter_datetime <= DATE_SUB(:endDate, INTERVAL 1 MONTH) "
             + "                          AND o.concept_id = ${23761} AND o.value_coded = ${1065}  "
             + "                   GROUP BY p.patient_id  "
             + "       ) tb ON tb.patient_id = res.patient_id "
