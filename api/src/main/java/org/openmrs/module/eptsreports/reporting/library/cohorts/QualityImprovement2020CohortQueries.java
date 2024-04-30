@@ -1457,14 +1457,12 @@ public class QualityImprovement2020CohortQueries {
    * All patients with a clinical consultation(encounter type 6) during the Revision period with the
    * following conditions:
    *
-   * <p>- “TRATAMENTO DE TUBERCULOSE”(concept_id 1268) value coded “Inicio” or “Continua” or
-   * “Fim”(concept_id IN [1256, 1257, 1267]) “Data Tratamento TB” (obs datetime 1268) between:
+   * <p><b>excluindo</b> todos os utentes com <b>“Tratamento TB</b> (respostas = {“Início” ,
+   * “Continua”, “Fim”) e a respectiva “Data de Tratamento TB” decorrida durante o <b>período de
+   * tratamento</b> (“Data de Consulta”>= “Data Início TPT” e <= “Data Início TPT”+ 9meses ou 297
+   * dias).
    *
-   * <p>- ( obs_datetime (from the last MASTERCARD - Ficha Resumo (encounter 53) with Ultima
-   * Profilaxia TPT (concept_id 23985) = INH (concept = 656) and (Data Início)” (obs_datetime for
-   * concept id 165308 value 1256) AND - obs_datetime (from the last clinical consultation
-   * (encounter 6) with Ultima Profilaxia TPT (concept_id 23985) = INH (concept = 656) and (Data *
-   * Início)” (obs_datetime for concept id 165308 value 1256) ) PLUS 9 MONTHS
+   * <p>Nota: a “Data Início TPT - Isoniazida” está definida no RF12.
    *
    * @return CohortDefinition
    *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
@@ -1535,7 +1533,8 @@ public class QualityImprovement2020CohortQueries {
             + "         AND e.encounter_type = ${6}  "
             + "         AND o.concept_id = ${1268}  "
             + "         AND o.value_coded IN (${1256} , ${1257}, ${1267})  "
-            + "         AND DATE(o.obs_datetime) between DATE(last.tpt_start_date) AND DATE(DATE_ADD(last.tpt_start_date, INTERVAL 9 MONTH))  "
+            + "         AND ( ( DATE(o.obs_datetime) BETWEEN DATE(last.tpt_start_date) AND DATE(DATE_ADD(last.tpt_start_date, INTERVAL 9 MONTH)) ) "
+            + "         OR ( DATE(o.obs_datetime) BETWEEN DATE(last.tpt_start_date) AND DATE(DATE_ADD(last.tpt_start_date, INTERVAL 297 DAY)) ) ) "
             + "         AND p.voided = 0  "
             + "         AND e.voided = 0  "
             + "         AND o.voided = 0";
@@ -1551,12 +1550,12 @@ public class QualityImprovement2020CohortQueries {
    * All patients with a clinical consultation(encounter type 6) during the Revision period with the
    * following conditions:
    *
-   * <p>- “TRATAMENTO DE TUBERCULOSE”(concept_id 1268) value coded “Inicio” or “Continua” or
-   * “Fim”(concept_id IN [1256, 1257, 1267]) “Data Tratamento TB” (obs datetime 1268) between:
+   * <p><b>excluindo</b> todos os utentes com <b>“Tratamento TB</b> (respostas = {“Início” ,”,
+   * “Continua”, “Fim”) e a respectiva “Data de Tratamento TB” decorrida durante o <b>período de
+   * tratamento</b> (“Data de Consulta”>= “Data Início TPT” e <= “Data Início TPT”+ 6meses ou 198
+   * dias).
    *
-   * <p>- “TRATAMENTO DE TUBERCULOSE”(concept_id 1268) value coded “Inicio” or “Continua” or
-   * “Fim”(concept_id IN [1256, 1257, 1267]) and “Data Tratamento TB” (obs datetime 1268) between
-   * Encounter_datetime(from B5_1 or B5_2) and Encounter_datetime(from B5_1 or B5_2) + 6 months
+   * <p>Nota: a “Data Início TPT – 3HP” está definida no RF12.1
    *
    * @return CohortDefinition
    *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
@@ -1627,7 +1626,8 @@ public class QualityImprovement2020CohortQueries {
             + "         AND e.encounter_type = ${6}  "
             + "         AND o.concept_id = ${1268}  "
             + "         AND o.value_coded IN (${1256} , ${1257}, ${1267})  "
-            + "         AND DATE(o.obs_datetime) between DATE(last.tpt_start_date) AND DATE(DATE_ADD(last.tpt_start_date, INTERVAL 6 MONTH))  "
+            + "         AND ( ( DATE(o.obs_datetime) between DATE(last.tpt_start_date) AND DATE(DATE_ADD(last.tpt_start_date, INTERVAL 6 MONTH)) ) "
+            + "         OR ( DATE(o.obs_datetime) between DATE(last.tpt_start_date) AND DATE(DATE_ADD(last.tpt_start_date, INTERVAL 198 DAY)) ) ) "
             + "         AND p.voided = 0  "
             + "         AND e.voided = 0  "
             + "         AND o.voided = 0";
@@ -9983,7 +9983,7 @@ public class QualityImprovement2020CohortQueries {
    *             occurred during the revision period (value_datetime >= startDateRevision and <=
    *             endDateRevision)
    *             <p>and “TPT Start Date” (the most recent date from B5_1 and B5_2) minus “TPT End
-   *             Date” is between 80 days and 190 days
+   *             Date” is between 80 days and 198 days
    *       </ul>
    * </ul>
    *
@@ -10090,7 +10090,7 @@ public class QualityImprovement2020CohortQueries {
             + "                GROUP BY tpt_start.patient_id  "
             + "            ) AS tpt_inicio ON tpt_inicio.patient_id = p.patient_id  "
             + "WHERE p.voided = 0  "
-            + "    AND TIMESTAMPDIFF(DAY, tpt_inicio.tpt_start_date,tpt_fim.tpt_end_date) BETWEEN  80 AND 190 ";
+            + "    AND TIMESTAMPDIFF(DAY, tpt_inicio.tpt_start_date,tpt_fim.tpt_end_date) BETWEEN  80 AND 198 ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
