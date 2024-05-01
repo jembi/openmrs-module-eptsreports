@@ -2145,12 +2145,12 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
     if (den == 1 || den == 3) {
-      compositionCohortDefinition.setName("A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
+      compositionCohortDefinition.setName("A AND NOT (B1 OR B2 OR B3 OR C OR D OR E)");
     } else if (den == 2 || den == 4) {
       compositionCohortDefinition.setName(
           "(A AND (B41 OR B42 OR B51 OR B52)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
     } else if (den == 5) {
-      compositionCohortDefinition.setName("(A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
+      compositionCohortDefinition.setName("(A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E)");
     } else if (den == 6) {
       compositionCohortDefinition.setName(
           "(A AND (B41 OR B42 OR B51 OR B52) AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
@@ -2288,14 +2288,13 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("B52", EptsReportUtils.map(b52, MAPPING));
 
     if (den == 1 || den == 3) {
-      compositionCohortDefinition.setCompositionString(
-          "A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
+      compositionCohortDefinition.setCompositionString("A AND NOT (B1 OR B2 OR B3 OR C OR D OR E)");
     } else if (den == 2 || den == 4) {
       compositionCohortDefinition.setCompositionString(
           "(A AND (B41 OR B42 OR B51 OR B52)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
     } else if (den == 5) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
+          "(A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E)");
     } else if (den == 6) {
       compositionCohortDefinition.setCompositionString(
           "(A AND (B41 OR B42 OR B51 OR B52) AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
@@ -2350,13 +2349,13 @@ public class QualityImprovement2020CohortQueries {
 
     if (num == 1 || num == 3) {
       compositionCohortDefinition.setName(
-          "(A AND  (B41 OR B42 OR B51 OR B52)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
+          "(A AND  (B41 OR B42 OR B51 OR B52)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E)");
     } else if (num == 2 || num == 4) {
       compositionCohortDefinition.setName(
           "(A AND (B41 OR B42 OR B51 OR B52) AND (GNEW OR L)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
     } else if (num == 5) {
       compositionCohortDefinition.setName(
-          "(A AND C AND (B41 OR B42 OR B51 OR B52) ) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
+          "(A AND C AND (B41 OR B42 OR B51 OR B52)) AND NOT (B1 OR B2 OR B3 OR D OR E)");
     } else if (num == 6) {
       compositionCohortDefinition.setName(
           "(A AND (B41 OR B42 OR B51 OR B52) AND C AND (GNEW OR L)) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
@@ -2511,13 +2510,13 @@ public class QualityImprovement2020CohortQueries {
 
     if (num == 1 || num == 3) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND  (B41 OR B42 OR B51 OR B52)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
+          "(A AND  (B41 OR B42 OR B51 OR B52)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E)");
     } else if (num == 2 || num == 4) {
       compositionCohortDefinition.setCompositionString(
           "(A AND (B41 OR B42 OR B51 OR B52) AND (GNEW OR L)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
     } else if (num == 5) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND C AND (B41 OR B42 OR B51 OR B52) ) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
+          "(A AND C AND (B41 OR B42 OR B51 OR B52)) AND NOT (B1 OR B2 OR B3 OR D OR E)");
     } else if (num == 6) {
       compositionCohortDefinition.setCompositionString(
           "(A AND (B41 OR B42 OR B51 OR B52) AND C AND (GNEW OR L)) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
@@ -12472,6 +12471,8 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
+   *
+   *
    * <blockquote>
    *
    * O sistema irá identificar utentes “Transferido Para” outras US em TARV durante o período de
