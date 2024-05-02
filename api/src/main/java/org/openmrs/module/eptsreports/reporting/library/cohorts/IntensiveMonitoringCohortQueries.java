@@ -2446,7 +2446,7 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
-        "(((B1 AND age) OR D) AND PrimeiraLinha AND NOT C");
+        "((B1 AND age) OR D) AND PrimeiraLinha AND NOT C");
 
     return compositionCohortDefinition;
   }
