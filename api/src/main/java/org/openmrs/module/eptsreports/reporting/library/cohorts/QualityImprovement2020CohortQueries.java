@@ -2847,8 +2847,7 @@ public class QualityImprovement2020CohortQueries {
           "(A AND B2) AND NOT B2E AND NOT (C OR D OR F) AND CHILDREN");
     }
     if (indicatorFlag == 11) {
-      compositionCohortDefinition.setCompositionString(
-          "(A AND B1 AND C) AND NOT B1E AND NOT (D OR F)");
+      compositionCohortDefinition.setCompositionString("(A AND B1 AND C) AND NOT (B1E OR F)");
     }
 
     return compositionCohortDefinition;
