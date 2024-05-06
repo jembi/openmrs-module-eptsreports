@@ -33,12 +33,12 @@ public class SetupQualityImprovementReport20 extends EptsDataExportManager {
 
   @Override
   public String getName() {
-    return "Melhoria de Qualidade - 2023";
+    return "Melhoria de Qualidade - 2024";
   }
 
   @Override
   public String getDescription() {
-    return "Este relatório apresenta os indicadores de melhoria de qualidade da Unidade Sanitária para o Programa do HIV/SIDA.";
+    return "Relatório com indicadores de melhoria de qualidade da US para o Programa de HIV/SIDA";
   }
 
   @Override
@@ -82,7 +82,7 @@ public class SetupQualityImprovementReport20 extends EptsDataExportManager {
           createXlsReportDesign(
               reportDefinition,
               "Template_MQ_2023.xls",
-              "Melhoria de Qualidade - 2023",
+              "Melhoria de Qualidade - 2024",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
