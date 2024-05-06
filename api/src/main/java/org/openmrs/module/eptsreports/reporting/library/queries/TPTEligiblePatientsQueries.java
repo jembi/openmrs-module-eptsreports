@@ -336,29 +336,6 @@ public class TPTEligiblePatientsQueries {
   }
 
   /**
-   * @see #getY1Query()
-   * @return {@link String}
-   */
-  public static String getY1QueryWithPatientIdForB5() {
-    return "SELECT ee.patient_id, o3.obs_datetime AS start_date "
-        + "FROM   encounter ee "
-        + "       JOIN obs o2 "
-        + "         ON o2.encounter_id = ee.encounter_id "
-        + "       JOIN obs o3 "
-        + "         ON o3.encounter_id = ee.encounter_id "
-        + "WHERE  ee.encounter_type = ${53} "
-        + "       AND o2.voided = 0 "
-        + "       AND o3.voided = 0 "
-        + "       AND ee.voided = 0 "
-        + "       AND ee.location_id = :location "
-        + "       AND ((o2.concept_id = ${23985} "
-        + "        AND o2.value_coded = ${656}) "
-        + "       AND (o3.concept_id = ${165308} "
-        + "        AND o3.value_coded = ${1256} "
-        + "        AND o3.obs_datetime <= :endDate)) ";
-  }
-
-  /**
    * <b>K. Patients IPT Start Dates as:</b>
    *
    * <p>Y2: Select Encounter Datetime from Ficha clinica (encounter type 6) with Profilaxia TPT
@@ -371,31 +348,6 @@ public class TPTEligiblePatientsQueries {
     return "SELECT ee.patient_id, o3.obs_datetime start_date "
         + "FROM encounter ee "
         + "    JOIN obs o2 ON o2.encounter_id = ee.encounter_id "
-        + "    JOIN obs o3 ON o3.encounter_id = ee.encounter_id "
-        + "WHERE "
-        + "        ee.encounter_type = ${6} "
-        + "  AND o2.voided = 0 "
-        + "  AND o3.voided = 0 "
-        + "  AND ee.voided = 0 "
-        + "  AND ee.location_id = :location "
-        + "  AND (( o2.concept_id = ${23985} "
-        + "    AND o2.value_coded = ${656} ) "
-        + "  AND ( o3.concept_id = ${165308} "
-        + "    AND o3.value_coded = ${1256} "
-        + "    AND o3.obs_datetime <= :endDate )) ";
-  }
-
-  /**
-   * @see #getY2Query()
-   * @return {@link String}
-   */
-  public static String getY2QueryWithPatientIdForB5() {
-    return "SELECT "
-        + "    ee.patient_id, o3.obs_datetime AS start_date "
-        + "FROM "
-        + "    encounter ee "
-        + "        JOIN "
-        + "    obs o2 ON o2.encounter_id = ee.encounter_id "
         + "    JOIN obs o3 ON o3.encounter_id = ee.encounter_id "
         + "WHERE "
         + "        ee.encounter_type = ${6} "
@@ -434,29 +386,6 @@ public class TPTEligiblePatientsQueries {
         + "    AND oo.voided = 0 "
         + "    AND ee.voided = 0 "
         + "    AND ee.location_id = :location ";
-  }
-
-  /**
-   * @see #getY3Query()
-   * @return {@link String}
-   */
-  public static String getY3QueryWithPatientIdForB5() {
-    return "SELECT ee.patient_id, oo2.obs_datetime AS start_date "
-        + "FROM   encounter ee "
-        + "           JOIN obs oo "
-        + "                ON oo.encounter_id = ee.encounter_id "
-        + "           JOIN obs oo2 "
-        + "                ON oo2.encounter_id = ee.encounter_id "
-        + "WHERE  ee.encounter_type = ${9} "
-        + "    AND oo.voided = 0 "
-        + "    AND oo2.voided = 0 "
-        + "    AND ee.voided = 0 "
-        + "    AND ee.location_id = :location "
-        + "    AND ((oo.concept_id = ${23985} "
-        + "    AND oo.value_coded = ${656}) "
-        + "    AND (oo2.concept_id = ${165308} "
-        + "    AND oo2.value_coded = ${1256} "
-        + "    AND oo2.obs_datetime <= :endDate)) ";
   }
 
   /**
@@ -678,13 +607,13 @@ public class TPTEligiblePatientsQueries {
         + "      AND pp.voided = 0 "
         + "      AND e.voided = 0 "
         + "      AND o.voided = 0 "
-        + "      AND NOT EXISTS (SELECT p.patient_id "
+        + "      AND pp.patient_id NOT IN (SELECT p.patient_id "
         + "                       FROM   patient p "
         + "                              INNER JOIN encounter e "
         + "                                      ON p.patient_id = e.patient_id "
         + "                              INNER JOIN obs o "
         + "                                      ON e.encounter_id = o.encounter_id "
-        + "                       WHERE  p.voided = 0 "
+        + "                       WHERE  p.voided = 0  AND p.patient_id = pp.patient_id "
         + "                              AND e.voided = 0 "
         + "                              AND o.voided = 0 "
         + "                              AND e.location_id = :location "
@@ -693,8 +622,8 @@ public class TPTEligiblePatientsQueries {
         + "                              AND o.value_coded IN ( ${656}, ${23982} ) "
         + "                              AND e.encounter_datetime <= "
         + "                                  Date_sub(filt.start_date, "
-        + "                                  INTERVAL 7 month)) "
-        + "       AND NOT EXISTS (SELECT p.patient_id "
+        + "                                  INTERVAL 7 month) "
+        + "       UNION SELECT p.patient_id "
         + "                       FROM   patient p "
         + "                              INNER JOIN encounter e "
         + "                                      ON e.patient_id = p.patient_id "
@@ -702,13 +631,10 @@ public class TPTEligiblePatientsQueries {
         + "                                      ON e.encounter_id = o.encounter_id "
         + "                              INNER JOIN obs o2 "
         + "                                      ON e.encounter_id = o2.encounter_id "
-        + "                              INNER JOIN obs o3 "
-        + "                                      ON e.encounter_id = o3.encounter_id "
-        + "                       WHERE  p.voided = 0 "
+        + "                       WHERE  p.voided = 0 AND p.patient_id = pp.patient_id "
         + "                              AND e.voided = 0 "
         + "                              AND o.voided = 0 "
         + "                              AND o2.voided = 0 "
-        + "                              AND o3.voided = 0 "
         + "                              AND e.location_id = :location "
         + "                              AND e.encounter_type IN ( ${6}, ${9} ) "
         + "                              AND ( ( ( o.concept_id = ${23985} "
@@ -720,9 +646,9 @@ public class TPTEligiblePatientsQueries {
         + "                                                INTERVAL "
         + "                                                7 month) "
         + "                                          ) ) "
-        + "                                     OR ( o3.concept_id = ${1719} "
-        + "                                          AND o3.value_coded = ${165307} ) )) "
-        + "       AND NOT EXISTS (SELECT p.patient_id "
+        + "                                     OR ( o2.concept_id = ${1719} "
+        + "                                          AND o2.value_coded = ${165307} ) ) "
+        + "       UNION SELECT p.patient_id "
         + "                       FROM   patient p "
         + "                              INNER JOIN encounter e "
         + "                                      ON e.patient_id = p.patient_id "
@@ -730,7 +656,7 @@ public class TPTEligiblePatientsQueries {
         + "                                      ON e.encounter_id = o.encounter_id "
         + "                              INNER JOIN obs o2 "
         + "                                      ON e.encounter_id = o2.encounter_id "
-        + "                       WHERE  p.voided = 0 "
+        + "                       WHERE  p.voided = 0 AND p.patient_id = pp.patient_id "
         + "                              AND e.voided = 0 "
         + "                              AND o.voided = 0 "
         + "                              AND o2.voided = 0 "
