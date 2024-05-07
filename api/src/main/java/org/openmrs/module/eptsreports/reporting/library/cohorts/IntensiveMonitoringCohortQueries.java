@@ -719,7 +719,7 @@ public class IntensiveMonitoringCohortQueries {
       }
     } else {
       if (line == 1) {
-        compositionCohortDefinition.setCompositionString("DENOMINATOR AND G AND age");
+        compositionCohortDefinition.setCompositionString("DENOMINATOR AND G");
       } else if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
             "(B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR  ( (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) )) AND NOT B5E) AND NOT (C OR D) AND G AND age");
@@ -2446,7 +2446,7 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
-        "(((B1 AND age) OR D) AND PrimeiraLinha AND NOT C");
+        "((B1 AND age) OR D) AND PrimeiraLinha AND NOT C");
 
     return compositionCohortDefinition;
   }
