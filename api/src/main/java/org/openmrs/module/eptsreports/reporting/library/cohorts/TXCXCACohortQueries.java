@@ -414,10 +414,7 @@ public class TXCXCACohortQueries {
     map.put("23973", hivMetadata.getconizationConcept().getConceptId());
 
     String query =
-        "SELECT     treatment.patient_id "
-            + "FROM ( "
-            + "SELECT     p.patient_id, "
-            + "     MAX(o.obs_datetime) AS last_treatment_result_date "
+        "SELECT     p.patient_id "
             + "FROM       patient p "
             + "               INNER JOIN encounter e "
             + "                          ON         e.patient_id = p.patient_id "
@@ -461,25 +458,18 @@ public class TXCXCACohortQueries {
             + "                 AND        e.location_id = :location "
             + "                 AND        o.concept_id = ${2094} "
             + "                 AND        o.value_coded = ${703} "
-            + "               GROUP BY   p.patient_id ) positive_via "
+            + "               GROUP BY   p.patient_id ) positive_via ON positive_via.patient_id = p.patient_id "
             + "WHERE      p.voided = 0 "
             + "  AND        o.voided = 0 "
             + "  AND        e.encounter_type = ${28} "
             + "  AND        e.location_id = :location "
-            + "  AND        ( ( "
-            + "                   o.concept_id = ${1185} "
-            + "                       AND        o.value_coded IN ( ${23974}, "
-            + "                                                      ${165439} ) "
-            + "                       AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate) "
-            + "    OR         ( "
-            + "                   o.concept_id = ${2149} "
-            + "                       AND        o.value_coded IN ( ${23974}, "
-            + "                                                      ${23972}, "
-            + "                                                      ${23970}, "
-            + "                                                      ${23973} ) "
-            + "                       AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND        :endDate) ) "
-            + "GROUP BY p.patient_id "
-            + "           ) treatment";
+            + "  AND        ( "
+            + "             (o.concept_id = ${1185} AND  o.value_coded IN ( ${23974}, ${165439} ) "
+            + " AND o.obs_datetime BETWEEN positive_via.last_positive_encounter AND :endDate ) "
+            + "    OR         ( o.concept_id = ${2149}  AND   o.value_coded IN ( ${23974},  ${23972},  ${23970}, ${23973} ) "
+            + " AND        o.obs_datetime BETWEEN positive_via.last_positive_encounter AND :endDate ) "
+            + "             ) "
+            + "GROUP BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 

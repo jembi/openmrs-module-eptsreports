@@ -5,7 +5,6 @@ import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.data.converter.*;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
 import org.openmrs.module.reporting.data.person.definition.*;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
@@ -23,18 +22,11 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
   private String c18Mappings = "endDate=${evaluationYear-2}-06-20,location=${location}";
   private String d18Mappings = "endDate=${evaluationYear-3}-06-20,location=${location}";
 
-  private final ListOfPatientsInAdvancedHivIllnessCohortQueries
-      listOfPatientsInAdvancedHivIllnessCohortQueries;
-
   @Autowired
   public ListOfPatientsWithMdsEvaluationCohortDataset(
-      ListOfPatientsWithMdsEvaluationCohortQueries listOfPatientsWithMdsEvaluationCohortQueries,
-      ListOfPatientsInAdvancedHivIllnessCohortQueries
-          listOfPatientsInAdvancedHivIllnessCohortQueries) {
+      ListOfPatientsWithMdsEvaluationCohortQueries listOfPatientsWithMdsEvaluationCohortQueries) {
     this.listOfPatientsWithMdsEvaluationCohortQueries =
         listOfPatientsWithMdsEvaluationCohortQueries;
-    this.listOfPatientsInAdvancedHivIllnessCohortQueries =
-        listOfPatientsInAdvancedHivIllnessCohortQueries;
   }
 
   public DataSetDefinition contructDataset() {
@@ -108,24 +100,25 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     //  SECÇÃO B
     //  12 MESES DEPOIS DO INÍCIO DO TARV: ELIGIBILIDADE A MDS
 
-    // B.1 - Data do pedido da 1ª CV - Sheet 1: Column J
+    // B.1 - Data do pedido da última CV nos 1˚s  12 meses de TARV - Sheet 1: Column J
     pdd.addColumn(
         "first_cv_date",
-        listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoad(),
+        listOfPatientsWithMdsEvaluationCohortQueries
+            .getLastViralLoadRequestOnTheFirst12MonthsOfTarv(),
         endDateMappings,
         new GeneralDateConverter());
 
-    // B.2 - Data de registo do resultado da 1ª CV - Sheet 1: Column K
+    // B.2 - Data de registo do resultado da última CV nos 1os 12 meses do TARV - Sheet 1: Column K
     pdd.addColumn(
         "first_cv_result_date",
         listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoadResultDate(),
         endDateMappings,
         new GeneralDateConverter());
 
-    // B.3 - Resultado da 1ª CV - Sheet 1: Column L
+    // B.3 - Resultado da última CV - Sheet 1: Column L
     pdd.addColumn(
         "first_cv_result",
-        listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoadResult(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastViralLoadResultOnThe1st12MonthsOfTarv(),
         endDateMappings,
         new ViralLoadQualitativeLabelConverter());
 
@@ -273,7 +266,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // TARV?: Coluna AH
     pdd.addColumn(
         "tb_screening_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionB(3, 9, true),
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionB(0, 12, true),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -281,7 +274,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // ao 12˚ mês de TARV Coluna AK
     pdd.addColumn(
         "pb_imc_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionB(3, 9, false),
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionB(0, 12, false),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -303,24 +296,26 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(),
         b18Mappings);
 
-    // C1 - Data do pedido da CV de seguimento: (coluna AP)
+    // C1 - Data do pedido da CV entre 12º e 24º mês de TARV: (coluna AP)
     pdd.addColumn(
         "cv_date_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getSecondViralLoad(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastViralLoadOnThePeriod(12, 24),
         endDateMappings,
         new GeneralDateConverter());
 
-    // C.2 - Data de registo do resultado da CV de Seguimento - Sheet 1: (coluna AQ)
+    // C.2 - Data de registo do resultado da CV entre 12º e 24º mês do TARV: (coluna AQ)
     pdd.addColumn(
         "cv_result_date_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getSecondViralLoadResultDate(),
+        listOfPatientsWithMdsEvaluationCohortQueries
+            .getLastViralLoadResultDateBetweenPeriodsInMonthsAfterTarv(12, 24),
         endDateMappings,
         new GeneralDateConverter());
 
     // C.3 - Identificação do Resultado da CV de Seguimento - Sheet 1: (coluna AR)
     pdd.addColumn(
         "cv_result_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getSecondViralLoadResult(),
+        listOfPatientsWithMdsEvaluationCohortQueries
+            .getSecondViralLoadResultBetweenPeriodsOfMonthsAfterTarv(12, 24),
         endDateMappings,
         new ViralLoadQualitativeLabelConverter());
 
@@ -498,21 +493,23 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // D.1 - Data do pedido da CV de seguimento - D.1 (coluna BV)
     pdd.addColumn(
         "cv_date_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getSecondViralLoad(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastViralLoadOnThePeriod(24, 36),
         endDateMappings,
         new GeneralDateConverter());
 
     // D.2 - Data de registo do resultado da CV de Seguimento - D.2 (coluna BV)
     pdd.addColumn(
         "cv_result_date_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getSecondViralLoadResultDate(),
+        listOfPatientsWithMdsEvaluationCohortQueries
+            .getLastViralLoadResultDateBetweenPeriodsInMonthsAfterTarv(24, 36),
         endDateMappings,
         new GeneralDateConverter());
 
     // D.3 - Resultado da CV de Seguimento - D.3 (coluna BX)
     pdd.addColumn(
         "cv_result_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getSecondViralLoadResult(),
+        listOfPatientsWithMdsEvaluationCohortQueries
+            .getSecondViralLoadResultBetweenPeriodsOfMonthsAfterTarv(24, 36),
         endDateMappings,
         new ViralLoadQualitativeLabelConverter());
 
@@ -541,7 +538,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithTbThirdToNineMonth(24, 36),
         endDateMappings);
 
-    // D.9 - Data de inscrição no MDS entre 24º e 36º mês de TARV: (coluna CD)
+    // D.9 - Data de inscrição em algum MDS entre 24º e 36º mês de TARV: (coluna CD)
     pdd.addColumn(
         "mds_tarv_d",
         listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(24, 36, false),

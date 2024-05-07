@@ -194,4 +194,47 @@ public class RMPREPCohortQueries {
     sqlCohortDefinition.setQuery(query);
     return sqlCohortDefinition;
   }
+
+  /**
+   * O sistema irá produzir o indicador B1 – “Nº de Utentes que iniciaram PrEP pela 1ª vez durante o
+   * período de reporte” da seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todos os utentes que iniciaram PrEP durante o período verificando se a data
+   *       mais antiga entre as seguintes datas ocorre dentro do período (>= “Data Início do
+   *       Relatório” e <= “Data Fim do Relatório”):
+   *       <ul>
+   *         <li>“O(a) utente está a iniciar pela 1a vez a PrEP Data” registada na “Ficha de
+   *             Consulta Inicial PrEP”
+   *         <li>“Data de Início PrEP” registada na secção “Resumo da Ficha de Seguimento” da “Ficha
+   *             de Consulta Inicial PrEP”
+   *       </ul>
+   *   <li>Excluindo todos os utentes “Transferidos De” outra Unidade Sanitária (RF10)
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getClientsWhoNewlyInitiatedPrep() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients Who Newly Initiated PrEP");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(
+            prepNewCohortQueries.getClientsWhoInitiatedPrep(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "B",
+        EptsReportUtils.map(
+            prepNewCohortQueries.getClientsWhoAreTransferredIn(),
+            "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("A AND NOT B");
+
+    return cd;
+  }
 }

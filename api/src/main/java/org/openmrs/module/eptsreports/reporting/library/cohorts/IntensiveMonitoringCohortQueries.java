@@ -719,7 +719,7 @@ public class IntensiveMonitoringCohortQueries {
       }
     } else {
       if (line == 1) {
-        compositionCohortDefinition.setCompositionString("DENOMINATOR AND G AND age");
+        compositionCohortDefinition.setCompositionString("DENOMINATOR AND G");
       } else if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
             "(B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR  ( (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) )) AND NOT B5E) AND NOT (C OR D) AND G AND age");
@@ -2446,7 +2446,7 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
-        "(((B1 AND age) OR D) AND PrimeiraLinha AND NOT C");
+        "((B1 AND age) OR D) AND PrimeiraLinha AND NOT C");
 
     return compositionCohortDefinition;
   }
@@ -3734,13 +3734,18 @@ public class IntensiveMonitoringCohortQueries {
             eriDSDCohortQueries.getFilaOrDrugPickup(), "endDate=${endDate},location=${location}"));
 
     cd.addSearch(
+        "pickUpsOnPreviousPeriod",
+        EptsReportUtils.map(
+            PatientsWithPickUpsOnPreviousPeriod(), "endDate=${endDate-3m},location=${location}"));
+
+    cd.addSearch(
         "transferredIn",
         EptsReportUtils.map(
             transferredIn,
             "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.setCompositionString(
-        "(B13 and treatmentInterruption AND filaOrDrugPickup) AND NOT transferredIn");
+        "(B13 AND (treatmentInterruption OR NOT pickUpsOnPreviousPeriod) AND filaOrDrugPickup) AND NOT transferredIn");
     return cd;
   }
 
@@ -4083,8 +4088,8 @@ public class IntensiveMonitoringCohortQueries {
             + "                   GROUP  BY p.patient_id) finished_treatment "
             + "               ON finished_treatment.patient_id = p.patient_id "
             + "WHERE  p.voided = 0 "
-            + "       AND TIMESTAMPDIFF(DAY, finished_treatment.last_tb_treatment, "
-            + "               last_consultation.most_recent) <= 30";
+            + "       AND ABS(TIMESTAMPDIFF(DAY, last_consultation.most_recent, "
+            + "            +  finished_treatment.last_tb_treatment)) <= 30";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -4151,6 +4156,78 @@ public class IntensiveMonitoringCohortQueries {
             + "       AND e.encounter_datetime >= :startDate "
             + "       AND e.encounter_datetime <= :endDate "
             + "GROUP  BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  public CohortDefinition PatientsWithPickUpsOnPreviousPeriod() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes Transferidos Para Outra US");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+
+    String query =
+        " SELECT   patient_id "
+            + " FROM     ( "
+            + "                     SELECT     p.patient_id, "
+            + "                                o.value_datetime AS last_datetime "
+            + "                     FROM       patient p "
+            + "                     INNER JOIN encounter e "
+            + "                     ON         e.patient_id = p.patient_id "
+            + "                     INNER JOIN obs o "
+            + "                     ON         o.encounter_id = e.encounter_id "
+            + "                     INNER JOIN "
+            + "                                ( "
+            + "                                           SELECT     p.patient_id, "
+            + "                                                      MAX(e.encounter_datetime) last_pickup "
+            + "                                           FROM       patient p "
+            + "                                           INNER JOIN encounter e "
+            + "                                           ON         e.patient_id = p.patient_id "
+            + "                                           INNER JOIN obs o "
+            + "                                           ON         o.encounter_id = e.encounter_id "
+            + "                                           WHERE      e.encounter_type = ${18} "
+            + "                                           AND        p.voided = 0 "
+            + "                                           AND        e.voided = 0 "
+            + "                                           AND        e.location_id = :location "
+            + "                                           AND        o.voided = 0 "
+            + "                                           AND        e.encounter_datetime <= :endDate "
+            + "                                           GROUP BY   p.patient_id ) last_fila "
+            + "                     ON         last_fila.patient_id = p.patient_id "
+            + "                     WHERE      e.encounter_type = ${18} "
+            + "                     AND        p.voided = 0 "
+            + "                     AND        e.voided = 0 "
+            + "                     AND        e.location_id = :location "
+            + "                     AND        o.voided = 0 "
+            + "                     AND        o.concept_id = ${5096} "
+            + "                     AND        o.value_datetime IS NOT NULL "
+            + "                     AND        e.encounter_datetime = last_fila.last_pickup "
+            + "                     GROUP BY   p.patient_id "
+            + "                     UNION "
+            + "                     SELECT     p.patient_id, "
+            + "                                MAX(o.value_datetime) AS last_datetime "
+            + "                     FROM       patient p "
+            + "                     INNER JOIN encounter e "
+            + "                     ON         e.patient_id = p.patient_id "
+            + "                     INNER JOIN obs o "
+            + "                     ON         o.encounter_id = e.encounter_id "
+            + "                     WHERE      e.encounter_type = ${52} "
+            + "                     AND        e.location_id = :location "
+            + "                     AND        o.value_datetime <= :endDate "
+            + "                     AND        o.concept_id = ${23866} "
+            + "                     AND        p.voided = 0 "
+            + "                     AND        e.voided = 0 "
+            + "                     AND        o.voided = 0 "
+            + "                     GROUP BY   p.patient_id ) last_schedule ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
