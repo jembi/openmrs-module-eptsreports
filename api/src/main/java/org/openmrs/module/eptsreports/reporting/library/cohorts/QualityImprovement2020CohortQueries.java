@@ -9667,7 +9667,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getPatientsWhoStartedTpt() {
+  public CohortDefinition getPatientsWhoStartedTpt(boolean inhOr3hp) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("iniciaram TPT – Isoniazida");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -9679,6 +9679,7 @@ public class QualityImprovement2020CohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     map.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
+    map.put("23954", tbMetadata.get3HPConcept().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
 
@@ -9704,9 +9705,13 @@ public class QualityImprovement2020CohortQueries {
             + "                       AND        e.location_id = :location "
             + "                       AND        e.encounter_type = ${53} "
             + "                       AND        ( ( "
-            + "                                        o.concept_id = ${23985} "
-            + "                                            AND        o.value_coded = ${656}) "
-            + "                         AND        ( "
+            + "                                        o.concept_id = ${23985} ";
+    query +=
+        inhOr3hp
+            ? "                                            AND        o.value_coded = ${656}) "
+            : "                                            AND        o.value_coded = ${23954}) ";
+    query +=
+        "                         AND        ( "
             + "                                        o2.concept_id = ${165308} "
             + "                                            AND        o2.value_coded = ${1256} "
             + "                                            AND        o2.obs_datetime BETWEEN :startDate AND :endDate ) ) "
@@ -9728,9 +9733,13 @@ public class QualityImprovement2020CohortQueries {
             + "                       AND        e.location_id = :location "
             + "                       AND        e.encounter_type = ${6} "
             + "                       AND        ( ( "
-            + "                                        o.concept_id = ${23985} "
-            + "                                            AND        o.value_coded = ${656}) "
-            + "                         AND        ( "
+            + "                                        o.concept_id = ${23985} ";
+    query +=
+        inhOr3hp
+            ? "                                            AND        o.value_coded = ${656}) "
+            : "                                            AND        o.value_coded = ${23954}) ";
+    query +=
+        "                         AND        ( "
             + "                                        o2.concept_id = ${165308} "
             + "                                            AND        o2.value_coded = ${1256} "
             + "                                            AND        o2.obs_datetime BETWEEN :startDate AND :endDate) ) "
