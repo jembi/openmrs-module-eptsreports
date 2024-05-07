@@ -12373,10 +12373,6 @@ public class QualityImprovement2020CohortQueries {
    *       registado na “Ficha Resumo” com “Data da Transferência” dentro do período de revisão;
    * </ul>
    *
-   * <p>Excluindo os utentes que tenham tido uma consulta clínica (Ficha Clínica) ou levantamento de
-   * ARV (FILA) após a “Data de Transferência” (a data mais recente entre os critérios acima
-   * identificados) e até “Data Fim Revisão”.
-   *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
@@ -12452,33 +12448,7 @@ public class QualityImprovement2020CohortQueries {
             + "                       AND o.concept_id = ${6272} "
             + "                       AND o.value_coded = ${1706} "
             + "                GROUP  BY p.patient_id) transferout "
-            + "        GROUP  BY transferout.patient_id) max_transferout "
-            + "WHERE  max_transferout.patient_id NOT IN (SELECT p.patient_id "
-            + "                                          FROM   patient p "
-            + "                                                 JOIN encounter e "
-            + "                                                   ON p.patient_id = "
-            + "                                                      e.patient_id "
-            + "                                          WHERE  p.voided = 0 "
-            + "                                                 AND e.voided = 0 "
-            + "                                                 AND e.encounter_type = ${6} "
-            + "                                                 AND e.location_id = :location "
-            + "                                                 AND "
-            + "                                                 e.encounter_datetime > transferout_date "
-            + "                                                 AND "
-            + "                                                 e.encounter_datetime <= :revisionEndDate "
-            + "                                          UNION "
-            + "                                          SELECT p.patient_id "
-            + "                                          FROM   patient p "
-            + "                                                 JOIN encounter e "
-            + "                                                   ON p.patient_id = "
-            + "                                                      e.patient_id "
-            + "                                          WHERE  p.voided = 0 "
-            + "                                                 AND e.voided = 0 "
-            + "                                                 AND e.encounter_type = ${18} "
-            + "                                                 AND e.location_id = :location "
-            + "                                                 AND e.encounter_datetime > transferout_date "
-            + "                                                 AND "
-            + "                                                 e.encounter_datetime <= :revisionEndDate)";
+            + "        GROUP  BY transferout.patient_id) max_transferout ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
