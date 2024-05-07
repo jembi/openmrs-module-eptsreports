@@ -2144,16 +2144,22 @@ public class QualityImprovement2020CohortQueries {
   public CohortDefinition getMQ7A(Integer den) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
-    if (den == 1 || den == 3) {
-      compositionCohortDefinition.setName("A AND NOT (B1 OR B2 OR B3 OR C OR D OR E)");
-    } else if (den == 2 || den == 4) {
+    if (den == 1) {
       compositionCohortDefinition.setName(
-          "(A AND (B41 OR B42 OR B51 OR B52)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
+          "Categoria 7 Adulto Indicador 7.1 – Denominador Início TPT");
+    } else if (den == 2) {
+      compositionCohortDefinition.setName(
+          "Categoria 7 Adulto Indicador 7.2 – Denominador- FIM TPT");
+    } else if (den == 3) {
+      compositionCohortDefinition.setName(
+          "Categoria 7 Pediátrico Indicador 7.3 – Denominador- Início TPT");
+    } else if (den == 4) {
+      compositionCohortDefinition.setName(
+          "Categoria 7 Pediátrico Indicador 7.4 – Denominador- FIM TPT");
     } else if (den == 5) {
-      compositionCohortDefinition.setName("(A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E)");
+      compositionCohortDefinition.setName("Categoria 7 MG Indicador 7.5 – Denominador- Início TPT");
     } else if (den == 6) {
-      compositionCohortDefinition.setName(
-          "(A AND (B41 OR B42 OR B51 OR B52) AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
+      compositionCohortDefinition.setName("Categoria 7 MG Indicador 7.6 – Denominador- FIM TPT");
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -2354,18 +2360,21 @@ public class QualityImprovement2020CohortQueries {
   public CohortDefinition getMQ7B(Integer num) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
-    if (num == 1 || num == 3) {
+    if (num == 1) {
       compositionCohortDefinition.setName(
-          "(A AND  (B41 OR B42 OR B51 OR B52)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E)");
-    } else if (num == 2 || num == 4) {
+          "Categoria 7 Adulto Indicador 7.1 – Numerador Início TPT");
+    } else if (num == 2) {
+      compositionCohortDefinition.setName("Categoria 7 Adulto Indicador 7.2 – Numerador FIM TPT");
+    } else if (num == 3) {
       compositionCohortDefinition.setName(
-          "(A AND (B41 OR B42 OR B51 OR B52) AND (GNEW OR L)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
+          "Categoria 7 Pediátrico Indicador 7.3 – Numerador Início TPT");
+    } else if (num == 4) {
+      compositionCohortDefinition.setName(
+          "Categoria 7 Pediátrico – Indicador 7.4 – Numerador FIM TPT");
     } else if (num == 5) {
-      compositionCohortDefinition.setName(
-          "(A AND C AND (B41 OR B42 OR B51 OR B52)) AND NOT (B1 OR B2 OR B3 OR D OR E)");
+      compositionCohortDefinition.setName("Categoria 7 MG Indicador 7.5 – Numerador Início TPT");
     } else if (num == 6) {
-      compositionCohortDefinition.setName(
-          "(A AND (B41 OR B42 OR B51 OR B52) AND C AND (GNEW OR L)) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
+      compositionCohortDefinition.setName("Categoria 7 MG Indicador 7.6 – Numerador FIM TPT");
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
