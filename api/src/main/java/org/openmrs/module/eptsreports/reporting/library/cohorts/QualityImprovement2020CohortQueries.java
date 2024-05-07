@@ -11927,15 +11927,32 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * Utentes que têm o registo de início do MDS para utente estável na última consulta decorrida há
-   * 12 meses (última “Data Consulta Clínica” >= “Data Fim Revisão” – 12 meses+1dia e <= “Data Fim
-   * Revisão”), ou seja, registo de um MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como:
+   * O sistema identificará os utentes registados num MDS para utentes estáveis para desagregação de
+   * Denominador (FR4) e Numerador (FR5) da seguinte forma:
    *
-   * <p>“GA” e o respectivo “Estado” = “Início” “DT” e o respectivo “Estado” = “Início” “DS” e o
-   * respectivo “Estado” = “Início” “APE” e o respectivo “Estado” = “Início” “FR” e o respectivo
-   * “Estado” = “Início” “DD” e o respectivo “Estado” = “Início”
+   * <ul>
+   *   <li>Todos os utentes com registo mais recente de MDS na Ficha Clínica (MDC1 ou MDC2 ou MDC3
+   *       ou MDC4 ou MDC5) nos últimos 12 meses antesda data do resultado da CV mais recente (“Data
+   *       Última CV”), como um dos seguintes:
+   *       <ul>
+   *         <li>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “GA” e o
+   *             respectivo “Estado” = “Início” ou “Continua”, ou
+   *         <li>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “DT” e o
+   *             respectivo “Estado” = “Início” ou “Continua”, ou último registo do “Tipo de
+   *             Dispensa” = “DT” na Ficha Clínica ou
+   *         <li>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “DS” e o
+   *             respectivo “Estado” = “Início” ou “Continua”, ou último registo do “Tipo de
+   *             Dispensa” = “DS” na Ficha Clínica ou
+   *         <li>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “FR” e o
+   *             respectivo “Estado” = “Início” ou “Continua”, ou
+   *         <li>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “DD” e o
+   *             respectivo “Estado” = “Início” ou “Continua”, ou
+   *         <li>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “DCA” e o
+   *             respectivo “Estado” = “Início” ou “Continua”,
+   *       </ul>
+   * </ul>
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition
       getPatientsWithMdcOnMostRecentClinicalFormWithFollowingDispensationTypesAndStateBasedOnLastVl12Months(
@@ -12000,7 +12017,8 @@ public class QualityImprovement2020CohortQueries {
             + "                                                 AND e.location_id = :location) max_vl_date "
             + "                                                 GROUP  BY patient_id "
             + "                   ) vl_date_tbl ON pp.patient_id = vl_date_tbl.patient_id "
-            + "                 WHERE  ee.encounter_datetime BETWEEN Date_add( vl_date_tbl.vl_max_date, INTERVAL - 12 MONTH) AND  vl_date_tbl.vl_max_date "
+            + "                 WHERE  ee.encounter_datetime >= Date_add( vl_date_tbl.vl_max_date, INTERVAL - 12 MONTH) "
+            + "                 AND ee.encounter_datetime < vl_date_tbl.vl_max_date "
             + "                 AND oo.concept_id = ${165174} "
             + "                 AND oo.voided = 0 "
             + "                 AND ee.voided = 0 "
@@ -12497,10 +12515,6 @@ public class QualityImprovement2020CohortQueries {
    *       registado na “Ficha Resumo” com “Data da Transferência” dentro do período de revisão;
    * </ul>
    *
-   * <p>Excluindo os utentes que tenham tido uma consulta clínica (Ficha Clínica) ou levantamento de
-   * ARV (FILA) após a “Data de Transferência” (a data mais recente entre os critérios acima
-   * identificados) e até “Data Fim Revisão”.
-   *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
@@ -12576,33 +12590,7 @@ public class QualityImprovement2020CohortQueries {
             + "                       AND o.concept_id = ${6272} "
             + "                       AND o.value_coded = ${1706} "
             + "                GROUP  BY p.patient_id) transferout "
-            + "        GROUP  BY transferout.patient_id) max_transferout "
-            + "WHERE  max_transferout.patient_id NOT IN (SELECT p.patient_id "
-            + "                                          FROM   patient p "
-            + "                                                 JOIN encounter e "
-            + "                                                   ON p.patient_id = "
-            + "                                                      e.patient_id "
-            + "                                          WHERE  p.voided = 0 "
-            + "                                                 AND e.voided = 0 "
-            + "                                                 AND e.encounter_type = ${6} "
-            + "                                                 AND e.location_id = :location "
-            + "                                                 AND "
-            + "                                                 e.encounter_datetime > transferout_date "
-            + "                                                 AND "
-            + "                                                 e.encounter_datetime <= :revisionEndDate "
-            + "                                          UNION "
-            + "                                          SELECT p.patient_id "
-            + "                                          FROM   patient p "
-            + "                                                 JOIN encounter e "
-            + "                                                   ON p.patient_id = "
-            + "                                                      e.patient_id "
-            + "                                          WHERE  p.voided = 0 "
-            + "                                                 AND e.voided = 0 "
-            + "                                                 AND e.encounter_type = ${18} "
-            + "                                                 AND e.location_id = :location "
-            + "                                                 AND e.encounter_datetime > transferout_date "
-            + "                                                 AND "
-            + "                                                 e.encounter_datetime <= :revisionEndDate)";
+            + "        GROUP  BY transferout.patient_id) max_transferout ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 

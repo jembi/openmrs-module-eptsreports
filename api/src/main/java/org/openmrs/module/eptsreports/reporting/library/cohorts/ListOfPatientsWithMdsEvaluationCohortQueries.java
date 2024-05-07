@@ -707,9 +707,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   /**
    * <b>RF17 - Data do pedido da 1a CV - B.1 (Coluna J)</b>
    *
-   * <p>O sistema irá determinar a Data do Pedido da 1ª Carga Viral do utente identificando a data
-   * da primeira consulta clínica (Ficha Clínica), após o início TARV (Data Início TARV), na qual
-   * foi efectuado o registo do Pedido de Carga Viral.<br>
+   * <p>O sistema irá determinar a Data do Pedido da CV nos 1˚s 12 meses de TARV, identificando a
+   * data da consulta clínica (Ficha Clínica), na qual foi efectuado o registo do Pedido de Carga
+   * Viral, durante os primeiros 12 meses de TARV, ou seja, “Data Consulta Pedido CV”>=”Data Início
+   * TARV” e <= “Data Início TARV”+12 meses.<br>
    * <br>
    *
    * <p>Nota 1: A “Data Início TARV” é definida no RF61. <br>
@@ -718,11 +719,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
    * na coorte de 24 meses ou na coorte de 36 meses conforme definido no RF4.
    *
+   * <p>Nota 3: Em caso de existência de mais de uma consulta clínica com registo de pedido de CV,
+   * durante os primeiros 12 meses do TARV, deve ser listado o registo mais recente/último.
+   *
    * @return {DataDefinition}
    */
-  public DataDefinition getFirstViralLoad() {
+  public DataDefinition getLastViralLoadRequestOnTheFirst12MonthsOfTarv() {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("Data do pedido da 1a CV");
+    sqlPatientDataDefinition.setName("Data do pedido da CV nos 1˚s  12 meses de TARV");
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> map = new HashMap<>();
@@ -746,7 +750,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     String query =
         "SELECT p.patient_id, "
-            + "                    Min(e.encounter_datetime) AS encounter_date "
+            + "                    MAX(e.encounter_datetime) AS encounter_date "
             + "             FROM   patient p "
             + "                    INNER JOIN encounter e "
             + "                            ON e.patient_id = p.patient_id "
@@ -767,7 +771,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "       AND o.concept_id = ${23722} "
             + "       AND o.value_coded = ${856} "
             + "       AND e.encounter_datetime >= art.art_encounter "
-            + "       AND e.encounter_datetime <= :endDate "
+            + "       AND e.encounter_datetime <= DATE_ADD(art.art_encounter, INTERVAL 12 MONTH) "
             + "             GROUP  BY p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -780,30 +784,26 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   /**
    * <b>Data do pedido da CV de seguimento- C.1 (coluna AP)</b>
    *
-   * <p>O sistema irá determinar a Data do Pedido da CV de seguimento do utente identificando a data
-   * da consulta clínica (Ficha Clínica), após o início TARV (Data Início TARV), na qual foi
-   * efectuado o registo registo do Pedido de Carga Viral, após o registo do primeiro resultado de
-   * carga viral, na consulta clínica (Ficha Clínica) ocorrida após o início TARV. Ou seja, “Data
-   * Pedido CV Seguimento”> “Data Primeiro Resultado CV”, sendo “Data Primeiro Resultado CV>”Data
-   * Início TARV”.<br>
+   * <p>O sistema irá determinar a Data do Pedido da CV da CV entre 12º e 24º mês de TARV
+   * identificando a consulta clínica (Ficha Clínica), com registo do Pedido de Carga Viral, e
+   * ocorrida entre 12º e 24º mês de TARV ou seja, “Data Consulta Pedido CV ” > “Data Início TARV” +
+   * 12 meses e <= “Data Início TARV” + 24 meses <br>
    * <br>
    *
    * <p>Nota A “Data Início TARV” é definida no RF61 <br>
    * <br>
    *
-   * <p>Nota 2: No caso de existirem mais de um registo de Pedido da CV após o primeiro resultado de
-   * CV, será considerado o registo de pedido da CV imediatamente a seguir do registo do primeiro
-   * resultado de CV. <br>
-   * <br>
-   *
    * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
-   * na coorte de 24 meses, conforme definido no RF4.
+   * na coorte de 24 meses ou na coorte de 36 meses, conforme definido no RF4.
+   *
+   * <p>Nota 3: Em caso de existência de mais de uma consulta clínica com registo de pedido de CV,
+   * entre 12º e 24º mês de TARV, deve ser listado o registo mais recente/último.
    *
    * @return {DataDefinition}
    */
-  public DataDefinition getSecondViralLoad() {
+  public DataDefinition getLastViralLoadOnThePeriod(int minNumberOfMonths, int maxNumberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("Data do pedido da CV de seguimento");
+    sqlPatientDataDefinition.setName("Data do pedido da CV de entre 12º e 24º mês de TARV");
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
@@ -829,44 +829,29 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     String query =
         "                   SELECT p.patient_id, "
-            + "                          Min(ee.encounter_datetime) AS encounter_date "
+            + "                          MAX(e.encounter_datetime) AS encounter_date "
             + "                   FROM   patient p "
-            + "                            INNER JOIN encounter ee "
-            + "                              ON ee.patient_id = p.patient_id "
+            + "                            INNER JOIN encounter e "
+            + "                              ON e.patient_id = p.patient_id "
             + "                            INNER JOIN obs o "
-            + "                              ON o.encounter_id = ee.encounter_id "
-            + "                          INNER JOIN (SELECT pa.patient_id, "
-            + "                                             Min(enc.encounter_datetime) AS "
-            + "                                             encounter_date "
-            + "                                      FROM   patient pa "
-            + "                                             INNER JOIN encounter enc "
-            + "                                                     ON enc.patient_id = "
-            + "                                                        pa.patient_id "
-            + "                                             INNER JOIN obs "
-            + "                                                     ON obs.encounter_id = "
-            + "                                                        enc.encounter_id "
-            + "                                             INNER JOIN ( "
+            + "                              ON o.encounter_id = e.encounter_id "
+            + "                          INNER JOIN ( "
             + "                           SELECT art_patient.patient_id, "
             + "                                  art_patient.first_pickup AS art_encounter "
             + "                           FROM   ( "
             + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
             + "                           ) art_patient "
-            + " ) art ON art.patient_id = pa.patient_id "
-            + "       WHERE  pa.voided = 0 "
-            + "       AND enc.voided = 0 "
-            + "       AND obs.voided = 0 "
-            + "       AND enc.encounter_type = ${6} "
-            + "       AND enc.location_id = :location "
-            + "       AND  ( (obs.concept_id = ${856} AND obs.value_numeric IS NOT NULL)  "
-            + "               OR (obs.concept_id = ${1305}  AND obs.value_coded IS NOT NULL) ) "
-            + "       AND enc.encounter_datetime > art.art_encounter "
-            + "       GROUP  BY pa.patient_id) first_encounter "
-            + "       ON first_encounter.patient_id = p.patient_id "
+            + " ) art ON art.patient_id = p.patient_id "
             + "       WHERE  p.voided = 0 "
-            + "       AND  ee.voided = 0 "
+            + "       AND  e.voided = 0 "
             + "       AND  o.voided = 0 "
-            + "       AND  ee.encounter_type = ${6} "
-            + "       AND  ee.encounter_datetime > first_encounter.encounter_date "
+            + "       AND  e.encounter_type = ${6} "
+            + "       AND  e.encounter_datetime > DATE_ADD(art.art_encounter, INTERVAL "
+            + minNumberOfMonths
+            + " MONTH ) "
+            + "       AND  e.encounter_datetime <= DATE_ADD(art.art_encounter, INTERVAL "
+            + maxNumberOfMonths
+            + " MONTH ) "
             + "       AND o.concept_id = ${23722} "
             + "       AND o.value_coded = ${856} "
             + "       GROUP BY p.patient_id";
@@ -881,9 +866,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   /**
    * <b>RF18 - Data do resultado da 1a CV- B.2 (Coluna K)</b>
    *
-   * <p>O sistema irá determinar a Data do Resultado da 1ª Carga Viral do utente identificando a
-   * data da primeira consulta clínica (Ficha Clínica), após o início TARV (Data Início TARV), na
-   * qual foi efectuado o registo de resultado da Carga Viral. <br>
+   * <p>O sistema irá determinar a Data do Resultado da CV nos 1os 12 meses do TARV, identificando a
+   * data da primeira consulta clínica (Ficha Clínica), na qual foi efectuado o registo do resultado
+   * da Carga Viral, durante os primeiros 12 meses do início TARV, ou seja, “Data Consulta Resultado
+   * CV”>=”Data Início TARV” e <= “Data Início TARV”+12 meses.<br>
    * <br>
    *
    * <p>Nota 1: A “Data Início TARV” é definida no RF61. <br>
@@ -891,6 +877,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
    * na coorte de 24 meses ou na coorte de 36 meses conforme definido no RF4.
+   *
+   * <p>Nota 3: Em caso de existência de mais de uma consulta clínica com registo de resultado de
+   * CV, durante os primeiros 12 meses, deve ser listada a data de consulta mais recente/última.
    *
    * @return {DataDefinition}
    */
@@ -909,7 +898,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
 
-    String query = getFirstVlDateQuery();
+    String query = getLastVlDateOn1st12MonthsOfTarv();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -918,9 +907,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     return sqlPatientDataDefinition;
   }
 
-  private String getFirstVlDateQuery() {
+  private String getLastVlDateOn1st12MonthsOfTarv() {
     return "SELECT     p.patient_id, "
-        + "           MIN(e.encounter_datetime) AS first_vl_date  "
+        + "           MAX(e.encounter_datetime) AS last_vl_date  "
         + "FROM       patient p "
         + "INNER JOIN encounter e "
         + "ON         e.patient_id = p.patient_id "
@@ -946,7 +935,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
         + "                      AND        o.value_coded IS NOT NULL)) "
         + "AND        e.location_id = :location "
         + "AND        e.encounter_datetime >= art.art_encounter "
-        + "AND        e.encounter_datetime <= :endDate "
+        + "AND        e.encounter_datetime <= DATE_ADD(art.art_encounter, INTERVAL 12 MONTH) "
         + "AND        p.voided = 0 "
         + "AND        e.voided = 0 "
         + "AND        o.voided = 0 "
@@ -954,12 +943,12 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   }
 
   /**
-   * <b>RF33 - Data de registo do resultado da CV de Seguimento: (coluna AQ) - Resposta= Data do
-   * resultado da 1ª Carga Viral</b>
+   * <b>RF33 - Data de registo Registo do Resultado da CV entre 12º e 24º mês do TARV</b>
    *
    * <p>O sistema irá determinar a Data do Resultado da CV de seguimento do utente identificando a
-   * data da consulta clínica (Ficha Clínica), após o início TARV (Data Início TARV), na qual foi
-   * efectuado o registo de segundo resultado da Carga Viral. <br>
+   * data da consulta clínica (Ficha Clínica), na qual foi efectuado o registo do resultado da Carga
+   * Viral, e ocorrida entre 12º e 24º mês de TARV, ou seja, “Data Consulta Resultado CV” > “Data
+   * Início TARV” + 12 meses e <= “Data Início TARV” + 24 meses.<br>
    * <br>
    *
    * <p>Nota 1: A “Data Início TARV” é definida no RF61. <br>
@@ -968,12 +957,16 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
    * na coorte de 24 meses, conforme definido no RF4.
    *
+   * <p>Nota 3: Em caso de existência de mais de uma consulta clínica com registo de resultado de
+   * CV, entre 12º e 24º meses de TARV, deve ser listada a data de consulta mais recente/última.
+   *
    * @return {DataDefinition}
    */
-  public DataDefinition getSecondViralLoadResultDate() {
+  public DataDefinition getLastViralLoadResultDateBetweenPeriodsInMonthsAfterTarv(
+      int minNumberOfMonths, int maxNumberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
-        "C2 - Data de registo do resultado da CV de Seguimento: (coluna AQ)");
+        "C2 - Data de registo do resultado da entre 12º e 24º mês do TARV");
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> map = new HashMap<>();
@@ -986,7 +979,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
 
-    String query = getSecondVlResultDateQuery();
+    String query = getLastVlDateBetweenPeriods(minNumberOfMonths, maxNumberOfMonths);
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -995,35 +988,43 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     return sqlPatientDataDefinition;
   }
 
-  private String getSecondVlResultDateQuery() {
-    return " SELECT     second_vl.patient_id, "
-        + "           MIN(ee.encounter_datetime) AS second_vl_date  "
-        + "FROM       patient second_vl "
-        + "INNER JOIN encounter ee "
-        + "ON         ee.patient_id = second_vl.patient_id "
-        + "INNER JOIN obs oo "
-        + "ON         oo.encounter_id = ee.encounter_id "
-        + "INNER JOIN ( "
-        + getFirstVlDateQuery()
-        + " ) first_vl "
-        + " ON first_vl.patient_id = second_vl.patient_id "
-        + "WHERE second_vl.voided = 0 "
-        + "AND ee.voided = 0 "
-        + "AND oo.voided = 0 "
-        + "AND ee.encounter_datetime > first_vl.first_vl_date "
-        + "AND      ee.encounter_type = ${6} "
-        + "AND        ee.location_id = :location "
+  private String getLastVlDateBetweenPeriods(int minNumberOfMonths, int maxNumberOfMonths) {
+    return " SELECT     p.patient_id, "
+        + "           MAX(e.encounter_datetime) AS last_vl_date  "
+        + "FROM       patient p "
+        + "INNER JOIN encounter e "
+        + "ON         e.patient_id = p.patient_id "
+        + "INNER JOIN obs o "
+        + "ON         o.encounter_id = e.encounter_id "
+        + "                          INNER JOIN ( "
+        + "                           SELECT art_patient.patient_id, "
+        + "                                  art_patient.first_pickup AS art_encounter "
+        + "                           FROM   ( "
+        + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
+        + "                           ) art_patient "
+        + " ) art ON art.patient_id = p.patient_id "
+        + "       WHERE  p.voided = 0 "
+        + "       AND  e.voided = 0 "
+        + "       AND  o.voided = 0 "
+        + "       AND  e.encounter_type = ${6} "
+        + "       AND  e.encounter_datetime > DATE_ADD(art.art_encounter, INTERVAL "
+        + minNumberOfMonths
+        + " MONTH ) "
+        + "       AND  e.encounter_datetime <= DATE_ADD(art.art_encounter, INTERVAL "
+        + maxNumberOfMonths
+        + " MONTH ) "
+        + "AND        e.location_id = :location "
         + "AND        ( ( "
-        + "                                 oo.concept_id= ${856} "
-        + "                         AND     oo.value_numeric IS NOT NULL ) "
+        + "                                 o.concept_id= ${856} "
+        + "                         AND     o.value_numeric IS NOT NULL ) "
         + "           OR         ( "
-        + "                                 oo.concept_id = ${1305} "
-        + "                      AND        oo.value_coded IS NOT NULL)) "
-        + "GROUP BY   second_vl.patient_id";
+        + "                                 o.concept_id = ${1305} "
+        + "                      AND        o.value_coded IS NOT NULL)) "
+        + "GROUP BY   p.patient_id";
   }
 
   /**
-   * <b>RF18 - Data do resultado da 1a CV- B.2 (Coluna K)</b>
+   * <b>RF18 - Data do resultado da ultima CV- B.2 (Coluna K)</b>
    *
    * <p>O sistema irá determinar o Resultado da 1ª Carga Viral do utente seleccionando o primeiro
    * resultado de Carga Viral registado na primeira consulta clínica (Ficha Clínica) após o início
@@ -1038,9 +1039,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {DataDefinition}
    */
-  public DataDefinition getFirstViralLoadResult() {
+  public DataDefinition getLastViralLoadResultOnThe1st12MonthsOfTarv() {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("B3- Resultado da 1ª CV");
+    sqlPatientDataDefinition.setName("B3- Resultado da ultima CV");
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> map = new HashMap<>();
@@ -1055,7 +1056,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     String query =
         "SELECT     p.patient_id, "
-            + "     IF(o.value_numeric IS NOT NULL, o.value_numeric, IF(o.value_coded = 165331, CONCAT('MENOR QUE ',o.comments), o.value_coded)) AS first_vl_result  "
+            + "     IF(concept_id= ${856}, o.value_numeric, IF(o.value_coded = 165331, CONCAT('MENOR QUE ',o.comments), o.value_coded)) AS first_vl_result  "
             + "FROM       patient p "
             + "INNER JOIN encounter e "
             + "ON         e.patient_id = p.patient_id "
@@ -1063,8 +1064,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "ON         o.encounter_id = e.encounter_id "
             + "INNER JOIN "
             + "           ( "
-            + getFirstVlDateQuery()
-            + "                     ) first_vl ON first_vl.patient_id = p.patient_id "
+            + getLastVlDateOn1st12MonthsOfTarv()
+            + "                     ) last_vl ON last_vl.patient_id = p.patient_id "
             + "       WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
@@ -1076,7 +1077,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                 o.concept_id = ${1305} "
             + "                      AND        o.value_coded IS NOT NULL)) "
             + "AND        e.location_id = :location "
-            + "AND        e.encounter_datetime = first_vl.first_vl_date "
+            + "AND        e.encounter_datetime = last_vl.last_vl_date "
             + "AND        p.voided = 0 "
             + "AND        e.voided = 0 "
             + "AND        o.voided = 0 "
@@ -1105,9 +1106,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {DataDefinition}
    */
-  public DataDefinition getSecondViralLoadResult() {
+  public DataDefinition getSecondViralLoadResultBetweenPeriodsOfMonthsAfterTarv(
+      int firstMonth, int lastMonth) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("C3- Resultado da CV de seguimento : (coluna AR)");
+    sqlPatientDataDefinition.setName("C3- Resultado da CV entre 12º e 24º mês do TARV ");
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> map = new HashMap<>();
@@ -1121,30 +1123,33 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
 
     String query =
-        "SELECT     second_vl.patient_id, "
-            + "          IF(oo.value_numeric IS NOT NULL, oo.value_numeric, IF(oo.value_coded = 165331, CONCAT('MENOR QUE ',oo.comments), oo.value_coded)) AS second_vl_result  "
-            + "FROM       patient second_vl "
-            + "INNER JOIN encounter ee "
-            + "ON         ee.patient_id = second_vl.patient_id "
-            + "INNER JOIN obs oo "
-            + "ON         oo.encounter_id = ee.encounter_id "
-            + "INNER JOIN ( "
-            + getSecondVlResultDateQuery()
-            + "  ) second_vl_date "
-            + " ON second_vl_date.patient_id = second_vl.patient_id "
-            + "WHERE second_vl.voided = 0 "
-            + "AND ee.voided = 0 "
-            + "AND oo.voided = 0 "
-            + "AND ee.encounter_datetime = second_vl_date.second_vl_date "
-            + "AND      ee.encounter_type = ${6} "
-            + "AND        ee.location_id = :location "
+        "SELECT     p.patient_id, "
+            + "     IF(o.concept_id= ${856}, o.value_numeric, IF(o.value_coded = 165331, CONCAT('MENOR QUE ',o.comments), o.value_coded)) AS first_vl_result  "
+            + "FROM       patient p "
+            + "INNER JOIN encounter e "
+            + "ON         e.patient_id = p.patient_id "
+            + "INNER JOIN obs o "
+            + "ON         o.encounter_id = e.encounter_id "
+            + "INNER JOIN "
+            + "           ( "
+            + getLastVlDateBetweenPeriods(firstMonth, lastMonth)
+            + "                     ) last_vl ON last_vl.patient_id = p.patient_id "
+            + "       WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "AND      e.encounter_type = ${6} "
             + "AND        ( ( "
-            + "                                 oo.concept_id= ${856} "
-            + "                         AND     oo.value_numeric IS NOT NULL ) "
+            + "                                 o.concept_id= ${856} "
+            + "                         AND     o.value_numeric IS NOT NULL ) "
             + "           OR         ( "
-            + "                                 oo.concept_id = ${1305} "
-            + "                      AND        oo.value_coded IS NOT NULL)) "
-            + "GROUP BY   second_vl.patient_id";
+            + "                                 o.concept_id = ${1305} "
+            + "                      AND        o.value_coded IS NOT NULL)) "
+            + "AND        e.location_id = :location "
+            + "AND        e.encounter_datetime = last_vl.last_vl_date "
+            + "AND        p.voided = 0 "
+            + "AND        e.voided = 0 "
+            + "AND        o.voided = 0 "
+            + "GROUP BY   p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1323,6 +1328,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "       AND enc.voided = 0 "
             + "       AND obs.voided = 0 "
             + "       AND enc.encounter_type = ${6} "
+            + "       AND enc.encounter_datetime = most_recent_cd4.encounter_date "
             + "       AND obs.concept_id = ${1695} "
             + "       AND obs.value_numeric IS NOT NULL "
             + "       GROUP BY cd4.patient_id ";
@@ -1706,18 +1712,19 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   }
 
   /**
-   * <b>RF24 - Data de inscrição no MDS - B.9 (Coluna R)</b><br>
+   * <b>Inscrito em algum MDS entre 24˚ a 36˚ mês de TARV? - D.9 (RF54)</b><br>
    * <br>
    *
-   * <p>O sistema irá determinar a “Data de inscrição no MDS” seleccionando a data de consulta com
-   * registo de pelo menos um campo de “Modelos diferenciados de Cuidados - MDS” (MDS 1, MDS 2, MDS
-   * 3, MDS 4 ou MDS 5) com resposta = “INICIO”, numa consulta clínica decorrida entre 3 a 9 meses
-   * do Início TARV (Data da Consulta >= “Data Início TARV” + 3 meses e <= “Data Início TARV” + 9
-   * meses). <br>
+   * <p>O sistema irá determinar a “Data de inscrição no MDS entre 24º e 36º mês do TARV”,
+   * seleccionando a data de consulta (Ficha Clínica) com registo de pelo menos um campo de “Modelos
+   * diferenciados de Cuidados - MDS” (MDS 1, MDS 2, MDS 3, MDS 4 ou MDS 5) com resposta = “INICIO”
+   * numa consulta clínica decorrida entre 24 a 36 meses do Início TARV (Data da Consulta >= “Data
+   * Início TARV” + 24 meses e <= “Data Início TARV” + 36 meses) <br>
    * <br>
    *
    * <p>Nota 1: Nota 1: caso exista mais que uma consulta clínica com registo do início no MDS, o
-   * sistema irá considerar o registo mais antigo<br>
+   * sistema irá considerar o registo mais antigo, ou seja, o primeiro registo durante o período de
+   * avaliação<br>
    * <br>
    *
    * <p>Nota 2: caso o utente não satisfaça o critério definido, o sistema não irá preencher nenhuma
@@ -1731,12 +1738,12 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * na coorte de 24 meses ou na coorte de 36 meses conforme definido no RF4. <br>
    * <br>
    *
-   * @return {DataDefinition}
+   * @return {@link DataDefinition}
    */
   public DataDefinition getMdsDate(int minNumberOfMonths, int maxNumberOfMonths, boolean b9Orc9) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
-        "B9- Data de inscrição no MDS: (coluna R) - Resposta = Data de Inscrição (RF24)");
+        "D9- Data de inscrição no MDS: (coluna CD) - Resposta = Data de Inscrição (RF54)");
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> map = new HashMap<>();
@@ -1761,13 +1768,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
 
-    String query = "                  SELECT     p.patient_id, ";
-    query +=
-        b9Orc9
-            ? "                             MIN(e.encounter_datetime) AS encounter_date "
-            : "                             MAX(e.encounter_datetime) AS encounter_date ";
-    query +=
-        "                  FROM       patient p "
+    String query =
+        "  SELECT     p.patient_id, MIN(e.encounter_datetime) AS encounter_date "
+            + "                  FROM       patient p "
             + "                  INNER JOIN encounter e "
             + "                  ON         e.patient_id = p.patient_id "
             + "                  INNER JOIN obs otype "
@@ -4726,6 +4729,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("1709", hivMetadata.getSuspendedTreatmentConcept().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
 
     String query =
         new EptsQueriesUtil()

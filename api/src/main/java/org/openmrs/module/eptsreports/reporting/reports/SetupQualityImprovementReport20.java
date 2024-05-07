@@ -38,7 +38,7 @@ public class SetupQualityImprovementReport20 extends EptsDataExportManager {
 
   @Override
   public String getDescription() {
-    return "Este relatório apresenta os indicadores de melhoria de qualidade da Unidade Sanitária para o Programa do HIV/SIDA.";
+    return "Relatório com indicadores de melhoria de qualidade da US para o Programa de HIV/SIDA";
   }
 
   @Override
