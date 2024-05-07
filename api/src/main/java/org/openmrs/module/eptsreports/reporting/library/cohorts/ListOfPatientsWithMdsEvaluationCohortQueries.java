@@ -1713,22 +1713,12 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   /**
    * <b>Inscrito em algum MDS entre 24˚ a 36˚ mês de TARV? - D.9 (RF54)</b><br>
-   * <br>
-   * <<<<<<< HEAD
-   *
-   * <p>O sistema irá determinar a “Data de inscrição no MDS” seleccionando a data de consulta com
-   * registo de pelo menos um campo de “Modelos diferenciados de Cuidados - MDS” (MDS 1, MDS 2, MDS
-   * 3, MDS 4 ou MDS 5) com resposta = “INICIO”, numa consulta clínica decorrida entre 3 a 9 meses
-   * do Início TARV (Data da Consulta >= “Data Início TARV” e <= “Data Início TARV” + 12 meses).
-   * <br>
-   * =======
    *
    * <p>O sistema irá determinar a “Data de inscrição no MDS entre 24º e 36º mês do TARV”,
    * seleccionando a data de consulta (Ficha Clínica) com registo de pelo menos um campo de “Modelos
    * diferenciados de Cuidados - MDS” (MDS 1, MDS 2, MDS 3, MDS 4 ou MDS 5) com resposta = “INICIO”
    * numa consulta clínica decorrida entre 24 a 36 meses do Início TARV (Data da Consulta >= “Data
    * Início TARV” + 24 meses e <= “Data Início TARV” + 36 meses) <br>
-   * >>>>>>> 2.x_develop <br>
    *
    * <p>Nota 1: Nota 1: caso exista mais que uma consulta clínica com registo do início no MDS, o
    * sistema irá considerar o registo mais antigo, ou seja, o primeiro registo durante o período de
