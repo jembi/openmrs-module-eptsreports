@@ -2467,14 +2467,6 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition tbTreatmentOnPeriod3hp = getPatientsWithTBTreatment3HP();
 
-    CohortDefinition b41 = getB4And1();
-
-    CohortDefinition b42 = getB4And2();
-
-    CohortDefinition b51 = getB5And1();
-
-    CohortDefinition b52 = getB5And2();
-
     CohortDefinition tptInh = getPatientsWhoStartedTpt(true);
 
     CohortDefinition tpt3hp = getPatientsWhoStartedTpt(false);
@@ -2528,17 +2520,11 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "J1", EptsReportUtils.map(tbTreatmentOnPeriod3hp, MAPPING));
 
-    compositionCohortDefinition.addSearch("B41", EptsReportUtils.map(b41, MAPPING));
+    compositionCohortDefinition.addSearch(
+        "GNEW", EptsReportUtils.map(getPatientsWithTptInhEnd(), MAPPING1));
 
-    compositionCohortDefinition.addSearch("B42", EptsReportUtils.map(b42, MAPPING));
-
-    compositionCohortDefinition.addSearch("B51", EptsReportUtils.map(b51, MAPPING));
-
-    compositionCohortDefinition.addSearch("B52", EptsReportUtils.map(b52, MAPPING));
-
-    compositionCohortDefinition.addSearch("GNEW", EptsReportUtils.map(getGNew(), MAPPING1));
-
-    compositionCohortDefinition.addSearch("L", EptsReportUtils.map(getGNew3HP(), MAPPING1));
+    compositionCohortDefinition.addSearch(
+        "L", EptsReportUtils.map(getPatientsWithTpt3hpEnd(), MAPPING1));
 
     compositionCohortDefinition.addSearch("INHSTART", EptsReportUtils.map(tptInh, MAPPING));
 
@@ -10011,10 +9997,10 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getGNew() {
+  public CohortDefinition getPatientsWithTptInhEnd() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("G new  INH");
+    cd.setName("TPT INH End");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -10145,7 +10131,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getGNew3HP() {
+  public CohortDefinition getPatientsWithTpt3hpEnd() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("G new 3HP");
