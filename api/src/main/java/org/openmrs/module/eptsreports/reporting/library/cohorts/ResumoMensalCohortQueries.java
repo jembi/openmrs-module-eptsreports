@@ -4202,7 +4202,6 @@ public class ResumoMensalCohortQueries {
 
     StringSubstitutor sb = new StringSubstitutor(map);
     cd.setQuery(sb.replace(query));
-    System.out.println(sb.replace(query));
     return cd;
   }
 }
