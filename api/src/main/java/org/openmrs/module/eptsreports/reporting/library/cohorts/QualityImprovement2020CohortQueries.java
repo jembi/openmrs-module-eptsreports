@@ -2850,7 +2850,11 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
 
-    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING11));
+    compositionCohortDefinition.addSearch(
+        "F",
+        EptsReportUtils.map(
+            transfOut,
+            "revisionStartDate=${revisionEndDate-14m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "ADULT",
@@ -4468,7 +4472,11 @@ public class QualityImprovement2020CohortQueries {
             transferredIn,
             "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
-    comp.addSearch("transferredOut", EptsReportUtils.map(transferredOut, MAPPING11));
+    comp.addSearch(
+        "transferredOut",
+        EptsReportUtils.map(
+            transferredOut,
+            "revisionStartDate=${revisionEndDate-14m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "ADULT",
@@ -4762,61 +4770,61 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     // Start adding the definitions based on the requirements
-    CohortDefinition den3 = getMQC12P2DEN(3);
+    CohortDefinition mq12Den3 = getMQC12P2DEN(3);
 
-    CohortDefinition den4 = getMQC12P2DEN(4);
+    CohortDefinition mq12Den4 = getMQC12P2DEN(4);
 
-    CohortDefinition den7 = getMQC12P2DEN(7);
+    CohortDefinition mq12Den7 = getMQC12P2DEN(7);
 
-    CohortDefinition den8 = getMQC12P2DEN(8);
+    CohortDefinition mq12Den8 = getMQC12P2DEN(8);
 
-    CohortDefinition den11 = getMQC12P2DEN(11);
+    CohortDefinition mq12Den11 = getMQC12P2DEN(11);
 
     CohortDefinition b13 = resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
 
     cd.addSearch(
-        "DEN3",
+        "mq12Den3",
         EptsReportUtils.map(
-            den3,
+            mq12Den3,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-        "DEN4",
+        "mq12Den4",
         EptsReportUtils.map(
-            den4,
+            mq12Den4,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-        "DEN7",
+        "mq12Den7",
         EptsReportUtils.map(
-            den7,
+            mq12Den7,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-        "DEN8",
+        "mq12Den8",
         EptsReportUtils.map(
-            den8,
+            mq12Den8,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-        "DEN11",
+        "mq12Den11",
         EptsReportUtils.map(
-            den11,
+            mq12Den11,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
         "B13", EptsReportUtils.map(b13, "endDate=${revisionEndDate},location=${location}"));
 
     if (flag == 3) {
-      cd.setCompositionString("DEN3 AND B13");
+      cd.setCompositionString("mq12Den3 AND B13");
     } else if (flag == 4) {
-      cd.setCompositionString("DEN4 AND B13");
+      cd.setCompositionString("mq12Den4 AND B13");
     } else if (flag == 7) {
-      cd.setCompositionString("DEN7 AND B13");
+      cd.setCompositionString("mq12Den7 AND B13");
     } else if (flag == 8) {
-      cd.setCompositionString("DEN8 AND B13");
+      cd.setCompositionString("mq12Den8 AND B13");
     } else if (flag == 11) {
-      cd.setCompositionString("DEN11 AND B13");
+      cd.setCompositionString("mq12Den11 AND B13");
     }
 
     return cd;
@@ -4940,12 +4948,12 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getArtPickupConcept().getConceptId(),
             hivMetadata.getArtDatePickupMasterCard().getConceptId());
 
-    CohortDefinition mi12Den1 = getMQ12DEN(1);
-    CohortDefinition mi12Den2 = getMQ12DEN(2);
-    CohortDefinition mi12Den5 = getMQ12DEN(5);
-    CohortDefinition mi12Den6 = getMQ12DEN(6);
-    CohortDefinition mi12Den9 = getMQ12DEN(9);
-    CohortDefinition mi12Den10 = getMQ12DEN(10);
+    CohortDefinition mq12Den1 = getMQ12DEN(1);
+    CohortDefinition mq12Den2 = getMQ12DEN(2);
+    CohortDefinition mq12Den5 = getMQ12DEN(5);
+    CohortDefinition mq12Den6 = getMQ12DEN(6);
+    CohortDefinition mq12Den9 = getMQ12DEN(9);
+    CohortDefinition mq12Den10 = getMQ12DEN(10);
 
     comp.addSearch(
         "H",
@@ -4971,53 +4979,53 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
-        "mi12Den1",
+        "mq12Den1",
         EptsReportUtils.map(
-            mi12Den1,
+            mq12Den1,
             "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
-        "mi12Den2",
+        "mq12Den2",
         EptsReportUtils.map(
-            mi12Den2,
+            mq12Den2,
             "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
-        "mi12Den5",
+        "mq12Den5",
         EptsReportUtils.map(
-            mi12Den5,
+            mq12Den5,
             "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
-        "mi12Den6",
+        "mq12Den6",
         EptsReportUtils.map(
-            mi12Den6,
+            mq12Den6,
             "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
-        "mi12Den9",
+        "mq12Den9",
         EptsReportUtils.map(
-            mi12Den9,
+            mq12Den9,
             "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
-        "mi12Den10",
+        "mq12Den10",
         EptsReportUtils.map(
-            mi12Den10,
+            mq12Den10,
             "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     if (den == 1) {
-      comp.setCompositionString("mi12Den1 AND H");
+      comp.setCompositionString("mq12Den1 AND H");
     } else if (den == 2) {
-      comp.setCompositionString("mi12Den2 AND I AND II AND III");
+      comp.setCompositionString("mq12Den2 AND I AND II AND III");
     } else if (den == 5) {
-      comp.setCompositionString("mi12Den5 AND H");
+      comp.setCompositionString("mq12Den5 AND H");
     } else if (den == 6) {
-      comp.setCompositionString("mi12Den6 AND I AND II AND III");
+      comp.setCompositionString("mq12Den6 AND I AND II AND III");
     } else if (den == 9) {
-      comp.setCompositionString("mi12Den9 AND H ");
+      comp.setCompositionString("mq12Den9 AND H ");
     } else if (den == 10) {
-      comp.setCompositionString("mi12Den10 AND I AND II AND III");
+      comp.setCompositionString("mq12Den10 AND I AND II AND III");
     }
     return comp;
   }
