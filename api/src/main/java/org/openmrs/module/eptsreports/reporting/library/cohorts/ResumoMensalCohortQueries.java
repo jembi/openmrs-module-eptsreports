@@ -1746,7 +1746,7 @@ public class ResumoMensalCohortQueries {
             "endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        "B5A", map(getTranferredOutPatients(), "onOrBefore=${startDate-1d},location=${location}"));
+        "B5A", map(getTranferredOutPatients(), "onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch(
         "B6A",
