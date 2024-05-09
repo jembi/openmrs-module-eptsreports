@@ -9061,7 +9061,7 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition alreadyMds = getPatientsAlreadyEnrolledInTheMdc();
     CohortDefinition onTB = commonCohortQueries.getPatientsOnTbTreatment();
     CohortDefinition onSK = getPatientsWithSarcomaKarposi();
-    CohortDefinition returned = eriDSDCohortQueries.getPatientsWhoReturned();
+    CohortDefinition returned = getPatientsWhoReturned();
     CohortDefinition endTb = getPatientsWhoEndedTbTreatmentWithin30DaysOfLastClinicalConslutation();
 
     cd.addSearch(
@@ -13403,5 +13403,71 @@ public class QualityImprovement2020CohortQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
     return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Utentes que reiniciaram o TARV nos últimos 3 meses</b>
+   *
+   * <p>O sistema irá identificar os utentes que reiniciaram o tratamento TARV nos últimos 3 meses,
+   * da seguinte forma:
+   *
+   * <ul>
+   *   <li>De todos os utentes activos em TARV “Data Fim Revisão” seguindo os critérios definidos no
+   *       “Resumo Mensal de HIV/SIDA” Indicador B13, o sistema irá filtrar utentes que
+   *   <li>tiveram interrupção no tratamento 3 meses antes do fim do período de revisão (“Data fim
+   *       de revisão” menos (-) 3 meses) (FR49) e
+   *   <li>tiveram pelo menos 1 registo de levantamento no “FILA” ou na “Ficha Recepção - Levantou
+   *       ARV” nos últimos 3 meses do fim do períodio (“Data de levantamento ” >= “Data Fim
+   *       Revisão” menos (–) 3 meses e <= “Data Fim Revisão”)
+   * </ul>
+   *
+   * O sistema irá excluir:
+   *
+   * <ul>
+   *   <li>Utentes Transferidos de outras Unidades Sanitárias
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsWhoReturned() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Patients who returned to treatment");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
+
+    cd.addSearch(
+        "treatmentInterruption",
+        EptsReportUtils.map(
+            eriDSDCohortQueries.getPatientsWhoExperiencedInterruptionInTreatment(),
+            "endDate=${endDate-3m},location=${location}"));
+
+    cd.addSearch(
+        "filaOrDrugPickup",
+        EptsReportUtils.map(
+            eriDSDCohortQueries.getFilaOrDrugPickup(), "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "transferredIn",
+        EptsReportUtils.map(
+            transferredIn, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "B13",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13(),
+            "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "(B13 and treatmentInterruption AND filaOrDrugPickup) AND NOT transferredIn");
+
+    return cd;
   }
 }
