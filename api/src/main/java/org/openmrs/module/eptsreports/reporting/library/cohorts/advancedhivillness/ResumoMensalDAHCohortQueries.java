@@ -131,7 +131,8 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "newOnArt",
         map(
-            getPatientsArtSituationOnDAH(hivMetadata.getStartDrugs()),
+            getPatientsArtSituationOnDAH(
+                Arrays.asList(hivMetadata.getStartDrugs(), hivMetadata.getPreTarvConcept())),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
@@ -179,7 +180,8 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "restartedArt",
         map(
-            getPatientsArtSituationOnDAH(hivMetadata.getRestartConcept()),
+            getPatientsArtSituationOnDAH(
+                Collections.singletonList(hivMetadata.getRestartConcept())),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
@@ -231,7 +233,7 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "onArt",
         map(
-            getPatientsArtSituationOnDAH(hivMetadata.getArtStatus()),
+            getPatientsArtSituationOnDAH(Collections.singletonList(hivMetadata.getArtStatus())),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
@@ -634,23 +636,32 @@ public class ResumoMensalDAHCohortQueries {
 
   /**
    *
-   * <li>Registados como “Novo Início" no campo “Situação do TARV no início do seguimento” (Secção
-   *     A) da Ficha de DAH que tem o registo de “Data de Início no Modelo de DAH” ocorrida durante
-   *     o período (“Data de Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”)
+   * <li>Registados como “Novo Início" ou "Pré-TARV" no campo “Situação do TARV no início do
+   *     seguimento” (Secção A) da Ficha de DAH que tem o registo de “Data de Início no Modelo de
+   *     DAH” ocorrida durante o período (“Data de Início no Modelo de DAH”>= “Data Início” e <=
+   *     “Data Fim”)
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsArtSituationOnDAH(Concept artSituaationConcept) {
+  public CohortDefinition getPatientsArtSituationOnDAH(List<Concept> results) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
-        "Número de utentes Registados como “Novo Início no campo “Situação do TARV no início do seguimento” (Secção A) da Ficha de DAH que tem o registo de “Data de Início no Modelo de DAH”");
+        "Número de utentes Registados como “Novo Início ou Pré-TARV no campo “Situação do TARV no início do seguimento” (Secção A) da Ficha de DAH que tem o registo de “Data de Início no Modelo de DAH”");
     sqlCohortDefinition.addParameters(getCohortParameters());
 
-    Map<String, Integer> map = new HashMap<>();
-    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
-    map.put("1255", hivMetadata.getARVPlanConcept().getConceptId());
-    map.put("artSituationConcept", artSituaationConcept.getConceptId());
+    List<Integer> answerIds = new ArrayList<>();
+
+    for (Concept concept : results) {
+      answerIds.add(concept.getConceptId());
+    }
+
+    Map<String, String> map = new HashMap<>();
+    map.put(
+        "90",
+        String.valueOf(hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId()));
+    map.put("1255", String.valueOf(hivMetadata.getARVPlanConcept().getConceptId()));
+    map.put("results", StringUtils.join(answerIds, ','));
 
     String query =
         "SELECT p.patient_id "
@@ -664,7 +675,6 @@ public class ResumoMensalDAHCohortQueries {
             + "                                       INNER JOIN obs o on e.encounter_id = o.encounter_id "
             + "                         WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                           AND e.encounter_type = ${90} "
-            + "                           AND e.encounter_datetime >= :startDate "
             + "                           AND e.encounter_datetime <= :endDate "
             + "                           AND e.location_id = :location "
             + "                         GROUP BY p.patient_id "
@@ -674,7 +684,7 @@ public class ResumoMensalDAHCohortQueries {
             + "  AND o.voided = 0 "
             + "  AND e.encounter_type = ${90} "
             + "  AND o.concept_id = ${1255} "
-            + "  AND o.value_coded = ${artSituationConcept} "
+            + "  AND o.value_coded IN (${results}) "
             + "  AND e.encounter_datetime = last_dah.last_date "
             + "  AND e.location_id = :location "
             + "GROUP BY p.patient_id";
@@ -1251,7 +1261,7 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "newOnArt",
         map(
-            getPatientsArtSituationOnDAH(hivMetadata.getStartDrugs()),
+            getPatientsArtSituationOnDAH(Collections.singletonList(hivMetadata.getStartDrugs())),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
@@ -1300,7 +1310,8 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "restartedArt",
         map(
-            getPatientsArtSituationOnDAH(hivMetadata.getRestartConcept()),
+            getPatientsArtSituationOnDAH(
+                Collections.singletonList(hivMetadata.getRestartConcept())),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
@@ -1368,7 +1379,7 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "onArt",
         map(
-            getPatientsArtSituationOnDAH(hivMetadata.getArtStatus()),
+            getPatientsArtSituationOnDAH(Collections.singletonList(hivMetadata.getArtStatus())),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
@@ -1524,6 +1535,7 @@ public class ResumoMensalDAHCohortQueries {
     map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
     map.put("1255", hivMetadata.getARVPlanConcept().getConceptId());
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("6275", hivMetadata.getPreTarvConcept().getConceptId());
 
     String query =
         "    SELECT p.patient_id  "
@@ -1537,7 +1549,6 @@ public class ResumoMensalDAHCohortQueries {
             + "                          INNER JOIN obs o on e.encounter_id = o.encounter_id  "
             + "            WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0  "
             + "              AND e.encounter_type = ${90}  "
-            + "              AND e.encounter_datetime >= :startDate  "
             + "              AND e.encounter_datetime <= :endDate  "
             + "              AND e.location_id = :location  "
             + "            GROUP BY p.patient_id  "
@@ -1547,7 +1558,7 @@ public class ResumoMensalDAHCohortQueries {
             + "      AND o.voided = 0  "
             + "      AND e.encounter_type = ${90}  "
             + "      AND o.concept_id = ${1255}  "
-            + "      AND o.value_coded = ${1256}  "
+            + "      AND o.value_coded IN (${1256}, ${6275})  "
             + "      AND e.encounter_datetime = last_dah.last_date  "
             + "      AND e.location_id = :location  "
             + "    GROUP BY p.patient_id  "
