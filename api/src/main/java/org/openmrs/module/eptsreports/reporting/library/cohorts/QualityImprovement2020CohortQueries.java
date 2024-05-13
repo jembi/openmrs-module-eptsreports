@@ -2722,7 +2722,8 @@ public class QualityImprovement2020CohortQueries {
     }
 
     if (indicatorFlag == 1) {
-      compositionCohortDefinition.setCompositionString("((A OR D) AND NOT (C OR E OR F))");
+      compositionCohortDefinition.setCompositionString("F");
+//      compositionCohortDefinition.setCompositionString("((A OR D) AND NOT (C OR E OR F))");
     }
     if (indicatorFlag == 5 || indicatorFlag == 6) {
       compositionCohortDefinition.setCompositionString("A AND NOT (C OR D OR E OR F)");
@@ -3427,6 +3428,100 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
+   *
+   * <li>Primeira consulta de APSS/PP após a Data Início TARV, ocorrida entre 20 a 33 dias após o início TARV (1ª “Data Consulta APSS/PP” >= “Data Início TARV” +20 Dias e <= “Data Início TARV” + 33dias) e </li>
+   *
+   * @param minDays minimum number of days to check after Art Start Date
+   * @param maxDays maximum number of days to check after Art Start Date
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition get1stApssBetween20and33DaysAfterArtStart(Integer minDays, Integer maxDays) {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+            "Primeira consulta de APSS/PP após a Data Início TARV, ocorrida entre 20 a 33 dias após o início TARV");
+
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getHistoricalDrugStartDateConcept().getConceptId());
+    map.put("minDays", minDays);
+    map.put("maxDays", maxDays);
+
+    String query =
+            "SELECT first_apss.patient_id "
+            + "FROM  (SELECT p.patient_id, "
+            + "              Min(e.encounter_datetime) AS first_encounter "
+            + "       FROM   patient p "
+            + "                  INNER JOIN encounter e "
+            + "                             ON p.patient_id = e.patient_id "
+            + "                  INNER JOIN (SELECT patient_id, "
+            + "                                     art.art_date "
+            + "                              FROM   (SELECT p.patient_id, "
+            + "                                             Min(value_datetime) art_date "
+            + "                                      FROM   patient p "
+            + "                                                 INNER JOIN encounter e "
+            + "                                                            ON p.patient_id = e.patient_id "
+            + "                                                 INNER JOIN obs o "
+            + "                                                            ON e.encounter_id = "
+            + "                                                               o.encounter_id "
+            + "                                      WHERE  p.voided = 0 "
+            + "                                        AND e.voided = 0 "
+            + "                                        AND o.voided = 0 "
+            + "                                        AND e.encounter_type = ${53} "
+            + "                                        AND o.concept_id = ${1190} "
+            + "                                        AND o.value_datetime IS NOT NULL "
+            + "                                        AND o.value_datetime <= :endDate "
+            + "                                        AND e.location_id = :location "
+            + "                                      GROUP  BY p.patient_id) art "
+            + "                              WHERE  art.art_date BETWEEN :startDate AND :endDate) "
+            + "           art_start "
+            + "                             ON art_start.patient_id = p.patient_id "
+            + "       WHERE  p.voided = 0 "
+            + "         AND e.voided = 0 "
+            + "         AND e.encounter_type = ${35} "
+            + "         AND e.location_id = :location "
+            + "         AND e.encounter_datetime > art_start.art_date "
+            + "       GROUP  BY p.patient_id) first_apss "
+            + "          INNER JOIN (SELECT patient_id, "
+            + "                             art.art_date "
+            + "                      FROM   (SELECT p.patient_id, "
+            + "                                     Min(value_datetime) art_date "
+            + "                              FROM   patient p "
+            + "                                         INNER JOIN encounter e "
+            + "                                                    ON p.patient_id = e.patient_id "
+            + "                                         INNER JOIN obs o "
+            + "                                                    ON e.encounter_id = o.encounter_id "
+            + "                              WHERE  p.voided = 0 "
+            + "                                AND e.voided = 0 "
+            + "                                AND o.voided = 0 "
+            + "                                AND e.encounter_type = ${53} "
+            + "                                AND o.concept_id = ${1190} "
+            + "                                AND o.value_datetime IS NOT NULL "
+            + "                                AND o.value_datetime <= :endDate "
+            + "                                AND e.location_id = :location "
+            + "                              GROUP  BY p.patient_id) art "
+            + "                      WHERE  art.art_date BETWEEN :startDate AND :endDate) art_start "
+            + "                     ON art_start.patient_id = first_apss.patient_id "
+            + "WHERE  first_apss.first_encounter BETWEEN Date_add(art_start.art_date, INTERVAL "
+            + "                                                   ${minDays} day) "
+            + "           AND "
+            + "           Date_add(art_start.art_date, INTERVAL "
+            + "                    ${maxDays} day)";
+
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
    * Pelo menos uma consulta de APSS/PP, ocorrida entre 20 a 33 dias após a primeira consulta de
    * APSS/PP (2ª “Data Consulta APSS/PP” >= 1ª “Data Consulta APSS/PP” +20 Dias e <= 1ª “Data
    * Consulta APSS/PP” + 33dias).
@@ -3630,7 +3725,7 @@ public class QualityImprovement2020CohortQueries {
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition firstApss = getApssBetween20and33DaysAfterArtStart(20, 33);
+    CohortDefinition firstApss = get1stApssBetween20and33DaysAfterArtStart(20,33);
 
     CohortDefinition secondApss = getApssBetween20and33DaysAfterFirstApss(20, 33);
 
@@ -4022,7 +4117,8 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING10));
     }
 
-    compositionCohortDefinition.setCompositionString("(((A OR D) AND G) AND NOT (C OR E OR F))");
+    compositionCohortDefinition.setCompositionString("G");
+//    compositionCohortDefinition.setCompositionString("(((A OR D) AND G) AND NOT (C OR E OR F))");
 
     return compositionCohortDefinition;
   }
