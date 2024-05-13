@@ -1253,7 +1253,10 @@ public class ResumoMensalDAHCohortQueries {
    *     Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”), considerar os utentes incluídos
    *     no indicador B1-Nº de utentes que iniciaram TARV nesta unidade sanitária durante o mês, do
    *     relatório “Resumo Mensal de HIV/SIDA” durante o período de compreendido entre “Data Início”
-   *     menos (–) 2 meses e “Data Fim”.
+   *     menos (–) 2 meses e “Data Fim” ou .
+   * <li>no Indicador A2- Nº de utentes que iniciou Pré-TARV (Cuidados de HIV) nesta unidade
+   *     sanitária durante o mês, do relatório “Resumo Mensal de HIV/SIDA” durante o período de
+   *     compreendido entre “Data Início” menos (–) 2 meses e “Data Fim”
    * <li>Excluindo:Todas as mulheres com registo de grávida, conforme definido no RF29 RF29:
    *     selecionando todos os utentes do sexo feminino, independentemente da idade, e registados
    *     como “Grávida=Sim” (Coluna 3) na “Ficha Clínica” e “Data de Consulta” ocorrida durante o
@@ -1270,10 +1273,14 @@ public class ResumoMensalDAHCohortQueries {
     CohortDefinition rmB1 =
         resumoMensalCohortQueries.getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1();
 
+    CohortDefinition rmA2 =
+        resumoMensalCohortQueries.getPatientsWhoInitiatedPreTarvAtAfacilityDuringCurrentMonthA2();
+
     cd.addSearch(
         "newOnArt",
         map(
-            getPatientsArtSituationOnDAH(Collections.singletonList(hivMetadata.getStartDrugs())),
+            getPatientsArtSituationOnDAH(
+                Arrays.asList(hivMetadata.getStartDrugs(), hivMetadata.getPreTarvConcept())),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
@@ -1283,12 +1290,18 @@ public class ResumoMensalDAHCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
+        "A2",
+        map(
+            getRMDefinitionsIfPatientDontHaveTarvSituationOnDah(rmA2),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
         "PREGNANT",
         map(
             intensiveMonitoringCohortQueries.getMI15C(),
             "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(newOnArt OR B1) AND NOT PREGNANT");
+    cd.setCompositionString("(newOnArt OR B1 OR A2) AND NOT PREGNANT");
     return cd;
   }
 
