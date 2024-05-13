@@ -309,7 +309,7 @@ public class ResumoMensalDAHCohortQueries {
   /**
    * <b>Relatório – Indicador 10 Resultado de CD4 baixo</b>
    *
-   * <p>Incluindo todos os utentes
+   * <p>Incluindo todos os utentes em seguimento de DAH (RF30) e
    * <li>que tiveram registo do “Resultado de CD4” secção B (Exames Laboratoriais à entrada e de
    *     seguimento) na Ficha de DAH, com respectiva “Data de CD4” ocorrida durante o período (>=
    *     “Data Início” e <= “Data Fim”) ou
@@ -335,7 +335,9 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "cd4ByAgeAndResult", mapStraightThrough(getPatientsWithCD4BasedOnAgeAndCd4Results()));
 
-    cd.setCompositionString("haveCd4Results AND cd4ByAgeAndResult");
+    cd.addSearch("onDAH", mapStraightThrough(getPatientsWhoStartedFollowupOnDAHComposition()));
+
+    cd.setCompositionString("onDAH AND haveCd4Results AND cd4ByAgeAndResult");
     return cd;
   }
 
@@ -375,7 +377,9 @@ public class ResumoMensalDAHCohortQueries {
                 Collections.singletonList(tbMetadata.getTestTBLAM()),
                 Arrays.asList(hivMetadata.getPositive(), hivMetadata.getNegative()))));
 
-    cd.setCompositionString("haveCd4Results AND tbLamResults");
+    cd.addSearch("onDAH", mapStraightThrough(getPatientsWhoStartedFollowupOnDAHComposition()));
+
+    cd.setCompositionString("onDAH AND haveCd4Results AND tbLamResults");
     return cd;
   }
 
@@ -408,7 +412,9 @@ public class ResumoMensalDAHCohortQueries {
                 Collections.singletonList(tbMetadata.getTestTBLAM()),
                 Collections.singletonList(hivMetadata.getPositive()))));
 
-    cd.setCompositionString("tbLamResults AND tbLamPositive");
+    cd.addSearch("onDAH", mapStraightThrough(getPatientsWhoStartedFollowupOnDAHComposition()));
+
+    cd.setCompositionString("onDAH AND tbLamResults AND tbLamPositive");
     return cd;
   }
 
@@ -448,7 +454,9 @@ public class ResumoMensalDAHCohortQueries {
                     hivMetadata.getCragSoroLabsetConcept(), hivMetadata.getCragSoroConcept()),
                 Arrays.asList(hivMetadata.getPositive(), hivMetadata.getNegative()))));
 
-    cd.setCompositionString("haveLowCd4Results AND cragResults");
+    cd.addSearch("onDAH", mapStraightThrough(getPatientsWhoStartedFollowupOnDAHComposition()));
+
+    cd.setCompositionString("onDAH AND haveLowCd4Results AND cragResults");
     return cd;
   }
 
@@ -482,7 +490,9 @@ public class ResumoMensalDAHCohortQueries {
                     hivMetadata.getCragSoroLabsetConcept(), hivMetadata.getCragSoroConcept()),
                 Collections.singletonList(hivMetadata.getPositive()))));
 
-    cd.setCompositionString("cragResults AND cragPositive");
+    cd.addSearch("onDAH", mapStraightThrough(getPatientsWhoStartedFollowupOnDAHComposition()));
+
+    cd.setCompositionString("onDAH AND cragResults AND cragPositive");
     return cd;
   }
 
@@ -511,7 +521,9 @@ public class ResumoMensalDAHCohortQueries {
             getPatientsWithPositiveOrNegativeCragLCRResults(
                 Arrays.asList(hivMetadata.getPositive(), hivMetadata.getNegative()))));
 
-    cd.setCompositionString("cragPositive AND cragResults");
+    cd.addSearch("onDAH", mapStraightThrough(getPatientsWhoStartedFollowupOnDAHComposition()));
+
+    cd.setCompositionString("onDAH AND cragPositive AND cragResults");
     return cd;
   }
 
@@ -534,7 +546,9 @@ public class ResumoMensalDAHCohortQueries {
 
     cd.addSearch("mccPreventivo", mapStraightThrough(getPatientsWhoStartedMccPreventivo()));
 
-    cd.setCompositionString("cragPositive AND mccPreventivo");
+    cd.addSearch("onDAH", mapStraightThrough(getPatientsWhoStartedFollowupOnDAHComposition()));
+
+    cd.setCompositionString("onDAH AND cragPositive AND mccPreventivo");
     return cd;
   }
 
@@ -566,7 +580,9 @@ public class ResumoMensalDAHCohortQueries {
 
     cd.addSearch("mmcTreatment", mapStraightThrough(getPatientsInMccTretament()));
 
-    cd.setCompositionString("cragPositive AND cragLCRPositive AND mmcTreatment");
+    cd.addSearch("onDAH", mapStraightThrough(getPatientsWhoStartedFollowupOnDAHComposition()));
+
+    cd.setCompositionString("onDAH AND cragPositive AND cragLCRPositive AND mmcTreatment");
     return cd;
   }
 
@@ -1146,6 +1162,53 @@ public class ResumoMensalDAHCohortQueries {
   }
 
   /**
+   * <b>Utentes em DAH até o fim do mês anterior Incluindo todos os utentes que tiveram registo de
+   * SK e Indicação de quimioterapia
+   *
+   * @see #getPatientsWithSarcomaSKAndQuimiotherapyIndication
+   * @see #getPatientsWhoStartedFollowupOnDAHComposition
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithSarcomaSKAndQuimiotherapyIndicationComposition() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Utentes em DAH com SK e indicacao de Quimioterapia");
+    cd.addParameters(getCohortParameters());
+
+    cd.addSearch(
+        "onSKIndication", mapStraightThrough(getPatientsWithSarcomaSKAndQuimiotherapyIndication()));
+
+    cd.addSearch("onDAH", mapStraightThrough(getPatientsWhoStartedFollowupOnDAHComposition()));
+
+    cd.setCompositionString("onDAH AND onSKIndication");
+    return cd;
+  }
+
+  /**
+   * <b>Utentes em DAH até o fim do mês anterior Incluindo todos os utentes iniciaram Ciclo 1 de
+   * quimioterapia durante o mês
+   *
+   * @see #getPatientsWithSarcomaSKAndStartedQuimiotherapy
+   * @see #getPatientsWhoStartedFollowupOnDAHComposition
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithSarcomaSKAndStartedQuimiotherapyComposition() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Utentes em DAH com SK e Inicaram Quimioterapia");
+    cd.addParameters(getCohortParameters());
+
+    cd.addSearch(
+        "onSKIndicationStartedQuimio",
+        mapStraightThrough(getPatientsWithSarcomaSKAndStartedQuimiotherapy()));
+
+    cd.addSearch("onDAH", mapStraightThrough(getPatientsWhoStartedFollowupOnDAHComposition()));
+
+    cd.setCompositionString("onDAH AND onSKIndicationStartedQuimio");
+    return cd;
+  }
+
+  /**
    * <b> Relatório – Indicador 18 SK e Indicação de quimioterapia</b>
    * <li>Incluindo todos os utentes que tiveram registo de "Data de Diagnóstico SK” registada na
    *     secção H (Sarcoma de Kaposi (SK)) da Ficha de DAH, com “Data do Diagnóstico de SK” ocorrida
@@ -1157,7 +1220,7 @@ public class ResumoMensalDAHCohortQueries {
   public CohortDefinition getPatientsWithSarcomaSKAndQuimiotherapyIndication() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Utentes com SK e indiccacao de Quimioterapia");
+    sqlCohortDefinition.setName("Utentes com SK e indicacao de Quimioterapia");
     sqlCohortDefinition.addParameters(getCohortParameters());
 
     Map<String, Integer> map = new HashMap<>();

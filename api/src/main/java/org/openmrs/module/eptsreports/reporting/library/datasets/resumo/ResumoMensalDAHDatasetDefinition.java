@@ -480,14 +480,15 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
             "Relatório – Indicador 18 SK e Indicação de quimioterapia",
             mapStraightThrough(
                 resumoMensalDAHCohortQueries
-                    .getPatientsWithSarcomaSKAndQuimiotherapyIndication())));
+                    .getPatientsWithSarcomaSKAndQuimiotherapyIndicationComposition())));
   }
 
   private Mapped<CohortIndicator> getPatientsWithSarcomaSKAndStartedQuimiotherapy() {
     return mapStraightThrough(
         eptsGeneralIndicator.getIndicator(
-            "Relatório – Indicador 19 SK e e Início de quimioterapia",
+            "Relatório – Indicador 19 SK e Início de quimioterapia",
             mapStraightThrough(
-                resumoMensalDAHCohortQueries.getPatientsWithSarcomaSKAndStartedQuimiotherapy())));
+                resumoMensalDAHCohortQueries
+                    .getPatientsWithSarcomaSKAndStartedQuimiotherapyComposition())));
   }
 }
