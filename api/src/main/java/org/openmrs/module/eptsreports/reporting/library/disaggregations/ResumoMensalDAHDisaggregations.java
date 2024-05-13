@@ -49,11 +49,96 @@ public class ResumoMensalDAHDisaggregations {
 
   /**
    * Method to combine dimensions by Art Status, Age, Pregnancy and Followup on DAH to fill
+   * indicators 8 and 9
+   *
+   * @return {@link BaseDataSet}
+   */
+  public List<BaseDataSet.ColumnParameters> get8and9ColumnDisaggregations() {
+
+    // NEW ON ART
+    BaseDataSet.ColumnParameters under15NewArt89 =
+        new BaseDataSet.ColumnParameters(
+            "under15NewArt89",
+            "Under 15 New on Art",
+            "art=new-art-dah-89|age=<15",
+            "under15NewArt89");
+
+    BaseDataSet.ColumnParameters above15NewArt89 =
+        new BaseDataSet.ColumnParameters(
+            "above15NewArt89",
+            "Above 15 New on Art",
+            "art=new-art-dah-89|age=15+",
+            "above15NewArt89");
+
+    // RESTARTED ART
+    BaseDataSet.ColumnParameters under15RestartedArt89 =
+        new BaseDataSet.ColumnParameters(
+            "under15RestartedArt",
+            "Under 15 RestartedArt",
+            "art=restart-art-dah-89|age=<15",
+            "under15RestartedArt89");
+
+    BaseDataSet.ColumnParameters above15RestartedArt89 =
+        new BaseDataSet.ColumnParameters(
+            "above15RestartedArt",
+            "Above 15 Restarted Art",
+            "art=restart-art-dah-89|age=15+",
+            "above15RestartedArt89");
+
+    // ACTIVE ON ART
+    BaseDataSet.ColumnParameters under15ActiveArt89 =
+        new BaseDataSet.ColumnParameters(
+            "under15ActiveArt",
+            "Under 15 Active on Art",
+            "art=on-art-dah-89|age=<15",
+            "under15ActiveArt89");
+
+    BaseDataSet.ColumnParameters above15ActiveArt89 =
+        new BaseDataSet.ColumnParameters(
+            "above15ActiveArt",
+            "Above 15 Active on Art",
+            "art=on-art-dah-89|age=15+",
+            "above15ActiveArt89");
+
+    // PREGNANT
+    BaseDataSet.ColumnParameters pregnant89 =
+        new BaseDataSet.ColumnParameters(
+            "pregnant", "Pregnant", "maternity=pregnant-dah", "pregnant");
+
+    // FOLLOWUP
+    BaseDataSet.ColumnParameters under15Followup89 =
+        new BaseDataSet.ColumnParameters(
+            "under15Followup",
+            "Under 15 on Followup",
+            "followup=on-dah|age=<15",
+            "under15Followup");
+
+    BaseDataSet.ColumnParameters above15Followup89 =
+        new BaseDataSet.ColumnParameters(
+            "above15Followup",
+            "Above 15 on Followup",
+            "followup=on-dah|age=15+",
+            "above15Followup");
+
+    return Arrays.asList(
+        under15NewArt89,
+        above15NewArt89,
+        under15RestartedArt89,
+        above15RestartedArt89,
+        under15ActiveArt89,
+        above15ActiveArt89,
+        pregnant89,
+        under15Followup89,
+        above15Followup89);
+  }
+
+  /**
+   * Method to combine dimensions by Art Status, Age, Pregnancy and Followup on DAH to fill
    * indicators from 10 to 19
    *
    * @return {@link BaseDataSet}
    */
-  public List<BaseDataSet.ColumnParameters> get8to19ColumnDisaggregations() {
+  public List<BaseDataSet.ColumnParameters> get10to19ColumnDisaggregations() {
 
     // NEW ON ART
     BaseDataSet.ColumnParameters under15NewArt =

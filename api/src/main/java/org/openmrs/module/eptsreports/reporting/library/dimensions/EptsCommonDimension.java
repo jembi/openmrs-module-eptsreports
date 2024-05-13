@@ -419,19 +419,38 @@ public class EptsCommonDimension {
     dim.addCohortDefinition(
         "new-art-dah",
         EptsReportUtils.map(
-            resumoMensalDAHCohortQueries.getPatientsWhoAreNewInArtDisaggregation(),
+            resumoMensalDAHCohortQueries.getPatientsWhoAreNewInArtDisaggregation(false),
             "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
 
     dim.addCohortDefinition(
         "restart-art-dah",
         EptsReportUtils.map(
-            resumoMensalDAHCohortQueries.getPatientsWhoRestartedArtDisaggregation(),
+            resumoMensalDAHCohortQueries.getPatientsWhoRestartedArtDisaggregation(false),
             "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
 
     dim.addCohortDefinition(
         "on-art-dah",
         EptsReportUtils.map(
-            resumoMensalDAHCohortQueries.getPatientsWhoAreInTarvDisaggregation(),
+            resumoMensalDAHCohortQueries.getPatientsWhoAreInTarvDisaggregation(false),
+            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
+
+    // ONLY FOR I8 AND I9
+    dim.addCohortDefinition(
+        "new-art-dah-89",
+        EptsReportUtils.map(
+            resumoMensalDAHCohortQueries.getPatientsWhoAreNewInArtDisaggregation(true),
+            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
+
+    dim.addCohortDefinition(
+        "restart-art-dah-89",
+        EptsReportUtils.map(
+            resumoMensalDAHCohortQueries.getPatientsWhoRestartedArtDisaggregation(true),
+            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
+
+    dim.addCohortDefinition(
+        "on-art-dah-89",
+        EptsReportUtils.map(
+            resumoMensalDAHCohortQueries.getPatientsWhoAreInTarvDisaggregation(true),
             "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
     return dim;
   }

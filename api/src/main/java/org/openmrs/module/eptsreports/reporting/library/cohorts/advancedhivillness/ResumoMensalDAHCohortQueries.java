@@ -1319,10 +1319,10 @@ public class ResumoMensalDAHCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsWhoAreNewInArtDisaggregation() {
+  public CohortDefinition getPatientsWhoAreNewInArtDisaggregation(boolean eightToNine) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    cd.setName("utentes novos inícios de TARV, para desagregação dos indicadores 8 a 19");
+    cd.setName("Utentes novos inícios de TARV, para desagregação dos indicadores 10 a 19");
     cd.addParameters(getCohortParameters());
 
     CohortDefinition rmB1 =
@@ -1356,7 +1356,8 @@ public class ResumoMensalDAHCohortQueries {
             intensiveMonitoringCohortQueries.getMI15C(),
             "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(newOnArt OR B1 OR A2) AND NOT PREGNANT");
+    cd.setCompositionString(
+        eightToNine ? "(B1 OR A2) AND NOT PREGNANT" : "(newOnArt OR B1 OR A2) AND NOT PREGNANT");
     return cd;
   }
 
@@ -1379,7 +1380,7 @@ public class ResumoMensalDAHCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsWhoRestartedArtDisaggregation() {
+  public CohortDefinition getPatientsWhoRestartedArtDisaggregation(boolean eightToNine) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("utentes Reinícios TARV, para desagregação dos indicadores 8 a 19");
@@ -1421,10 +1422,13 @@ public class ResumoMensalDAHCohortQueries {
             intensiveMonitoringCohortQueries.getMI15C(),
             "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
 
-    cd.addSearch("newArt", mapStraightThrough(getPatientsWhoAreNewInArtDisaggregation()));
+    cd.addSearch(
+        "newArt", mapStraightThrough(getPatientsWhoAreNewInArtDisaggregation(eightToNine)));
 
     cd.setCompositionString(
-        "((restartedArt OR B3P1 OR B3P2 OR B3P3) AND NOT PREGNANT) AND NOT newArt");
+        eightToNine
+            ? "((B3P1 OR B3P2 OR B3P3) AND NOT PREGNANT) AND NOT newArt"
+            : "((restartedArt OR B3P1 OR B3P2 OR B3P3) AND NOT PREGNANT) AND NOT newArt");
     return cd;
   }
 
@@ -1447,7 +1451,7 @@ public class ResumoMensalDAHCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsWhoAreInTarvDisaggregation() {
+  public CohortDefinition getPatientsWhoAreInTarvDisaggregation(boolean eightToNine) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("utentes Activos em TARV, para desagregação dos indicadores 8 a 19");
@@ -1475,11 +1479,16 @@ public class ResumoMensalDAHCohortQueries {
             intensiveMonitoringCohortQueries.getMI15C(),
             "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
 
-    cd.addSearch("restarted", mapStraightThrough(getPatientsWhoRestartedArtDisaggregation()));
+    cd.addSearch(
+        "restarted", mapStraightThrough(getPatientsWhoRestartedArtDisaggregation(eightToNine)));
 
-    cd.addSearch("newArt", mapStraightThrough(getPatientsWhoAreNewInArtDisaggregation()));
+    cd.addSearch(
+        "newArt", mapStraightThrough(getPatientsWhoAreNewInArtDisaggregation(eightToNine)));
 
-    cd.setCompositionString("((onArt OR B12) AND NOT PREGNANT) AND NOT (restarted OR newArt)");
+    cd.setCompositionString(
+        eightToNine
+            ? "(B12 AND NOT PREGNANT) AND NOT (restarted OR newArt)"
+            : "((onArt OR B12) AND NOT PREGNANT) AND NOT (restarted OR newArt)");
     return cd;
   }
 

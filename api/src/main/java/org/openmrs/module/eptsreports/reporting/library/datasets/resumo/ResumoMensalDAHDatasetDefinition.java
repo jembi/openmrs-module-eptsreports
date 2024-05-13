@@ -186,7 +186,7 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         "I8",
         "Indicador 8 – Pedido de CD4",
         getPatientsWhoHaveCd4Request(),
-        resumoMensalDAHDisaggregations.get8to19ColumnDisaggregations());
+        resumoMensalDAHDisaggregations.get8and9ColumnDisaggregations());
 
     // INDICATOR 9
     dd.addColumn("TOTALI9", "Indicador 9 – Resultado de CD4", getPatientsWhoHaveCd4Results(), "");
@@ -196,7 +196,7 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         "I9",
         "Indicador 9 – Resultado de CD4",
         getPatientsWhoHaveCd4Results(),
-        resumoMensalDAHDisaggregations.get8to19ColumnDisaggregations());
+        resumoMensalDAHDisaggregations.get8and9ColumnDisaggregations());
 
     // INDICATOR 10
     dd.addColumn(
@@ -207,7 +207,7 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         "I10",
         "Indicador 10 - Resultado de CD4 baixo",
         getPatientsWithLowCd4Results(),
-        resumoMensalDAHDisaggregations.get8to19ColumnDisaggregations());
+        resumoMensalDAHDisaggregations.get10to19ColumnDisaggregations());
 
     // INDICATOR 11
     dd.addColumn("TOTALI11", "Indicador 11 Resultado TB LAM", getPatientsWithLowTBLAMResults(), "");
@@ -217,7 +217,7 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         "I11",
         "Indicador 11 Resultado TB LAM",
         getPatientsWithLowTBLAMResults(),
-        resumoMensalDAHDisaggregations.get8to19ColumnDisaggregations());
+        resumoMensalDAHDisaggregations.get10to19ColumnDisaggregations());
 
     // INDICATOR 12
     dd.addColumn(
@@ -231,7 +231,7 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         "I12",
         "Indicador 12 Resultado de TB LAM Positivo",
         getPatientsWithPositiveTBLAMResults(),
-        resumoMensalDAHDisaggregations.get8to19ColumnDisaggregations());
+        resumoMensalDAHDisaggregations.get10to19ColumnDisaggregations());
 
     // INDICATOR 13
     dd.addColumn(
@@ -245,7 +245,7 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         "I13",
         "Indicador 13 CD4 Baixo e Resultado de CrAg Sérico",
         getPatientsWithLowCd4AndCragResults(),
-        resumoMensalDAHDisaggregations.get8to19ColumnDisaggregations());
+        resumoMensalDAHDisaggregations.get10to19ColumnDisaggregations());
 
     // INDICATOR 14
     dd.addColumn(
@@ -259,7 +259,7 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         "I14",
         "Indicador 14 CD4 Baixo e Resultado de CrAg Sérico Positivo",
         getPatientsWithLowCd4AndPositiveCragResults(),
-        resumoMensalDAHDisaggregations.get8to19ColumnDisaggregations());
+        resumoMensalDAHDisaggregations.get10to19ColumnDisaggregations());
 
     // INDICATOR 15
     dd.addColumn(
@@ -273,7 +273,7 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         "I15",
         "Indicador 15 Utentes CrAg sérico Positivo e registo de CrAg no LCR",
         getPatientsWithPositiveOrNegativeOnCragLCRResults(),
-        resumoMensalDAHDisaggregations.get8to19ColumnDisaggregations());
+        resumoMensalDAHDisaggregations.get10to19ColumnDisaggregations());
 
     // INDICATOR 16
     dd.addColumn(
@@ -287,7 +287,7 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         "I16",
         "Indicador 16 CrAg sérico positivo e início de MCC Preventivo",
         getPatientsWithPositiveCragResultsAndStartedMccPreventivo(),
-        resumoMensalDAHDisaggregations.get8to19ColumnDisaggregations());
+        resumoMensalDAHDisaggregations.get10to19ColumnDisaggregations());
 
     // INDICATOR 17
     dd.addColumn(
@@ -301,7 +301,7 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         "I17",
         "Indicador 17 CrAg LCR positivo e início de MCC",
         getPatientsWithPositiveCragLcrResultsAndStartedMcc(),
-        resumoMensalDAHDisaggregations.get8to19ColumnDisaggregations());
+        resumoMensalDAHDisaggregations.get10to19ColumnDisaggregations());
 
     // INDICATOR 18
     dd.addColumn(
@@ -315,7 +315,7 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         "I18",
         "Indicador 18 SK e Indicação de quimioterapia",
         getPatientsWithSarcomaSKAndQuimiotherapyIndication(),
-        resumoMensalDAHDisaggregations.get8to19ColumnDisaggregations());
+        resumoMensalDAHDisaggregations.get10to19ColumnDisaggregations());
 
     // INDICATOR 19
     dd.addColumn(
@@ -329,7 +329,7 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         "I19",
         "Indicador 19 SK e Início de quimioterapia",
         getPatientsWithSarcomaSKAndStartedQuimiotherapy(),
-        resumoMensalDAHDisaggregations.get8to19ColumnDisaggregations());
+        resumoMensalDAHDisaggregations.get10to19ColumnDisaggregations());
 
     return dd;
   }
