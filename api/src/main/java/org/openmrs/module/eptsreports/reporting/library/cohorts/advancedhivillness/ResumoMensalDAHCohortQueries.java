@@ -80,11 +80,7 @@ public class ResumoMensalDAHCohortQueries {
     cd.setName("Número total de activos em DAH em TARV,  até ao fim do mês anterior");
     cd.addParameters(getCohortParameters());
 
-    cd.addSearch(
-        "onDAH",
-        mapStraightThrough(
-            listOfPatientsInAdvancedHivIllnessCohortQueries.getPatientsWhoStartedFollowupOnDAH(
-                false)));
+    cd.addSearch("onDAH", mapStraightThrough(getPatientsWhoStartedFollowupOnDAH(false)));
 
     cd.addSearch(
         "leftTreatment",
@@ -130,8 +126,7 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "onDAHDuringPeriod",
         map(
-            listOfPatientsInAdvancedHivIllnessCohortQueries.getPatientsWhoStartedFollowupOnDAH(
-                true),
+            getPatientsWhoStartedFollowupOnDAH(true),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
@@ -185,8 +180,7 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "onDAHDuringPeriod",
         map(
-            listOfPatientsInAdvancedHivIllnessCohortQueries.getPatientsWhoStartedFollowupOnDAH(
-                true),
+            getPatientsWhoStartedFollowupOnDAH(true),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
@@ -238,8 +232,7 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "onDAHDuringPeriod",
         map(
-            listOfPatientsInAdvancedHivIllnessCohortQueries.getPatientsWhoStartedFollowupOnDAH(
-                true),
+            getPatientsWhoStartedFollowupOnDAH(true),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
@@ -294,8 +287,7 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "onDAHDuringPeriod",
         map(
-            listOfPatientsInAdvancedHivIllnessCohortQueries.getPatientsWhoStartedFollowupOnDAH(
-                true),
+            getPatientsWhoStartedFollowupOnDAH(true),
             "startDate=${startDate-7m},endDate=${startDate-6m-1d},location=${location}"));
 
     cd.addSearch(
@@ -1599,6 +1591,50 @@ public class ResumoMensalDAHCohortQueries {
             + "              AND e.encounter_type = ${90}  "
             + "              AND e.location_id = :location "
             + "            AND e.patient_id = p.patient_id ) ";
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(substitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b> Utentes que iniciaram o seguimento no Modelo de DAH </b>
+   *
+   * <p>Utentes com registo do “Início de Seguimento no Modelo de Doença Avançada” (Data Início DAH
+   * - encounter_datetime) na Ficha de DAH (encounter type = 90) durante o período de avaliação, ou
+   * seja, “Data Início DAH” >= “Data Início Avaliação” e “Data Início DAH” <= “Data Fim Avaliação”
+   *
+   * <p>Utentes com registo do “Início de Seguimento no Modelo de Doença Avançada” (Data Início DAH
+   * * - encounter_datetime) na Ficha de DAH (encounter type = 90) ocorrida até fim do mês anterior
+   * [“Data de Início no Modelo de DAH” <= “Data Início” menos (-) 1 dia]
+   *
+   * @param duringThePeriod Flag to change the evaluation period
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoStartedFollowupOnDAH(boolean duringThePeriod) {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes que Iniciaram o seguimento na Ficha DAH");
+    sqlCohortDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+
+    String query =
+        " SELECT p.patient_id "
+            + "FROM "
+            + "    patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "WHERE p.voided = 0 AND e.voided = 0 "
+            + "  AND e.encounter_type = ${90} ";
+    query +=
+        duringThePeriod
+            ? "  AND e.encounter_datetime >= :startDate "
+                + "  AND e.encounter_datetime <= :endDate "
+            : " AND e.encounter_datetime <= :startDate ";
+
+    query += "  AND e.location_id = :location " + "GROUP BY p.patient_id";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
 
