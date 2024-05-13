@@ -382,13 +382,13 @@ public class IntensiveMonitoringCohortQueries {
     compositionCohortDefinition.addSearch(
         "GNEW",
         EptsReportUtils.map(
-            qualityImprovement2020CohortQueries.getGNew(),
+            qualityImprovement2020CohortQueries.getPatientsWithTptInhEnd(),
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "L",
         EptsReportUtils.map(
-            qualityImprovement2020CohortQueries.getGNew3HP(),
+            qualityImprovement2020CohortQueries.getPatientsWithTpt3hpEnd(),
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch("DENOMINATOR", Mapped.mapStraightThrough(denominator));
