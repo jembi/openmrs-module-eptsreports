@@ -108,7 +108,10 @@ public class ResumoMensalDAHCohortQueries {
    *     Início no Modelo de DAH”>= “Data Início” e <= “Data Fim”), considerar os utentes incluídos
    *     no indicador B1-Nº de utentes que iniciaram TARV nesta unidade sanitária durante o mês, do
    *     relatório “Resumo Mensal de HIV/SIDA” durante o período de compreendido entre “Data Início”
-   *     menos (–) 2 meses e “Data Fim”.
+   *     menos (–) 2 meses e “Data Fim” ou .
+   * <li>no Indicador A2- Nº de utentes que iniciou Pré-TARV (Cuidados de HIV) nesta unidade
+   *     sanitária durante o mês, do relatório “Resumo Mensal de HIV/SIDA” durante o período de
+   *     compreendido entre “Data Início” menos (–) 2 meses e “Data Fim”
    *
    * @return {@link CohortDefinition}
    */
@@ -120,6 +123,9 @@ public class ResumoMensalDAHCohortQueries {
 
     CohortDefinition rmB1 =
         resumoMensalCohortQueries.getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1();
+
+    CohortDefinition rmA2 =
+        resumoMensalCohortQueries.getPatientsWhoInitiatedPreTarvAtAfacilityDuringCurrentMonthA2();
 
     cd.addSearch(
         "onDAHDuringPeriod",
@@ -141,7 +147,13 @@ public class ResumoMensalDAHCohortQueries {
             getRMDefinitionsIfPatientDontHaveTarvSituationOnDah(rmB1),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("onDAHDuringPeriod AND (newOnArt OR B1)");
+    cd.addSearch(
+        "A2",
+        map(
+            getRMDefinitionsIfPatientDontHaveTarvSituationOnDah(rmA2),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("onDAHDuringPeriod AND (newOnArt OR B1 OR A2)");
     return cd;
   }
 
