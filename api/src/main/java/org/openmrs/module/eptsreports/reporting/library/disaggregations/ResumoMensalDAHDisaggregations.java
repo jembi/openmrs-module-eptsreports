@@ -170,10 +170,7 @@ public class ResumoMensalDAHDisaggregations {
     // FOLLOWUP
     BaseDataSet.ColumnParameters under15Followup =
         new BaseDataSet.ColumnParameters(
-            "under15Followup",
-            "Under 15 on Followup",
-            "followup=on-dah|age=<15",
-            "under15Followup");
+            "under15Followup", "Under 15 on Followup", "age=<15", "under15Followup");
 
     BaseDataSet.ColumnParameters above15Followup =
         new BaseDataSet.ColumnParameters(
