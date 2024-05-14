@@ -1087,38 +1087,6 @@ public class EptsCommonDimension {
   }
 
   /**
-   * <b>Relatório Desagregação Utentes em Seguimento de DAH</b>
-   * <li>Com registo de “Data de Início no Modelo de DAH”, na Ficha de DAH, ocorrida até o fim do
-   *     período (“Data de Início no Modelo de DAH” <= “Data Fim”).
-   *
-   *     <p>Excluindo todos os utentes
-   * <li>Com registo de pelo menos um motivo (Óbito/ Abandono/ Transferido Para) e “Data de Saída de
-   *     TARV na US” (secção J), na Ficha de DAH, ocorrida após a data mais recente da “Data de
-   *     Início no Modelo de DAH” e e até o fim do período (“Data de Saída de TARV na US” >= “Última
-   *     Data de Início no Modelo de DAH” e <= “Data Fim”) ou
-   * <li>Com registo de “Data de Saída” (secção I), registada na Ficha de DAH e ocorrida após a data
-   *     mais recente da “Data de Início no Modelo de DAH” e até o fim do período (“Data de Saída de
-   *     TARV na US” >= “Última Data de Início no Modelo de DAH” e <= “Data Fim”)
-   *
-   * @return {@link CohortDefinitionDimension}
-   */
-  public CohortDefinitionDimension getPatientsWhoStartedFollowupOnDAHDisaggregation() {
-    CohortDefinitionDimension dim = new CohortDefinitionDimension();
-    dim.addParameter(new Parameter("startDate", "startDate", Date.class));
-    dim.addParameter(new Parameter("endDate", "endDate", Date.class));
-    dim.addParameter(new Parameter("location", "location", Location.class));
-    dim.setName("utentes em seguimento de DAH, para desagregação dos indicadores 10 a 19");
-
-    dim.addCohortDefinition(
-        "on-dah",
-        EptsReportUtils.map(
-            resumoMensalDAHCohortQueries.getPatientsWhoStartedFollowupOnDAHComposition(),
-            "startDate=${endDate},endDate=${endDate},location=${location}"));
-
-    return dim;
-  }
-
-  /**
    * <b>Description:</b> Clients marked with “PrEP Interrompida” and field “Razões para Interromper
    * PrEP” with one of reasons of interruption on the “Ficha de Consulta Inicial PrEP” with the most
    * recent date that falls during the reporting period OR Clients with the field “PrEP

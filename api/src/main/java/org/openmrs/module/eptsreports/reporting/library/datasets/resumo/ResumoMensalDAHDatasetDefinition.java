@@ -71,12 +71,6 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
             eptsCommonDimension.maternityDimension(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    dd.addDimension(
-        "followup",
-        map(
-            eptsCommonDimension.getPatientsWhoStartedFollowupOnDAHDisaggregation(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
     // INDICATOR 0
     dd.addColumn(
         "TOTALI0",

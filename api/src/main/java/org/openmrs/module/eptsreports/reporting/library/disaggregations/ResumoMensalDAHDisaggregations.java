@@ -105,21 +105,6 @@ public class ResumoMensalDAHDisaggregations {
         new BaseDataSet.ColumnParameters(
             "pregnant", "Pregnant", "maternity=pregnant-dah", "pregnant");
 
-    // FOLLOWUP
-    BaseDataSet.ColumnParameters under15Followup89 =
-        new BaseDataSet.ColumnParameters(
-            "under15Followup",
-            "Under 15 on Followup",
-            "followup=on-dah|age=<15",
-            "under15Followup");
-
-    BaseDataSet.ColumnParameters above15Followup89 =
-        new BaseDataSet.ColumnParameters(
-            "above15Followup",
-            "Above 15 on Followup",
-            "followup=on-dah|age=15+",
-            "above15Followup");
-
     return Arrays.asList(
         under15NewArt89,
         above15NewArt89,
@@ -127,9 +112,7 @@ public class ResumoMensalDAHDisaggregations {
         above15RestartedArt89,
         under15ActiveArt89,
         above15ActiveArt89,
-        pregnant89,
-        under15Followup89,
-        above15Followup89);
+        pregnant89);
   }
 
   /**
@@ -194,10 +177,7 @@ public class ResumoMensalDAHDisaggregations {
 
     BaseDataSet.ColumnParameters above15Followup =
         new BaseDataSet.ColumnParameters(
-            "above15Followup",
-            "Above 15 on Followup",
-            "followup=on-dah|age=15+",
-            "above15Followup");
+            "above15Followup", "Above 15 on Followup", "age=15+", "above15Followup");
 
     return Arrays.asList(
         under15NewArt,
