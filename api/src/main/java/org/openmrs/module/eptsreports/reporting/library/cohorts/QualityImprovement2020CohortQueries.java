@@ -5006,8 +5006,7 @@ public class QualityImprovement2020CohortQueries {
         "mq12Den9",
         EptsReportUtils.map(
             mq12Den9,
-            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"));
-
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     comp.addSearch(
         "mq12Den10",
         EptsReportUtils.map(
