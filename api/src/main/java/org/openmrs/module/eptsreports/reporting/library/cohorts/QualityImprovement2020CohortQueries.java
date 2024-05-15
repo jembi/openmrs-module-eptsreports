@@ -4982,37 +4982,37 @@ public class QualityImprovement2020CohortQueries {
         "mq12Den1",
         EptsReportUtils.map(
             mq12Den1,
-            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "mq12Den2",
         EptsReportUtils.map(
             mq12Den2,
-            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "mq12Den5",
         EptsReportUtils.map(
             mq12Den5,
-            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "mq12Den6",
         EptsReportUtils.map(
             mq12Den6,
-            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "mq12Den9",
         EptsReportUtils.map(
             mq12Den9,
-            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "mq12Den10",
         EptsReportUtils.map(
             mq12Den10,
-            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     if (den == 1) {
       comp.setCompositionString("mq12Den1 AND H");
