@@ -12629,7 +12629,7 @@ public class QualityImprovement2020CohortQueries {
   public CohortDefinition getTranferredOutPatientsCat7() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("All patients registered in encounter “Ficha Resumo-MasterCard”");
+    sqlCohortDefinition.setName("All patients registered as Transferred Out");
     sqlCohortDefinition.addParameter(
         new Parameter("revisionStartDate", "revisionStartDate", Date.class));
     sqlCohortDefinition.addParameter(
@@ -12647,9 +12647,7 @@ public class QualityImprovement2020CohortQueries {
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
 
     String query =
-        "SELECT patient_id "
-            + "FROM   (SELECT transferout.patient_id, "
-            + "               transferout.max_date AS transferout_date "
+        "SELECT transferout.patient_id "
             + "        FROM   (SELECT p.patient_id, "
             + "                       last_registed_clinical.last_date_registed AS max_date "
             + "                FROM   patient p "
@@ -12723,8 +12721,7 @@ public class QualityImprovement2020CohortQueries {
             + "                           last_registed_resumo.last_date_registed "
             + "                       AND o.concept_id = ${6272} "
             + "                       AND o.value_coded = ${1706} "
-            + "                GROUP  BY p.patient_id) transferout "
-            + "        GROUP  BY transferout.patient_id) max_transferout";
+            + "                GROUP  BY p.patient_id) transferout ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
