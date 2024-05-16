@@ -2685,6 +2685,11 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
       compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
+      compositionCohortDefinition.addSearch(
+          "ADULT",
+          EptsReportUtils.map(
+              genericCohortQueries.getPatientAgeBasedOnFirstViralLoadDate(15, 200),
+              "startDate=${startDate},endDate=${endDate},location=${location}"));
     } else if (reportSource.equals(MIMQ.MI)) {
 
       if (indicatorFlag == 1) {
@@ -2728,7 +2733,8 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.setCompositionString("A AND NOT (C OR D OR E OR F)");
     }
     if (indicatorFlag == 2) {
-      compositionCohortDefinition.setCompositionString("((B2 AND B1 AND B5) AND NOT (B4 OR F))");
+      compositionCohortDefinition.setCompositionString(
+          "((B2 AND (ADULT OR B5) AND B1) AND NOT (B4 OR F))");
     }
     if (indicatorFlag == 7) {
       compositionCohortDefinition.setCompositionString("((B1 AND B2) AND NOT (B4 OR B5 OR F))");
