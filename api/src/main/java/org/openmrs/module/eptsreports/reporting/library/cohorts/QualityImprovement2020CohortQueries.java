@@ -2728,7 +2728,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.setCompositionString("A AND NOT (C OR D OR E OR F)");
     }
     if (indicatorFlag == 2) {
-      compositionCohortDefinition.setCompositionString("((B2 AND (B1 OR B5)) AND NOT (B4 OR F))");
+      compositionCohortDefinition.setCompositionString("((B2 AND B1 AND B5) AND NOT (B4 OR F))");
     }
     if (indicatorFlag == 7) {
       compositionCohortDefinition.setCompositionString("((B1 AND B2) AND NOT (B4 OR B5 OR F))");
@@ -3269,7 +3269,7 @@ public class QualityImprovement2020CohortQueries {
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
             + "       AND o.value_coded = ${21150} "
-            + "       AND e.encounter_type = ${6};  ";
+            + "       AND e.encounter_type = ${6}";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -12786,9 +12786,9 @@ public class QualityImprovement2020CohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("All patients registered in encounter “Ficha Resumo-MasterCard”");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -12802,55 +12802,77 @@ public class QualityImprovement2020CohortQueries {
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
 
     String query =
-        " SELECT patient_id "
+        "SELECT patient_id "
             + "FROM   (SELECT transferout.patient_id, "
-            + "               Max(transferout.last_date) transferout_date "
-            + "        FROM   ( SELECT p.patient_id, "
-            + "                        last_clinical.last_date AS last_date "
-            + "                 FROM   patient p "
-            + "                            JOIN encounter e "
-            + "                                 ON p.patient_id = e.patient_id "
-            + "                            JOIN obs o "
-            + "                                 ON e.encounter_id = o.encounter_id "
-            + "                            JOIN (SELECT p.patient_id, "
-            + "                                         Max(e.encounter_datetime) AS last_date "
-            + "                                  FROM   patient p "
-            + "                                             JOIN encounter e "
-            + "                                                  ON p.patient_id = e.patient_id "
-            + "                                  WHERE  p.voided = 0 "
-            + "                                    AND e.voided = 0 "
-            + "                                    AND e.location_id = :location "
-            + "                                    AND e.encounter_type = ${6} "
-            + "                                    AND e.encounter_datetime <= :revisionEndDate "
-            + "                                  GROUP BY p.patient_id) last_clinical "
-            + "                                ON last_clinical.patient_id = p.patient_id "
-            + "                 WHERE  p.voided = 0 "
-            + "                   AND e.voided = 0 "
-            + "                   AND e.location_id = :location "
-            + "                   AND e.encounter_type = ${6} "
-            + "                   AND e.encounter_datetime = last_clinical.last_date "
-            + "                   AND o.voided = 0 "
-            + "                   AND o.concept_id = ${6273} "
-            + "                   AND o.value_coded = ${1706} "
-            + "                 GROUP  BY p.patient_id "
+            + "               Max(transferout.max_date_state) transferout_date "
+            + "        FROM   (SELECT p.patient_id, "
+            + "                       last_clinical_state.last_date AS max_date_state "
+            + "                FROM   patient p "
+            + "                           JOIN encounter e "
+            + "                                ON p.patient_id = e.patient_id "
+            + "                           JOIN obs o "
+            + "                                ON e.encounter_id = o.encounter_id "
+            + "                           JOIN (SELECT p.patient_id, "
+            + "                                        Max(e.encounter_datetime) AS last_date "
+            + "                                 FROM   patient p "
+            + "                                            JOIN encounter e "
+            + "                                                 ON p.patient_id = e.patient_id "
+            + "                                            JOIN obs o "
+            + "                                                 ON e.encounter_id = o.encounter_id "
+            + "                                 WHERE  p.voided = 0 "
+            + "                                   AND e.voided = 0 "
+            + "                                   AND o.voided = 0 "
+            + "                                   AND e.location_id = :location "
+            + "                                   AND e.encounter_type = ${6} "
+            + "                                   AND e.encounter_datetime <= :revisionEndDate "
+            + "                                   AND o.concept_id = ${6273} "
+            + "                                   AND o.value_coded IS NOT NULL "
+            + "                                 GROUP  BY p.patient_id) last_clinical_state "
+            + "                                ON last_clinical_state.patient_id = p.patient_id "
+            + "                WHERE  p.voided = 0 "
+            + "                  AND e.voided = 0 "
+            + "                  AND e.location_id = :location "
+            + "                  AND e.encounter_type = ${6} "
+            + "                  AND e.encounter_datetime = last_clinical_state.last_date "
+            + "                  AND o.voided = 0 "
+            + "                  AND o.concept_id = ${6273} "
+            + "                  AND o.value_coded = ${1706} "
+            + "                GROUP  BY p.patient_id "
             + "                UNION "
             + "                SELECT p.patient_id, "
-            + "                       Max(o.obs_datetime) AS last_date "
+            + "                       last_resumo_state.last_date AS max_date_state "
             + "                FROM   patient p "
-            + "                       JOIN encounter e "
-            + "                         ON p.patient_id = e.patient_id "
-            + "                       JOIN obs o "
-            + "                         ON e.encounter_id = o.encounter_id "
+            + "                           JOIN encounter e "
+            + "                                ON p.patient_id = e.patient_id "
+            + "                           JOIN obs o "
+            + "                                ON e.encounter_id = o.encounter_id "
+            + "                           JOIN (SELECT p.patient_id, "
+            + "                                        Max(o.obs_datetime) AS last_date "
+            + "                                 FROM   patient p "
+            + "                                            JOIN encounter e "
+            + "                                                 ON p.patient_id = e.patient_id "
+            + "                                            JOIN obs o "
+            + "                                                 ON e.encounter_id = o.encounter_id "
+            + "                                 WHERE  p.voided = 0 "
+            + "                                   AND e.voided = 0 "
+            + "                                   AND o.voided = 0 "
+            + "                                   AND e.location_id = :location "
+            + "                                   AND e.encounter_type = ${53} "
+            + "                                   AND e.encounter_datetime <= :revisionEndDate "
+            + "                                   AND o.concept_id = ${6272} "
+            + "                                   AND o.value_coded IS NOT NULL "
+            + "                                 GROUP  BY p.patient_id) last_resumo_state "
+            + "                                ON last_resumo_state.patient_id = p.patient_id "
             + "                WHERE  p.voided = 0 "
-            + "                       AND e.voided = 0 "
-            + "                       AND e.location_id = :location "
-            + "                       AND e.encounter_type = ${53} "
-            + "                       AND o.obs_datetime <= :revisionEndDate "
-            + "                       AND o.voided = 0 "
-            + "                       AND o.concept_id = ${6272} "
-            + "                       AND o.value_coded = ${1706} "
+            + "                  AND e.voided = 0 "
+            + "                  AND e.location_id = :location "
+            + "                  AND e.encounter_type = ${53} "
+            + "                  AND e.encounter_datetime = last_resumo_state.last_date "
+            + "                  AND o.voided = 0 "
+            + "                  AND o.concept_id = ${6272} "
+            + "                  AND o.value_coded = ${1706} "
             + "                GROUP  BY p.patient_id) transferout "
-            + "        GROUP  BY transferout.patient_id) max_transferout ";
+            + "        GROUP  BY transferout.patient_id) max_transferout";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
