@@ -13333,27 +13333,21 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
-
   /**
    * <b>RF27: Utentes reinicios TARV</b>
    *
-   * <p>
-   *     Incluindo todos os utentes que tiveram registo de “Mudança de
-   *     E stado de Permanência” = “Reinício” numa consulta clínica (Ficha Clínica)
-   *     ocorrida durante o período de revisão (“Data de Consulta Reinício” >=
-   *     “Data Início Revisão” e <= “Data Fim Revisão”)
-   * </p>
+   * <p>Incluindo todos os utentes que tiveram registo de “Mudança de E stado de Permanência” =
+   * “Reinício” numa consulta clínica (Ficha Clínica) ocorrida durante o período de revisão (“Data
+   * de Consulta Reinício” >= “Data Início Revisão” e <= “Data Fim Revisão”)
    *
-   * <p>
-   *     <b>Nota</b>: em caso de existência de mais que uma consulta com registo de Reinício
-   *     durante o período de revisão, o sistema irá considerar o registo mais recente.
-   * </p>
+   * <p><b>Nota</b>: em caso de existência de mais que uma consulta com registo de Reinício durante
+   * o período de revisão, o sistema irá considerar o registo mais recente.
    *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithRestartedStateOfStay() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Patients with LINHA TERAPEUTICA equal to PRIMEIRA LINHA");
+    sqlCohortDefinition.setName("Utentes reinicios TARV");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
@@ -13364,9 +13358,95 @@ public class QualityImprovement2020CohortQueries {
     map.put("1705", hivMetadata.getRestartConcept().getConceptId());
 
     String query =
-            new EptsQueriesUtil().patientIdQueryBuilder(
-                    QualityImprovement2020Queries.getPatientsWithRestartedStateOfStayQuery()
-            ).getQuery();
+        new EptsQueriesUtil()
+            .patientIdQueryBuilder(
+                QualityImprovement2020Queries.getPatientsWithRestartedStateOfStayQuery())
+            .getQuery();
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>RF27: utentes que abandonaram o tratamento há mais de 3 meses</b>
+   *
+   * <p>Filtrando os utentes que abandonaram o tratamento há mais de 3 meses, ou seja, “Data de
+   * Consulta Reinício” menos (-) “Data de Abandono” >= 99 dias. A “Data de Abandono” é a data mais
+   * recente entre os seguintes critérios:
+   * <li>“Data de Último Levantamento”, registado na Ficha Recepção/Lavantou ARV, antes da “Data de
+   *     Consulta Reinício”), adicionando (+) 90 dias (Nota: 30 dias para identificar a data
+   *     esperada do próximo levantamento, e 60 dias para identificar o abandono)
+   * <li>“Data de Consulta” (Ficha Clínica) ocorrida antes da “Data de Consulta Reinício” e onde foi
+   *     efectuado o registo de “Estado de Permanência” com resposta “Abandono”. Nota: será
+   *     considerada a última consulta com registo de “Abandono” antes da consulta de reinício.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoAbandonedMoreThan3months() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes utentes que abandonaram o tratamento há mais de 3 meses");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
+    map.put("1707", hivMetadata.getAbandonedConcept().getConceptId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+
+    String query =
+        "SELECT restarted.patient_id FROM ( "
+            + QualityImprovement2020Queries.getPatientsWithRestartedStateOfStayQuery()
+            + "                         ) restarted "
+            + "INNER JOIN  (SELECT abandoned_dates.patient_id, MAX(abandoned_dates.last_date) AS abandoned_date "
+            + "            FROM (SELECT p.patient_id, "
+            + "                         date_add(max(o.value_datetime), INTERVAL 90 DAY) as last_date "
+            + "                  FROM patient p "
+            + "                           INNER JOIN encounter e "
+            + "                                      ON e.patient_id = p.patient_id "
+            + "                           INNER JOIN obs o "
+            + "                                      ON o.encounter_id = e.encounter_id "
+            + "                           INNER JOIN ( "
+            + QualityImprovement2020Queries.getPatientsWithRestartedStateOfStayQuery()
+            + "                                     ) restarted ON restarted.patient_id = p.patient_id "
+            + "                  WHERE "
+            + "                     e.voided = 0 "
+            + "                    AND p.voided = 0 "
+            + "                    AND o.voided = 0 "
+            + "                    AND e.location_id = :location "
+            + "                    AND e.encounter_type = ${52} "
+            + "                    AND o.concept_id = ${23866} "
+            + "                    AND o.value_datetime < restarted.restart_date "
+            + "                  GROUP BY p.patient_id "
+            + "                  UNION "
+            + "                  SELECT p.patient_id, "
+            + "                         MAX(e.encounter_datetime) AS last_date "
+            + "                  FROM patient p "
+            + "                           INNER JOIN encounter e "
+            + "                                ON p.patient_id = e.patient_id "
+            + "                           INNER JOIN obs o "
+            + "                                ON e.encounter_id = o.encounter_id "
+            + "                           INNER JOIN ( "
+            + QualityImprovement2020Queries.getPatientsWithRestartedStateOfStayQuery()
+            + "                                     ) restarted ON restarted.patient_id = p.patient_id "
+            + "                  WHERE p.voided = 0 "
+            + "                    AND e.voided = 0 "
+            + "                    AND o.voided = 0 "
+            + "                    AND e.location_id = :location "
+            + "                    AND e.encounter_type = ${6} "
+            + "                    AND e.encounter_datetime < restarted.restart_date "
+            + "                    AND o.concept_id = ${6273} "
+            + "                    AND o.value_coded = ${1707} "
+            + "                  GROUP BY p.patient_id) abandoned_dates "
+            + "            GROUP BY abandoned_dates.patient_id) abandoned "
+            + "           ON abandoned.patient_id = restarted.patient_id "
+            + "               AND DATEDIFF(restarted.restart_date, abandoned.abandoned_date) >= 99 ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
