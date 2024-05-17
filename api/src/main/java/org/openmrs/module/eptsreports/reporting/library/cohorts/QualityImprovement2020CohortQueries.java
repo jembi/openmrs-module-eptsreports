@@ -13454,4 +13454,105 @@ public class QualityImprovement2020CohortQueries {
 
     return sqlCohortDefinition;
   }
+
+  /**
+   *
+   * <li>os utentes que tiveram registo de resultado CD4 na consulta clínica (Ficha Clínica),
+   *     ocorrida nos últimos 12 meses da consulta de reinício (“Data Consulta Resultado CD4” >=
+   *     “Data de Consulta Reinício” menos (-) 12 meses e < “Data de Consulta Reinício”)
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getCd4ResultAfterWuthinRestartDateMinus12months() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "os utentes que tiveram registo de resultado CD4 na consulta clínica (Ficha Clínica) "
+            + "ocorrida nos últimos 12 meses da consulta de reinício ");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    String query =
+        "SELECT pa.patient_id "
+            + "FROM "
+            + "    patient pa "
+            + "        INNER JOIN encounter e "
+            + "                   ON e.patient_id =  pa.patient_id "
+            + "        INNER JOIN obs "
+            + "                   ON obs.encounter_id = e.encounter_id "
+            + "        INNER JOIN "
+            + "    ( "
+            + QualityImprovement2020Queries.getPatientsWithRestartedStateOfStayQuery()
+            + "    ) restarted ON restarted.patient_id = pa.patient_id "
+            + "WHERE  pa.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND obs.voided = 0 "
+            + "  AND e.encounter_type = ${6} "
+            + "  AND ( "
+            + "        (obs.concept_id = ${1695} AND obs.value_numeric IS NOT NULL) "
+            + "        OR "
+            + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
+            + "      ) "
+            + "  AND e.encounter_datetime >= DATE_SUB(restarted.restart_date, INTERVAL 12 MONTH) "
+            + "  AND e.encounter_datetime < restarted.restart_date "
+            + "  AND e.location_id = :location "
+            + "GROUP BY pa.patient_id";
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>RF27: Utentes Reinícios TARV Elegíveis ao Pedido de CD4 </b>
+   *
+   * <p>Incluindo todos os utentes que tiveram registo de “Mudança de Estado de Permanência” =
+   * “Reinício” numa consulta clínica (Ficha Clínica) ocorrida durante o período de revisão
+   *
+   * <p>Filtrando os utentes que abandonaram o tratamento há mais de 3 meses, ou seja, “Data de
+   * Consulta Reinício” menos (-) “Data de Abandono” >= 99 dias.
+   *
+   * <p>Excluindo os utentes que tiveram registo de resultado CD4 na consulta clínica (Ficha
+   * Clínica), ocorrida nos últimos 12 meses da consulta de reinício
+   *
+   * @see #getPatientsWithRestartedStateOfStay()
+   * @see #getPatientsWhoAbandonedMoreThan3months()
+   * @see #getCd4ResultAfterWuthinRestartDateMinus12months()
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsRestartedAndEligibleForCd4Request() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Utentes Reinícios TARV Elegíveis ao Pedido de CD4");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "RESTARTED",
+        EptsReportUtils.map(
+            getPatientsWithRestartedStateOfStay(),
+            "endDate=${endDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "ABANDONED",
+        EptsReportUtils.map(
+            getPatientsWhoAbandonedMoreThan3months(),
+            "endDate=${endDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "CD4",
+        EptsReportUtils.map(
+            getCd4ResultAfterWuthinRestartDateMinus12months(),
+            "endDate=${endDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("(RESTARTED AND ABANDONED) AND NOT CD4");
+
+    return cd;
+  }
 }
