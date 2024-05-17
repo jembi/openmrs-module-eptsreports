@@ -2665,4 +2665,31 @@ public class QualityImprovement2020Queries {
 
     return sqlCohortDefinition;
   }
+
+  /**
+   * Incluindo todos os utentes que tiveram registo de “Mudança de E
+   * stado de Permanência” = “Reinício” numa consulta clínica (Ficha Clínica)
+   * ocorrida durante o período de revisão (“Data de Consulta Reinício” >=
+   * “Data Início Revisão” e <= “Data Fim Revisão”)
+   * @return {@link String}
+   */
+  public static String getPatientsWithRestartedStateOfStayQuery(){
+    return " SELECT p.patient_id, "
+            + "       Max(e.encounter_datetime) AS restart_date "
+            + "FROM   patient p "
+            + "           JOIN encounter e "
+            + "                ON p.patient_id = e.patient_id "
+            + "           JOIN obs o "
+            + "                ON e.encounter_id = o.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ${6} "
+            + "  AND e.encounter_datetime >= :startDate "
+            + "  AND e.encounter_datetime <= :endDate "
+            + "  AND o.concept_id = ${6273} "
+            + "  AND o.value_coded = ${1705} "
+            + "GROUP  BY p.patient_id ";
+  }
 }

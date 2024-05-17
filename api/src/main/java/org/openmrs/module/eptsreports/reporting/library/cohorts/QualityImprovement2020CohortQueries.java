@@ -13332,4 +13332,46 @@ public class QualityImprovement2020CohortQueries {
 
     return sqlCohortDefinition;
   }
+
+
+  /**
+   * <b>RF27: Utentes reinicios TARV</b>
+   *
+   * <p>
+   *     Incluindo todos os utentes que tiveram registo de “Mudança de
+   *     E stado de Permanência” = “Reinício” numa consulta clínica (Ficha Clínica)
+   *     ocorrida durante o período de revisão (“Data de Consulta Reinício” >=
+   *     “Data Início Revisão” e <= “Data Fim Revisão”)
+   * </p>
+   *
+   * <p>
+   *     <b>Nota</b>: em caso de existência de mais que uma consulta com registo de Reinício
+   *     durante o período de revisão, o sistema irá considerar o registo mais recente.
+   * </p>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithRestartedStateOfStay() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients with LINHA TERAPEUTICA equal to PRIMEIRA LINHA");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
+
+    String query =
+            new EptsQueriesUtil().patientIdQueryBuilder(
+                    QualityImprovement2020Queries.getPatientsWithRestartedStateOfStayQuery()
+            ).getQuery();
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
 }
