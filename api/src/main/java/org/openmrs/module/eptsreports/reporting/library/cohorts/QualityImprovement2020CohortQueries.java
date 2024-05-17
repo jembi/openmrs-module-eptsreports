@@ -4368,7 +4368,8 @@ public class QualityImprovement2020CohortQueries {
 
     if (reportSource.equals(EptsReportConstants.MIMQ.MQ)) {
       compositionCohortDefinition.addSearch(
-          "DENOMINATOR", EptsReportUtils.map(getMQC11DEN(3, EptsReportConstants.MIMQ.MQ), MAPPING));
+          "DENOMINATOR",
+          EptsReportUtils.map(getMQC11DEN(3, EptsReportConstants.MIMQ.MQ), MAPPING1));
       compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING1));
     } else if (reportSource.equals(EptsReportConstants.MIMQ.MI)) {
       compositionCohortDefinition.addSearch(
