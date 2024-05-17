@@ -13456,7 +13456,7 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   *
+   * <b>>RF27: Registo de resultado CD4 na consulta clínica</b>
    * <li>os utentes que tiveram registo de resultado CD4 na consulta clínica (Ficha Clínica),
    *     ocorrida nos últimos 12 meses da consulta de reinício (“Data Consulta Resultado CD4” >=
    *     “Data de Consulta Reinício” menos (-) 12 meses e < “Data de Consulta Reinício”)
@@ -13535,23 +13535,64 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
+    cd.addSearch("RESTARTED", EptsReportUtils.map(getPatientsWithRestartedStateOfStay(), MAPPING));
     cd.addSearch(
-        "RESTARTED",
-        EptsReportUtils.map(
-            getPatientsWithRestartedStateOfStay(),
-            "endDate=${endDate},endDate=${endDate},location=${location}"));
+        "ABANDONED", EptsReportUtils.map(getPatientsWhoAbandonedMoreThan3months(), MAPPING));
     cd.addSearch(
-        "ABANDONED",
-        EptsReportUtils.map(
-            getPatientsWhoAbandonedMoreThan3months(),
-            "endDate=${endDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "CD4",
-        EptsReportUtils.map(
-            getCd4ResultAfterWuthinRestartDateMinus12months(),
-            "endDate=${endDate},endDate=${endDate},location=${location}"));
+        "CD4", EptsReportUtils.map(getCd4ResultAfterWuthinRestartDateMinus12months(), MAPPING));
 
     cd.setCompositionString("(RESTARTED AND ABANDONED) AND NOT CD4");
+
+    return cd;
+  }
+
+  /**
+   * <b>Categoria 9 Denominador - Pedido e Resultado de CD4 nos Reinícios TARV– Adulto </b>
+   *
+   * <p>Incluindo todos os utentes que reiniciaram TARV durante o período de revisão e são elegíveis
+   * ao pedido de CD4 (RF27)
+   *
+   * <p>Filtrando os utentes com idade ≥15 anos (seguindo o critério definido no RF11).
+   *
+   * <p>Excluindo todos os utentes “Transferido de” outra US (seguindo os critérios definidos no
+   * RF5)
+   *
+   * <p>Nota: esta definição do denominador é a mesma para o denominador dos indicadores 9.7
+   * (pedido) e 9.8 (resultado) do grupo de adultos reinícios TARV.
+   *
+   * @see #getPatientsRestartedAndEligibleForCd4Request()
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getAdultPatientsRestartedWithCd4RequestAndResult() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Categoria 9 Denominador - Pedido e Resultado de CD4 nos Reinícios TARV– Adulto");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "ADULT",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnFirstClinicalConsultation(15, null),
+            "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "RESTARTED", EptsReportUtils.map(getPatientsRestartedAndEligibleForCd4Request(), MAPPING));
+
+    cd.addSearch(
+        "transferredIn",
+        EptsReportUtils.map(
+            QualityImprovement2020Queries.getTransferredInPatients(
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+                hivMetadata.getPatientFoundYesConcept().getConceptId(),
+                hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+                hivMetadata.getArtStatus().getConceptId()),
+            MAPPING));
+
+    cd.setCompositionString("(RESTARTED AND ADULT) AND NOT transferredIn");
 
     return cd;
   }
