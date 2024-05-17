@@ -2665,7 +2665,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transfOut = getTranferredOutPatients();
+    CohortDefinition transfOut = getTranferredOutPatientsCat7();
 
     if (reportSource.equals(MIMQ.MQ)) {
       compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
@@ -2684,7 +2684,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING11));
       compositionCohortDefinition.addSearch(
           "ADULT",
           EptsReportUtils.map(
@@ -4266,7 +4266,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition f = getTranferredOutPatients();
+    CohortDefinition f = getTranferredOutPatientsCat7();
     CohortDefinition g = getPatientsWith3MonthlyApssConsultationsWithin99Days();
 
     if (reportResource.equals(EptsReportConstants.MIMQ.MQ)) {
@@ -4274,7 +4274,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING11));
       compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING1));
     } else if (reportResource.equals(EptsReportConstants.MIMQ.MI)) {
       compositionCohortDefinition.addSearch("A", EptsReportUtils.map(a, MAPPING4));
@@ -4417,7 +4417,7 @@ public class QualityImprovement2020CohortQueries {
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
 
-    CohortDefinition f = getTranferredOutPatients();
+    CohortDefinition f = getTranferredOutPatientsCat7();
     CohortDefinition h = getMQC11NH(true);
 
     if (reportSource.equals(EptsReportConstants.MIMQ.MQ)) {
@@ -4425,7 +4425,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("B4", EptsReportUtils.map(b4, MAPPING1));
       compositionCohortDefinition.addSearch("B5", EptsReportUtils.map(b5, MAPPING));
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING11));
       compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING));
     } else if (reportSource.equals(EptsReportConstants.MIMQ.MI)) {
       compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(b1, MAPPING8));
@@ -4477,7 +4477,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getPatientFoundYesConcept().getConceptId(),
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
-    CohortDefinition f = getTranferredOutPatients();
+    CohortDefinition f = getTranferredOutPatientsCat7();
     CohortDefinition g = getPatientsWith3MonthlyApssConsultationsWithin99Days();
 
     if (reportSource.equals(EptsReportConstants.MIMQ.MQ)) {
@@ -4485,7 +4485,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING11));
       compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING1));
     } else if (reportSource.equals(EptsReportConstants.MIMQ.MI)) {
       compositionCohortDefinition.addSearch("A", EptsReportUtils.map(a, MAPPING4));
@@ -4537,7 +4537,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getPatientFoundYesConcept().getConceptId(),
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
-    CohortDefinition f = getTranferredOutPatients();
+    CohortDefinition f = getTranferredOutPatientsCat7();
     CohortDefinition i = getPatientWhoHadThreeApssAfterArtStart();
     CohortDefinition babies = genericCohortQueries.getAgeInMonths(0, 9);
 
@@ -4546,7 +4546,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING11));
       compositionCohortDefinition.addSearch(
           "I",
           EptsReportUtils.map(i, "startDate=${startDate},endDate=${endDate},location=${location}"));
@@ -4609,7 +4609,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getBreastfeeding().getConceptId());
 
-    CohortDefinition f = getTranferredOutPatients();
+    CohortDefinition f = getTranferredOutPatientsCat7();
     CohortDefinition h = getMQC11NH();
 
     if (reportSource.equals(EptsReportConstants.MIMQ.MQ)) {
@@ -4617,7 +4617,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(b2, MAPPING1));
       compositionCohortDefinition.addSearch("B4", EptsReportUtils.map(b4, MAPPING));
       compositionCohortDefinition.addSearch("B5", EptsReportUtils.map(b5, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING11));
       compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING));
     } else if (reportSource.equals(EptsReportConstants.MIMQ.MI)) {
       compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(b1, MAPPING5));
