@@ -12790,7 +12790,7 @@ public class QualityImprovement2020CohortQueries {
   public CohortDefinition getTranferredOutPatients() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("All patients registered in encounter “Ficha Resumo-MasterCard”");
+    sqlCohortDefinition.setName("All patients registered as Transferred Out");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(
@@ -12808,11 +12808,9 @@ public class QualityImprovement2020CohortQueries {
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
 
     String query =
-        "SELECT patient_id "
-            + "FROM   (SELECT transferout.patient_id, "
-            + "               transferout.max_date_state AS transferout_date "
+        "SELECT transferred_out.patient_id "
             + "        FROM   (SELECT p.patient_id, "
-            + "                       last_clinical_state.last_date AS max_date_state "
+            + "               last_clinical_state.last_date AS last_date "
             + "                FROM   patient p "
             + "                           JOIN encounter e "
             + "                                ON p.patient_id = e.patient_id "
@@ -12830,6 +12828,7 @@ public class QualityImprovement2020CohortQueries {
             + "                                   AND o.voided = 0 "
             + "                                   AND e.location_id = :location "
             + "                                   AND e.encounter_type = ${6} "
+            + "                                   AND e.encounter_datetime >= :startDate "
             + "                                   AND e.encounter_datetime <= :revisionEndDate "
             + "                                   AND o.concept_id = ${6273} "
             + "                                   AND o.value_coded IS NOT NULL "
@@ -12854,14 +12853,14 @@ public class QualityImprovement2020CohortQueries {
             + "                         ON e.encounter_id = o.encounter_id "
             + "                WHERE  p.voided = 0 "
             + "                       AND e.voided = 0 "
+            + "                       AND o.voided = 0 "
             + "                       AND e.location_id = :location "
             + "                       AND e.encounter_type = ${53} "
+            + "                       AND o.obs_datetime >= :startDate "
             + "                       AND o.obs_datetime <= :revisionEndDate "
-            + "                       AND o.voided = 0 "
             + "                       AND o.concept_id = ${6272} "
             + "                       AND o.value_coded = ${1706} "
-            + "                GROUP  BY p.patient_id) transferout "
-            + "        GROUP  BY transferout.patient_id) max_transferout ";
+            + "                GROUP  BY p.patient_id) transferred_out ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
