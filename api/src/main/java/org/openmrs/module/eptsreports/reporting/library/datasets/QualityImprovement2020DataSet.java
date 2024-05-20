@@ -2713,7 +2713,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
 
     dataSetDefinition.addColumn(
         "MQ9DEN7",
-        "9.8 % de adultos HIV+ ≥ 15 anos reinícios TARV que teve conhecimento do resultado do CD4 dentro de 33 dias após a data da consulta clínica de reinício TARV",
+        "9.7 % de adultos HIV+ ≥ 15 anos que reiniciaram TARV durante o período de revisão e tiveram registo de pedido do CD4 na consulta de reinício",
         EptsReportUtils.map(
             customCohortIndicator(
                 qualityImprovement2020CohortQueries
@@ -2724,7 +2724,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
 
     dataSetDefinition.addColumn(
         "MQ9DEN8",
-        "Resultado de CD4 = “% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez",
+        "9.8 % de adultos HIV+ ≥ 15 anos reinícios TARV que teve conhecimento do resultado do CD4 dentro de 33 dias após a data da consulta clínica de reinício TARV",
         EptsReportUtils.map(
             customCohortIndicator(
                 qualityImprovement2020CohortQueries
@@ -2793,6 +2793,16 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+
+    dataSetDefinition.addColumn(
+            "MQ9NUM7",
+            "9.7 % de adultos HIV+ ≥ 15 anos que reiniciaram TARV durante o período de revisão e tiveram registo de pedido do CD4 na consulta de reinício",
+            EptsReportUtils.map(
+                    customCohortIndicator(
+                            qualityImprovement2020CohortQueries.getPatientsWithCd4RequestOnRestartedTarvDate(),
+                            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "");
 
     // MQ indicators category 10 denominator
 

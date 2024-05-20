@@ -13596,4 +13596,85 @@ public class QualityImprovement2020CohortQueries {
 
     return cd;
   }
+
+  /**
+   * <b>Categoria 9 Numerador - Pedido CD4 nos Reinícios TARV - Adultos </b>
+   *
+   * <p>Incluindo todos os utentes do Denominador - Pedido de CD4 nos Reinícios TARV- Adulto
+   * (definidos no RF21)
+   *
+   * <p>Filtrando os que tiveram registo do “Pedido de CD4” na consulta clínica de reinício durante
+   * o período de revisão. Nota: é a consulta clínica de reinício na qual o utente é elegível ao
+   * pedido de CD4 (seguindo os critérios definidos no RF27)
+   *
+   * @see #getAdultPatientsRestartedWithCd4RequestAndResult()
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithCd4RequestOnRestartedTarvDate() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Categoria 9 Numerador - Pedido CD4 nos Reinícios TARV - Adultos");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "DENOMINATOR",
+        EptsReportUtils.map(getAdultPatientsRestartedWithCd4RequestAndResult(), MAPPING1));
+
+    cd.addSearch(
+        "REQUEST", EptsReportUtils.map(getPatientsWithCd4RequestsOnRestartedTarvDate(), MAPPING));
+
+    cd.setCompositionString("DENOMINATOR AND REQUEST");
+
+    return cd;
+  }
+
+  /**
+   * Filtrando os que tiveram registo do “Pedido de CD4” na consulta clínica de reinício durante o
+   * período de revisão. Nota: é a consulta clínica de reinício na qual o utente é elegível ao
+   * pedido de CD4 (seguindo os critérios definidos no RF27)
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithCd4RequestsOnRestartedTarvDate() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "Os utentes que tiveram registo de “Pedido de CD4” na consulta clínica de reinício durante o período de revisão ");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    String query =
+        "SELECT pa.patient_id "
+            + "FROM "
+            + "    patient pa "
+            + "        INNER JOIN encounter e "
+            + "                   ON e.patient_id =  pa.patient_id "
+            + "        INNER JOIN obs "
+            + "                   ON obs.encounter_id = e.encounter_id "
+            + "        INNER JOIN "
+            + "    ( "
+            + QualityImprovement2020Queries.getPatientsWithRestartedStateOfStayQuery()
+            + "    ) restarted ON restarted.patient_id = pa.patient_id "
+            + "WHERE  pa.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND obs.voided = 0 "
+            + "  AND e.encounter_type = ${6} "
+            + "  AND obs.concept_id = ${23722} AND obs.value_coded = ${1695} "
+            + "  AND e.encounter_datetime = restarted.restart_date "
+            + "  AND e.location_id = :location "
+            + "GROUP BY pa.patient_id";
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
 }
