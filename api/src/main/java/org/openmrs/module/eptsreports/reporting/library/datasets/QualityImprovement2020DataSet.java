@@ -2823,6 +2823,27 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             mapping),
         "");
 
+    dataSetDefinition.addColumn(
+        "MQ9NUM9",
+        "9.9 % de crianças HIV+ < 15 anos que reiniciaram TARV durante o período de revisão e tiveram registo de pedido do CD4 na consulta de reinício",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                qualityImprovement2020CohortQueries.getPatientsWithCd4RequestOnRestartedTarvDate(9),
+                mapping),
+            mapping),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MQ9NUM10",
+        "9.10 % de crianças HIV+ < 15 anos reinícios TARV que teve conhecimento do resultado do CD4 dentro de 33 dias após a data da consulta clínica de reinício TARV",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                qualityImprovement2020CohortQueries.getPatientsWithCd4RequestOnRestartedTarvDate(
+                    10),
+                mapping),
+            mapping),
+        "");
+
     // MQ indicators category 10 denominator
 
     CohortIndicator MQ10DEN1A =

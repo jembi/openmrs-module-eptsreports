@@ -13643,11 +13643,20 @@ public class QualityImprovement2020CohortQueries {
 
     switch (numerator) {
       case 7:
-        cd.setName("Categoria 9 Numerador - Pedido de CD4 nos Reinícios TARV - Adultos");
+        cd.setName(
+            "9.7 % de adultos HIV+ ≥ 15 anos que reiniciaram TARV durante o período de revisão e tiveram registo de pedido do CD4 na consulta de reinício");
         break;
       case 8:
-        cd.setName("Categoria 9 Numerador - Resultado de CD4 nos Reinícios TARV - Adultos");
+        cd.setName(
+            "9.8 % de adultos HIV+ ≥ 15 anos reinícios TARV que teve conhecimento do resultado do CD4 dentro de 33 dias após a data da consulta clínica de reinício TARV");
         break;
+      case 9:
+        cd.setName(
+            "9.9 % de crianças HIV+ < 15 anos que reiniciaram TARV durante o período de revisão e tiveram registo de pedido do CD4 na consulta de reinício");
+        break;
+      case 10:
+        cd.setName(
+            "9.10 % de crianças HIV+ < 15 anos reinícios TARV que teve conhecimento do resultado do CD4 dentro de 33 dias após a data da consulta clínica de reinício TARV");
     }
 
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -13673,6 +13682,20 @@ public class QualityImprovement2020CohortQueries {
       cd.addSearch(
           "DENOMINATOR",
           EptsReportUtils.map(getAdultPatientsRestartedWithCd4RequestAndResult(8), MAPPING1));
+
+      cd.setCompositionString("DENOMINATOR AND RESULTS");
+    } else if (numerator == 9) {
+
+      cd.addSearch(
+          "DENOMINATOR",
+          EptsReportUtils.map(getAdultPatientsRestartedWithCd4RequestAndResult(9), MAPPING1));
+
+      cd.setCompositionString("DENOMINATOR AND REQUEST");
+    } else if (numerator == 10) {
+
+      cd.addSearch(
+          "DENOMINATOR",
+          EptsReportUtils.map(getAdultPatientsRestartedWithCd4RequestAndResult(10), MAPPING1));
 
       cd.setCompositionString("DENOMINATOR AND RESULTS");
     }
