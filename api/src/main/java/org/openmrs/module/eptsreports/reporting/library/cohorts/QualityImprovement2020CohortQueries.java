@@ -13610,10 +13610,19 @@ public class QualityImprovement2020CohortQueries {
    * @see #getAdultPatientsRestartedWithCd4RequestAndResult()
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsWithCd4RequestOnRestartedTarvDate() {
+  public CohortDefinition getPatientsWithCd4RequestOnRestartedTarvDate(int numerator) {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Categoria 9 Numerador - Pedido CD4 nos Reinícios TARV - Adultos");
+
+    switch (numerator) {
+      case 7:
+        cd.setName("Categoria 9 Numerador - Pedido de CD4 nos Reinícios TARV - Adultos");
+        break;
+      case 8:
+        cd.setName("Categoria 9 Numerador - Resultado de CD4 nos Reinícios TARV - Adultos");
+        break;
+    }
+
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
@@ -13626,8 +13635,14 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch(
         "REQUEST", EptsReportUtils.map(getPatientsWithCd4RequestsOnRestartedTarvDate(), MAPPING));
 
-    cd.setCompositionString("DENOMINATOR AND REQUEST");
+    cd.addSearch(
+        "RESULTS", EptsReportUtils.map(getPatientsWithCd4ResultsOnRestartedTarvDate(), MAPPING));
 
+    if (numerator == 7) {
+      cd.setCompositionString("DENOMINATOR AND REQUEST");
+    } else if (numerator == 8) {
+      cd.setCompositionString("DENOMINATOR AND RESULTS");
+    }
     return cd;
   }
 
@@ -13671,6 +13686,64 @@ public class QualityImprovement2020CohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
     map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * Filtrando os que tiveram registo do “Resultado de CD4” numa consulta clínica decorrida em 33
+   * dias da consulta clínica de reinício durante o período de revisão. Nota: é a consulta clínica
+   * de reinício na qual o utente é elegível ao pedido de CD4 (seguindo os critérios definidos no
+   * RF27)
+   *
+   * @see #getAdultPatientsRestartedWithCd4RequestAndResult()
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithCd4ResultsOnRestartedTarvDate() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "Utentes que tiveram registo do “Resultado de CD4” numa consulta clínica decorrida em 33 dias da consulta clínica de reinício");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
+
+    String query =
+        "SELECT pa.patient_id "
+            + "FROM "
+            + "    patient pa "
+            + "        INNER JOIN encounter enc "
+            + "                   ON enc.patient_id =  pa.patient_id "
+            + "        INNER JOIN obs "
+            + "                   ON obs.encounter_id = enc.encounter_id "
+            + "        INNER JOIN "
+            + "    ( "
+            + QualityImprovement2020Queries.getPatientsWithRestartedStateOfStayQuery()
+            + "    ) restarted ON restarted.patient_id = pa.patient_id "
+            + "WHERE  pa.voided = 0 "
+            + "  AND enc.voided = 0 "
+            + "  AND obs.voided = 0 "
+            + "  AND enc.encounter_type = ${6} "
+            + "  AND ( "
+            + "        (obs.concept_id = ${1695} AND obs.value_numeric IS NOT NULL) "
+            + "        OR "
+            + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
+            + "      ) "
+            + "  AND enc.encounter_datetime >= restarted.restart_date "
+            + "  AND enc.encounter_datetime <= DATE_ADD(restarted.restart_date, INTERVAL 33 DAY) "
+            + "  AND enc.location_id = :location "
+            + "GROUP BY pa.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(sb.replace(query));
