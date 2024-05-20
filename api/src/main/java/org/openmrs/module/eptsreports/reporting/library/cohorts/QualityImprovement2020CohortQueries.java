@@ -13563,20 +13563,47 @@ public class QualityImprovement2020CohortQueries {
    * @see #getPatientsRestartedAndEligibleForCd4Request()
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getAdultPatientsRestartedWithCd4RequestAndResult() {
+  public CohortDefinition getAdultPatientsRestartedWithCd4RequestAndResult(int denominator) {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Categoria 9 Denominador - Pedido e Resultado de CD4 nos Reinícios TARV– Adulto");
+
+    switch (denominator) {
+      case 7:
+        cd.setName(
+            " % de adultos HIV+ ≥ 15 anos que reiniciaram TARV durante o período de revisão e tiveram registo de pedido do CD4 na consulta de reinício");
+        break;
+      case 8:
+        cd.setName(
+            "9.8 % de adultos HIV+ ≥ 15 anos reinícios TARV que teve conhecimento do resultado do CD4 dentro de 33 dias após a data da consulta clínica de reinício TARV");
+        break;
+      case 9:
+        cd.setName(
+            " 9.9 % de crianças HIV+ < 15 anos que reiniciaram TARV durante o período de revisão e tiveram registo de pedido do CD4 na consulta de reinício");
+        break;
+      case 10:
+        cd.setName(
+            " 9.10 % de crianças HIV+ < 15 anos reinícios TARV que teve conhecimento do resultado do CD4 dentro de 33 dias após a data da consulta clínica de reinício TARV");
+        break;
+    }
+
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    cd.addSearch(
-        "ADULT",
-        EptsReportUtils.map(
-            genericCohortQueries.getAgeOnFirstClinicalConsultation(15, null),
-            "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
+    if (denominator == 7 || denominator == 8) {
+      cd.addSearch(
+          "AGE",
+          EptsReportUtils.map(
+              genericCohortQueries.getAgeOnFirstClinicalConsultation(15, null),
+              "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
+    } else if (denominator == 9 || denominator == 10) {
+      cd.addSearch(
+          "AGE",
+          EptsReportUtils.map(
+              genericCohortQueries.getAgeOnFirstClinicalConsultation(0, 14),
+              "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
+    }
 
     cd.addSearch(
         "RESTARTED", EptsReportUtils.map(getPatientsRestartedAndEligibleForCd4Request(), MAPPING));
@@ -13592,7 +13619,7 @@ public class QualityImprovement2020CohortQueries {
                 hivMetadata.getArtStatus().getConceptId()),
             MAPPING));
 
-    cd.setCompositionString("(RESTARTED AND ADULT) AND NOT transferredIn");
+    cd.setCompositionString("(RESTARTED AND AGE) AND NOT transferredIn");
 
     return cd;
   }
@@ -13607,7 +13634,7 @@ public class QualityImprovement2020CohortQueries {
    * o período de revisão. Nota: é a consulta clínica de reinício na qual o utente é elegível ao
    * pedido de CD4 (seguindo os critérios definidos no RF27)
    *
-   * @see #getAdultPatientsRestartedWithCd4RequestAndResult()
+   * @see #getAdultPatientsRestartedWithCd4RequestAndResult(int)
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithCd4RequestOnRestartedTarvDate(int numerator) {
@@ -13629,18 +13656,24 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     cd.addSearch(
-        "DENOMINATOR",
-        EptsReportUtils.map(getAdultPatientsRestartedWithCd4RequestAndResult(), MAPPING1));
-
-    cd.addSearch(
         "REQUEST", EptsReportUtils.map(getPatientsWithCd4RequestsOnRestartedTarvDate(), MAPPING));
 
     cd.addSearch(
         "RESULTS", EptsReportUtils.map(getPatientsWithCd4ResultsOnRestartedTarvDate(), MAPPING));
 
     if (numerator == 7) {
+
+      cd.addSearch(
+          "DENOMINATOR",
+          EptsReportUtils.map(getAdultPatientsRestartedWithCd4RequestAndResult(7), MAPPING1));
+
       cd.setCompositionString("DENOMINATOR AND REQUEST");
     } else if (numerator == 8) {
+
+      cd.addSearch(
+          "DENOMINATOR",
+          EptsReportUtils.map(getAdultPatientsRestartedWithCd4RequestAndResult(8), MAPPING1));
+
       cd.setCompositionString("DENOMINATOR AND RESULTS");
     }
     return cd;
@@ -13701,7 +13734,7 @@ public class QualityImprovement2020CohortQueries {
    * de reinício na qual o utente é elegível ao pedido de CD4 (seguindo os critérios definidos no
    * RF27)
    *
-   * @see #getAdultPatientsRestartedWithCd4RequestAndResult()
+   * @see #getAdultPatientsRestartedWithCd4RequestAndResult(int)
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithCd4ResultsOnRestartedTarvDate() {
