@@ -2870,7 +2870,7 @@ public class QualityImprovement2020CohortQueries {
 
     if (indicatorFlag == 3) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND B1) AND NOT B1E AND NOT (C OR D OR F) AND ADULT");
+          "(A AND (B1 OR D)) AND NOT B1E AND NOT (C OR F) AND ADULT");
     }
     if (indicatorFlag == 4) {
       compositionCohortDefinition.setCompositionString(
@@ -4982,37 +4982,36 @@ public class QualityImprovement2020CohortQueries {
         "mq12Den1",
         EptsReportUtils.map(
             mq12Den1,
-            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "mq12Den2",
         EptsReportUtils.map(
             mq12Den2,
-            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "mq12Den5",
         EptsReportUtils.map(
             mq12Den5,
-            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "mq12Den6",
         EptsReportUtils.map(
             mq12Den6,
-            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "mq12Den9",
         EptsReportUtils.map(
             mq12Den9,
-            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"));
-
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     comp.addSearch(
         "mq12Den10",
         EptsReportUtils.map(
             mq12Den10,
-            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     if (den == 1) {
       comp.setCompositionString("mq12Den1 AND H");
@@ -12633,7 +12632,7 @@ public class QualityImprovement2020CohortQueries {
   public CohortDefinition getTranferredOutPatientsCat7() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("All patients registered in encounter “Ficha Resumo-MasterCard”");
+    sqlCohortDefinition.setName("All patients registered as Transferred Out");
     sqlCohortDefinition.addParameter(
         new Parameter("revisionStartDate", "revisionStartDate", Date.class));
     sqlCohortDefinition.addParameter(
@@ -12651,57 +12650,81 @@ public class QualityImprovement2020CohortQueries {
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
 
     String query =
-        " SELECT patient_id "
-            + "FROM   (SELECT transferout.patient_id, "
-            + "               Max(transferout.last_date) transferout_date "
-            + "        FROM   ( SELECT p.patient_id, "
-            + "                        last_clinical.last_date AS last_date "
-            + "                 FROM   patient p "
-            + "                            JOIN encounter e "
-            + "                                 ON p.patient_id = e.patient_id "
-            + "                            JOIN obs o "
-            + "                                 ON e.encounter_id = o.encounter_id "
-            + "                            JOIN (SELECT p.patient_id, "
-            + "                                         Max(e.encounter_datetime) AS last_date "
-            + "                                  FROM   patient p "
-            + "                                             JOIN encounter e "
-            + "                                                  ON p.patient_id = e.patient_id "
-            + "                                  WHERE  p.voided = 0 "
-            + "                                    AND e.voided = 0 "
-            + "                                    AND e.location_id = :location "
-            + "                                    AND e.encounter_type = ${6} "
-            + "                                    AND e.encounter_datetime >= :revisionStartDate "
-            + "                                    AND e.encounter_datetime <= :revisionEndDate "
-            + "                                  GROUP BY p.patient_id) last_clinical "
-            + "                                ON last_clinical.patient_id = p.patient_id "
-            + "                 WHERE  p.voided = 0 "
-            + "                   AND e.voided = 0 "
-            + "                   AND e.location_id = :location "
-            + "                   AND e.encounter_type = ${6} "
-            + "                   AND e.encounter_datetime = last_clinical.last_date "
-            + "                   AND o.voided = 0 "
-            + "                   AND o.concept_id = ${6273} "
-            + "                   AND o.value_coded = ${1706} "
-            + "                 GROUP  BY p.patient_id "
-            + "                UNION "
-            + "                SELECT p.patient_id, "
-            + "                       Max(o.obs_datetime) AS last_date "
+        "SELECT transferout.patient_id "
+            + "        FROM   (SELECT p.patient_id, "
+            + "                       last_registed_clinical.last_date_registed AS max_date "
             + "                FROM   patient p "
             + "                       JOIN encounter e "
             + "                         ON p.patient_id = e.patient_id "
             + "                       JOIN obs o "
             + "                         ON e.encounter_id = o.encounter_id "
+            + "                       JOIN (SELECT p.patient_id, "
+            + "                                    Max(e.encounter_datetime) AS "
+            + "                                    last_date_registed "
+            + "                             FROM   patient p "
+            + "                                    JOIN encounter e "
+            + "                                      ON p.patient_id = e.patient_id "
+            + "                                    JOIN obs o "
+            + "                                      ON e.encounter_id = o.encounter_id "
+            + "                             WHERE  p.voided = 0 "
+            + "                                    AND e.voided = 0 "
+            + "                                    AND o.voided = 0 "
+            + "                                    AND e.location_id = :location "
+            + "                                    AND e.encounter_type = ${6} "
+            + "                                    AND e.encounter_datetime >= "
+            + "                                        :revisionStartDate "
+            + "                                    AND e.encounter_datetime <= :revisionEndDate "
+            + "                                    AND o.concept_id = ${6273} "
+            + "                                    AND o.value_coded IS NOT NULL "
+            + "                             GROUP  BY p.patient_id) last_registed_clinical "
+            + "                         ON last_registed_clinical.patient_id = p.patient_id "
             + "                WHERE  p.voided = 0 "
             + "                       AND e.voided = 0 "
             + "                       AND e.location_id = :location "
-            + "                       AND e.encounter_type = ${53} "
-            + "                       AND o.obs_datetime >= :revisionStartDate "
-            + "                       AND o.obs_datetime <= :revisionEndDate "
+            + "                       AND e.encounter_type = ${6} "
+            + "                       AND e.encounter_datetime = "
+            + "                           last_registed_clinical.last_date_registed "
             + "                       AND o.voided = 0 "
+            + "                       AND o.concept_id = ${6273} "
+            + "                       AND o.value_coded = ${1706} "
+            + "                GROUP  BY p.patient_id "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       last_registed_resumo.last_date_registed AS last_date "
+            + "                FROM   patient p "
+            + "                       JOIN encounter e "
+            + "                         ON p.patient_id = e.patient_id "
+            + "                       JOIN obs o "
+            + "                         ON e.encounter_id = o.encounter_id "
+            + "                       JOIN (SELECT p.patient_id, "
+            + "                                    Max(o.obs_datetime) AS last_date_registed "
+            + "                             FROM   patient p "
+            + "                                    JOIN encounter e "
+            + "                                      ON p.patient_id = e.patient_id "
+            + "                                    JOIN obs o "
+            + "                                      ON e.encounter_id = o.encounter_id "
+            + "                             WHERE  p.voided = 0 "
+            + "                                    AND e.voided = 0 "
+            + "                                    AND o.voided = 0 "
+            + "                                    AND e.location_id = :location "
+            + "                                    AND e.encounter_type = ${53} "
+            + "                                    AND o.obs_datetime >= "
+            + "                                        :revisionStartDate "
+            + "                                    AND o.obs_datetime <= :revisionEndDate "
+            + "                                    AND o.concept_id = ${6272} "
+            + "                                    AND o.value_coded IS NOT NULL "
+            + "                             GROUP  BY p.patient_id) last_registed_resumo "
+            + "                         ON last_registed_resumo.patient_id = p.patient_id "
+            + "                WHERE  p.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND o.voided = 0 "
+            + "                       AND e.location_id = :location "
+            + "                       AND e.encounter_type = ${53} "
+            + "                       AND o.obs_datetime = "
+            + "                           last_registed_resumo.last_date_registed "
             + "                       AND o.concept_id = ${6272} "
             + "                       AND o.value_coded = ${1706} "
-            + "                GROUP  BY p.patient_id) transferout "
-            + "        GROUP  BY transferout.patient_id) max_transferout ";
+            + "                GROUP  BY p.patient_id) transferout ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
