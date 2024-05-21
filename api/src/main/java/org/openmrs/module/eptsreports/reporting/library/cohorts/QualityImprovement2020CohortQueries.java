@@ -8460,7 +8460,7 @@ public class QualityImprovement2020CohortQueries {
                 hivMetadata.getYesConcept().getConceptId(),
                 hivMetadata.getApplicationForLaboratoryResearch().getConceptId(),
                 hivMetadata.getCD4AbsoluteOBSConcept().getConceptId()),
-            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},location=${location}"));
 
     cd.addSearch(
         "resultCd4ForPregnant",
@@ -8468,7 +8468,7 @@ public class QualityImprovement2020CohortQueries {
             getCd4ResultAfterFirstConsultationOfPregnancy(
                 commonMetadata.getPregnantConcept().getConceptId(),
                 hivMetadata.getYesConcept().getConceptId()),
-            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
+            inclusionPeriodMappings));
 
     if (flag == 5) {
       cd.setCompositionString("(pregnantOnPeriod AND requestCd4ForPregnant) AND NOT transferredIn");
