@@ -1276,7 +1276,7 @@ public class ResumoMensalQueries {
             + "                      AND        e.voided = 0 "
             + "                      AND        o.voided = 0 "
             + "                      AND        e.encounter_type = ${53} "
-            + "                      AND        e.encounter_datetime <= :onOrBefore "
+            + "                      AND        o.obs_datetime <= :onOrBefore "
             + "                      AND        e.location_id = :location "
             + "                      AND        o.concept_id = ${6272} "
             + "                      GROUP BY   p.patient_id) max_resumo_state "
