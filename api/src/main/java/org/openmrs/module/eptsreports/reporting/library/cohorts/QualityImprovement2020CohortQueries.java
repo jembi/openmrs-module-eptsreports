@@ -9061,7 +9061,8 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition alreadyMds = getPatientsAlreadyEnrolledInTheMdc();
     CohortDefinition onTB = commonCohortQueries.getPatientsOnTbTreatment();
     CohortDefinition onSK = getPatientsWithSarcomaKarposi();
-    CohortDefinition returned = eriDSDCohortQueries.getPatientsWhoReturned();
+    CohortDefinition returned = getPatientsWhoReturned();
+    CohortDefinition endTb = getPatientsWhoEndedTbTreatmentWithin30DaysOfLastClinicalConslutation();
 
     cd.addSearch(
         "A",
@@ -9124,9 +9125,12 @@ public class QualityImprovement2020CohortQueries {
         "AGE",
         EptsReportUtils.map(
             ageCohortQueries.createXtoYAgeCohort("Ages", 2, 200), "effectiveDate=${endDate}"));
+    cd.addSearch(
+        "endTb",
+        EptsReportUtils.map(endTb, "revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.setCompositionString(
-        "A AND B1 AND NOT (C OR D OR F OR G OR MDS OR onTB OR adverseReaction OR onSK OR returned) AND AGE");
+        "A AND B1 AND NOT (C OR D OR F OR G OR MDS OR onTB OR endTb OR adverseReaction OR onSK OR returned) AND AGE");
 
     return cd;
   }
@@ -13334,6 +13338,75 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
+   * <b>Utentes que terminaram tratamento de TB há menos de 30 dias (Exclusão)</b>
+   *
+   * <p>O sistema irá identificar todos os utentes que terminaram o tratamento de TB há menos de 30
+   * dias, seleccionando:
+   *
+   * <ul>
+   *   <li>Todos os utentes com último registo de Tratamento TB= Fim (F), com respectiva data de fim
+   *       de tratamento (“Data Fim TB”) numa consulta clínica (Ficha Clínica- MasterCard) ocorrida
+   *       até a data fim de revisão e.</i>
+   *   <li>Sendo esta “Data Fim TB” ocorrida há menos de 30 dias da última consulta do período de
+   *       revisão (“Data Última Consulta”), ou seja, “Data Última Consulta” menos (-) “Última
+   *       Consulta Fim TB” <= 30 dias.</i>
+   *       <p><b>Nota:</b> A “Data Última Consulta” é a última “Data de Consulta” no período de
+   *       revisão.
+   * </ul>
+   */
+  public CohortDefinition getPatientsWhoEndedTbTreatmentWithin30DaysOfLastClinicalConslutation() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes que terminaram tratamento de TB há menos de 30 dias");
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1268", hivMetadata.getTBTreatmentPlanConcept().getConceptId());
+    map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "           INNER JOIN (SELECT p.patient_id, "
+            + "                              Max(o.obs_datetime) AS last_tb_end "
+            + "                       FROM   patient p "
+            + "                                  INNER JOIN encounter e "
+            + "                                             ON e.patient_id = p.patient_id "
+            + "                                  INNER JOIN obs o "
+            + "                                             ON o.encounter_id = e.encounter_id "
+            + "                       WHERE  p.voided = 0 "
+            + "                         AND e.voided = 0 "
+            + "                         AND o.voided = 0 "
+            + "                         AND e.encounter_type = ${6} "
+            + "                         AND e.location_id = :location "
+            + "                         AND o.concept_id = ${1268} "
+            + "                         AND o.value_coded = ${1267} "
+            + "                       GROUP  BY p.patient_id) tb_end "
+            + "                      ON tb_end.patient_id = p.patient_id "
+            + "           INNER JOIN (SELECT p.patient_id, "
+            + "                              Max(e.encounter_datetime) AS max_consult "
+            + "                       FROM   patient p "
+            + "                                  INNER JOIN encounter e "
+            + "                                             ON e.patient_id = p.patient_id "
+            + "                       WHERE  p.voided = 0 "
+            + "                         AND e.voided = 0 "
+            + "                         AND e.encounter_type = ${6} "
+            + "                         AND e.location_id = :location "
+            + "                         AND e.encounter_datetime <= :revisionEndDate "
+            + "                       GROUP  BY p.patient_id) last_consult "
+            + "                      ON last_consult.patient_id = p.patient_id "
+            + "WHERE  Timestampdiff(day, last_consult.max_consult, tb_end.last_tb_end) <= 30";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
    * <b>RF27: Utentes reinicios TARV</b>
    *
    * <p>Incluindo todos os utentes que tiveram registo de “Mudança de E stado de Permanência” =
@@ -13805,5 +13878,71 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.setQuery(sb.replace(query));
 
     return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Utentes que reiniciaram o TARV nos últimos 3 meses</b>
+   *
+   * <p>O sistema irá identificar os utentes que reiniciaram o tratamento TARV nos últimos 3 meses,
+   * da seguinte forma:
+   *
+   * <ul>
+   *   <li>De todos os utentes activos em TARV “Data Fim Revisão” seguindo os critérios definidos no
+   *       “Resumo Mensal de HIV/SIDA” Indicador B13, o sistema irá filtrar utentes que
+   *   <li>tiveram interrupção no tratamento 3 meses antes do fim do período de revisão (“Data fim
+   *       de revisão” menos (-) 3 meses) (FR49) e
+   *   <li>tiveram pelo menos 1 registo de levantamento no “FILA” ou na “Ficha Recepção - Levantou
+   *       ARV” nos últimos 3 meses do fim do períodio (“Data de levantamento ” >= “Data Fim
+   *       Revisão” menos (–) 3 meses e <= “Data Fim Revisão”)
+   * </ul>
+   *
+   * O sistema irá excluir:
+   *
+   * <ul>
+   *   <li>Utentes Transferidos de outras Unidades Sanitárias
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsWhoReturned() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Patients who returned to treatment");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
+
+    cd.addSearch(
+        "treatmentInterruption",
+        EptsReportUtils.map(
+            eriDSDCohortQueries.getPatientsWhoExperiencedInterruptionInTreatment(),
+            "endDate=${endDate-3m},location=${location}"));
+
+    cd.addSearch(
+        "filaOrDrugPickup",
+        EptsReportUtils.map(
+            eriDSDCohortQueries.getFilaOrDrugPickup(), "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "transferredIn",
+        EptsReportUtils.map(
+            transferredIn, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "B13",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13(),
+            "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "(B13 and treatmentInterruption AND filaOrDrugPickup) AND NOT transferredIn");
+
+    return cd;
   }
 }

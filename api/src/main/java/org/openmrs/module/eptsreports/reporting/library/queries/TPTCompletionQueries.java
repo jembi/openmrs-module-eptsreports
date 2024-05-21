@@ -85,7 +85,7 @@ public class TPTCompletionQueries {
         + "      AND ( o.concept_id = ${23985}  "
         + "        AND o.value_coded IN ( ${656}, ${23982} ) )  "
         + "      and o2.concept_id = ${23987}  "
-        + "      and o2.value_coded not in (${1256},${1705}, ${1257})  "
+        + "      and o2.value_coded in (${1256},${1705}, ${1257})  "
         + ") and o2.concept_id != ${23987} "
         + "                       ) filt "
         + "WHERE      filt.patient_id NOT IN "
