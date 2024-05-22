@@ -4679,6 +4679,52 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   }
 
   /**
+   * <b>Utentes Activos em TARV</b>
+   * <li>Iniciaram TARV até o fim do período de avaliação, ou seja, com registo do Início TARV
+   *     Excluindo todos os utentes:
+   * <li>Abandonos em TARV
+   * <li>Transferidos Para Outra US
+   * <li>Suspensos em TARV
+   * <li>Óbitos
+   * <li>Reinícios
+   *
+   * @return {@link String}
+   */
+  public String getPatientsActiveOnTarv() {
+    return "SELECT  final.patient_id, 'Activo' "
+        + "FROM "
+        + "    ( "
+        + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
+        + " ) final "
+        + "WHERE final.patient_id NOT IN ("
+        + new EptsQueriesUtil()
+            .unionBuilder(
+                listOfPatientsOnAdvancedHivIllnessQueries.getPatientsWhoAbandonedTarvQuery(false))
+            .union(
+                listOfPatientsOnAdvancedHivIllnessQueries
+                    .getPatientsWhoSuspendedTarvOrAreTransferredOut(
+                        hivMetadata
+                            .getSuspendedTreatmentWorkflowState()
+                            .getProgramWorkflowStateId(),
+                        hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
+                        true,
+                        true))
+            .union(
+                listOfPatientsOnAdvancedHivIllnessQueries
+                    .getPatientsWhoSuspendedTarvOrAreTransferredOut(
+                        hivMetadata
+                            .getSuspendedTreatmentWorkflowState()
+                            .getProgramWorkflowStateId(),
+                        hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
+                        false,
+                        true))
+            .union(listOfPatientsOnAdvancedHivIllnessQueries.getPatientsWhoDied(false))
+            .buildQuery()
+        + "     ) "
+        + "GROUP BY final.patient_id ";
+  }
+
+  /**
    * <b> Estado de permanência no 12˚ mês de TARV- B.18 </b>
    * <li>Resposta = “Abandono”, os utentes em TARV que abandonaram o tratamento
    * <li>Resposta = “Óbito”, os utentes em TARV que foram óbito
@@ -4747,7 +4793,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             .union(
                 listOfPatientsWithMdsEvaluationQueries
                     .getPatientsWhoHaveTransferredOutAsPermananceState())
-            .union(listOfPatientsOnAdvancedHivIllnessQueries.getPatientsActiveOnTarv())
+            .union(getPatientsActiveOnTarv())
             .buildQuery();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
