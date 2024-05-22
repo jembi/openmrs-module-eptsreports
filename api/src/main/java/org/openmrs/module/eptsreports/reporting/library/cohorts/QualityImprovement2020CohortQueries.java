@@ -2886,7 +2886,7 @@ public class QualityImprovement2020CohortQueries {
 
     if (indicatorFlag == 3) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND (B1 OR D)) AND NOT B1E AND NOT (C OR F) AND ADULT");
+          "(A AND (ADULT OR D)) AND B1 NOT (B1E OR C OR F)");
     }
     if (indicatorFlag == 4) {
       compositionCohortDefinition.setCompositionString(
