@@ -1141,7 +1141,7 @@ public class QualityImprovement2020Queries {
             + "                                AND e.voided = 0   "
             + "                                AND o.voided = 0      "
             + "                                AND o.concept_id = ${856}   "
-            + "                                AND o.value_numeric >= "
+            + "                                AND o.value_numeric > "
             + vlQuantity
             + "                                AND ( e.encounter_type = ${6} AND e.encounter_datetime BETWEEN :startDate AND :endDate) "
             + "                                AND e.location_id = :location   "
@@ -2664,6 +2664,26 @@ public class QualityImprovement2020Queries {
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
+  }
+
+  public static String getArtStartDate() {
+    return "SELECT p.patient_id, "
+        + "                                             Min(value_datetime) art_date "
+        + "                                      FROM   patient p "
+        + "                                                 INNER JOIN encounter e "
+        + "                                                            ON p.patient_id = e.patient_id "
+        + "                                                 INNER JOIN obs o "
+        + "                                                            ON e.encounter_id = "
+        + "                                                               o.encounter_id "
+        + "                                      WHERE  p.voided = 0 "
+        + "                                        AND e.voided = 0 "
+        + "                                        AND o.voided = 0 "
+        + "                                        AND e.encounter_type = ${53} "
+        + "                                        AND o.concept_id = ${1190} "
+        + "                                        AND o.value_datetime IS NOT NULL "
+        + "                                        AND o.value_datetime <= :endDate "
+        + "                                        AND e.location_id = :location "
+        + "                                      GROUP  BY p.patient_id";
   }
 
   /**

@@ -82,6 +82,10 @@ public class QualityImprovement2020CohortQueries {
       "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}";
   private final String MAPPING11 =
       "revisionStartDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}";
+  private final String MAPPING12 =
+      "revisionStartDate=${revisionEndDate-5m+1d},revisionEndDate=${revisionEndDate},location=${location}";
+  private final String MAPPING13 =
+      "revisionStartDate=${revisionEndDate-4m+1d},revisionEndDate=${revisionEndDate},location=${location}";
 
   @Autowired
   public QualityImprovement2020CohortQueries(
@@ -2665,7 +2669,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transfOut = getTranferredOutPatients();
+    CohortDefinition transfOut = getTranferredOutPatientsCat7();
 
     if (reportSource.equals(MIMQ.MQ)) {
       compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
@@ -2684,11 +2688,16 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING11));
+      compositionCohortDefinition.addSearch(
+          "ADULT",
+          EptsReportUtils.map(
+              genericCohortQueries.getPatientAgeBasedOnFirstViralLoadDate(15, 200),
+              "startDate=${startDate},endDate=${endDate},location=${location}"));
     } else if (reportSource.equals(MIMQ.MI)) {
 
       if (indicatorFlag == 1) {
-        compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING5));
+        compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING12));
       }
       if (indicatorFlag == 1 || indicatorFlag == 3 || indicatorFlag == 5 || indicatorFlag == 6) {
         compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING4));
@@ -2711,13 +2720,19 @@ public class QualityImprovement2020CohortQueries {
         compositionCohortDefinition.addSearch(
             "B5", EptsReportUtils.map(breastfeedingWithCargaViralHigherThan1000, MAPPING8));
 
+        compositionCohortDefinition.addSearch(
+            "ADULT",
+            EptsReportUtils.map(
+                genericCohortQueries.getPatientAgeBasedOnFirstViralLoadDate(15, 200),
+                "startDate=${startDate},endDate=${endDate},location=${location}"));
+
         compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
         compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
         compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING7));
-        compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING9));
+        compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING13));
       }
       if (indicatorFlag == 3 || indicatorFlag == 5 || indicatorFlag == 6) {
-        compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING5));
+        compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING12));
       }
     }
 
@@ -2728,7 +2743,8 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.setCompositionString("A AND NOT (C OR D OR E OR F)");
     }
     if (indicatorFlag == 2) {
-      compositionCohortDefinition.setCompositionString("((B2 AND (B1 OR B5)) AND NOT (B4 OR F))");
+      compositionCohortDefinition.setCompositionString(
+          "((B2 AND (ADULT OR B5) AND B1) AND NOT (B4 OR F))");
     }
     if (indicatorFlag == 7) {
       compositionCohortDefinition.setCompositionString("((B1 AND B2) AND NOT (B4 OR B5 OR F))");
@@ -3269,7 +3285,7 @@ public class QualityImprovement2020CohortQueries {
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
             + "       AND o.value_coded = ${21150} "
-            + "       AND e.encounter_type = ${6};  ";
+            + "       AND e.encounter_type = ${6}";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -3418,6 +3434,263 @@ public class QualityImprovement2020CohortQueries {
             + "  AND e.encounter_datetime BETWEEN DATE_ADD(art_start.art_date, INTERVAL ${minDays} DAY) "
             + "    AND DATE_ADD(art_start.art_date, INTERVAL ${maxDays} DAY) "
             + "GROUP  BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   *
+   * <li>Primeira consulta de APSS/PP após a Data Início TARV, ocorrida entre 20 a 33 dias após o
+   *     início TARV (1ª “Data Consulta APSS/PP” >= “Data Início TARV” +20 Dias e <= “Data Início
+   *     TARV” + 33dias) e
+   *
+   * @param minDays minimum number of days to check after Art Start Date
+   * @param maxDays maximum number of days to check after Art Start Date
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition get1stApssBetween20and33DaysAfterArtStart(
+      Integer minDays, Integer maxDays) {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "Primeira consulta de APSS/PP após a Data Início TARV, ocorrida entre 20 a 33 dias após o início TARV");
+
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getHistoricalDrugStartDateConcept().getConceptId());
+    map.put("minDays", minDays);
+    map.put("maxDays", maxDays);
+
+    String query =
+        "SELECT first_apss.patient_id "
+            + "FROM  (SELECT p.patient_id, "
+            + "              Min(e.encounter_datetime) AS first_encounter "
+            + "       FROM   patient p "
+            + "                  INNER JOIN encounter e "
+            + "                             ON p.patient_id = e.patient_id "
+            + "                  INNER JOIN (SELECT patient_id, "
+            + "                                     art.art_date "
+            + "                              FROM   ("
+            + QualityImprovement2020Queries.getArtStartDate()
+            + ") art "
+            + "                              WHERE  art.art_date BETWEEN :startDate AND :endDate) "
+            + "           art_start "
+            + "                             ON art_start.patient_id = p.patient_id "
+            + "       WHERE  p.voided = 0 "
+            + "         AND e.voided = 0 "
+            + "         AND e.encounter_type = ${35} "
+            + "         AND e.location_id = :location "
+            + "         AND e.encounter_datetime > art_start.art_date "
+            + "       GROUP  BY p.patient_id) first_apss "
+            + "          INNER JOIN (SELECT patient_id, "
+            + "                             art.art_date "
+            + "                      FROM   ("
+            + QualityImprovement2020Queries.getArtStartDate()
+            + ") art "
+            + "                      WHERE  art.art_date BETWEEN :startDate AND :endDate) art_start "
+            + "                     ON art_start.patient_id = first_apss.patient_id "
+            + "WHERE  first_apss.first_encounter BETWEEN Date_add(art_start.art_date, INTERVAL "
+            + "                                                   ${minDays} day) "
+            + "           AND "
+            + "           Date_add(art_start.art_date, INTERVAL "
+            + "                    ${maxDays} day)";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   *
+   * <li>Pelo menos uma consulta de APSS/PP, ocorrida entre 20 a 33 dias após o a primeira consulta
+   *     de APSS/PP (2ª “Data Consulta APSS/PP” >= 1ª “Data Consulta APSS/PP” +20 Dias e <= 1ª “Data
+   *     Consulta APSS/PP” + 33dias)<b>Nota: caso existir mais que uma consulta de APSS/PP no
+   *     período compreendido entre 20 e 33 dias após a primeira consulta de APSS/PP, considerar a
+   *     primeira ocorrência neste período como 2ª “Data Consulta APSS/PP”.</b>
+   *
+   * @param minDays minimum number of days to check after Art Start Date
+   * @param maxDays maximum number of days to check after Art Start Date
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition get2ndApssBetween20and33DaysAfterArtStart(
+      Integer minDays, Integer maxDays) {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "Segunda consulta de APSS/PP após a Data Início TARV, ocorrida entre 20 a 33 dias após o início TARV");
+
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getHistoricalDrugStartDateConcept().getConceptId());
+    map.put("minDays", minDays);
+    map.put("maxDays", maxDays);
+
+    String query =
+        "SELECT second_apss.patient_id "
+            + "FROM   ( "
+            + "                  SELECT     p.patient_id, "
+            + "                             Min(e.encounter_datetime) AS second_encounter "
+            + "                  FROM       patient p "
+            + "                  INNER JOIN encounter e "
+            + "                  ON         p.patient_id = e.patient_id "
+            + "                  INNER JOIN "
+            + "                             ( "
+            + "                                        SELECT     first_apss.patient_id, "
+            + "                                                   first_apss.first_encounter "
+            + "                                        FROM       ( "
+            + "                                                              SELECT     p.patient_id, "
+            + "                                                                         Min(e.encounter_datetime) AS first_encounter "
+            + "                                                              FROM       patient p "
+            + "                                                              INNER JOIN encounter e "
+            + "                                                              ON         p.patient_id = e.patient_id "
+            + "                                                              INNER JOIN ( "
+            + "                                                                                SELECT patient_id, "
+            + "                                                                    art.art_date "
+            + "                                                             FROM ( "
+            + QualityImprovement2020Queries.getArtStartDate()
+            + "                                                                     ) art "
+            + "                                                                                WHERE  art.art_date BETWEEN :startDate AND    :endDate) art_start "
+            + "                                                              ON         art_start.patient_id = p.patient_id "
+            + "                                                              WHERE      p.voided = 0 "
+            + "                                                              AND        e.voided = 0 "
+            + "                                                              AND        e.encounter_type = ${35} "
+            + "                                                              AND        e.location_id = :location "
+            + "                                                              AND        e.encounter_datetime > art_start.art_date "
+            + "                                                              GROUP BY   p.patient_id) first_apss "
+            + "                                        INNER JOIN ( "
+            + "                                                                                SELECT patient_id, "
+            + "                                                                    art.art_date "
+            + "                                                             FROM ( "
+            + QualityImprovement2020Queries.getArtStartDate()
+            + "                                                                     ) art "
+            + "                                                          WHERE  art.art_date BETWEEN :startDate AND    :endDate) art_start "
+            + "                                        ON         art_start.patient_id = first_apss.patient_id "
+            + "                                        WHERE      first_apss.first_encounter BETWEEN date_add( art_start.art_date, INTERVAL ${minDays} day) AND        date_add(art_start.art_date, INTERVAL ${maxDays} day)) first_apss "
+            + "                  ON         first_apss.patient_id = p.patient_id "
+            + "                  WHERE      p.voided = 0 "
+            + "                  AND        e.voided = 0 "
+            + "                  AND        e.encounter_type = ${35} "
+            + "                  AND        e.location_id = :location "
+            + "                  AND        e.encounter_datetime > first_apss.first_encounter "
+            + "                  AND        e.encounter_datetime BETWEEN date_add(first_apss.first_encounter, INTERVAL ${minDays} day) AND        date_add(first_apss.first_encounter, INTERVAL ${maxDays} day) "
+            + "                  GROUP BY   p.patient_id) second_apss";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   *
+   * <li>Pelo menos uma consulta de APSS/PP, ocorrida entre 20 a 33 dias após o a segunda consulta
+   *     de APSS/PP registada no ponto anterior (3ª “Data Consulta APSS/PP” >= 2ª “Data Consulta
+   *     APSS/PP” +20 Dias e <= 2ª “Data Consulta APSS/PP” + 33dias).</b>
+   * <li><b>Nota:</b>“Data Início TARV” é a data definida segundo os critérios do RF5.
+   *
+   * @param minDays minimum number of days to check after Art Start Date
+   * @param maxDays maximum number of days to check after Art Start Date
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition get3rdApssBetween20and33DaysAfterArtStart(
+      Integer minDays, Integer maxDays) {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "Terceira consulta de APSS/PP após a Data Início TARV, ocorrida entre 20 a 33 dias após o início TARV");
+
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getHistoricalDrugStartDateConcept().getConceptId());
+    map.put("minDays", minDays);
+    map.put("maxDays", maxDays);
+
+    String query =
+        "SELECT third_apss.patient_id "
+            + "FROM   ( "
+            + "                  SELECT     p.patient_id, "
+            + "                             Min(e.encounter_datetime) AS third_encounter "
+            + "                  FROM       patient p "
+            + "                  INNER JOIN encounter e "
+            + "                  ON         p.patient_id = e.patient_id "
+            + "                  INNER JOIN "
+            + "                             ( "
+            + "                                        SELECT     p.patient_id, "
+            + "                                                   Min(e.encounter_datetime) AS second_encounter "
+            + "                                        FROM       patient p "
+            + "                                        INNER JOIN encounter e "
+            + "                                        ON         p.patient_id = e.patient_id "
+            + "                                        INNER JOIN "
+            + "                                                   ( "
+            + "                                                              SELECT     first_apss.patient_id, "
+            + "                                                                         first_apss.first_encounter "
+            + "                                                              FROM       ( "
+            + "                                                                                    SELECT     p.patient_id, "
+            + "                                                                                               Min(e.encounter_datetime) AS first_encounter "
+            + "                                                                                    FROM       patient p "
+            + "                                                                                    INNER JOIN encounter e "
+            + "                                                                                    ON         p.patient_id = e.patient_id "
+            + "                                                                                    INNER JOIN ( "
+            + "                                                                                SELECT patient_id, "
+            + "                                                                    art.art_date "
+            + "                                                             FROM ( "
+            + QualityImprovement2020Queries.getArtStartDate()
+            + "                                                                     ) art "
+            + "                                                                                                      WHERE  art.art_date BETWEEN :startDate AND    :endDate) art_start "
+            + "                                                                                    ON         art_start.patient_id = p.patient_id "
+            + "                                                                                    WHERE      p.voided = 0 "
+            + "                                                                                    AND        e.voided = 0 "
+            + "                                                                                    AND        e.encounter_type = ${35} "
+            + "                                                                                    AND        e.location_id = :location "
+            + "                                                                                    AND        e.encounter_datetime > art_start.art_date "
+            + "                                                                                    GROUP BY   p.patient_id) first_apss "
+            + "                                                              INNER JOIN ( "
+            + "                                                                                SELECT patient_id, "
+            + "                                                                    art.art_date "
+            + "                                                             FROM ( "
+            + QualityImprovement2020Queries.getArtStartDate()
+            + "                                                                     ) art "
+            + "                                                                                WHERE  art.art_date BETWEEN :startDate AND    :endDate ) art_start "
+            + "                                                              ON         art_start.patient_id = first_apss.patient_id "
+            + "                                                              WHERE      first_apss.first_encounter BETWEEN date_add( art_start.art_date, INTERVAL ${minDays} day) AND        date_add(art_start.art_date, INTERVAL ${maxDays} day)) first_apss "
+            + "                                        ON         first_apss.patient_id = p.patient_id "
+            + "                                        WHERE      p.voided = 0 "
+            + "                                        AND        e.voided = 0 "
+            + "                                        AND        e.encounter_type = ${35} "
+            + "                                        AND        e.location_id = :location "
+            + "                                        AND        e.encounter_datetime > first_apss.first_encounter "
+            + "                                        AND        e.encounter_datetime BETWEEN date_add(first_apss.first_encounter, INTERVAL ${minDays} day ) AND        date_add(first_apss.first_encounter, INTERVAL ${maxDays} day ) "
+            + "                                        GROUP BY   p.patient_id) second_apss "
+            + "                  ON         second_apss.patient_id = p.patient_id "
+            + "                  WHERE      p.voided = 0 "
+            + "                  AND        e.voided = 0 "
+            + "                  AND        e.encounter_type = ${35} "
+            + "                  AND        e.location_id = :location "
+            + "                  AND        e.encounter_datetime > second_apss.second_encounter "
+            + "                  AND        e.encounter_datetime BETWEEN date_add(second_apss.second_encounter, INTERVAL ${minDays} day ) AND        date_add(second_apss.second_encounter, INTERVAL ${maxDays} day ) "
+            + "                  GROUP BY   p.patient_id) third_apss";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -3630,11 +3903,11 @@ public class QualityImprovement2020CohortQueries {
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition firstApss = getApssBetween20and33DaysAfterArtStart(20, 33);
+    CohortDefinition firstApss = get1stApssBetween20and33DaysAfterArtStart(20, 33);
 
-    CohortDefinition secondApss = getApssBetween20and33DaysAfterFirstApss(20, 33);
+    CohortDefinition secondApss = get2ndApssBetween20and33DaysAfterArtStart(20, 33);
 
-    CohortDefinition thirdApss = getApssBetween20and33DaysAfterSecondApss(20, 33);
+    CohortDefinition thirdApss = get3rdApssBetween20and33DaysAfterArtStart(20, 33);
 
     compositionCohortDefinition.addSearch(
         "firstApss",
@@ -4003,7 +4276,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition f = getTranferredOutPatients();
+    CohortDefinition f = getTranferredOutPatientsCat7();
     CohortDefinition g = getPatientsWith3MonthlyApssConsultationsWithin99Days();
 
     if (reportResource.equals(EptsReportConstants.MIMQ.MQ)) {
@@ -4011,14 +4284,14 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING11));
       compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING1));
     } else if (reportResource.equals(EptsReportConstants.MIMQ.MI)) {
       compositionCohortDefinition.addSearch("A", EptsReportUtils.map(a, MAPPING4));
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING6));
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING6));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING6));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING5));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING12));
       compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING10));
     }
 
@@ -4095,7 +4368,8 @@ public class QualityImprovement2020CohortQueries {
 
     if (reportSource.equals(EptsReportConstants.MIMQ.MQ)) {
       compositionCohortDefinition.addSearch(
-          "DENOMINATOR", EptsReportUtils.map(getMQC11DEN(3, EptsReportConstants.MIMQ.MQ), MAPPING));
+          "DENOMINATOR",
+          EptsReportUtils.map(getMQC11DEN(3, EptsReportConstants.MIMQ.MQ), MAPPING1));
       compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING1));
     } else if (reportSource.equals(EptsReportConstants.MIMQ.MI)) {
       compositionCohortDefinition.addSearch(
@@ -4154,7 +4428,7 @@ public class QualityImprovement2020CohortQueries {
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
 
-    CohortDefinition f = getTranferredOutPatients();
+    CohortDefinition f = getTranferredOutPatientsCat7();
     CohortDefinition h = getMQC11NH(true);
 
     if (reportSource.equals(EptsReportConstants.MIMQ.MQ)) {
@@ -4162,14 +4436,14 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("B4", EptsReportUtils.map(b4, MAPPING1));
       compositionCohortDefinition.addSearch("B5", EptsReportUtils.map(b5, MAPPING));
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING11));
       compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING));
     } else if (reportSource.equals(EptsReportConstants.MIMQ.MI)) {
       compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(b1, MAPPING8));
       compositionCohortDefinition.addSearch("B4", EptsReportUtils.map(b4, MAPPING8));
       compositionCohortDefinition.addSearch("B5", EptsReportUtils.map(b5, MAPPING8));
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING9));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING13));
       compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING8));
     }
 
@@ -4214,7 +4488,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getPatientFoundYesConcept().getConceptId(),
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
-    CohortDefinition f = getTranferredOutPatients();
+    CohortDefinition f = getTranferredOutPatientsCat7();
     CohortDefinition g = getPatientsWith3MonthlyApssConsultationsWithin99Days();
 
     if (reportSource.equals(EptsReportConstants.MIMQ.MQ)) {
@@ -4222,14 +4496,14 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING11));
       compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING1));
     } else if (reportSource.equals(EptsReportConstants.MIMQ.MI)) {
       compositionCohortDefinition.addSearch("A", EptsReportUtils.map(a, MAPPING4));
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING6));
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING6));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING6));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING5));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING12));
       compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING10));
     }
 
@@ -4274,7 +4548,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getPatientFoundYesConcept().getConceptId(),
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
-    CohortDefinition f = getTranferredOutPatients();
+    CohortDefinition f = getTranferredOutPatientsCat7();
     CohortDefinition i = getPatientWhoHadThreeApssAfterArtStart();
     CohortDefinition babies = genericCohortQueries.getAgeInMonths(0, 9);
 
@@ -4283,7 +4557,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING11));
       compositionCohortDefinition.addSearch(
           "I",
           EptsReportUtils.map(i, "startDate=${startDate},endDate=${endDate},location=${location}"));
@@ -4293,7 +4567,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING6));
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING6));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING6));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING5));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING12));
       compositionCohortDefinition.addSearch(
           "I",
           EptsReportUtils.map(
@@ -4346,7 +4620,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getBreastfeeding().getConceptId());
 
-    CohortDefinition f = getTranferredOutPatients();
+    CohortDefinition f = getTranferredOutPatientsCat7();
     CohortDefinition h = getMQC11NH();
 
     if (reportSource.equals(EptsReportConstants.MIMQ.MQ)) {
@@ -4354,14 +4628,14 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(b2, MAPPING1));
       compositionCohortDefinition.addSearch("B4", EptsReportUtils.map(b4, MAPPING));
       compositionCohortDefinition.addSearch("B5", EptsReportUtils.map(b5, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING11));
       compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING));
     } else if (reportSource.equals(EptsReportConstants.MIMQ.MI)) {
       compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(b1, MAPPING5));
       compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(b2, MAPPING8));
       compositionCohortDefinition.addSearch("B4", EptsReportUtils.map(b4, MAPPING8));
       compositionCohortDefinition.addSearch("B5", EptsReportUtils.map(b5, MAPPING8));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING9));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING13));
       compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING8));
     }
 
@@ -12530,11 +12804,11 @@ public class QualityImprovement2020CohortQueries {
   public CohortDefinition getTranferredOutPatients() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("All patients registered in encounter “Ficha Resumo-MasterCard”");
+    sqlCohortDefinition.setName("All patients registered as Transferred Out");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -12548,37 +12822,41 @@ public class QualityImprovement2020CohortQueries {
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
 
     String query =
-        " SELECT patient_id "
-            + "FROM   (SELECT transferout.patient_id, "
-            + "               Max(transferout.last_date) transferout_date "
-            + "        FROM   ( SELECT p.patient_id, "
-            + "                        last_clinical.last_date AS last_date "
-            + "                 FROM   patient p "
-            + "                            JOIN encounter e "
-            + "                                 ON p.patient_id = e.patient_id "
-            + "                            JOIN obs o "
-            + "                                 ON e.encounter_id = o.encounter_id "
-            + "                            JOIN (SELECT p.patient_id, "
-            + "                                         Max(e.encounter_datetime) AS last_date "
-            + "                                  FROM   patient p "
-            + "                                             JOIN encounter e "
-            + "                                                  ON p.patient_id = e.patient_id "
-            + "                                  WHERE  p.voided = 0 "
-            + "                                    AND e.voided = 0 "
-            + "                                    AND e.location_id = :location "
-            + "                                    AND e.encounter_type = ${6} "
-            + "                                    AND e.encounter_datetime <= :revisionEndDate "
-            + "                                  GROUP BY p.patient_id) last_clinical "
-            + "                                ON last_clinical.patient_id = p.patient_id "
-            + "                 WHERE  p.voided = 0 "
-            + "                   AND e.voided = 0 "
-            + "                   AND e.location_id = :location "
-            + "                   AND e.encounter_type = ${6} "
-            + "                   AND e.encounter_datetime = last_clinical.last_date "
-            + "                   AND o.voided = 0 "
-            + "                   AND o.concept_id = ${6273} "
-            + "                   AND o.value_coded = ${1706} "
-            + "                 GROUP  BY p.patient_id "
+        "SELECT transferred_out.patient_id "
+            + "        FROM   (SELECT p.patient_id, "
+            + "               last_clinical_state.last_date AS last_date "
+            + "                FROM   patient p "
+            + "                           JOIN encounter e "
+            + "                                ON p.patient_id = e.patient_id "
+            + "                           JOIN obs o "
+            + "                                ON e.encounter_id = o.encounter_id "
+            + "                           JOIN (SELECT p.patient_id, "
+            + "                                        Max(e.encounter_datetime) AS last_date "
+            + "                                 FROM   patient p "
+            + "                                            JOIN encounter e "
+            + "                                                 ON p.patient_id = e.patient_id "
+            + "                                            JOIN obs o "
+            + "                                                 ON e.encounter_id = o.encounter_id "
+            + "                                 WHERE  p.voided = 0 "
+            + "                                   AND e.voided = 0 "
+            + "                                   AND o.voided = 0 "
+            + "                                   AND e.location_id = :location "
+            + "                                   AND e.encounter_type = ${6} "
+            + "                                   AND e.encounter_datetime >= :startDate "
+            + "                                   AND e.encounter_datetime <= :revisionEndDate "
+            + "                                   AND o.concept_id = ${6273} "
+            + "                                   AND o.value_coded IS NOT NULL "
+            + "                                 GROUP  BY p.patient_id) last_clinical_state "
+            + "                                ON last_clinical_state.patient_id = p.patient_id "
+            + "                WHERE  p.voided = 0 "
+            + "                  AND e.voided = 0 "
+            + "                  AND e.location_id = :location "
+            + "                  AND e.encounter_type = ${6} "
+            + "                  AND e.encounter_datetime = last_clinical_state.last_date "
+            + "                  AND o.voided = 0 "
+            + "                  AND o.concept_id = ${6273} "
+            + "                  AND o.value_coded = ${1706} "
+            + "                GROUP  BY p.patient_id "
             + "                UNION "
             + "                SELECT p.patient_id, "
             + "                       Max(o.obs_datetime) AS last_date "
@@ -12589,14 +12867,14 @@ public class QualityImprovement2020CohortQueries {
             + "                         ON e.encounter_id = o.encounter_id "
             + "                WHERE  p.voided = 0 "
             + "                       AND e.voided = 0 "
+            + "                       AND o.voided = 0 "
             + "                       AND e.location_id = :location "
             + "                       AND e.encounter_type = ${53} "
+            + "                       AND o.obs_datetime >= :startDate "
             + "                       AND o.obs_datetime <= :revisionEndDate "
-            + "                       AND o.voided = 0 "
             + "                       AND o.concept_id = ${6272} "
             + "                       AND o.value_coded = ${1706} "
-            + "                GROUP  BY p.patient_id) transferout "
-            + "        GROUP  BY transferout.patient_id) max_transferout ";
+            + "                GROUP  BY p.patient_id) transferred_out ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
