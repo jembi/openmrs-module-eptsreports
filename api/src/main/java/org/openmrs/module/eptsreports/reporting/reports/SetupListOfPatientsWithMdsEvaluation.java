@@ -34,7 +34,7 @@ public class SetupListOfPatientsWithMdsEvaluation extends EptsDataExportManager 
 
   @Override
   public String getName() {
-    return "Lista De Pacientes com Avaliação da Implementação de MDS";
+    return "Relatório de Avaliação de MDS";
   }
 
   @Override
@@ -76,7 +76,7 @@ public class SetupListOfPatientsWithMdsEvaluation extends EptsDataExportManager 
           createXlsReportDesign(
               reportDefinition,
               "Template_MDS_v2.0.1.xls",
-              "Lista De Pacientes com Avaliação da Implementação de MDS",
+              "Relatório de Avaliação de MDS",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
