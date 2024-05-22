@@ -1735,7 +1735,7 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23986", typeDispensationTPTConceptUuid);
     map.put("1098", monthlyConcept);
     map.put("23720", quarterlyConcept);
-
+    map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
     map.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
     map.put("1705", hivMetadata.getRestartConcept().getConceptId());
     map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());

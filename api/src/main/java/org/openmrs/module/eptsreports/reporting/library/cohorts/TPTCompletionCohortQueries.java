@@ -583,6 +583,7 @@ public class TPTCompletionCohortQueries {
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("1705", hivMetadata.getRestartConcept().getConceptId());
+    valuesMap.put("1267", hivMetadata.getCompletedConcept().getConceptId());
 
     EptsQueriesUtil patientBuilder = new EptsQueriesUtil();
 
@@ -2408,6 +2409,7 @@ public class TPTCompletionCohortQueries {
     map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
     map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
+    map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
 
     EptsQueriesUtil unionBuilder = new EptsQueriesUtil();
 
@@ -2520,7 +2522,7 @@ public class TPTCompletionCohortQueries {
             + Y
             + " ) inh_start ON inh_start.patient_id = p.patient_id "
             + "       WHERE p.voided =0 AND e.voided = 0 AND o.voided=0 AND o2.voided=0 "
-            + "             AND e.encounter_type = ${53} "
+            + "             AND e.encounter_type = ${53} AND e.location_id = :location "
             + "             AND  (o.concept_id = ${23985} AND o.value_coded = ${656}) "
             + "             AND (o2.concept_id = ${165308} AND o2.value_coded = ${1267}) "
             + "             AND o2.obs_datetime BETWEEN DATE_ADD(inh_start.start_date, interval 173 day) "
