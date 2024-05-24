@@ -14247,4 +14247,91 @@ public class QualityImprovement2020CohortQueries {
 
     return cd;
   }
+
+  /**
+   * <b>Utentes Presuntivos de TB</b>
+   *
+   * <p>O sistema irá identificar utentes <b>presuntivos de TB</b> seleccionando:
+   *
+   * <ul>
+   *   <li>todos os utentes com registo de “Tem sintomas?” (TB) = “Sim” em uma consulta clínica
+   *       (Ficha Clínica) ocorrida durante o período de revisão; ou
+   *   <li>>todos os utentes com registo de algum sintoma FESTAC em uma consulta clínica (Ficha
+   *       Clínica) ocorrida durante o período de revisão;
+   *       <p>Nota 1: A “Data Presuntivo de TB” do utente é a data da consulta clínica (Ficha
+   *       clínica) com registo da primeira ocorrência (algum dos sintomas FESTAC) durante o período
+   *       de revisão dos critérios acima definidos.
+   *       <p>Nota 2: Os sintomas FESTAC incluem (Febre- F, Emagrecimento – E, Sudorese Noturna –S,
+   *       Tosse a mais de 2 semanas –T, Astenia –A, Contacto com TB- C e Adenopatia Cervical
+   *       Indolor)
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getUtentesPresuntivosDeTb() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes Presuntivos de TB");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23758", hivMetadata.getTBSymptomsConcept().getConceptId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("1766", tbMetadata.getObservationTB().getConceptId());
+    map.put("1763", tbMetadata.getFeverLastingMoraThan3Weeks().getConceptId());
+    map.put("1764", tbMetadata.getWeightLossOfMoreThan3KgInLastMonth().getConceptId());
+    map.put("1762", tbMetadata.getNightsWeatsLastingMoraThan3Weeks().getConceptId());
+    map.put("1760", tbMetadata.getCoughLastingMoraThan3Weeks().getConceptId());
+    map.put("23760", tbMetadata.getAsthenia().getConceptId());
+    map.put("1765", tbMetadata.getCohabitantBeingTreatedForTB().getConceptId());
+    map.put("161", tbMetadata.getLymphadenopathy().getConceptId());
+
+    String query =
+        "SELECT patient_id "
+            + "FROM   (SELECT p.patient_id, "
+            + "               Min(e.encounter_datetime) AS data_presuntivo_tb "
+            + "        FROM   patient p "
+            + "                   INNER JOIN encounter e "
+            + "                              ON e.patient_id = p.patient_id "
+            + "                   INNER JOIN obs o "
+            + "                              ON o.encounter_id = e.encounter_id "
+            + "        WHERE  p.voided = 0 "
+            + "          AND e.voided = 0 "
+            + "          AND o.voided = 0 "
+            + "          AND e.location_id = :location "
+            + "          AND e.encounter_datetime >= :startDate "
+            + "          AND e.encounter_datetime <= :endDate "
+            + "          AND e.encounter_type = ${6} "
+            + "          AND o.concept_id = ${23758} "
+            + "          AND o.value_coded = ${1065} "
+            + "        GROUP  BY p.patient_id "
+            + "        UNION "
+            + "        SELECT p.patient_id, "
+            + "               Min(e.encounter_datetime) AS data_sintoma_tb "
+            + "        FROM   patient p "
+            + "                   INNER JOIN encounter e "
+            + "                              ON e.patient_id = p.patient_id "
+            + "                   INNER JOIN obs o "
+            + "                              ON o.encounter_id = e.encounter_id "
+            + "        WHERE  p.voided = 0 "
+            + "          AND e.voided = 0 "
+            + "          AND o.voided = 0 "
+            + "          AND e.location_id = :location "
+            + "          AND e.encounter_datetime >= :startDate "
+            + "          AND e.encounter_datetime <= :endDate "
+            + "          AND e.encounter_type = ${6} "
+            + "          AND o.concept_id = ${1766} "
+            + "          AND o.value_coded IN ( ${1763}, ${1764}, ${1762}, ${1760}, "
+            + "                                 ${23760}, ${1765}, ${161} ) "
+            + "        GROUP  BY p.patient_id) presuntivo_tb";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
 }
