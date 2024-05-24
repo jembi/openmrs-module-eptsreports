@@ -2765,4 +2765,31 @@ public class QualityImprovement2020Queries {
         + "                              ${23760}, ${1765}, ${161} ) "
         + "GROUP  BY p.patient_id";
   }
+
+  /**
+   * todos os utentes com registo do <b>“Pedido de Xpert”</b> em uma <b>consulta clínica (Ficha
+   * Clínica) –</b> secção investigações pedidos laboratoriais, ocorrida durante o período de
+   * revisão (>= “Data Início Revisão” e <= “Data Fim Revisão”).
+   *
+   * @return {@link String}
+   */
+  public static String getPatientsWithPedidoDeXpert() {
+    return "SELECT p.patient_id, "
+        + "       Min(e.encounter_datetime) AS data_pedido_genexpert "
+        + "FROM   patient p "
+        + "           INNER JOIN encounter e "
+        + "                      ON e.patient_id = p.patient_id "
+        + "           INNER JOIN obs o "
+        + "                      ON o.encounter_id = e.encounter_id "
+        + "WHERE  p.voided = 0 "
+        + "  AND e.voided = 0 "
+        + "  AND o.voided = 0 "
+        + "  AND e.location_id = :location "
+        + "  AND e.encounter_datetime >= :startDate "
+        + "  AND e.encounter_datetime <= :endDate "
+        + "  AND e.encounter_type = ${6} "
+        + "  AND o.concept_id = ${23722} "
+        + "  AND o.value_coded = ${23723} "
+        + "GROUP  BY p.patient_id";
+  }
 }
