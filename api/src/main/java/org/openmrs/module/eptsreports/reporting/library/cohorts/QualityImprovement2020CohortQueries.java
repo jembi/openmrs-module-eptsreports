@@ -14334,4 +14334,62 @@ public class QualityImprovement2020CohortQueries {
 
     return sqlCohortDefinition;
   }
+
+  /**
+   * <b>Utentes com Pedido de Xpert</b>
+   *
+   * <p>O sistema irá identificar utentes com registo de <b>Pedido de teste Xpert</b> durante o
+   * período de revisão, selecionando:
+   *
+   * <ul>
+   *   <li>todos os utentes com registo do <b>“Pedido de Xpert”</b> em uma <b>consulta clínica
+   *       (Ficha Clínica) –</b> secção investigações pedidos laboratoriais, ocorrida durante o
+   *       período de revisão (>= “Data Início Revisão” e <= “Data Fim Revisão”).
+   *       <p>Nota 1: A “Data Presuntivo de TB” do utente é a data da consulta clínica (Ficha
+   *       clínica) com registo da primeira ocorrência (algum dos sintomas FESTAC) durante o período
+   *       de revisão dos critérios acima definidos.
+   *       <p><b>Nota 1:</b> em caso de existência de mais de uma consulta clínica com registo de
+   *       pedido de teste Xpert, o sistema irá considerar a <b>primeira</b> ocorrência durante o
+   *       período de revisão como <b>“Data Pedido de Xpert”.</b>
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getUtentesComPedidoDeXpert() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes com Pedido de Xpert");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    map.put("23723", tbMetadata.getTBGenexpertTestConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_datetime >= :startDate "
+            + "       AND e.encounter_datetime <= :endDate "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND o.concept_id = ${23722} "
+            + "       AND o.value_coded = ${23723} "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
 }
