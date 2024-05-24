@@ -2712,4 +2712,57 @@ public class QualityImprovement2020Queries {
         + "  AND o.value_coded = ${1705} "
         + "GROUP  BY p.patient_id ";
   }
+
+  /**
+   * todos os utentes com registo de “Tem sintomas?” (TB) = “Sim” em uma consulta clínica (Ficha
+   * Clínica) ocorrida durante o período de revisão;
+   *
+   * @return {@link String}
+   */
+  public static String getPatientsWithSintomasTBSim() {
+    return "SELECT p.patient_id, "
+        + "               Min(e.encounter_datetime) AS data_presuntivo_tb "
+        + "        FROM   patient p "
+        + "                   INNER JOIN encounter e "
+        + "                              ON e.patient_id = p.patient_id "
+        + "                   INNER JOIN obs o "
+        + "                              ON o.encounter_id = e.encounter_id "
+        + "        WHERE  p.voided = 0 "
+        + "          AND e.voided = 0 "
+        + "          AND o.voided = 0 "
+        + "          AND e.location_id = :location "
+        + "          AND e.encounter_datetime >= :startDate "
+        + "          AND e.encounter_datetime <= :endDate "
+        + "          AND e.encounter_type = ${6} "
+        + "          AND o.concept_id = ${23758} "
+        + "          AND o.value_coded = ${1065} "
+        + "        GROUP  BY p.patient_id";
+  }
+
+  /**
+   * todos os utentes com registo de algum sintoma FESTAC em uma consulta clínica (Ficha Clínica)
+   * ocorrida durante o período de revisão;
+   *
+   * @return {@link String}
+   */
+  public static String getPatientsWithSintomasFestac() {
+    return "SELECT p.patient_id, "
+        + "       Min(e.encounter_datetime) AS data_presuntivo_tb "
+        + "FROM   patient p "
+        + "       INNER JOIN encounter e "
+        + "               ON e.patient_id = p.patient_id "
+        + "       INNER JOIN obs o "
+        + "               ON o.encounter_id = e.encounter_id "
+        + "WHERE  p.voided = 0 "
+        + "       AND e.voided = 0 "
+        + "       AND o.voided = 0 "
+        + "       AND e.location_id = :location "
+        + "       AND e.encounter_datetime >= :startDate "
+        + "       AND e.encounter_datetime <= :endDate "
+        + "       AND e.encounter_type = ${6} "
+        + "       AND o.concept_id = ${1766} "
+        + "       AND o.value_coded IN ( ${1763}, ${1764}, ${1762}, ${1760}, "
+        + "                              ${23760}, ${1765}, ${161} ) "
+        + "GROUP  BY p.patient_id";
+  }
 }

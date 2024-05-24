@@ -14249,6 +14249,21 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
+   * <b>RF8 - Utentes Presuntivos de TB</b>
+   *
+   * @return {@link String}
+   */
+  private String getUnionQueryUtentesPresuntivos() {
+
+    EptsQueriesUtil queriesUtil = new EptsQueriesUtil();
+
+    return queriesUtil
+        .unionBuilder(QualityImprovement2020Queries.getPatientsWithSintomasTBSim())
+        .union(QualityImprovement2020Queries.getPatientsWithSintomasFestac())
+        .buildQuery();
+  }
+
+  /**
    * <b>Utentes Presuntivos de TB</b>
    *
    * <p>O sistema irá identificar utentes <b>presuntivos de TB</b> seleccionando:
@@ -14290,43 +14305,7 @@ public class QualityImprovement2020CohortQueries {
     map.put("161", tbMetadata.getLymphadenopathy().getConceptId());
 
     String query =
-        "SELECT patient_id "
-            + "FROM   (SELECT p.patient_id, "
-            + "               Min(e.encounter_datetime) AS data_presuntivo_tb "
-            + "        FROM   patient p "
-            + "                   INNER JOIN encounter e "
-            + "                              ON e.patient_id = p.patient_id "
-            + "                   INNER JOIN obs o "
-            + "                              ON o.encounter_id = e.encounter_id "
-            + "        WHERE  p.voided = 0 "
-            + "          AND e.voided = 0 "
-            + "          AND o.voided = 0 "
-            + "          AND e.location_id = :location "
-            + "          AND e.encounter_datetime >= :startDate "
-            + "          AND e.encounter_datetime <= :endDate "
-            + "          AND e.encounter_type = ${6} "
-            + "          AND o.concept_id = ${23758} "
-            + "          AND o.value_coded = ${1065} "
-            + "        GROUP  BY p.patient_id "
-            + "        UNION "
-            + "        SELECT p.patient_id, "
-            + "               Min(e.encounter_datetime) AS data_sintoma_tb "
-            + "        FROM   patient p "
-            + "                   INNER JOIN encounter e "
-            + "                              ON e.patient_id = p.patient_id "
-            + "                   INNER JOIN obs o "
-            + "                              ON o.encounter_id = e.encounter_id "
-            + "        WHERE  p.voided = 0 "
-            + "          AND e.voided = 0 "
-            + "          AND o.voided = 0 "
-            + "          AND e.location_id = :location "
-            + "          AND e.encounter_datetime >= :startDate "
-            + "          AND e.encounter_datetime <= :endDate "
-            + "          AND e.encounter_type = ${6} "
-            + "          AND o.concept_id = ${1766} "
-            + "          AND o.value_coded IN ( ${1763}, ${1764}, ${1762}, ${1760}, "
-            + "                                 ${23760}, ${1765}, ${161} ) "
-            + "        GROUP  BY p.patient_id) presuntivo_tb";
+        "SELECT patient_id " + "FROM   (" + getUnionQueryUtentesPresuntivos() + ") presuntivo_tb";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
