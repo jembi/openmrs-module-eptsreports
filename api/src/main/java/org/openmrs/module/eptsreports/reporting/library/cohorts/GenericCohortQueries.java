@@ -1122,12 +1122,13 @@ public class GenericCohortQueries {
    * @param maxAge Maximum age of a patient based on Presuntivo TB Start Date
    * @return CohortDefinition
    */
-  public CohortDefinition getAgeOnPresuntivoStartDate(Integer minAge, Integer maxAge) {
+  public CohortDefinition getAgeOnPresuntivoTbDate(Integer minAge, Integer maxAge) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Idade do Utente – Data Presuntivo TB");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("23758", hivMetadata.getTBSymptomsConcept().getConceptId());
@@ -1142,6 +1143,7 @@ public class GenericCohortQueries {
     map.put("161", tbMetadata.getLymphadenopathy().getConceptId());
     map.put("minAge", minAge);
     map.put("maxAge", maxAge);
+
     String query =
         "SELECT p.person_id "
             + "FROM person p "
@@ -1163,6 +1165,67 @@ public class GenericCohortQueries {
       query +=
           "   TIMESTAMPDIFF(YEAR, p.birthdate, presuntivoTb.data_presuntivo_tb) >= ${minAge};  ";
     }
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * Idade do Utente – Data Pedido Xpert
+   *
+   * <p>O sistema irá determinar a idade do utente na Data Pedido Xpert, ou seja, irá calcular a
+   * idade com base na seguinte fórmula:
+   *
+   * <ul>
+   *   <li><b>Idade = Data Pedido de Xpert - Data de Nascimento</b>
+   * </ul>
+   *
+   * <p><b>Nota 1:</b> A idade será calculada em anos, excepto para os utentes com idade <= 18
+   * meses, para os quais será calculada em meses.
+   *
+   * <p><b>Nota 1:</b> A “Data Pedido de Xpert” do utente é definida no <b>RF8.1</b>
+   *
+   * @param minAge Minimum age of a patient based on Presuntivo TB Start Date
+   * @param maxAge Maximum age of a patient based on Presuntivo TB Start Date
+   * @return CohortDefinition
+   */
+  public CohortDefinition getAgeOnXpertRequestDate(Integer minAge, Integer maxAge) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Idade do Utente – Data Pedido Xpert");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    map.put("23723", tbMetadata.getTBGenexpertTestConcept().getConceptId());
+    map.put("minAge", minAge);
+    map.put("maxAge", maxAge);
+
+    String query =
+        "SELECT p.person_id "
+            + "FROM person p "
+            + "     INNER JOIN ( "
+            + QualityImprovement2020Queries.getPatientsWithPedidoDeXpert()
+            + "          ) AS pedidoXpert ON p.person_id = pedidoXpert.patient_id "
+            + "WHERE pedidoXpert.data_pedido_genexpert >= :startDate "
+            + "  AND pedidoXpert.data_pedido_genexpert <= :endDate "
+            + "  AND ";
+    if (minAge != null && maxAge != null) {
+      query +=
+          "     TIMESTAMPDIFF(YEAR, p.birthdate, pedidoXpert.data_pedido_genexpert) >= ${minAge}  "
+              + "         AND   "
+              + "   TIMESTAMPDIFF(YEAR, p.birthdate, pedidoXpert.data_pedido_genexpert) <= ${maxAge}; ";
+    } else if (minAge == null && maxAge != null) {
+      query +=
+          "   TIMESTAMPDIFF(YEAR, p.birthdate, pedidoXpert.data_pedido_genexpert) <= ${maxAge}; ";
+    } else if (minAge != null && maxAge == null) {
+      query +=
+          "   TIMESTAMPDIFF(YEAR, p.birthdate, pedidoXpert.data_pedido_genexpert) >= ${minAge};  ";
+    }
+
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
     return sqlCohortDefinition;
