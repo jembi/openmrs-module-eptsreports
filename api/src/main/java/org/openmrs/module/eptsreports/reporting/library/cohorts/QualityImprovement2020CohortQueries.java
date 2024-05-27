@@ -14253,7 +14253,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return {@link String}
    */
-  private String getUnionQueryUtentesPresuntivos() {
+  static String getUnionQueryUtentesPresuntivos() {
 
     EptsQueriesUtil queriesUtil = new EptsQueriesUtil();
 

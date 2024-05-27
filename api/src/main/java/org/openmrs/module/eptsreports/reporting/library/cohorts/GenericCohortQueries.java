@@ -30,6 +30,7 @@ import org.openmrs.Program;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.AgeInMonthsOnArtStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.AgeOnArtStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.AgeOnPreArtStartDateCalculation;
@@ -69,6 +70,8 @@ public class GenericCohortQueries {
   @Autowired private CommonMetadata commonMetadata;
 
   @Autowired private CommonQueries commonQueries;
+
+  @Autowired private TbMetadata tbMetadata;
 
   /**
    * Generic Coded Observation cohort
@@ -1097,6 +1100,71 @@ public class GenericCohortQueries {
 
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * Idade do Utente – Data Presuntivo TB
+   *
+   * <p>O sistema irá determinar a idade do utente na Data Presuntivo TB, ou seja, irá calcular a
+   * idade com base na seguinte fórmula:
+   *
+   * <ul>
+   *   <li><b>Idade = Data Presuntiva de TB - Data de Nascimento</b>
+   * </ul>
+   *
+   * <p><b>Nota 1:</b> A idade será calculada em anos, excepto para os utentes com idade <= 18
+   * meses, para os quais será calculada em meses.
+   *
+   * <p><b>Nota 1:</b> A “Data Presuntivo de TB” do utente é definida no <b>RF8</b>
+   *
+   * @param minAge Minimum age of a patient based on Presuntivo TB Start Date
+   * @param maxAge Maximum age of a patient based on Presuntivo TB Start Date
+   * @return CohortDefinition
+   */
+  public CohortDefinition getAgeOnPresuntivoStartDate(Integer minAge, Integer maxAge) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Idade do Utente – Data Presuntivo TB");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23758", hivMetadata.getTBSymptomsConcept().getConceptId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("1766", tbMetadata.getObservationTB().getConceptId());
+    map.put("1763", tbMetadata.getFeverLastingMoraThan3Weeks().getConceptId());
+    map.put("1764", tbMetadata.getWeightLossOfMoreThan3KgInLastMonth().getConceptId());
+    map.put("1762", tbMetadata.getNightsWeatsLastingMoraThan3Weeks().getConceptId());
+    map.put("1760", tbMetadata.getCoughLastingMoraThan3Weeks().getConceptId());
+    map.put("23760", tbMetadata.getAsthenia().getConceptId());
+    map.put("1765", tbMetadata.getCohabitantBeingTreatedForTB().getConceptId());
+    map.put("161", tbMetadata.getLymphadenopathy().getConceptId());
+    map.put("minAge", minAge);
+    map.put("maxAge", maxAge);
+    String query =
+        "SELECT p.person_id "
+            + "FROM person p "
+            + "     INNER JOIN ( "
+            + QualityImprovement2020CohortQueries.getUnionQueryUtentesPresuntivos()
+            + "          ) AS presuntivoTb ON p.person_id = presuntivoTb.patient_id "
+            + "WHERE presuntivoTb.data_presuntivo_tb >= :startDate "
+            + "  AND presuntivoTb.data_presuntivo_tb <= :endDate "
+            + "  AND ";
+    if (minAge != null && maxAge != null) {
+      query +=
+          "     TIMESTAMPDIFF(YEAR, p.birthdate, presuntivoTb.data_presuntivo_tb) >= ${minAge}  "
+              + "         AND   "
+              + "   TIMESTAMPDIFF(YEAR, p.birthdate, presuntivoTb.data_presuntivo_tb) <= ${maxAge}; ";
+    } else if (minAge == null && maxAge != null) {
+      query +=
+          "   TIMESTAMPDIFF(YEAR, p.birthdate, presuntivoTb.data_presuntivo_tb) <= ${maxAge}; ";
+    } else if (minAge != null && maxAge == null) {
+      query +=
+          "   TIMESTAMPDIFF(YEAR, p.birthdate, presuntivoTb.data_presuntivo_tb) >= ${minAge};  ";
+    }
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
     return sqlCohortDefinition;
   }
 }
