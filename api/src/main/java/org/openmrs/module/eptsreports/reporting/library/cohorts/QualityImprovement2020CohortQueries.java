@@ -14403,4 +14403,65 @@ public class QualityImprovement2020CohortQueries {
 
     return sqlCohortDefinition;
   }
+
+  /**
+   * <b>MQ19</b>: Melhoria de Qualidade Category 19 <br>
+   * <i> DENOMINATOR 1: (presuntivosTb AND adultoTbPresuntivo) NOT F</i> <br>
+   * <i> DENOMINATOR 2: (presuntivosTb AND menorTbPresuntivo) NOT F</i> <br>
+   * <i> DENOMINATOR 3: A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)</i> <br>
+   * <i> DENOMINATOR 4: (A AND B4) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)</i> <br>
+   * <i> DENOMINATOR 5: (A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)</i> <br>
+   * <i> DENOMINATOR 6: (A AND B4 AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)</i> <br>
+   *
+   * @param den indicator number
+   */
+  public CohortDefinition getMQ19A(Integer den) {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    if (den == 1) {
+      compositionCohortDefinition.setName("Categoria 19 Denominador – Pedido XPert  Adulto");
+    } else if (den == 2) {
+      compositionCohortDefinition.setName("Categoria 19 Denominador – Pedido XPert Pediátrico");
+    } else if (den == 3) {
+      compositionCohortDefinition.setName("Categoria 19 Denominador – Resultado XPert Adulto");
+    } else if (den == 4) {
+      compositionCohortDefinition.setName("Categoria 19 Denominador – Resultado XPert  Pediátrico");
+    } else if (den == 5) {
+      compositionCohortDefinition.setName("Categoria 19 Numerador – Resultado XPert  Pediátrico");
+    } else if (den == 6) {
+      compositionCohortDefinition.setName("Categoria 19 Denominador – Tratamento TB - Pediátrico");
+    }
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition presuntivosTb = getUtentesPresuntivosDeTb();
+
+    compositionCohortDefinition.addSearch(
+        "adultoTbPresuntivo",
+        EptsReportUtils.map(genericCohortQueries.getAgeOnPresuntivoTbDate(15, 200), MAPPING3));
+
+    compositionCohortDefinition.addSearch(
+        "menorTbPresuntivo",
+        EptsReportUtils.map(genericCohortQueries.getAgeOnPresuntivoTbDate(0, 15), MAPPING3));
+
+    CohortDefinition transferOut = getTranferredOutPatientsCat7();
+
+    compositionCohortDefinition.addSearch(
+        "presuntivosTb", EptsReportUtils.map(presuntivosTb, MAPPING3));
+    //
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transferOut, MAPPING11));
+
+    if (den == 1) {
+      compositionCohortDefinition.setCompositionString(
+          "(presuntivosTb AND adultoTbPresuntivo) NOT F");
+    } else if (den == 2) {
+      compositionCohortDefinition.setCompositionString(
+          "(presuntivosTb AND menorTbPresuntivo) NOT F");
+    }
+
+    return compositionCohortDefinition;
+  }
 }

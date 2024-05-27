@@ -2945,6 +2945,44 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(MQ18NUM, "revisionEndDate=${revisionEndDate},location=${location}"),
         "ageBasedOnArtCat18=10-14");
 
+    // Category 19 Denominator Indicators
+
+    // MQ Cat 19 Den 1
+    CohortIndicator MQ19DEN1 =
+            eptsGeneralIndicator.getIndicator(
+                    "MQ19DEN1",
+                    EptsReportUtils.map(
+                            qualityImprovement2020CohortQueries.getMQ19A(1),
+                            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MQ19DEN1.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+            "MQ12DEN1",
+            "19.1 % de adultos (>=15 anos) presuntivos de TB com pedido de teste molecular (Xpert/Truenat) na data da 1ª consulta",
+            EptsReportUtils.map(
+                    MQ19DEN1,
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "");
+
+    // MQ Cat 19 Den 2
+    CohortIndicator MQ19DEN2 =
+            eptsGeneralIndicator.getIndicator(
+                    "MQ19DEN2",
+                    EptsReportUtils.map(
+                            qualityImprovement2020CohortQueries.getMQ19A(2),
+                            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MQ19DEN2.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+            "MQ12DEN2",
+            "19.4 % de crianças (0-14 anos) presuntivos de TB com pedido de teste molecular (Xpert/Truenat) na data da 1ª consulta.",
+            EptsReportUtils.map(
+                    MQ19DEN2,
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "");
+
     return dataSetDefinition;
   }
 

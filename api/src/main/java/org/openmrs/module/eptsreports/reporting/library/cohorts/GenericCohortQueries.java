@@ -1150,9 +1150,7 @@ public class GenericCohortQueries {
             + "     INNER JOIN ( "
             + QualityImprovement2020CohortQueries.getUnionQueryUtentesPresuntivos()
             + "          ) AS presuntivoTb ON p.person_id = presuntivoTb.patient_id "
-            + "WHERE presuntivoTb.data_presuntivo_tb >= :startDate "
-            + "  AND presuntivoTb.data_presuntivo_tb <= :endDate "
-            + "  AND ";
+            + "WHERE ";
     if (minAge != null && maxAge != null) {
       query +=
           "     TIMESTAMPDIFF(YEAR, p.birthdate, presuntivoTb.data_presuntivo_tb) >= ${minAge}  "
@@ -1210,9 +1208,7 @@ public class GenericCohortQueries {
             + "     INNER JOIN ( "
             + QualityImprovement2020Queries.getPatientsWithPedidoDeXpert()
             + "          ) AS pedidoXpert ON p.person_id = pedidoXpert.patient_id "
-            + "WHERE pedidoXpert.data_pedido_genexpert >= :startDate "
-            + "  AND pedidoXpert.data_pedido_genexpert <= :endDate "
-            + "  AND ";
+            + "WHERE ";
     if (minAge != null && maxAge != null) {
       query +=
           "     TIMESTAMPDIFF(YEAR, p.birthdate, pedidoXpert.data_pedido_genexpert) >= ${minAge}  "
@@ -1270,9 +1266,7 @@ public class GenericCohortQueries {
             + "     INNER JOIN ( "
             + QualityImprovement2020Queries.getPatientsWithActiveTbDiagnosis()
             + "          ) AS tbActivo ON p.person_id = tbActivo.patient_id "
-            + "WHERE tbActivo.data_diagnostico_tb >= :startDate "
-            + "  AND tbActivo.data_diagnostico_tb <= :endDate "
-            + "  AND ";
+            + "WHERE ";
     if (minAge != null && maxAge != null) {
       query +=
           "     TIMESTAMPDIFF(YEAR, p.birthdate, tbActivo.data_diagnostico_tb) >= ${minAge}  "
