@@ -2802,7 +2802,7 @@ public class QualityImprovement2020Queries {
    */
   public static String getPatientsWithActiveTbDiagnosis() {
     return "SELECT p.patient_id, "
-        + "                Min(e.encounter_datetime) AS data_pedido_genexpert "
+        + "                Min(e.encounter_datetime) AS data_diagnostico_tb "
         + "         FROM   patient p "
         + "                    INNER JOIN encounter e "
         + "                               ON e.patient_id = p.patient_id "

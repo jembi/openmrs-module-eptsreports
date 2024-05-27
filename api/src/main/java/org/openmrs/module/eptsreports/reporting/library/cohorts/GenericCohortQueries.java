@@ -1230,4 +1230,62 @@ public class GenericCohortQueries {
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
     return sqlCohortDefinition;
   }
+
+  /**
+   * Idade do Utente – Data Diagnóstico TB Activo
+   *
+   * <p>O sistema irá determinar a idade do utente na Data Diagnóstico TB, ou seja, irá calcular a
+   * idade com base na seguinte fórmula:
+   *
+   * <ul>
+   *   <li><b>Idade = Data Diagnóstico de TB - Data de Nascimento</b>
+   * </ul>
+   *
+   * <p><b>Nota 1:</b> A idade será calculada em anos, excepto para os utentes com idade <= 18
+   * meses, para os quais será calculada em meses.
+   *
+   * <p><b>Nota 2:</b> A “Data Diagnóstico de TB” do utente é definida no <b>RF8.2</b>
+   *
+   * @param minAge Minimum age of a patient based on Presuntivo TB Start Date
+   * @param maxAge Maximum age of a patient based on Presuntivo TB Start Date
+   * @return CohortDefinition
+   */
+  public CohortDefinition getAgeOnTbDiagnosisDate(Integer minAge, Integer maxAge) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Idade do Utente – Data Diagnóstico TB Activo");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23761", tbMetadata.getActiveTBConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("minAge", minAge);
+    map.put("maxAge", maxAge);
+
+    String query =
+        "SELECT p.person_id "
+            + "FROM person p "
+            + "     INNER JOIN ( "
+            + QualityImprovement2020Queries.getPatientsWithActiveTbDiagnosis()
+            + "          ) AS tbActivo ON p.person_id = tbActivo.patient_id "
+            + "WHERE tbActivo.data_diagnostico_tb >= :startDate "
+            + "  AND tbActivo.data_diagnostico_tb <= :endDate "
+            + "  AND ";
+    if (minAge != null && maxAge != null) {
+      query +=
+          "     TIMESTAMPDIFF(YEAR, p.birthdate, tbActivo.data_diagnostico_tb) >= ${minAge}  "
+              + "         AND   "
+              + "   TIMESTAMPDIFF(YEAR, p.birthdate, tbActivo.data_diagnostico_tb) <= ${maxAge}; ";
+    } else if (minAge == null && maxAge != null) {
+      query += "   TIMESTAMPDIFF(YEAR, p.birthdate, tbActivo.data_diagnostico_tb) <= ${maxAge}; ";
+    } else if (minAge != null && maxAge == null) {
+      query += "   TIMESTAMPDIFF(YEAR, p.birthdate, tbActivo.data_diagnostico_tb) >= ${minAge};  ";
+    }
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlCohortDefinition;
+  }
 }
