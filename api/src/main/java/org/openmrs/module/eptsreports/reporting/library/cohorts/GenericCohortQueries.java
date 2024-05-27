@@ -1116,7 +1116,7 @@ public class GenericCohortQueries {
    * <p><b>Nota 1:</b> A idade será calculada em anos, excepto para os utentes com idade <= 18
    * meses, para os quais será calculada em meses.
    *
-   * <p><b>Nota 1:</b> A “Data Presuntivo de TB” do utente é definida no <b>RF8</b>
+   * <p><b>Nota 2:</b> A “Data Presuntivo de TB” do utente é definida no <b>RF8</b>
    *
    * @param minAge Minimum age of a patient based on Presuntivo TB Start Date
    * @param maxAge Maximum age of a patient based on Presuntivo TB Start Date
@@ -1184,7 +1184,7 @@ public class GenericCohortQueries {
    * <p><b>Nota 1:</b> A idade será calculada em anos, excepto para os utentes com idade <= 18
    * meses, para os quais será calculada em meses.
    *
-   * <p><b>Nota 1:</b> A “Data Pedido de Xpert” do utente é definida no <b>RF8.1</b>
+   * <p><b>Nota 2:</b> A “Data Pedido de Xpert” do utente é definida no <b>RF8.1</b>
    *
    * @param minAge Minimum age of a patient based on Presuntivo TB Start Date
    * @param maxAge Maximum age of a patient based on Presuntivo TB Start Date

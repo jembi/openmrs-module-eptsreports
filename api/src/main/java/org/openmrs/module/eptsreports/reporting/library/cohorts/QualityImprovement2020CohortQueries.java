@@ -14348,22 +14348,54 @@ public class QualityImprovement2020CohortQueries {
     map.put("23723", tbMetadata.getTBGenexpertTestConcept().getConceptId());
 
     String query =
-        "SELECT p.patient_id "
-            + "FROM   patient p "
-            + "       INNER JOIN encounter e "
-            + "               ON e.patient_id = p.patient_id "
-            + "       INNER JOIN obs o "
-            + "               ON o.encounter_id = e.encounter_id "
-            + "WHERE  p.voided = 0 "
-            + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "       AND e.location_id = :location "
-            + "       AND e.encounter_datetime >= :startDate "
-            + "       AND e.encounter_datetime <= :endDate "
-            + "       AND e.encounter_type = ${6} "
-            + "       AND o.concept_id = ${23722} "
-            + "       AND o.value_coded = ${23723} "
-            + "GROUP  BY p.patient_id";
+        "SELECT patient_id "
+            + "FROM   ( "
+            + QualityImprovement2020Queries.getPatientsWithPedidoDeXpert()
+            + " ) pedidoXpert";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Utentes com Diagnóstico TB Activo</b>
+   *
+   * <p>O sistema irá identificar utentes com registo de <b>Diagnóstico de TB Activo</b> durante o
+   * período de revisão, seleccionando:
+   *
+   * <ul>
+   *   <li>todos os utentes com registo de <b>“Diagnóstico de TB Activo” = "Sim"</b> em uma consulta
+   *       clínica (Ficha Clínica) ocorrida durante o período de revisão (>= “Data Início Revisão” e
+   *       <= “Data Fim Revisão”);
+   * </ul>
+   *
+   * <p><b>Nota 1:</b> em caso de existência de mais de uma consulta clínica com registo de
+   * diagnóstico de tb activo, o sistema irá considerar a <b>primeira</b> ocorrência durante o
+   * período de revisão como <b>“Data Diagnóstico de TB”</b>.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getUtentesComDiagnosticoTbActivo() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes com Diagnóstico TB Activo");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23761", tbMetadata.getActiveTBConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+
+    String query =
+        "SELECT patient_id "
+            + "FROM   ( "
+            + QualityImprovement2020Queries.getPatientsWithActiveTbDiagnosis()
+            + " ) tbActivo";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
