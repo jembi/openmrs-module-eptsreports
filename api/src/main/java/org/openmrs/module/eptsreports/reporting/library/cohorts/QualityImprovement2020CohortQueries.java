@@ -14523,6 +14523,59 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
+   *
+   *
+   * <ul>
+   *   <li><b>Filtrando</b> os que tiveram registo do <b>“Tratamento de TB” = “Início”</b> em uma
+   *       <b>consulta clínica (Ficha Clínica)</b> ocorrida durante o período de revisão, sendo a
+   *       respectiva <b>“Data Início Tratamento TB”</b>. igual a <b>“Data Diagnóstico de TB”</b> ou
+   *       seja <b>“Data Início Tratamento TB”</b> menos (-) a <b>“Data Diagnóstico de TB”</b> igual
+   *       a <b>zero</b>.
+   * </ul>
+   *
+   * <p><b>Nota 1:</b> A <b>“Data Diagnóstico de TB”</b> do utente é definida no <b>RF8.2</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getUtentesComInicioDeTratamentoDeTbNaDataDeDiagnosticoTb() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes com Pedido de Xpert na Data Presuntivo de TB");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23761", tbMetadata.getActiveTBConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("1268", hivMetadata.getTBTreatmentPlanConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN ( "
+            + QualityImprovement2020Queries.getPatientsWithActiveTbDiagnosis()
+            + "                   ) diagnosticoTb "
+            + "               ON diagnosticoTb.patient_id = p.patient_id "
+            + "       INNER JOIN ( "
+            + QualityImprovement2020Queries.getPatientsWhoStartedTbTreatment()
+            + "                   ) tratamentoTb "
+            + "               ON tratamentoTb.patient_id = p.patient_id "
+            + "WHERE  diagnosticoTb.data_diagnostico_tb = "
+            + "       tratamentoTb.data_inicio_tratamento_tb "
+            + "       AND Timestampdiff(day, diagnosticoTb.data_diagnostico_tb, "
+            + "               tratamentoTb.data_inicio_tratamento_tb ) = 0";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
    * <b>MQ19</b>: Melhoria de Qualidade Category 19 <br>
    * <i> DENOMINATOR 1: (presuntivosTb AND age) NOT transferredOut</i> <br>
    * <i> DENOMINATOR 2: (resultadoXpert AND age) NOT transferredOut</i> <br>
@@ -14620,10 +14673,10 @@ public class QualityImprovement2020CohortQueries {
    * <b>MQ19</b>: Melhoria de Qualidade Category 19<br>
    * <i> NUMERATOR 1: MQ19DEN1 AND pedidoXpertOnPresuntivoTb</i> <br>
    * <i> NUMERATOR 2: MQ19DEN2 AND resultadoXpertEm7Dias</i> <br>
-   * <i> NUMERATOR 3: </i> <br>
+   * <i> NUMERATOR 3: MQ19DEN3 AND tratamentoDeTbNaDataDeDiagnosticoTb</i> <br>
    * <i> NUMERATOR 4: MQ19DEN4 AND pedidoXpertOnPresuntivoTb</i> <br>
    * <i> NUMERATOR 5: MQ19DEN5 AND resultadoXpertEm7Dias</i> <br>
-   * <i> NUMERATOR 6: </i> <br>
+   * <i> NUMERATOR 6: MQ19DEN6 AND tratamentoDeTbNaDataDeDiagnosticoTb</i> <br>
    *
    * @param num indicator number
    * @return CohortDefinition
@@ -14667,6 +14720,9 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition resultadoXpertEm7Dias = getUtentesComResultadoDeXpertEm7Dias(true);
 
+    CohortDefinition tratamentoDeTbNaDataDeDiagnosticoTb =
+        getUtentesComInicioDeTratamentoDeTbNaDataDeDiagnosticoTb();
+
     compositionCohortDefinition.addSearch("MQ19DEN1", EptsReportUtils.map(mq19DenOne, MAPPING1));
 
     compositionCohortDefinition.addSearch("MQ19DEN2", EptsReportUtils.map(mq19DenTwo, MAPPING1));
@@ -14685,18 +14741,24 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "resultadoXpertEm7Dias", EptsReportUtils.map(resultadoXpertEm7Dias, MAPPING3));
 
+    compositionCohortDefinition.addSearch(
+        "tratamentoDeTbNaDataDeDiagnosticoTb",
+        EptsReportUtils.map(tratamentoDeTbNaDataDeDiagnosticoTb, MAPPING3));
+
     if (num == 1) {
       compositionCohortDefinition.setCompositionString("MQ19DEN1 AND pedidoXpertOnPresuntivoTb");
     } else if (num == 2) {
       compositionCohortDefinition.setCompositionString("MQ19DEN2 AND resultadoXpertEm7Dias");
     } else if (num == 3) {
-      compositionCohortDefinition.setCompositionString("MQ19DEN3");
+      compositionCohortDefinition.setCompositionString(
+          "MQ19DEN3 AND tratamentoDeTbNaDataDeDiagnosticoTb");
     } else if (num == 4) {
       compositionCohortDefinition.setCompositionString("MQ19DEN4 AND pedidoXpertOnPresuntivoTb");
     } else if (num == 5) {
       compositionCohortDefinition.setCompositionString("MQ19DEN5 AND resultadoXpertEm7Dias");
     } else if (num == 6) {
-      compositionCohortDefinition.setCompositionString("MQ19DEN6");
+      compositionCohortDefinition.setCompositionString(
+          "MQ19DEN6 AND tratamentoDeTbNaDataDeDiagnosticoTb");
     }
 
     return compositionCohortDefinition;
