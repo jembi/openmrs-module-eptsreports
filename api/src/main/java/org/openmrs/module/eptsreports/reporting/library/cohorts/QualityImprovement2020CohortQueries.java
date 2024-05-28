@@ -14421,13 +14421,13 @@ public class QualityImprovement2020CohortQueries {
     if (den == 1) {
       compositionCohortDefinition.setName("Categoria 19 Denominador – Pedido XPert  Adulto");
     } else if (den == 2) {
-      compositionCohortDefinition.setName("Categoria 19 Denominador – Pedido XPert Pediátrico");
-    } else if (den == 3) {
       compositionCohortDefinition.setName("Categoria 19 Denominador – Resultado XPert Adulto");
+    } else if (den == 3) {
+      compositionCohortDefinition.setName("Categoria 19 Denominador – Tratamento TB - Adulto");
     } else if (den == 4) {
-      compositionCohortDefinition.setName("Categoria 19 Denominador – Resultado XPert  Pediátrico");
+      compositionCohortDefinition.setName("Categoria 19 Denominador – Pedido XPert Pediátrico");
     } else if (den == 5) {
-      compositionCohortDefinition.setName("Categoria 19 Numerador – Resultado XPert  Pediátrico");
+      compositionCohortDefinition.setName("Categoria 19 Denominador – Resultado XPert  Pediátrico");
     } else if (den == 6) {
       compositionCohortDefinition.setName("Categoria 19 Denominador – Tratamento TB - Pediátrico");
     }
@@ -14437,29 +14437,51 @@ public class QualityImprovement2020CohortQueries {
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
+    if (den == 1) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(genericCohortQueries.getAgeOnPresuntivoTbDate(15, 200), MAPPING3));
+    } else if (den == 2) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(genericCohortQueries.getAgeOnXpertRequestDate(15, 200), MAPPING3));
+    } else if (den == 3) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(genericCohortQueries.getAgeOnTbDiagnosisDate(15, 200), MAPPING3));
+    } else if (den == 4) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(genericCohortQueries.getAgeOnPresuntivoTbDate(0, 15), MAPPING3));
+    } else if (den == 5) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(genericCohortQueries.getAgeOnXpertRequestDate(0, 15), MAPPING3));
+    } else if (den == 6) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(genericCohortQueries.getAgeOnTbDiagnosisDate(0, 15), MAPPING3));
+    }
+
     CohortDefinition presuntivosTb = getUtentesPresuntivosDeTb();
-
-    compositionCohortDefinition.addSearch(
-        "adultoTbPresuntivo",
-        EptsReportUtils.map(genericCohortQueries.getAgeOnPresuntivoTbDate(15, 200), MAPPING3));
-
-    compositionCohortDefinition.addSearch(
-        "menorTbPresuntivo",
-        EptsReportUtils.map(genericCohortQueries.getAgeOnPresuntivoTbDate(0, 15), MAPPING3));
 
     CohortDefinition transferOut = getTranferredOutPatientsCat7();
 
     compositionCohortDefinition.addSearch(
         "presuntivosTb", EptsReportUtils.map(presuntivosTb, MAPPING3));
-    //
-    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transferOut, MAPPING11));
 
-    if (den == 1) {
+    compositionCohortDefinition.addSearch(
+        "transferredOut", EptsReportUtils.map(transferOut, MAPPING11));
+
+    if (den == 1 || den == 4) {
       compositionCohortDefinition.setCompositionString(
-          "(presuntivosTb AND adultoTbPresuntivo) NOT F");
-    } else if (den == 2) {
+          "(presuntivosTb AND age) NOT transferredOut");
+    } else if (den == 2 || den == 5) {
       compositionCohortDefinition.setCompositionString(
-          "(presuntivosTb AND menorTbPresuntivo) NOT F");
+          "(presuntivosTb AND age) NOT transferredOut");
+    } else if (den == 3 || den == 6) {
+      compositionCohortDefinition.setCompositionString(
+          "(presuntivosTb AND age) NOT transferredOut");
     }
 
     return compositionCohortDefinition;
