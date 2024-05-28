@@ -14361,6 +14361,56 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
+   *
+   *
+   * <ul>
+   *   <li><b>Incluindo</b> todos os utentes com <b>pedido de Xpert</b> durante o período de revisão
+   *       <b>(RF8.1)</b> e que tiveram também um registo de <b>“Resultado de Xpert”</b> na
+   *       <b>consulta clínica (Ficha Clínica)</b> – secção investigações resultados laboratoriais,
+   *       ocorrida durante o período de revisão (>= “Data Início Revisão” e <= “Data Fim Revisão”).
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getUtentesComResultadoDeXpertEm7Dias() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes com Resultado de Xpert dentro de 7 dias após Pedido");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    map.put("23723", tbMetadata.getTBGenexpertTestConcept().getConceptId());
+    map.put("703", tbMetadata.getPositiveConcept().getConceptId());
+    map.put("664", tbMetadata.getNegativeConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN ( "
+            + QualityImprovement2020Queries.getPatientsWithPedidoDeXpert()
+            + "                   ) pedidoXpert "
+            + "               ON pedidoXpert.patient_id = p.patient_id "
+            + "       INNER JOIN ( "
+            + QualityImprovement2020Queries.getPatientsWithResultadoDeXpert()
+            + "                   ) resultadoXpert "
+            + "               ON resultadoXpert.patient_id = p.patient_id "
+            + "WHERE  resultadoXpert.data_resultado_genexpert >= "
+            + "       pedidoXpert.data_pedido_genexpert "
+            + "       AND Timestampdiff(day, resultadoXpert.data_resultado_genexpert, "
+            + "               pedidoXpert.data_pedido_genexpert) <= 7";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
    * <b>Utentes com Diagnóstico TB Activo</b>
    *
    * <p>O sistema irá identificar utentes com registo de <b>Diagnóstico de TB Activo</b> durante o
@@ -14463,22 +14513,27 @@ public class QualityImprovement2020CohortQueries {
           EptsReportUtils.map(genericCohortQueries.getAgeOnTbDiagnosisDate(0, 15), MAPPING3));
     }
 
+    CohortDefinition transferOut = getTranferredOutPatientsCat7();
+
     CohortDefinition presuntivosTb = getUtentesPresuntivosDeTb();
 
-    CohortDefinition transferOut = getTranferredOutPatientsCat7();
+    CohortDefinition resultadoXpert = getUtentesComResultadoDeXpertEm7Dias();
+
+    compositionCohortDefinition.addSearch(
+        "transferredOut", EptsReportUtils.map(transferOut, MAPPING11));
 
     compositionCohortDefinition.addSearch(
         "presuntivosTb", EptsReportUtils.map(presuntivosTb, MAPPING3));
 
     compositionCohortDefinition.addSearch(
-        "transferredOut", EptsReportUtils.map(transferOut, MAPPING11));
+        "resultadoXpert", EptsReportUtils.map(resultadoXpert, MAPPING3));
 
     if (den == 1 || den == 4) {
       compositionCohortDefinition.setCompositionString(
           "(presuntivosTb AND age) NOT transferredOut");
     } else if (den == 2 || den == 5) {
       compositionCohortDefinition.setCompositionString(
-          "(presuntivosTb AND age) NOT transferredOut");
+          "(resultadoXpert AND age) NOT transferredOut");
     } else if (den == 3 || den == 6) {
       compositionCohortDefinition.setCompositionString(
           "(presuntivosTb AND age) NOT transferredOut");

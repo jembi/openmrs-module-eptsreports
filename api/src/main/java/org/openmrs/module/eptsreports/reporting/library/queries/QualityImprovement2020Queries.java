@@ -2794,6 +2794,33 @@ public class QualityImprovement2020Queries {
   }
 
   /**
+   * registo de “Resultado de Xpert” na consulta clínica (Ficha Clínica) – secção investigações
+   * resultados laboratoriais, ocorrida durante o período de revisão (>= “Data Início Revisão” e <=
+   * “Data Fim Revisão”)
+   *
+   * @return {@link String}
+   */
+  public static String getPatientsWithResultadoDeXpert() {
+    return "SELECT p.patient_id, "
+        + "       Min(e.encounter_datetime) AS data_resultado_genexpert "
+        + "FROM   patient p "
+        + "           INNER JOIN encounter e "
+        + "                      ON e.patient_id = p.patient_id "
+        + "           INNER JOIN obs o "
+        + "                      ON o.encounter_id = e.encounter_id "
+        + "WHERE  p.voided = 0 "
+        + "  AND e.voided = 0 "
+        + "  AND o.voided = 0 "
+        + "  AND e.location_id = :location "
+        + "  AND e.encounter_datetime >= :startDate "
+        + "  AND e.encounter_datetime <= :endDate "
+        + "  AND e.encounter_type = ${6} "
+        + "  AND o.concept_id = ${23723} "
+        + "  AND o.value_coded IN ( ${703}, ${664} ) "
+        + "GROUP  BY p.patient_id";
+  }
+
+  /**
    * todos os utentes com registo de <b>“Diagnóstico de TB Activo” = "Sim"</b> em uma consulta
    * clínica (Ficha Clínica) ocorrida durante o período de revisão (>= “Data Início Revisão” e <=
    * “Data Fim Revisão”);
