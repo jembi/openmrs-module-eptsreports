@@ -14549,6 +14549,7 @@ public class QualityImprovement2020CohortQueries {
     } else if (den == 6) {
       compositionCohortDefinition.setName("Categoria 19 Denominador – Tratamento TB - Pediátrico");
     }
+
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(
@@ -14617,12 +14618,12 @@ public class QualityImprovement2020CohortQueries {
 
   /**
    * <b>MQ19</b>: Melhoria de Qualidade Category 19<br>
-   * <i> DENOMINATOR 1: MQ19DEN1 AND pedidoXpertOnPresuntivoTb</i> <br>
-   * <i> DENOMINATOR 2: MQ19DEN2 AND resultadoXpertEm7Dias</i> <br>
-   * <i> DENOMINATOR 3: </i> <br>
-   * <i> DENOMINATOR 4: MQ19DEN4 AND pedidoXpertAndPresuntivoTb</i> <br>
-   * <i> DENOMINATOR 5: MQ19DEN5 AND resultadoXpertEm7Dias</i> <br>
-   * <i> DENOMINATOR 6: </i> <br>
+   * <i> NUMERATOR 1: MQ19DEN1 AND pedidoXpertOnPresuntivoTb</i> <br>
+   * <i> NUMERATOR 2: MQ19DEN2 AND resultadoXpertEm7Dias</i> <br>
+   * <i> NUMERATOR 3: </i> <br>
+   * <i> NUMERATOR 4: MQ19DEN4 AND pedidoXpertOnPresuntivoTb</i> <br>
+   * <i> NUMERATOR 5: MQ19DEN5 AND resultadoXpertEm7Dias</i> <br>
+   * <i> NUMERATOR 6: </i> <br>
    *
    * @param num indicator number
    * @return CohortDefinition
@@ -14643,6 +14644,7 @@ public class QualityImprovement2020CohortQueries {
     } else if (num == 6) {
       compositionCohortDefinition.setName("Categoria 19 Numerador – Tratamento TB - Pediátrico");
     }
+
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(
@@ -14665,17 +14667,17 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition resultadoXpertEm7Dias = getUtentesComResultadoDeXpertEm7Dias(true);
 
-    compositionCohortDefinition.addSearch("MQ19DEN1", EptsReportUtils.map(mq19DenOne, MAPPING3));
+    compositionCohortDefinition.addSearch("MQ19DEN1", EptsReportUtils.map(mq19DenOne, MAPPING1));
 
-    compositionCohortDefinition.addSearch("MQ19DEN2", EptsReportUtils.map(mq19DenTwo, MAPPING3));
+    compositionCohortDefinition.addSearch("MQ19DEN2", EptsReportUtils.map(mq19DenTwo, MAPPING1));
 
-    compositionCohortDefinition.addSearch("MQ19DEN3", EptsReportUtils.map(mq19DenThree, MAPPING3));
+    compositionCohortDefinition.addSearch("MQ19DEN3", EptsReportUtils.map(mq19DenThree, MAPPING1));
 
-    compositionCohortDefinition.addSearch("MQ19DEN4", EptsReportUtils.map(mq19DenFour, MAPPING3));
+    compositionCohortDefinition.addSearch("MQ19DEN4", EptsReportUtils.map(mq19DenFour, MAPPING1));
 
-    compositionCohortDefinition.addSearch("MQ19DEN5", EptsReportUtils.map(mq19DenFive, MAPPING3));
+    compositionCohortDefinition.addSearch("MQ19DEN5", EptsReportUtils.map(mq19DenFive, MAPPING1));
 
-    compositionCohortDefinition.addSearch("MQ19DEN6", EptsReportUtils.map(mq19DenSix, MAPPING3));
+    compositionCohortDefinition.addSearch("MQ19DEN6", EptsReportUtils.map(mq19DenSix, MAPPING1));
 
     compositionCohortDefinition.addSearch(
         "pedidoXpertOnPresuntivoTb", EptsReportUtils.map(pedidoXpertOnPresuntivoTb, MAPPING3));
@@ -14690,12 +14692,13 @@ public class QualityImprovement2020CohortQueries {
     } else if (num == 3) {
       compositionCohortDefinition.setCompositionString("MQ19DEN3");
     } else if (num == 4) {
-      compositionCohortDefinition.setCompositionString("MQ19DEN4 AND pedidoXpertAndPresuntivoTb");
+      compositionCohortDefinition.setCompositionString("MQ19DEN4 AND pedidoXpertOnPresuntivoTb");
     } else if (num == 5) {
       compositionCohortDefinition.setCompositionString("MQ19DEN5 AND resultadoXpertEm7Dias");
     } else if (num == 6) {
       compositionCohortDefinition.setCompositionString("MQ19DEN6");
     }
+
     return compositionCohortDefinition;
   }
 }
