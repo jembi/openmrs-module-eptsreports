@@ -14374,7 +14374,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getUtentesComResultadoDeXpertEm7Dias() {
+  public CohortDefinition getUtentesComResultadoDeXpertEm7Dias(boolean sevenDays) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Utentes com Resultado de Xpert dentro de 7 dias após Pedido");
@@ -14399,11 +14399,15 @@ public class QualityImprovement2020CohortQueries {
             + "       INNER JOIN ( "
             + QualityImprovement2020Queries.getPatientsWithResultadoDeXpert()
             + "                   ) resultadoXpert "
-            + "               ON resultadoXpert.patient_id = p.patient_id "
-            + "WHERE  resultadoXpert.data_resultado_genexpert >= "
-            + "       pedidoXpert.data_pedido_genexpert "
-            + "       AND Timestampdiff(day, pedidoXpert.data_pedido_genexpert, "
-            + "               resultadoXpert.data_resultado_genexpert) <= 7";
+            + "               ON resultadoXpert.patient_id = p.patient_id ";
+    query +=
+        sevenDays
+            ? "WHERE  resultadoXpert.data_resultado_genexpert >= "
+                + "       pedidoXpert.data_pedido_genexpert "
+                + "       AND Timestampdiff(day, pedidoXpert.data_pedido_genexpert, "
+                + "               resultadoXpert.data_resultado_genexpert) <= 7"
+            : "WHERE  resultadoXpert.data_resultado_genexpert >= "
+                + "       pedidoXpert.data_pedido_genexpert ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -14581,7 +14585,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition presuntivosTb = getUtentesPresuntivosDeTb();
 
-    CohortDefinition resultadoXpert = getUtentesComResultadoDeXpertEm7Dias();
+    CohortDefinition resultadoXpert = getUtentesComResultadoDeXpertEm7Dias(false);
 
     CohortDefinition diagnosticoTbActivo = getUtentesComDiagnosticoTbActivo();
 
@@ -14613,11 +14617,11 @@ public class QualityImprovement2020CohortQueries {
 
   /**
    * <b>MQ19</b>: Melhoria de Qualidade Category 19<br>
-   * <i> DENOMINATOR 1: </i> <br>
-   * <i> DENOMINATOR 2: </i> <br>
+   * <i> DENOMINATOR 1: MQ19DEN1 AND pedidoXpertOnPresuntivoTb</i> <br>
+   * <i> DENOMINATOR 2: MQ19DEN2 AND resultadoXpertEm7Dias</i> <br>
    * <i> DENOMINATOR 3: </i> <br>
-   * <i> DENOMINATOR 4: </i> <br>
-   * <i> DENOMINATOR 5: </i> <br>
+   * <i> DENOMINATOR 4: MQ19DEN4 AND pedidoXpertAndPresuntivoTb</i> <br>
+   * <i> DENOMINATOR 5: MQ19DEN5 AND resultadoXpertEm7Dias</i> <br>
    * <i> DENOMINATOR 6: </i> <br>
    *
    * @param num indicator number
@@ -14627,15 +14631,15 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
     if (num == 1) {
-      compositionCohortDefinition.setName("Categoria 19 Numerador – Pedido XPert  Adulto");
+      compositionCohortDefinition.setName("Categoria 19 Numerador – Pedido XPert Adulto");
     } else if (num == 2) {
-      compositionCohortDefinition.setName("Categoria 19 Numerador – Resultado XPert  Adulto");
+      compositionCohortDefinition.setName("Categoria 19 Numerador – Resultado XPert Adulto");
     } else if (num == 3) {
-      compositionCohortDefinition.setName("Categoria 19 Numerador – Tratamento TB - Adulto");
+      compositionCohortDefinition.setName("Categoria 19 Numerador – Tratamento TB Adulto");
     } else if (num == 4) {
-      compositionCohortDefinition.setName("Categoria 19 Numerador – Pedido XPert  Pediátrico");
+      compositionCohortDefinition.setName("Categoria 19 Numerador – Pedido XPert Pediátrico");
     } else if (num == 5) {
-      compositionCohortDefinition.setName("Categoria 19 Numerador – Resultado XPert  Pediátrico");
+      compositionCohortDefinition.setName("Categoria 19 Numerador – Resultado XPert Pediátrico");
     } else if (num == 6) {
       compositionCohortDefinition.setName("Categoria 19 Numerador – Tratamento TB - Pediátrico");
     }
@@ -14659,6 +14663,8 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition pedidoXpertOnPresuntivoTb = getUtentesComPedidoXpertNaDataPresuntivoDeTB();
 
+    CohortDefinition resultadoXpertEm7Dias = getUtentesComResultadoDeXpertEm7Dias(true);
+
     compositionCohortDefinition.addSearch("MQ19DEN1", EptsReportUtils.map(mq19DenOne, MAPPING3));
 
     compositionCohortDefinition.addSearch("MQ19DEN2", EptsReportUtils.map(mq19DenTwo, MAPPING3));
@@ -14674,16 +14680,19 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "pedidoXpertOnPresuntivoTb", EptsReportUtils.map(pedidoXpertOnPresuntivoTb, MAPPING3));
 
+    compositionCohortDefinition.addSearch(
+        "resultadoXpertEm7Dias", EptsReportUtils.map(resultadoXpertEm7Dias, MAPPING3));
+
     if (num == 1) {
       compositionCohortDefinition.setCompositionString("MQ19DEN1 AND pedidoXpertOnPresuntivoTb");
     } else if (num == 2) {
-      compositionCohortDefinition.setCompositionString("MQ19DEN2");
+      compositionCohortDefinition.setCompositionString("MQ19DEN2 AND resultadoXpertEm7Dias");
     } else if (num == 3) {
       compositionCohortDefinition.setCompositionString("MQ19DEN3");
     } else if (num == 4) {
       compositionCohortDefinition.setCompositionString("MQ19DEN4 AND pedidoXpertAndPresuntivoTb");
     } else if (num == 5) {
-      compositionCohortDefinition.setCompositionString("MQ19DEN5");
+      compositionCohortDefinition.setCompositionString("MQ19DEN5 AND resultadoXpertEm7Dias");
     } else if (num == 6) {
       compositionCohortDefinition.setCompositionString("MQ19DEN6");
     }
