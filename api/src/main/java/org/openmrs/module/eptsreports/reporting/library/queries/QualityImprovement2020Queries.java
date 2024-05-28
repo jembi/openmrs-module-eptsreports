@@ -2715,30 +2715,30 @@ public class QualityImprovement2020Queries {
 
   /**
    * Incluindo todos os utentes que tiveram registo de “Mudança de E stado de Permanência” =
-   * “Reinício” e Pedido CD4 numa consulta clínica (Ficha Clínica) ocorrida durante o período de revisão (“Data
-   * de Consulta Reinício” >= “Data Início Revisão” e <= “Data Fim Revisão”)
+   * “Reinício” e Pedido CD4 numa consulta clínica (Ficha Clínica) ocorrida durante o período de
+   * revisão (“Data de Consulta Reinício” >= “Data Início Revisão” e <= “Data Fim Revisão”)
    *
    * @return {@link String}
    */
   public static String getPatientsWithRestartedStateOfStayAndCd4RequestQuery() {
-    return "SELECT pa.patient_id "
-            + "FROM "
-            + "    patient pa "
-            + "        INNER JOIN encounter e "
-            + "                   ON e.patient_id =  pa.patient_id "
-            + "        INNER JOIN obs "
-            + "                   ON obs.encounter_id = e.encounter_id "
-            + "        INNER JOIN "
-            + "    ( "
-            + getPatientsWithRestartedStateOfStayQuery()
-            + "    ) restarted ON restarted.patient_id = pa.patient_id "
-            + "WHERE  pa.voided = 0 "
-            + "  AND e.voided = 0 "
-            + "  AND obs.voided = 0 "
-            + "  AND e.encounter_type = ${6} "
-            + "  AND obs.concept_id = ${23722} AND obs.value_coded = ${1695} "
-            + "  AND e.encounter_datetime = restarted.restart_date "
-            + "  AND e.location_id = :location "
-            + "GROUP BY pa.patient_id";
+    return "SELECT pa.patient_id , restarted.restart_date "
+        + "FROM "
+        + "    patient pa "
+        + "        INNER JOIN encounter e "
+        + "                   ON e.patient_id =  pa.patient_id "
+        + "        INNER JOIN obs "
+        + "                   ON obs.encounter_id = e.encounter_id "
+        + "        INNER JOIN "
+        + "    ( "
+        + getPatientsWithRestartedStateOfStayQuery()
+        + "    ) restarted ON restarted.patient_id = pa.patient_id "
+        + "WHERE  pa.voided = 0 "
+        + "  AND e.voided = 0 "
+        + "  AND obs.voided = 0 "
+        + "  AND e.encounter_type = ${6} "
+        + "  AND obs.concept_id = ${23722} AND obs.value_coded = ${1695} "
+        + "  AND e.encounter_datetime = restarted.restart_date "
+        + "  AND e.location_id = :location "
+        + "GROUP BY pa.patient_id";
   }
 }

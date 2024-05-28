@@ -1106,9 +1106,9 @@ public class GenericCohortQueries {
    * <p>
    * <li>Idade = “Data Consulta Reinício” - Data de Nascimento
    * <li>Nota1: A idade será calculada em anos.
-   * <li>Nota2:“Data Consulta Reinício” é a data da consulta clínica (Ficha Clínica) com
-   * registo de “Mudança de Estado de Permanência” = “Reinício” ocorrida durante o período
-   * de revisão (“Data de Consulta Reinício” >= “Data Início Revisão” e <= “Data Fim Revisão”)
+   * <li>Nota2:“Data Consulta Reinício” é a data da consulta clínica (Ficha Clínica) com registo de
+   *     “Mudança de Estado de Permanência” = “Reinício” ocorrida durante o período de revisão
+   *     (“Data de Consulta Reinício” >= “Data Início Revisão” e <= “Data Fim Revisão”)
    *
    * @param minAge Minimum age of a patient
    * @param maxAge Maximum age of a patient
@@ -1129,18 +1129,18 @@ public class GenericCohortQueries {
     map.put("maxAge", maxAge);
 
     String query =
-            "SELECT p.person_id "
-                    + "FROM person p "
-                    + "     INNER JOIN ( "
-                    + QualityImprovement2020Queries.getPatientsWithRestartedStateOfStayQuery()
-                    + "     ) AS restarted ON p.person_id = restarted.patient_id "
-                    + " WHERE  ";
+        "SELECT p.person_id "
+            + "FROM person p "
+            + "     INNER JOIN ( "
+            + QualityImprovement2020Queries.getPatientsWithRestartedStateOfStayQuery()
+            + "     ) AS restarted ON p.person_id = restarted.patient_id "
+            + " WHERE  ";
 
     if (minAge != null && maxAge != null) {
       query +=
-              "     TIMESTAMPDIFF(YEAR, p.birthdate, restarted.restart_date) >= ${minAge}  "
-                      + "         AND   "
-                      + "   TIMESTAMPDIFF(YEAR, p.birthdate, restarted.restart_date) <= ${maxAge} ";
+          "     TIMESTAMPDIFF(YEAR, p.birthdate, restarted.restart_date) >= ${minAge}  "
+              + "         AND   "
+              + "   TIMESTAMPDIFF(YEAR, p.birthdate, restarted.restart_date) <= ${maxAge} ";
 
     } else if (minAge == null && maxAge != null) {
       query += "   TIMESTAMPDIFF(YEAR, p.birthdate, restarted.restart_date) <= ${maxAge} ";
@@ -1161,15 +1161,17 @@ public class GenericCohortQueries {
    * <p>
    * <li>Idade = “Data Consulta Reinício e Pedido CD4” - Data de Nascimento
    * <li>Nota1: A idade será calculada em anos.
-   * <li>Nota2:“Data Consulta Reinício e Pedido CD4” é a data da consulta clínica (Ficha Clínica) com
-   * registo de “Mudança de Estado de Permanência” = “Reinício” e Pedido CD4 ocorrida durante o período
-   * de revisão (“Data de Consulta Reinício” >= “Data Início Revisão” e <= “Data Fim Revisão”)
+   * <li>Nota2:“Data Consulta Reinício e Pedido CD4” é a data da consulta clínica (Ficha Clínica)
+   *     com registo de “Mudança de Estado de Permanência” = “Reinício” e Pedido CD4 ocorrida
+   *     durante o período de revisão (“Data de Consulta Reinício” >= “Data Início Revisão” e <=
+   *     “Data Fim Revisão”)
    *
    * @param minAge Minimum age of a patient
    * @param maxAge Maximum age of a patient
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getAgeOnRestartedStateOfStayAndCd4Request(Integer minAge, Integer maxAge) {
+  public CohortDefinition getAgeOnRestartedStateOfStayAndCd4Request(
+      Integer minAge, Integer maxAge) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Idade do Utente na Data Reinício TARV que teve pedido de CD4");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -1186,18 +1188,18 @@ public class GenericCohortQueries {
     map.put("maxAge", maxAge);
 
     String query =
-            "SELECT p.person_id "
-                    + "FROM person p "
-                    + "     INNER JOIN ( "
-                    + QualityImprovement2020Queries.getPatientsWithRestartedStateOfStayAndCd4RequestQuery()
-                    + "     ) AS restarted ON p.person_id = restarted.patient_id "
-                    + " WHERE  ";
+        "SELECT p.person_id "
+            + "FROM person p "
+            + "     INNER JOIN ( "
+            + QualityImprovement2020Queries.getPatientsWithRestartedStateOfStayAndCd4RequestQuery()
+            + "     ) AS restarted ON p.person_id = restarted.patient_id "
+            + " WHERE  ";
 
     if (minAge != null && maxAge != null) {
       query +=
-              "     TIMESTAMPDIFF(YEAR, p.birthdate, restarted.restart_date) >= ${minAge}  "
-                      + "         AND   "
-                      + "   TIMESTAMPDIFF(YEAR, p.birthdate, restarted.restart_date) <= ${maxAge} ";
+          "     TIMESTAMPDIFF(YEAR, p.birthdate, restarted.restart_date) >= ${minAge}  "
+              + "         AND   "
+              + "   TIMESTAMPDIFF(YEAR, p.birthdate, restarted.restart_date) <= ${maxAge} ";
 
     } else if (minAge == null && maxAge != null) {
       query += "   TIMESTAMPDIFF(YEAR, p.birthdate, restarted.restart_date) <= ${maxAge} ";
