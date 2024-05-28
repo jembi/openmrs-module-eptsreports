@@ -38,7 +38,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
   public DataSetDefinition constructQualityImprovement2020DataSet() {
 
     CohortIndicatorDataSetDefinition dataSetDefinition = new CohortIndicatorDataSetDefinition();
-    dataSetDefinition.setName("Quality Improvement DataSet 2020");
+    dataSetDefinition.setName("Quality Improvement DataSet 2024");
     dataSetDefinition.addParameters(getParameters());
 
     /* add dimensions */
