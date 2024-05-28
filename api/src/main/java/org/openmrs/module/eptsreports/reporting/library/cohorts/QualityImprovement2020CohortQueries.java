@@ -14519,6 +14519,8 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition resultadoXpert = getUtentesComResultadoDeXpertEm7Dias();
 
+    CohortDefinition diagnosticoTbActivo = getUtentesComDiagnosticoTbActivo();
+
     compositionCohortDefinition.addSearch(
         "transferredOut", EptsReportUtils.map(transferOut, MAPPING11));
 
@@ -14528,6 +14530,9 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "resultadoXpert", EptsReportUtils.map(resultadoXpert, MAPPING3));
 
+    compositionCohortDefinition.addSearch(
+        "diagnosticoTbActivo", EptsReportUtils.map(diagnosticoTbActivo, MAPPING3));
+
     if (den == 1 || den == 4) {
       compositionCohortDefinition.setCompositionString(
           "(presuntivosTb AND age) NOT transferredOut");
@@ -14536,7 +14541,7 @@ public class QualityImprovement2020CohortQueries {
           "(resultadoXpert AND age) NOT transferredOut");
     } else if (den == 3 || den == 6) {
       compositionCohortDefinition.setCompositionString(
-          "(presuntivosTb AND age) NOT transferredOut");
+          "(diagnosticoTbActivo AND age) NOT transferredOut");
     }
 
     return compositionCohortDefinition;
