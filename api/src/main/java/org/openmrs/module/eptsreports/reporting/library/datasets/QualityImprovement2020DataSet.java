@@ -3048,10 +3048,120 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
     MQ19DEN6.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
-        "MQ12DEN6",
+        "MQ19DEN6",
         "19.6 % de crianças (0 - 14 anos) HIV+ diagnosticados com TB e que iniciaram tratamento de TB na data do diagnóstico de TB",
         EptsReportUtils.map(
             MQ19DEN6,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    // Category 19 numerator indicators
+
+    // MQ Cat 19 Num 1
+    CohortIndicator MQ19NUM1 =
+        eptsGeneralIndicator.getIndicator(
+            "MQ19NUM1",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ19B(1),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MQ19NUM1.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MQ19NUM1",
+        "19.1 % de adultos (>=15 anos) presuntivos de TB com pedido de teste molecular (Xpert/Truenat) na data da 1ª consulta",
+        EptsReportUtils.map(
+            MQ19NUM1,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    // MQ Cat 19 Num 2
+    CohortIndicator MQ19NUM2 =
+        eptsGeneralIndicator.getIndicator(
+            "MQ19NUM2",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ19B(2),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MQ19NUM2.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MQ19NUM2",
+        "19.2 % de adultos (>=15 anos) HIV+ presuntivos de TB que receberam resultado do teste molecular (Xpert/Truenat) dentro de 7 dias após o pedido",
+        EptsReportUtils.map(
+            MQ19NUM2,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    // MQ Cat 19 Num 3
+    CohortIndicator MQ19NUM3 =
+        eptsGeneralIndicator.getIndicator(
+            "MQ19NUM3",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ19B(3),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MQ19NUM3.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MQ19NUM3",
+        "19.3 % de adultos (>=15 anos) HIV+ diagnosticados com TB e que iniciaram tratamento de TB na data do diagnóstico de TB",
+        EptsReportUtils.map(
+            MQ19NUM3,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    // MQ Cat 19 Num 4
+    CohortIndicator MQ19NUM4 =
+        eptsGeneralIndicator.getIndicator(
+            "MQ19NUM4",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ19B(4),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MQ19NUM4.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MQ19NUM4",
+        "19.4 % de crianças (0-14 anos) presuntivos de TB com pedido de teste molecular (Xpert/Truenat) na data da 1ª consulta",
+        EptsReportUtils.map(
+            MQ19NUM4,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    // MQ Cat 19 Num 5
+    CohortIndicator MQ19NUM5 =
+        eptsGeneralIndicator.getIndicator(
+            "MQ19NUM5",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ19B(5),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MQ19NUM5.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MQ19NUM5",
+        "19.5 % de crianças (0-14 anos) HIV+ presuntivos de TB que receberam resultado do teste molecular (Xpert/Truenat) dentro de 7 dias após o pedido",
+        EptsReportUtils.map(
+            MQ19NUM5,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    // MQ Cat 19 Num 6
+    CohortIndicator MQ19NUM6 =
+        eptsGeneralIndicator.getIndicator(
+            "MQ19NUM6",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ19B(6),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MQ19NUM6.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MQ19NUM6",
+        "19.6 % de crianças (0 - 14 anos) HIV+ diagnosticados com TB e que iniciaram tratamento de TB na data do diagnóstico de TB",
+        EptsReportUtils.map(
+            MQ19NUM6,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
