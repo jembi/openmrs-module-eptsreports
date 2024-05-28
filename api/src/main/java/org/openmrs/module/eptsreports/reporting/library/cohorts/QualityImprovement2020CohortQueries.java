@@ -14361,13 +14361,15 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   *
+   * O sistema irá identificar os utentes que tiveram registo do resultado Xpert dentro de 7 dias do
+   * pedido de Xpert, selecionado:
    *
    * <ul>
-   *   <li><b>Incluindo</b> todos os utentes com <b>pedido de Xpert</b> durante o período de revisão
-   *       <b>(RF8.1)</b> e que tiveram também um registo de <b>“Resultado de Xpert”</b> na
-   *       <b>consulta clínica (Ficha Clínica)</b> – secção investigações resultados laboratoriais,
-   *       ocorrida durante o período de revisão (>= “Data Início Revisão” e <= “Data Fim Revisão”).
+   *   <li>os utentes que tiveram registo do “Resultado de Xpert” na consulta clínica (Ficha
+   *       Clínica) – secção investigações resultados laboratoriais, ocorrida durante o período de
+   *       revisão, sete (7) dias após o registo do “Pedido de Xpert” na consulta clínica (Ficha
+   *       Clínica) – secção investigações pedidos laboratoriais, ocorrida durante o período de
+   *       revisão. Ou seja, “Data Resultado Xpert” menos (-) a “Data Pedido Xpert” >=0 e <=7 dias.
    * </ul>
    *
    * @return {@link CohortDefinition}
@@ -14400,8 +14402,70 @@ public class QualityImprovement2020CohortQueries {
             + "               ON resultadoXpert.patient_id = p.patient_id "
             + "WHERE  resultadoXpert.data_resultado_genexpert >= "
             + "       pedidoXpert.data_pedido_genexpert "
-            + "       AND Timestampdiff(day, resultadoXpert.data_resultado_genexpert, "
-            + "               pedidoXpert.data_pedido_genexpert) <= 7";
+            + "       AND Timestampdiff(day, pedidoXpert.data_pedido_genexpert, "
+            + "               resultadoXpert.data_resultado_genexpert) <= 7";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   *
+   *
+   * <ul>
+   *   <li><b>Filtrando</b> os que tiveram registo do <b>Pedido de Xpert</b> na <b>consulta clínica
+   *       (Ficha Clínica) - </b> secção investigações pedidos laboratoriais, ocorrida na <b>Data
+   *       Presuntivo de TB</b>.
+   *       <p><b>Nota:</b> a data da consulta clínica com o pedido de teste Xpert, <b>“Data Pedido
+   *       Xpert”</b> menos a <b>"Data Presuntivo de TB"</b> deve ser igual a <b>zero.</b> ocorrida
+   *       durante o período de revisão (>= “Data Início Revisão” e <= “Data Fim Revisão”).
+   * </ul>
+   *
+   * <p><b>Nota 1:</b> A <b>“Data Presuntivo de TB”</b> do utente é definida no <b>RF8</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getUtentesComPedidoXpertNaDataPresuntivoDeTB() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes com Pedido de Xpert na Data Presuntivo de TB");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    map.put("23723", tbMetadata.getTBGenexpertTestConcept().getConceptId());
+    map.put("23758", hivMetadata.getTBSymptomsConcept().getConceptId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("1766", tbMetadata.getObservationTB().getConceptId());
+    map.put("1763", tbMetadata.getFeverLastingMoraThan3Weeks().getConceptId());
+    map.put("1764", tbMetadata.getWeightLossOfMoreThan3KgInLastMonth().getConceptId());
+    map.put("1762", tbMetadata.getNightsWeatsLastingMoraThan3Weeks().getConceptId());
+    map.put("1760", tbMetadata.getCoughLastingMoraThan3Weeks().getConceptId());
+    map.put("23760", tbMetadata.getAsthenia().getConceptId());
+    map.put("1765", tbMetadata.getCohabitantBeingTreatedForTB().getConceptId());
+    map.put("161", tbMetadata.getLymphadenopathy().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN ( "
+            + QualityImprovement2020Queries.getPatientsWithPedidoDeXpert()
+            + "                   ) pedidoXpert "
+            + "               ON pedidoXpert.patient_id = p.patient_id "
+            + "       INNER JOIN ( "
+            + getUnionQueryUtentesPresuntivos()
+            + "                   ) presuntivosTb "
+            + "               ON presuntivosTb.patient_id = p.patient_id "
+            + "WHERE  presuntivosTb.data_presuntivo_tb = "
+            + "       pedidoXpert.data_pedido_genexpert "
+            + "       AND Timestampdiff(day, presuntivosTb.data_presuntivo_tb, "
+            + "               pedidoXpert.data_pedido_genexpert) = 0";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -14456,12 +14520,12 @@ public class QualityImprovement2020CohortQueries {
 
   /**
    * <b>MQ19</b>: Melhoria de Qualidade Category 19 <br>
-   * <i> DENOMINATOR 1: (presuntivosTb AND adultoTbPresuntivo) NOT F</i> <br>
-   * <i> DENOMINATOR 2: (presuntivosTb AND menorTbPresuntivo) NOT F</i> <br>
-   * <i> DENOMINATOR 3: A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)</i> <br>
-   * <i> DENOMINATOR 4: (A AND B4) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)</i> <br>
-   * <i> DENOMINATOR 5: (A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)</i> <br>
-   * <i> DENOMINATOR 6: (A AND B4 AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)</i> <br>
+   * <i> DENOMINATOR 1: (presuntivosTb AND age) NOT transferredOut</i> <br>
+   * <i> DENOMINATOR 2: (resultadoXpert AND age) NOT transferredOut</i> <br>
+   * <i> DENOMINATOR 3: (diagnosticoTbActivo AND age) NOT transferredOut</i> <br>
+   * <i> DENOMINATOR 4: (presuntivosTb AND age) NOT transferredOut</i> <br>
+   * <i> DENOMINATOR 5: (resultadoXpert AND age) NOT transferredOut</i> <br>
+   * <i> DENOMINATOR 6: (diagnosticoTbActivo AND age) NOT transferredOut</i> <br>
    *
    * @param den indicator number
    */
@@ -14544,6 +14608,85 @@ public class QualityImprovement2020CohortQueries {
           "(diagnosticoTbActivo AND age) NOT transferredOut");
     }
 
+    return compositionCohortDefinition;
+  }
+
+  /**
+   * <b>MQ19</b>: Melhoria de Qualidade Category 19<br>
+   * <i> DENOMINATOR 1: </i> <br>
+   * <i> DENOMINATOR 2: </i> <br>
+   * <i> DENOMINATOR 3: </i> <br>
+   * <i> DENOMINATOR 4: </i> <br>
+   * <i> DENOMINATOR 5: </i> <br>
+   * <i> DENOMINATOR 6: </i> <br>
+   *
+   * @param num indicator number
+   * @return CohortDefinition
+   */
+  public CohortDefinition getMQ19B(Integer num) {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    if (num == 1) {
+      compositionCohortDefinition.setName("Categoria 19 Numerador – Pedido XPert  Adulto");
+    } else if (num == 2) {
+      compositionCohortDefinition.setName("Categoria 19 Numerador – Resultado XPert  Adulto");
+    } else if (num == 3) {
+      compositionCohortDefinition.setName("Categoria 19 Numerador – Tratamento TB - Adulto");
+    } else if (num == 4) {
+      compositionCohortDefinition.setName("Categoria 19 Numerador – Pedido XPert  Pediátrico");
+    } else if (num == 5) {
+      compositionCohortDefinition.setName("Categoria 19 Numerador – Resultado XPert  Pediátrico");
+    } else if (num == 6) {
+      compositionCohortDefinition.setName("Categoria 19 Numerador – Tratamento TB - Pediátrico");
+    }
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition mq19DenOne = getMQ19A(1);
+
+    CohortDefinition mq19DenTwo = getMQ19A(2);
+
+    CohortDefinition mq19DenThree = getMQ19A(3);
+
+    CohortDefinition mq19DenFour = getMQ19A(4);
+
+    CohortDefinition mq19DenFive = getMQ19A(5);
+
+    CohortDefinition mq19DenSix = getMQ19A(6);
+
+    CohortDefinition pedidoXpertOnPresuntivoTb = getUtentesComPedidoXpertNaDataPresuntivoDeTB();
+
+    compositionCohortDefinition.addSearch("MQ19DEN1", EptsReportUtils.map(mq19DenOne, MAPPING3));
+
+    compositionCohortDefinition.addSearch("MQ19DEN2", EptsReportUtils.map(mq19DenTwo, MAPPING3));
+
+    compositionCohortDefinition.addSearch("MQ19DEN3", EptsReportUtils.map(mq19DenThree, MAPPING3));
+
+    compositionCohortDefinition.addSearch("MQ19DEN4", EptsReportUtils.map(mq19DenFour, MAPPING3));
+
+    compositionCohortDefinition.addSearch("MQ19DEN5", EptsReportUtils.map(mq19DenFive, MAPPING3));
+
+    compositionCohortDefinition.addSearch("MQ19DEN6", EptsReportUtils.map(mq19DenSix, MAPPING3));
+
+    compositionCohortDefinition.addSearch(
+        "pedidoXpertOnPresuntivoTb", EptsReportUtils.map(pedidoXpertOnPresuntivoTb, MAPPING3));
+
+    if (num == 1) {
+      compositionCohortDefinition.setCompositionString("MQ19DEN1 AND pedidoXpertOnPresuntivoTb");
+    } else if (num == 2) {
+      compositionCohortDefinition.setCompositionString("MQ19DEN2");
+    } else if (num == 3) {
+      compositionCohortDefinition.setCompositionString("MQ19DEN3");
+    } else if (num == 4) {
+      compositionCohortDefinition.setCompositionString("MQ19DEN4 AND pedidoXpertAndPresuntivoTb");
+    } else if (num == 5) {
+      compositionCohortDefinition.setCompositionString("MQ19DEN5");
+    } else if (num == 6) {
+      compositionCohortDefinition.setCompositionString("MQ19DEN6");
+    }
     return compositionCohortDefinition;
   }
 }
