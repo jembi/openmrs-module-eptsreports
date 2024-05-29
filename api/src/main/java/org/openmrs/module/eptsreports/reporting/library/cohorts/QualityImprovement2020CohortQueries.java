@@ -14247,4 +14247,44 @@ public class QualityImprovement2020CohortQueries {
 
     return cd;
   }
+
+  /**
+   * <b>adultos (15/+anos) na 1ª aou 2ª linha de TARV que tiveram consulta clínica no período de
+   * revisão e que eram elegíveis ao pedido de CV </b>
+   *
+   * <p>Incluindo o somatório do resultado dos seguintes indicadores - para denominador:
+   * <li>Denominador do Indicador 13.1-1ª Linha da Categoria 13 Adulto de Pedido de CV (RF16.1)
+   * <li>Denominador do Indicador 13.4-2ª Linha da Categoria 13 Adulto de Pedido de CV (RF18)
+   *
+   *     <p>Incluindo o somatório do resultado dos seguintes indicadores - para numerador:
+   * <li>Numerador do Indicador 13.1-1ª Linha da Categoria 13 Adulto de Pedido de CV (RF17.1).
+   * <li>Numerador do Indicador 13.4-2ª Linha da Categoria 13 Adulto de Pedido de CV (RF19).
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getSumOfPatientsIn1stOr2ndLineOfArt(Boolean denominator) {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName(
+        "# de adultos (15/+anos) na 1ª ou 2ª linha de TARV - Somatorio (numerador e denominador)");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    if (denominator) {
+      cd.addSearch("PRIMEIRALINHA", Mapped.mapStraightThrough(getMQ13(true, 1)));
+
+      cd.addSearch("SEGUNDALINHA", Mapped.mapStraightThrough(getMQ13(true, 4)));
+    } else {
+      cd.addSearch("PRIMEIRALINHA", Mapped.mapStraightThrough(getMQ13(false, 1)));
+
+      cd.addSearch("SEGUNDALINHA", Mapped.mapStraightThrough(getMQ13(false, 4)));
+    }
+
+    cd.setCompositionString("PRIMEIRALINHA OR SEGUNDALINHA");
+
+    return cd;
+  }
 }
