@@ -38,7 +38,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
   public DataSetDefinition constructQualityImprovement2020DataSet() {
 
     CohortIndicatorDataSetDefinition dataSetDefinition = new CohortIndicatorDataSetDefinition();
-    dataSetDefinition.setName("Quality Improvement DataSet 2020");
+    dataSetDefinition.setName("Quality Improvement DataSet 2024");
     dataSetDefinition.addParameters(getParameters());
 
     /* add dimensions */
@@ -2658,14 +2658,14 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
 
     dataSetDefinition.addColumn(
         "MQ9DEN1",
-        "% de adultos  HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
+        "9.1 % de adultos (15/+anos) com pedido de CD4 na primeira consulta clínica depois do diagnóstico de HIV+",
         EptsReportUtils.map(
             customCohortIndicator(qualityImprovement2020CohortQueries.getMQ9Den(1), mapping),
             mapping),
         "");
     dataSetDefinition.addColumn(
         "MQ9DEN2",
-        "% de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
+        "9.2 % de adultos (15/+anos) HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias após a primeira consulta clínica",
         EptsReportUtils.map(
             customCohortIndicator(qualityImprovement2020CohortQueries.getMQ9Den(2), mapping),
             mapping),
@@ -2673,42 +2673,43 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
 
     dataSetDefinition.addColumn(
         "MQ9DEN3",
-        "% de crianças HIV+ ≤ 14 anos que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra",
+        "9.3 % de adultos (15/+anos) com pedido de CD4 na consulta clínica de reinício do TARV",
         EptsReportUtils.map(
-            customCohortIndicator(qualityImprovement2020CohortQueries.getMQ9Den(3), mapping),
+            customCohortIndicator(
+                qualityImprovement2020CohortQueries
+                    .getAdultPatientsRestartedWithCd4RequestAndResult(3),
+                mapping),
             mapping),
         "");
     dataSetDefinition.addColumn(
         "MQ9DEN4",
-        "% de crianças HIV+ ≤ 14 anos que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira consulta clínica/abertura da Ficha Mestra",
+        "9.4 % de adultos (15/+anos) que receberam o resultado do CD4 dentro de 33 dias após consulta clínica de reinício do TARV",
         EptsReportUtils.map(
-            customCohortIndicator(qualityImprovement2020CohortQueries.getMQ9Den(4), mapping),
+            customCohortIndicator(
+                qualityImprovement2020CohortQueries.getPatientsRestartedAndEligibleForCd4Request(4),
+                mapping),
             mapping),
         "");
 
     dataSetDefinition.addColumn(
         "MQ9DEN5",
-        "Pedido de CD4 = “% de MG HIV+ que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra",
+        "9.5 % de crianças  (0-14 anos) com pedido de CD4 na primeira consulta clínica depois do diagnóstico de HIV+",
         EptsReportUtils.map(
-            customCohortIndicator(
-                qualityImprovement2020CohortQueries.getCd4RequestAndResultForPregnantsCat9Den(5),
-                mapping),
+            customCohortIndicator(qualityImprovement2020CohortQueries.getMQ9Den5and6(), mapping),
             mapping),
         "");
 
     dataSetDefinition.addColumn(
         "MQ9DEN6",
-        "Resultado de CD4 = “% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez",
+        "9.6 % de crianças  (0-14 anos) HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira consulta clínica",
         EptsReportUtils.map(
-            customCohortIndicator(
-                qualityImprovement2020CohortQueries.getCd4RequestAndResultForPregnantsCat9Den(6),
-                mapping),
+            customCohortIndicator(qualityImprovement2020CohortQueries.getMQ9Den5and6(), mapping),
             mapping),
         "");
 
     dataSetDefinition.addColumn(
         "MQ9DEN7",
-        "9.7 % de adultos HIV+ ≥ 15 anos que reiniciaram TARV durante o período de revisão e tiveram registo de pedido do CD4 na consulta de reinício",
+        "9.7 % de crianças (0-14 anos) com pedido de CD4 na consulta clínica de reinício do TARV",
         EptsReportUtils.map(
             customCohortIndicator(
                 qualityImprovement2020CohortQueries
@@ -2719,33 +2720,30 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
 
     dataSetDefinition.addColumn(
         "MQ9DEN8",
-        "9.8 % de adultos HIV+ ≥ 15 anos reinícios TARV que teve conhecimento do resultado do CD4 dentro de 33 dias após a data da consulta clínica de reinício TARV",
+        "9.8 % de crianças (0-14 anos) que receberam o resultado do CD4 dentro de 33 dias após consulta clínica de reinício do TARV",
         EptsReportUtils.map(
             customCohortIndicator(
-                qualityImprovement2020CohortQueries
-                    .getAdultPatientsRestartedWithCd4RequestAndResult(8),
+                qualityImprovement2020CohortQueries.getPatientsRestartedAndEligibleForCd4Request(8),
                 mapping),
             mapping),
         "");
 
     dataSetDefinition.addColumn(
         "MQ9DEN9",
-        "9.9 % de crianças HIV+ < 15 anos que reiniciaram TARV durante o período de revisão e tiveram registo de pedido do CD4 na consulta de reinício",
+        "9.9 % de MG  HIV+ com registo de pedido de CD4 na primeira CPN",
         EptsReportUtils.map(
             customCohortIndicator(
-                qualityImprovement2020CohortQueries
-                    .getAdultPatientsRestartedWithCd4RequestAndResult(9),
+                qualityImprovement2020CohortQueries.getCd4RequestAndResultForPregnantsCat9Den(9),
                 mapping),
             mapping),
         "");
 
     dataSetDefinition.addColumn(
         "MQ9DEN10",
-        "9.10 % de crianças HIV+ < 15 anos reinícios TARV que teve conhecimento do resultado do CD4 dentro de 33 dias após a data da consulta clínica de reinício TARV",
+        "9.10 % de MG  HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira CPN",
         EptsReportUtils.map(
             customCohortIndicator(
-                qualityImprovement2020CohortQueries
-                    .getAdultPatientsRestartedWithCd4RequestAndResult(10),
+                qualityImprovement2020CohortQueries.getCd4RequestAndResultForPregnantsCat9Den(10),
                 mapping),
             mapping),
         "");
@@ -2753,7 +2751,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
     // MQ indicators category 9 numerator
     dataSetDefinition.addColumn(
         "MQ9NUM1",
-        "% de adultos HIV+ ≥ 15 anos que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra",
+        "9.1 % de adultos  (15/+anos) com pedido de CD4 na primeira consulta clínica depois do diagnóstico de HIV+",
         EptsReportUtils.map(
             customCohortIndicator(qualityImprovement2020CohortQueries.getMQ9Num(1), mapping),
             mapping),
@@ -2761,7 +2759,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
 
     dataSetDefinition.addColumn(
         "MQ9NUM2",
-        "% de adultos HIV+ ≥ 15 anos que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira consulta clínica/abertura da Ficha Mestra",
+        "9.2 % de adultos  (15/+anos) HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira consulta clínica",
         EptsReportUtils.map(
             customCohortIndicator(qualityImprovement2020CohortQueries.getMQ9Num(2), mapping),
             mapping),
@@ -2777,7 +2775,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
 
     dataSetDefinition.addColumn(
         "MQ9NUM4",
-        "% de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
+        "9.4 % de adultos (15/+anos) que receberam o resultado do CD4 dentro de 33 dias após consulta clínica de reinício do TARV",
         EptsReportUtils.map(
             customCohortIndicator(qualityImprovement2020CohortQueries.getMQ9Num(4), mapping),
             mapping),
@@ -2785,21 +2783,18 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
 
     dataSetDefinition.addColumn(
         "MQ9NUM5",
-        "% de MG HIV+ em TARV com registo de pedido de CD4 na primeira CPN (Primeira consulta com registo Gravidez)",
+        "9.5 % de crianças  (0-14 anos) com pedido de CD4 na primeira consulta clínica depois do diagnóstico de HIV+",
         EptsReportUtils.map(
-            customCohortIndicator(
-                qualityImprovement2020CohortQueries.getCd4RequestAndResultForPregnantsCat9Num(5),
-                mapping),
+            customCohortIndicator(qualityImprovement2020CohortQueries.getMQ9Num(5), mapping),
             mapping),
         "");
 
     dataSetDefinition.addColumn(
         "MQ9NUM6",
-        "% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez",
+        "9.6 % de crianças  (0-14 anos) HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira consulta clínica",
         EptsReportUtils.map(
-            customCohortIndicator(
-                qualityImprovement2020CohortQueries.getCd4RequestAndResultForPregnantsCat9Num(6),
-                mapping),
+            customCohortIndicator( // getMQ9Num
+                qualityImprovement2020CohortQueries.getMQ9Num(6), mapping),
             mapping),
         "");
 
@@ -2825,10 +2820,10 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
 
     dataSetDefinition.addColumn(
         "MQ9NUM9",
-        "9.9 % de crianças HIV+ < 15 anos que reiniciaram TARV durante o período de revisão e tiveram registo de pedido do CD4 na consulta de reinício",
+        "9.9 % de MG  HIV+ com registo de pedido de CD4 na primeira CPN",
         EptsReportUtils.map(
             customCohortIndicator(
-                qualityImprovement2020CohortQueries.getPatientsWithCd4RequestOnRestartedTarvDate(9),
+                qualityImprovement2020CohortQueries.getCd4RequestAndResultForPregnantsCat9Num(9),
                 mapping),
             mapping),
         "");
@@ -2838,8 +2833,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "9.10 % de crianças HIV+ < 15 anos reinícios TARV que teve conhecimento do resultado do CD4 dentro de 33 dias após a data da consulta clínica de reinício TARV",
         EptsReportUtils.map(
             customCohortIndicator(
-                qualityImprovement2020CohortQueries.getPatientsWithCd4RequestOnRestartedTarvDate(
-                    10),
+                qualityImprovement2020CohortQueries.getCd4RequestAndResultForPregnantsCat9Num(10),
                 mapping),
             mapping),
         "");
