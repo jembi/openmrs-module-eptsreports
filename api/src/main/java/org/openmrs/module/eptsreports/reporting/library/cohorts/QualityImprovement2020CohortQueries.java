@@ -2995,6 +2995,7 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition abandonedTarv = getPatientsWhoAbandonedOrRestartedTarvOnLast6MonthsArt();
     CohortDefinition abandonedFirstLine = getPatientsWhoAbandonedTarvOnOnFirstLineDate();
     CohortDefinition abandonedSecondLine = getPatientsWhoAbandonedTarvOnOnSecondLineDate();
+    CohortDefinition tbDiagnosisActive = getPatientsWithTbActiveOrTbTreatment();
 
     if (indicator == 2) {
       compositionCohortDefinition.addSearch(
@@ -3077,12 +3078,15 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "ABANDONED2LINE", EptsReportUtils.map(abandonedSecondLine, MAPPING1));
 
+    compositionCohortDefinition.addSearch(
+        "tbDiagnosisActive", EptsReportUtils.map(tbDiagnosisActive, MAPPING));
+
     if (indicator == 2 || indicator == 9 || indicator == 10 || indicator == 11)
       compositionCohortDefinition.setCompositionString(
-          "((A AND NOT C) OR B1) AND NOT (F OR E OR DD OR ABANDONEDTARV) AND age");
+          "((A AND NOT C) OR B1) AND NOT (F OR E OR DD OR ABANDONEDTARV OR tbDiagnosisActive) AND age");
     if (indicator == 5 || indicator == 14)
       compositionCohortDefinition.setCompositionString(
-          "B2New AND NOT (F OR E OR DD OR ABANDONEDTARV) AND age");
+          "B2New AND NOT (F OR E OR DD OR ABANDONEDTARV OR tbDiagnosisActive) AND age");
     return compositionCohortDefinition;
   }
 
@@ -5998,10 +6002,12 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("K", EptsReportUtils.map(getMQC13P3NUM_K(), MAPPING1));
     cd.addSearch("L", EptsReportUtils.map(getMQC13P3NUM_L(), MAPPING));
     cd.addSearch("DD", EptsReportUtils.map(getDeadPatientsCompositionMQ13(), MAPPING3));
+    cd.addSearch(
+        "tbDiagnosisActive", EptsReportUtils.map(getPatientsWithTbActiveOrTbTreatment(), MAPPING));
 
     if (indicator == 2 || indicator == 9 || indicator == 10 || indicator == 11)
       cd.setCompositionString(
-          "((A AND NOT C AND (G OR J)) OR (B1 AND (H OR K))) AND NOT (F OR E OR DD OR ABANDONEDTARV) AND age");
+          "((A AND NOT C AND (G OR J)) OR (B1 AND (H OR K))) AND NOT (F OR E OR DD OR ABANDONEDTARV OR tbDiagnosisActive) AND age");
     if (indicator == 5 || indicator == 14)
       cd.setCompositionString(
           "(B2New AND (I OR L)) AND NOT (F OR E OR DD OR ABANDONEDTARV) AND age");
@@ -14380,6 +14386,46 @@ public class QualityImprovement2020CohortQueries {
       cd.addSearch("PRIMEIRALINHA", Mapped.mapStraightThrough(getMQ13(false, 8)));
 
       cd.addSearch("SEGUNDALINHA", Mapped.mapStraightThrough(getMQ13(false, 13)));
+    }
+
+    cd.setCompositionString("PRIMEIRALINHA OR SEGUNDALINHA");
+
+    return cd;
+  }
+
+  /**
+   * <b># de crianças (15/+anos) na 1a ou 2ª linha de TARV ou mudança de regime de 1ª linhaV</b>
+   *
+   * <p>Incluindo o somatório do resultado dos seguintes indicadores - para denominador:
+   * <li>Denominador do Indicador 13.2-1ª Linha da Categoria 13 Adulto de Resultado de CV (RF34.1).
+   *     <liDenominador do Indicador 13.5-2ª Linha da Categoria 13 Adulto de Resultado de CV (RF42).
+   *
+   *     <p>Incluindo o somatório do resultado dos seguintes indicadores - para numerador:
+   * <li>Numerador do Indicador 13.2-1ª Linha da Categoria 13 Adulto de Resultado de CV (RF35.1).
+   * <li>Numerador do Indicador 13.5-2ª Linha da Categoria 13 Adulto de Resultado de CV (RF43).
+   *
+   * @param denominator boolean parameter to choose between Denominator and Numerator
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getSumOfPatientsIn1stOr2ndLineOfArtForDenNum2(Boolean denominator) {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName(
+        "# criancas de (15/+anos) na 1a ou 2ª linha de TARV ou mudança de regime de 1ª linha");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    if (denominator) {
+      cd.addSearch("PRIMEIRALINHA", Mapped.mapStraightThrough(getMQC13P3DEN(2)));
+
+      cd.addSearch("SEGUNDALINHA", Mapped.mapStraightThrough(getMQC13P3DEN(5)));
+    } else {
+      cd.addSearch("PRIMEIRALINHA", Mapped.mapStraightThrough(getMQC13P3NUM(2)));
+
+      cd.addSearch("SEGUNDALINHA", Mapped.mapStraightThrough(getMQC13P3NUM(5)));
     }
 
     cd.setCompositionString("PRIMEIRALINHA OR SEGUNDALINHA");
