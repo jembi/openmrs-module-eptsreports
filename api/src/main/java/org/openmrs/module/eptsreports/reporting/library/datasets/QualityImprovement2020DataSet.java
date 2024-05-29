@@ -1242,20 +1242,21 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-    CohortIndicator MQ13DEN4 =
+    CohortIndicator MQ13DEN4SegundaLinha =
         eptsGeneralIndicator.getIndicator(
-            "MQ13DEN4",
+            "MQ13DEN4SegundaLinha",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ13(true, 4),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    MQ13DEN4.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    MQ13DEN4SegundaLinha.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
-        "MQ13DEN4",
+        "MQ13DEN4SegundaLinha",
         "# de adultos (15/+anos) na 2a linha de TARV que tiveram consulta clínica no período de revisão e que eram elegíveis ao pedido de CV",
         EptsReportUtils.map(
-            MQ13DEN4,
+            MQ13DEN4SegundaLinha,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
@@ -1329,20 +1330,21 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-    CohortIndicator MQ13DEN13 =
+    CohortIndicator MQ13DEN13SegundaLinha =
         eptsGeneralIndicator.getIndicator(
-            "MQ13DEN13",
+            "MQ13DEN13SegundaLinha",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ13(true, 13),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    MQ13DEN13.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    MQ13DEN13SegundaLinha.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
-        "MQ13DEN13",
+        "MQ13DEN13SegundaLinha",
         "# de crianças na 2a linha de TARV que tiveram consulta clínica no período de revisão e que eram elegíveis ao pedido de CV",
         EptsReportUtils.map(
-            MQ13DEN13,
+            MQ13DEN13SegundaLinha,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
@@ -1382,20 +1384,21 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-    CohortIndicator MQ13NUM4 =
+    CohortIndicator MQ13NUM4SegundaLinha =
         eptsGeneralIndicator.getIndicator(
-            "MQ13NUM4",
+            "MQ13NUM4SegundaLinha",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ13(false, 4),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    MQ13NUM4.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    MQ13NUM4SegundaLinha.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
-        "MQ13NUM4",
+        "MQ13NUM4SegundaLinha",
         "# de adultos (15/+anos) na 2a linha de TARV que tiveram consulta clínica no período de revisão, eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico",
         EptsReportUtils.map(
-            MQ13NUM4,
+            MQ13NUM4SegundaLinha,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
@@ -1470,20 +1473,21 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-    CohortIndicator MQ13NUM13 =
+    CohortIndicator MQ13NUM13SegundaLinha =
         eptsGeneralIndicator.getIndicator(
-            "MQ13NUM13",
+            "MQ13NUM13SegundaLinha",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ13(false, 13),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    MQ13NUM13.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    MQ13NUM13SegundaLinha.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
-        "MQ13NUM13",
+        "MQ13NUM13SegundaLinha",
         "# de crianças na 2a linha de TARV que tiveram consulta clínica no período de revisão, eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico",
         EptsReportUtils.map(
-            MQ13NUM13,
+            MQ13NUM13SegundaLinha,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
@@ -1522,20 +1526,21 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-    CohortIndicator MQ13DEN5 =
+    CohortIndicator MQ13DEN5SegundaLinha =
         eptsGeneralIndicator.getIndicator(
-            "MQ13DEN5",
+            "MQ13DEN5SegundaLinha",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQC13P3DEN(5),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    MQ13DEN5.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    MQ13DEN5SegundaLinha.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
-        "MQ13DEN5",
+        "MQ13DEN5SegundaLinha",
         "Adultos (15/+anos) na 2a linha de TARV que receberam o resultado da CV entre o sexto e o nono mês após o início da 2a linha de TARV",
         EptsReportUtils.map(
-            MQ13DEN5,
+            MQ13DEN5SegundaLinha,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
@@ -1609,20 +1614,21 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-    CohortIndicator MQ13DEN14 =
+    CohortIndicator MQ13DEN14SegundaLinha =
         eptsGeneralIndicator.getIndicator(
-            "MQ13DEN14",
+            "MQ13DEN14SegundaLinha",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQC13P3DEN(14),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    MQ13DEN14.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    MQ13DEN14SegundaLinha.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
-        "MQ13DEN14",
+        "MQ13DEN14SegundaLinha",
         "Crianças na 2a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início da 2a linha de TARV",
         EptsReportUtils.map(
-            MQ13DEN14,
+            MQ13DEN14SegundaLinha,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
@@ -1783,37 +1789,39 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-    CohortIndicator MQ13NUM5 =
+    CohortIndicator MQ13NUM5SegundaLinha =
         eptsGeneralIndicator.getIndicator(
-            "MQ13NUM5",
+            "MQ13NUM5SegundaLinha",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQC13P3NUM(5),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    MQ13NUM5.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    MQ13NUM5SegundaLinha.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
-        "MQ13NUM5",
+        "MQ13NUM5SegundaLinha",
         "adultos (15/+anos) na 2a linha de TARV que receberam o resultado da CV entre o sexto e o nono mês após o início da 2a linha de TARV",
         EptsReportUtils.map(
-            MQ13NUM5,
+            MQ13NUM5SegundaLinha,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-    CohortIndicator MQ13NUM14 =
+    CohortIndicator MQ13NUM14SegundaLinha =
         eptsGeneralIndicator.getIndicator(
-            "MQ13NUM14",
+            "MQ13NUM14SegundaLinha",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQC13P3NUM(14),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    MQ13NUM14.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    MQ13NUM14SegundaLinha.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
-        "MQ13NUM14",
+        "MQ13NUM14SegundaLinha",
         "Crianças na 2a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início da 2a linha de TARV",
         EptsReportUtils.map(
-            MQ13NUM14,
+            MQ13NUM14SegundaLinha,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
