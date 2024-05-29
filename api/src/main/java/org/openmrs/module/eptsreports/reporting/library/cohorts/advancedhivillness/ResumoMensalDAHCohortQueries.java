@@ -1338,17 +1338,25 @@ public class ResumoMensalDAHCohortQueries {
                 Arrays.asList(hivMetadata.getStartDrugs(), hivMetadata.getPreTarvConcept())),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.addSearch(
-        "B1",
-        map(
-            getRMDefinitionsIfPatientDontHaveTarvSituationOnDah(rmB1),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    if (eightToNine) {
+      cd.addSearch(
+          "B1", map(rmB1, "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
 
-    cd.addSearch(
-        "A2",
-        map(
-            getRMDefinitionsIfPatientDontHaveTarvSituationOnDah(rmA2),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+      cd.addSearch(
+          "A2", map(rmA2, "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
+    } else {
+      cd.addSearch(
+          "B1",
+          map(
+              getRMDefinitionsIfPatientDontHaveTarvSituationOnDah(rmB1),
+              "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+      cd.addSearch(
+          "A2",
+          map(
+              getRMDefinitionsIfPatientDontHaveTarvSituationOnDah(rmA2),
+              "startDate=${startDate},endDate=${endDate},location=${location}"));
+    }
 
     cd.addSearch(
         "PREGNANT",
@@ -1395,26 +1403,39 @@ public class ResumoMensalDAHCohortQueries {
                 Collections.singletonList(hivMetadata.getRestartConcept())),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.addSearch(
-        "B3P1",
-        map(
-            getRMDefinitionsIfPatientDontHaveTarvSituationOnDahForRestartedAndActiveDisaggregation(
-                rmB3),
-            "startDate=${startDate-2m},endDate=${endDate-2m},onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    if (eightToNine) {
+      cd.addSearch(
+          "B3P1",
+          map(rmB3, "startDate=${startDate-2m},endDate=${endDate-2m},location=${location}"));
 
-    cd.addSearch(
-        "B3P2",
-        map(
-            getRMDefinitionsIfPatientDontHaveTarvSituationOnDahForRestartedAndActiveDisaggregation(
-                rmB3),
-            "startDate=${startDate-1m},endDate=${endDate-1m},onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+      cd.addSearch(
+          "B3P2",
+          map(rmB3, "startDate=${startDate-1m},endDate=${endDate-1m},location=${location}"));
 
-    cd.addSearch(
-        "B3P3",
-        map(
-            getRMDefinitionsIfPatientDontHaveTarvSituationOnDahForRestartedAndActiveDisaggregation(
-                rmB3),
-            "startDate=${startDate},endDate=${endDate},onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+      cd.addSearch(
+          "B3P3", map(rmB3, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    } else {
+      cd.addSearch(
+          "B3P1",
+          map(
+              getRMDefinitionsIfPatientDontHaveTarvSituationOnDahForRestartedAndActiveDisaggregation(
+                  rmB3),
+              "startDate=${startDate-2m},endDate=${endDate-2m},onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+      cd.addSearch(
+          "B3P2",
+          map(
+              getRMDefinitionsIfPatientDontHaveTarvSituationOnDahForRestartedAndActiveDisaggregation(
+                  rmB3),
+              "startDate=${startDate-1m},endDate=${endDate-1m},onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+      cd.addSearch(
+          "B3P3",
+          map(
+              getRMDefinitionsIfPatientDontHaveTarvSituationOnDahForRestartedAndActiveDisaggregation(
+                  rmB3),
+              "startDate=${startDate},endDate=${endDate},onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    }
 
     cd.addSearch(
         "PREGNANT",
@@ -1466,12 +1487,17 @@ public class ResumoMensalDAHCohortQueries {
             getPatientsArtSituationOnDAH(Collections.singletonList(hivMetadata.getArtStatus())),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.addSearch(
-        "B12",
-        map(
-            getRMDefinitionsIfPatientDontHaveTarvSituationOnDahForRestartedAndActiveDisaggregation(
-                rmb12),
-            "startDate=${startDate},endDate=${endDate},onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    if (eightToNine) {
+      cd.addSearch(
+          "B12", map(rmb12, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    } else {
+      cd.addSearch(
+          "B12",
+          map(
+              getRMDefinitionsIfPatientDontHaveTarvSituationOnDahForRestartedAndActiveDisaggregation(
+                  rmb12),
+              "startDate=${startDate},endDate=${endDate},onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    }
 
     cd.addSearch(
         "PREGNANT",

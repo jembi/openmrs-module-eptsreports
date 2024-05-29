@@ -2886,7 +2886,7 @@ public class QualityImprovement2020CohortQueries {
 
     if (indicatorFlag == 3) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND (B1 OR D)) AND NOT B1E AND NOT (C OR F) AND ADULT");
+          "(A AND (ADULT OR D)) AND B1 NOT (B1E OR C OR F)");
     }
     if (indicatorFlag == 4) {
       compositionCohortDefinition.setCompositionString(
@@ -8526,44 +8526,39 @@ public class QualityImprovement2020CohortQueries {
   public CohortDefinition getMQ9Den(int flag) {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
 
     switch (flag) {
       case 1:
         cd.setName(
-            "% de adultos  HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição");
+            "9.1 % de adultos  (15/+anos) com pedido de CD4 na primeira consulta clínica depois do diagnóstico de HIV+");
         break;
       case 2:
         cd.setName(
-            "% de adultos HIV+ ≥ 15 anos que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira consulta clínica/abertura da Ficha Mestra");
+            "9.2 % de adultos (15/+anos) HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias após a primeira consulta clínica");
         break;
-      case 3:
+      case 6:
         cd.setName(
-            "% de crianças HIV+ ≤ 14 anos que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra");
-        break;
-      case 4:
-        cd.setName(
-            "% de crianças HIV+ ≤ 14 anos que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira consulta clínica/abertura da Ficha Mestra");
+            "9.6 % de crianças  (0-14 anos) HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira consulta clínica");
         break;
     }
 
-    if (flag == 1 || flag == 2) {
+    if (flag == 1) {
       cd.addSearch(
           "AGE",
           EptsReportUtils.map(
               genericCohortQueries.getAgeOnFirstClinicalConsultation(15, null),
               "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
-    } else if (flag == 3 || flag == 4) {
+    } else if (flag == 2 || flag == 6) {
       cd.addSearch(
           "AGE",
           EptsReportUtils.map(
               genericCohortQueries.getAgeOnFirstClinicalConsultation(0, 14),
               "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
     }
-
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
 
     String inclusionPeriodMappings =
         "revisionEndDate=${revisionEndDate},startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},location=${location}";
@@ -8627,21 +8622,20 @@ public class QualityImprovement2020CohortQueries {
    * <li>Resultado de CD4 = “% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro
    *     de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez”
    *
-   * @param flag parameter to receive the indicator numbe
+   * @param denominator parameter to receive the indicator numbe
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getCd4RequestAndResultForPregnantsCat9Den(int flag) {
+  public CohortDefinition getCd4RequestAndResultForPregnantsCat9Den(Integer denominator) {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    switch (flag) {
-      case 5:
-        cd.setName(
-            "Pedido de CD4 = “% de MG HIV+ que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra”");
+    switch (denominator) {
+      case 9:
+        cd.setName("9.9 % de MG  HIV+ com registo de pedido de CD4 na primeira CPN");
         break;
-      case 6:
+      case 10:
         cd.setName(
-            "Resultado de CD4 = “% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez”");
+            "9.10 % de MG  HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira CPN");
         break;
     }
 
@@ -8678,53 +8672,30 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * O sistema irá produzir o Numerador para o indicador do pedido de CD4 para MG: “# de MG HIV+ em
-   * TARV com registo de pedido de CD4 na primeira CPN (Primeira consulta com registo Gravidez)”
+   * Incluindo todas as utentes do Denominador - Pedido de CD4 – MG (definidos no RF16)
    *
-   * @param flag parameter to receive the indicator number
+   * <p>Filtrando as que tiveram registo do “Pedido de CD4” na mesma consulta clínica na qual
+   * tiveram o primeiro registo de Gravidez durante o período de inclusão (>= “Data Fim de Revisão”
+   * menos (-) 12 meses mais (+) 1 dia e “Data fim de Revisão” menos (-) 9 meses)
+   *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getCd4RequestAndResultForPregnantsCat9Num(int flag) {
+  public CohortDefinition getCd4RequestAndResultForPregnantsCat9Num(Integer numerator) {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-
-    switch (flag) {
-      case 5:
-        cd.setName(
-            "Pedido de CD4 = “% de MG HIV+ que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra”");
+    switch (numerator) {
+      case 9:
+        cd.setName("9.9 % de MG  HIV+ com registo de pedido de CD4 na primeira CPN.");
         break;
-      case 6:
+      case 10:
         cd.setName(
-            "Resultado de CD4 = “% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez”");
+            "9.10 % de MG  HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira CPN");
         break;
     }
-
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    String inclusionPeriodMappings =
-        "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}";
-
-    cd.addSearch(
-        "pregnantOnPeriod",
-        EptsReportUtils.map(
-            getFirstPregnancyORBreastfeedingOnClinicalConsultation(
-                commonMetadata.getPregnantConcept().getConceptId(),
-                hivMetadata.getYesConcept().getConceptId()),
-            inclusionPeriodMappings));
-
-    cd.addSearch(
-        "transferredIn",
-        EptsReportUtils.map(
-            QualityImprovement2020Queries.getTransferredInPatients(
-                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-                hivMetadata.getPatientFoundYesConcept().getConceptId(),
-                hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-                hivMetadata.getArtStatus().getConceptId()),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "requestCd4ForPregnant",
@@ -8736,19 +8707,17 @@ public class QualityImprovement2020CohortQueries {
                 hivMetadata.getCD4AbsoluteOBSConcept().getConceptId()),
             "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},location=${location}"));
 
-    cd.addSearch(
-        "resultCd4ForPregnant",
-        EptsReportUtils.map(
-            getCd4ResultAfterFirstConsultationOfPregnancy(
-                commonMetadata.getPregnantConcept().getConceptId(),
-                hivMetadata.getYesConcept().getConceptId()),
-            inclusionPeriodMappings));
-
-    if (flag == 5) {
-      cd.setCompositionString("(pregnantOnPeriod AND requestCd4ForPregnant) AND NOT transferredIn");
-    } else if (flag == 6) {
-      cd.setCompositionString("(pregnantOnPeriod AND resultCd4ForPregnant) AND NOT transferredIn");
+    if (numerator == 9) {
+      cd.addSearch(
+          "DENOMINATOR",
+          EptsReportUtils.map(getCd4RequestAndResultForPregnantsCat9Den(9), MAPPING1));
+    } else if (numerator == 10) {
+      cd.addSearch(
+          "DENOMINATOR",
+          EptsReportUtils.map(getCd4RequestAndResultForPregnantsCat9Den(10), MAPPING1));
     }
+
+    cd.setCompositionString("DENOMINATOR AND requestCd4ForPregnant");
 
     return cd;
   }
@@ -8940,39 +8909,50 @@ public class QualityImprovement2020CohortQueries {
    *       dentro de 33 dias após a inscrição
    * </ul>
    *
-   * @param flag indicator number
+   * @param numerator indicator number
    * @return CohortDefinition
    */
-  public CohortDefinition getMQ9Num(int flag) {
+  public CohortDefinition getMQ9Num(Integer numerator) {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    switch (flag) {
+    switch (numerator) {
       case 1:
         cd.setName(
             "% de adultos HIV+ ≥ 15 anos que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra");
         break;
       case 2:
         cd.setName(
-            "% de adultos HIV+ ≥ 15 anos que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira consulta clínica/abertura da Ficha Mestra");
+            "9.2 % de adultos  (15/+anos) HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira consulta clínica");
         break;
       case 3:
         cd.setName(
-            "% de crianças HIV+ ≤ 14 anos que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra");
+            "9.3 % de adultos (15/+anos) com pedido de CD4 na consulta clínica de reinício do TARV");
         break;
       case 4:
         cd.setName(
-            "% de crianças HIV+ ≤ 14 anos que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira consulta clínica/abertura da Ficha Mestra");
+            "9.4 % de adultos (15/+anos) que receberam o resultado do CD4 dentro de 33 dias após consulta clínica de reinício do TARV");
+        break;
+      case 5:
+        cd.setName(
+            "9.5 % de crianças  (0-14 anos) com pedido de CD4 na primeira consulta clínica depois do diagnóstico de HIV+");
+        break;
+      case 6:
+        cd.setName(
+            "9.6 % de crianças  (0-14 anos) HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira consulta clínica");
+        break;
+      case 8:
+        cd.setName("");
         break;
     }
 
-    if (flag == 1 || flag == 2) {
+    if (numerator == 1 || numerator == 2) {
       cd.addSearch(
           "AGE",
           EptsReportUtils.map(
               genericCohortQueries.getAgeOnFirstClinicalConsultation(15, null),
               "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
-    } else if (flag == 3 || flag == 4) {
+    } else if (numerator == 3 || numerator == 4) {
       cd.addSearch(
           "AGE",
           EptsReportUtils.map(
@@ -8985,72 +8965,44 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    String inclusionPeriodMappings =
-        "revisionEndDate=${revisionEndDate},startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},location=${location}";
+    if (numerator == 1) {
+      cd.addSearch("DENOMINATOR", EptsReportUtils.map(getMQ9Den(1), MAPPING1));
+    } else if (numerator == 2) {
+      cd.addSearch("DENOMINATOR", EptsReportUtils.map(getMQ9Den(2), MAPPING1));
+    } else if (numerator == 3) {
+      cd.addSearch(
+          "DENOMINATOR",
+          EptsReportUtils.map(getAdultPatientsRestartedWithCd4RequestAndResult(3), MAPPING1));
+    } else if (numerator == 4) {
+      cd.addSearch(
+          "DENOMINATOR",
+          EptsReportUtils.map(getPatientsRestartedAndEligibleForCd4Request(4), MAPPING1));
+    } else if (numerator == 5 || numerator == 6) {
+      cd.addSearch("DENOMINATOR", EptsReportUtils.map(getMQ9Den5and6(), MAPPING1));
+    } else if (numerator == 8) {
+      cd.addSearch(
+          "DENOMINATOR",
+          EptsReportUtils.map(getPatientsRestartedAndEligibleForCd4Request(8), MAPPING1));
+    }
 
     cd.addSearch(
-        "A",
-        EptsReportUtils.map(
-            getFirstClinicalConsultationDuringInclusionPeriod(),
-            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
-    cd.addSearch(
-        "C",
-        EptsReportUtils.map(
-            commonCohortQueries.getMOHPregnantORBreastfeeding(
-                commonMetadata.getPregnantConcept().getConceptId(),
-                hivMetadata.getYesConcept().getConceptId()),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "D",
-        EptsReportUtils.map(
-            commonCohortQueries.getMOHPregnantORBreastfeeding(
-                commonMetadata.getBreastfeeding().getConceptId(),
-                hivMetadata.getYesConcept().getConceptId()),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "E",
-        EptsReportUtils.map(
-            QualityImprovement2020Queries.getTransferredInPatients(
-                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-                hivMetadata.getPatientFoundYesConcept().getConceptId(),
-                hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-                hivMetadata.getArtStatus().getConceptId()),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "requestCd4",
+        "REQUEST",
         EptsReportUtils.map(
             getRequestForCd4OnFirstClinicalConsultationDuringInclusionPeriod(),
             "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-        "resultCd4",
+        "RESULTS",
         EptsReportUtils.map(
             getCd4ResultAfterFirstConsultationOnInclusionPeriod(),
             "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    cd.addSearch(
-        "pregnantOnPeriod",
-        EptsReportUtils.map(
-            getMOHPregnantORBreastfeedingOnClinicalConsultation(
-                commonMetadata.getPregnantConcept().getConceptId(),
-                hivMetadata.getYesConcept().getConceptId()),
-            inclusionPeriodMappings));
-    cd.addSearch(
-        "breastfeedingOnPeriod",
-        EptsReportUtils.map(
-            getMOHPregnantORBreastfeedingOnClinicalConsultation(
-                commonMetadata.getBreastfeeding().getConceptId(),
-                hivMetadata.getYesConcept().getConceptId()),
-            inclusionPeriodMappings));
-
-    if (flag == 1 || flag == 3) {
-      cd.setCompositionString(
-          "(A OR D OR breastfeedingOnPeriod) AND requestCd4 AND NOT (C OR pregnantOnPeriod OR E) AND AGE");
-    } else if (flag == 2 || flag == 4) {
-      cd.setCompositionString(
-          "(A OR D OR breastfeedingOnPeriod) AND resultCd4 AND NOT (C OR pregnantOnPeriod OR E) AND AGE");
+    if (numerator == 1 || numerator == 3 || numerator == 5) {
+      cd.setCompositionString("DENOMINATOR AND REQUEST");
+      //      cd.setCompositionString("DENOMINATOR AND REQUEST AND AGE");
+    } else if (numerator == 2 || numerator == 4 || numerator == 6) {
+      cd.setCompositionString("DENOMINATOR AND RESULTS");
+      //      cd.setCompositionString("DENOMINATOR AND RESULTS AND AGE");
     }
 
     return cd;
@@ -13833,16 +13785,16 @@ public class QualityImprovement2020CohortQueries {
   /**
    * <b>>RF27: Registo de resultado CD4 na consulta clínica</b>
    * <li>os utentes que tiveram registo de resultado CD4 na consulta clínica (Ficha Clínica),
-   *     ocorrida nos últimos 12 meses da consulta de reinício (“Data Consulta Resultado CD4” >=
-   *     “Data de Consulta Reinício” menos (-) 12 meses e < “Data de Consulta Reinício”)
+   *     ocorrida “Data Consulta Reinício e “Data Fim Revisão” (“Data Consulta Resultado CD4” >=
+   *     “Data de Consulta Reinício” e <= “Data de Consulta Reinício”)
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getCd4ResultAfterWuthinRestartDateMinus12months() {
+  public CohortDefinition getCd4ResultAfterRestartDate() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
         "os utentes que tiveram registo de resultado CD4 na consulta clínica (Ficha Clínica) "
-            + "ocorrida nos últimos 12 meses da consulta de reinício ");
+            + "ocorrida entre “Data Consulta Reinício e “Data Fim Revisão” ");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
@@ -13868,8 +13820,8 @@ public class QualityImprovement2020CohortQueries {
             + "        OR "
             + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
             + "      ) "
-            + "  AND e.encounter_datetime >= DATE_SUB(restarted.restart_date, INTERVAL 12 MONTH) "
-            + "  AND e.encounter_datetime < restarted.restart_date "
+            + "  AND e.encounter_datetime >= restarted.restart_date "
+            + "  AND e.encounter_datetime <= :endDate "
             + "  AND e.location_id = :location "
             + "GROUP BY pa.patient_id";
 
@@ -13887,36 +13839,67 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * <b>RF27: Utentes Reinícios TARV Elegíveis ao Pedido de CD4 </b>
+   * <b>9.4 % de adultos (15/+anos) que receberam o resultado do CD4 dentro de 33 dias após consulta
+   * clínica de reinício do TARV" / 9.8 % de crianças (0-14 anos) que receberam o resultado do CD4
+   * dentro de 33 dias após consulta clínica de reinício do TARV</b>
    *
    * <p>Incluindo todos os utentes que tiveram registo de “Mudança de Estado de Permanência” =
    * “Reinício” numa consulta clínica (Ficha Clínica) ocorrida durante o período de revisão
    *
-   * <p>Filtrando os utentes que abandonaram o tratamento há mais de 3 meses, ou seja, “Data de
-   * Consulta Reinício” menos (-) “Data de Abandono” >= 99 dias.
+   * <p>Filtrando os utentes que receberam um resultado de CD4 numa consulta clínica ocorrida entre
+   * “Data Consulta Reinício e “Data Fim Revisão” (“Data Resultado CD4”>= “Data Consulta Reinício e
+   * <=”Data Fim Revisão”)
    *
-   * <p>Excluindo os utentes que tiveram registo de resultado CD4 na consulta clínica (Ficha
-   * Clínica), ocorrida nos últimos 12 meses da consulta de reinício
+   * <p>Incluindo todos os utentes com idade ≥15 anos (RF11.2)
+   *
+   * <p>excepto os que reiniciaram com menos de 30 dias do fim do período de revisão ( “Data
+   * Consulta Reinício” menos (-) “Data Fim Revisão” < 33 dias)
    *
    * @see #getPatientsWithRestartedStateOfStay()
-   * @see #getPatientsWhoAbandonedMoreThan3months()
-   * @see #getCd4ResultAfterWuthinRestartDateMinus12months()
+   * @see GenericCohortQueries#getAgeOnRestartedStateOfStayAndCd4Request(Integer, Integer)
+   * @see #getCd4ResultAfterRestartDate()
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsRestartedAndEligibleForCd4Request() {
+  public CohortDefinition getPatientsRestartedAndEligibleForCd4Request(Integer denominator) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Utentes Reinícios TARV Elegíveis ao Pedido de CD4");
+
+    switch (denominator) {
+      case 4:
+        cd.setName(
+            "9.4 % de adultos (15/+anos) que receberam o resultado do CD4 dentro de 33 dias após consulta clínica de reinício do TARV");
+        break;
+      case 8:
+        cd.setName(
+            "9.8 % de crianças (0-14 anos) que receberam o resultado do CD4 dentro de 33 dias após consulta clínica de reinício do TARV");
+        break;
+    }
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     cd.addSearch("RESTARTED", EptsReportUtils.map(getPatientsWithRestartedStateOfStay(), MAPPING));
     cd.addSearch(
-        "ABANDONED", EptsReportUtils.map(getPatientsWhoAbandonedMoreThan3months(), MAPPING));
-    cd.addSearch(
-        "CD4", EptsReportUtils.map(getCd4ResultAfterWuthinRestartDateMinus12months(), MAPPING));
+        "RESTARTED30DAYSBEFORE",
+        EptsReportUtils.map(
+            getPatientsWithRestartedStateOfStay(),
+            "startDate=${startDate},endDate=${revisionEndDate-34d},location=${location}"));
 
-    cd.setCompositionString("(RESTARTED AND ABANDONED) AND NOT CD4");
+    cd.addSearch("RESULTS", EptsReportUtils.map(getCd4ResultAfterRestartDate(), MAPPING3));
+
+    if (denominator == 4) {
+      cd.addSearch(
+          "AGE",
+          EptsReportUtils.map(
+              genericCohortQueries.getAgeOnRestartedStateOfStayAndCd4Request(15, null), MAPPING3));
+    } else if (denominator == 8) {
+      cd.addSearch(
+          "AGE",
+          EptsReportUtils.map(
+              genericCohortQueries.getAgeOnRestartedStateOfStayAndCd4Request(0, 14), MAPPING3));
+    }
+
+    cd.setCompositionString("(RESTARTED AND RESULTS AND AGE) AND NOT RESTARTED30DAYSBEFORE");
 
     return cd;
   }
@@ -13935,7 +13918,7 @@ public class QualityImprovement2020CohortQueries {
    * <p>Nota: esta definição do denominador é a mesma para o denominador dos indicadores 9.7
    * (pedido) e 9.8 (resultado) do grupo de adultos reinícios TARV.
    *
-   * @see #getPatientsRestartedAndEligibleForCd4Request()
+   * @see #getPatientsWithRestartedStateOfStay()
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getAdultPatientsRestartedWithCd4RequestAndResult(int denominator) {
@@ -13943,17 +13926,13 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     switch (denominator) {
+      case 3:
+        cd.setName(
+            "9.3 % de adultos (15/+anos) com pedido de CD4 na consulta clínica de reinício do TARV");
+        break;
       case 7:
         cd.setName(
-            " % de adultos HIV+ ≥ 15 anos que reiniciaram TARV durante o período de revisão e tiveram registo de pedido do CD4 na consulta de reinício");
-        break;
-      case 8:
-        cd.setName(
-            "9.8 % de adultos HIV+ ≥ 15 anos reinícios TARV que teve conhecimento do resultado do CD4 dentro de 33 dias após a data da consulta clínica de reinício TARV");
-        break;
-      case 9:
-        cd.setName(
-            " 9.9 % de crianças HIV+ < 15 anos que reiniciaram TARV durante o período de revisão e tiveram registo de pedido do CD4 na consulta de reinício");
+            "9.7 % de crianças (0-14 anos) com pedido de CD4 na consulta clínica de reinício do TARV");
         break;
       case 10:
         cd.setName(
@@ -13966,12 +13945,16 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    if (denominator == 7 || denominator == 8) {
+    if (denominator == 3) {
       cd.addSearch(
           "AGE",
           EptsReportUtils.map(
-              genericCohortQueries.getAgeOnFirstClinicalConsultation(15, null),
-              "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
+              genericCohortQueries.getAgeOnRestartedStateOfStayConsultation(15, null), MAPPING));
+    } else if (denominator == 7) {
+      cd.addSearch(
+          "AGE",
+          EptsReportUtils.map(
+              genericCohortQueries.getAgeOnRestartedStateOfStayConsultation(0, 14), MAPPING));
     } else if (denominator == 9 || denominator == 10) {
       cd.addSearch(
           "AGE",
@@ -13980,8 +13963,7 @@ public class QualityImprovement2020CohortQueries {
               "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
     }
 
-    cd.addSearch(
-        "RESTARTED", EptsReportUtils.map(getPatientsRestartedAndEligibleForCd4Request(), MAPPING));
+    cd.addSearch("RESTARTED", EptsReportUtils.map(getPatientsWithRestartedStateOfStay(), MAPPING));
 
     cd.addSearch(
         "transferredIn",
@@ -14019,7 +14001,7 @@ public class QualityImprovement2020CohortQueries {
     switch (numerator) {
       case 7:
         cd.setName(
-            "9.7 % de adultos HIV+ ≥ 15 anos que reiniciaram TARV durante o período de revisão e tiveram registo de pedido do CD4 na consulta de reinício");
+            "9.7 % de crianças (0-14 anos) com pedido de CD4 na consulta clínica de reinício do TARV");
         break;
       case 8:
         cd.setName(
@@ -14056,21 +14038,21 @@ public class QualityImprovement2020CohortQueries {
 
       cd.addSearch(
           "DENOMINATOR",
-          EptsReportUtils.map(getAdultPatientsRestartedWithCd4RequestAndResult(8), MAPPING1));
+          EptsReportUtils.map(getPatientsRestartedAndEligibleForCd4Request(8), MAPPING1));
 
       cd.setCompositionString("DENOMINATOR AND RESULTS");
     } else if (numerator == 9) {
 
       cd.addSearch(
           "DENOMINATOR",
-          EptsReportUtils.map(getAdultPatientsRestartedWithCd4RequestAndResult(9), MAPPING1));
+          EptsReportUtils.map(getCd4RequestAndResultForPregnantsCat9Den(9), MAPPING1));
 
       cd.setCompositionString("DENOMINATOR AND REQUEST");
     } else if (numerator == 10) {
 
       cd.addSearch(
           "DENOMINATOR",
-          EptsReportUtils.map(getAdultPatientsRestartedWithCd4RequestAndResult(10), MAPPING1));
+          EptsReportUtils.map(getCd4RequestAndResultForPregnantsCat9Den(10), MAPPING1));
 
       cd.setCompositionString("DENOMINATOR AND RESULTS");
     }
@@ -14249,6 +14231,87 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
+   * <b>MQ9Den: M&Q Report - Categoria 9 Denominador</b><br>
+   *
+   * <ul>
+   *   <li>9.1. % de adultos HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4
+   *       dentro de 33 dias após a inscrição
+   *   <li>9.2. % de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4
+   *       dentro de 33 dias após a inscrição
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getMQ9Den5and6() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "AGE",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnFirstClinicalConsultation(0, 14),
+            "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    String inclusionPeriodMappings =
+        "revisionEndDate=${revisionEndDate},startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},location=${location}";
+
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(
+            getFirstClinicalConsultationDuringInclusionPeriod(),
+            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "C",
+        EptsReportUtils.map(
+            commonCohortQueries.getMOHPregnantORBreastfeeding(
+                commonMetadata.getPregnantConcept().getConceptId(),
+                hivMetadata.getYesConcept().getConceptId()),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "D",
+        EptsReportUtils.map(
+            commonCohortQueries.getMOHPregnantORBreastfeeding(
+                commonMetadata.getBreastfeeding().getConceptId(),
+                hivMetadata.getYesConcept().getConceptId()),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "E",
+        EptsReportUtils.map(
+            QualityImprovement2020Queries.getTransferredInPatients(
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+                hivMetadata.getPatientFoundYesConcept().getConceptId(),
+                hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+                hivMetadata.getArtStatus().getConceptId()),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "pregnantOnPeriod",
+        EptsReportUtils.map(
+            getMOHPregnantORBreastfeedingOnClinicalConsultation(
+                commonMetadata.getPregnantConcept().getConceptId(),
+                hivMetadata.getYesConcept().getConceptId()),
+            inclusionPeriodMappings));
+
+    cd.addSearch(
+        "breastfeedingOnPeriod",
+        EptsReportUtils.map(
+            getMOHPregnantORBreastfeedingOnClinicalConsultation(
+                commonMetadata.getBreastfeeding().getConceptId(),
+                hivMetadata.getYesConcept().getConceptId()),
+            inclusionPeriodMappings));
+
+    cd.setCompositionString(
+        "((A AND AGE) AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod))");
+    return cd;
+  }
+
+  /**
    * <b>RF8 - Utentes Presuntivos de TB</b>
    *
    * @return {@link String}
@@ -14354,9 +14417,7 @@ public class QualityImprovement2020CohortQueries {
             + " ) pedidoXpert";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
-
     return sqlCohortDefinition;
   }
 
@@ -14705,15 +14766,10 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition mq19DenOne = getMQ19A(1);
-
     CohortDefinition mq19DenTwo = getMQ19A(2);
-
     CohortDefinition mq19DenThree = getMQ19A(3);
-
     CohortDefinition mq19DenFour = getMQ19A(4);
-
     CohortDefinition mq19DenFive = getMQ19A(5);
-
     CohortDefinition mq19DenSix = getMQ19A(6);
 
     CohortDefinition pedidoXpertOnPresuntivoTb = getUtentesComPedidoXpertNaDataPresuntivoDeTB();
