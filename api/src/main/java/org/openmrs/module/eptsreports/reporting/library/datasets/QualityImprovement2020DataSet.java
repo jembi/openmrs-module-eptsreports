@@ -1297,16 +1297,35 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ13DEN8",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ13(true, 8),
+                qualityImprovement2020CohortQueries.getSumOfPatientsIn1stOr2ndLineOfArtForDenNum8(
+                    true),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ13DEN8.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
         "MQ13DEN8",
-        "# de crianças (10-14 anos de idade) na 1a linha de TARV que tiveram consulta clínica no período de revisão e que eram elegíveis ao pedido de CV",
+        "# de crianças na 1a linha (10-14 anos de idade) ou 2ª linha (0-14 anos) de TARV que tiveram consulta clínica no período de revisão e que eram elegíveis ao pedido de CV",
         EptsReportUtils.map(
             MQ13DEN8,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    CohortIndicator MQ13DEN8PrimeiraLinha =
+        eptsGeneralIndicator.getIndicator(
+            "MQ13DEN8PrimeiraLinha",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ13(true, 8),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MQ13DEN8PrimeiraLinha.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MQ13DEN8PrimeiraLinha",
+        "# de crianças (10-14 anos de idade) na 1a linha de TARV que tiveram consulta clínica no período de revisão e que eram elegíveis ao pedido de CV",
+        EptsReportUtils.map(
+            MQ13DEN8PrimeiraLinha,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
@@ -1418,16 +1437,36 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ13NUM8",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ13(false, 8),
+                qualityImprovement2020CohortQueries.getSumOfPatientsIn1stOr2ndLineOfArtForDenNum8(
+                    false),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ13NUM8.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
         "MQ13NUM8",
-        "# de crianças (10-14 anos de idade) na 1a linha de TARV que tiveram consulta clínica no período de revisão, eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico",
+        "# de crianças na 1a linha (10-14 anos de idade) ou 2ª linha (0-14 anos de idade) de TARV que tiveram consulta clínica no período de revisão, "
+            + "eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico",
         EptsReportUtils.map(
             MQ13NUM8,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    CohortIndicator MQ13NUM8PrimeiraLinha =
+        eptsGeneralIndicator.getIndicator(
+            "MQ13NUM8PrimeiraLinha",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ13(false, 8),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MQ13NUM8PrimeiraLinha.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MQ13NUM8",
+        "# de crianças (10-14 anos de idade) na 1a linha de TARV que tiveram consulta clínica no período de revisão, eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico",
+        EptsReportUtils.map(
+            MQ13NUM8PrimeiraLinha,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
