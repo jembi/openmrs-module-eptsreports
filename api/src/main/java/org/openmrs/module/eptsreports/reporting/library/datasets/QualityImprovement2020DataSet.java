@@ -3006,7 +3006,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
     MQ19DEN4.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
-        "MQ12DEN4",
+        "MQ19DEN4",
         "19.4 % de crianças (0-14 anos) presuntivos de TB com pedido de teste molecular (Xpert/Truenat) na data da 1ª consulta.",
         EptsReportUtils.map(
             MQ19DEN4,
@@ -3024,7 +3024,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
     MQ19DEN5.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
-        "MQ12DEN5",
+        "MQ19DEN5",
         "19.5 % de crianças (0-14 anos) HIV+ presuntivos de TB que receberam resultado do teste molecular (Xpert/Truenat) dentro de 7 dias após o pedido",
         EptsReportUtils.map(
             MQ19DEN5,
