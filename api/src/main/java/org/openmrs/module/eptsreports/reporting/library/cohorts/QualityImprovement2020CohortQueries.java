@@ -5689,6 +5689,8 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition SegundaLinha = getUtentesSegundaLinha();
 
+    CohortDefinition tbDiagnosisActive = getPatientsWithTbActiveOrTbTreatment();
+
     if (line == 1) {
       compositionCohortDefinition.addSearch(
           "age",
@@ -5804,16 +5806,19 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "SegundaLinha", EptsReportUtils.map(SegundaLinha, MAPPING1));
 
+    compositionCohortDefinition.addSearch(
+        "tbDiagnosisActive", EptsReportUtils.map(tbDiagnosisActive, MAPPING));
+
     if (den) {
       if (line == 1) {
         compositionCohortDefinition.setCompositionString(
-            "(((B1 AND age) OR D) AND PrimeiraLinha) AND NOT C");
+            "(((B1 AND age) OR D) AND PrimeiraLinha) AND NOT (C OR tbDiagnosisActive)");
       } else if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND PrimeiraLinha) AND NOT (C OR D) AND age");
+            "(B1 AND PrimeiraLinha AND age) AND NOT (C OR D OR tbDiagnosisActive) ");
       } else if (line == 4) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND SegundaLinha) AND NOT C AND (D AND age)");
+            "(B1 AND SegundaLinha AND D AND age) AND NOT (C OR tbDiagnosisActive) ");
       } else if (line == 13) {
         compositionCohortDefinition.setCompositionString(
             "((B1 AND SegundaLinha) AND NOT (C OR D) AND age");
@@ -5821,13 +5826,13 @@ public class QualityImprovement2020CohortQueries {
     } else {
       if (line == 1) {
         compositionCohortDefinition.setCompositionString(
-            "(((B1 AND age) OR D) AND PrimeiraLinha) AND NOT C AND G");
+            "(((B1 AND age) OR D) AND PrimeiraLinha) AND NOT (C OR tbDiagnosisActive) AND G");
       } else if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND PrimeiraLinha) AND NOT (C OR D) AND G AND age");
+            "(B1 AND PrimeiraLinha AND G AND age) AND NOT (C OR D OR tbDiagnosisActive) ");
       } else if (line == 4) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND SegundaLinha) AND NOT C AND (D AND G AND age)");
+            "(B1 AND SegundaLinha AND D AND G AND age) AND NOT (C OR tbDiagnosisActive)");
       } else if (line == 13) {
         compositionCohortDefinition.setCompositionString(
             "((B1 AND SegundaLinha) AND NOT (C OR D) AND (G AND age)");
@@ -14284,6 +14289,58 @@ public class QualityImprovement2020CohortQueries {
     }
 
     cd.setCompositionString("PRIMEIRALINHA OR SEGUNDALINHA");
+
+    return cd;
+  }
+
+  /**
+   * <b>adultos (15/+anos) na 1ª aou 2ª linha de TARV que tiveram consulta clínica no período de
+   * revisão e que eram elegíveis ao pedido de CV </b>
+   *
+   * <p>todos os utentes que tiveram registo de “Diagnóstico de TB Activa” = Sim numa Ficha Clínica
+   * durante o período ou
+   *
+   * <p>registo de “Tratamento de TB” com “Estado” = “Início” ou “Continua” com a respectiva “Data
+   * de Tratamento TB” ocorrida durante o período numa consulta clínica ocorrida durante o período
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithTbActiveOrTbTreatment() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("os utentes com diagnóstico TB Activa durante o período de revisão");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition tbActive =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            false,
+            false,
+            "once",
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getActiveTBConcept(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            null,
+            null);
+
+    CohortDefinition tbTreatment =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            false,
+            false,
+            "once",
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getTBTreatmentPlanConcept(),
+            Arrays.asList(
+                hivMetadata.getStartDrugsConcept(), hivMetadata.getContinueRegimenConcept()),
+            null,
+            null);
+
+    cd.addSearch("tbActive", Mapped.mapStraightThrough(tbActive));
+
+    cd.addSearch("tbTreatment", Mapped.mapStraightThrough(tbTreatment));
+
+    cd.setCompositionString("tbActive OR tbTreatment");
 
     return cd;
   }
