@@ -6010,7 +6010,7 @@ public class QualityImprovement2020CohortQueries {
           "((A AND NOT C AND (G OR J)) OR (B1 AND (H OR K))) AND NOT (F OR E OR DD OR ABANDONEDTARV OR tbDiagnosisActive) AND age");
     if (indicator == 5 || indicator == 14)
       cd.setCompositionString(
-          "(B2New AND (I OR L)) AND NOT (F OR E OR DD OR ABANDONEDTARV) AND age");
+          "(B2New AND (I OR L)) AND NOT (F OR E OR DD OR ABANDONEDTARV OR tbDiagnosisActive) AND age");
 
     return cd;
   }
@@ -14426,6 +14426,52 @@ public class QualityImprovement2020CohortQueries {
       cd.addSearch("PRIMEIRALINHA", Mapped.mapStraightThrough(getMQC13P3NUM(2)));
 
       cd.addSearch("SEGUNDALINHA", Mapped.mapStraightThrough(getMQC13P3NUM(5)));
+    }
+
+    cd.setCompositionString("PRIMEIRALINHA OR SEGUNDALINHA");
+
+    return cd;
+  }
+
+  /**
+   * <b># de crianças na 1a linha de TARV ou mudança de regime de 1ª linha (10-14 anos de idade) ou
+   * 2ª Linha TARV (0-14 anos de idade) que receberam o resultado da CV entre o sexto e o nono mês
+   * após início do TARV</b>
+   *
+   * <p>Incluindo o somatório do resultado dos seguintes indicadores - para denominador:
+   * <li>Denominador do Indicador 13.11-1ª Linha da Categoria 13 Pediátrico de Resultado de CV
+   *     (RF40.1).
+   * <li>Denominador do Indicador 13.14-2ª Linha da Categoria 13 Pediátrico de Resultado de CV
+   *     (RF44).
+   *
+   *     <p>Incluindo o somatório do resultado dos seguintes indicadores - para numerador:
+   * <li>Numerador do Indicador 13.11-1ª Linha da Categoria 13 Pediátrico de Resultado de CV (RF41.1).
+   * <li>Numerador do Indicador 13.14-2ª Linha da Categoria 13 Pediátrico de Resultado de CV (RF45).
+   *
+   * @param denominator boolean parameter to choose between Denominator and Numerator
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getSumOfPatientsIn1stOr2ndLineOfArtForDenNum11(Boolean denominator) {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName(
+        "# de crianças na 1a linha de TARV ou mudança de regime de 1ª linha (10-14 anos de idade) "
+            + "ou 2ª Linha TARV (0-14 anos de idade) que receberam o resultado da CV entre o sexto"
+            + " e o nono mês após início do TARV");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    if (denominator) {
+      cd.addSearch("PRIMEIRALINHA", Mapped.mapStraightThrough(getMQC13P3DEN(11)));
+
+      cd.addSearch("SEGUNDALINHA", Mapped.mapStraightThrough(getMQC13P3DEN(14)));
+    } else {
+      cd.addSearch("PRIMEIRALINHA", Mapped.mapStraightThrough(getMQC13P3NUM(11)));
+
+      cd.addSearch("SEGUNDALINHA", Mapped.mapStraightThrough(getMQC13P3NUM(14)));
     }
 
     cd.setCompositionString("PRIMEIRALINHA OR SEGUNDALINHA");

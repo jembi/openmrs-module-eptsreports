@@ -1577,16 +1577,35 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ13DEN11",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQC13P3DEN(11),
+                qualityImprovement2020CohortQueries.getSumOfPatientsIn1stOr2ndLineOfArtForDenNum11(
+                    true),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ13DEN11.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
         "MQ13DEN11",
-        "crianças  (10-14 anos de idade) na 1a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início do TARV ",
+        "# de crianças na 1a linha de TARV ou mudança de regime de 1ª linha (10-14 anos de idade) ou 2ª Linha TARV (0-14 anos de idade) que receberam o resultado da CV entre o sexto e o nono mês após início do TARV",
         EptsReportUtils.map(
             MQ13DEN11,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    CohortIndicator MQ13DEN11PrimeiraLinha =
+        eptsGeneralIndicator.getIndicator(
+            "MQ13DEN11PrimeiraLinha",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQC13P3DEN(11),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MQ13DEN11PrimeiraLinha.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MQ13DEN11PrimeiraLinha",
+        "crianças  (10-14 anos de idade) na 1a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início do TARV ",
+        EptsReportUtils.map(
+            MQ13DEN11PrimeiraLinha,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
@@ -1732,16 +1751,35 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ13NUM11",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQC13P3NUM(11),
+                qualityImprovement2020CohortQueries.getSumOfPatientsIn1stOr2ndLineOfArtForDenNum11(
+                    false),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ13NUM11.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
         "MQ13NUM11",
-        " crianças  (10-14 anos de idade) na 1a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início do TARV",
+        "# de crianças (10-14 anos de idade) na 1a linha de TARV ou mudança de regime de 1ª linha”, que receberam o resultado da CV entre o sexto e o nono mês após início do TARV",
         EptsReportUtils.map(
             MQ13NUM11,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    CohortIndicator MQ13NUM11PrimeiraLinha =
+        eptsGeneralIndicator.getIndicator(
+            "MQ13NUM11PrimeiraLinha",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQC13P3NUM(11),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MQ13NUM11PrimeiraLinha.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MQ13NUM11PrimeiraLinha",
+        " crianças  (10-14 anos de idade) na 1a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início do TARV",
+        EptsReportUtils.map(
+            MQ13NUM11PrimeiraLinha,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
