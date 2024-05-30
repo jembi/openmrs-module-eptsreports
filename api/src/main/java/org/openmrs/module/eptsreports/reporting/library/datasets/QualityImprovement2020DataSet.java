@@ -1365,6 +1365,23 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
+    CohortIndicator MQ13DEN13 =
+            eptsGeneralIndicator.getIndicator(
+                    "MQ13DEN13",
+                    EptsReportUtils.map(
+                            qualityImprovement2020CohortQueries.getMQ13NewDen13(),
+                            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MQ13DEN13.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+            "MQ13DEN13",
+            "% de crianças (0-14 anos) coinfectados TB/HIV com consulta clínica no período de revisão, elegíveis ao pedido de CV e com registo de pedido de CV",
+            EptsReportUtils.map(
+                    MQ13DEN13,
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "");
+
     // Category 13 Numerator indicators
     CohortIndicator MQ13NUM1 =
         eptsGeneralIndicator.getIndicator(
@@ -1423,7 +1440,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ13NUM4",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ13NewNum4(),
+                qualityImprovement2020CohortQueries.getMQ13NewNum4(true),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ13NUM4.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -1524,6 +1541,23 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             MQ13NUM13SegundaLinha,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+
+    CohortIndicator MQ13NUM13 =
+            eptsGeneralIndicator.getIndicator(
+                    "MQ13NUM13",
+                    EptsReportUtils.map(
+                            qualityImprovement2020CohortQueries.getMQ13NewNum4(false),
+                            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MQ13NUM13.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+            "MQ13NUM13",
+            "% de crianças (0-14 anos) coinfectados TB/HIV com consulta clínica no período de revisão, elegíveis ao pedido de CV e com registo de pedido de CV",
+            EptsReportUtils.map(
+                    MQ13NUM13,
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "");
 
     // Category 13 Part 3 Denominator Indicators
 
