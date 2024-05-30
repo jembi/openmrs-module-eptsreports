@@ -14566,9 +14566,9 @@ public class QualityImprovement2020CohortQueries {
    * <b>% de adultos (15/+anos) coinfectados TB/HIV com consulta clínica no período de revisão,
    * elegíveis ao pedido de CV e com registo de pedido de CV</b>
    * <li>incluindo todos os utentes selecionados no Indicador 13.4 Denominador definido no RF52
-   *     (Categoria 13 TB/HIV Adulto Indicador 13.4 – Denominador Pedido CV) /
-   *     incluindo todos os utentes selecionados no Indicador 13.13 Denominador definido no RF54
-   *     (Categoria 13 TB/HIV Pediátrico Indicador 13.13 - Denominador Pedido CV) e
+   *     (Categoria 13 TB/HIV Adulto Indicador 13.4 – Denominador Pedido CV) / incluindo todos os
+   *     utentes selecionados no Indicador 13.13 Denominador definido no RF54 (Categoria 13 TB/HIV
+   *     Pediátrico Indicador 13.13 - Denominador Pedido CV) e
    * <li>filtrando os utentes que têm o registo de “Pedido de Investigações Laboratoriais” igual a
    *     “Carga Viral” na última consulta clínica decorrida no período de revisão (“Data Última
    *     Consulta”).
@@ -14592,11 +14592,11 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch("EXAMREQUEST", EptsReportUtils.map(cvExamRequest, MAPPING3));
 
-if(numerator4){
-  cd.addSearch("DENOMINATOR", EptsReportUtils.map(getMQ13NewDen4(), MAPPING1));
-}else {
-  cd.addSearch("DENOMINATOR", EptsReportUtils.map(getMQ13NewDen13(), MAPPING1));
-}
+    if (numerator4) {
+      cd.addSearch("DENOMINATOR", EptsReportUtils.map(getMQ13NewDen4(), MAPPING1));
+    } else {
+      cd.addSearch("DENOMINATOR", EptsReportUtils.map(getMQ13NewDen13(), MAPPING1));
+    }
 
     cd.setCompositionString("DENOMINATOR AND EXAMREQUEST");
 
@@ -14606,22 +14606,17 @@ if(numerator4){
   /**
    * <b>% de crianças (0-14 anos) coinfectados TB/HIV com consulta clínica no período de revisão,
    * elegíveis ao pedido de CV e com registo de pedido de CV</b>
-   * <li>
-   *     incluindo todos os utentes com idade >= 0 e <= 14 anos (seguindo o critério definido no
+   * <li>incluindo todos os utentes com idade >= 0 e <= 14 anos (seguindo o critério definido no
    *     RF12) e que tiveram o registo de pelo menos uma consulta clínica durante o período de
-   *     revisão (“Data Última Consulta”>= “Data Início Revisão” e <= “Data Fim Revisão”).
-   *     Nota: considerar a última consulta clínica durante o período de revisão.
-   * <li>
-   *     filtrando os utentes em 1ª Linha de TARV elegíveis ao pedido de Carga Viral (CV),
-   *     seguindo os critérios definidos no RF14, ou os utentes em 2ª Linha de TARV elegíveis
-   *     ao pedido de Carga Viral (CV), seguindo os critérios definidos no RF15.
-   * <li>
-   *     filtrando os utentes com diagnóstico TB Activa durante o período de revisão (RF60).
-   * <li>
-   *     excluindo mulheres grávidas registadas na última consulta clínica (seguindo os critérios
+   *     revisão (“Data Última Consulta”>= “Data Início Revisão” e <= “Data Fim Revisão”). Nota:
+   *     considerar a última consulta clínica durante o período de revisão.
+   * <li>filtrando os utentes em 1ª Linha de TARV elegíveis ao pedido de Carga Viral (CV), seguindo
+   *     os critérios definidos no RF14, ou os utentes em 2ª Linha de TARV elegíveis ao pedido de
+   *     Carga Viral (CV), seguindo os critérios definidos no RF15.
+   * <li>filtrando os utentes com diagnóstico TB Activa durante o período de revisão (RF60).
+   * <li>excluindo mulheres grávidas registadas na última consulta clínica (seguindo os critérios
    *     definidos no RF10)
-   * <li>
-   *     excluindo mulheres lactantes registadas na última consulta clínica (seguindo os critérios
+   * <li>excluindo mulheres lactantes registadas na última consulta clínica (seguindo os critérios
    *     definidos no RF11)
    *
    * @return {@link CohortDefinition}
@@ -14630,7 +14625,7 @@ if(numerator4){
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName(
-            " adultos (15/+anos) coinfectados TB/HIV com consulta clínica no período de revisão");
+        " adultos (15/+anos) coinfectados TB/HIV com consulta clínica no período de revisão");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
@@ -14639,14 +14634,14 @@ if(numerator4){
     CohortDefinition lastClinical = commonCohortQueries.getMOHPatientsLastClinicalConsultation();
 
     CohortDefinition pregnant =
-            commonCohortQueries.getNewMQPregnantORBreastfeeding(
-                    hivMetadata.getPregnantConcept().getConceptId(),
-                    hivMetadata.getYesConcept().getConceptId());
+        commonCohortQueries.getNewMQPregnantORBreastfeeding(
+            hivMetadata.getPregnantConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId());
 
     CohortDefinition breastfeeding =
-            commonCohortQueries.getNewMQPregnantORBreastfeeding(
-                    hivMetadata.getBreastfeeding().getConceptId(),
-                    hivMetadata.getYesConcept().getConceptId());
+        commonCohortQueries.getNewMQPregnantORBreastfeeding(
+            hivMetadata.getBreastfeeding().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId());
 
     CohortDefinition firstLine = getUtentesPrimeiraLinha(UtentesPrimeiraLinhaPreposition.MQ);
 
@@ -14655,27 +14650,26 @@ if(numerator4){
     CohortDefinition tbDiagnosisActive = getPatientsWithTbActiveOrTbTreatment();
 
     cd.addSearch(
-            "AGE",
-            EptsReportUtils.map(
-                    commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(0, 14),
-                    MAPPING3));
+        "AGE",
+        EptsReportUtils.map(
+            commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(0, 14), MAPPING3));
 
     cd.addSearch(
-            "CONSULTATION",
-            EptsReportUtils.map(
-                    lastClinical,
-                    "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+        "CONSULTATION",
+        EptsReportUtils.map(
+            lastClinical,
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-            "PREGNANT",
-            EptsReportUtils.map(
-                    pregnant, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+        "PREGNANT",
+        EptsReportUtils.map(
+            pregnant, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-            "BREASTFEEDING",
-            EptsReportUtils.map(
-                    breastfeeding,
-                    "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+        "BREASTFEEDING",
+        EptsReportUtils.map(
+            breastfeeding,
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch("FIRSTLINE", EptsReportUtils.map(firstLine, MAPPING1));
 
@@ -14684,7 +14678,135 @@ if(numerator4){
     cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING));
 
     cd.setCompositionString(
-            "(CONSULTATION AND (FIRSTLINE OR SECONDLINE) AND TBACTIVE AND AGE) AND NOT (PREGNANT OR BREASTFEEDING)");
+        "(CONSULTATION AND (FIRSTLINE OR SECONDLINE) AND TBACTIVE AND AGE) AND NOT (PREGNANT OR BREASTFEEDING)");
+
+    return cd;
+  }
+
+  /**
+   * <b>% de adultos (15/+anos) coinfectados TB/HIV com resultado de CV registado na FM</b>
+   * <li>incluindo os utentes com idade >= 15 anos (seguindo o critério definido no RF13) e que
+   *     iniciaram TARV no período de inclusão (seguindo os requisitos definidos no RF5) excluindo
+   *     mulheres grávidas no início TARV (seguindo os critérios definidos no RF8)
+   * <li>incluindo os utentes com idade >= 15 anos (seguindo o critério definido no RF13) e que têm
+   *     o último registo de “Regime ARV Segunda Linha” na Ficha Resumo durante o período de
+   *     inclusão (“Data Última 2ª Linha” >= “Data Início Inclusão” e <= “Data Fim Inclusão”)
+   *     excepto os utentes que têm como “Justificação de Mudança do Tratamento” (associada a “Data
+   *     Última 2ª Linha”) igual a “Gravidez”. Nota: serão considerados os dois grupos, os adultos
+   *     >=15 anos que iniciaram tarv durante o período de inclusão, e também os adultos >=15 anos
+   *     que iniciaram 2ª linha de tarv durante o período de inclusão.
+   * <li>filtrando os utentes com diagnóstico TB Activa durante o período de inclusão (RF60).
+   * <li>excluindo os utentes “Transferido de” outra US (seguindo os critérios definidos no RF6)
+   * <li>excluindo os utentes “Transferido para” outra US (seguindo os critérios definidos no RF7)
+   * <li>excluindo os utentes com registo de “Óbito” (seguindo os critérios definidos no RF7.1)
+   * <li>excluindo os utentes abandono ou reinício TARV nos últimos 6 meses anteriores a última
+   *     consulta do período de revisão (seguindo os critérios definidos no RF7.2);
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getMQ13NewDen5() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("% de adultos (15/+anos) coinfectados TB/HIV com resultado de CV registado na FM");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition startedART = getMOHArtStartDate();
+
+    CohortDefinition pregnant =
+        commonCohortQueries.getNewMQPregnantORBreastfeeding(
+            hivMetadata.getPregnantConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId());
+
+    CohortDefinition tbDiagnosisActive = getPatientsWithTbActiveOrTbTreatment();
+
+    CohortDefinition arvRegimen = getPatientsOnRegimeArvSecondLine();
+
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
+
+    CohortDefinition transferredOut = getTranferredOutPatients();
+
+    CohortDefinition dead = getDeadPatientsCompositionMQ13();
+
+    CohortDefinition abandonedOrRestartedTarv =
+        getPatientsWhoAbandonedOrRestartedTarvOnLast6MonthsArt();
+
+    cd.addSearch(
+        "ARTSTART",
+        EptsReportUtils.map(
+            startedART, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "PREGNANT",
+        EptsReportUtils.map(
+            pregnant, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch("ARVREGIMEN", EptsReportUtils.map(arvRegimen, MAPPING));
+
+    cd.addSearch("TRANSFERREDIN", EptsReportUtils.map(transferredIn, MAPPING));
+
+    cd.addSearch(
+        "TRANSFERREDOUT",
+        EptsReportUtils.map(
+            transferredOut,
+            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING));
+
+    cd.addSearch("DEAD", EptsReportUtils.map(dead, MAPPING3));
+
+    cd.addSearch("ABANDONED", EptsReportUtils.map(abandonedOrRestartedTarv, MAPPING1));
+
+    cd.setCompositionString(
+        "((ARTSTART AND NOT PREGNANT) OR ARVREGIMEN) AND TBACTIVE AND NOT (TRANSFERREDIN OR TRANSFERREDOUT OR DEAD OR ABANDONED)");
+
+    return cd;
+  }
+
+  /**
+   * <b>% de adultos (15/+anos) coinfectados TB/HIV com resultado de CV registado na FM</b>
+   * <li>incluindo todos os utentes selecionados no Indicador 13.5 Denominador definido no RF56
+   *     (Categoria 13 TB/HIV Adulto Indicador 13.5 - Denominador Resultado CV) e
+   * <li>filtrando os utentes que tiveram um registo do Resultado de Carga Viral (quantitativo ou
+   *     qualitativo) na Ficha Clínica ou Ficha Resumo (última carga viral) entre “Data de Início
+   *     TARV” mais (+) 6meses e “Data de Início TARV” mais (+) 9meses ou entre “Data última 2ª
+   *     Linha” mais (+) 6meses e “Data de Início TARV” mais (+) 9meses.
+   *
+   * @see #getMQ13NewDen5()
+   * @see #getMQC13P3NUM_I()
+   * @see #getMQC13P3NUM_L()
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getMQ13NewNum5() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition vlOnSecondLine = getMQC13P3NUM_I();
+    CohortDefinition vlOnTarv = getMQC13P3NUM_L();
+
+    cd.addSearch(
+        "VL2LINE",
+        EptsReportUtils.map(
+            vlOnSecondLine,
+            "startDate=${startDate},endDate=${endDate},less3mDate=${startDate-3m},location=${location}"));
+    cd.addSearch("VLTARV", EptsReportUtils.map(vlOnTarv, MAPPING));
+
+    cd.addSearch("DENOMINATOR", EptsReportUtils.map(getMQ13NewDen5(), MAPPING1));
+
+    cd.setCompositionString("DENOMINATOR AND (VL2LINE OR VLTARV)");
 
     return cd;
   }
