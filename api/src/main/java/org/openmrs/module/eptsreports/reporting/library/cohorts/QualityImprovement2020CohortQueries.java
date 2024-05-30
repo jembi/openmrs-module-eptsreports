@@ -14785,10 +14785,10 @@ public class QualityImprovement2020CohortQueries {
    * @see #getMQC13P3NUM_L()
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getMQ13NewNum5() {
+  public CohortDefinition getMQ13NewNum5(Boolean numerator5) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    cd.setName("");
+    cd.setName("adultos (15/+anos) coinfectados TB/HIV com resultado de CV registado na FM");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
@@ -14803,10 +14803,90 @@ public class QualityImprovement2020CohortQueries {
             vlOnSecondLine,
             "startDate=${startDate},endDate=${endDate},less3mDate=${startDate-3m},location=${location}"));
     cd.addSearch("VLTARV", EptsReportUtils.map(vlOnTarv, MAPPING));
-
-    cd.addSearch("DENOMINATOR", EptsReportUtils.map(getMQ13NewDen5(), MAPPING1));
+    if (numerator5) {
+      cd.addSearch("DENOMINATOR", EptsReportUtils.map(getMQ13NewDen5(), MAPPING1));
+    } else {
+      cd.addSearch("DENOMINATOR", EptsReportUtils.map(getMQ13NewDen14(), MAPPING1));
+    }
 
     cd.setCompositionString("DENOMINATOR AND (VL2LINE OR VLTARV)");
+
+    return cd;
+  }
+
+  /**
+   * <b>% de crianças (0-14 anos) coinfectados TB/HIV com resultado de CV registado na FM</b>
+   * <li>incluindo todos os utentes com idade >=0 e <=14 anos (seguindo o critério definido no RF13)
+   *     e que iniciaram 1ª ou 2ª Linha do TARV no período de inclusão (seguindo os requisitos
+   *     definidos no RF5) excluindo mulheres grávidas no início TARV (seguindo os critérios
+   *     definidos no RF8) e
+   * <li>incluindo todos os utentes com idade >=0 e <= 14 anos (seguindo o critério definido no
+   *     RF13) e que têm o último registo de “Regime ARV Segunda Linha” na Ficha Resumo durante o
+   *     período de inclusão (“Data Última 2ª Linha” >= “Data Início Inclusão” e <= “Data Fim
+   *     Inclusão”) excepto os utentes que têm como “Justificação de Mudança do Tratamento”
+   *     (associada a “Data Última 2ª Linha”) igual a “Gravidez”
+   * <li>filtrando os utentes com diagnóstico TB Activa durante o período de inclusão (RF60).
+   * <li>excluindo os utentes “Transferido de” outra US (seguindo os critérios definidos no RF6)
+   * <li>excluindo os utentes “Transferido para” outra US (seguindo os critérios definidos no RF7)
+   * <li>excluindo os utentes com registo de “Óbito” (seguindo os critérios definidos no RF7.1)
+   * <li>excluindo os utentes abandono ou reinício TARV nos últimos 6 meses anteriores a última
+   *     consulta do período de revisão (seguindo os critérios definidos no RF7.2);
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getMQ13NewDen14() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("crianças (0-14 anos) coinfectados TB/HIV com resultado de CV registado na FM");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition firstLine = getUtentesPrimeiraLinha(UtentesPrimeiraLinhaPreposition.MQ);
+
+    CohortDefinition secondLine = getUtentesSegundaLinha();
+
+    CohortDefinition arvRegimen = getPatientsOnRegimeArvSecondLine();
+
+    CohortDefinition tbDiagnosisActive = getPatientsWithTbActiveOrTbTreatment();
+
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
+
+    CohortDefinition transferredOut = getTranferredOutPatients();
+
+    CohortDefinition dead = getDeadPatientsCompositionMQ13();
+
+    CohortDefinition abandonedOrRestartedTarv =
+        getPatientsWhoAbandonedOrRestartedTarvOnLast6MonthsArt();
+
+    cd.addSearch("FIRSTLINE", EptsReportUtils.map(firstLine, MAPPING1));
+
+    cd.addSearch("SECONDLINE", EptsReportUtils.map(secondLine, MAPPING1));
+
+    cd.addSearch("ARVREGIMEN", EptsReportUtils.map(arvRegimen, MAPPING));
+
+    cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING));
+
+    cd.addSearch("TRANSFERREDIN", EptsReportUtils.map(transferredIn, MAPPING));
+
+    cd.addSearch(
+        "TRANSFERREDOUT",
+        EptsReportUtils.map(
+            transferredOut,
+            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    cd.addSearch("DEAD", EptsReportUtils.map(dead, MAPPING3));
+
+    cd.addSearch("ABANDONED", EptsReportUtils.map(abandonedOrRestartedTarv, MAPPING1));
+
+    cd.setCompositionString(
+        "(FIRSTLINE OR SECONDLINE OR ARVREGIMEN) AND TBACTIVE AND NOT (TRANSFERREDIN OR TRANSFERREDOUT OR DEAD OR ABANDONED)");
 
     return cd;
   }
