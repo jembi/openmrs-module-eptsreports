@@ -14445,7 +14445,8 @@ public class QualityImprovement2020CohortQueries {
    *     (RF44).
    *
    *     <p>Incluindo o somatório do resultado dos seguintes indicadores - para numerador:
-   * <li>Numerador do Indicador 13.11-1ª Linha da Categoria 13 Pediátrico de Resultado de CV (RF41.1).
+   * <li>Numerador do Indicador 13.11-1ª Linha da Categoria 13 Pediátrico de Resultado de CV
+   *     (RF41.1).
    * <li>Numerador do Indicador 13.14-2ª Linha da Categoria 13 Pediátrico de Resultado de CV (RF45).
    *
    * @param denominator boolean parameter to choose between Denominator and Numerator
@@ -14475,6 +14476,122 @@ public class QualityImprovement2020CohortQueries {
     }
 
     cd.setCompositionString("PRIMEIRALINHA OR SEGUNDALINHA");
+
+    return cd;
+  }
+
+  /**
+   * <b>% de adultos (15/+anos) coinfectados TB/HIV com consulta clínica no período de revisão,
+   * elegíveis ao pedido de CV e com registo de pedido de CV</b>
+   * <li>incluindo todos os utentes com idade >= 15 anos (seguindo o critério definido no RF12) e
+   *     que tiveram o registo de pelo menos uma consulta clínica durante o período de revisão
+   *     (“Data Última Consulta”>= “Data Início Revisão” e <= “Data Fim Revisão”). Nota: considerar
+   *     a última consulta clínica durante o período de revisão.
+   * <li>incluindo as mulheres lactantes (independentemente da idade) registadas na última consulta
+   *     clínica (seguindo o critério definido no RF11). Nota: serão considerados os dois grupos,
+   *     adultos >=15 anos, e também as mulheres lactantes independentemente da idade.
+   * <li>filtrando os utentes em 1ª Linha de TARV elegíveis ao pedido de Carga Viral (CV), seguindo
+   *     os critérios definidos no RF14, ou os utentes em 2ª Linha de TARV elegíveis ao pedido de
+   *     Carga Viral (CV), seguindo os critérios definidos no RF15.
+   * <li>filtrando os utentes com diagnóstico TB Activa durante o período de revisão (RF60).
+   * <li>excluindo mulheres grávidas registadas na última consulta clínica (seguindo os critérios
+   *     definidos no RF10).
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getMQ13NewDen4() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName(
+        " adultos (15/+anos) coinfectados TB/HIV com consulta clínica no período de revisão");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition lastClinical = commonCohortQueries.getMOHPatientsLastClinicalConsultation();
+
+    CohortDefinition pregnant =
+        commonCohortQueries.getNewMQPregnantORBreastfeeding(
+            hivMetadata.getPregnantConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId());
+
+    CohortDefinition breastfeeding =
+        commonCohortQueries.getNewMQPregnantORBreastfeeding(
+            hivMetadata.getBreastfeeding().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId());
+
+    CohortDefinition firstLine = getUtentesPrimeiraLinha(UtentesPrimeiraLinhaPreposition.MQ);
+
+    CohortDefinition secondLine = getUtentesSegundaLinha();
+
+    CohortDefinition tbDiagnosisActive = getPatientsWithTbActiveOrTbTreatment();
+
+    cd.addSearch(
+        "AGE",
+        EptsReportUtils.map(
+            commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(15, null),
+            MAPPING3));
+
+    cd.addSearch(
+        "CONSULTATION",
+        EptsReportUtils.map(
+            lastClinical,
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "PREGNANT",
+        EptsReportUtils.map(
+            pregnant, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "BREASTFEEDING",
+        EptsReportUtils.map(
+            breastfeeding,
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch("FIRSTLINE", EptsReportUtils.map(firstLine, MAPPING1));
+
+    cd.addSearch("SECONDLINE", EptsReportUtils.map(secondLine, MAPPING1));
+
+    cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING));
+
+    cd.setCompositionString(
+        "((CONSULTATION OR BREASTFEEDING) AND (FIRSTLINE OR SECONDLINE) AND TBACTIVE AND AGE) AND NOT PREGNANT ");
+
+    return cd;
+  }
+
+  /**
+   * <b>% de adultos (15/+anos) coinfectados TB/HIV com consulta clínica no período de revisão,
+   * elegíveis ao pedido de CV e com registo de pedido de CV</b>
+   * <li>incluindo todos os utentes selecionados no Indicador 13.4 Denominador definido no RF52
+   *     (Categoria 13 TB/HIV Adulto Indicador 13.4 – Denominador Pedido CV) e
+   * <li>filtrando os utentes que têm o registo de “Pedido de Investigações Laboratoriais” igual a
+   *     “Carga Viral” na última consulta clínica decorrida no período de revisão (“Data Última
+   *     Consulta”).
+   *
+   * @see #getMQ13NewDen4()
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getMQ13NewNum4() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName(
+        "% de adultos (15/+anos) coinfectados TB/HIV com consulta clínica no período de "
+            + "revisão, elegíveis ao pedido de CV e com registo de pedido de CV");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition cvExamRequest = getMQ13G();
+
+    cd.addSearch("EXAMREQUEST", EptsReportUtils.map(cvExamRequest, MAPPING3));
+
+    cd.addSearch("DENOMINATOR", EptsReportUtils.map(getMQ13NewDen4(), MAPPING1));
+
+    cd.setCompositionString("DENOMINATOR AND EXAMREQUEST");
 
     return cd;
   }
