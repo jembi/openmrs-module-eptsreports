@@ -9010,10 +9010,8 @@ public class QualityImprovement2020CohortQueries {
 
     if (numerator == 1 || numerator == 3 || numerator == 5) {
       cd.setCompositionString("DENOMINATOR AND REQUEST");
-      //      cd.setCompositionString("DENOMINATOR AND REQUEST AND AGE");
     } else if (numerator == 2 || numerator == 4 || numerator == 6) {
       cd.setCompositionString("DENOMINATOR AND RESULTS");
-      //      cd.setCompositionString("DENOMINATOR AND RESULTS AND AGE");
     }
 
     return cd;
