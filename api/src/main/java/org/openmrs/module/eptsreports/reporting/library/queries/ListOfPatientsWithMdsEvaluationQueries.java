@@ -415,7 +415,8 @@ public class ListOfPatientsWithMdsEvaluationQueries {
     return stringSubstitutor.replace(query);
   }
 
-  public static String getB1PatientsWhoAreTransferredIn(String inclusionEndMonthAndDay) {
+  public static String getB1PatientsWhoAreTransferredIn(
+      String inclusionEndMonthAndDay, int numberOfYearsEndDate) {
 
     String query =
         "SELECT patient_id "
@@ -431,9 +432,12 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "          AND p.voided = 0 "
             + "          AND pg.program_id = ${2} "
             + "          AND ps.state = ${29} "
-            + "          AND ps.start_date <= CONCAT(:evaluationYear, "
+            + "          AND ps.start_date <= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
-            + "        ) "
+            + "        ) ,INTERVAL  "
+            + numberOfYearsEndDate
+            + " YEAR) "
             + "          AND pg.location_id = :location "
             + "        GROUP  BY p.patient_id "
             + "        UNION "
@@ -455,9 +459,12 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "          AND o.concept_id = ${1369} "
             + "          AND o.value_coded = ${1065} "
             + "          AND o2.concept_id = ${23891} "
-            + "            AND o2.value_datetime <= CONCAT(:evaluationYear, "
+            + "            AND o2.value_datetime <= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
-            + "        ) "
+            + "        ) ,INTERVAL  "
+            + numberOfYearsEndDate
+            + " YEAR) "
             + "        GROUP  BY p.patient_id) transferido_de";
 
     Map<String, Integer> map = new HashMap<>();
