@@ -8557,13 +8557,13 @@ public class QualityImprovement2020CohortQueries {
         break;
     }
 
-    if (flag == 1) {
+    if (flag == 1 || flag == 2) {
       cd.addSearch(
           "AGE",
           EptsReportUtils.map(
               genericCohortQueries.getAgeOnFirstClinicalConsultation(15, null),
               "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
-    } else if (flag == 2 || flag == 6) {
+    } else if (flag == 6) {
       cd.addSearch(
           "AGE",
           EptsReportUtils.map(
@@ -8708,6 +8708,8 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
+    String inclusionPeriodMappings =
+        "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},location=${location}";
     cd.addSearch(
         "requestCd4ForPregnant",
         EptsReportUtils.map(
@@ -8716,19 +8718,27 @@ public class QualityImprovement2020CohortQueries {
                 hivMetadata.getYesConcept().getConceptId(),
                 hivMetadata.getApplicationForLaboratoryResearch().getConceptId(),
                 hivMetadata.getCD4AbsoluteOBSConcept().getConceptId()),
-            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},location=${location}"));
+            inclusionPeriodMappings));
+
+    cd.addSearch(
+        "resultCd4ForPregnant",
+        EptsReportUtils.map(
+            getCd4ResultAfterFirstConsultationOfPregnancy(
+                commonMetadata.getPregnantConcept().getConceptId(),
+                hivMetadata.getYesConcept().getConceptId()),
+            inclusionPeriodMappings));
 
     if (numerator == 9) {
       cd.addSearch(
           "DENOMINATOR",
           EptsReportUtils.map(getCd4RequestAndResultForPregnantsCat9Den(9), MAPPING1));
+      cd.setCompositionString("DENOMINATOR AND requestCd4ForPregnant");
     } else if (numerator == 10) {
       cd.addSearch(
           "DENOMINATOR",
           EptsReportUtils.map(getCd4RequestAndResultForPregnantsCat9Den(10), MAPPING1));
+      cd.setCompositionString("DENOMINATOR AND resultCd4ForPregnant");
     }
-
-    cd.setCompositionString("DENOMINATOR AND requestCd4ForPregnant");
 
     return cd;
   }
@@ -8957,20 +8967,6 @@ public class QualityImprovement2020CohortQueries {
         break;
     }
 
-    if (numerator == 1 || numerator == 2) {
-      cd.addSearch(
-          "AGE",
-          EptsReportUtils.map(
-              genericCohortQueries.getAgeOnFirstClinicalConsultation(15, null),
-              "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
-    } else if (numerator == 3 || numerator == 4) {
-      cd.addSearch(
-          "AGE",
-          EptsReportUtils.map(
-              genericCohortQueries.getAgeOnFirstClinicalConsultation(0, 14),
-              "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
-    }
-
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -8997,21 +8993,33 @@ public class QualityImprovement2020CohortQueries {
     }
 
     cd.addSearch(
-        "REQUEST",
+        "REQUEST1CONSULTA",
         EptsReportUtils.map(
             getRequestForCd4OnFirstClinicalConsultationDuringInclusionPeriod(),
             "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-        "RESULTS",
+        "REQUESTONRESTART",
+        EptsReportUtils.map(getPatientsWithCd4RequestsOnRestartedTarvDate(), MAPPING3));
+
+    cd.addSearch(
+        "RESULTS1CONSULTA",
         EptsReportUtils.map(
             getCd4ResultAfterFirstConsultationOnInclusionPeriod(),
             "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    if (numerator == 1 || numerator == 3 || numerator == 5) {
-      cd.setCompositionString("DENOMINATOR AND REQUEST");
-    } else if (numerator == 2 || numerator == 4 || numerator == 6) {
-      cd.setCompositionString("DENOMINATOR AND RESULTS");
+    cd.addSearch(
+        "RESULTSONRESTART",
+        EptsReportUtils.map(getPatientsWithCd4ResultsOnRestartedTarvDate(), MAPPING3));
+
+    if (numerator == 1 || numerator == 5) {
+      cd.setCompositionString("DENOMINATOR AND REQUEST1CONSULTA");
+    } else if (numerator == 3) {
+      cd.setCompositionString("DENOMINATOR AND REQUESTONRESTART");
+    } else if (numerator == 4) {
+      cd.setCompositionString("DENOMINATOR AND RESULTSONRESTART");
+    } else if (numerator == 2 || numerator == 6) {
+      cd.setCompositionString("DENOMINATOR AND RESULTS1CONSULTA");
     }
 
     return cd;
@@ -13887,12 +13895,10 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    cd.addSearch("RESTARTED", EptsReportUtils.map(getPatientsWithRestartedStateOfStay(), MAPPING));
+    cd.addSearch("RESTARTED", EptsReportUtils.map(getPatientsWithRestartedStateOfStay(), MAPPING3));
     cd.addSearch(
-        "RESTARTED30DAYSBEFORE",
-        EptsReportUtils.map(
-            getPatientsWithRestartedStateOfStay(),
-            "startDate=${startDate},endDate=${revisionEndDate-34d},location=${location}"));
+        "RESTARTED33DAYSBEFORE",
+        EptsReportUtils.map(getPatientsRestartedWithLessThan33Days(), MAPPING3));
 
     cd.addSearch("RESULTS", EptsReportUtils.map(getCd4ResultAfterRestartDate(), MAPPING3));
 
@@ -13908,7 +13914,7 @@ public class QualityImprovement2020CohortQueries {
               genericCohortQueries.getAgeOnRestartedStateOfStayAndCd4Request(0, 14), MAPPING3));
     }
 
-    cd.setCompositionString("(RESTARTED AND RESULTS AND AGE) AND NOT RESTARTED30DAYSBEFORE");
+    cd.setCompositionString("(RESTARTED AND RESULTS AND AGE) AND NOT RESTARTED33DAYSBEFORE");
 
     return cd;
   }
@@ -13958,12 +13964,12 @@ public class QualityImprovement2020CohortQueries {
       cd.addSearch(
           "AGE",
           EptsReportUtils.map(
-              genericCohortQueries.getAgeOnRestartedStateOfStayConsultation(15, null), MAPPING));
+              genericCohortQueries.getAgeOnRestartedStateOfStayConsultation(15, null), MAPPING3));
     } else if (denominator == 7) {
       cd.addSearch(
           "AGE",
           EptsReportUtils.map(
-              genericCohortQueries.getAgeOnRestartedStateOfStayConsultation(0, 14), MAPPING));
+              genericCohortQueries.getAgeOnRestartedStateOfStayConsultation(0, 14), MAPPING3));
     } else if (denominator == 9 || denominator == 10) {
       cd.addSearch(
           "AGE",
@@ -13972,7 +13978,7 @@ public class QualityImprovement2020CohortQueries {
               "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
     }
 
-    cd.addSearch("RESTARTED", EptsReportUtils.map(getPatientsWithRestartedStateOfStay(), MAPPING));
+    cd.addSearch("RESTARTED", EptsReportUtils.map(getPatientsWithRestartedStateOfStay(), MAPPING3));
 
     cd.addSearch(
         "transferredIn",
@@ -14031,10 +14037,10 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     cd.addSearch(
-        "REQUEST", EptsReportUtils.map(getPatientsWithCd4RequestsOnRestartedTarvDate(), MAPPING));
+        "REQUEST", EptsReportUtils.map(getPatientsWithCd4RequestsOnRestartedTarvDate(), MAPPING3));
 
     cd.addSearch(
-        "RESULTS", EptsReportUtils.map(getPatientsWithCd4ResultsOnRestartedTarvDate(), MAPPING));
+        "RESULTS", EptsReportUtils.map(getPatientsWithCd4ResultsOnRestartedTarvDate(), MAPPING3));
 
     if (numerator == 7) {
 
@@ -14950,5 +14956,40 @@ public class QualityImprovement2020CohortQueries {
         "(FIRSTLINE OR SECONDLINE OR ARVREGIMEN) AND TBACTIVE AND NOT (TRANSFERREDIN OR TRANSFERREDOUT OR DEAD OR ABANDONED)");
 
     return cd;
+  }
+
+  /**
+   * <b> excepto os que reiniciaram com menos de 30 dias do fim do período de revisão (“Data
+   * Consulta Reinício” menos (-) “Data Fim Revisão” < 33 dias) </b>
+   *
+   * @see QualityImprovement2020Queries#getPatientsWithRestartedStateOfStayQuery()
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsRestartedWithLessThan33Days() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "os que reiniciaram com menos de 30 dias do fim do período de revisão"
+            + " (“Data Consulta Reinício” menos (-) “Data Fim Revisão” < 33 dias");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    String query =
+        "SELECT restart.patient_id "
+            + " FROM   ( "
+            + QualityImprovement2020Queries.getPatientsWithRestartedStateOfStayQuery()
+            + " )restart "
+            + " WHERE "
+            + " TIMESTAMPDIFF(DAY, restart.restart_date, :endDate) < 33 ";
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
   }
 }
