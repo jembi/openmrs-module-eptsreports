@@ -13878,12 +13878,10 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    cd.addSearch("RESTARTED", EptsReportUtils.map(getPatientsWithRestartedStateOfStay(), MAPPING));
+    cd.addSearch("RESTARTED", EptsReportUtils.map(getPatientsWithRestartedStateOfStay(), MAPPING3));
     cd.addSearch(
-        "RESTARTED30DAYSBEFORE",
-        EptsReportUtils.map(
-            getPatientsWithRestartedStateOfStay(),
-            "startDate=${startDate},endDate=${revisionEndDate-34d},location=${location}"));
+        "RESTARTED33DAYSBEFORE",
+        EptsReportUtils.map(getPatientsRestartedWithLessThan33Days(), MAPPING3));
 
     cd.addSearch("RESULTS", EptsReportUtils.map(getCd4ResultAfterRestartDate(), MAPPING3));
 
@@ -13899,7 +13897,7 @@ public class QualityImprovement2020CohortQueries {
               genericCohortQueries.getAgeOnRestartedStateOfStayAndCd4Request(0, 14), MAPPING3));
     }
 
-    cd.setCompositionString("(RESTARTED AND RESULTS AND AGE) AND NOT RESTARTED30DAYSBEFORE");
+    cd.setCompositionString("(RESTARTED AND RESULTS AND AGE) AND NOT RESTARTED33DAYSBEFORE");
 
     return cd;
   }
@@ -14309,5 +14307,40 @@ public class QualityImprovement2020CohortQueries {
     cd.setCompositionString(
         "((A AND AGE) AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod))");
     return cd;
+  }
+
+  /**
+   * <b> excepto os que reiniciaram com menos de 30 dias do fim do período de revisão (“Data
+   * Consulta Reinício” menos (-) “Data Fim Revisão” < 33 dias) </b>
+   *
+   * @see QualityImprovement2020Queries#getPatientsWithRestartedStateOfStayQuery()
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsRestartedWithLessThan33Days() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "os que reiniciaram com menos de 30 dias do fim do período de revisão"
+            + " (“Data Consulta Reinício” menos (-) “Data Fim Revisão” < 33 dias");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    String query =
+        "SELECT restart.patient_id "
+            + " FROM   ( "
+            + QualityImprovement2020Queries.getPatientsWithRestartedStateOfStayQuery()
+            + " )restart "
+            + " WHERE "
+            + " TIMESTAMPDIFF(DAY, restart.restart_date, :endDate) < 33 ";
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
   }
 }
