@@ -55,7 +55,7 @@ public class TPTCompletionQueries {
         + "      o2.value_coded = ${1257} and o2.obs_datetime <= :endDate)  "
         + "UNION  "
         + "SELECT p.patient_id, "
-        + "       e.encounter_datetime "
+        + "       e.encounter_datetime AS start_date "
         + "FROM   patient p "
         + "           INNER JOIN encounter e "
         + "                      ON p.patient_id = e.patient_id "
