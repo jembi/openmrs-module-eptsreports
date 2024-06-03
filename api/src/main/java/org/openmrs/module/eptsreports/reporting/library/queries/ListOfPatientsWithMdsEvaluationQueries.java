@@ -415,6 +415,70 @@ public class ListOfPatientsWithMdsEvaluationQueries {
     return stringSubstitutor.replace(query);
   }
 
+  public static String getB1PatientsWhoAreTransferredIn(
+      String inclusionEndMonthAndDay, int numberOfYearsEndDate) {
+
+    String query =
+        "SELECT patient_id "
+            + "FROM   (SELECT p.patient_id, "
+            + "               ps.start_date AS data_transferido "
+            + "        FROM   patient p "
+            + "                   INNER JOIN patient_program pg "
+            + "                              ON p.patient_id = pg.patient_id "
+            + "                   INNER JOIN patient_state ps "
+            + "                              ON pg.patient_program_id = ps.patient_program_id "
+            + "        WHERE  pg.voided = 0 "
+            + "          AND ps.voided = 0 "
+            + "          AND p.voided = 0 "
+            + "          AND pg.program_id = ${2} "
+            + "          AND ps.state = ${29} "
+            + "          AND ps.start_date <= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + "        ) ,INTERVAL  "
+            + numberOfYearsEndDate
+            + " YEAR) "
+            + "          AND pg.location_id = :location "
+            + "        GROUP  BY p.patient_id "
+            + "        UNION "
+            + "        SELECT p.patient_id, "
+            + "               o2.obs_datetime AS data_transferido "
+            + "        FROM   patient p "
+            + "                   INNER JOIN encounter e "
+            + "                              ON p.patient_id = e.patient_id "
+            + "                   INNER JOIN obs o "
+            + "                              ON e.encounter_id = o.encounter_id "
+            + "                   INNER JOIN obs o2 "
+            + "                              ON e.encounter_id = o2.encounter_id "
+            + "        WHERE  p.voided = 0 "
+            + "          AND e.voided = 0 "
+            + "          AND o.voided = 0 "
+            + "          AND o2.voided = 0 "
+            + "          AND e.location_id = :location "
+            + "          AND e.encounter_type = ${53} "
+            + "          AND o.concept_id = ${1369} "
+            + "          AND o.value_coded = ${1065} "
+            + "          AND o2.concept_id = ${23891} "
+            + "            AND o2.value_datetime <= DATE_SUB( "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + "        ) ,INTERVAL  "
+            + numberOfYearsEndDate
+            + " YEAR) "
+            + "        GROUP  BY p.patient_id) transferido_de";
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    return stringSubstitutor.replace(query);
+  }
+
   /**
    * <b>Utentes Transferidos Para</b><br>
    * O sistema irá identificar os utentes Transferido para até o fim do período de avaliação, da
