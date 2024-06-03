@@ -2793,8 +2793,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ9NUM6",
         "9.6 % de crianças  (0-14 anos) HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira consulta clínica",
         EptsReportUtils.map(
-            customCohortIndicator( // getMQ9Num
-                qualityImprovement2020CohortQueries.getMQ9Num(6), mapping),
+            customCohortIndicator(qualityImprovement2020CohortQueries.getMQ9Num(6), mapping),
             mapping),
         "");
 
