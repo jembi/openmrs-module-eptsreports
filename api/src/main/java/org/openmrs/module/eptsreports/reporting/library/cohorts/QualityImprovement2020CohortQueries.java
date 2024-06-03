@@ -8992,18 +8992,23 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(getPatientsWithCd4RequestsOnRestartedTarvDate(), MAPPING3));
 
     cd.addSearch(
-        "RESULTS",
+        "RESULTS1CONSULTA",
         EptsReportUtils.map(
             getCd4ResultAfterFirstConsultationOnInclusionPeriod(),
             "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "RESULTSONRESTART",
+        EptsReportUtils.map(getPatientsWithCd4ResultsOnRestartedTarvDate(), MAPPING3));
 
     if (numerator == 1 || numerator == 5) {
       cd.setCompositionString("DENOMINATOR AND REQUEST1CONSULTA");
     } else if (numerator == 3) {
       cd.setCompositionString("DENOMINATOR AND REQUESTONRESTART");
-
-    } else if (numerator == 2 || numerator == 4 || numerator == 6) {
-      cd.setCompositionString("DENOMINATOR AND RESULTS");
+    } else if (numerator == 4) {
+      cd.setCompositionString("DENOMINATOR AND RESULTSONRESTART");
+    } else if (numerator == 2 || numerator == 6) {
+      cd.setCompositionString("DENOMINATOR AND RESULTS1CONSULTA");
     }
 
     return cd;
