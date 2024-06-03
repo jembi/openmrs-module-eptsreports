@@ -13652,7 +13652,7 @@ public class QualityImprovement2020CohortQueries {
             + "                         AND e.encounter_datetime <= :revisionEndDate "
             + "                       GROUP  BY p.patient_id) last_consult "
             + "                      ON last_consult.patient_id = p.patient_id "
-            + "WHERE  Timestampdiff(day, last_consult.max_consult, tb_end.last_tb_end) <= 30";
+            + "WHERE  Timestampdiff(day, tb_end.last_tb_end, last_consult.max_consult) <= 30";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
