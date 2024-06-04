@@ -2884,7 +2884,7 @@ public class QualityImprovement2020Queries {
    */
   public static String getPatientsWhoStartedTbTreatment() {
     return "SELECT p.patient_id, "
-        + "                o.obs_datetime AS data_inicio_tratamento_tb "
+        + "                MIN(o.obs_datetime) AS data_inicio_tratamento_tb "
         + "         FROM   patient p "
         + "                    INNER JOIN encounter e "
         + "                               ON e.patient_id = p.patient_id "
