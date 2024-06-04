@@ -14992,39 +14992,4 @@ public class QualityImprovement2020CohortQueries {
 
     return sqlCohortDefinition;
   }
-
-  /**
-   * <b> excepto os que reiniciaram com menos de 30 dias do fim do período de revisão (“Data
-   * Consulta Reinício” menos (-) “Data Fim Revisão” < 33 dias) </b>
-   *
-   * @see QualityImprovement2020Queries#getPatientsWithRestartedStateOfStayQuery()
-   * @return {@link CohortDefinition}
-   */
-  public CohortDefinition getPatientsRestartedWithLessThan33Days() {
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName(
-        "os que reiniciaram com menos de 30 dias do fim do período de revisão"
-            + " (“Data Consulta Reinício” menos (-) “Data Fim Revisão” < 33 dias");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-
-    String query =
-        "SELECT restart.patient_id "
-            + " FROM   ( "
-            + QualityImprovement2020Queries.getPatientsWithRestartedStateOfStayQuery()
-            + " )restart "
-            + " WHERE "
-            + " TIMESTAMPDIFF(DAY, restart.restart_date, :endDate) < 33 ";
-
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
-    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
-
-    StringSubstitutor sb = new StringSubstitutor(map);
-    sqlCohortDefinition.setQuery(sb.replace(query));
-
-    return sqlCohortDefinition;
-  }
 }
