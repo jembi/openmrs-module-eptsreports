@@ -20,12 +20,13 @@ import org.springframework.stereotype.Component;
 public class ListOfPatientsEligibleForCd4RequestCohortQueries {
 
   private final HivMetadata hivMetadata;
-
   private final ResumoMensalCohortQueries resumoMensalCohortQueries;
 
   String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
   String MAPPING2 =
       "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}";
+  String MAPPING3 =
+      "startDate=${startDate},endDate=${generationDate},generationDate=${generationDate},location=${location}";
 
   @Autowired
   public ListOfPatientsEligibleForCd4RequestCohortQueries(
@@ -50,10 +51,10 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
    *     Resumo Mensal B1
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientWhoInitiatedTarvDuringPeriod() {
+  public CohortDefinition getPatientWhoInitiatedTarvDuringPeriodC1() {
 
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
-
+    compositionCohortDefinition.setName("C1 - Utentes que iniciaram TARV durante o período");
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(
@@ -72,6 +73,52 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
         "CD4RESULT", map(cd4ResultByReportGenerationDate, MAPPING2));
 
     compositionCohortDefinition.setCompositionString("B1 AND NOT CD4RESULT");
+
+    return compositionCohortDefinition;
+  }
+
+  /**
+   * <b>C2 - Utentes reinício TARV elegíveis ao CD4</b>
+   *
+   * <p>Incluindo todos os utentes que tiveram registo de “Mudança de Estado de Permanência” =
+   * “Reinício” numa consulta clínica (Ficha Clínica – Ficha Mestra) ocorrida durante o período de
+   * reporte (“Data Consulta Reinício” >= “Data Início” e <= “Data Fim”). Nota: no caso de existirem
+   * mais de uma consulta com registo de Reinício durante o período de reporte, o sistema irá
+   * considerar a primeira ocorrência como “Data Consulta Reinício”
+   *
+   * <p>Incluindo todos os utentes que tiveram registo de “Mudança de Estado de Permanência” =
+   * “Reinício” na Ficha Resumo- Ficha Mestra ocorrida durante o período de reporte (“Data Mudança
+   * de Estado Reinício” >= “Data Início” e <= “Data Fim”). Nota: no caso de existirem mais de uma
+   * data com registo de Reinício durante o período de reporte, o sistema irá considerar a primeira
+   * ocorrência como “Data Mudança de Estado Reinício”.
+   *
+   * <p>Excluindo todos os utentes que tiveram registo de resultado de CD4 numa consulta clínica
+   * (Ficha Clínica – Ficha Mestra) durante o período compreendido entre “Data Início” e a data
+   * geração do relatório.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientWhoRestartedTarvAndEligibleForCd4RequestC2() {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName("C2 - Utentes reinício TARV elegíveis ao CD4");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("generationDate", "generationDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition restarted = getPatientsWithRestartedStateOfStay();
+
+    CohortDefinition cd4ResultByReportGenerationDate =
+        getPatientsWithCd4ResultsOnRestartedTarvDate(true);
+
+    compositionCohortDefinition.addSearch("RESTARTEDONCLINICA", map(restarted, MAPPING));
+
+    compositionCohortDefinition.addSearch(
+        "CD4RESULT", map(cd4ResultByReportGenerationDate, MAPPING3));
+
+    compositionCohortDefinition.setCompositionString("RESTARTED AND NOT CD4RESULT");
 
     return compositionCohortDefinition;
   }
@@ -123,6 +170,114 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
                         : "  AND enc.encounter_datetime <= :generationDate ")
             + "  AND enc.location_id = :location "
             + "GROUP BY pa.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * Incluindo todos os utentes que tiveram registo de “Mudança de Estado de Permanência” =
+   * “Reinício” numa consulta clínica (Ficha Clínica – Ficha Mestra) ocorrida durante o período de
+   * reporte (“Data Consulta Reinício” >= “Data Início” e <= “Data Fim”). Nota: no caso de existirem
+   * mais de uma consulta com registo de Reinício durante o período de reporte, o sistema irá
+   * considerar a primeira ocorrência como “Data Consulta Reinício”. ou
+   *
+   * <p>Incluindo todos os utentes que tiveram registo de “Mudança de Estado de Permanência” =
+   * “Reinício” na Ficha Resumo- Ficha Mestra ocorrida durante o período de reporte (“Data Mudança
+   * de Estado Reinício” >= “Data Início” e <= “Data Fim”). Nota: no caso de existirem mais de uma
+   * data com registo de Reinício durante o período de reporte, o sistema irá considerar a primeira
+   * ocorrência como “Data Mudança de Estado Reinício”.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithRestartedStateOfStay() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
+
+    String query =
+        " SELECT p.patient_id "
+            + "FROM   patient p "
+            + "           INNER JOIN encounter e "
+            + "                      ON e.patient_id = p.patient_id "
+            + "           INNER JOIN obs o "
+            + "                      ON o.encounter_id = e.encounter_id "
+            + "INNER JOIN ( "
+            + "             SELECT p.patient_id, "
+            + "                    MIN(e.encounter_datetime) AS first_date "
+            + "             FROM   patient p "
+            + "                        INNER JOIN encounter e "
+            + "                                   ON e.patient_id = p.patient_id "
+            + "                        INNER JOIN obs o "
+            + "                                   ON o.encounter_id = e.encounter_id "
+            + "             WHERE "
+            + "                 p.voided = 0 "
+            + "               AND e.voided = 0 "
+            + "               AND o.voided = 0 "
+            + "               AND e.encounter_type = ${6} "
+            + "               AND e.location_id = :location "
+            + "               AND o.concept_id = ${6273} "
+            + "               AND o.value_coded IS NOT NULL "
+            + "               AND e.encounter_datetime >= :startDate "
+            + "               AND e.encounter_datetime <= :endDate "
+            + "             GROUP  BY p.patient_id "
+            + ") first_state ON first_state.patient_id = p.patient_id "
+            + "WHERE   p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.encounter_type = ${6} "
+            + "  AND e.location_id = :location "
+            + "  AND o.concept_id = ${6273} "
+            + "  AND o.value_coded = ${1705} "
+            + "  AND e.encounter_datetime = first_state.first_date "
+            + "GROUP  BY p.patient_id "
+            + "UNION "
+            + "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "           INNER JOIN encounter e "
+            + "                      ON e.patient_id = p.patient_id "
+            + "           INNER JOIN obs o "
+            + "                      ON o.encounter_id = e.encounter_id "
+            + "           INNER JOIN ( "
+            + "             SELECT p.patient_id, "
+            + "                    MIN(o.obs_datetime) AS first_date "
+            + "             FROM   patient p "
+            + "                        INNER JOIN encounter e "
+            + "                                   ON e.patient_id = p.patient_id "
+            + "                        INNER JOIN obs o "
+            + "                                   ON o.encounter_id = e.encounter_id "
+            + "             WHERE "
+            + "                 p.voided = 0 "
+            + "               AND e.voided = 0 "
+            + "               AND o.voided = 0 "
+            + "               AND e.encounter_type = ${53} "
+            + "               AND e.location_id = :location "
+            + "               AND o.concept_id = ${6272} "
+            + "               AND o.value_coded IS NOT NULL "
+            + "               AND e.encounter_datetime >= :startDate "
+            + "               AND e.encounter_datetime <= :endDate "
+            + "             GROUP  BY p.patient_id "
+            + ") first_state ON first_state.patient_id = p.patient_id "
+            + "WHERE   p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.encounter_type = ${53} "
+            + "  AND e.location_id = :location "
+            + "  AND o.concept_id = ${6272} "
+            + "  AND o.value_coded = ${1705} "
+            + "  AND o.obs_datetime = first_state.first_date "
+            + "GROUP  BY p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(sb.replace(query));
