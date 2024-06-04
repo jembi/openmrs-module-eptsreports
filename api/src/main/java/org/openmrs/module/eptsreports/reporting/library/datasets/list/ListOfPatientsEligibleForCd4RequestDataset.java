@@ -6,6 +6,7 @@ import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.BaseDataSet;
 import org.openmrs.module.reporting.data.DataDefinition;
+import org.openmrs.module.reporting.data.converter.BirthdateConverter;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
 import org.openmrs.module.reporting.data.person.definition.ConvertedPersonDataDefinition;
@@ -58,6 +59,10 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
 
     // 2 - Name - Sheet 1: Column B
     patientDataSetDefinition.addColumn("name", nameDefinition, "");
+
+    // 3 - Data Nascimento - Sheet 1: Column C
+    patientDataSetDefinition.addColumn(
+        "birthdate", new BirthdateDataDefinition(), "", new BirthdateConverter("dd-MM-yyyy"));
 
     // 4 - Sexo -Sheet 1: Column D
     patientDataSetDefinition.addColumn(
