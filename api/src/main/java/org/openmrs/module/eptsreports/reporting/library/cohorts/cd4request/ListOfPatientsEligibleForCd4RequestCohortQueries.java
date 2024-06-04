@@ -113,7 +113,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     CohortDefinition cd4ResultByReportGenerationDate =
         getPatientsWithCd4ResultsOnRestartedTarvDate(true);
 
-    compositionCohortDefinition.addSearch("RESTARTEDONCLINICA", map(restarted, MAPPING));
+    compositionCohortDefinition.addSearch("RESTARTED", map(restarted, MAPPING));
 
     compositionCohortDefinition.addSearch(
         "CD4RESULT", map(cd4ResultByReportGenerationDate, MAPPING3));
