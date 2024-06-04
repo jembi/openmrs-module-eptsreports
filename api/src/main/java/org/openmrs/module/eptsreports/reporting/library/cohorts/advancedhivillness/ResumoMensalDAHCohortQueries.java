@@ -1665,8 +1665,6 @@ public class ResumoMensalDAHCohortQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
     map.put("1255", hivMetadata.getARVPlanConcept().getConceptId());
-    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
-    map.put("6275", hivMetadata.getPreTarvConcept().getConceptId());
 
     String query =
         "    SELECT p.patient_id  "
@@ -1689,7 +1687,7 @@ public class ResumoMensalDAHCohortQueries {
             + "      AND o.voided = 0  "
             + "      AND e.encounter_type = ${90}  "
             + "      AND o.concept_id = ${1255}  "
-            + "      AND o.value_coded IN (${1256}, ${6275})  "
+            + "      AND o.value_coded IS NOT NULL  "
             + "      AND e.encounter_datetime = last_dah.last_date  "
             + "      AND e.location_id = :location  "
             + "    GROUP BY p.patient_id  "
