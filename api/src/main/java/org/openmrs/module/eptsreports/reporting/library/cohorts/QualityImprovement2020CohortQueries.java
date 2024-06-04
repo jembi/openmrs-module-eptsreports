@@ -15367,15 +15367,15 @@ public class QualityImprovement2020CohortQueries {
     } else if (den == 4) {
       compositionCohortDefinition.addSearch(
           "age",
-          EptsReportUtils.map(genericCohortQueries.getAgeOnPresuntivoTbDate(0, 15), MAPPING3));
+          EptsReportUtils.map(genericCohortQueries.getAgeOnPresuntivoTbDate(0, 14), MAPPING3));
     } else if (den == 5) {
       compositionCohortDefinition.addSearch(
           "age",
-          EptsReportUtils.map(genericCohortQueries.getAgeOnXpertRequestDate(0, 15), MAPPING3));
+          EptsReportUtils.map(genericCohortQueries.getAgeOnXpertRequestDate(0, 14), MAPPING3));
     } else if (den == 6) {
       compositionCohortDefinition.addSearch(
           "age",
-          EptsReportUtils.map(genericCohortQueries.getAgeOnTbDiagnosisDate(0, 15), MAPPING3));
+          EptsReportUtils.map(genericCohortQueries.getAgeOnTbDiagnosisDate(0, 14), MAPPING3));
     }
 
     CohortDefinition transferOut = getTranferredOutPatientsCat7();
