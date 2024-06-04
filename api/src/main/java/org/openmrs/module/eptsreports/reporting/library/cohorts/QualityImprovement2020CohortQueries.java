@@ -8551,25 +8551,14 @@ public class QualityImprovement2020CohortQueries {
         cd.setName(
             "9.2 % de adultos (15/+anos) HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias após a primeira consulta clínica");
         break;
-      case 6:
-        cd.setName(
-            "9.6 % de crianças  (0-14 anos) HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira consulta clínica");
-        break;
     }
 
-    if (flag == 1 || flag == 2) {
       cd.addSearch(
           "AGE",
           EptsReportUtils.map(
               genericCohortQueries.getAgeOnFirstClinicalConsultation(15, null),
               "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
-    } else if (flag == 6) {
-      cd.addSearch(
-          "AGE",
-          EptsReportUtils.map(
-              genericCohortQueries.getAgeOnFirstClinicalConsultation(0, 14),
-              "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
-    }
+
 
     String inclusionPeriodMappings =
         "revisionEndDate=${revisionEndDate},startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},location=${location}";
@@ -8622,7 +8611,7 @@ public class QualityImprovement2020CohortQueries {
             inclusionPeriodMappings));
 
     cd.setCompositionString(
-        "((A OR D OR breastfeedingOnPeriod) AND NOT (C OR E OR pregnantOnPeriod)) AND AGE");
+        "(A AND (AGE OR D OR breastfeedingOnPeriod)) AND NOT (C OR E OR pregnantOnPeriod)");
     return cd;
   }
 
