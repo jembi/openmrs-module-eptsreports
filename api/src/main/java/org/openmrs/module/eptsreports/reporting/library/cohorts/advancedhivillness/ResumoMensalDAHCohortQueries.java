@@ -300,7 +300,7 @@ public class ResumoMensalDAHCohortQueries {
         "B8",
         map(
             resumoMensalCohortQueries.getPatientsWhoDiedB8(true),
-            "onOrAfter=${startDate},onOrBefore=${startDate-6m-1d},locationList=${location}"));
+            "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}"));
 
     cd.setCompositionString("onDAHDuringPeriod AND (diedAfterStartDah OR B8)");
     return cd;
@@ -335,7 +335,11 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "cd4ByAgeAndResult", mapStraightThrough(getPatientsWithCD4BasedOnAgeAndCd4Results()));
 
-    cd.addSearch("onDAH", mapStraightThrough(getPatientsWhoStartedFollowupOnDAHComposition()));
+    cd.addSearch(
+        "onDAH",
+        map(
+            getPatientsWhoStartedFollowupOnDAHComposition(),
+            "startDate=${endDate},endDate={endDate},location=${location}"));
 
     cd.setCompositionString("onDAH AND haveCd4Results AND cd4ByAgeAndResult");
     return cd;
@@ -377,7 +381,11 @@ public class ResumoMensalDAHCohortQueries {
                 Collections.singletonList(tbMetadata.getTestTBLAM()),
                 Arrays.asList(hivMetadata.getPositive(), hivMetadata.getNegative()))));
 
-    cd.addSearch("onDAH", mapStraightThrough(getPatientsWhoStartedFollowupOnDAHComposition()));
+    cd.addSearch(
+        "onDAH",
+        map(
+            getPatientsWhoStartedFollowupOnDAHComposition(),
+            "startDate=${endDate},endDate={endDate},location=${location}"));
 
     cd.setCompositionString("onDAH AND haveCd4Results AND tbLamResults");
     return cd;
@@ -412,7 +420,11 @@ public class ResumoMensalDAHCohortQueries {
                 Collections.singletonList(tbMetadata.getTestTBLAM()),
                 Collections.singletonList(hivMetadata.getPositive()))));
 
-    cd.addSearch("onDAH", mapStraightThrough(getPatientsWhoStartedFollowupOnDAHComposition()));
+    cd.addSearch(
+        "onDAH",
+        map(
+            getPatientsWhoStartedFollowupOnDAHComposition(),
+            "startDate=${endDate},endDate={endDate},location=${location}"));
 
     cd.setCompositionString("onDAH AND tbLamResults AND tbLamPositive");
     return cd;
@@ -454,7 +466,11 @@ public class ResumoMensalDAHCohortQueries {
                     hivMetadata.getCragSoroLabsetConcept(), hivMetadata.getCragSoroConcept()),
                 Arrays.asList(hivMetadata.getPositive(), hivMetadata.getNegative()))));
 
-    cd.addSearch("onDAH", mapStraightThrough(getPatientsWhoStartedFollowupOnDAHComposition()));
+    cd.addSearch(
+        "onDAH",
+        map(
+            getPatientsWhoStartedFollowupOnDAHComposition(),
+            "startDate=${endDate},endDate={endDate},location=${location}"));
 
     cd.setCompositionString("onDAH AND haveLowCd4Results AND cragResults");
     return cd;
