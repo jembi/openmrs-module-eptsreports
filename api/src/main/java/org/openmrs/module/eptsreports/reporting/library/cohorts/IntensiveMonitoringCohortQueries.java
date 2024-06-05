@@ -1489,12 +1489,12 @@ public class IntensiveMonitoringCohortQueries {
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
 
     String query =
-        "SELECT p.patient_id FROM patient p  "
+        "SELECT p.patient_id FROM patient p INNER JOIN person pr ON p.patient_id = pr.person_id  "
             + " INNER JOIN encounter e ON e.patient_id=p.patient_id  "
             + " INNER JOIN obs o ON o.encounter_id=e.encounter_id "
             + " WHERE p.voided = 0 AND e.voided=0 AND e.location_id=:location "
             + " AND e.encounter_type= ${6} AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
-            + " AND o.concept_id = ${1982} AND o.value_coded= ${1065} AND o.voided=0 "
+            + " AND o.concept_id = ${1982} AND o.value_coded= ${1065} AND o.voided=0 AND pr.gender = 'F' "
             + " GROUP BY p.patient_id ";
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
