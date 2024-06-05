@@ -411,6 +411,8 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    valuesMap.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
     valuesMap.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
 
     String query =
@@ -418,12 +420,18 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
             + "FROM   patient p "
             + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
             + "WHERE  e.encounter_type = ${6} "
             + "       AND e.location_id = :location "
             + "       AND e.encounter_datetime <= CURRENT_DATE() "
             + "       AND o.concept_id = ${165174} "
+            + "       AND o2.concept_id = ${165322} "
+            + "       AND o2.value_coded IN ( ${1256}, ${1257} ) "
+            + "       AND o.obs_group_id = o2.obs_group_id "
             + "       AND e.voided = 0 "
             + "       AND p.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND o2.voided = 0 "
             + "GROUP  BY p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(valuesMap);
@@ -473,13 +481,18 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
             + "                          FROM   patient p "
             + "                                 INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "                                 INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                 INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
             + "                          WHERE  e.encounter_type = ${6} "
             + "                                 AND e.location_id = :location "
             + "                                 AND e.encounter_datetime <= CURRENT_DATE() "
             + "                                 AND o.concept_id = ${165174} "
+            + "                                 AND o2.concept_id = ${165322} "
+            + "                                 AND o2.value_coded IN ( ${1256}, ${1257} ) "
+            + "                                 AND o.obs_group_id = o2.obs_group_id "
             + "                                 AND e.voided = 0 "
             + "                                 AND p.voided = 0 "
             + "                                 AND o.voided = 0 "
+            + "                                 AND o2.voided = 0 "
             + "                          GROUP  BY p.patient_id) most_recent "
             + "                      ON most_recent.patient_id = p.patient_id "
             + "       WHERE  e.encounter_datetime = most_recent.consultation_date "
