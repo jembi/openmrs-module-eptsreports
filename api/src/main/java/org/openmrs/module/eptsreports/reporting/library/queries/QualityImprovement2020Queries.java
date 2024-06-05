@@ -1,9 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
@@ -2743,56 +2740,49 @@ public class QualityImprovement2020Queries {
   }
 
   /**
-   * todos os utentes com registo de “Tem sintomas?” (TB) = “Sim” em uma consulta clínica (Ficha
-   * Clínica) ocorrida durante o período de revisão;
-   *
-   * @return {@link String}
-   */
-  public static String getPatientsWithSintomasTBSim() {
-    return "SELECT p.patient_id, "
-        + "               Min(e.encounter_datetime) AS data_presuntivo_tb "
-        + "        FROM   patient p "
-        + "                   INNER JOIN encounter e "
-        + "                              ON e.patient_id = p.patient_id "
-        + "                   INNER JOIN obs o "
-        + "                              ON o.encounter_id = e.encounter_id "
-        + "        WHERE  p.voided = 0 "
-        + "          AND e.voided = 0 "
-        + "          AND o.voided = 0 "
-        + "          AND e.location_id = :location "
-        + "          AND e.encounter_datetime >= :startDate "
-        + "          AND e.encounter_datetime <= :endDate "
-        + "          AND e.encounter_type = ${6} "
-        + "          AND o.concept_id = ${23758} "
-        + "          AND o.value_coded = ${1065} "
-        + "        GROUP  BY p.patient_id";
-  }
-
-  /**
    * todos os utentes com registo de algum sintoma FESTAC em uma consulta clínica (Ficha Clínica)
    * ocorrida durante o período de revisão;
    *
    * @return {@link String}
    */
-  public static String getPatientsWithSintomasFestac() {
-    return "SELECT p.patient_id, "
-        + "       Min(e.encounter_datetime) AS data_presuntivo_tb "
-        + "FROM   patient p "
-        + "       INNER JOIN encounter e "
-        + "               ON e.patient_id = p.patient_id "
-        + "       INNER JOIN obs o "
-        + "               ON o.encounter_id = e.encounter_id "
-        + "WHERE  p.voided = 0 "
-        + "       AND e.voided = 0 "
-        + "       AND o.voided = 0 "
-        + "       AND e.location_id = :location "
-        + "       AND e.encounter_datetime >= :startDate "
-        + "       AND e.encounter_datetime <= :endDate "
-        + "       AND e.encounter_type = ${6} "
-        + "       AND o.concept_id = ${1766} "
-        + "       AND o.value_coded IN ( ${1763}, ${1764}, ${1762}, ${1760}, "
-        + "                              ${23760}, ${1765}, ${161} ) "
-        + "GROUP  BY p.patient_id";
+  public static String getPatientsWithSintomasFestac(
+      int encounterType, List<Integer> concepts, List<Integer> values) {
+    Map<String, String> map = new HashMap<>();
+    map.put("encounterType", String.valueOf(encounterType));
+    map.put("concepts", getMetadata(concepts));
+    map.put("values", getMetadata(values));
+
+    String query =
+        "SELECT p.patient_id, "
+            + "       Min(e.encounter_datetime) AS data_presuntivo_tb "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_datetime >= :startDate "
+            + "       AND e.encounter_datetime <= :endDate "
+            + "       AND e.encounter_type = ${encounterType} "
+            + "       AND o.concept_id IN (${concepts}) "
+            + "       AND o.value_coded IN (${values}) "
+            + "GROUP  BY p.patient_id";
+    StringSubstitutor sb = new StringSubstitutor(map);
+    return sb.replace(query);
+  }
+
+  private static String getMetadata(List<Integer> list) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < list.size(); i++) {
+      sb.append(list.get(i));
+      if (i < list.size() - 1) {
+        sb.append(", ");
+      }
+    }
+    return sb.toString();
   }
 
   /**

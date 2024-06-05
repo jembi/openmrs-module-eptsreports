@@ -15000,14 +15000,36 @@ public class QualityImprovement2020CohortQueries {
    */
   static String getUnionQueryUtentesPresuntivos() {
 
+    HivMetadata hivMetadata = new HivMetadata();
+    TbMetadata tbMetadata = new TbMetadata();
+
+    int encounterType1 = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    List<Integer> concepts1 = Arrays.asList(hivMetadata.getTBSymptomsConcept().getConceptId());
+    List<Integer> values1 = Arrays.asList(hivMetadata.getPatientFoundYesConcept().getConceptId());
+
+    int encounterType2 = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    List<Integer> concepts2 = Arrays.asList(tbMetadata.getObservationTB().getConceptId());
+    List<Integer> values2 =
+        Arrays.asList(
+            tbMetadata.getFeverLastingMoraThan3Weeks().getConceptId(),
+            tbMetadata.getWeightLossOfMoreThan3KgInLastMonth().getConceptId(),
+            tbMetadata.getNightsWeatsLastingMoraThan3Weeks().getConceptId(),
+            tbMetadata.getCoughLastingMoraThan3Weeks().getConceptId(),
+            tbMetadata.getAsthenia().getConceptId(),
+            tbMetadata.getCohabitantBeingTreatedForTB().getConceptId(),
+            tbMetadata.getLymphadenopathy().getConceptId());
+
     EptsQueriesUtil queriesUtil = new EptsQueriesUtil();
 
     return queriesUtil
-        .unionBuilder(QualityImprovement2020Queries.getPatientsWithSintomasTBSim())
-        .union(QualityImprovement2020Queries.getPatientsWithSintomasFestac())
+        .unionBuilder(
+            QualityImprovement2020Queries.getPatientsWithSintomasFestac(
+                encounterType1, concepts1, values1))
+        .union(
+            QualityImprovement2020Queries.getPatientsWithSintomasFestac(
+                encounterType2, concepts2, values2))
         .buildQuery();
   }
-
   /**
    * <b>Utentes Presuntivos de TB</b>
    *
