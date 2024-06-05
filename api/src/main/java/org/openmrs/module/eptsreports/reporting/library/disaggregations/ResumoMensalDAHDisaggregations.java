@@ -103,7 +103,10 @@ public class ResumoMensalDAHDisaggregations {
     // PREGNANT
     BaseDataSet.ColumnParameters pregnant89 =
         new BaseDataSet.ColumnParameters(
-            "pregnant89", "Pregnant for 8 and 9 indicators", "maternity=pregnant-dah", "pregnant");
+            "pregnant89",
+            "Pregnant for 8 and 9 indicators",
+            "gender=F|maternity=pregnant-dah",
+            "pregnant");
 
     return Arrays.asList(
         under15NewArt89,
@@ -165,7 +168,7 @@ public class ResumoMensalDAHDisaggregations {
     // PREGNANT
     BaseDataSet.ColumnParameters pregnant =
         new BaseDataSet.ColumnParameters(
-            "pregnant", "Pregnant", "maternity=pregnant-dah", "pregnant");
+            "pregnant", "Pregnant", "gender=F|maternity=pregnant-dah", "pregnant");
 
     // FOLLOWUP
     BaseDataSet.ColumnParameters under15Followup =
