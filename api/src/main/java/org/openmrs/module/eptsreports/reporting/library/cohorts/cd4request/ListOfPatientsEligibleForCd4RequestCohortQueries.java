@@ -37,7 +37,8 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
       "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}";
   String MAPPING3 =
       "startDate=${startDate},endDate=${generationDate},generationDate=${generationDate},location=${location}";
-  String MAPPING4 = "startDate=${startDate},generationDate=${generationDate},,location=${location}";
+  String MAPPING4 = "startDate=${startDate},generationDate=${generationDate},location=${location}";
+  String MAPPING5 = "endDate=${endDate},generationDate=${generationDate},location=${location}";
 
   @Autowired
   public ListOfPatientsEligibleForCd4RequestCohortQueries(
@@ -68,10 +69,13 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
    * <p>Têm condição activa de estadiamento clínico III ou IV durante o período de reporte
    * (CD4_RF6); ou
    *
+   * <p>são elegíveis ao pedido de CD4 de seguimento (CD4_RF7); ou
+   *
    * @see #getPatientWhoInitiatedTarvDuringPeriodC1() Iniciaram TARV
    * @see #getPatientWhoRestartedTarvAndEligibleForCd4RequestC2() Reiniciaram TARV
    * @see #getPatientsWithTwoHighVlResultsC3() Receberam dois resultados de CV alta
    * @see #getPatientWithEstadiamentoIIIorIVC4() Condição activa de estadiamento clinico
+   * @see #getPatientEligibleForCd4FollowupC5() Elegiveis ao pedido de CD4 Seguimento
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsEligibleForCd4RequestComposition() {
@@ -89,13 +93,16 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     CohortDefinition restarted = getPatientWhoRestartedTarvAndEligibleForCd4RequestC2();
     CohortDefinition receivedHighVl = getPatientsWithTwoHighVlResultsC3();
     CohortDefinition estadio = getPatientWithEstadiamentoIIIorIVC4();
+    CohortDefinition eligibleForCd4Followup = getPatientEligibleForCd4FollowupC5();
 
     compositionCohortDefinition.addSearch("STARTED", map(started, MAPPING2));
     compositionCohortDefinition.addSearch("RESTARTED", map(restarted, MAPPING2));
     compositionCohortDefinition.addSearch("HIGHVL", map(receivedHighVl, MAPPING4));
     compositionCohortDefinition.addSearch("ESTADIO", map(estadio, MAPPING2));
+    compositionCohortDefinition.addSearch("ELIGIBLECD4", map(eligibleForCd4Followup, MAPPING5));
 
-    compositionCohortDefinition.setCompositionString("STARTED OR RESTARTED OR HIGHVL OR ESTADIO");
+    compositionCohortDefinition.setCompositionString(
+        "STARTED OR RESTARTED OR HIGHVL OR ESTADIO OR ELIGIBLECD4");
 
     return compositionCohortDefinition;
   }
@@ -272,6 +279,48 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     compositionCohortDefinition.addSearch("CD4RESULT", map(cd4ResultByEstadioDate, MAPPING2));
 
     compositionCohortDefinition.setCompositionString("ESTADIO AND NOT CD4RESULT");
+
+    return compositionCohortDefinition;
+  }
+
+  /**
+   * <b>C5 - Utentes elegíveis ao CD4 Seguimento</b>
+   *
+   * <p>incluindo todos os utentes com registo do último resultado do CD4 registado numa consulta
+   * clínica (Ficha Clínica – Ficha Mestra) que ocorreu 12 meses antes do fim do período de reporte,
+   * e cujo resultado absoluto é < 350 ou resultado percentual é < 30% (“Data Último Resultado CD4”
+   * <= “Data Início” – 12 meses e “Último Resultado CD4 Absoluto” <350 ou “Último Resultado CD4
+   * Percentual” < 30);
+   *
+   * <p>excluindo os utentes que tiveram registo do resultado de CD4 numa consulta clínica (Ficha
+   * Clínica – Ficha Mestra) ocorrida entre “Data Último Resultado CD4” + 1dia e a data geração do
+   * relatório
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientEligibleForCd4FollowupC5() {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName("C5 - Utentes elegíveis ao CD4 Seguimento");
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("generationDate", "generationDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition cd4LessThan350 = getPatientsWithCd4ResultsLessThan350();
+
+    CohortDefinition cd4ResulstOnCd4Date = getPatientsWithCd4ResultsOnLastCd4Date();
+
+    compositionCohortDefinition.addSearch(
+        "CD4LESS350", map(cd4LessThan350, "endDate=${endDate-12m},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "CD4RESULT",
+        map(
+            cd4ResulstOnCd4Date,
+            "endDate=${endDate-12m},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString("CD4LESS350 AND NOT CD4RESULT");
 
     return compositionCohortDefinition;
   }
@@ -604,6 +653,113 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
             + "      ) "
             + "       AND e.encounter_datetime >= estadio.first_date "
+            + "  AND enc.encounter_datetime <= :generationDate "
+            + "  AND enc.location_id = :location "
+            + "GROUP BY pa.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * incluindo todos os utentes com registo do último resultado do CD4 registado numa consulta
+   * clínica (Ficha Clínica – Ficha Mestra) que ocorreu 12 meses antes do fim do período de reporte,
+   * e cujo resultado absoluto é < 350 ou resultado percentual é < 30% (“Data Último Resultado CD4”
+   * <= “Data Início” – 12 meses e “Último Resultado CD4 Absoluto” <350 ou “Último Resultado CD4
+   * Percentual” < 30);
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithCd4ResultsLessThan350() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("resultado do CD4 apos Data Último Resultado CV");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+
+    String query =
+        "SELECT pa.patient_id "
+            + "FROM "
+            + "    patient pa "
+            + "        INNER JOIN encounter enc "
+            + "                   ON enc.patient_id =  pa.patient_id "
+            + "        INNER JOIN obs "
+            + "                   ON obs.encounter_id = enc.encounter_id "
+            + " INNER JOIN ( "
+            + ListOfPatientsEligibleForCd4RequestQueries.getLastCd4ResultDateQuery()
+            + " ) cd4_date ON cd4_date.patient_id = p.patient_id "
+            + "WHERE  pa.voided = 0 "
+            + "  AND enc.voided = 0 "
+            + "  AND obs.voided = 0 "
+            + "  AND enc.encounter_type = ${6} "
+            + "  AND ( "
+            + "        (obs.concept_id = ${1695} "
+            + "             AND obs.value_numeric IS NOT NULL "
+            + "             AND obs.value_numeric < 350) "
+            + "        OR "
+            + "        (obs.concept_id = ${730} "
+            + "             AND obs.value_numeric IS NOT NULL "
+            + "             AND obs.value_numeric < 30) "
+            + "      ) "
+            + "       AND e.encounter_datetime = cd4_date.last_cd4 "
+            + "  AND enc.location_id = :location "
+            + "GROUP BY pa.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * utentes que tiveram registo do resultado de CD4 numa consulta clínica (Ficha Clínica – Ficha
+   * Mestra) ocorrida entre “Data Último Resultado CD4” + 1dia e a data geração do relatório
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithCd4ResultsOnLastCd4Date() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("resultado do CD4 apos Data Último Resultado CV");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("generationDate", "generationDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+
+    String query =
+        "SELECT pa.patient_id "
+            + "FROM "
+            + "    patient pa "
+            + "        INNER JOIN encounter enc "
+            + "                   ON enc.patient_id =  pa.patient_id "
+            + "        INNER JOIN obs "
+            + "                   ON obs.encounter_id = enc.encounter_id "
+            + " INNER JOIN ( "
+            + ListOfPatientsEligibleForCd4RequestQueries.getLastCd4ResultDateQuery()
+            + " ) cd4_date ON cd4_date.patient_id = p.patient_id "
+            + "WHERE  pa.voided = 0 "
+            + "  AND enc.voided = 0 "
+            + "  AND obs.voided = 0 "
+            + "  AND enc.encounter_type = ${6} "
+            + "  AND ( "
+            + "        (obs.concept_id = ${1695} AND obs.value_numeric IS NOT NULL) "
+            + "        OR "
+            + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
+            + "      ) "
+            + "       AND e.encounter_datetime >= DATE_ADD(cd4_date.last_cd4, INTERVAL 1 DAY) "
             + "  AND enc.encounter_datetime <= :generationDate "
             + "  AND enc.location_id = :location "
             + "GROUP BY pa.patient_id";

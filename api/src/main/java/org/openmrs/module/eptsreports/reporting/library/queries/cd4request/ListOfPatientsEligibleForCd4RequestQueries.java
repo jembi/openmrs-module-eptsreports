@@ -129,4 +129,31 @@ public class ListOfPatientsEligibleForCd4RequestQueries {
         + "                                    AND e.location_id = :location "
         + "                             GROUP  BY p.patient_id ";
   }
+
+  /**
+   * último resultado do CD4 registado numa consulta clínica (Ficha Clínica – Ficha Mestra)
+   *
+   * @return {@link String}
+   */
+  public static String getLastCd4ResultDateQuery() {
+    return "SELECT pa.patient_id, MAX(e.encounter_datetime) AS last_cd4 "
+        + "FROM "
+        + "    patient pa "
+        + "        INNER JOIN encounter enc "
+        + "                   ON enc.patient_id =  pa.patient_id "
+        + "        INNER JOIN obs "
+        + "                   ON obs.encounter_id = enc.encounter_id "
+        + "WHERE  pa.voided = 0 "
+        + "  AND enc.voided = 0 "
+        + "  AND obs.voided = 0 "
+        + "  AND enc.encounter_type = ${6} "
+        + "  AND ( "
+        + "        (obs.concept_id = ${1695} AND obs.value_numeric IS NOT NULL) "
+        + "        OR "
+        + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
+        + "      ) "
+        + "  AND enc.encounter_datetime <= :endDate "
+        + "  AND enc.location_id = :location "
+        + "GROUP BY pa.patient_id";
+  }
 }
