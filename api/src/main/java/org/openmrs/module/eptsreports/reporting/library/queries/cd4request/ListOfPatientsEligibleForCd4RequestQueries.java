@@ -101,4 +101,32 @@ public class ListOfPatientsEligibleForCd4RequestQueries {
         + "                                  AND o.voided = 0  "
         + "                           GROUP  BY p.patient_id ";
   }
+
+  /**
+   * Registo da lista representativa de Estadio IV (CD4_RF25)
+   *
+   * <p>Registo da lista representativa de Estadio III (CD4_RF24)
+   *
+   * @return {@link String}
+   */
+  public static String getEstadioOmsQuery() {
+    return "    SELECT p.patient_id,  "
+        + "                        Min(e.encounter_datetime) AS first_date "
+        + "                             FROM   patient p "
+        + "                                    INNER JOIN encounter e "
+        + "                                            ON p.patient_id = e.patient_id "
+        + "                                    INNER JOIN obs o "
+        + "                                            ON e.encounter_id = o.encounter_id "
+        + "                             WHERE  p.voided = 0 "
+        + "                                    AND e.voided = 0 "
+        + "                                    AND o.voided = 0 "
+        + "                                    AND e.encounter_type = ${6}  "
+        + "                                    AND o.concept_id = ${1406} "
+        + "                                    AND o.value_coded IN (${3},${42},${43},${60},${126},${507},${1294}, "
+        + "                                         ${1570},${5018},${5042},${5334},${5344},${5340},${5945},${6783},${6990},${7180},${14656}) "
+        + "                                    AND e.encounter_datetime >= :startDate "
+        + "                                    AND e.encounter_datetime <= :endDate "
+        + "                                    AND e.location_id = :location "
+        + "                             GROUP  BY p.patient_id ";
+  }
 }

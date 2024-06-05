@@ -7,8 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.cd4request.ListOfPatientsEligibleForCd4RequestQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -23,7 +26,11 @@ import org.springframework.stereotype.Component;
 public class ListOfPatientsEligibleForCd4RequestCohortQueries {
 
   private final HivMetadata hivMetadata;
+  private final CommonMetadata commonMetadata;
+  private final TbMetadata tbMetadata;
   private final ResumoMensalCohortQueries resumoMensalCohortQueries;
+  private final ListOfPatientsInAdvancedHivIllnessCohortQueries
+      listOfPatientsInAdvancedHivIllnessCohortQueries;
 
   String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
   String MAPPING2 =
@@ -34,9 +41,18 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
 
   @Autowired
   public ListOfPatientsEligibleForCd4RequestCohortQueries(
-      HivMetadata hivMetadata, ResumoMensalCohortQueries resumoMensalCohortQueries) {
+      HivMetadata hivMetadata,
+      CommonMetadata commonMetadata,
+      TbMetadata tbMetadata,
+      ResumoMensalCohortQueries resumoMensalCohortQueries,
+      ListOfPatientsInAdvancedHivIllnessCohortQueries
+          listOfPatientsInAdvancedHivIllnessCohortQueries) {
     this.hivMetadata = hivMetadata;
+    this.commonMetadata = commonMetadata;
+    this.tbMetadata = tbMetadata;
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
+    this.listOfPatientsInAdvancedHivIllnessCohortQueries =
+        listOfPatientsInAdvancedHivIllnessCohortQueries;
   }
 
   /**
@@ -49,9 +65,13 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
    *
    * <p>Receberam dois resultados de CV alta (CD4_RF5); ou
    *
+   * <p>Têm condição activa de estadiamento clínico III ou IV durante o período de reporte
+   * (CD4_RF6); ou
+   *
    * @see #getPatientWhoInitiatedTarvDuringPeriodC1() Iniciaram TARV
    * @see #getPatientWhoRestartedTarvAndEligibleForCd4RequestC2() Reiniciaram TARV
    * @see #getPatientsWithTwoHighVlResultsC3() Receberam dois resultados de CV alta
+   * @see #getPatientWithEstadiamentoIIIorIVC4() Condição activa de estadiamento clinico
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsEligibleForCd4RequestComposition() {
@@ -68,12 +88,14 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     CohortDefinition started = getPatientWhoInitiatedTarvDuringPeriodC1();
     CohortDefinition restarted = getPatientWhoRestartedTarvAndEligibleForCd4RequestC2();
     CohortDefinition receivedHighVl = getPatientsWithTwoHighVlResultsC3();
+    CohortDefinition estadio = getPatientWithEstadiamentoIIIorIVC4();
 
     compositionCohortDefinition.addSearch("STARTED", map(started, MAPPING2));
     compositionCohortDefinition.addSearch("RESTARTED", map(restarted, MAPPING2));
     compositionCohortDefinition.addSearch("HIGHVL", map(receivedHighVl, MAPPING4));
+    compositionCohortDefinition.addSearch("ESTADIO", map(estadio, MAPPING2));
 
-    compositionCohortDefinition.setCompositionString(" STARTED OR RESTARTED OR HIGHVL");
+    compositionCohortDefinition.setCompositionString("STARTED OR RESTARTED OR HIGHVL OR ESTADIO");
 
     return compositionCohortDefinition;
   }
@@ -207,6 +229,49 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
         "LASTCD4", Mapped.mapStraightThrough(lastCd4ResultAfterLastVl));
 
     compositionCohortDefinition.setCompositionString("(LASTVL AND SECONDVL) AND NOT LASTCD4");
+
+    return compositionCohortDefinition;
+  }
+
+  /**
+   * <b>C4 - Utentes com critério de Estadiamento Clínico III ou IV</b>
+   * <li>pelo menos um registo da lista representativa de Estadio IV (DAH_RF28), no campo de
+   *     “Infecções Oportunistas incluindo Sarcoma de Kaposi e outras doenças”, na “Ficha Clínica –
+   *     Ficha Mestra”, registada durante o período de avaliação (“Data Consulta” >= “Data Início” e
+   *     “Data Consulta” <= “Data Fim”) ou
+   * <li>pelo menos um registo da lista representativa de Estadio III (DAH_RF27), no campo de
+   *     “Infecções Oportunistas incluindo Sarcoma de Kaposi e outras doenças”, na “Ficha Clínica –
+   *     Ficha Mestra”, registada durante o período de avaliação (“Data Consulta” >= “Data Início” e
+   *     “Data Consulta” <= “Data Fim”)
+   *
+   *     <p>excluindo todos os utentes que tiveram registo do resultado de CD4 numa consulta (Ficha
+   *     Clínica – Ficha Mestra) ocorrida entre a “Data Consulta Estadio III_IV” e a data geração do
+   *     relatório.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientWithEstadiamentoIIIorIVC4() {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName(
+        "C4 - Utentes com critério de Estadiamento Clínico III ou IV");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("generationDate", "generationDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition estadio =
+        listOfPatientsInAdvancedHivIllnessCohortQueries
+            .getPatientsWithCriterioEstadiamentoInicioSeguimento();
+
+    CohortDefinition cd4ResultByEstadioDate = getPatientsWithCd4ResultsOnEstadioDate();
+
+    compositionCohortDefinition.addSearch("ESTADIO", map(estadio, MAPPING));
+
+    compositionCohortDefinition.addSearch("CD4RESULT", map(cd4ResultByEstadioDate, MAPPING2));
+
+    compositionCohortDefinition.setCompositionString("ESTADIO AND NOT CD4RESULT");
 
     return compositionCohortDefinition;
   }
@@ -472,6 +537,73 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
             + "      ) "
             + "       AND e.encounter_datetime >= last_vl.most_recent "
+            + "  AND enc.encounter_datetime <= :generationDate "
+            + "  AND enc.location_id = :location "
+            + "GROUP BY pa.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * todos os utentes que tiveram registo do resultado de CD4 numa consulta (Ficha Clínica – Ficha
+   * Mestra) ocorrida entre a “Data Consulta Estadio III/IV” e a data geração do relatório
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithCd4ResultsOnEstadioDate() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("resultado do CD4 apos Data Último Resultado CV");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("generationDate", "generationDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
+    map.put("5018", hivMetadata.getChronicDiarrheaConcept().getConceptId());
+    map.put("3", hivMetadata.getAnemiaConcept().getConceptId());
+    map.put("5945", hivMetadata.getFeverConcept().getConceptId());
+    map.put("43", hivMetadata.getPneumoniaConcept().getConceptId());
+    map.put("60", hivMetadata.getMeningitisConcept().getConceptId());
+    map.put("126", hivMetadata.getGingivitisConcept().getConceptId());
+    map.put("6783", hivMetadata.getEstomatiteUlcerativaNecrotizanteConcept().getConceptId());
+    map.put("5334", hivMetadata.getCandidiaseOralConcept().getConceptId());
+    map.put("1294", hivMetadata.getCryptococcalMeningitisConcept().getConceptId());
+    map.put("1570", hivMetadata.getCervicalCancerConcept().getConceptId());
+    map.put("5340", hivMetadata.getCandidiaseEsofagicaConcept().getConceptId());
+    map.put("5344", hivMetadata.getHerpesSimplesConcept().getConceptId());
+    map.put("14656", hivMetadata.getCachexiaConcept().getConceptId());
+    map.put("7180", hivMetadata.getToxoplasmoseConcept().getConceptId());
+    map.put("6990", hivMetadata.getHivDiseaseResultingInEncephalopathyConcept().getConceptId());
+    map.put("507", commonMetadata.getKaposiSarcomaConcept().getConceptId());
+    map.put("5042", tbMetadata.getExtraPulmonaryTbConcept().getConceptId());
+    map.put("42", tbMetadata.getPulmonaryTB().getConceptId());
+
+    String query =
+        "SELECT pa.patient_id "
+            + "FROM "
+            + "    patient pa "
+            + "        INNER JOIN encounter enc "
+            + "                   ON enc.patient_id =  pa.patient_id "
+            + "        INNER JOIN obs "
+            + "                   ON obs.encounter_id = enc.encounter_id "
+            + " INNER JOIN ( "
+            + ListOfPatientsEligibleForCd4RequestQueries.getEstadioOmsQuery()
+            + " ) estadio ON estadio.patient_id = p.patient_id "
+            + "WHERE  pa.voided = 0 "
+            + "  AND enc.voided = 0 "
+            + "  AND obs.voided = 0 "
+            + "  AND enc.encounter_type = ${6} "
+            + "  AND ( "
+            + "        (obs.concept_id = ${1695} AND obs.value_numeric IS NOT NULL) "
+            + "        OR "
+            + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
+            + "      ) "
+            + "       AND e.encounter_datetime >= estadio.first_date "
             + "  AND enc.encounter_datetime <= :generationDate "
             + "  AND enc.location_id = :location "
             + "GROUP BY pa.patient_id";
