@@ -69,13 +69,16 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
    * <p>Têm condição activa de estadiamento clínico III ou IV durante o período de reporte
    * (CD4_RF6); ou
    *
-   * <p>são elegíveis ao pedido de CD4 de seguimento (CD4_RF7); ou
+   * <p>São elegíveis ao pedido de CD4 de seguimento (CD4_RF7); ou
+   *
+   * <p>São mulheres grávidas e elegíveis ao pedido de CD4 (CD4_RF8).
    *
    * @see #getPatientWhoInitiatedTarvDuringPeriodC1() Iniciaram TARV
    * @see #getPatientWhoRestartedTarvAndEligibleForCd4RequestC2() Reiniciaram TARV
    * @see #getPatientsWithTwoHighVlResultsC3() Receberam dois resultados de CV alta
    * @see #getPatientWithEstadiamentoIIIorIVC4() Condição activa de estadiamento clinico
    * @see #getPatientEligibleForCd4FollowupC5() Elegiveis ao pedido de CD4 Seguimento
+   * @see #getPatientPregnantEligibleForCd4RequestC6() Elegiveis ao pedido de CD4 Seguimento
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsEligibleForCd4RequestComposition() {
@@ -94,15 +97,17 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     CohortDefinition receivedHighVl = getPatientsWithTwoHighVlResultsC3();
     CohortDefinition estadio = getPatientWithEstadiamentoIIIorIVC4();
     CohortDefinition eligibleForCd4Followup = getPatientEligibleForCd4FollowupC5();
+    CohortDefinition pregnant = getPatientPregnantEligibleForCd4RequestC6();
 
     compositionCohortDefinition.addSearch("STARTED", map(started, MAPPING2));
     compositionCohortDefinition.addSearch("RESTARTED", map(restarted, MAPPING2));
     compositionCohortDefinition.addSearch("HIGHVL", map(receivedHighVl, MAPPING4));
     compositionCohortDefinition.addSearch("ESTADIO", map(estadio, MAPPING2));
     compositionCohortDefinition.addSearch("ELIGIBLECD4", map(eligibleForCd4Followup, MAPPING5));
+    compositionCohortDefinition.addSearch("PREGNANT", map(pregnant, MAPPING2));
 
     compositionCohortDefinition.setCompositionString(
-        "STARTED OR RESTARTED OR HIGHVL OR ESTADIO OR ELIGIBLECD4");
+        "STARTED OR RESTARTED OR HIGHVL OR ESTADIO OR ELIGIBLECD4 OR PREGNANT");
 
     return compositionCohortDefinition;
   }
@@ -321,6 +326,52 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             "endDate=${endDate-12m},generationDate=${generationDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString("CD4LESS350 AND NOT CD4RESULT");
+
+    return compositionCohortDefinition;
+  }
+
+  /**
+   * <b>C6 - Utentes mulheres grávidas elegíveis ao CD4</b>
+   *
+   * <p>incluindo todos os utentes do sexo feminino com registo de “Grávida” = “Sim” numa consulta
+   * clínica (Ficha Clínica – Ficha Mestra) ocorrida nos últimos 9 meses do fim do período de
+   * reporte (>= “Data Fim” - 9 meses e “Data Fim”). Nota: a “Data da Primeira Consulta Gravidez” é
+   * a data da consulta na qual ocorreu o primeiro registo de “Grávida” = “Sim” nos últimos 9 meses
+   * do fim do período de reporte.
+   *
+   * <p>excluindo as utentes que tiveram registo de resultado de CD4 numa consulta clínica (Ficha
+   * Clínica – Ficha Mestra) ocorrida entre “Data de Primeira Consulta Gravidez” e a data geração do
+   * relatório.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientPregnantEligibleForCd4RequestC6() {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName("C6 - Utentes mulheres grávidas elegíveis ao CD4");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("generationDate", "generationDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition pregnantOnLast9Months = getPatientsPregnantOnLast9Months();
+
+    CohortDefinition cd4ResultsOnPregnancyDate = getPatientsWithCd4ResultsOnPregnancyDate();
+
+    compositionCohortDefinition.addSearch(
+        "PREGNANT9MONTHS",
+        map(
+            pregnantOnLast9Months,
+            "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "CD4RESULT",
+        map(
+            cd4ResultsOnPregnancyDate,
+            "startDate=${endDate-9m},endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString("PREGNANT9MONTHS AND NOT CD4RESULT");
 
     return compositionCohortDefinition;
   }
@@ -760,6 +811,95 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
             + "      ) "
             + "       AND e.encounter_datetime >= DATE_ADD(cd4_date.last_cd4, INTERVAL 1 DAY) "
+            + "  AND enc.encounter_datetime <= :generationDate "
+            + "  AND enc.location_id = :location "
+            + "GROUP BY pa.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * incluindo todos os utentes do sexo feminino com registo de “Grávida” = “Sim” numa consulta
+   * clínica (Ficha Clínica – Ficha Mestra) ocorrida nos últimos 9 meses do fim do período de
+   * reporte (>= “Data Fim” - 9 meses e “Data Fim”). Nota: a “Data da Primeira Consulta Gravidez” é
+   * a data da consulta na qual ocorreu o primeiro registo de “Grávida” = “Sim” nos últimos 9 meses
+   * do fim do período de reporte
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsPregnantOnLast9Months() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Utentes mulheres grávidas");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+
+    String pregnacyDateQuery = ListOfPatientsEligibleForCd4RequestQueries.getPregnancyQuery();
+    String query = new EptsQueriesUtil().patientIdQueryBuilder(pregnacyDateQuery).getQuery();
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * utentes que tiveram registo de resultado de CD4 numa consulta clínica (Ficha Clínica – Ficha
+   * Mestra) ocorrida entre “Data de Primeira Consulta Gravidez” e a data geração do relatório
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithCd4ResultsOnPregnancyDate() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "utentes que tiveram registo de resultado de CD4 Primeira Gravidez");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("generationDate", "generationDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+
+    String query =
+        "SELECT pa.patient_id "
+            + "FROM "
+            + "    patient pa "
+            + "        INNER JOIN encounter enc "
+            + "                   ON enc.patient_id =  pa.patient_id "
+            + "        INNER JOIN obs "
+            + "                   ON obs.encounter_id = enc.encounter_id "
+            + " INNER JOIN ( "
+            + ListOfPatientsEligibleForCd4RequestQueries.getPregnancyQuery()
+            + " ) pregnant ON pregnant.patient_id = p.patient_id "
+            + "WHERE  pa.voided = 0 "
+            + "  AND enc.voided = 0 "
+            + "  AND obs.voided = 0 "
+            + "  AND enc.encounter_type = ${6} "
+            + "  AND ( "
+            + "        (obs.concept_id = ${1695} "
+            + "             AND obs.value_numeric IS NOT NULL) "
+            + "        OR "
+            + "        (obs.concept_id = ${730} "
+            + "             AND obs.value_numeric IS NOT NULL ) "
+            + "      ) "
+            + "  AND e.encounter_datetime =  "
+            + "  AND e.encounter_datetime >= pregnant.pregnancy_date "
             + "  AND enc.encounter_datetime <= :generationDate "
             + "  AND enc.location_id = :location "
             + "GROUP BY pa.patient_id";

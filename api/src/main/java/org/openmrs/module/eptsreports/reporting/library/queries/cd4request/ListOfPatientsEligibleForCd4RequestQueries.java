@@ -156,4 +156,32 @@ public class ListOfPatientsEligibleForCd4RequestQueries {
         + "  AND enc.location_id = :location "
         + "GROUP BY pa.patient_id";
   }
+
+  /**
+   * utentes do sexo feminino com registo de “Grávida” = “Sim” numa consulta clínica (Ficha Clínica
+   * – Ficha Mestra) ocorrida nos últimos 9 meses do fim do período de reporte
+   *
+   * @return {@link String}
+   */
+  public static String getPregnancyQuery() {
+    return " SELECT p.patient_id, MIN(e.encounter_datetime) AS pregnancy_date "
+        + "FROM patient p  "
+        + "     INNER JOIN person pr "
+        + "       ON p.patient_id = pr.patient_id "
+        + "     INNER JOIN encounter e "
+        + "         ON e.patient_id=p.patient_id  "
+        + "     INNER JOIN obs o "
+        + "         ON o.encounter_id=e.encounter_id "
+        + "WHERE p.voided = 0 "
+        + "   AND e.voided=0 "
+        + "   AND o.voided=0 "
+        + "   AND e.location_id=:location "
+        + "   AND e.encounter_type= ${6} "
+        + "   AND o.concept_id = ${1982} "
+        + "   AND o.value_coded= ${1065}"
+        + "   AND pr.gender = 'F' "
+        + "   AND e.encounter_datetime >= :startDate "
+        + "   AND e.encounter_datetime <= :endDate "
+        + "GROUP BY p.patient_id ";
+  }
 }
