@@ -9,9 +9,12 @@ import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.queries.cd4request.ListOfPatientsEligibleForCd4RequestQueries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
+import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,12 +30,52 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
       "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}";
   String MAPPING3 =
       "startDate=${startDate},endDate=${generationDate},generationDate=${generationDate},location=${location}";
+  String MAPPING4 = "startDate=${startDate},generationDate=${generationDate},,location=${location}";
 
   @Autowired
   public ListOfPatientsEligibleForCd4RequestCohortQueries(
       HivMetadata hivMetadata, ResumoMensalCohortQueries resumoMensalCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
+  }
+
+  /**
+   * <b>Relatório – Lista de Utentes com critérios de elegibilidade para pedido de CD4 durante o
+   * período</b>
+   *
+   * <p>Iniciaram TARV durante o período de reporte (CD4_RF3); ou
+   *
+   * <p>Reiniciaram TARV durante o período de reporte (CD4_RF4); ou
+   *
+   * <p>Receberam dois resultados de CV alta (CD4_RF5); ou
+   *
+   * @see #getPatientWhoInitiatedTarvDuringPeriodC1() Iniciaram TARV
+   * @see #getPatientWhoRestartedTarvAndEligibleForCd4RequestC2() Reiniciaram TARV
+   * @see #getPatientsWithTwoHighVlResultsC3() Receberam dois resultados de CV alta
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsEligibleForCd4RequestComposition() {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName(
+        "Relatório – Lista de Utentes com critérios de elegibilidade para pedido de CD4 durante o períodoo");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("generationDate", "generationDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition started = getPatientWhoInitiatedTarvDuringPeriodC1();
+    CohortDefinition restarted = getPatientWhoRestartedTarvAndEligibleForCd4RequestC2();
+    CohortDefinition receivedHighVl = getPatientsWithTwoHighVlResultsC3();
+
+    compositionCohortDefinition.addSearch("STARTED", map(started, MAPPING2));
+    compositionCohortDefinition.addSearch("RESTARTED", map(restarted, MAPPING2));
+    compositionCohortDefinition.addSearch("HIGHVL", map(receivedHighVl, MAPPING4));
+
+    compositionCohortDefinition.setCompositionString(" STARTED OR RESTARTED OR HIGHVL");
+
+    return compositionCohortDefinition;
   }
 
   /**
@@ -119,6 +162,51 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
         "CD4RESULT", map(cd4ResultByReportGenerationDate, MAPPING3));
 
     compositionCohortDefinition.setCompositionString("RESTARTED AND NOT CD4RESULT");
+
+    return compositionCohortDefinition;
+  }
+
+  /**
+   * <b>C3 - Utentes com 2 CV Altas</b>
+   *
+   * <p>incluindo todos os utentes com registo do último “Resultado de CV” numa consulta clínica
+   * (Ficha Clínica – Ficha Mestra) ocorrida 6 meses antes do período de reporte, cujo resultado é >
+   * 1000cps/ml (“Data Último Resultado CV” <= “Data Fim” – 6 meses e “Último Resultado CV”
+   * >1000cps/ml);
+   *
+   * <p>filtrando as utentes que tiveram registo do penúltimo “Resultado de CV” numa consulta
+   * clínica (Ficha Clínica – Ficha Mestra) ocorrida 6 meses antes do período de reporte, e cujo
+   * resultado também é >1000 cps/ml (“Data Penúltimo Resultado CV” <= “Data Fim” – 6 meses e
+   * “Penúltimo Resultado CV” >1000cps/ml);
+   *
+   * <p>exluindo as utentes que tiveram registo do resultado do CD4 numa consulta clínica (Ficha
+   * Clínica – Ficha Mestra) ocorrida entre “Data Último Resultado CV” e a data geração do
+   * relatório.
+   *
+   * @see #getPatientsWithVlResultGreaterThan1000Copies() Ultimo Resultado VL > 1000
+   * @see #getPatientsWithSecondVlResultGreaterThan1000Copies() Penultimo Resultado VL > 1000
+   * @see #getPatientsWithCd4ResultsOnLastVlDate() Ultimo Resultado CD4 apos Ultimo Resultado VL
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithTwoHighVlResultsC3() {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName("C3 - Utentes com 2 CV Altas");
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("generationDate", "generationDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition lastVlResult = getPatientsWithVlResultGreaterThan1000Copies();
+    CohortDefinition secondVlResult = getPatientsWithSecondVlResultGreaterThan1000Copies();
+    CohortDefinition lastCd4ResultAfterLastVl = getPatientsWithCd4ResultsOnLastVlDate();
+
+    compositionCohortDefinition.addSearch("LASTVL", Mapped.mapStraightThrough(lastVlResult));
+    compositionCohortDefinition.addSearch("SECONDVL", Mapped.mapStraightThrough(secondVlResult));
+    compositionCohortDefinition.addSearch(
+        "LASTCD4", Mapped.mapStraightThrough(lastCd4ResultAfterLastVl));
+
+    compositionCohortDefinition.setCompositionString("(LASTVL AND SECONDVL) AND NOT LASTCD4");
 
     return compositionCohortDefinition;
   }
@@ -278,6 +366,115 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "  AND o.value_coded = ${1705} "
             + "  AND o.obs_datetime = first_state.first_date "
             + "GROUP  BY p.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * incluindo todos os utentes com registo do último “Resultado de CV” numa consulta clínica (Ficha
+   * Clínica – Ficha Mestra) ocorrida 6 meses antes do período de reporte, cujo resultado é >
+   * 1000cps/ml (“Data Último Resultado CV” <= “Data Fim” – 6 meses e “Último Resultado CV”
+   * >1000cps/ml);
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithVlResultGreaterThan1000Copies() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("utentes com registo do último “Resultado de CV” > 1000cps/ml");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+
+    String lastVlQuery = ListOfPatientsEligibleForCd4RequestQueries.getLastVlResult();
+    String query = new EptsQueriesUtil().patientIdQueryBuilder(lastVlQuery).getQuery();
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * utentes que tiveram registo do penúltimo “Resultado de CV” numa consulta clínica (Ficha Clínica
+   * – Ficha Mestra) ocorrida 6 meses antes do período de reporte, e cujo resultado também é >1000
+   * cps/ml (“Data Penúltimo Resultado CV” <= “Data Fim” – 6 meses e “Penúltimo Resultado CV”
+   * >1000cps/ml)
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithSecondVlResultGreaterThan1000Copies() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("utentes com registo do penúltimo “Resultado de CV” > 1000cps/ml");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+
+    String secondVlQuery = ListOfPatientsEligibleForCd4RequestQueries.getSecondVlResult();
+    String query = new EptsQueriesUtil().patientIdQueryBuilder(secondVlQuery).getQuery();
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b> utentes que tiveram registo do resultado do CD4 numa consulta clínica (Ficha Clínica –
+   * Ficha Mestra) ocorrida entre “Data Último Resultado CV” e a data geração do relatório </b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithCd4ResultsOnLastVlDate() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("resultado do CD4 apos Data Último Resultado CV");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("generationDate", "generationDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+
+    String query =
+        "SELECT pa.patient_id "
+            + "FROM "
+            + "    patient pa "
+            + "        INNER JOIN encounter enc "
+            + "                   ON enc.patient_id =  pa.patient_id "
+            + "        INNER JOIN obs "
+            + "                   ON obs.encounter_id = enc.encounter_id "
+            + " INNER JOIN ( "
+            + ListOfPatientsEligibleForCd4RequestQueries.getLastVlResultDate()
+            + " ) last_vl ON last_vl.patient_id = p.patient_id "
+            + "WHERE  pa.voided = 0 "
+            + "  AND enc.voided = 0 "
+            + "  AND obs.voided = 0 "
+            + "  AND enc.encounter_type = ${6} "
+            + "  AND ( "
+            + "        (obs.concept_id = ${1695} AND obs.value_numeric IS NOT NULL) "
+            + "        OR "
+            + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
+            + "      ) "
+            + "       AND e.encounter_datetime >= last_vl.most_recent "
+            + "  AND enc.encounter_datetime <= :generationDate "
+            + "  AND enc.location_id = :location "
+            + "GROUP BY pa.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(sb.replace(query));
