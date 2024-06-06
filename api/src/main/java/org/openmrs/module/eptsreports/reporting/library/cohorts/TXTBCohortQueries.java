@@ -2706,4 +2706,26 @@ public class TXTBCohortQueries {
     cd.setQuery(query);
     return cd;
   }
+
+  /**
+   * <b>Description:</b> DenominatorScreenedOnly
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getDenominatorScreenedOnly() {
+    CompositionCohortDefinition definition = new CompositionCohortDefinition();
+    addGeneralParameters(definition);
+    definition.setName("TxTB - Denominator Screened Only");
+
+    definition.addSearch("art-list", EptsReportUtils.map(artList(), generalParameterMapping));
+
+    definition.addSearch(
+        "tb-screening", EptsReportUtils.map(yesOrNoInvestigationResult(), generalParameterMapping));
+
+    definition.setCompositionString("art-list AND tb-screening");
+
+    return definition;
+  }
 }

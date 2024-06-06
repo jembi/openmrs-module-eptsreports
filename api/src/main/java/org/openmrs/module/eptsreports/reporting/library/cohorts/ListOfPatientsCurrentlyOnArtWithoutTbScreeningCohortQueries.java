@@ -52,16 +52,16 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     composition.setName("Currently on ART without TB Screening");
 
     CohortDefinition txCurr = txCurrCohortQueries.getTxCurrBaseCohort();
-    CohortDefinition txTbDenominator = txtbCohortQueries.getDenominator();
+    CohortDefinition txTbScreened  = txtbCohortQueries.getDenominatorScreenedOnly();
 
     composition.addSearch(
         "tx-curr", EptsReportUtils.map(txCurr, "endDate=${endDate},location=${location}"));
     composition.addSearch(
-        "txtb-denominator",
+        "txtb-screened",
         EptsReportUtils.map(
-            txTbDenominator, "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+          txTbScreened, "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
 
-    composition.setCompositionString("tx-curr AND NOT txtb-denominator");
+    composition.setCompositionString("tx-curr AND NOT txtb-screened");
 
     return composition;
   }
