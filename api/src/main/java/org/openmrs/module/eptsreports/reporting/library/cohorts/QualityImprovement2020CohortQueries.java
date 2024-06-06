@@ -3079,7 +3079,7 @@ public class QualityImprovement2020CohortQueries {
         "ABANDONED2LINE", EptsReportUtils.map(abandonedSecondLine, MAPPING1));
 
     compositionCohortDefinition.addSearch(
-        "tbDiagnosisActive", EptsReportUtils.map(tbDiagnosisActive, MAPPING));
+        "tbDiagnosisActive", EptsReportUtils.map(tbDiagnosisActive, MAPPING3));
 
     if (indicator == 2 || indicator == 9 || indicator == 10 || indicator == 11)
       compositionCohortDefinition.setCompositionString(
@@ -5811,7 +5811,7 @@ public class QualityImprovement2020CohortQueries {
         "SegundaLinha", EptsReportUtils.map(SegundaLinha, MAPPING1));
 
     compositionCohortDefinition.addSearch(
-        "tbDiagnosisActive", EptsReportUtils.map(tbDiagnosisActive, MAPPING));
+        "tbDiagnosisActive", EptsReportUtils.map(tbDiagnosisActive, MAPPING3));
 
     if (den) {
       if (line == 1) {
@@ -5830,7 +5830,7 @@ public class QualityImprovement2020CohortQueries {
     } else {
       if (line == 1) {
         compositionCohortDefinition.setCompositionString(
-            "(((B1 AND age) OR D) AND PrimeiraLinha) AND NOT (C OR tbDiagnosisActive) AND G");
+            "((((B1 AND age) OR D) AND PrimeiraLinha) AND NOT (C OR tbDiagnosisActive)) AND G");
       } else if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
             "(B1 AND PrimeiraLinha AND G AND age) AND NOT (C OR D OR tbDiagnosisActive) ");
@@ -6003,7 +6003,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("L", EptsReportUtils.map(getMQC13P3NUM_L(), MAPPING));
     cd.addSearch("DD", EptsReportUtils.map(getDeadPatientsCompositionMQ13(), MAPPING3));
     cd.addSearch(
-        "tbDiagnosisActive", EptsReportUtils.map(getPatientsWithTbActiveOrTbTreatment(), MAPPING));
+        "tbDiagnosisActive", EptsReportUtils.map(getPatientsWithTbActiveOrTbTreatment(), MAPPING3));
 
     if (indicator == 2 || indicator == 9 || indicator == 10 || indicator == 11)
       cd.setCompositionString(
@@ -14414,7 +14414,8 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch("tbTreatment", Mapped.mapStraightThrough(tbTreatment));
 
-    cd.setCompositionString("tbActive OR tbTreatment");
+    cd.setCompositionString("tbActive");
+    //    cd.setCompositionString("tbActive OR tbTreatment");
 
     return cd;
   }
@@ -14621,7 +14622,7 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch("SECONDLINE", EptsReportUtils.map(secondLine, MAPPING1));
 
-    cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING));
+    cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING3));
 
     cd.setCompositionString(
         "((CONSULTATION OR BREASTFEEDING) AND (FIRSTLINE OR SECONDLINE) AND TBACTIVE AND AGE) AND NOT PREGNANT ");
@@ -14742,7 +14743,7 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch("SECONDLINE", EptsReportUtils.map(secondLine, MAPPING1));
 
-    cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING));
+    cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING3));
 
     cd.setCompositionString(
         "(CONSULTATION AND (FIRSTLINE OR SECONDLINE) AND TBACTIVE AND AGE) AND NOT (PREGNANT OR BREASTFEEDING)");
@@ -14910,6 +14911,8 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
+    CohortDefinition startedART = getMOHArtStartDate();
+
     CohortDefinition firstLine = getUtentesPrimeiraLinha(UtentesPrimeiraLinhaPreposition.MQ);
 
     CohortDefinition secondLine = getUtentesSegundaLinha();
@@ -14933,13 +14936,20 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition abandonedOrRestartedTarv =
         getPatientsWhoAbandonedOrRestartedTarvOnLast6MonthsArt();
 
+    cd.addSearch(
+        "AGE",
+        EptsReportUtils.map(
+            commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(0, 14), MAPPING3));
+
+    cd.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
+
     cd.addSearch("FIRSTLINE", EptsReportUtils.map(firstLine, MAPPING1));
 
     cd.addSearch("SECONDLINE", EptsReportUtils.map(secondLine, MAPPING1));
 
     cd.addSearch("ARVREGIMEN", EptsReportUtils.map(arvRegimen, MAPPING));
 
-    cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING));
+    cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING3));
 
     cd.addSearch("TRANSFERREDIN", EptsReportUtils.map(transferredIn, MAPPING));
 
@@ -14954,6 +14964,7 @@ public class QualityImprovement2020CohortQueries {
 
     cd.setCompositionString(
         "(FIRSTLINE OR SECONDLINE OR ARVREGIMEN) AND TBACTIVE AND NOT (TRANSFERREDIN OR TRANSFERREDOUT OR DEAD OR ABANDONED)");
+    //        "(AGE AND (A OR ARVREGIMEN)) AND TBACTIVE AND NOT (TRANSFERREDIN OR TRANSFERREDOUT OR DEAD OR ABANDONED)");
 
     return cd;
   }
