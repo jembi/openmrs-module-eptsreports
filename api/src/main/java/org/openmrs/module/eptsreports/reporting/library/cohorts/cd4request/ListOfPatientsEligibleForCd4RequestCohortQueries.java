@@ -12,6 +12,7 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.queries.advancedhivillness.ListOfPatientsOnAdvancedHivIllnessQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.cd4request.ListOfPatientsEligibleForCd4RequestQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -31,6 +32,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
   private final ResumoMensalCohortQueries resumoMensalCohortQueries;
   private final ListOfPatientsInAdvancedHivIllnessCohortQueries
       listOfPatientsInAdvancedHivIllnessCohortQueries;
+  private final ListOfPatientsOnAdvancedHivIllnessQueries listOfPatientsOnAdvancedHivIllnessQueries;
 
   String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
   String MAPPING2 =
@@ -47,13 +49,15 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
       TbMetadata tbMetadata,
       ResumoMensalCohortQueries resumoMensalCohortQueries,
       ListOfPatientsInAdvancedHivIllnessCohortQueries
-          listOfPatientsInAdvancedHivIllnessCohortQueries) {
+          listOfPatientsInAdvancedHivIllnessCohortQueries,
+      ListOfPatientsOnAdvancedHivIllnessQueries listOfPatientsOnAdvancedHivIllnessQueries) {
     this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
     this.tbMetadata = tbMetadata;
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
     this.listOfPatientsInAdvancedHivIllnessCohortQueries =
         listOfPatientsInAdvancedHivIllnessCohortQueries;
+    this.listOfPatientsOnAdvancedHivIllnessQueries = listOfPatientsOnAdvancedHivIllnessQueries;
   }
 
   /**
@@ -71,7 +75,13 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
    *
    * <p>São elegíveis ao pedido de CD4 de seguimento (CD4_RF7); ou
    *
-   * <p>São mulheres grávidas e elegíveis ao pedido de CD4 (CD4_RF8).
+   * <p>São mulheres grávidas e elegíveis ao pedido de CD4 (CD4_RF8). <br>
+   * Excluindo todos os utentes que: <br>
+   *
+   * <p>Tenham sido transferidos para outra unidade sanitária até a data geração do relatório
+   * (DAH_RF22);
+   *
+   * <p>Tenham registo de óbito até a data geração do relatório (DAH_RF23)
    *
    * @see #getPatientWhoInitiatedTarvDuringPeriodC1() Iniciaram TARV
    * @see #getPatientWhoRestartedTarvAndEligibleForCd4RequestC2() Reiniciaram TARV
@@ -79,6 +89,10 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
    * @see #getPatientWithEstadiamentoIIIorIVC4() Condição activa de estadiamento clinico
    * @see #getPatientEligibleForCd4FollowupC5() Elegiveis ao pedido de CD4 Seguimento
    * @see #getPatientPregnantEligibleForCd4RequestC6() Elegiveis ao pedido de CD4 Seguimento
+   * @see ResumoMensalCohortQueries#getTranferredOutPatients() Tenham sido transferidos para outra
+   *     unidade sanitária
+   * @see #getTransferredOutPatientsByGenerationDate() Tenham registo de óbito até a data geração do
+   *     relatório
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsEligibleForCd4RequestComposition() {
@@ -98,16 +112,25 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     CohortDefinition estadio = getPatientWithEstadiamentoIIIorIVC4();
     CohortDefinition eligibleForCd4Followup = getPatientEligibleForCd4FollowupC5();
     CohortDefinition pregnant = getPatientPregnantEligibleForCd4RequestC6();
+    CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
+    CohortDefinition died = getTransferredOutPatientsByGenerationDate();
 
     compositionCohortDefinition.addSearch("STARTED", map(started, MAPPING2));
     compositionCohortDefinition.addSearch("RESTARTED", map(restarted, MAPPING2));
-    compositionCohortDefinition.addSearch("HIGHVL", map(receivedHighVl, MAPPING4));
+    compositionCohortDefinition.addSearch("HIGHVL", map(receivedHighVl, MAPPING5));
     compositionCohortDefinition.addSearch("ESTADIO", map(estadio, MAPPING2));
     compositionCohortDefinition.addSearch("ELIGIBLECD4", map(eligibleForCd4Followup, MAPPING5));
     compositionCohortDefinition.addSearch("PREGNANT", map(pregnant, MAPPING2));
+    compositionCohortDefinition.addSearch(
+        "TRANSFERREDOUT",
+        map(
+            transferredOut,
+            "startDate=${startDate},endDate=${endDate},onOrBefore=${generationDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "DIED", map(died, "endDate=${generationDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
-        "STARTED OR RESTARTED OR HIGHVL OR ESTADIO OR ELIGIBLECD4 OR PREGNANT");
+        "(STARTED OR RESTARTED OR HIGHVL OR ESTADIO OR ELIGIBLECD4 OR PREGNANT) AND NOT (TRANSFERREDOUT OR DIED)");
 
     return compositionCohortDefinition;
   }
@@ -418,8 +441,8 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "      ) "
                 .concat(
                     duringPeriod
-                        ? "       AND e.encounter_datetime >= :startDate "
-                            + "       AND e.encounter_datetime <= :endDate "
+                        ? "       AND enc.encounter_datetime >= :startDate "
+                            + "       AND enc.encounter_datetime <= :endDate "
                         : "  AND enc.encounter_datetime <= :generationDate ")
             + "  AND enc.location_id = :location "
             + "GROUP BY pa.patient_id";
@@ -626,7 +649,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "                   ON obs.encounter_id = enc.encounter_id "
             + " INNER JOIN ( "
             + ListOfPatientsEligibleForCd4RequestQueries.getLastVlResultDate()
-            + " ) last_vl ON last_vl.patient_id = p.patient_id "
+            + " ) last_vl ON last_vl.patient_id = pa.patient_id "
             + "WHERE  pa.voided = 0 "
             + "  AND enc.voided = 0 "
             + "  AND obs.voided = 0 "
@@ -636,7 +659,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "        OR "
             + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
             + "      ) "
-            + "       AND e.encounter_datetime >= last_vl.most_recent "
+            + "       AND enc.encounter_datetime >= last_vl.most_recent "
             + "  AND enc.encounter_datetime <= :generationDate "
             + "  AND enc.location_id = :location "
             + "GROUP BY pa.patient_id";
@@ -682,6 +705,8 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     map.put("507", commonMetadata.getKaposiSarcomaConcept().getConceptId());
     map.put("5042", tbMetadata.getExtraPulmonaryTbConcept().getConceptId());
     map.put("42", tbMetadata.getPulmonaryTB().getConceptId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
 
     String query =
         "SELECT pa.patient_id "
@@ -693,7 +718,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "                   ON obs.encounter_id = enc.encounter_id "
             + " INNER JOIN ( "
             + ListOfPatientsEligibleForCd4RequestQueries.getEstadioOmsQuery()
-            + " ) estadio ON estadio.patient_id = p.patient_id "
+            + " ) estadio ON estadio.patient_id = pa.patient_id "
             + "WHERE  pa.voided = 0 "
             + "  AND enc.voided = 0 "
             + "  AND obs.voided = 0 "
@@ -703,7 +728,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "        OR "
             + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
             + "      ) "
-            + "       AND e.encounter_datetime >= estadio.first_date "
+            + "       AND enc.encounter_datetime >= estadio.first_date "
             + "  AND enc.encounter_datetime <= :generationDate "
             + "  AND enc.location_id = :location "
             + "GROUP BY pa.patient_id";
@@ -746,7 +771,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "                   ON obs.encounter_id = enc.encounter_id "
             + " INNER JOIN ( "
             + ListOfPatientsEligibleForCd4RequestQueries.getLastCd4ResultDateQuery()
-            + " ) cd4_date ON cd4_date.patient_id = p.patient_id "
+            + " ) cd4_date ON cd4_date.patient_id = pa.patient_id "
             + "WHERE  pa.voided = 0 "
             + "  AND enc.voided = 0 "
             + "  AND obs.voided = 0 "
@@ -760,7 +785,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "             AND obs.value_numeric IS NOT NULL "
             + "             AND obs.value_numeric < 30) "
             + "      ) "
-            + "       AND e.encounter_datetime = cd4_date.last_cd4 "
+            + "       AND enc.encounter_datetime = cd4_date.last_cd4 "
             + "  AND enc.location_id = :location "
             + "GROUP BY pa.patient_id";
 
@@ -800,7 +825,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "                   ON obs.encounter_id = enc.encounter_id "
             + " INNER JOIN ( "
             + ListOfPatientsEligibleForCd4RequestQueries.getLastCd4ResultDateQuery()
-            + " ) cd4_date ON cd4_date.patient_id = p.patient_id "
+            + " ) cd4_date ON cd4_date.patient_id = pa.patient_id "
             + "WHERE  pa.voided = 0 "
             + "  AND enc.voided = 0 "
             + "  AND obs.voided = 0 "
@@ -810,7 +835,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "        OR "
             + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
             + "      ) "
-            + "       AND e.encounter_datetime >= DATE_ADD(cd4_date.last_cd4, INTERVAL 1 DAY) "
+            + "       AND enc.encounter_datetime >= DATE_ADD(cd4_date.last_cd4, INTERVAL 1 DAY) "
             + "  AND enc.encounter_datetime <= :generationDate "
             + "  AND enc.location_id = :location "
             + "GROUP BY pa.patient_id";
@@ -886,7 +911,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "                   ON obs.encounter_id = enc.encounter_id "
             + " INNER JOIN ( "
             + ListOfPatientsEligibleForCd4RequestQueries.getPregnancyQuery()
-            + " ) pregnant ON pregnant.patient_id = p.patient_id "
+            + " ) pregnant ON pregnant.patient_id = pa.patient_id "
             + "WHERE  pa.voided = 0 "
             + "  AND enc.voided = 0 "
             + "  AND obs.voided = 0 "
@@ -898,11 +923,52 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "        (obs.concept_id = ${730} "
             + "             AND obs.value_numeric IS NOT NULL ) "
             + "      ) "
-            + "  AND e.encounter_datetime =  "
-            + "  AND e.encounter_datetime >= pregnant.pregnancy_date "
+            + "  AND enc.encounter_datetime >= pregnant.pregnancy_date "
             + "  AND enc.encounter_datetime <= :generationDate "
             + "  AND enc.location_id = :location "
             + "GROUP BY pa.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Utentes em TARV com registo de Óbito</b>
+   * <li>Utentes com registo de “Óbito” (último estado de inscrição) no programa SERVIÇO TARV
+   *     TRATAMENTO até a data geração do relatório (“Data de Óbito” <= Data Geração Relatório”;
+   * <li>Utentes com registo do último estado [“Mudança Estado Permanência TARV” (Coluna 21) = “O”
+   *     (Óbito) na Ficha Clínica com “Data da Consulta Actual” (Coluna 1, durante a qual se fez o
+   *     registo da mudança do estado de permanência TARV) <= “Data Geração Relatório”; ou
+   * <li>Utentes com último registo de “Mudança Estado Permanência TARV” = “Óbito” na Ficha Resumo
+   *     com “Data de Óbito” <= “Data Geração Relatório”; ou
+   * <li>Utentes com registo de “Óbito” nos “Dados Demográficos do Utente com “Data de Óbito” <=
+   *     “Data Geração Relatório”;
+   * <li>excepto os utentes que tenham tido um levantamento de ARV (FILA) ou uma consulta (Ficha
+   *     Clínica) após a “Data de Óbito” (a data mais recente entre os critérios acima
+   *     identificados) e até a “Data Geração do Relatório”.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getTransferredOutPatientsByGenerationDate() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes em TARV com registo de Óbito");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("10", hivMetadata.getArtDeadWorkflowState().getProgramWorkflowStateId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("1", hivMetadata.getHIVCareProgram().getProgramId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+
+    String query = listOfPatientsOnAdvancedHivIllnessQueries.getPatientsWhoDied(false);
 
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(sb.replace(query));

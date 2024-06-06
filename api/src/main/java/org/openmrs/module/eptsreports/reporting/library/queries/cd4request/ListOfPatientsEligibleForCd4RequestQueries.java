@@ -136,7 +136,7 @@ public class ListOfPatientsEligibleForCd4RequestQueries {
    * @return {@link String}
    */
   public static String getLastCd4ResultDateQuery() {
-    return "SELECT pa.patient_id, MAX(e.encounter_datetime) AS last_cd4 "
+    return "SELECT pa.patient_id, MAX(enc.encounter_datetime) AS last_cd4 "
         + "FROM "
         + "    patient pa "
         + "        INNER JOIN encounter enc "
@@ -167,7 +167,7 @@ public class ListOfPatientsEligibleForCd4RequestQueries {
     return " SELECT p.patient_id, MIN(e.encounter_datetime) AS pregnancy_date "
         + "FROM patient p  "
         + "     INNER JOIN person pr "
-        + "       ON p.patient_id = pr.patient_id "
+        + "       ON p.patient_id = pr.person_id "
         + "     INNER JOIN encounter e "
         + "         ON e.patient_id=p.patient_id  "
         + "     INNER JOIN obs o "
