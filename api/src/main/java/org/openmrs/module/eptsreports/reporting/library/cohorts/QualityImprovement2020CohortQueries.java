@@ -4936,18 +4936,13 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * <b>MQC13Part3B2</b>: Melhoria de Qualidade Category 13 Deniminator B2 <br>
-   * <i> BI2 and not B2E</i> <br>
+   * <b>RF58 - Categoria 13 TB/HIV Indicador 13.14 Pediátrico Denominador – Resultado de CV</b>:
    *
    * <ul>
-   *   <li>BI2- Select all patients who have the LAST “LINHA TERAPEUTICA” (Concept Id 21151)
-   *       recorded in Ficha Clinica (encounter type 6, encounter_datetime) with value coded
-   *       “SEGUNDA LINHA” (concept id 21148) during the inclusion period (startDateInclusion and
-   *       endDateInclusion) AND
-   *   <li>B1E - Exclude all patients with clinical consultation (encounter type 6) with concept
-   *       “PEDIDO DE INVESTIGACOES LABORATORIAIS” (Concept Id 23722) and value coded “HIV CARGA
-   *       VIRAL” (Concept Id 856) on Encounter_datetime startDateInclusion-3months and
-   *       startDateInclusion.
+   *   <li>que têm o último registo de “Regime ARV Segunda Linha” na Ficha Resumo durante o período
+   *       de inclusão (“Data Última 2ª Linha” >= “Data Início Inclusão” e <= “Data Fim Inclusão”)
+   *       excepto os utentes que têm como “Justificação de Mudança do Tratamento” (associada a
+   *       “Data Última 2ª Linha”) igual a “Gravidez”
    * </ul>
    *
    * @return CohortDefinition
@@ -4969,33 +4964,45 @@ public class QualityImprovement2020CohortQueries {
 
     String query =
         "SELECT p.patient_id "
-            + "  FROM patient p "
-            + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "       INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
-            + "  WHERE e.voided = 0 AND p.voided = 0 "
-            + "    AND o.voided = 0 "
-            + "    AND o2.voided = 0 "
-            + "    AND e.encounter_type = ${53} "
-            + "    AND e.location_id = :location "
-            + "    AND (o.concept_id = ${21187} AND o.value_coded IS NOT NULL) "
-            + "               AND ( "
-            + "                      (o2.concept_id = ${1792} AND o2.value_coded <> ${1982})"
-            + "                       OR "
-            + "                      (o2.concept_id = ${1792} AND o2.value_coded IS NULL) "
-            + "                       OR "
-            + "                      ( "
-            + "                       NOT EXISTS ( "
-            + "                               SELECT * FROM obs oo "
-            + "                               WHERE oo.voided = 0 "
-            + "                               AND oo.encounter_id = e.encounter_id "
-            + "                               AND oo.concept_id = 1792 "
-            + "                           ) "
-            + "                     ) "
-            + "                    ) "
-            + "    AND o.obs_datetime >= :startDate "
-            + "    AND o.obs_datetime <= :endDate "
-            + "  GROUP BY p.patient_id";
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN (SELECT p.patient_id, "
+            + "                          Max(o.obs_datetime) AS max_2nd_line_date "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                  ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  e.voided = 0 "
+            + "                          AND p.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.encounter_type = ${53} "
+            + "                          AND e.location_id = :location "
+            + "                          AND ( o.concept_id = ${21187} "
+            + "                                AND o.value_coded IS NOT NULL ) "
+            + "                          AND o.obs_datetime >= :startDate "
+            + "                          AND o.obs_datetime <= :endDate "
+            + "                   GROUP  BY p.patient_id) last_2nd_line "
+            + "               ON last_2nd_line.patient_id = p.patient_id "
+            + "WHERE  p.patient_id NOT IN (SELECT p.patient_id "
+            + "                            FROM   patient p "
+            + "                                   INNER JOIN encounter e "
+            + "                                           ON e.patient_id = p.patient_id "
+            + "                                   INNER JOIN obs o1 "
+            + "                                           ON o1.encounter_id = e.encounter_id "
+            + "                            WHERE  p.voided = 0 "
+            + "                                   AND e.voided = 0 "
+            + "                                   AND o1.voided = 0 "
+            + "                                   AND e.encounter_type = ${53} "
+            + "                                   AND e.location_id = :location "
+            + "                                   AND ( o1.concept_id = ${1792} "
+            + "                                         AND o1.value_coded = ${1982} ) "
+            + "                                   AND o1.obs_datetime = "
+            + "                                       last_2nd_line.max_2nd_line_date "
+            + "                            GROUP  BY p.patient_id)";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -14885,9 +14892,8 @@ public class QualityImprovement2020CohortQueries {
   /**
    * <b>% de crianças (0-14 anos) coinfectados TB/HIV com resultado de CV registado na FM</b>
    * <li>incluindo todos os utentes com idade >=0 e <=14 anos (seguindo o critério definido no RF13)
-   *     e que iniciaram 1ª ou 2ª Linha do TARV no período de inclusão (seguindo os requisitos
-   *     definidos no RF5) excluindo mulheres grávidas no início TARV (seguindo os critérios
-   *     definidos no RF8) e
+   *     e que iniciaram TARV no período de inclusão (seguindo os requisitos definidos no RF5)
+   *     excluindo mulheres grávidas no início TARV (seguindo os critérios definidos no RF8) e
    * <li>incluindo todos os utentes com idade >=0 e <= 14 anos (seguindo o critério definido no
    *     RF13) e que têm o último registo de “Regime ARV Segunda Linha” na Ficha Resumo durante o
    *     período de inclusão (“Data Última 2ª Linha” >= “Data Início Inclusão” e <= “Data Fim
@@ -14963,8 +14969,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("ABANDONED", EptsReportUtils.map(abandonedOrRestartedTarv, MAPPING1));
 
     cd.setCompositionString(
-        "(FIRSTLINE OR SECONDLINE OR ARVREGIMEN) AND TBACTIVE AND NOT (TRANSFERREDIN OR TRANSFERREDOUT OR DEAD OR ABANDONED)");
-    //        "(AGE AND (A OR ARVREGIMEN)) AND TBACTIVE AND NOT (TRANSFERREDIN OR TRANSFERREDOUT OR DEAD OR ABANDONED)");
+        "(AGE AND (A OR ARVREGIMEN)) AND TBACTIVE AND NOT (TRANSFERREDIN OR TRANSFERREDOUT OR DEAD OR ABANDONED)");
 
     return cd;
   }
