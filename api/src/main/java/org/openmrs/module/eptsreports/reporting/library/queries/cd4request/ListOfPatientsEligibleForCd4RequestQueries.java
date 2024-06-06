@@ -185,6 +185,14 @@ public class ListOfPatientsEligibleForCd4RequestQueries {
         + "GROUP BY p.patient_id ";
   }
 
+  /**
+   * se o utente é do sexo feminino e tem registo de “Grávida” = “Sim” numa consulta clínica (Ficha
+   * Clinica – Ficha Mestra) durante o período de reporte. <br>
+   * em caso de existência de registo “Grávida” = “Sim” e “Lactante” = “Sim” na mesma consulta (mais
+   * recente), será considerada como “Grávida”.
+   *
+   * @return {@link String}
+   */
   public static String getFemalePregnantPatientsQuery() {
 
     return "SELECT max_pregnant.patient_id, "
@@ -235,6 +243,12 @@ public class ListOfPatientsEligibleForCd4RequestQueries {
         + "        OR ( max_breastfeeding.breastfeeding_date IS NULL )";
   }
 
+  /**
+   * se o utente é do sexo feminino e tem registo de “Lactante” = “Sim” numa consulta clínica (Ficha
+   * Clínica – Ficha Mestra) durante o período de reporte
+   *
+   * @return {@link String}
+   */
   public static String getFemaleBreastfeedingPatientsQuery() {
     return "SELECT max_breastfeeding.patient_id, "
         + "       max_breastfeeding.breastfeeding_date "
@@ -282,5 +296,24 @@ public class ListOfPatientsEligibleForCd4RequestQueries {
         + "         AND max_breastfeeding.breastfeeding_date > max_pregnant.pregnancy_date "
         + "       ) "
         + "        OR ( max_pregnant.pregnancy_date IS NULL ) ";
+  }
+
+  /**
+   * A data mais recente de consulta clínica (Ficha Clínica) decorrida até o fim do período de
+   * reporte
+   *
+   * @return {@link String}
+   */
+  public static String getLastConsultationDateQuery() {
+    return " SELECT p.patient_id, MAX(e.encounter_datetime) AS last_date "
+        + " FROM   patient p  "
+        + "          INNER JOIN encounter e  "
+        + "                          ON p.patient_id = e.patient_id  "
+        + " WHERE  p.voided = 0  "
+        + "          AND e.voided = 0  "
+        + "          AND e.location_id = :location "
+        + "          AND e.encounter_type = ${6} "
+        + "         AND e.encounter_datetime <= :endDate "
+        + " GROUP BY p.patient_id ";
   }
 }

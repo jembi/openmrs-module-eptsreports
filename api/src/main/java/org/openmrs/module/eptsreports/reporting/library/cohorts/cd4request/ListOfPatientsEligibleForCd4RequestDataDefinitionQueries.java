@@ -98,6 +98,10 @@ public class ListOfPatientsEligibleForCd4RequestDataDefinitionQueries {
    *     consulta clínica (Ficha Clinica – Ficha Mestra) durante o período de reporte
    * <li>Resposta = Lactante, se o utente é do sexo feminino e tem registo de “Lactante” = “Sim”
    *     numa consulta clínica (Ficha Clínica – Ficha Mestra) durante o período de reporte.
+   * <li>Nota 1: em caso de existência de registo “Grávida” = “Sim” e “Lactante” = “Sim” durante o
+   *     período de reporte, será considerado o registo mais recente.
+   * <li>Nota 2: em caso de existência de registo “Grávida” = “Sim” e “Lactante” = “Sim” na mesma
+   *     consulta (mais recente), será considerada como “Grávida”.
    *
    * @return {@link DataDefinition}
    */
@@ -141,6 +145,72 @@ public class ListOfPatientsEligibleForCd4RequestDataDefinitionQueries {
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>Data da Última Consulta Clínica</b>
+   *
+   * <p>A data mais recente de consulta clínica (Ficha Clínica) decorrida até o fim do período de
+   * reporte (campo: “Data Consulta”).
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getLastClinicalConsultationDate() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Data da Última Consulta Clínica");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    String query = ListOfPatientsEligibleForCd4RequestQueries.getLastConsultationDateQuery();
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+    sqlPatientDataDefinition.setQuery(substitutor.replace(query));
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>Data da Proxima Consulta Clínica Agendada</b>
+   *
+   * <p>A data de próxima consulta registada na última consulta clínica (Ficha Clínica) decorrida
+   * até o fim do período de reporte (campo: “Data Próxima Consulta”)
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getNextConsultationDateOnLastClinicalConsultationDate() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Last Drug Pick Up Date");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("1410", hivMetadata.getReturnVisitDateConcept().getConceptId());
+
+    String lastConsultationDateQuery =
+        ListOfPatientsEligibleForCd4RequestQueries.getLastConsultationDateQuery();
+
+    String query =
+        " SELECT p.patient_id, o.value_datetime AS next_consultation_date "
+            + " FROM   patient p  "
+            + "          INNER JOIN encounter e  "
+            + "                          ON p.patient_id = e.patient_id  "
+            + "          INNER JOIN obs o "
+            + "                             ON o.encounter_id = e.encounter_id  "
+            + " INNER JOIN ( "
+            + lastConsultationDateQuery
+            + " )last_consultation ON last_consultation.patient_id = p.patient_id  "
+            + " WHERE  p.voided = 0  "
+            + "          AND e.voided = 0  "
+            + "          AND o.voided = 0  "
+            + "          AND e.location_id = :location "
+            + "          AND e.encounter_type = ${6} "
+            + "         AND e.encounter_datetime = last_consultation.last_date "
+            + "         AND o.concept_id = ${1410} "
+            + "         AND o.value_datetime IS NOT NULL "
+            + " GROUP BY p.patient_id ";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+    sqlPatientDataDefinition.setQuery(substitutor.replace(query));
     return sqlPatientDataDefinition;
   }
 }

@@ -114,6 +114,21 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         MAPPING2,
         new NotApplicableIfNullConverter());
 
+    // 8 - Data da Última Consulta Clínica – Sheet 1: Column H
+    patientDataSetDefinition.addColumn(
+        "last_consultation",
+        listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getLastClinicalConsultationDate(),
+        "endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
+    // 9 - Data da Próxima Consulta Clínica Agendada – Sheet 1: Column I
+    patientDataSetDefinition.addColumn(
+        "next_consultation",
+        listOfPatientsEligibleForCd4RequestDataDefinitionQueries
+            .getNextConsultationDateOnLastClinicalConsultationDate(),
+        "endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
     return patientDataSetDefinition;
   }
 
