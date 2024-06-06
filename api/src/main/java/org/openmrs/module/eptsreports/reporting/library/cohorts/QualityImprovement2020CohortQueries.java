@@ -14421,8 +14421,7 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch("tbTreatment", Mapped.mapStraightThrough(tbTreatment));
 
-    cd.setCompositionString("tbActive");
-    //    cd.setCompositionString("tbActive OR tbTreatment");
+    cd.setCompositionString("tbActive OR tbTreatment");
 
     return cd;
   }
