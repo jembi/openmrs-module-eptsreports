@@ -2,9 +2,7 @@ package org.openmrs.module.eptsreports.reporting.library.datasets.list;
 
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.eptsreports.reporting.data.converter.EmptyToNaoAndAnyToSimConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.*;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.cd4request.ListOfPatientsEligibleForCd4RequestCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.cd4request.ListOfPatientsEligibleForCd4RequestDataDefinitionQueries;
@@ -128,6 +126,68 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
             .getNextConsultationDateOnLastClinicalConsultationDate(),
         "endDate=${endDate},location=${location}",
         new NotApplicableIfNullConverter());
+
+    // 10 - Data do último Pedido de CD4 – Sheet 1: Column K
+    patientDataSetDefinition.addColumn(
+            "cd4_request_date",
+            listOfPatientsEligibleForCd4RequestDataDefinitionQueries
+                    .getLastCd4ResquestDate(), "endDate=${endDate},location=${location}");
+
+    // 11 - Resultado do Último CD4 – Sheet 1: Column L
+    patientDataSetDefinition.addColumn(
+            "last_cd4_result",
+            listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4Result(),
+            MAPPING2,
+            new NotApplicableIfNullConverter());
+
+    // 12 - Data do Último CD4 – Sheet 1: Column M
+    patientDataSetDefinition.addColumn(
+            "last_cd4_resultdate",
+            listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultDate(),
+            MAPPING2,
+            new DashDateFormatConverter());
+
+    // 13 - Resultado do Penúltimo CD4 – Sheet 1: Column N
+    patientDataSetDefinition.addColumn(
+            "second_cd4_result",
+            listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultBeforeMostRecentCd4(),
+            MAPPING2,
+            new NotApplicableIfNullConverter());
+
+    // 14 - Data do Penúltimo CD4 – Sheet 1: Column O
+    patientDataSetDefinition.addColumn(
+            "second_cd4_resultdate",
+            listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultDateBeforeMostRecentCd4(),
+            MAPPING2,
+            new DashDateFormatConverter());
+
+    //     15 - Data de Registo de Estadio – Sheet 1: Column P
+    patientDataSetDefinition.addColumn(
+            "last_estadio_date",
+            listOfPatientsInAdvancedHivIllnessCohortQueries.getDateOfEstadioByTheEndOfPeriod(),
+            "endDate=${endDate},location=${location}",
+            new DashDateFormatConverter());
+
+    // 16 - Infecções Estadio OMS – Sheet 1: Column Q
+    patientDataSetDefinition.addColumn(
+            "last_estadio_result",
+            listOfPatientsInAdvancedHivIllnessCohortQueries.getResultOfEstadioByTheEndOfPeriod(),
+            "endDate=${endDate},location=${location}",
+            new NotApplicableIfNullConverter());
+
+    // 17 - Motivo de Mudança de Estadiamento Clínico - 1 – Sheet 1: Column R
+    patientDataSetDefinition.addColumn(
+            "reason_change_estadio",
+            listOfPatientsInAdvancedHivIllnessCohortQueries.getReasonToChangeEstadio1(),
+            "endDate=${endDate},location=${location}",
+            new ObservationToConceptNameConverter());
+
+    // 18 - Motivo de Mudança de Estadiamento Clínico - 2 – Sheet 1: Column S
+    patientDataSetDefinition.addColumn(
+            "reason_change_estadio2",
+            listOfPatientsInAdvancedHivIllnessCohortQueries.getReasonToChangeEstadio2(),
+            "endDate=${endDate},location=${location}",
+            new ObservationToConceptNameConverter());
 
     return patientDataSetDefinition;
   }
