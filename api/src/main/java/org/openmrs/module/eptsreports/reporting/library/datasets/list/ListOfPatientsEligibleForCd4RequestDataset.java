@@ -189,6 +189,36 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
             "endDate=${endDate},location=${location}",
             new ObservationToConceptNameConverter());
 
+    // 19 - Resultado da Última Carga Viral – Sheet 1: Column T
+    patientDataSetDefinition.addColumn(
+            "vl_result_date",
+            listOfPatientsInAdvancedHivIllnessCohortQueries.getMostRecentVLResultDate(),
+            "endDate=${endDate},location=${location}",
+            new DashDateFormatConverter());
+
+    // 20 -Data da Último Carga Viral – Sheet 1: Column U
+    patientDataSetDefinition.addColumn(
+            "vl_result",
+            listOfPatientsInAdvancedHivIllnessCohortQueries.getMostRecentVLResult(),
+            "endDate=${endDate},location=${location}",
+            new ViralLoadQualitativeLabelConverter());
+
+    // 21 - Resultado da Penúltima Carga Viral – Sheet 1: Column V
+    patientDataSetDefinition.addColumn(
+            "second_vl_resultdate",
+            listOfPatientsInAdvancedHivIllnessCohortQueries
+                    .getLastVLResultDateBeforeMostRecentVLResultDate(),
+            "endDate=${endDate},location=${location}",
+            new DashDateFormatConverter());
+
+    // 22 - Data da Penúltima Carga Viral – Sheet 1: Column W
+    patientDataSetDefinition.addColumn(
+            "second_vl_result",
+            listOfPatientsInAdvancedHivIllnessCohortQueries
+                    .getLastVLResultBeforeMostRecentVLResultDate(),
+            "endDate=${endDate},location=${location}",
+            new ViralLoadQualitativeLabelConverter());
+
     return patientDataSetDefinition;
   }
 
