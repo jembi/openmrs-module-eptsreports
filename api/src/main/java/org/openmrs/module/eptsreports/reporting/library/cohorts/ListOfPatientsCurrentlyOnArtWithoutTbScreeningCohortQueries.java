@@ -414,6 +414,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
     valuesMap.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
     valuesMap.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
+    valuesMap.put("165322", hivMetadata.getMdcState().getConceptId());
 
     String query =
         "SELECT p.patient_id, Max(e.encounter_datetime) consultation_date "
