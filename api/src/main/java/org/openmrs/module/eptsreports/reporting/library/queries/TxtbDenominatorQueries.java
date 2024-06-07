@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
@@ -505,6 +506,89 @@ public class TxtbDenominatorQueries {
             + " GROUP BY patient_id";
 
     sqlPatientDataDefinition.setQuery(query);
+
+    return sqlPatientDataDefinition;
+  }
+
+  // TODO: Itélio use UNION Builder
+  public DataDefinition getMostRecentTbStartDate() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Most Recent TB Start Date ");
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("5", tbMetadata.getTBProgram().getProgramId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("42", tbMetadata.getPulmonaryTB().getConceptId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1113", tbMetadata.getTBDrugTreatmentStartDate().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("1268", hivMetadata.getTBTreatmentPlanConcept().getConceptId());
+    map.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
+
+    String query =
+        "SELECT patient_id, MAX(most_recent_tb) AS most_recent_tb_start_date FROM ( "
+            + "SELECT p.patient_id, MAX(o.value_datetime) AS most_recent_tb FROM   patient p "
+            + "         INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "  WHERE  e.encounter_type IN (${6}, ${9}) "
+            + "         AND e.location_id = :location "
+            + "         AND e.encounter_datetime <= :endDate "
+            + "         AND o.concept_id = ${1113} "
+            + "         AND p.voided = 0 "
+            + "         AND e.voided = 0 "
+            + "         AND o.voided = 0 "
+            + "GROUP BY p.patient_id "
+            + " "
+            + "UNION "
+            + " "
+            + "SELECT p.patient_id, MAX(o.obs_datetime) AS most_recent_tb FROM   patient p "
+            + "         INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "  WHERE  e.encounter_type = ${6} "
+            + "         AND e.location_id = :location "
+            + "         AND e.encounter_datetime <= :endDate "
+            + "         AND o.concept_id = ${1268} "
+            + "         AND o.value_coded = ${1256} "
+            + "         AND p.voided = 0 "
+            + "         AND e.voided = 0 "
+            + "         AND o.voided = 0 "
+            + "GROUP BY p.patient_id "
+            + " "
+            + "UNION "
+            + " "
+            + "SELECT p.patient_id, MAX(o.obs_datetime) AS most_recent_tb FROM   patient p "
+            + "         INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "  WHERE  e.encounter_type = ${53} "
+            + "         AND e.location_id = :location "
+            + "         AND e.encounter_datetime <= :endDate "
+            + "         AND o.concept_id = ${1406} "
+            + "         AND o.value_coded = ${42} "
+            + "         AND p.voided = 0 "
+            + "         AND e.voided = 0 "
+            + "         AND o.voided = 0 "
+            + "GROUP BY p.patient_id "
+            + " "
+            + "UNION "
+            + " "
+            + "SELECT p.patient_id, MAX(pg.date_enrolled) most_recent_tb FROM patient p "
+            + "	INNER JOIN patient_program pg ON p.patient_id=pg.patient_id "
+            + "  WHERE pg.program_id = ${5} "
+            + "  	AND pg.location_id = :location "
+            + "  	AND pg.voided = 0 "
+            + "  	AND p.voided = 0 "
+            + "GROUP BY p.patient_id "
+            + ") sources "
+            + " "
+            + "WHERE sources.most_recent_tb <= :endDate "
+            + "GROUP BY patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlPatientDataDefinition.setQuery(sb.replace(query));
 
     return sqlPatientDataDefinition;
   }
