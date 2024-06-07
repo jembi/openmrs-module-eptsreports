@@ -263,7 +263,7 @@ public class TPTCompletionCohortQueries {
             mapping));
 
     compositionCohortDefinition.setCompositionString(
-        "txcurr AND (((A1 OR A2 OR A3 OR A4) AND (B1B OR B2 OR (B5Part1 OR B5Part2 OR B5Part3) OR (B6Part1 OR B6Part2 OR B6Part3))) OR ((C1 OR C2 OR C3 OR C4 OR C5) AND (D1 OR D2 OR D3 OR D4)))");
+        "txcurr AND (((A1 OR A2 OR A3 OR A4) AND (B1B OR B2 OR (B5Part1 OR B5Part2 OR B5Part3) OR (B6Part1 OR B6Part2 OR B6Part3))) OR ((C1 OR C2 OR C3 OR C4 OR C5) AND (D1 OR D2 OR D3 OR D4 OR D5)))");
 
     return compositionCohortDefinition;
   }
@@ -637,7 +637,7 @@ public class TPTCompletionCohortQueries {
             + "  obs o ON e.encounter_id = o.encounter_id"
             + "  INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id"
             + " WHERE"
-            + " p.voided = 0 AND e.voided = 0 AND o.voided = 0"
+            + " p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0"
             + " AND e.encounter_type = ${encounterTypes}"
             + " AND (o.concept_id = ${23985}"
             + " AND o.value_coded = ${23954})"
@@ -739,7 +739,7 @@ public class TPTCompletionCohortQueries {
             + " obs o ON e.encounter_id = o.encounter_id"
             + " INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id    "
             + " WHERE"
-            + " p.voided = 0 AND e.voided = 0 AND o.voided = 0"
+            + " p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
             + "    AND e.encounter_type IN (${encounterTypes})"
             + " AND (o.concept_id = ${23985} AND o.value_coded = ${656})   "
             + " AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256}   "
@@ -950,6 +950,7 @@ public class TPTCompletionCohortQueries {
             + "  p.voided = 0  "
             + "  AND e.voided = 0  "
             + "  AND o.voided = 0 "
+            + "  AND o2.voided = 0 "
             + "  AND e.encounter_type = ${60} "
             + "  AND (o.concept_id = ${23985} AND o.value_coded IN (${656} , ${23982})) "
             + "  AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1256} , ${1705})) "
@@ -1043,6 +1044,7 @@ public class TPTCompletionCohortQueries {
             + "  e.encounter_type = ${60} AND p.voided = 0   "
             + "  AND e.voided = 0   "
             + "  AND o.voided = 0   "
+            + "  AND o2.voided = 0   "
             + "  AND ( o.concept_id = ${23985} AND o.value_coded in (${23954},${23984}) )  "
             + "  AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1256} , ${1705}))  "
             + "  AND e.location_id = :location  "
@@ -2451,7 +2453,7 @@ public class TPTCompletionCohortQueries {
             + "                          AND oo.value_coded IN ( ${656}, ${23982} ) "
             + "                   GROUP  BY ee.encounter_id) start "
             + "               ON start.encounter_id = e2.encounter_id "
-            + "WHERE e2.voided = 0 "
+            + "WHERE e2.voided = 0 AND oo.voided = 0 "
             + "       AND e2.patient_id = p.patient_id "
             + "       AND e2.encounter_type = ${60} "
             + "       AND e2.location_id = :location "
