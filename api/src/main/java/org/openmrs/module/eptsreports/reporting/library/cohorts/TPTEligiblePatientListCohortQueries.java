@@ -1403,7 +1403,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                               AND o.value_coded = ${656} "
             + "                                        GROUP  BY e.encounter_id) AS inh "
             + "                                    ON inh.encounter_id = o.encounter_id "
-            + "                           WHERE  o.voided = 0 AND e.voided = 0 "
+            + "                           WHERE  o.voided = 0 "
             + "                                  AND o.concept_id = ${165308} "
             + "                                  AND o.value_coded IN ( ${1256}, ${1257} ) "
             + "                           GROUP  BY o.encounter_id) AS continua "
