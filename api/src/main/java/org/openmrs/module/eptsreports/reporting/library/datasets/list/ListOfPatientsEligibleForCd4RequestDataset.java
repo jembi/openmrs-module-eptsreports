@@ -23,9 +23,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
 
-  String MAPPING =
-      "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}";
-  String MAPPING2 = "startDate=${startDate},endDate=${endDate},location=${location}";
+  String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
+  String MAPPING2 = "endDate=${endDate},location=${location}";
 
   private final ListOfPatientsInAdvancedHivIllnessCohortQueries
       listOfPatientsInAdvancedHivIllnessCohortQueries;
@@ -101,13 +100,13 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
     patientDataSetDefinition.addColumn(
         "art_start",
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getArtStartDate(),
-        "endDate=${endDate},location=${location}");
+        MAPPING2);
 
     //  6  - Transferido de Outra US- Sheet 1: Column F
     patientDataSetDefinition.addColumn(
         "transferred_in",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getPatientsTransferredInByTheEndOfPeriod(),
-        "endDate=${endDate},location=${location}",
+        MAPPING2,
         new EmptyToNaoAndAnyToSimConverter());
 
     // 7 - Grávida / Lactante – Sheet 1: Column G
@@ -122,7 +121,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
     patientDataSetDefinition.addColumn(
         "last_consultation",
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getLastClinicalConsultationDate(),
-        "endDate=${endDate},location=${location}",
+        MAPPING2,
         new NotApplicableIfNullConverter());
 
     // 9 - Data da Próxima Consulta Clínica Agendada – Sheet 1: Column I
@@ -130,14 +129,14 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         "next_consultation",
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries
             .getNextConsultationDateOnLastClinicalConsultationDate(),
-        "endDate=${endDate},location=${location}",
+        MAPPING2,
         new NotApplicableIfNullConverter());
 
     // 10 - Data do último Pedido de CD4 – Sheet 1: Column K
     patientDataSetDefinition.addColumn(
         "cd4_request_date",
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getLastCd4ResquestDate(),
-        "endDate=${endDate},location=${location}");
+        MAPPING2);
 
     // 11 - Data do Último CD4 – Sheet 1: Column L
     patientDataSetDefinition.addColumn(
@@ -171,42 +170,42 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
     patientDataSetDefinition.addColumn(
         "last_estadio_date",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getDateOfEstadioByTheEndOfPeriod(),
-        "endDate=${endDate},location=${location}",
+        MAPPING2,
         new DashDateFormatConverter());
 
     // 16 - Infecções Estadio OMS – Sheet 1: Column Q
     patientDataSetDefinition.addColumn(
         "last_estadio_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getResultOfEstadioByTheEndOfPeriod(),
-        "endDate=${endDate},location=${location}",
+        MAPPING2,
         new NotApplicableIfNullConverter());
 
     // 17 - Motivo de Mudança de Estadiamento Clínico - 1 – Sheet 1: Column R
     patientDataSetDefinition.addColumn(
         "reason_change_estadio",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getReasonToChangeEstadio1(),
-        "endDate=${endDate},location=${location}",
+        MAPPING2,
         new ObservationToConceptNameConverter());
 
     // 18 - Motivo de Mudança de Estadiamento Clínico - 2 – Sheet 1: Column S
     patientDataSetDefinition.addColumn(
         "reason_change_estadio2",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getReasonToChangeEstadio2(),
-        "endDate=${endDate},location=${location}",
+        MAPPING2,
         new ObservationToConceptNameConverter());
 
     // 19 - Resultado da Última Carga Viral – Sheet 1: Column T
     patientDataSetDefinition.addColumn(
         "vl_result_date",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getMostRecentVLResultDate(),
-        "endDate=${endDate},location=${location}",
+        MAPPING2,
         new DashDateFormatConverter());
 
     // 20 -Data da Último Carga Viral – Sheet 1: Column U
     patientDataSetDefinition.addColumn(
         "vl_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getMostRecentVLResult(),
-        "endDate=${endDate},location=${location}",
+        MAPPING2,
         new ViralLoadQualitativeLabelConverter());
 
     // 21 - Resultado da Penúltima Carga Viral – Sheet 1: Column V
@@ -214,7 +213,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         "second_vl_resultdate",
         listOfPatientsInAdvancedHivIllnessCohortQueries
             .getLastVLResultDateBeforeMostRecentVLResultDate(),
-        "endDate=${endDate},location=${location}",
+        MAPPING2,
         new DashDateFormatConverter());
 
     // 22 - Data da Penúltima Carga Viral – Sheet 1: Column W
@@ -222,7 +221,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         "second_vl_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries
             .getLastVLResultBeforeMostRecentVLResultDate(),
-        "endDate=${endDate},location=${location}",
+        MAPPING2,
         new ViralLoadQualitativeLabelConverter());
 
     return patientDataSetDefinition;
@@ -235,17 +234,13 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
 
     dataSetDefinition.setParameters(getParameters());
 
-    String MAPPING2 =
-        "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}";
-    String MAPPING5 = "endDate=${endDate},generationDate=${generationDate},location=${location}";
-
     CohortIndicator totalOfEligibleForCd4Request =
         eptsGeneralIndicator.getIndicator(
             "ELEGIBLE_CD4",
             EptsReportUtils.map(
                 listOfPatientsEligibleForCd4RequestCohortQueries
                     .getPatientsEligibleForCd4RequestComposition(),
-                MAPPING2));
+                MAPPING));
 
     CohortIndicator newlyStarted =
         eptsGeneralIndicator.getIndicator(
@@ -253,7 +248,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
             EptsReportUtils.map(
                 listOfPatientsEligibleForCd4RequestCohortQueries
                     .getPatientWhoInitiatedTarvDuringPeriodC1(),
-                MAPPING2));
+                MAPPING));
 
     CohortIndicator restarted =
         eptsGeneralIndicator.getIndicator(
@@ -261,7 +256,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
             EptsReportUtils.map(
                 listOfPatientsEligibleForCd4RequestCohortQueries
                     .getPatientWhoRestartedTarvAndEligibleForCd4RequestC2(),
-                MAPPING2));
+                MAPPING));
 
     CohortIndicator highVl =
         eptsGeneralIndicator.getIndicator(
@@ -269,7 +264,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
             EptsReportUtils.map(
                 listOfPatientsEligibleForCd4RequestCohortQueries
                     .getPatientsWithTwoHighVlResultsC3(),
-                MAPPING5));
+                MAPPING2));
 
     CohortIndicator estadio =
         eptsGeneralIndicator.getIndicator(
@@ -277,7 +272,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
             EptsReportUtils.map(
                 listOfPatientsEligibleForCd4RequestCohortQueries
                     .getPatientWithEstadiamentoIIIorIVC4(),
-                MAPPING2));
+                MAPPING));
 
     CohortIndicator eligibleForCd4Followup =
         eptsGeneralIndicator.getIndicator(
@@ -285,7 +280,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
             EptsReportUtils.map(
                 listOfPatientsEligibleForCd4RequestCohortQueries
                     .getPatientEligibleForCd4FollowupC5(),
-                MAPPING5));
+                MAPPING2));
 
     CohortIndicator pregnant =
         eptsGeneralIndicator.getIndicator(
@@ -293,33 +288,33 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
             EptsReportUtils.map(
                 listOfPatientsEligibleForCd4RequestCohortQueries
                     .getPatientPregnantEligibleForCd4RequestC6(),
-                MAPPING2));
+                MAPPING));
 
     dataSetDefinition.addColumn(
         "ELEGIBLE_CD4",
         "Total de utentes elegíveis ao pedido de CD4",
-        EptsReportUtils.map(totalOfEligibleForCd4Request, MAPPING2),
+        EptsReportUtils.map(totalOfEligibleForCd4Request, MAPPING),
         "");
 
     dataSetDefinition.addColumn(
-        "C1", "CD4 Inicial - Novos inícios TARV", EptsReportUtils.map(newlyStarted, MAPPING2), "");
+        "C1", "CD4 Inicial - Novos inícios TARV", EptsReportUtils.map(newlyStarted, MAPPING), "");
 
     dataSetDefinition.addColumn(
-        "C2", "CD4 Inicial - Reinícios", EptsReportUtils.map(restarted, MAPPING2), "");
+        "C2", "CD4 Inicial - Reinícios", EptsReportUtils.map(restarted, MAPPING), "");
 
-    dataSetDefinition.addColumn("C3", "CV Alta", EptsReportUtils.map(highVl, MAPPING5), "");
+    dataSetDefinition.addColumn("C3", "CV Alta", EptsReportUtils.map(highVl, MAPPING), "");
 
     dataSetDefinition.addColumn(
         "C4",
         "Condição Activa de Estadiamento III ou IV",
-        EptsReportUtils.map(estadio, MAPPING2),
+        EptsReportUtils.map(estadio, MAPPING),
         "");
 
     dataSetDefinition.addColumn(
-        "C5", "CD4 Seguimento", EptsReportUtils.map(eligibleForCd4Followup, MAPPING5), "");
+        "C5", "CD4 Seguimento", EptsReportUtils.map(eligibleForCd4Followup, MAPPING), "");
 
     dataSetDefinition.addColumn(
-        "C6", "Mulheres Grávidas", EptsReportUtils.map(pregnant, MAPPING2), "");
+        "C6", "Mulheres Grávidas", EptsReportUtils.map(pregnant, MAPPING), "");
 
     return dataSetDefinition;
   }
