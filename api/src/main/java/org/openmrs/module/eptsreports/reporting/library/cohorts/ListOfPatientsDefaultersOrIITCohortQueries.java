@@ -2366,4 +2366,50 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
 
     return sqlPatientDataDefinition;
   }
+
+  /** 6 */
+  public DataDefinition getLastRegisteredKeyPopulation(Concept keyPopConcept) {
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+    spdd.setName("Patient's Most Recent Ficha Clinica with KPOP Registered");
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("keypop", keyPopConcept.getConceptId());
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+
+    String sql =
+        "SELECT patient_id "
+            + "FROM ( "
+            + "   SELECT p.person_id AS patient_id, Max(e.encounter_datetime) AS last_date "
+            + "	  FROM   person p "
+            + "	  INNER JOIN encounter e  ON e.patient_id = p.person_id "
+            + "	  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "	  WHERE e.voided = 0 "
+            + "		  AND p.voided = 0 "
+            + "		  AND o.voided = 0 "
+            + "		  AND e.location_id = :location "
+            + "		  AND e.encounter_type = 6 "
+            + "		  AND o.concept_id = 23703 "
+            + "		  AND ( ";
+    if (keyPopConcept.getConceptId() == 1377) {
+      sql += "      (p.gender = 'M' AND o.value_coded = ${keypop}) ";
+    } else if (keyPopConcept.getConceptId() == 1901) {
+      sql += "      (p.gender = 'F' AND o.value_coded = ${keypop}) ";
+    } else {
+      sql +=
+          "      (p.gender = 'M' AND o.value_coded = ${keypop}) "
+              + "     	OR "
+              + "      (p.gender = 'F' AND o.value_coded = ${keypop}) ";
+    }
+    sql +=
+        "      ) "
+            + " 		AND e.encounter_datetime <= CURRENT_DATE() "
+            + " 	GROUP  BY p.person_id "
+            + ") last_keypop";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(sql));
+    return spdd;
+  }
 }

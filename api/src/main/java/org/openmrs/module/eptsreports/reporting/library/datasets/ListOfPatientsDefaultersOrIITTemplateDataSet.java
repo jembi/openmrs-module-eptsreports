@@ -245,35 +245,78 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         "endDate=${endDate},location=${location}",
         new SupportGroupsConverter());
 
-    // 25 - Last Drug Pick-up Date - Sheet 1: Column Y */
+    // 32 - HSH - Sheet 1: Column AF */
+    pdd.addColumn(
+        "keypop_hsh", 
+        listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
+            hivMetadata.getHomosexualConcept()), 
+            "endDate=${endDate}", null);
+
+    // 33 - PID - Sheet 1: Column AG */
+    pdd.addColumn(
+        "keypop_pid",  
+        listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
+            hivMetadata.getDrugUseConcept()), 
+            "endDate=${endDate}", null);
+
+    // 34 - REC - Sheet 1: Column AH */
+    pdd.addColumn(
+        "keypop_rec",  
+        listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
+            hivMetadata.getImprisonmentConcept()), 
+            "endDate=${endDate}", null);
+
+    // 35 - MTS - Sheet 1: Column AI */
+    pdd.addColumn(
+        "keypop_mts",  
+        listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
+            hivMetadata.getSexWorkerConcept()), 
+            "endDate=${endDate}", null);
+
+    // 36 - TG - Sheet 1: Column AJ */
+    pdd.addColumn(
+        "keypop_tg",  
+        listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
+            hivMetadata.getTransGenderConcept()), 
+            "endDate=${endDate}", null);
+
+    // 40 - Last Drug Pick-up Date - Sheet 1: Column AN */
     pdd.addColumn(
         "date_of_last_survey_fila",
         listChildrenOnARTandFormulationsDataset.getLastDrugPickupDate(),
         "endDate=${endDate},location=${location}",
         null);
 
-    // 26 - Last Drug Pick-up Date - Sheet 1: Column Z */
+    // 41 - Last Drug Pick-up Date - Sheet 1: Column AO */
     pdd.addColumn(
         "date_of_last_survey_reception_raised_ARV",
         listOfPatientsDefaultersOrIITCohortQueries.getLastDrugPickUpDate(),
         "endDate=${endDate},location=${location}",
         null);
 
-    // 27 - Next Drug pick-up Date - Sheet 1: Column AA */
+    // 42 - Next Drug pick-up Date - Sheet 1: Column AP */
     pdd.addColumn(
         "next_date_survey_fila",
         listChildrenOnARTandFormulationsDataset.getNextDrugPickupDate(),
         "endDate=${endDate},location=${location}",
         null);
 
-    // 28 - Next Drug pick-up Date - Sheet 1: Column AB */
+    // 43 - Next Drug pick-up Date - Sheet 1: Column AQ */
     pdd.addColumn(
         "next_date_survey _reception_raised_ARV",
         listOfPatientsDefaultersOrIITCohortQueries.getNextDrugPickUpDateARV(),
         "endDate=${endDate},location=${location}",
         null);
 
-    // 29 - Days of Delay - Sheet 1: Column AC */
+    // 44 - Days of Delay - Sheet 1: Column AR */
+    pdd.addColumn(
+        "days_of_absence_to_survey",
+        listOfPatientsDefaultersOrIITCohortQueries.getNumberOfDaysOfDelay(),
+        "endDate=${endDate},location=${location}",
+        null);
+
+    // TODO
+    // 45 - Days of Delay - Sheet 1: Column AS */
     pdd.addColumn(
         "days_of_absence_to_survey",
         listOfPatientsDefaultersOrIITCohortQueries.getNumberOfDaysOfDelay(),
