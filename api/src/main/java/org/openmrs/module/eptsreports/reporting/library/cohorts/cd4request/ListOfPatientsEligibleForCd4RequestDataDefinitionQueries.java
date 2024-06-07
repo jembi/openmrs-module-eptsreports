@@ -216,13 +216,13 @@ public class ListOfPatientsEligibleForCd4RequestDataDefinitionQueries {
 
   /**
    * <b>Data do último Pedido de CD4</b>
-   * <p>
-   *     A data do último registo de “Pedido de CD4” na consulta clínica
-   *     (Ficha Clínica – Ficha Mestra) decorrida até ao fim do período de reporte
-   * </p>
+   *
+   * <p>A data do último registo de “Pedido de CD4” na consulta clínica (Ficha Clínica – Ficha
+   * Mestra) decorrida até ao fim do período de reporte
+   *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getLastCd4ResquestDate(){
+  public DataDefinition getLastCd4ResquestDate() {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Data do último Pedido de CD4");
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -234,21 +234,21 @@ public class ListOfPatientsEligibleForCd4RequestDataDefinitionQueries {
     map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
 
     String query =
-            "SELECT p.patient_id, MAX(e.encounter_datetime) request_date "
-                    + "FROM   patient p "
-                    + "       INNER JOIN encounter e "
-                    + "               ON e.patient_id = p.patient_id "
-                    + "       INNER JOIN obs o "
-                    + "               ON o.encounter_id = e.encounter_id "
-                    + "WHERE  p.voided = 0 "
-                    + "       AND e.voided = 0 "
-                    + "       AND o.voided = 0 "
-                    + "       AND e.encounter_type = ${6} "
-                    + "       AND e.location_id = :location "
-                    + "       AND o.concept_id = ${23722} "
-                    + "       AND o.value_coded = ${1695} "
-                    + "       AND e.encounter_datetime <= :endDate "
-                    + " GROUP BY p.patient_id ";
+        "SELECT p.patient_id, MAX(e.encounter_datetime) request_date "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${23722} "
+            + "       AND o.value_coded = ${1695} "
+            + "       AND e.encounter_datetime <= :endDate "
+            + " GROUP BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlPatientDataDefinition.setQuery(sb.replace(query));
