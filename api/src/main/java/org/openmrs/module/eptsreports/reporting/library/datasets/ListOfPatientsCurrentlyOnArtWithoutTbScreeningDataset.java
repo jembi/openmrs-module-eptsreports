@@ -198,6 +198,11 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseD
         "endDate=${endDate},location=${location}");
 
     patientDefinition.addColumn(
+        "most_recent_tb_start_date",
+        txtbDenominatorQueries.getMostRecentTbStartDate(),
+        "endDate=${endDate},location=${location}");
+
+    patientDefinition.addColumn(
         "mdc_consultation_date",
         listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
             .getMostRecentMdcConsultationDate(),
