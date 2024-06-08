@@ -16,11 +16,7 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
 import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
@@ -1243,17 +1239,6 @@ public class GenericCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("23758", hivMetadata.getTBSymptomsConcept().getConceptId());
-    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
-    map.put("1766", tbMetadata.getObservationTB().getConceptId());
-    map.put("1763", tbMetadata.getFeverLastingMoraThan3Weeks().getConceptId());
-    map.put("1764", tbMetadata.getWeightLossOfMoreThan3KgInLastMonth().getConceptId());
-    map.put("1762", tbMetadata.getNightsWeatsLastingMoraThan3Weeks().getConceptId());
-    map.put("1760", tbMetadata.getCoughLastingMoraThan3Weeks().getConceptId());
-    map.put("23760", tbMetadata.getAsthenia().getConceptId());
-    map.put("1765", tbMetadata.getCohabitantBeingTreatedForTB().getConceptId());
-    map.put("161", tbMetadata.getLymphadenopathy().getConceptId());
     map.put("minAge", minAge);
     map.put("maxAge", maxAge);
 
@@ -1266,15 +1251,13 @@ public class GenericCohortQueries {
             + "WHERE ";
     if (minAge != null && maxAge != null) {
       query +=
-          "     TIMESTAMPDIFF(YEAR, p.birthdate, presuntivoTb.data_presuntivo_tb) >= ${minAge}  "
+          "     TIMESTAMPDIFF(YEAR, p.birthdate, presuntivoTb.the_date) >= ${minAge}  "
               + "         AND   "
-              + "   TIMESTAMPDIFF(YEAR, p.birthdate, presuntivoTb.data_presuntivo_tb) <= ${maxAge}; ";
+              + "   TIMESTAMPDIFF(YEAR, p.birthdate, presuntivoTb.the_date) <= ${maxAge}; ";
     } else if (minAge == null && maxAge != null) {
-      query +=
-          "   TIMESTAMPDIFF(YEAR, p.birthdate, presuntivoTb.data_presuntivo_tb) <= ${maxAge}; ";
+      query += "   TIMESTAMPDIFF(YEAR, p.birthdate, presuntivoTb.the_date) <= ${maxAge}; ";
     } else if (minAge != null && maxAge == null) {
-      query +=
-          "   TIMESTAMPDIFF(YEAR, p.birthdate, presuntivoTb.data_presuntivo_tb) >= ${minAge};  ";
+      query += "   TIMESTAMPDIFF(YEAR, p.birthdate, presuntivoTb.the_date) >= ${minAge};  ";
     }
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -1308,10 +1291,13 @@ public class GenericCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
+    HivMetadata hivMetadata = new HivMetadata();
+    TbMetadata tbMetadata = new TbMetadata();
+    int encounterType = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    int concept = hivMetadata.getApplicationForLaboratoryResearch().getConceptId();
+    List<Integer> values = Arrays.asList(tbMetadata.getTBGenexpertTestConcept().getConceptId());
+
     Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
-    map.put("23723", tbMetadata.getTBGenexpertTestConcept().getConceptId());
     map.put("minAge", minAge);
     map.put("maxAge", maxAge);
 
@@ -1319,20 +1305,19 @@ public class GenericCohortQueries {
         "SELECT p.person_id "
             + "FROM person p "
             + "     INNER JOIN ( "
-            + QualityImprovement2020Queries.getPatientsWithPedidoDeXpert()
+            + QualityImprovement2020Queries.getPatientsWithConsulationObservationsAndEarliestDate(
+                encounterType, concept, values, true)
             + "          ) AS pedidoXpert ON p.person_id = pedidoXpert.patient_id "
             + "WHERE ";
     if (minAge != null && maxAge != null) {
       query +=
-          "     TIMESTAMPDIFF(YEAR, p.birthdate, pedidoXpert.data_pedido_genexpert) >= ${minAge}  "
+          "     TIMESTAMPDIFF(YEAR, p.birthdate, pedidoXpert.the_date) >= ${minAge}  "
               + "         AND   "
-              + "   TIMESTAMPDIFF(YEAR, p.birthdate, pedidoXpert.data_pedido_genexpert) <= ${maxAge}; ";
+              + "   TIMESTAMPDIFF(YEAR, p.birthdate, pedidoXpert.the_date) <= ${maxAge}; ";
     } else if (minAge == null && maxAge != null) {
-      query +=
-          "   TIMESTAMPDIFF(YEAR, p.birthdate, pedidoXpert.data_pedido_genexpert) <= ${maxAge}; ";
+      query += "   TIMESTAMPDIFF(YEAR, p.birthdate, pedidoXpert.the_date) <= ${maxAge}; ";
     } else if (minAge != null && maxAge == null) {
-      query +=
-          "   TIMESTAMPDIFF(YEAR, p.birthdate, pedidoXpert.data_pedido_genexpert) >= ${minAge};  ";
+      query += "   TIMESTAMPDIFF(YEAR, p.birthdate, pedidoXpert.the_date) >= ${minAge};  ";
     }
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -1366,10 +1351,13 @@ public class GenericCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
+    HivMetadata hivMetadata = new HivMetadata();
+    TbMetadata tbMetadata = new TbMetadata();
+    int encounterType = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    int concept = tbMetadata.getActiveTBConcept().getConceptId();
+    List<Integer> values = Arrays.asList(hivMetadata.getYesConcept().getConceptId());
+
     Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("23761", tbMetadata.getActiveTBConcept().getConceptId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
     map.put("minAge", minAge);
     map.put("maxAge", maxAge);
 
@@ -1377,22 +1365,25 @@ public class GenericCohortQueries {
         "SELECT p.person_id "
             + "FROM person p "
             + "     INNER JOIN ( "
-            + QualityImprovement2020Queries.getPatientsWithActiveTbDiagnosis()
+            + QualityImprovement2020Queries.getPatientsWithConsulationObservationsAndEarliestDate(
+                encounterType, concept, values, true)
             + "          ) AS tbActivo ON p.person_id = tbActivo.patient_id "
             + "WHERE ";
     if (minAge != null && maxAge != null) {
       query +=
-          "     TIMESTAMPDIFF(YEAR, p.birthdate, tbActivo.data_diagnostico_tb) >= ${minAge}  "
+          "     TIMESTAMPDIFF(YEAR, p.birthdate, tbActivo.the_date) >= ${minAge}  "
               + "         AND   "
-              + "   TIMESTAMPDIFF(YEAR, p.birthdate, tbActivo.data_diagnostico_tb) <= ${maxAge}; ";
+              + "   TIMESTAMPDIFF(YEAR, p.birthdate, tbActivo.the_date) <= ${maxAge}; ";
     } else if (minAge == null && maxAge != null) {
-      query += "   TIMESTAMPDIFF(YEAR, p.birthdate, tbActivo.data_diagnostico_tb) <= ${maxAge}; ";
+      query += "   TIMESTAMPDIFF(YEAR, p.birthdate, tbActivo.the_date) <= ${maxAge}; ";
     } else if (minAge != null && maxAge == null) {
-      query += "   TIMESTAMPDIFF(YEAR, p.birthdate, tbActivo.data_diagnostico_tb) >= ${minAge};  ";
+      query += "   TIMESTAMPDIFF(YEAR, p.birthdate, tbActivo.the_date) >= ${minAge};  ";
     }
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
     return sqlCohortDefinition;
   }
 }

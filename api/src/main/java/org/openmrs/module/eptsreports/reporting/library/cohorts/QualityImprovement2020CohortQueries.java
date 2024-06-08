@@ -15004,11 +15004,11 @@ public class QualityImprovement2020CohortQueries {
     TbMetadata tbMetadata = new TbMetadata();
 
     int encounterType1 = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
-    List<Integer> concepts1 = Arrays.asList(hivMetadata.getTBSymptomsConcept().getConceptId());
+    int concept1 = hivMetadata.getTBSymptomsConcept().getConceptId();
     List<Integer> values1 = Arrays.asList(hivMetadata.getPatientFoundYesConcept().getConceptId());
 
     int encounterType2 = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
-    List<Integer> concepts2 = Arrays.asList(tbMetadata.getObservationTB().getConceptId());
+    int concept2 = tbMetadata.getObservationTB().getConceptId();
     List<Integer> values2 =
         Arrays.asList(
             tbMetadata.getFeverLastingMoraThan3Weeks().getConceptId(),
@@ -15023,11 +15023,11 @@ public class QualityImprovement2020CohortQueries {
 
     return queriesUtil
         .unionBuilder(
-            QualityImprovement2020Queries.getPatientsWithSintomasFestac(
-                encounterType1, concepts1, values1))
+            QualityImprovement2020Queries.getPatientsWithConsulationObservationsAndEarliestDate(
+                encounterType1, concept1, values1, true))
         .union(
-            QualityImprovement2020Queries.getPatientsWithSintomasFestac(
-                encounterType2, concepts2, values2))
+            QualityImprovement2020Queries.getPatientsWithConsulationObservationsAndEarliestDate(
+                encounterType2, concept2, values2, true))
         .buildQuery();
   }
   /**
@@ -15058,25 +15058,10 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("23758", hivMetadata.getTBSymptomsConcept().getConceptId());
-    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
-    map.put("1766", tbMetadata.getObservationTB().getConceptId());
-    map.put("1763", tbMetadata.getFeverLastingMoraThan3Weeks().getConceptId());
-    map.put("1764", tbMetadata.getWeightLossOfMoreThan3KgInLastMonth().getConceptId());
-    map.put("1762", tbMetadata.getNightsWeatsLastingMoraThan3Weeks().getConceptId());
-    map.put("1760", tbMetadata.getCoughLastingMoraThan3Weeks().getConceptId());
-    map.put("23760", tbMetadata.getAsthenia().getConceptId());
-    map.put("1765", tbMetadata.getCohabitantBeingTreatedForTB().getConceptId());
-    map.put("161", tbMetadata.getLymphadenopathy().getConceptId());
-
     String query =
         "SELECT patient_id " + "FROM   (" + getUnionQueryUtentesPresuntivos() + ") presuntivo_tb";
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlCohortDefinition.setQuery((query));
 
     return sqlCohortDefinition;
   }
@@ -15101,7 +15086,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getUtentesComPedidoDeXpert() {
+  public static CohortDefinition getUtentesComPedidoDeXpert() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Utentes com Pedido de Xpert");
@@ -15109,19 +15094,21 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
-    map.put("23723", tbMetadata.getTBGenexpertTestConcept().getConceptId());
+    HivMetadata hivMetadata = new HivMetadata();
+    TbMetadata tbMetadata = new TbMetadata();
+
+    int encounterType = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    int concept = hivMetadata.getApplicationForLaboratoryResearch().getConceptId();
+    List<Integer> values = Arrays.asList(tbMetadata.getTBGenexpertTestConcept().getConceptId());
 
     String query =
         "SELECT patient_id "
             + "FROM   ( "
-            + QualityImprovement2020Queries.getPatientsWithPedidoDeXpert()
+            + QualityImprovement2020Queries.getPatientsWithConsulationObservationsAndEarliestDate(
+                encounterType, concept, values, true)
             + " ) pedidoXpert";
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlCohortDefinition.setQuery((query));
     return sqlCohortDefinition;
   }
 
@@ -15147,36 +15134,42 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
-    map.put("23723", tbMetadata.getTBGenexpertTestConcept().getConceptId());
-    map.put("703", tbMetadata.getPositiveConcept().getConceptId());
-    map.put("664", tbMetadata.getNegativeConcept().getConceptId());
+    HivMetadata hivMetadata = new HivMetadata();
+    TbMetadata tbMetadata = new TbMetadata();
+
+    int encounterType = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    int concept = hivMetadata.getApplicationForLaboratoryResearch().getConceptId();
+    List<Integer> values = Arrays.asList(tbMetadata.getTBGenexpertTestConcept().getConceptId());
+
+    int encounterType2 = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    int concept2 = tbMetadata.getTBGenexpertTestConcept().getConceptId();
+    List<Integer> values2 =
+        Arrays.asList(
+            tbMetadata.getPositiveConcept().getConceptId(),
+            tbMetadata.getNegativeConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id "
             + "FROM   patient p "
             + "       INNER JOIN ( "
-            + QualityImprovement2020Queries.getPatientsWithPedidoDeXpert()
+            + QualityImprovement2020Queries.getPatientsWithConsulationObservationsAndEarliestDate(
+                encounterType, concept, values, true)
             + "                   ) pedidoXpert "
             + "               ON pedidoXpert.patient_id = p.patient_id "
             + "       INNER JOIN ( "
-            + QualityImprovement2020Queries.getPatientsWithResultadoDeXpert()
+            + QualityImprovement2020Queries.getPatientsWithConsulationObservationsAndEarliestDate(
+                encounterType2, concept2, values2, true)
             + "                   ) resultadoXpert "
             + "               ON resultadoXpert.patient_id = p.patient_id ";
     query +=
         sevenDays
-            ? "WHERE  resultadoXpert.data_resultado_genexpert >= "
-                + "       pedidoXpert.data_pedido_genexpert "
-                + "       AND Timestampdiff(day, pedidoXpert.data_pedido_genexpert, "
-                + "               resultadoXpert.data_resultado_genexpert) <= 7"
-            : "WHERE  resultadoXpert.data_resultado_genexpert >= "
-                + "       pedidoXpert.data_pedido_genexpert ";
+            ? "WHERE  resultadoXpert.the_date >= "
+                + "       pedidoXpert.the_date "
+                + "       AND Timestampdiff(day, pedidoXpert.the_date, "
+                + "               resultadoXpert.the_date) <= 7"
+            : "WHERE  resultadoXpert.the_date >= " + "       pedidoXpert.the_date ";
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlCohortDefinition.setQuery((query));
 
     return sqlCohortDefinition;
   }
@@ -15205,40 +15198,31 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
-    map.put("23723", tbMetadata.getTBGenexpertTestConcept().getConceptId());
-    map.put("23758", hivMetadata.getTBSymptomsConcept().getConceptId());
-    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
-    map.put("1766", tbMetadata.getObservationTB().getConceptId());
-    map.put("1763", tbMetadata.getFeverLastingMoraThan3Weeks().getConceptId());
-    map.put("1764", tbMetadata.getWeightLossOfMoreThan3KgInLastMonth().getConceptId());
-    map.put("1762", tbMetadata.getNightsWeatsLastingMoraThan3Weeks().getConceptId());
-    map.put("1760", tbMetadata.getCoughLastingMoraThan3Weeks().getConceptId());
-    map.put("23760", tbMetadata.getAsthenia().getConceptId());
-    map.put("1765", tbMetadata.getCohabitantBeingTreatedForTB().getConceptId());
-    map.put("161", tbMetadata.getLymphadenopathy().getConceptId());
+    HivMetadata hivMetadata = new HivMetadata();
+    TbMetadata tbMetadata = new TbMetadata();
+
+    int encounterType = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    int concept = hivMetadata.getApplicationForLaboratoryResearch().getConceptId();
+    List<Integer> values = Arrays.asList(tbMetadata.getTBGenexpertTestConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id "
             + "FROM   patient p "
             + "       INNER JOIN ( "
-            + QualityImprovement2020Queries.getPatientsWithPedidoDeXpert()
+            + QualityImprovement2020Queries.getPatientsWithConsulationObservationsAndEarliestDate(
+                encounterType, concept, values, true)
             + "                   ) pedidoXpert "
             + "               ON pedidoXpert.patient_id = p.patient_id "
             + "       INNER JOIN ( "
             + getUnionQueryUtentesPresuntivos()
             + "                   ) presuntivosTb "
             + "               ON presuntivosTb.patient_id = p.patient_id "
-            + "WHERE  presuntivosTb.data_presuntivo_tb = "
-            + "       pedidoXpert.data_pedido_genexpert "
-            + "       AND Timestampdiff(day, presuntivosTb.data_presuntivo_tb, "
-            + "               pedidoXpert.data_pedido_genexpert) = 0";
+            + "WHERE  presuntivosTb.the_date = "
+            + "       pedidoXpert.the_date "
+            + "       AND Timestampdiff(day, presuntivosTb.the_date, "
+            + "               pedidoXpert.the_date) = 0";
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlCohortDefinition.setQuery((query));
 
     return sqlCohortDefinition;
   }
@@ -15269,20 +15253,21 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("23761", tbMetadata.getActiveTBConcept().getConceptId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    HivMetadata hivMetadata = new HivMetadata();
+    TbMetadata tbMetadata = new TbMetadata();
+
+    int encounterType = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    int concept = tbMetadata.getActiveTBConcept().getConceptId();
+    List<Integer> values = Arrays.asList(hivMetadata.getYesConcept().getConceptId());
 
     String query =
         "SELECT patient_id "
             + "FROM   ( "
-            + QualityImprovement2020Queries.getPatientsWithActiveTbDiagnosis()
+            + QualityImprovement2020Queries.getPatientsWithConsulationObservationsAndEarliestDate(
+                encounterType, concept, values, true)
             + " ) tbActivo";
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlCohortDefinition.setQuery((query));
 
     return sqlCohortDefinition;
   }
@@ -15310,32 +15295,36 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("23761", tbMetadata.getActiveTBConcept().getConceptId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
-    map.put("1268", hivMetadata.getTBTreatmentPlanConcept().getConceptId());
-    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    HivMetadata hivMetadata = new HivMetadata();
+    TbMetadata tbMetadata = new TbMetadata();
+
+    int encounterType = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    int concept = tbMetadata.getActiveTBConcept().getConceptId();
+    List<Integer> values = Arrays.asList(hivMetadata.getYesConcept().getConceptId());
+
+    int encounterType2 = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    int concept2 = hivMetadata.getTBTreatmentPlanConcept().getConceptId();
+    List<Integer> values2 = Arrays.asList(hivMetadata.getStartDrugs().getConceptId());
 
     String query =
         "SELECT p.patient_id "
             + "FROM   patient p "
             + "       INNER JOIN ( "
-            + QualityImprovement2020Queries.getPatientsWithActiveTbDiagnosis()
+            + QualityImprovement2020Queries.getPatientsWithConsulationObservationsAndEarliestDate(
+                encounterType, concept, values, true)
             + "                   ) diagnosticoTb "
             + "               ON diagnosticoTb.patient_id = p.patient_id "
             + "       INNER JOIN ( "
-            + QualityImprovement2020Queries.getPatientsWhoStartedTbTreatment()
+            + QualityImprovement2020Queries.getPatientsWithConsulationObservationsAndEarliestDate(
+                encounterType2, concept2, values2, false)
             + "                   ) tratamentoTb "
             + "               ON tratamentoTb.patient_id = p.patient_id "
-            + "WHERE  diagnosticoTb.data_diagnostico_tb = "
-            + "       tratamentoTb.data_inicio_tratamento_tb "
-            + "       AND Timestampdiff(day, diagnosticoTb.data_diagnostico_tb, "
-            + "               tratamentoTb.data_inicio_tratamento_tb ) = 0";
+            + "WHERE  diagnosticoTb.the_date = "
+            + "       tratamentoTb.the_date "
+            + "       AND Timestampdiff(day, diagnosticoTb.the_date, "
+            + "               tratamentoTb.the_date ) = 0";
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlCohortDefinition.setQuery((query));
 
     return sqlCohortDefinition;
   }
