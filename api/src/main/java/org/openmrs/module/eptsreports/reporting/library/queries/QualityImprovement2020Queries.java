@@ -1,9 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
@@ -2740,5 +2737,50 @@ public class QualityImprovement2020Queries {
         + "  AND e.encounter_datetime = restarted.restart_date "
         + "  AND e.location_id = :location "
         + "GROUP BY pa.patient_id";
+  }
+
+  /** @return {@link String} */
+  public static String getPatientsWithConsulationObservationsAndEarliestDate(
+      int encounterType, int concept, List<Integer> values, boolean encounterDate) {
+    Map<String, String> map = new HashMap<>();
+    map.put("encounterType", String.valueOf(encounterType));
+    map.put("concept", String.valueOf(concept));
+    map.put("values", getMetadata(values));
+
+    String query = "SELECT p.patient_id, ";
+    query +=
+        encounterDate
+            ? "       Min(e.encounter_datetime) AS the_date "
+            : "       MIN(o.obs_datetime) AS the_date ";
+    query +=
+        "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_datetime >= :startDate "
+            + "       AND e.encounter_datetime <= :endDate "
+            + "       AND e.encounter_type = ${encounterType} "
+            + "       AND o.concept_id = ${concept} "
+            + "       AND o.value_coded IN (${values}) "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    return sb.replace(query);
+  }
+
+  private static String getMetadata(List<Integer> list) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < list.size(); i++) {
+      sb.append(list.get(i));
+      if (i < list.size() - 1) {
+        sb.append(", ");
+      }
+    }
+    return sb.toString();
   }
 }

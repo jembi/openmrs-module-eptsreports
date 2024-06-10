@@ -14981,4 +14981,524 @@ public class QualityImprovement2020CohortQueries {
 
     return sqlCohortDefinition;
   }
+
+  /**
+   * <b>RF8 - Utentes Presuntivos de TB</b>
+   *
+   * @return {@link String}
+   */
+  static String getUnionQueryUtentesPresuntivos() {
+
+    HivMetadata hivMetadata = new HivMetadata();
+    TbMetadata tbMetadata = new TbMetadata();
+
+    int encounterType1 = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    int concept1 = hivMetadata.getTBSymptomsConcept().getConceptId();
+    List<Integer> values1 = Arrays.asList(hivMetadata.getPatientFoundYesConcept().getConceptId());
+
+    int encounterType2 = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    int concept2 = tbMetadata.getObservationTB().getConceptId();
+    List<Integer> values2 =
+        Arrays.asList(
+            tbMetadata.getFeverLastingMoraThan3Weeks().getConceptId(),
+            tbMetadata.getWeightLossOfMoreThan3KgInLastMonth().getConceptId(),
+            tbMetadata.getNightsWeatsLastingMoraThan3Weeks().getConceptId(),
+            tbMetadata.getCoughLastingMoraThan3Weeks().getConceptId(),
+            tbMetadata.getAsthenia().getConceptId(),
+            tbMetadata.getCohabitantBeingTreatedForTB().getConceptId(),
+            tbMetadata.getLymphadenopathy().getConceptId());
+
+    EptsQueriesUtil queriesUtil = new EptsQueriesUtil();
+
+    return queriesUtil
+        .unionBuilder(
+            QualityImprovement2020Queries.getPatientsWithConsulationObservationsAndEarliestDate(
+                encounterType1, concept1, values1, true))
+        .union(
+            QualityImprovement2020Queries.getPatientsWithConsulationObservationsAndEarliestDate(
+                encounterType2, concept2, values2, true))
+        .buildQuery();
+  }
+  /**
+   * <b>Utentes Presuntivos de TB</b>
+   *
+   * <p>O sistema irá identificar utentes <b>presuntivos de TB</b> seleccionando:
+   *
+   * <ul>
+   *   <li>todos os utentes com registo de “Tem sintomas?” (TB) = “Sim” em uma consulta clínica
+   *       (Ficha Clínica) ocorrida durante o período de revisão; ou
+   *   <li>>todos os utentes com registo de algum sintoma FESTAC em uma consulta clínica (Ficha
+   *       Clínica) ocorrida durante o período de revisão;
+   *       <p>Nota 1: A “Data Presuntivo de TB” do utente é a data da consulta clínica (Ficha
+   *       clínica) com registo da primeira ocorrência (algum dos sintomas FESTAC) durante o período
+   *       de revisão dos critérios acima definidos.
+   *       <p>Nota 2: Os sintomas FESTAC incluem (Febre- F, Emagrecimento – E, Sudorese Noturna –S,
+   *       Tosse a mais de 2 semanas –T, Astenia –A, Contacto com TB- C e Adenopatia Cervical
+   *       Indolor)
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getUtentesPresuntivosDeTb() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes Presuntivos de TB");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    String query =
+        "SELECT patient_id " + "FROM   (" + getUnionQueryUtentesPresuntivos() + ") presuntivo_tb";
+
+    sqlCohortDefinition.setQuery((query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Utentes com Pedido de Xpert</b>
+   *
+   * <p>O sistema irá identificar utentes com registo de <b>Pedido de teste Xpert</b> durante o
+   * período de revisão, selecionando:
+   *
+   * <ul>
+   *   <li>todos os utentes com registo do <b>“Pedido de Xpert”</b> em uma <b>consulta clínica
+   *       (Ficha Clínica) –</b> secção investigações pedidos laboratoriais, ocorrida durante o
+   *       período de revisão (>= “Data Início Revisão” e <= “Data Fim Revisão”).
+   *       <p>Nota 1: A “Data Presuntivo de TB” do utente é a data da consulta clínica (Ficha
+   *       clínica) com registo da primeira ocorrência (algum dos sintomas FESTAC) durante o período
+   *       de revisão dos critérios acima definidos.
+   *       <p><b>Nota 1:</b> em caso de existência de mais de uma consulta clínica com registo de
+   *       pedido de teste Xpert, o sistema irá considerar a <b>primeira</b> ocorrência durante o
+   *       período de revisão como <b>“Data Pedido de Xpert”.</b>
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public static CohortDefinition getUtentesComPedidoDeXpert() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes com Pedido de Xpert");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    HivMetadata hivMetadata = new HivMetadata();
+    TbMetadata tbMetadata = new TbMetadata();
+
+    int encounterType = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    int concept = hivMetadata.getApplicationForLaboratoryResearch().getConceptId();
+    List<Integer> values = Arrays.asList(tbMetadata.getTBGenexpertTestConcept().getConceptId());
+
+    String query =
+        "SELECT patient_id "
+            + "FROM   ( "
+            + QualityImprovement2020Queries.getPatientsWithConsulationObservationsAndEarliestDate(
+                encounterType, concept, values, true)
+            + " ) pedidoXpert";
+
+    sqlCohortDefinition.setQuery((query));
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * O sistema irá identificar os utentes que tiveram registo do resultado Xpert dentro de 7 dias do
+   * pedido de Xpert, selecionado:
+   *
+   * <ul>
+   *   <li>os utentes que tiveram registo do “Resultado de Xpert” na consulta clínica (Ficha
+   *       Clínica) – secção investigações resultados laboratoriais, ocorrida durante o período de
+   *       revisão, sete (7) dias após o registo do “Pedido de Xpert” na consulta clínica (Ficha
+   *       Clínica) – secção investigações pedidos laboratoriais, ocorrida durante o período de
+   *       revisão. Ou seja, “Data Resultado Xpert” menos (-) a “Data Pedido Xpert” >=0 e <=7 dias.
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getUtentesComResultadoDeXpertEm7Dias(boolean sevenDays) {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes com Resultado de Xpert dentro de 7 dias após Pedido");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    HivMetadata hivMetadata = new HivMetadata();
+    TbMetadata tbMetadata = new TbMetadata();
+
+    int encounterType = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    int concept = hivMetadata.getApplicationForLaboratoryResearch().getConceptId();
+    List<Integer> values = Arrays.asList(tbMetadata.getTBGenexpertTestConcept().getConceptId());
+
+    int encounterType2 = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    int concept2 = tbMetadata.getTBGenexpertTestConcept().getConceptId();
+    List<Integer> values2 =
+        Arrays.asList(
+            tbMetadata.getPositiveConcept().getConceptId(),
+            tbMetadata.getNegativeConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN ( "
+            + QualityImprovement2020Queries.getPatientsWithConsulationObservationsAndEarliestDate(
+                encounterType, concept, values, true)
+            + "                   ) pedidoXpert "
+            + "               ON pedidoXpert.patient_id = p.patient_id "
+            + "       INNER JOIN ( "
+            + QualityImprovement2020Queries.getPatientsWithConsulationObservationsAndEarliestDate(
+                encounterType2, concept2, values2, true)
+            + "                   ) resultadoXpert "
+            + "               ON resultadoXpert.patient_id = p.patient_id ";
+    query +=
+        sevenDays
+            ? "WHERE  resultadoXpert.the_date >= "
+                + "       pedidoXpert.the_date "
+                + "       AND Timestampdiff(day, pedidoXpert.the_date, "
+                + "               resultadoXpert.the_date) <= 7"
+            : "WHERE  resultadoXpert.the_date >= " + "       pedidoXpert.the_date ";
+
+    sqlCohortDefinition.setQuery((query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   *
+   *
+   * <ul>
+   *   <li><b>Filtrando</b> os que tiveram registo do <b>Pedido de Xpert</b> na <b>consulta clínica
+   *       (Ficha Clínica) - </b> secção investigações pedidos laboratoriais, ocorrida na <b>Data
+   *       Presuntivo de TB</b>.
+   *       <p><b>Nota:</b> a data da consulta clínica com o pedido de teste Xpert, <b>“Data Pedido
+   *       Xpert”</b> menos a <b>"Data Presuntivo de TB"</b> deve ser igual a <b>zero.</b> ocorrida
+   *       durante o período de revisão (>= “Data Início Revisão” e <= “Data Fim Revisão”).
+   * </ul>
+   *
+   * <p><b>Nota 1:</b> A <b>“Data Presuntivo de TB”</b> do utente é definida no <b>RF8</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getUtentesComPedidoXpertNaDataPresuntivoDeTB() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes com Pedido de Xpert na Data Presuntivo de TB");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    HivMetadata hivMetadata = new HivMetadata();
+    TbMetadata tbMetadata = new TbMetadata();
+
+    int encounterType = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    int concept = hivMetadata.getApplicationForLaboratoryResearch().getConceptId();
+    List<Integer> values = Arrays.asList(tbMetadata.getTBGenexpertTestConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN ( "
+            + QualityImprovement2020Queries.getPatientsWithConsulationObservationsAndEarliestDate(
+                encounterType, concept, values, true)
+            + "                   ) pedidoXpert "
+            + "               ON pedidoXpert.patient_id = p.patient_id "
+            + "       INNER JOIN ( "
+            + getUnionQueryUtentesPresuntivos()
+            + "                   ) presuntivosTb "
+            + "               ON presuntivosTb.patient_id = p.patient_id "
+            + "WHERE  presuntivosTb.the_date = "
+            + "       pedidoXpert.the_date "
+            + "       AND Timestampdiff(day, presuntivosTb.the_date, "
+            + "               pedidoXpert.the_date) = 0";
+
+    sqlCohortDefinition.setQuery((query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Utentes com Diagnóstico TB Activo</b>
+   *
+   * <p>O sistema irá identificar utentes com registo de <b>Diagnóstico de TB Activo</b> durante o
+   * período de revisão, seleccionando:
+   *
+   * <ul>
+   *   <li>todos os utentes com registo de <b>“Diagnóstico de TB Activo” = "Sim"</b> em uma consulta
+   *       clínica (Ficha Clínica) ocorrida durante o período de revisão (>= “Data Início Revisão” e
+   *       <= “Data Fim Revisão”);
+   * </ul>
+   *
+   * <p><b>Nota 1:</b> em caso de existência de mais de uma consulta clínica com registo de
+   * diagnóstico de tb activo, o sistema irá considerar a <b>primeira</b> ocorrência durante o
+   * período de revisão como <b>“Data Diagnóstico de TB”</b>.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getUtentesComDiagnosticoTbActivo() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes com Diagnóstico TB Activo");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    HivMetadata hivMetadata = new HivMetadata();
+    TbMetadata tbMetadata = new TbMetadata();
+
+    int encounterType = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    int concept = tbMetadata.getActiveTBConcept().getConceptId();
+    List<Integer> values = Arrays.asList(hivMetadata.getYesConcept().getConceptId());
+
+    String query =
+        "SELECT patient_id "
+            + "FROM   ( "
+            + QualityImprovement2020Queries.getPatientsWithConsulationObservationsAndEarliestDate(
+                encounterType, concept, values, true)
+            + " ) tbActivo";
+
+    sqlCohortDefinition.setQuery((query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   *
+   *
+   * <ul>
+   *   <li><b>Filtrando</b> os que tiveram registo do <b>“Tratamento de TB” = “Início”</b> em uma
+   *       <b>consulta clínica (Ficha Clínica)</b> ocorrida durante o período de revisão, sendo a
+   *       respectiva <b>“Data Início Tratamento TB”</b>. igual a <b>“Data Diagnóstico de TB”</b> ou
+   *       seja <b>“Data Início Tratamento TB”</b> menos (-) a <b>“Data Diagnóstico de TB”</b> igual
+   *       a <b>zero</b>.
+   * </ul>
+   *
+   * <p><b>Nota 1:</b> A <b>“Data Diagnóstico de TB”</b> do utente é definida no <b>RF8.2</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getUtentesComInicioDeTratamentoDeTbNaDataDeDiagnosticoTb() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes com Pedido de Xpert na Data Presuntivo de TB");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    HivMetadata hivMetadata = new HivMetadata();
+    TbMetadata tbMetadata = new TbMetadata();
+
+    int encounterType = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    int concept = tbMetadata.getActiveTBConcept().getConceptId();
+    List<Integer> values = Arrays.asList(hivMetadata.getYesConcept().getConceptId());
+
+    int encounterType2 = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    int concept2 = hivMetadata.getTBTreatmentPlanConcept().getConceptId();
+    List<Integer> values2 = Arrays.asList(hivMetadata.getStartDrugs().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN ( "
+            + QualityImprovement2020Queries.getPatientsWithConsulationObservationsAndEarliestDate(
+                encounterType, concept, values, true)
+            + "                   ) diagnosticoTb "
+            + "               ON diagnosticoTb.patient_id = p.patient_id "
+            + "       INNER JOIN ( "
+            + QualityImprovement2020Queries.getPatientsWithConsulationObservationsAndEarliestDate(
+                encounterType2, concept2, values2, false)
+            + "                   ) tratamentoTb "
+            + "               ON tratamentoTb.patient_id = p.patient_id "
+            + "WHERE  diagnosticoTb.the_date = "
+            + "       tratamentoTb.the_date "
+            + "       AND Timestampdiff(day, diagnosticoTb.the_date, "
+            + "               tratamentoTb.the_date ) = 0";
+
+    sqlCohortDefinition.setQuery((query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>MQ19</b>: Melhoria de Qualidade Category 19 <br>
+   * <i> DENOMINATOR 1: (presuntivosTb AND age) NOT transferredOut</i> <br>
+   * <i> DENOMINATOR 2: (resultadoXpert AND age) NOT transferredOut</i> <br>
+   * <i> DENOMINATOR 3: (diagnosticoTbActivo AND age) NOT transferredOut</i> <br>
+   * <i> DENOMINATOR 4: (presuntivosTb AND age) NOT transferredOut</i> <br>
+   * <i> DENOMINATOR 5: (resultadoXpert AND age) NOT transferredOut</i> <br>
+   * <i> DENOMINATOR 6: (diagnosticoTbActivo AND age) NOT transferredOut</i> <br>
+   *
+   * @param den indicator number
+   */
+  public CohortDefinition getMQ19A(Integer den) {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    if (den == 1) {
+      compositionCohortDefinition.setName("Categoria 19 Denominador – Pedido XPert  Adulto");
+    } else if (den == 2) {
+      compositionCohortDefinition.setName("Categoria 19 Denominador – Resultado XPert Adulto");
+    } else if (den == 3) {
+      compositionCohortDefinition.setName("Categoria 19 Denominador – Tratamento TB - Adulto");
+    } else if (den == 4) {
+      compositionCohortDefinition.setName("Categoria 19 Denominador – Pedido XPert Pediátrico");
+    } else if (den == 5) {
+      compositionCohortDefinition.setName("Categoria 19 Denominador – Resultado XPert  Pediátrico");
+    } else if (den == 6) {
+      compositionCohortDefinition.setName("Categoria 19 Denominador – Tratamento TB - Pediátrico");
+    }
+
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    if (den == 1) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(genericCohortQueries.getAgeOnPresuntivoTbDate(15, 200), MAPPING3));
+    } else if (den == 2) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(genericCohortQueries.getAgeOnXpertRequestDate(15, 200), MAPPING3));
+    } else if (den == 3) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(genericCohortQueries.getAgeOnTbDiagnosisDate(15, 200), MAPPING3));
+    } else if (den == 4) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(genericCohortQueries.getAgeOnPresuntivoTbDate(0, 14), MAPPING3));
+    } else if (den == 5) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(genericCohortQueries.getAgeOnXpertRequestDate(0, 14), MAPPING3));
+    } else if (den == 6) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(genericCohortQueries.getAgeOnTbDiagnosisDate(0, 14), MAPPING3));
+    }
+
+    CohortDefinition transferOut = getTranferredOutPatientsCat7();
+
+    CohortDefinition presuntivosTb = getUtentesPresuntivosDeTb();
+
+    CohortDefinition resultadoXpert = getUtentesComResultadoDeXpertEm7Dias(false);
+
+    CohortDefinition diagnosticoTbActivo = getUtentesComDiagnosticoTbActivo();
+
+    compositionCohortDefinition.addSearch(
+        "transferredOut", EptsReportUtils.map(transferOut, MAPPING11));
+
+    compositionCohortDefinition.addSearch(
+        "presuntivosTb", EptsReportUtils.map(presuntivosTb, MAPPING3));
+
+    compositionCohortDefinition.addSearch(
+        "resultadoXpert", EptsReportUtils.map(resultadoXpert, MAPPING3));
+
+    compositionCohortDefinition.addSearch(
+        "diagnosticoTbActivo", EptsReportUtils.map(diagnosticoTbActivo, MAPPING3));
+
+    if (den == 1 || den == 4) {
+      compositionCohortDefinition.setCompositionString(
+          "(presuntivosTb AND age) NOT transferredOut");
+    } else if (den == 2 || den == 5) {
+      compositionCohortDefinition.setCompositionString(
+          "(resultadoXpert AND age) NOT transferredOut");
+    } else if (den == 3 || den == 6) {
+      compositionCohortDefinition.setCompositionString(
+          "(diagnosticoTbActivo AND age) NOT transferredOut");
+    }
+
+    return compositionCohortDefinition;
+  }
+
+  /**
+   * <b>MQ19</b>: Melhoria de Qualidade Category 19<br>
+   * <i> NUMERATOR 1: MQ19DEN1 AND pedidoXpertOnPresuntivoTb</i> <br>
+   * <i> NUMERATOR 2: MQ19DEN2 AND resultadoXpertEm7Dias</i> <br>
+   * <i> NUMERATOR 3: MQ19DEN3 AND tratamentoDeTbNaDataDeDiagnosticoTb</i> <br>
+   * <i> NUMERATOR 4: MQ19DEN4 AND pedidoXpertOnPresuntivoTb</i> <br>
+   * <i> NUMERATOR 5: MQ19DEN5 AND resultadoXpertEm7Dias</i> <br>
+   * <i> NUMERATOR 6: MQ19DEN6 AND tratamentoDeTbNaDataDeDiagnosticoTb</i> <br>
+   *
+   * @param num indicator number
+   * @return CohortDefinition
+   */
+  public CohortDefinition getMQ19B(Integer num) {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    if (num == 1) {
+      compositionCohortDefinition.setName("Categoria 19 Numerador – Pedido XPert Adulto");
+    } else if (num == 2) {
+      compositionCohortDefinition.setName("Categoria 19 Numerador – Resultado XPert Adulto");
+    } else if (num == 3) {
+      compositionCohortDefinition.setName("Categoria 19 Numerador – Tratamento TB Adulto");
+    } else if (num == 4) {
+      compositionCohortDefinition.setName("Categoria 19 Numerador – Pedido XPert Pediátrico");
+    } else if (num == 5) {
+      compositionCohortDefinition.setName("Categoria 19 Numerador – Resultado XPert Pediátrico");
+    } else if (num == 6) {
+      compositionCohortDefinition.setName("Categoria 19 Numerador – Tratamento TB - Pediátrico");
+    }
+
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition mq19DenOne = getMQ19A(1);
+    CohortDefinition mq19DenTwo = getMQ19A(2);
+    CohortDefinition mq19DenThree = getMQ19A(3);
+    CohortDefinition mq19DenFour = getMQ19A(4);
+    CohortDefinition mq19DenFive = getMQ19A(5);
+    CohortDefinition mq19DenSix = getMQ19A(6);
+
+    CohortDefinition pedidoXpertOnPresuntivoTb = getUtentesComPedidoXpertNaDataPresuntivoDeTB();
+
+    CohortDefinition resultadoXpertEm7Dias = getUtentesComResultadoDeXpertEm7Dias(true);
+
+    CohortDefinition tratamentoDeTbNaDataDeDiagnosticoTb =
+        getUtentesComInicioDeTratamentoDeTbNaDataDeDiagnosticoTb();
+
+    compositionCohortDefinition.addSearch("MQ19DEN1", EptsReportUtils.map(mq19DenOne, MAPPING1));
+
+    compositionCohortDefinition.addSearch("MQ19DEN2", EptsReportUtils.map(mq19DenTwo, MAPPING1));
+
+    compositionCohortDefinition.addSearch("MQ19DEN3", EptsReportUtils.map(mq19DenThree, MAPPING1));
+
+    compositionCohortDefinition.addSearch("MQ19DEN4", EptsReportUtils.map(mq19DenFour, MAPPING1));
+
+    compositionCohortDefinition.addSearch("MQ19DEN5", EptsReportUtils.map(mq19DenFive, MAPPING1));
+
+    compositionCohortDefinition.addSearch("MQ19DEN6", EptsReportUtils.map(mq19DenSix, MAPPING1));
+
+    compositionCohortDefinition.addSearch(
+        "pedidoXpertOnPresuntivoTb", EptsReportUtils.map(pedidoXpertOnPresuntivoTb, MAPPING3));
+
+    compositionCohortDefinition.addSearch(
+        "resultadoXpertEm7Dias", EptsReportUtils.map(resultadoXpertEm7Dias, MAPPING3));
+
+    compositionCohortDefinition.addSearch(
+        "tratamentoDeTbNaDataDeDiagnosticoTb",
+        EptsReportUtils.map(tratamentoDeTbNaDataDeDiagnosticoTb, MAPPING3));
+
+    if (num == 1) {
+      compositionCohortDefinition.setCompositionString("MQ19DEN1 AND pedidoXpertOnPresuntivoTb");
+    } else if (num == 2) {
+      compositionCohortDefinition.setCompositionString("MQ19DEN2 AND resultadoXpertEm7Dias");
+    } else if (num == 3) {
+      compositionCohortDefinition.setCompositionString(
+          "MQ19DEN3 AND tratamentoDeTbNaDataDeDiagnosticoTb");
+    } else if (num == 4) {
+      compositionCohortDefinition.setCompositionString("MQ19DEN4 AND pedidoXpertOnPresuntivoTb");
+    } else if (num == 5) {
+      compositionCohortDefinition.setCompositionString("MQ19DEN5 AND resultadoXpertEm7Dias");
+    } else if (num == 6) {
+      compositionCohortDefinition.setCompositionString(
+          "MQ19DEN6 AND tratamentoDeTbNaDataDeDiagnosticoTb");
+    }
+
+    return compositionCohortDefinition;
+  }
 }
