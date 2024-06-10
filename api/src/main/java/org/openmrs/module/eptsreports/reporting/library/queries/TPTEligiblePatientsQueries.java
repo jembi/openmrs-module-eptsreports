@@ -384,6 +384,7 @@ public class TPTEligiblePatientsQueries {
         + "         AND oo2.value_coded = ${1256} "
         + "         AND oo2.obs_datetime <= :endDate )) "
         + "    AND oo.voided = 0 "
+        + "    AND oo2.voided = 0 "
         + "    AND ee.voided = 0 "
         + "    AND ee.location_id = :location ";
   }

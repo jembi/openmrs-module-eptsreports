@@ -17,6 +17,7 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Deprecated
 public class SetupListOfPatientsCurrentlyOnArtWithoutTbScreening extends EptsDataExportManager {
@@ -73,7 +74,7 @@ public class SetupListOfPatientsCurrentlyOnArtWithoutTbScreening extends EptsDat
     rd.setDescription(getDescription());
     rd.setParameters(getParameters());
     rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
-    rd.addDataSetDefinition("SC", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
+    rd.addDataSetDefinition("SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
     rd.addDataSetDefinition(
         "LP",
         Mapped.mapStraightThrough(
@@ -94,12 +95,12 @@ public class SetupListOfPatientsCurrentlyOnArtWithoutTbScreening extends EptsDat
       rd =
           createXlsReportDesign(
               reportDefinition,
-              "Template_List_Patients_Currently_ART_No_TB_Screening.xls",
+              "Template_TB5_List_Patients_Currently_ART_No_TB_Screening_v1.1.xls",
               "Patients Currently on ART without TB Screening",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:8,dataset:LP");
+      props.put("repeatingSections", "sheet:1,row:9,dataset:LP");
       props.put("sortWeight", "5000");
       rd.setProperties(props);
     } catch (IOException e) {

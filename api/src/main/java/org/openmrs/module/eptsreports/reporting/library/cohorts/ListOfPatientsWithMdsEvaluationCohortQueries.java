@@ -120,7 +120,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " YEAR) "
             + " AND art_patient.patient_id "
             + " NOT IN ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
+            + ListOfPatientsWithMdsEvaluationQueries.getB1PatientsWhoAreTransferredIn(
                 inclusionEndMonthAndDay, numberOfYearsEndDate)
             + " )";
 
