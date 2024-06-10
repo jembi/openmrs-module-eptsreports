@@ -2372,6 +2372,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
     spdd.setName("Patient's Most Recent Ficha Clinica with KPOP Registered");
     spdd.addParameter(new Parameter("location", "location", Location.class));
+    spdd.addParameter(new Parameter("endDate", "endDate", Date.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("keypop", keyPopConcept.getConceptId());
@@ -2379,34 +2380,40 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     valuesMap.put("23703", hivMetadata.getKeyPopulationConcept().getConceptId());
 
     String sql =
-        // "SELECT patient_id "
-        //    + "FROM ( "
-        "   SELECT p.person_id AS patient_id, Max(e.encounter_datetime) AS last_date "
-            + "	  FROM   person p "
-            + "	  INNER JOIN encounter e  ON e.patient_id = p.person_id "
-            + "	  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "	  WHERE e.voided = 0 "
-            + "		  AND p.voided = 0 "
-            + "		  AND o.voided = 0 "
-            + "		  AND e.location_id = :location "
-            + "		  AND e.encounter_type = ${6} "
-            + "		  AND o.concept_id = ${23703} "
-            + "		  AND ( ";
+        " SELECT patient_id, "
+            + "   CASE "
+            + "     WHEN value_coded IS NOT NULL THEN 'S' "
+            + "     ELSE 'N' "
+            + "   END AS S_or_N "
+            + " FROM ( "
+            + "   SELECT p.patient_id, value_coded "
+            + "   FROM patient p "
+            + "     LEFT JOIN ( "
+            + "       SELECT p.person_id AS patient_id, Max(e.encounter_datetime) AS last_date, o.value_coded "
+            + "   	  FROM   person p "
+            + "   	  INNER JOIN encounter e  ON e.patient_id = p.person_id "
+            + "   	  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "   	  WHERE e.voided = 0 "
+            + "   		  AND p.voided = 0 "
+            + "   		  AND o.voided = 0 "
+            + "   		  AND e.location_id = :location "
+            + "   		  AND e.encounter_type = ${6} "
+            + "   		  AND o.concept_id = ${23703} "
+            + "   		  AND ( ";
     if (keyPopConcept.getConceptId() == 1377) {
-      sql += "        (p.gender = 'M' AND o.value_coded = ${keypop}) ";
+      sql += "                (p.gender = 'M' AND o.value_coded = ${keypop}) ";
     } else if (keyPopConcept.getConceptId() == 1901) {
-      sql += "        (p.gender = 'F' AND o.value_coded = ${keypop}) ";
+      sql += "                (p.gender = 'F' AND o.value_coded = ${keypop}) ";
     } else {
       sql +=
-          "               (p.gender = 'M' AND o.value_coded = ${keypop}) "
+          "                   (p.gender = 'M' AND o.value_coded = ${keypop}) "
               + "             OR "
               + "             (p.gender = 'F' AND o.value_coded = ${keypop}) ";
     }
     sql +=
-        "           ) "
+        "         ) "
             + "         AND e.encounter_datetime <= CURRENT_DATE() "
-            + "GROUP  BY p.person_id ";
-    //            + ") last_keypop";
+            + "       GROUP  BY p.person_id ";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
