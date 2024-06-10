@@ -8553,12 +8553,11 @@ public class QualityImprovement2020CohortQueries {
         break;
     }
 
-      cd.addSearch(
-          "AGE",
-          EptsReportUtils.map(
-              genericCohortQueries.getAgeOnFirstClinicalConsultation(15, null),
-              "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
-
+    cd.addSearch(
+        "AGE",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnFirstClinicalConsultation(15, null),
+            "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     String inclusionPeriodMappings =
         "revisionEndDate=${revisionEndDate},startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},location=${location}";
@@ -11647,34 +11646,53 @@ public class QualityImprovement2020CohortQueries {
     map.put("states", getMetadataFrom(states));
 
     String query =
-        "SELECT     p.patient_id "
-            + "FROM       patient p "
-            + "INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "INNER JOIN obs otype ON otype.encounter_id = e.encounter_id "
-            + "INNER JOIN obs ostate ON ostate.encounter_id = e.encounter_id "
-            + "INNER JOIN ( "
-            + "                      SELECT     p.patient_id, MAX(e.encounter_datetime) consultation_date "
-            + "                      FROM       patient p "
-            + "                      INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                      WHERE      e.encounter_type = ${6} "
-            + "                      AND        e.location_id = :location "
-            + "                      AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
-            + "                      AND        p.voided = 0 "
-            + "                      AND        e.voided = 0 "
-            + "                      GROUP BY   p.patient_id ) consultation ON consultation.patient_id = p.patient_id "
-            + "WHERE      e.encounter_type = ${6} "
-            + "AND        e.location_id = :location "
-            + "AND        otype.concept_id = ${165174} "
-            + "AND        otype.value_coded IN (${dispensationTypes}) "
-            + "AND        ostate.concept_id = ${165322} "
-            + "AND        ostate.value_coded IN (${states}) "
-            + "AND        e.encounter_datetime < consultation.consultation_date "
-            + "AND        otype.obs_group_id = ostate.obs_group_id "
-            + "AND        e.voided = 0 "
-            + "AND        p.voided = 0 "
-            + "AND        otype.voided = 0 "
-            + "AND        ostate.voided = 0 "
-            + "GROUP BY   p.patient_id ";
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs otype "
+            + "               ON otype.encounter_id = e.encounter_id "
+            + "       INNER JOIN obs ostate "
+            + "               ON ostate.encounter_id = e.encounter_id "
+            + "       INNER JOIN (SELECT p.patient_id, "
+            + "                          Max(e.encounter_datetime) AS "
+            + "                          second_last_encounter_date "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                          INNER JOIN (SELECT p.patient_id, "
+            + "                                             Max(e.encounter_datetime) "
+            + "                                             consultation_date "
+            + "                                      FROM   patient p "
+            + "                                             INNER JOIN encounter e "
+            + "                                                     ON e.patient_id = "
+            + "                                                        p.patient_id "
+            + "                                      WHERE  e.encounter_type = ${6} "
+            + "                                             AND e.location_id = :location "
+            + "                                             AND e.encounter_datetime BETWEEN "
+            + "                                                 :startDate AND :endDate "
+            + "                                             AND p.voided = 0 "
+            + "                                             AND e.voided = 0 "
+            + "                                      GROUP  BY p.patient_id) consultation "
+            + "                                  ON consultation.patient_id = p.patient_id "
+            + "                   WHERE  e.encounter_type = 6 "
+            + "                          AND e.location_id = :location "
+            + "                          AND e.encounter_datetime < "
+            + "                              consultation.consultation_date "
+            + "                   GROUP  BY p.patient_id) second_last_consultation "
+            + "               ON second_last_consultation.patient_id = p.patient_id "
+            + "WHERE  e.encounter_type = ${6} "
+            + "       AND e.encounter_datetime = "
+            + "           second_last_consultation.second_last_encounter_date "
+            + "       AND otype.concept_id = ${165174} "
+            + "       AND otype.value_coded IN (${dispensationTypes}) "
+            + "       AND ostate.concept_id = ${165322} "
+            + "       AND ostate.value_coded IN (${states}) "
+            + "       AND otype.obs_group_id = ostate.obs_group_id "
+            + "       AND e.voided = 0 "
+            + "       AND p.voided = 0 "
+            + "       AND otype.voided = 0 "
+            + "       AND ostate.voided = 0";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
