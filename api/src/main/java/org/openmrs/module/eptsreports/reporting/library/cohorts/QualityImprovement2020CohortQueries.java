@@ -2990,7 +2990,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transfOut = getTranferredOutPatients();
+    CohortDefinition transfOut = getTranferredOutPatientsCat7();
 
     CohortDefinition abandonedTarv = getPatientsWhoAbandonedOrRestartedTarvOnLast6MonthsArt();
     CohortDefinition abandonedFirstLine = getPatientsWhoAbandonedTarvOnOnFirstLineDate();
@@ -3063,11 +3063,7 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
 
-    compositionCohortDefinition.addSearch(
-        "F",
-        EptsReportUtils.map(
-            transfOut,
-            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING11));
 
     compositionCohortDefinition.addSearch(
         "ABANDONEDTARV", EptsReportUtils.map(abandonedTarv, MAPPING1));
@@ -5996,11 +5992,7 @@ public class QualityImprovement2020CohortQueries {
         "ABANDONED2LINE",
         EptsReportUtils.map(getPatientsWhoAbandonedTarvOnOnSecondLineDate(), MAPPING1));
 
-    cd.addSearch(
-        "F",
-        EptsReportUtils.map(
-            commonCohortQueries.getTranferredOutPatients(),
-            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    cd.addSearch("F", EptsReportUtils.map(getTranferredOutPatientsCat7(), MAPPING11));
 
     cd.addSearch("G", EptsReportUtils.map(getMQC13P3NUM_G(), MAPPING));
     cd.addSearch("H", EptsReportUtils.map(getMQC13P3NUM_H(), MAPPING));
