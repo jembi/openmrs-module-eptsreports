@@ -3079,7 +3079,7 @@ public class QualityImprovement2020CohortQueries {
         "ABANDONED2LINE", EptsReportUtils.map(abandonedSecondLine, MAPPING1));
 
     compositionCohortDefinition.addSearch(
-        "tbDiagnosisActive", EptsReportUtils.map(tbDiagnosisActive, MAPPING3));
+        "tbDiagnosisActive", EptsReportUtils.map(tbDiagnosisActive, MAPPING));
 
     if (indicator == 2 || indicator == 9 || indicator == 10 || indicator == 11)
       compositionCohortDefinition.setCompositionString(
@@ -6010,7 +6010,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("L", EptsReportUtils.map(getMQC13P3NUM_L(), MAPPING));
     cd.addSearch("DD", EptsReportUtils.map(getDeadPatientsCompositionMQ13(), MAPPING3));
     cd.addSearch(
-        "tbDiagnosisActive", EptsReportUtils.map(getPatientsWithTbActiveOrTbTreatment(), MAPPING3));
+        "tbDiagnosisActive", EptsReportUtils.map(getPatientsWithTbActiveOrTbTreatment(), MAPPING));
 
     if (indicator == 2 || indicator == 9 || indicator == 10 || indicator == 11)
       cd.setCompositionString(
