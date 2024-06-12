@@ -100,7 +100,8 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
     patientDataSetDefinition.addColumn(
         "art_start",
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getArtStartDate(),
-        MAPPING2);
+        MAPPING2,
+        new DashDateFormatConverter());
 
     //  6  - Transferido de Outra US- Sheet 1: Column F
     patientDataSetDefinition.addColumn(
@@ -122,7 +123,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         "last_consultation",
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getLastClinicalConsultationDate(),
         MAPPING2,
-        new NotApplicableIfNullConverter());
+        new DashDateFormatConverter());
 
     // 9 - Data da Próxima Consulta Clínica Agendada – Sheet 1: Column I
     patientDataSetDefinition.addColumn(
@@ -130,85 +131,92 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries
             .getNextConsultationDateOnLastClinicalConsultationDate(),
         MAPPING2,
-        new NotApplicableIfNullConverter());
+        new DashDateFormatConverter());
 
-    // 10 - Data do último Pedido de CD4 – Sheet 1: Column K
+    // 10 - Motivo para Elegibilidade de CD4- Sheet 1: Column J
+    patientDataSetDefinition.addColumn(
+        "eligibility_reason",
+        listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getReasonForCd4Eligibility(),
+        MAPPING);
+
+    // 11 - Data do último Pedido de CD4 – Sheet 1: Column K
     patientDataSetDefinition.addColumn(
         "cd4_request_date",
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getLastCd4ResquestDate(),
-        MAPPING2);
+        MAPPING2,
+        new DashDateFormatConverter());
 
-    // 11 - Data do Último CD4 – Sheet 1: Column L
+    // 12 - Data do Último CD4 – Sheet 1: Column L
     patientDataSetDefinition.addColumn(
         "last_cd4_resultdate",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultDate(),
         MAPPING2,
         new DashDateFormatConverter());
 
-    // 12 - Resultado do Último CD4 – Sheet 1: Column M
+    // 13 - Resultado do Último CD4 – Sheet 1: Column M
     patientDataSetDefinition.addColumn(
         "last_cd4_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4Result(),
         MAPPING2,
         new NotApplicableIfNullConverter());
 
-    // 13 - Data do Penúltimo CD4 – Sheet 1: Column N
+    // 14 - Data do Penúltimo CD4 – Sheet 1: Column N
     patientDataSetDefinition.addColumn(
         "second_cd4_resultdate",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultDateBeforeMostRecentCd4(),
         MAPPING2,
         new DashDateFormatConverter());
 
-    // 14 - Resultado do Penúltimo CD4 – Sheet 1: Column O
+    // 15 - Resultado do Penúltimo CD4 – Sheet 1: Column O
     patientDataSetDefinition.addColumn(
         "second_cd4_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultBeforeMostRecentCd4(),
         MAPPING2,
         new NotApplicableIfNullConverter());
 
-    //     15 - Data de Registo de Estadio – Sheet 1: Column P
+    //     16 - Data de Registo de Estadio – Sheet 1: Column P
     patientDataSetDefinition.addColumn(
         "last_estadio_date",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getDateOfEstadioByTheEndOfPeriod(),
         MAPPING2,
         new DashDateFormatConverter());
 
-    // 16 - Infecções Estadio OMS – Sheet 1: Column Q
+    // 17 - Infecções Estadio OMS – Sheet 1: Column Q
     patientDataSetDefinition.addColumn(
         "last_estadio_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getResultOfEstadioByTheEndOfPeriod(),
         MAPPING2,
         new NotApplicableIfNullConverter());
 
-    // 17 - Motivo de Mudança de Estadiamento Clínico - 1 – Sheet 1: Column R
+    // 18 - Motivo de Mudança de Estadiamento Clínico - 1 – Sheet 1: Column R
     patientDataSetDefinition.addColumn(
         "reason_change_estadio",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getReasonToChangeEstadio1(),
         MAPPING2,
         new ObservationToConceptNameConverter());
 
-    // 18 - Motivo de Mudança de Estadiamento Clínico - 2 – Sheet 1: Column S
+    // 19 - Motivo de Mudança de Estadiamento Clínico - 2 – Sheet 1: Column S
     patientDataSetDefinition.addColumn(
         "reason_change_estadio2",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getReasonToChangeEstadio2(),
         MAPPING2,
         new ObservationToConceptNameConverter());
 
-    // 19 - Resultado da Última Carga Viral – Sheet 1: Column T
+    // 20 - Resultado da Última Carga Viral – Sheet 1: Column T
     patientDataSetDefinition.addColumn(
         "vl_result_date",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getMostRecentVLResultDate(),
         MAPPING2,
         new DashDateFormatConverter());
 
-    // 20 -Data da Último Carga Viral – Sheet 1: Column U
+    // 21 -Data da Último Carga Viral – Sheet 1: Column U
     patientDataSetDefinition.addColumn(
         "vl_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getMostRecentVLResult(),
         MAPPING2,
         new ViralLoadQualitativeLabelConverter());
 
-    // 21 - Resultado da Penúltima Carga Viral – Sheet 1: Column V
+    // 22 - Resultado da Penúltima Carga Viral – Sheet 1: Column V
     patientDataSetDefinition.addColumn(
         "second_vl_resultdate",
         listOfPatientsInAdvancedHivIllnessCohortQueries
@@ -216,7 +224,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         MAPPING2,
         new DashDateFormatConverter());
 
-    // 22 - Data da Penúltima Carga Viral – Sheet 1: Column W
+    // 23 - Data da Penúltima Carga Viral – Sheet 1: Column W
     patientDataSetDefinition.addColumn(
         "second_vl_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries
@@ -236,7 +244,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
 
     CohortIndicator totalOfEligibleForCd4Request =
         eptsGeneralIndicator.getIndicator(
-            "ELEGIBLE_CD4",
+            "ELIGIBLE_CD4",
             EptsReportUtils.map(
                 listOfPatientsEligibleForCd4RequestCohortQueries
                     .getPatientsEligibleForCd4RequestComposition(),
@@ -291,7 +299,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
                 MAPPING));
 
     dataSetDefinition.addColumn(
-        "ELEGIBLE_CD4",
+        "ELIGIBLE_CD4",
         "Total de utentes elegíveis ao pedido de CD4",
         EptsReportUtils.map(totalOfEligibleForCd4Request, MAPPING),
         "");

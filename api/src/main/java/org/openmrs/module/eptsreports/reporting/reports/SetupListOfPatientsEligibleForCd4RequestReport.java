@@ -47,7 +47,7 @@ public class SetupListOfPatientsEligibleForCd4RequestReport extends EptsDataExpo
 
   @Override
   public String getDescription() {
-    return "Este relatório gera o número agregado e a lista de utentes elegíveis ao pedido de CD4 durante o\n"
+    return "Este relatório gera o número agregado e a lista de utentes elegíveis ao pedido de CD4 durante o "
         + "período de reporte.";
   }
 
@@ -97,7 +97,7 @@ public class SetupListOfPatientsEligibleForCd4RequestReport extends EptsDataExpo
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Template_Lista_de_Utentes_Elegiveis_Pedido_CD4_v1.4.xls",
+              "Template_Utentes_Elegiveis_Pedido_CD4.xls",
               "Lista de Utentes Elegíveis ao Pedido de CD4",
               getExcelDesignUuid(),
               null);
