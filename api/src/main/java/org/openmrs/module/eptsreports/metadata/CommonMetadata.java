@@ -14,6 +14,7 @@
 package org.openmrs.module.eptsreports.metadata;
 
 import org.openmrs.Concept;
+import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
 import org.springframework.stereotype.Component;
 
@@ -721,6 +722,97 @@ public class CommonMetadata extends Metadata {
   public Concept getOnePlusConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.onePlusConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>person_attribute_type_id = 50</b>
+   *
+   * <p><b>Name:</b> Data de Inscrição no OVC
+   *
+   * <p><b>Description: </b>
+   *
+   * @return {@link PersonAttributeType}
+   */
+  public PersonAttributeType getOVCDataInscricaoPersonAttributeType() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.dataInscricaoOVCUuid");
+    return getPersonAttributeType(uuid);
+  }
+
+  /**
+   * <b>person_attribute_type_id = 51</b>
+   *
+   * <p><b>Name:</b> Data de Saída do OVC
+   *
+   * <p><b>Description: </b>
+   *
+   * @return {@link PersonAttributeType}
+   */
+  public PersonAttributeType getOVCDataSaidaPersonAttributeType() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.dataSaidaOVCUuid");
+    return getPersonAttributeType(uuid);
+  }
+
+  /**
+   * <b>person_attribute_type_id = 51</b>
+   *
+   * <p><b>Name:</b> Data de Saída do OVC
+   *
+   * <p><b>Description: </b>
+   *
+   * @return {@link PersonAttributeType}
+   */
+  public PersonAttributeType getOVCEstadoBeneficiarioPersonAttributeType() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.estadoDoBeneficiarioOVCUuid");
+    return getPersonAttributeType(uuid);
+  }
+
+  /**
+   * <b>person_attribute_type_id = 165475</b>
+   *
+   * <p><b>Name:</b> ACTIVO
+   *
+   * <p><b>Description: Beneficiário do OVC com estado ACTIVO</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getOVCActivoConcept() {
+    String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.activoOVCUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>person_attribute_type_id = 165472</b>
+   *
+   * <p><b>Name:</b> ACTIVO
+   *
+   * <p><b>Description: Beneficiário do OVC com estado GRADUADO</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getOVCGraduadoConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.graduadoOVCUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>person_attribute_type_id = 165473</b>
+   *
+   * <p><b>Name:</b> ACTIVO
+   *
+   * <p><b>Description: Beneficiário do OVC saida sem graduação</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getOVCSaidaSemGraduacaoConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.saidaSemGraduacaoOVCUuid");
     return getConcept(uuid);
   }
 }

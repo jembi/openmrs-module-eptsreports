@@ -52,14 +52,14 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     composition.setName("Currently on ART without TB Screening");
 
     CohortDefinition txCurr = txCurrCohortQueries.getTxCurrBaseCohort();
-    CohortDefinition txTbScreened  = txtbCohortQueries.getDenominatorScreenedOnly();
+    CohortDefinition txTbScreened = txtbCohortQueries.getDenominatorScreenedOnly();
 
     composition.addSearch(
         "tx-curr", EptsReportUtils.map(txCurr, "endDate=${endDate},location=${location}"));
     composition.addSearch(
         "txtb-screened",
         EptsReportUtils.map(
-          txTbScreened, "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+            txTbScreened, "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
 
     composition.setCompositionString("tx-curr AND NOT txtb-screened");
 
@@ -414,6 +414,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
     valuesMap.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
     valuesMap.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
+    valuesMap.put("165322", hivMetadata.getMdcState().getConceptId());
 
     String query =
         "SELECT p.patient_id, Max(e.encounter_datetime) consultation_date "
