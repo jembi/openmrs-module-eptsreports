@@ -215,6 +215,8 @@ public class QualityImprovement2020CohortQueries {
 
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
+    System.out.println(stringSubstitutor.replace(query));
+
     return sqlCohortDefinition;
   }
 
@@ -8552,12 +8554,11 @@ public class QualityImprovement2020CohortQueries {
         break;
     }
 
-      cd.addSearch(
-          "AGE",
-          EptsReportUtils.map(
-              genericCohortQueries.getAgeOnFirstClinicalConsultation(15, null),
-              "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
-
+    cd.addSearch(
+        "AGE",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnFirstClinicalConsultation(15, null),
+            "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     String inclusionPeriodMappings =
         "revisionEndDate=${revisionEndDate},startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},location=${location}";
@@ -14797,7 +14798,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch(
         "ARTSTART",
         EptsReportUtils.map(
-            startedART, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            startedART, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "PREGNANT",
