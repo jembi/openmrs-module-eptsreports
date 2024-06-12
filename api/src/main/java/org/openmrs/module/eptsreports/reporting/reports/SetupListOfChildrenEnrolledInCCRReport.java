@@ -26,7 +26,7 @@ public class SetupListOfChildrenEnrolledInCCRReport extends EptsDataExportManage
 
   @Override
   public String getName() {
-    return "Lista de Crianças Inscritas em CCR (CCR1)";
+    return "CCR1: Lista de Crianças Inscritas em CCR";
   }
 
   @Override
@@ -69,7 +69,7 @@ public class SetupListOfChildrenEnrolledInCCRReport extends EptsDataExportManage
           createXlsReportDesign(
               reportDefinition,
               "Template_List_CCR_Patients_v1.0.xls",
-              "Lista de Crianças Inscritas em CCR (CCR1)",
+              "CCR1: Lista de Crianças Inscritas em CCR",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
