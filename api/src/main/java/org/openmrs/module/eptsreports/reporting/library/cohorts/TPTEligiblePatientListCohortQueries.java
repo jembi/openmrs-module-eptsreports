@@ -2181,6 +2181,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                   WHERE  o.encounter_id = ee.encounter_id AND o.voided = 0 "
             + "                                          AND o.concept_id = ${23985} "
             + "                                          AND o.value_coded IN ( ${23954}, ${23984} ) "
+            + "                                          AND o.obs_datetime <= :endDate"
             + "                                          AND o.obs_datetime BETWEEN "
             + "                                            tabela.encounter_datetime AND "
             + "                                Date_add(tabela.encounter_datetime, "
