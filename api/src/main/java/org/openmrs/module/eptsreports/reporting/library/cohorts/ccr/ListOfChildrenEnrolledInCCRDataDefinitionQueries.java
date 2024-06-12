@@ -37,8 +37,8 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
   public CohortDefinition getListOfChildrenEnrolledInCCR() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("List of Children enrolled in CCR");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -67,7 +67,7 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
   public DataDefinition getPatientAgeInYearsOrMonths(Boolean ageOrRemainingMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Idade do Utente no fim do Período de Reporte");
-    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
 
     String query =
         " SELECT pr.person_id, "
@@ -87,6 +87,32 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
             + "               ON ages.patient_id = pr.person_id "
             + "                  AND pr.voided = 0";
 
+    sqlPatientDataDefinition.setQuery(query);
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>CCR Enrollment Date (Data Inscrição na CCR)</b>
+   * <li>All children who have a CCR NID registered and are enrolled in CCR in Program Enrollment
+   *     with admission date (Data de admissão) during the reporting period
+   * <li>All children who have a CCR: Ficha Resumo with Data de abertura do processo during the
+   *     reporting period.
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getCCREnrollmentDate() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("CCR Enrollment Date (Data Inscrição na CCR)");
+    sqlPatientDataDefinition.addParameter(
+        new Parameter("startDate", "Start Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
+    map.put("6", hivMetadata.getCCRProgram().getProgramId());
+
+    String query = new EptsQueriesUtil().min(getChildrenEnrolledInCCRQuery()).getQuery();
     sqlPatientDataDefinition.setQuery(query);
     return sqlPatientDataDefinition;
   }

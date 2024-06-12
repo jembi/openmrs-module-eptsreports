@@ -3,6 +3,7 @@ package org.openmrs.module.eptsreports.reporting.library.datasets.list;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.eptsreports.reporting.data.converter.DashDateFormatConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
@@ -68,9 +69,10 @@ public class ListOfChildrenEnrolledInCCRDataset extends BaseDataSet {
     DataDefinition nameDefinition =
         new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), nameFormatter);
 
+    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
     patientDataSetDefinition.addRowFilter(
         listOfChildrenEnrolledInCCRDataDefinitionQueries.getListOfChildrenEnrolledInCCR(),
-        "startDate=${startDate},endDate=${endDate},location=${location}");
+        mappings);
 
     patientDataSetDefinition.addColumn("id", new PersonIdDataDefinition(), "");
 
@@ -120,6 +122,13 @@ public class ListOfChildrenEnrolledInCCRDataset extends BaseDataSet {
 
     //    Contacto – Sheet 1: Column I
     patientDataSetDefinition.addColumn("contact", conctactDef, "");
+
+    // CCR Enrollment Date (Data Inscrição na CCR) – Sheet 1: Column J
+    patientDataSetDefinition.addColumn(
+        "ccr_enrollment_date",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getCCREnrollmentDate(),
+        mappings,
+        new DashDateFormatConverter());
 
     return patientDataSetDefinition;
   }
