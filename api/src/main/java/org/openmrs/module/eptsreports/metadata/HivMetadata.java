@@ -2571,6 +2571,21 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
+   * <b>program_id = 6</b>
+   *
+   * <p><b>Name:</b> CCR
+   *
+   * <p><b>Description:</b> Programa de consultas para criancas em risco (CCR)
+   *
+   * @return {@link Program}
+   */
+  public Program getCCRProgram() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.ccrProgramUuid");
+    return getProgram(uuid);
+  }
+
+  /**
    * <b>program_id = 8</b>
    *
    * <p><b>Name:</b> PTV/ETV
@@ -5897,5 +5912,21 @@ public class HivMetadata extends ProgramsMetadata {
         Context.getAdministrationService()
             .getGlobalProperty("eptsreports.termoablationConceptUuid");
     return getConcept(uuid);
+  }
+
+  /**
+   * <b>encounterType_id = 92</b>
+   *
+   * <p><b>Name:</b> CCR - Resumo
+   *
+   * <p><b>Description:</b> Consulta Inicial de criança em Risco
+   *
+   * @return {@link EncounterType}
+   */
+  public EncounterType getCCRResumoEncounterType() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.ccrResumoEncounterTypeUuid");
+    return getEncounterType(uuid);
   }
 }

@@ -3995,4 +3995,20 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.ccrProgramUuid</property>
+		<defaultValue>611f0a6b-68b7-4de7-bc7a-fd021330eef8</defaultValue>
+		<description>
+			UUID for CCR Program
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.ccrResumoEncounterTypeUuid</property>
+		<defaultValue>b479d374-b186-4741-bf20-1471da6a50fc</defaultValue>
+		<description>
+			UUID for CCR Resumo EncounterType
+		</description>
+	</globalProperty>
+
 </module>
