@@ -2990,7 +2990,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transfOut = getTranferredOutPatients();
+    CohortDefinition transfOut = getTranferredOutPatientsCat7();
 
     CohortDefinition abandonedTarv = getPatientsWhoAbandonedOrRestartedTarvOnLast6MonthsArt();
     CohortDefinition abandonedFirstLine = getPatientsWhoAbandonedTarvOnOnFirstLineDate();
@@ -3063,11 +3063,7 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
 
-    compositionCohortDefinition.addSearch(
-        "F",
-        EptsReportUtils.map(
-            transfOut,
-            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING11));
 
     compositionCohortDefinition.addSearch(
         "ABANDONEDTARV", EptsReportUtils.map(abandonedTarv, MAPPING1));
@@ -4936,18 +4932,13 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * <b>MQC13Part3B2</b>: Melhoria de Qualidade Category 13 Deniminator B2 <br>
-   * <i> BI2 and not B2E</i> <br>
+   * <b>RF58 - Categoria 13 TB/HIV Indicador 13.14 Pediátrico Denominador – Resultado de CV</b>:
    *
    * <ul>
-   *   <li>BI2- Select all patients who have the LAST “LINHA TERAPEUTICA” (Concept Id 21151)
-   *       recorded in Ficha Clinica (encounter type 6, encounter_datetime) with value coded
-   *       “SEGUNDA LINHA” (concept id 21148) during the inclusion period (startDateInclusion and
-   *       endDateInclusion) AND
-   *   <li>B1E - Exclude all patients with clinical consultation (encounter type 6) with concept
-   *       “PEDIDO DE INVESTIGACOES LABORATORIAIS” (Concept Id 23722) and value coded “HIV CARGA
-   *       VIRAL” (Concept Id 856) on Encounter_datetime startDateInclusion-3months and
-   *       startDateInclusion.
+   *   <li>que têm o último registo de “Regime ARV Segunda Linha” na Ficha Resumo durante o período
+   *       de inclusão (“Data Última 2ª Linha” >= “Data Início Inclusão” e <= “Data Fim Inclusão”)
+   *       excepto os utentes que têm como “Justificação de Mudança do Tratamento” (associada a
+   *       “Data Última 2ª Linha”) igual a “Gravidez”
    * </ul>
    *
    * @return CohortDefinition
@@ -4969,33 +4960,45 @@ public class QualityImprovement2020CohortQueries {
 
     String query =
         "SELECT p.patient_id "
-            + "  FROM patient p "
-            + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "       INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
-            + "  WHERE e.voided = 0 AND p.voided = 0 "
-            + "    AND o.voided = 0 "
-            + "    AND o2.voided = 0 "
-            + "    AND e.encounter_type = ${53} "
-            + "    AND e.location_id = :location "
-            + "    AND (o.concept_id = ${21187} AND o.value_coded IS NOT NULL) "
-            + "               AND ( "
-            + "                      (o2.concept_id = ${1792} AND o2.value_coded <> ${1982})"
-            + "                       OR "
-            + "                      (o2.concept_id = ${1792} AND o2.value_coded IS NULL) "
-            + "                       OR "
-            + "                      ( "
-            + "                       NOT EXISTS ( "
-            + "                               SELECT * FROM obs oo "
-            + "                               WHERE oo.voided = 0 "
-            + "                               AND oo.encounter_id = e.encounter_id "
-            + "                               AND oo.concept_id = 1792 "
-            + "                           ) "
-            + "                     ) "
-            + "                    ) "
-            + "    AND o.obs_datetime >= :startDate "
-            + "    AND o.obs_datetime <= :endDate "
-            + "  GROUP BY p.patient_id";
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN (SELECT p.patient_id, "
+            + "                          Max(o.obs_datetime) AS max_2nd_line_date "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                  ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  e.voided = 0 "
+            + "                          AND p.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.encounter_type = ${53} "
+            + "                          AND e.location_id = :location "
+            + "                          AND ( o.concept_id = ${21187} "
+            + "                                AND o.value_coded IS NOT NULL ) "
+            + "                          AND o.obs_datetime >= :startDate "
+            + "                          AND o.obs_datetime <= :endDate "
+            + "                   GROUP  BY p.patient_id) last_2nd_line "
+            + "               ON last_2nd_line.patient_id = p.patient_id "
+            + "WHERE  p.patient_id NOT IN (SELECT p.patient_id "
+            + "                            FROM   patient p "
+            + "                                   INNER JOIN encounter e "
+            + "                                           ON e.patient_id = p.patient_id "
+            + "                                   INNER JOIN obs o1 "
+            + "                                           ON o1.encounter_id = e.encounter_id "
+            + "                            WHERE  p.voided = 0 "
+            + "                                   AND e.voided = 0 "
+            + "                                   AND o1.voided = 0 "
+            + "                                   AND e.encounter_type = ${53} "
+            + "                                   AND e.location_id = :location "
+            + "                                   AND ( o1.concept_id = ${1792} "
+            + "                                         AND o1.value_coded = ${1982} ) "
+            + "                                   AND o1.obs_datetime = "
+            + "                                       last_2nd_line.max_2nd_line_date "
+            + "                            GROUP  BY p.patient_id)";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -5811,7 +5814,7 @@ public class QualityImprovement2020CohortQueries {
         "SegundaLinha", EptsReportUtils.map(SegundaLinha, MAPPING1));
 
     compositionCohortDefinition.addSearch(
-        "tbDiagnosisActive", EptsReportUtils.map(tbDiagnosisActive, MAPPING));
+        "tbDiagnosisActive", EptsReportUtils.map(tbDiagnosisActive, MAPPING3));
 
     if (den) {
       if (line == 1) {
@@ -5830,7 +5833,7 @@ public class QualityImprovement2020CohortQueries {
     } else {
       if (line == 1) {
         compositionCohortDefinition.setCompositionString(
-            "(((B1 AND age) OR D) AND PrimeiraLinha) AND NOT (C OR tbDiagnosisActive) AND G");
+            "((((B1 AND age) OR D) AND PrimeiraLinha) AND NOT (C OR tbDiagnosisActive)) AND G");
       } else if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
             "(B1 AND PrimeiraLinha AND G AND age) AND NOT (C OR D OR tbDiagnosisActive) ");
@@ -5989,11 +5992,7 @@ public class QualityImprovement2020CohortQueries {
         "ABANDONED2LINE",
         EptsReportUtils.map(getPatientsWhoAbandonedTarvOnOnSecondLineDate(), MAPPING1));
 
-    cd.addSearch(
-        "F",
-        EptsReportUtils.map(
-            commonCohortQueries.getTranferredOutPatients(),
-            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    cd.addSearch("F", EptsReportUtils.map(getTranferredOutPatientsCat7(), MAPPING11));
 
     cd.addSearch("G", EptsReportUtils.map(getMQC13P3NUM_G(), MAPPING));
     cd.addSearch("H", EptsReportUtils.map(getMQC13P3NUM_H(), MAPPING));
@@ -14610,7 +14609,7 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch("SECONDLINE", EptsReportUtils.map(secondLine, MAPPING1));
 
-    cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING));
+    cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING3));
 
     cd.setCompositionString(
         "((CONSULTATION OR BREASTFEEDING) AND (FIRSTLINE OR SECONDLINE) AND TBACTIVE AND AGE) AND NOT PREGNANT ");
@@ -14731,7 +14730,7 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch("SECONDLINE", EptsReportUtils.map(secondLine, MAPPING1));
 
-    cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING));
+    cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING3));
 
     cd.setCompositionString(
         "(CONSULTATION AND (FIRSTLINE OR SECONDLINE) AND TBACTIVE AND AGE) AND NOT (PREGNANT OR BREASTFEEDING)");
@@ -14873,9 +14872,8 @@ public class QualityImprovement2020CohortQueries {
   /**
    * <b>% de crianças (0-14 anos) coinfectados TB/HIV com resultado de CV registado na FM</b>
    * <li>incluindo todos os utentes com idade >=0 e <=14 anos (seguindo o critério definido no RF13)
-   *     e que iniciaram 1ª ou 2ª Linha do TARV no período de inclusão (seguindo os requisitos
-   *     definidos no RF5) excluindo mulheres grávidas no início TARV (seguindo os critérios
-   *     definidos no RF8) e
+   *     e que iniciaram TARV no período de inclusão (seguindo os requisitos definidos no RF5)
+   *     excluindo mulheres grávidas no início TARV (seguindo os critérios definidos no RF8) e
    * <li>incluindo todos os utentes com idade >=0 e <= 14 anos (seguindo o critério definido no
    *     RF13) e que têm o último registo de “Regime ARV Segunda Linha” na Ficha Resumo durante o
    *     período de inclusão (“Data Última 2ª Linha” >= “Data Início Inclusão” e <= “Data Fim
@@ -14898,6 +14896,8 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition startedART = getMOHArtStartDate();
 
     CohortDefinition firstLine = getUtentesPrimeiraLinha(UtentesPrimeiraLinhaPreposition.MQ);
 
@@ -14922,13 +14922,20 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition abandonedOrRestartedTarv =
         getPatientsWhoAbandonedOrRestartedTarvOnLast6MonthsArt();
 
+    cd.addSearch(
+        "AGE",
+        EptsReportUtils.map(
+            commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(0, 14), MAPPING3));
+
+    cd.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
+
     cd.addSearch("FIRSTLINE", EptsReportUtils.map(firstLine, MAPPING1));
 
     cd.addSearch("SECONDLINE", EptsReportUtils.map(secondLine, MAPPING1));
 
     cd.addSearch("ARVREGIMEN", EptsReportUtils.map(arvRegimen, MAPPING));
 
-    cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING));
+    cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING3));
 
     cd.addSearch("TRANSFERREDIN", EptsReportUtils.map(transferredIn, MAPPING));
 
@@ -14942,7 +14949,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("ABANDONED", EptsReportUtils.map(abandonedOrRestartedTarv, MAPPING1));
 
     cd.setCompositionString(
-        "(FIRSTLINE OR SECONDLINE OR ARVREGIMEN) AND TBACTIVE AND NOT (TRANSFERREDIN OR TRANSFERREDOUT OR DEAD OR ABANDONED)");
+        "(AGE AND (A OR ARVREGIMEN)) AND TBACTIVE AND NOT (TRANSFERREDIN OR TRANSFERREDOUT OR DEAD OR ABANDONED)");
 
     return cd;
   }
