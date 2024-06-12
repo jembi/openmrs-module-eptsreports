@@ -9,6 +9,8 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
+import org.openmrs.module.reporting.data.DataDefinition;
+import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -48,6 +50,45 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
     return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Idade do Utente no fim do Período de Reporte</b>
+   * <li>For children with birth date information registered in the system, the age of the patient
+   *     should be calculated as the child’s age at the reporting end date in years and months
+   *
+   *     <p>Age (years)
+   *
+   *     <p>Age (months) Note: Age should be expressed as total years in columns D and the remaining
+   *     months in column E
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getPatientAgeInYearsOrMonths(Boolean ageOrRemainingMonths) {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Idade do Utente no fim do Período de Reporte");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+
+    String query =
+        " SELECT pr.person_id, "
+                .concat(
+                    ageOrRemainingMonths
+                        ? " ages.age AS age "
+                        : " ABS(TIMESTAMPDIFF(MONTH, DATE_ADD(pr.birthdate, INTERVAL ages.age YEAR), :endDate)) AS remaining_months ")
+            + "FROM   person pr "
+            + "       INNER JOIN (SELECT p.patient_id, "
+            + "                          FLOOR(DATEDIFF(:endDate, ps.birthdate) / 365) AS "
+            + "                          age "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN person ps "
+            + "                                  ON p.patient_id = ps.person_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND ps.voided = 0) ages "
+            + "               ON ages.patient_id = pr.person_id "
+            + "                  AND pr.voided = 0";
+
+    sqlPatientDataDefinition.setQuery(query);
+    return sqlPatientDataDefinition;
   }
 
   private String getChildrenEnrolledInCCRQuery() {
