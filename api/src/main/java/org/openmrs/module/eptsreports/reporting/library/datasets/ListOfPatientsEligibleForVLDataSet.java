@@ -3,8 +3,12 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.eptsreports.metadata.CommonMetadata;
+import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.data.converter.ConceptNameConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsEligibleForVLCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsEligibleForVLDataDefinitionQueries;
 import org.openmrs.module.reporting.data.DataDefinition;
@@ -29,17 +33,29 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
 
   private ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset;
 
+  private ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries;
+
+  private HivMetadata hivMetadata;
+
+  private CommonMetadata commonMetadata;
+
   @Autowired
   public ListOfPatientsEligibleForVLDataSet(
       ListOfPatientsEligibleForVLDataDefinitionQueries
           listOfpatientsEligibleForVLDataDefinitionQueries,
       ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset,
-      ListOfPatientsEligibleForVLCohortQueries listOfPatientsEligibleForVLCohortQueries) {
+      ListOfPatientsEligibleForVLCohortQueries listOfPatientsEligibleForVLCohortQueries,
+      ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries,
+      HivMetadata hivMetadata,
+      CommonMetadata commonMetadata) {
 
     this.listOfpatientsEligibleForVLDataDefinitionQueries =
         listOfpatientsEligibleForVLDataDefinitionQueries;
     this.listChildrenOnARTandFormulationsDataset = listChildrenOnARTandFormulationsDataset;
     this.listOfPatientsEligibleForVLCohortQueries = listOfPatientsEligibleForVLCohortQueries;
+    this.listOfPatientsDefaultersOrIITCohortQueries = listOfPatientsDefaultersOrIITCohortQueries;
+    this.hivMetadata = hivMetadata;
+    this.commonMetadata = commonMetadata;
   }
 
   public DataSetDefinition constructDataSet() {
@@ -103,6 +119,11 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
         null);
 
     pdd.addColumn(
+        "data_ultimo_pedido_vl", // TODO
+        listOfpatientsEligibleForVLDataDefinitionQueries.getPatientsAndMostRecentVLResultDate(),
+        "startDate=${startDate},location=${location}");
+        
+    pdd.addColumn(
         "last_vl_date",
         listOfpatientsEligibleForVLDataDefinitionQueries.getPatientsAndMostRecentVLResultDate(),
         "startDate=${startDate},location=${location}",
@@ -156,6 +177,95 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
             .getPatientsAndNumberOfAPSSAndPPAfterHadVLGreaterThan1000(),
         "startDate=${startDate},location=${location}",
         null);
+
+    // ??? - Sheet 1: Column T */
+
+    // HSH - Sheet 1: Column U */
+    pdd.addColumn(
+        "keypop_hsh",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
+            hivMetadata.getHomosexualConcept()),
+        "endDate=${endDate}");
+
+    // PID - Sheet 1: Column V */
+    pdd.addColumn(
+        "keypop_pid",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
+            hivMetadata.getDrugUseConcept()),
+        "endDate=${endDate}");
+
+    // REC - Sheet 1: Column W */
+    pdd.addColumn(
+        "keypop_rec",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
+            hivMetadata.getImprisonmentConcept()),
+        "endDate=${endDate}");
+
+    // MTS - Sheet 1: Column X */
+    pdd.addColumn(
+        "keypop_mts",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
+            hivMetadata.getSexWorkerConcept()),
+        "endDate=${endDate}");
+
+    // TG - Sheet 1: Column Y */
+    pdd.addColumn(
+        "keypop_tg",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
+            hivMetadata.getTransGenderConcept()),
+        "endDate=${endDate}");
+
+    // Data de Inscrição no OVC - Sheet 1: Column Z */
+    pdd.addColumn(
+        "ovc_data_inscricao",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastOVCDate(
+            commonMetadata.getOVCDataInscricaoPersonAttributeType(), false),
+        "endDate=${endDate}",
+        new NotApplicableIfNullConverter());
+
+    // Data de Saída no OVC - Sheet 1: Column AA */
+    pdd.addColumn(
+        "ovc_data_saida",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastOVCDate(
+            commonMetadata.getOVCDataSaidaPersonAttributeType(), false),
+        "endDate=${endDate}",
+        new NotApplicableIfNullConverter());
+
+    // Estado do Beneficiário - Sheet 1: Column AB */
+    pdd.addColumn(
+        "ovc_estado_beneficiario",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastOVCDate(
+            commonMetadata.getOVCEstadoBeneficiarioPersonAttributeType(),
+            true),
+        "endDate=${endDate}",
+        new NotApplicableIfNullConverter());
+
+    // Saída de TARV - Sheet 1: Column AC */
+    pdd.addColumn(
+        "saida_tarv",// TODO
+        listOfPatientsDefaultersOrIITCohortQueries.getLastOVCDate(
+            commonMetadata.getOVCEstadoBeneficiarioPersonAttributeType(),
+            true),
+        "endDate=${endDate}",
+        new NotApplicableIfNullConverter());
+
+    // Saída de TARV - Sheet 1: Column AC */
+    pdd.addColumn(
+        "saida_tarv_date",// TODO
+        listOfPatientsDefaultersOrIITCohortQueries.getLastOVCDate(
+            commonMetadata.getOVCEstadoBeneficiarioPersonAttributeType(),
+            true),
+        "endDate=${endDate}",
+        new NotApplicableIfNullConverter());
+
+    // Saída de TARV - Sheet 1: Column AC */
+    pdd.addColumn(
+        "ovc_estado_beneficiario",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastOVCDate(
+            commonMetadata.getOVCEstadoBeneficiarioPersonAttributeType(),
+            true),
+        "endDate=${endDate}",
+        new NotApplicableIfNullConverter());
 
     pdd.addColumn("pid", new PersonIdDataDefinition(), "");
 
