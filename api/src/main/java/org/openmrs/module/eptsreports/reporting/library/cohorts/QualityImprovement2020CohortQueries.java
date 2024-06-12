@@ -215,8 +215,6 @@ public class QualityImprovement2020CohortQueries {
 
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
-    System.out.println(stringSubstitutor.replace(query));
-
     return sqlCohortDefinition;
   }
 
