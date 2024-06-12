@@ -5,15 +5,26 @@ import java.util.*;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
+import org.openmrs.module.eptsreports.reporting.library.datasets.list.ListOfChildrenEnrolledInCCRDataset;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Deprecated
 public class SetupListOfChildrenEnrolledInCCRReport extends EptsDataExportManager {
+
+  private final ListOfChildrenEnrolledInCCRDataset listOfChildrenEnrolledInCCRDataset;
+
+  @Autowired
+  public SetupListOfChildrenEnrolledInCCRReport(
+      ListOfChildrenEnrolledInCCRDataset listOfChildrenEnrolledInCCRDataset) {
+    this.listOfChildrenEnrolledInCCRDataset = listOfChildrenEnrolledInCCRDataset;
+  }
+
   @Override
   public String getExcelDesignUuid() {
     return "27af6b66-28a2-11ef-a438-57c285b9b2c7";
@@ -55,6 +66,17 @@ public class SetupListOfChildrenEnrolledInCCRReport extends EptsDataExportManage
         "DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
     reportDefinition.addDataSetDefinition(
         "SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
+
+    // Cohort datasets
+    reportDefinition.addDataSetDefinition(
+        "CCR",
+        Mapped.mapStraightThrough(
+            listOfChildrenEnrolledInCCRDataset.listOfChildrenEnrolledInCCRColumnsDataset()));
+
+    reportDefinition.addDataSetDefinition(
+        "TOTAL",
+        Mapped.mapStraightThrough(
+            listOfChildrenEnrolledInCCRDataset.listOfChildrenEnrolledInCCRTotalsDataset()));
 
     return reportDefinition;
   }
