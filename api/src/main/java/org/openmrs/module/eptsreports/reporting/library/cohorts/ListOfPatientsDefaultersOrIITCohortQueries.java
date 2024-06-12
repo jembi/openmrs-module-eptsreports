@@ -2387,9 +2387,10 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "   END AS S_or_N "
             + " FROM ( "
             + "   SELECT p.patient_id, value_coded "
+            + "   INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "   FROM patient p "
             + "     LEFT JOIN ( "
-            + "       SELECT p.person_id AS patient_id, Max(e.encounter_datetime) AS last_date, o.value_coded "
+            + "       SELECT p.person_id AS patient_id, Max(e.encounter_datetime) AS last_date, ${keypop} AS value_coded "
             + "   	  FROM   person p "
             + "   	  INNER JOIN encounter e  ON e.patient_id = p.person_id "
             + "   	  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -2415,6 +2416,9 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "         AND e.encounter_datetime <= CURRENT_DATE() "
             + "       GROUP  BY p.person_id "
             + "   ) AS has_kpop ON p.patient_id = has_kpop.patient_id"
+            + "   WHERE p.voided = 0 "
+            + "     AND e.location_id = :location "
+            + "   GROUP BY p.patient_id "
             + " ) S_or_N";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
