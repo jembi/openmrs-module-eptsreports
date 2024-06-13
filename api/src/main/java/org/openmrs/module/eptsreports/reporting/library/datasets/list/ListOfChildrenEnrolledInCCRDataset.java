@@ -3,8 +3,11 @@ package org.openmrs.module.eptsreports.reporting.library.datasets.list;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.eptsreports.metadata.CommonMetadata;
+import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.data.converter.DashDateFormatConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.SifNotNullAndNifNullConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ccr.ListOfChildrenEnrolledInCCRDataDefinitionQueries;
@@ -30,18 +33,26 @@ public class ListOfChildrenEnrolledInCCRDataset extends BaseDataSet {
   private final ListOfPatientsDefaultersOrIITCohortQueries
       listOfPatientsDefaultersOrIITCohortQueries;
 
+  private final CommonMetadata commonMetadata;
+
+  private final HivMetadata hivMetadata;
+
   @Autowired
   public ListOfChildrenEnrolledInCCRDataset(
       ListOfChildrenEnrolledInCCRDataDefinitionQueries
           listOfChildrenEnrolledInCCRDataDefinitionQueries,
       ListOfPatientsInAdvancedHivIllnessCohortQueries
           listOfPatientsInAdvancedHivIllnessCohortQueries,
-      ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries) {
+      ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries,
+      CommonMetadata commonMetadata,
+      HivMetadata hivMetadata) {
     this.listOfChildrenEnrolledInCCRDataDefinitionQueries =
         listOfChildrenEnrolledInCCRDataDefinitionQueries;
     this.listOfPatientsInAdvancedHivIllnessCohortQueries =
         listOfPatientsInAdvancedHivIllnessCohortQueries;
     this.listOfPatientsDefaultersOrIITCohortQueries = listOfPatientsDefaultersOrIITCohortQueries;
+    this.commonMetadata = commonMetadata;
+    this.hivMetadata = hivMetadata;
   }
 
   public DataSetDefinition listOfChildrenEnrolledInCCRColumnsDataset() {
@@ -129,6 +140,83 @@ public class ListOfChildrenEnrolledInCCRDataset extends BaseDataSet {
         listOfChildrenEnrolledInCCRDataDefinitionQueries.getCCREnrollmentDate(),
         mappings,
         new DashDateFormatConverter());
+
+    // Prematurity (Prematuridade) – Sheet 1: Column K
+    patientDataSetDefinition.addColumn(
+        "reason_k",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getReasonForVisitOnCCREnrollmentDate(
+            commonMetadata.getPrematuridadeConcept()),
+        mappings, new SifNotNullAndNifNullConverter());
+
+    // Birth weight under 2.5 kg (Peso ao nascer inferior a 2,5kg) – Sheet 1: Column L
+    patientDataSetDefinition.addColumn(
+        "reason_l",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getReasonForVisitOnCCREnrollmentDate(
+            commonMetadata.getPesoInferior2dot5KgConcept()),
+        mappings, new SifNotNullAndNifNullConverter());
+
+    // Failure to thrive (Crescimento insuficiente) – Sheet 1: Column M
+    patientDataSetDefinition.addColumn(
+        "reason_m",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getReasonForVisitOnCCREnrollmentDate(
+            commonMetadata.getFalenciaDeCrescimentoConcept()),
+        mappings, new SifNotNullAndNifNullConverter());
+
+    // Acute Malnutrition (Desnutrição aguda) – Sheet 1: Column N
+    patientDataSetDefinition.addColumn(
+        "reason_n",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getReasonForVisitOnCCREnrollmentDate(
+            hivMetadata.getChronicMalnutritionConcept()),
+        mappings, new SifNotNullAndNifNullConverter());
+
+    // HIV exposure (Exposição ao HIV) – Sheet 1: Column O
+    patientDataSetDefinition.addColumn(
+        "reason_o",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getReasonForVisitOnCCREnrollmentDate(
+            commonMetadata.getRecenNascidoMaeHivPositivoConcept()),
+        mappings, new SifNotNullAndNifNullConverter());
+
+    // Mother deceased or absent (Mãe falecida/ausente) – Sheet 1: Column P
+    patientDataSetDefinition.addColumn(
+        "reason_p",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getReasonForVisitOnCCREnrollmentDate(
+            commonMetadata.getCriancaMaeAusenteConcept()),
+        mappings, new SifNotNullAndNifNullConverter());
+
+    // Contact with Tuberculosis (Contacto com Tuberculose) – Sheet 1: Column Q
+    patientDataSetDefinition.addColumn(
+        "reason_q",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getReasonForVisitOnCCREnrollmentDate(
+            commonMetadata.getContactoTbConcept()),
+        mappings, new SifNotNullAndNifNullConverter());
+
+    // Twins (Gémeos) – Sheet 1: Column R
+    patientDataSetDefinition.addColumn(
+        "reason_r",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getReasonForVisitOnCCREnrollmentDate(
+            commonMetadata.getTwinsConcept()),
+        mappings, new SifNotNullAndNifNullConverter());
+
+    // Formula feeding or abrupt weaning (Leite artificial ou desmame brusco) – Sheet 1: Column S
+    patientDataSetDefinition.addColumn(
+        "reason_s",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getReasonForVisitOnCCREnrollmentDate(
+            commonMetadata.getDesmameBruscoAleitamentoArtificalConcept()),
+        mappings, new SifNotNullAndNifNullConverter());
+
+    // Recent migration of the family (Migração recente da família) – Sheet 1: Column T
+    patientDataSetDefinition.addColumn(
+        "reason_t",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getReasonForVisitOnCCREnrollmentDate(
+            commonMetadata.getMigracaoRecenteFamiliaConcept()),
+        mappings, new SifNotNullAndNifNullConverter());
+
+    // Other (Outro) – Sheet 1: Column U
+    patientDataSetDefinition.addColumn(
+        "reason_u",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getReasonForVisitOnCCREnrollmentDate(
+            hivMetadata.getOtherOrNonCodedConcept()),
+        mappings, new SifNotNullAndNifNullConverter());
 
     return patientDataSetDefinition;
   }

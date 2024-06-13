@@ -4011,4 +4011,86 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.motivoConsultaCriancaRiscoConceptUuid</property>
+		<defaultValue>e1dee58c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for MOTIVO DE CONSULTA CRIANCA EM RISCO Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.prematuridadeConceptUuid</property>
+		<defaultValue>e1dec53e-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for PREMATURIDADE/ RN BAIXO PESO Concept
+		</description>
+	</globalProperty>
+
+
+	<globalProperty>
+		<property>@MODULE_ID@.recenNascidoMaeHivPositivoConceptUuid</property>
+		<defaultValue>e1dc9ade-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for RECÉN NASCIDO DE MÃE HIV POSITIVO Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.desmameBruscoAleitamentoArtificalConceptUuid</property>
+		<defaultValue>e1dec66a-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for DESMAME BRUSCO E/OU ALEITAMENTO ARTIFICIAL EXCLUSIVO menor 1 ANO Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.contactoTbConceptUuid</property>
+		<defaultValue>e1dec872-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for CONTACTO TB Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.twinsConceptUuid</property>
+		<defaultValue>e1dec976-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for GÉMEOS Concept
+		</description>
+	</globalProperty>
+
+
+	<globalProperty>
+		<property>@MODULE_ID@.falenciaDeCrescimentoConceptUuid</property>
+		<defaultValue>e1e2b900-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for FALÊNCIA DE CRESCIMENTO Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.pesoInferior2dot5KgConceptUuid</property>
+		<defaultValue>8bc36c10-abfb-437a-b046-6a7aab694233</defaultValue>
+		<description>
+			UUID for PESO AO NASCER INFERIOR A 2.5 KG Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.migracaoRecenteFamiliaConceptUuid</property>
+		<defaultValue>04079f35-0c37-45c8-895e-2c38674b25e8</defaultValue>
+		<description>
+			UUID for MIGRAÇÃO RECENTE DA FAMILIA Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.criancaMaeAusenteConceptUuid</property>
+		<defaultValue>e1deca70-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for CRIANÇA COM MÃE AUSENTE Concept
+		</description>
+	</globalProperty>
+
 </module>
