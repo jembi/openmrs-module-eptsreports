@@ -39,7 +39,6 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
       "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}";
   String MAPPING3 =
       "startDate=${startDate},endDate=${generationDate},generationDate=${generationDate},location=${location}";
-  String MAPPING4 = "startDate=${startDate},generationDate=${generationDate},location=${location}";
   String MAPPING5 = "endDate=${endDate},generationDate=${generationDate},location=${location}";
 
   @Autowired
@@ -258,8 +257,10 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     CohortDefinition secondVlResult = getPatientsWithSecondVlResultGreaterThan1000Copies();
     CohortDefinition lastCd4ResultAfterLastVl = getPatientsWithCd4ResultsOnLastVlDate();
 
-    compositionCohortDefinition.addSearch("LASTVL", Mapped.mapStraightThrough(lastVlResult));
-    compositionCohortDefinition.addSearch("SECONDVL", Mapped.mapStraightThrough(secondVlResult));
+    compositionCohortDefinition.addSearch(
+        "LASTVL", map(lastVlResult, "endDate=${endDate-6m},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "SECONDVL", map(secondVlResult, "endDate=${endDate-6m},location=${location}"));
     compositionCohortDefinition.addSearch(
         "LASTCD4", Mapped.mapStraightThrough(lastCd4ResultAfterLastVl));
 
@@ -974,5 +975,39 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     sqlCohortDefinition.setQuery(sb.replace(query));
 
     return sqlCohortDefinition;
+  }
+
+  /**
+   * <p>Definition to apply base cohort exclusions to each Summary Indicator
+   * @param indicator Summary Indicator to be evaluated (C1 to C6)
+   * @param mappings Each Summary Indicator Mappings
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getSummaryComposition(CohortDefinition indicator, String mappings) {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName("Definition to apply base cohort exclusions to each Summary Indicator");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("generationDate", "generationDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
+    CohortDefinition died = getTransferredOutPatientsByGenerationDate();
+
+    compositionCohortDefinition.addSearch("INDICATOR", map(indicator, mappings));
+
+    compositionCohortDefinition.addSearch(
+        "TRANSFERREDOUT",
+        map(
+            transferredOut,
+            "startDate=${startDate},endDate=${endDate},onOrBefore=${generationDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "DIED", map(died, "endDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString("INDICATOR AND NOT (TRANSFERREDOUT OR DIED)");
+
+    return compositionCohortDefinition;
   }
 }

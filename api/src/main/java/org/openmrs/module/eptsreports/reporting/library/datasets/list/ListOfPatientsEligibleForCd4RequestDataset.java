@@ -133,7 +133,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         MAPPING2,
         new DashDateFormatConverter());
 
-    // 10 - Motivo para Elegibilidade de CD4- Sheet 1: Column J
+    //     10 - Motivo para Elegibilidade de CD4- Sheet 1: Column J
     patientDataSetDefinition.addColumn(
         "eligibility_reason",
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getReasonForCd4Eligibility(),
@@ -254,48 +254,60 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "C1",
             EptsReportUtils.map(
-                listOfPatientsEligibleForCd4RequestCohortQueries
-                    .getPatientWhoInitiatedTarvDuringPeriodC1(),
+                listOfPatientsEligibleForCd4RequestCohortQueries.getSummaryComposition(
+                    listOfPatientsEligibleForCd4RequestCohortQueries
+                        .getPatientWhoInitiatedTarvDuringPeriodC1(),
+                    MAPPING),
                 MAPPING));
 
     CohortIndicator restarted =
         eptsGeneralIndicator.getIndicator(
             "C2",
             EptsReportUtils.map(
-                listOfPatientsEligibleForCd4RequestCohortQueries
-                    .getPatientWhoRestartedTarvAndEligibleForCd4RequestC2(),
+                listOfPatientsEligibleForCd4RequestCohortQueries.getSummaryComposition(
+                    listOfPatientsEligibleForCd4RequestCohortQueries
+                        .getPatientWhoRestartedTarvAndEligibleForCd4RequestC2(),
+                    MAPPING),
                 MAPPING));
 
     CohortIndicator highVl =
         eptsGeneralIndicator.getIndicator(
             "C3",
             EptsReportUtils.map(
-                listOfPatientsEligibleForCd4RequestCohortQueries
-                    .getPatientsWithTwoHighVlResultsC3(),
-                MAPPING2));
+                listOfPatientsEligibleForCd4RequestCohortQueries.getSummaryComposition(
+                    listOfPatientsEligibleForCd4RequestCohortQueries
+                        .getPatientsWithTwoHighVlResultsC3(),
+                    MAPPING2),
+                MAPPING));
 
     CohortIndicator estadio =
         eptsGeneralIndicator.getIndicator(
             "C4",
             EptsReportUtils.map(
-                listOfPatientsEligibleForCd4RequestCohortQueries
-                    .getPatientWithEstadiamentoIIIorIVC4(),
+                listOfPatientsEligibleForCd4RequestCohortQueries.getSummaryComposition(
+                    listOfPatientsEligibleForCd4RequestCohortQueries
+                        .getPatientWithEstadiamentoIIIorIVC4(),
+                    MAPPING),
                 MAPPING));
 
     CohortIndicator eligibleForCd4Followup =
         eptsGeneralIndicator.getIndicator(
             "C5",
             EptsReportUtils.map(
-                listOfPatientsEligibleForCd4RequestCohortQueries
-                    .getPatientEligibleForCd4FollowupC5(),
-                MAPPING2));
+                listOfPatientsEligibleForCd4RequestCohortQueries.getSummaryComposition(
+                    listOfPatientsEligibleForCd4RequestCohortQueries
+                        .getPatientEligibleForCd4FollowupC5(),
+                    MAPPING2),
+                MAPPING));
 
     CohortIndicator pregnant =
         eptsGeneralIndicator.getIndicator(
             "C6",
             EptsReportUtils.map(
-                listOfPatientsEligibleForCd4RequestCohortQueries
-                    .getPatientPregnantEligibleForCd4RequestC6(),
+                listOfPatientsEligibleForCd4RequestCohortQueries.getSummaryComposition(
+                    listOfPatientsEligibleForCd4RequestCohortQueries
+                        .getPatientPregnantEligibleForCd4RequestC6(),
+                    MAPPING2),
                 MAPPING));
 
     dataSetDefinition.addColumn(
