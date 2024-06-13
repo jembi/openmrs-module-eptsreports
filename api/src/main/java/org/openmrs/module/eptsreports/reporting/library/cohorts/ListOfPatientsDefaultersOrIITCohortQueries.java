@@ -2368,6 +2368,36 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     return sqlPatientDataDefinition;
   }
 
+  public DataDefinition getLastKeyPopulationRegistrationDate() {
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+    spdd.setName("Patient's Most Recent Ficha Clinica with KPOP Registration Date");
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+    spdd.addParameter(new Parameter("endDate", "endDate", Date.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23703", hivMetadata.getKeyPopulationConcept().getConceptId());
+
+    String sql =
+        " SELECT p.patient_id AS patient_id, Max(e.encounter_datetime) AS last_date "
+            + " FROM patient p "
+            + " 	INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + " 	INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + " WHERE e.voided = 0 "
+            + " 	AND p.voided = 0 "
+            + " 	AND o.voided = 0 "
+            + " 	AND e.location_id = @location "
+            + " 	AND e.encounter_type = ${6} "
+            + " 	AND o.concept_id = ${23703} "
+            + " 	AND e.encounter_datetime <= CURRENT_DATE() "
+            + " GROUP BY p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    spdd.setQuery(substitutor.replace(sql));
+    return spdd;
+  }
+
   public DataDefinition getLastRegisteredKeyPopulation(Concept keyPopConcept) {
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
     spdd.setName("Patient's Most Recent Ficha Clinica with KPOP Registered");
