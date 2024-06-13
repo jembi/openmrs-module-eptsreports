@@ -117,7 +117,8 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
     map.put("6", hivMetadata.getCCRProgram().getProgramId());
 
     String query = new EptsQueriesUtil().min(getChildrenEnrolledInCCRQuery()).getQuery();
-    sqlPatientDataDefinition.setQuery(query);
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
     return sqlPatientDataDefinition;
   }
 
@@ -139,7 +140,6 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
-    map.put("6", hivMetadata.getCCRProgram().getProgramId());
     map.put("1874", commonMetadata.getMotivoConsultaCriancaRiscoConcept().getConceptId());
     map.put("reasonConcept", reasonConcept.getConceptId());
 
@@ -150,17 +150,9 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
             + "               ON p.patient_id = e.patient_id "
             + "       INNER JOIN obs o "
             + "               ON e.encounter_id = o.encounter_id "
-            + "       INNER JOIN (SELECT p.patient_id, "
-            + "                          Min(e.encounter_datetime) AS enrollment_date "
-            + "                   FROM   patient p "
-            + "                          INNER JOIN encounter e "
-            + "                                  ON p.patient_id = e.patient_id "
-            + "                   WHERE  p.voided = 0 "
-            + "                          AND e.voided = 0 "
-            + "                          AND e.encounter_type = ${92} "
-            + "                          AND e.encounter_datetime >= :startDate "
-            + "                          AND e.encounter_datetime <= :endDate "
-            + "                   GROUP  BY p.patient_id)ccr_enrollment "
+            + "       INNER JOIN ( "
+            + getCCRResumoEnrollmentDateQuery()
+            + ")ccr_enrollment "
             + "               ON ccr_enrollment.patient_id = p.patient_id "
             + "WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
@@ -171,8 +163,116 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
             + "       AND e.encounter_datetime = ccr_enrollment.enrollment_date "
             + "GROUP  BY p.patient_id";
 
-    sqlPatientDataDefinition.setQuery(query);
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
     return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>Mother’s PTV Code (Código PTV) – CCR: Ficha Resumo
+   *
+   * <p>The number registered in the Exposição ao HIV, código PTV field on CCR: Ficha Resumo
+   * (obtained in CCR1_FR6)
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getPtvCode() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Mother’s PTV Code (Código PTV) – CCR: Ficha Resumo");
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
+    map.put("1874", commonMetadata.getMotivoConsultaCriancaRiscoConcept().getConceptId());
+    map.put("1586", commonMetadata.getRecenNascidoMaeHivPositivoConcept().getConceptId());
+
+    String query =
+        " SELECT p.patient_id, o2.comments AS ptv_code "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "       INNER JOIN obs o2 "
+            + "               ON e.encounter_id = o2.encounter_id "
+            + "       INNER JOIN ( "
+            + getCCRResumoEnrollmentDateQuery()
+            + " )ccr_enrollment "
+            + "               ON ccr_enrollment.patient_id = p.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND o2.voided = 0 "
+            + "       AND e.encounter_type = ${92} "
+            + "       AND (o.concept_id = ${1874} "
+            + "         AND o.value_coded = ${1586}) "
+            + "         AND (o2.concept_id = ${1586} "
+            + "         AND o2.comments IS NOT NULL) "
+            + "       AND e.encounter_datetime = ccr_enrollment.enrollment_date "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>Mother’s Name (Nome da mãe) – CCR: Ficha Resumo
+   *
+   * <p>The name registered in the Nome da mãe field on CCR: Ficha Resumo (obtained in CCR1_FR6)
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getMothersName() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Mother’s Name (Nome da mãe) – CCR: Ficha Resumo");
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
+    map.put("1477", commonMetadata.getMothersNameConcept().getConceptId());
+
+    String query =
+        " SELECT p.patient_id, o.value_text AS mother_name "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "       INNER JOIN ( "
+            + getCCRResumoEnrollmentDateQuery()
+            + " )ccr_enrollment "
+            + "               ON ccr_enrollment.patient_id = p.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${92} "
+            + "       AND o.concept_id = ${1477} "
+            + "         AND o.value_text IS NOT NULL "
+            + "       AND e.encounter_datetime = ccr_enrollment.enrollment_date "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlPatientDataDefinition;
+  }
+
+  private String getCCRResumoEnrollmentDateQuery() {
+    return "SELECT p.patient_id, "
+        + "                          Min(e.encounter_datetime) AS enrollment_date "
+        + "                   FROM   patient p "
+        + "                          INNER JOIN encounter e "
+        + "                                  ON p.patient_id = e.patient_id "
+        + "                   WHERE  p.voided = 0 "
+        + "                          AND e.voided = 0 "
+        + "                          AND e.encounter_type = ${92} "
+        + "                          AND e.encounter_datetime >= :startDate "
+        + "                          AND e.encounter_datetime <= :endDate "
+        + "                   GROUP  BY p.patient_id ";
   }
 
   private String getChildrenEnrolledInCCRQuery() {
