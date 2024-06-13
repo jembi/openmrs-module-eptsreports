@@ -14770,8 +14770,8 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition startedART = getMOHArtStartDate();
 
     CohortDefinition pregnant =
-        commonCohortQueries.getNewMQPregnantORBreastfeeding(
-            hivMetadata.getPregnantConcept().getConceptId(),
+        commonCohortQueries.getMOHPregnantORBreastfeeding(
+            commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
 
     CohortDefinition tbDiagnosisActive = getPatientsWithTbActiveOrTbTreatment();
@@ -14934,7 +14934,7 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch("ARVREGIMEN", EptsReportUtils.map(arvRegimen, MAPPING));
 
-    cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING3));
+    cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING));
 
     cd.addSearch("TRANSFERREDIN", EptsReportUtils.map(transferredIn, MAPPING));
 
