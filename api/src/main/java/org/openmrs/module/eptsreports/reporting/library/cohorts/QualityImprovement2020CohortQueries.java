@@ -7709,8 +7709,8 @@ public class QualityImprovement2020CohortQueries {
     comp.addSearch(
         "G2",
         EptsReportUtils.map(
-            getCombinedB13ForCat15Indicators(),
-            "revisionEndDate=${revisionEndDate},location=${location}"));
+            resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13(),
+            "endDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
@@ -8069,8 +8069,8 @@ public class QualityImprovement2020CohortQueries {
     comp.addSearch(
         "G2",
         EptsReportUtils.map(
-            getCombinedB13ForCat15Indicators(),
-            "revisionEndDate=${revisionEndDate},location=${location}"));
+            resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13(),
+            "endDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "VL2Pedidos",
