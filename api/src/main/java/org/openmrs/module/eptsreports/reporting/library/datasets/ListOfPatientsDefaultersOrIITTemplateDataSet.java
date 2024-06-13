@@ -5,10 +5,14 @@ import java.util.Date;
 import org.openmrs.Location;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.data.converter.CalculationResultConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.DispensationTypeMdcConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.SupportGroupsConverter;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.DataConverter;
@@ -29,18 +33,29 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
 
   private ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries;
 
+  private ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+      listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries;
+
   private HivMetadata hivMetadata;
+
+  private CommonMetadata commonMetadata;
 
   @Autowired
   public ListOfPatientsDefaultersOrIITTemplateDataSet(
       ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset,
       TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet,
       ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries,
-      HivMetadata hivMetadata) {
+      ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+          listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries,
+      HivMetadata hivMetadata,
+      CommonMetadata commonMetadata) {
     this.listChildrenOnARTandFormulationsDataset = listChildrenOnARTandFormulationsDataset;
     this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
     this.listOfPatientsDefaultersOrIITCohortQueries = listOfPatientsDefaultersOrIITCohortQueries;
+    this.listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries =
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries;
     this.hivMetadata = hivMetadata;
+    this.commonMetadata = commonMetadata;
   }
 
   public DataSetDefinition constructDataSet() {
@@ -62,6 +77,11 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
             null);
     DataConverter formatter = new ObjectFormatter("{familyName}, {givenName}");
 
+    pdd.addRowFilter(
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+            .getPatientsCurrentlyOnArtWithoutTbScreening(),
+        "endDate=${endDate},location=${location}");
+
     pdd.addColumn("id", new PersonIdDataDefinition(), "");
 
     // 1 - NID - Sheet 1: Column A */
@@ -71,7 +91,7 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), formatter);
     pdd.setParameters(getParameters());
 
-    //     2 - Name - Sheet 1: Column B */
+    // 2 - Name - Sheet 1: Column B */
     pdd.addColumn("name", nameDef, "");
 
     // 3 - ART Start Date - Sheet 1: Column C */
@@ -245,40 +265,160 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         "endDate=${endDate},location=${location}",
         new SupportGroupsConverter());
 
-    // 25 - Last Drug Pick-up Date - Sheet 1: Column Y */
+    // 25 - Most Recent Date MDS "I" or "C" - Sheet 1: Column Y */
+    pdd.addColumn(
+        "mds_consultation_date",
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+            .getMostRecentMdcConsultationDate(),
+        "location=${location}");
+
+    //    // 26 - MDS1 - Sheet 1: Column Z */
+    pdd.addColumn(
+        "mds1",
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.getMdcDispensationType(
+            ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.DispensationColumn.MDC1),
+        "location=${location}",
+        new DispensationTypeMdcConverter());
+
+    // 27 - MDS2 - Sheet 1: Column AA */
+    pdd.addColumn(
+        "mds2",
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.getMdcDispensationType(
+            ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.DispensationColumn.MDC2),
+        "location=${location}",
+        new DispensationTypeMdcConverter());
+
+    // 28 - MDS3 - Sheet 1: Column AB */
+    pdd.addColumn(
+        "mds3",
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.getMdcDispensationType(
+            ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.DispensationColumn.MDC3),
+        "location=${location}",
+        new DispensationTypeMdcConverter());
+
+    // 29 - MDS4 - Sheet 1: Column AC */
+    pdd.addColumn(
+        "mds4",
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.getMdcDispensationType(
+            ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.DispensationColumn.MDC4),
+        "location=${location}",
+        new DispensationTypeMdcConverter());
+
+    // 30 - MDS5 - Sheet 1: Column AD */
+    pdd.addColumn(
+        "mds5",
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.getMdcDispensationType(
+            ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.DispensationColumn.MDC5),
+        "location=${location}",
+        new DispensationTypeMdcConverter());
+
+    // 31 - Data da consulta mais recente - Sheet 1: Column AE */
+    pdd.addColumn(
+        "mdc_consultation_date",
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+            .getMostRecentMdcConsultationDate(),
+        "location=${location}");
+
+    // 32 - HSH - Sheet 1: Column AF */
+    pdd.addColumn(
+        "keypop_hsh",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
+            hivMetadata.getHomosexualConcept()),
+        "endDate=${endDate}");
+
+    // 33 - PID - Sheet 1: Column AG */
+    pdd.addColumn(
+        "keypop_pid",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
+            hivMetadata.getDrugUseConcept()),
+        "endDate=${endDate}");
+
+    // 34 - REC - Sheet 1: Column AH */
+    pdd.addColumn(
+        "keypop_rec",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
+            hivMetadata.getImprisonmentConcept()),
+        "endDate=${endDate}");
+
+    // 35 - MTS - Sheet 1: Column AI */
+    pdd.addColumn(
+        "keypop_mts",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
+            hivMetadata.getSexWorkerConcept()),
+        "endDate=${endDate}");
+
+    // 36 - TG - Sheet 1: Column AJ */
+    pdd.addColumn(
+        "keypop_tg",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
+            hivMetadata.getTransGenderConcept()),
+        "endDate=${endDate}");
+
+    // 37 - Data de Inscrição no OVC - Sheet 1: Column AK */
+    pdd.addColumn(
+        "ovc_data_inscricao",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastOVCDate(
+            commonMetadata.getOVCDataInscricaoPersonAttributeType(), false),
+        "endDate=${endDate}",
+        new NotApplicableIfNullConverter());
+
+    // 38 - Data de Saída no OVC - Sheet 1: Column AL */
+    pdd.addColumn(
+        "ovc_data_saida",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastOVCDate(
+            commonMetadata.getOVCDataSaidaPersonAttributeType(), false),
+        "endDate=${endDate}",
+        new NotApplicableIfNullConverter());
+
+    // 39 - Estado do Beneficiário - Sheet 1: Column AM */
+    pdd.addColumn(
+        "ovc_estado_beneficiario",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastOVCDate(
+            commonMetadata.getOVCEstadoBeneficiarioPersonAttributeType(),
+            true),
+        "endDate=${endDate}",
+        new NotApplicableIfNullConverter());
+
+    // 40 - Last Drug Pick-up Date - Sheet 1: Column AN */
     pdd.addColumn(
         "date_of_last_survey_fila",
         listChildrenOnARTandFormulationsDataset.getLastDrugPickupDate(),
         "endDate=${endDate},location=${location}",
         null);
 
-    // 26 - Last Drug Pick-up Date - Sheet 1: Column Z */
+    // 41 - Last Drug Pick-up Date - Sheet 1: Column AO */
     pdd.addColumn(
         "date_of_last_survey_reception_raised_ARV",
         listOfPatientsDefaultersOrIITCohortQueries.getLastDrugPickUpDate(),
         "endDate=${endDate},location=${location}",
         null);
 
-    // 27 - Next Drug pick-up Date - Sheet 1: Column AA */
+    // 42 - Next Drug pick-up Date - Sheet 1: Column AP */
     pdd.addColumn(
         "next_date_survey_fila",
         listChildrenOnARTandFormulationsDataset.getNextDrugPickupDate(),
         "endDate=${endDate},location=${location}",
         null);
 
-    // 28 - Next Drug pick-up Date - Sheet 1: Column AB */
+    // 43 - Next Drug pick-up Date - Sheet 1: Column AQ */
     pdd.addColumn(
         "next_date_survey _reception_raised_ARV",
         listOfPatientsDefaultersOrIITCohortQueries.getNextDrugPickUpDateARV(),
         "endDate=${endDate},location=${location}",
         null);
 
-    // 29 - Days of Delay - Sheet 1: Column AC */
+    // 44 - Days of Delay - Sheet 1: Column AR */
     pdd.addColumn(
         "days_of_absence_to_survey",
         listOfPatientsDefaultersOrIITCohortQueries.getNumberOfDaysOfDelay(),
         "endDate=${endDate},location=${location}",
         null);
+
+    // 45 -Abandono Notificado - Sheet 1: Column AS */
+    pdd.addColumn(
+        "abandono_notificado_date",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastAbandonoNotificado(),
+        "endDate=${endDate},location=${location}");
 
     return pdd;
   }

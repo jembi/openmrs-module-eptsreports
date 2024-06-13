@@ -87,12 +87,12 @@ public class SetupListOfPatientsDefaultersOrIITReport extends EptsDataExportMana
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Template_List_Patients_Defaulters_IIT_TARV_v1.5.xls",
+              "Template_List_Patients_Defaulters_IIT_TARV_v1.7.xls",
               "List Patients Defaulters IIT TARV Report",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:10,dataset:FATL");
+      props.put("repeatingSections", "sheet:1,row:11,dataset:FATL");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
