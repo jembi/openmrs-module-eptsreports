@@ -756,4 +756,46 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
 
     return sqlPatientDataDefinition;
   }
+
+  /**
+   * <b>The system will show Data do Último Pedido de Carga Viral as follows:</b>
+   *
+   * <ul>
+   *   <li>Data do Último Pedido de Carga Viral – Sheet 1: Column J The most recent clinical
+   *       consultation (FIcha Clínica) date by report start date, with a viral load request
+   *       registered.
+   * </ul>
+   *
+   * @return CohortDefinition *
+   */
+  public DataDefinition getPatientsLastVLRequestDate() {
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+    spdd.setName("Patient's Most Recent Ficha Clinica with KPOP Registration Date");
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+    spdd.addParameter(new Parameter("endDate", "endDate", Date.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+
+    String sql =
+        " SELECT p.patient_id, MAX(e.encounter_datetime) "
+            + " FROM patient p "
+            + "	  INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "   INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + " WHERE p.voided = 0 "
+            + "	  AND e.voided = 0 "
+            + "   AND o.voided = 0 "
+            + "   AND e.location_id = :location "
+            + "   AND e.encounter_type = ${6} "
+            + "	  AND o.concept_id = ${23722} "
+            + "   AND o.value_coded = ${856} "
+            + " GROUP BY p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    spdd.setQuery(substitutor.replace(sql));
+    return spdd;
+  }
 }
