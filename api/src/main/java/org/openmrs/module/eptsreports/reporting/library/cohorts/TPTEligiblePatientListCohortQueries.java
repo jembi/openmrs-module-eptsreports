@@ -1212,7 +1212,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                        AND ( o2.concept_id = ${165308} "
             + "                                AND o2.value_coded IN ( ${1256}, ${1257} ) )"
             + "                        AND o2.obs_datetime <= :endDate "
-            + "                                )consultations "
+            + "                        group by ee.encounter_id )consultations "
             + "                                WHERE consultations.patient_id= p.patient_id "
             + "                                AND consultations.obs_datetime > tabela.start_date "
             + "                                AND consultations.obs_datetime <= Date_add(tabela.start_date, interval 7 month) "
@@ -1545,9 +1545,8 @@ public class TPTEligiblePatientListCohortQueries {
     // this will generate one union separated query based on the given queries
     String unionQuery =
         unionBuilder
-            .unionBuilder(TPTEligiblePatientsQueries.getY4QueryWithPatientIdForB5())
-            .union(TPTEligiblePatientsQueries.getY5QueryWithPatientIdForB5())
-            .union(TPTEligiblePatientsQueries.getY6QueryWithPatientIdForB5())
+            .unionBuilder(TPTEligiblePatientsQueries.getY5QueryWithPatientIdForB5())
+            .union(TPTCompletionQueries.getInhStartOnFilt(false))
             .buildQuery();
 
     String query =
@@ -1754,7 +1753,7 @@ public class TPTEligiblePatientListCohortQueries {
     String unionQuery =
         unionBuilder
             .unionBuilder(TPTEligiblePatientsQueries.getY5QueryWithPatientIdForB5())
-            .union(TPTCompletionQueries.getInhStartOnFilt())
+            .union(TPTCompletionQueries.getInhStartOnFilt(false))
             .buildQuery();
 
     String query =

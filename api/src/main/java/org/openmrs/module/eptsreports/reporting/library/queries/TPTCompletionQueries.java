@@ -31,7 +31,7 @@ public class TPTCompletionQueries {
    *
    * @return {@link String}
    */
-  public static String getInhStartOnFilt() {
+  public static String getInhStartOnFilt(Boolean duringPeriod) {
     return " SELECT     filt.patient_id, filt.start_date AS start_date "
         + " FROM    ( "
         + "SELECT p.patient_id,  "
@@ -53,7 +53,12 @@ public class TPTCompletionQueries {
         + "    AND o.value_coded IN ( ${656}, ${23982} ) )  "
         + "      and (o2.concept_id = ${23987}  "
         + "            AND  "
-        + "      o2.value_coded = ${1257} and o2.obs_datetime <= :endDate)  "
+        + "      o2.value_coded = ${1257} "
+            .concat(
+                duringPeriod
+                    ? "  and o2.obs_datetime >= :startDate and o2.obs_datetime <= :endDate "
+                    : " and o2.obs_datetime <= :endDate ")
+        + " )  "
         + "UNION  "
         + "SELECT p.patient_id, "
         + "       e.encounter_datetime AS start_date "

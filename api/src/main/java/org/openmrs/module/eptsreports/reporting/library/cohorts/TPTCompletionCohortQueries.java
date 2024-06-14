@@ -108,7 +108,8 @@ public class TPTCompletionCohortQueries {
             tbMetadata.getRegimeTPTConcept().getConceptId(),
             tbMetadata.getIsoniazidConcept().getConceptId(),
             tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId(),
-            hivMetadata.getStartDrugs().getConceptId());
+            hivMetadata.getStartDrugs().getConceptId(),
+            false);
 
     CohortDefinition A2Inh =
         getINHStartA2Part2(
@@ -118,15 +119,18 @@ public class TPTCompletionCohortQueries {
             tbMetadata.getRegimeTPTConcept().getConceptId(),
             tbMetadata.getIsoniazidConcept().getConceptId(),
             tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId(),
-            hivMetadata.getStartDrugs().getConceptId());
+            hivMetadata.getStartDrugs().getConceptId(),
+            false);
 
-    compositionCohortDefinition.addSearch("A1", EptsReportUtils.map(A1Inh, mapping));
+    compositionCohortDefinition.addSearch("A1", EptsReportUtils.map(A1Inh, mapping3));
 
-    compositionCohortDefinition.addSearch("A2", EptsReportUtils.map(A2Inh, mapping));
+    compositionCohortDefinition.addSearch("A2", EptsReportUtils.map(A2Inh, mapping3));
 
-    compositionCohortDefinition.addSearch("A3", EptsReportUtils.map(getINHStartA6(), mapping));
+    compositionCohortDefinition.addSearch(
+        "A3", EptsReportUtils.map(getINHStartA6(false), mapping3));
 
-    compositionCohortDefinition.addSearch("A4", EptsReportUtils.map(getINHStartA4(), mapping));
+    compositionCohortDefinition.addSearch(
+        "A4", EptsReportUtils.map(getINHStartA4(false), mapping3));
 
     compositionCohortDefinition.addSearch("B1B", EptsReportUtils.map(getIPTB1part2(), mapping));
 
@@ -204,15 +208,20 @@ public class TPTCompletionCohortQueries {
                 hivMetadata.getQuarterlyConcept().getConceptId()),
             mapping));
 
-    compositionCohortDefinition.addSearch("C1", EptsReportUtils.map(get3HPStartC1(), mapping));
+    compositionCohortDefinition.addSearch(
+        "C1", EptsReportUtils.map(get3HPStartC1(false), mapping3));
 
-    compositionCohortDefinition.addSearch("C2", EptsReportUtils.map(get3HPStartC2(), mapping));
+    compositionCohortDefinition.addSearch(
+        "C2", EptsReportUtils.map(get3HPStartC2(false), mapping3));
 
-    compositionCohortDefinition.addSearch("C3", EptsReportUtils.map(get3HPStartC3(), mapping));
+    compositionCohortDefinition.addSearch(
+        "C3", EptsReportUtils.map(get3HPStartC3(false), mapping3));
 
-    compositionCohortDefinition.addSearch("C4", EptsReportUtils.map(get3HPStartC4(), mapping));
+    compositionCohortDefinition.addSearch(
+        "C4", EptsReportUtils.map(get3HPStartC4(false), mapping3));
 
-    compositionCohortDefinition.addSearch("C5", EptsReportUtils.map(getINHStartC5Query(), mapping));
+    compositionCohortDefinition.addSearch(
+        "C5", EptsReportUtils.map(getINHStartC5Query(false), mapping3));
 
     compositionCohortDefinition.addSearch(
         "D1",
@@ -274,6 +283,45 @@ public class TPTCompletionCohortQueries {
     definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     definition.addParameter(new Parameter("endDate", "End Date", Date.class));
     definition.addParameter(new Parameter("location", "Location", Location.class));
+
+    definition.addSearch("C1", EptsReportUtils.map(get3HPStartC1(true), mapping3));
+
+    definition.addSearch("C2", EptsReportUtils.map(get3HPStartC2(true), mapping3));
+
+    definition.addSearch("C3", EptsReportUtils.map(get3HPStartC3(true), mapping3));
+
+    definition.addSearch("C4", EptsReportUtils.map(get3HPStartC4(true), mapping3));
+
+    definition.addSearch("C5", EptsReportUtils.map(getINHStartC5Query(true), mapping3));
+
+    CohortDefinition A1Inh =
+        getINHStartA2Part2(
+            Collections.singletonList(
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId()),
+            tbMetadata.getRegimeTPTConcept().getConceptId(),
+            tbMetadata.getIsoniazidConcept().getConceptId(),
+            tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId(),
+            hivMetadata.getStartDrugs().getConceptId(),
+            true);
+
+    CohortDefinition A2Inh =
+        getINHStartA2Part2(
+            Arrays.asList(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId()),
+            tbMetadata.getRegimeTPTConcept().getConceptId(),
+            tbMetadata.getIsoniazidConcept().getConceptId(),
+            tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId(),
+            hivMetadata.getStartDrugs().getConceptId(),
+            true);
+
+    definition.addSearch("A1", EptsReportUtils.map(A1Inh, mapping3));
+
+    definition.addSearch("A2", EptsReportUtils.map(A2Inh, mapping3));
+
+    definition.addSearch("A3", EptsReportUtils.map(getINHStartA6(true), mapping3));
+
+    definition.addSearch("A4", EptsReportUtils.map(getINHStartA4(true), mapping3));
     definition.addSearch(
         "A",
         EptsReportUtils.map(
@@ -281,23 +329,18 @@ public class TPTCompletionCohortQueries {
             "onOrBefore=${endDate},location=${location}"));
 
     definition.addSearch(
-        "B",
+        "TRFOUT",
         EptsReportUtils.map(
             tbPrevCohortQueries.getPatientsTransferredOut(),
-            "startDate=${startDate-6m},endDate=${endDate},location=${location}"));
+            "startDate=${startDate+7m},endDate=${endDate},location=${location}"));
     definition.addSearch(
-        "C",
+        "COMPLETED",
         EptsReportUtils.map(
             tbPrevCohortQueries.getPatientsThatCompletedIsoniazidProphylacticTreatment(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            "startDate=${endDate-1m},endDate=${endDate},location=${location}"));
 
-    definition.addSearch(
-        "D",
-        EptsReportUtils.map(
-            tbPrevCohortQueries.getPatientsStartedTpt(),
-            "startDate=${startDate+6m},endDate=${endDate+6m},location=${location}"));
-    definition.setCompositionString("A AND D AND NOT (B AND NOT C)");
-
+    definition.setCompositionString(
+        "A AND ( (A1 OR A2 OR A3 OR A4) OR (C1 OR C2 OR C3 OR C4 OR C5) ) AND NOT (TRFOUT AND NOT COMPLETED) ");
     return definition;
   }
 
@@ -477,6 +520,7 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addSearch(
         "G", EptsReportUtils.map(getTbPrevDenominatorForTPTCompletion(), generalParameterMapping));
 
+    //    compositionCohortDefinition.setCompositionString("G");
     compositionCohortDefinition.setCompositionString("tpt1 AND G");
 
     return compositionCohortDefinition;
@@ -563,10 +607,11 @@ public class TPTCompletionCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getINHStartA4() {
+  public CohortDefinition getINHStartA4(Boolean duringPeriod) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("TPT Completion A4");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
@@ -587,7 +632,9 @@ public class TPTCompletionCohortQueries {
     EptsQueriesUtil patientBuilder = new EptsQueriesUtil();
 
     String query =
-        patientBuilder.patientIdQueryBuilder(TPTCompletionQueries.getInhStartOnFilt()).getQuery();
+        patientBuilder
+            .patientIdQueryBuilder(TPTCompletionQueries.getInhStartOnFilt(duringPeriod))
+            .getQuery();
 
     StringSubstitutor sb = new StringSubstitutor(valuesMap);
 
@@ -612,11 +659,13 @@ public class TPTCompletionCohortQueries {
       int regimeTPTConcept,
       int threeHPConceptConcept,
       int dataEstadoDaProfilaxiaConcept,
-      List<Integer> states) {
+      List<Integer> states,
+      Boolean duringPeriod) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
     sqlCohortDefinition.setName(" all patients with Profilaxia INH");
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, String> map = new HashMap<>();
@@ -642,7 +691,10 @@ public class TPTCompletionCohortQueries {
             + " AND (o.concept_id = ${23985}"
             + " AND o.value_coded = ${23954})"
             + " AND (o2.concept_id = ${165308} AND o2.value_coded IN (${states})) "
-            + " AND o2.obs_datetime < :endDate"
+                .concat(
+                    duringPeriod
+                        ? " AND o2.obs_datetime >= :endDate AND o2.obs_datetime < :endDate "
+                        : " AND o2.obs_datetime < :endDate ")
             + " AND e.location_id = :location ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -714,11 +766,13 @@ public class TPTCompletionCohortQueries {
       int regimeTPTConcept,
       int isoniazidConcept,
       int dataEstadoDaProfilaxiaConcept,
-      int startDrugsConcept) {
+      int startDrugsConcept,
+      Boolean duringPeriod) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
     sqlCohortDefinition.setName(" all patients with Profilaxia TPT");
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, String> map = new HashMap<>();
@@ -743,8 +797,12 @@ public class TPTCompletionCohortQueries {
             + "    AND e.encounter_type IN (${encounterTypes})"
             + " AND (o.concept_id = ${23985} AND o.value_coded = ${656})   "
             + " AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256}   "
-            + "    AND o2.obs_datetime < :endDate) "
-            + "    AND e.location_id = :location ";
+                .concat(
+                    duringPeriod
+                        ? "       AND o2.obs_datetime >= :startDate "
+                            + "       AND o2.obs_datetime < :endDate "
+                        : " AND o2.obs_datetime < :endDate ")
+            + "   ) AND e.location_id = :location ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -922,11 +980,12 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getINHStartA6() {
+  public CohortDefinition getINHStartA6(Boolean duringPeriod) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
     sqlCohortDefinition.setName("all patients with Regime de TPT and Seguimento de tratamento TPT");
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -954,7 +1013,10 @@ public class TPTCompletionCohortQueries {
             + "  AND e.encounter_type = ${60} "
             + "  AND (o.concept_id = ${23985} AND o.value_coded IN (${656} , ${23982})) "
             + "  AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1256} , ${1705})) "
-            + "  AND o2.obs_datetime <= :endDate  "
+                .concat(
+                    duringPeriod
+                        ? " AND o2.obs_datetime >= :startDate AND o2.obs_datetime <= :endDate "
+                        : " AND o2.obs_datetime <= :endDate ")
             + "  AND e.location_id = :location ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -973,11 +1035,12 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition get3HPStartC1() {
+  public CohortDefinition get3HPStartC1(Boolean duringPeriod) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
     sqlCohortDefinition.setName(" all patients with Ficha Clinica Master Card ");
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
@@ -997,7 +1060,12 @@ public class TPTCompletionCohortQueries {
             + "       AND e.encounter_type = ${6} "
             + "       AND o.concept_id = ${1719} "
             + "       AND o.value_coded = ${165307} "
-            + "       AND e.encounter_datetime < :endDate ";
+                .concat(
+                    duringPeriod
+                        ? "       AND e.encounter_datetime >= :startDate "
+                            + "       AND e.encounter_datetime < :endDate "
+                        : " AND e.encounter_datetime < :endDate ")
+            + " ";
 
     StringSubstitutor sb = new StringSubstitutor(valuesMap);
 
@@ -1019,11 +1087,12 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition get3HPStartC2() {
+  public CohortDefinition get3HPStartC2(Boolean duringPeriod) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with FILT ");
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -1048,7 +1117,12 @@ public class TPTCompletionCohortQueries {
             + "  AND ( o.concept_id = ${23985} AND o.value_coded in (${23954},${23984}) )  "
             + "  AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1256} , ${1705}))  "
             + "  AND e.location_id = :location  "
-            + "  AND o2.obs_datetime < :endDate ";
+                .concat(
+                    duringPeriod
+                        ? "       AND o2.obs_datetime >= :startDate "
+                            + "       AND o2.obs_datetime < :endDate "
+                        : " AND o2.obs_datetime < :endDate ")
+            + " ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1073,11 +1147,12 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition get3HPStartC3() {
+  public CohortDefinition get3HPStartC3(Boolean duringPeriod) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
     sqlCohortDefinition.setName(" all patients with Ficha Clinica Master Card ");
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -1110,10 +1185,15 @@ public class TPTCompletionCohortQueries {
             + "                 AND o2.voided = 0 "
             + "                 AND e.encounter_type = ${60} "
             + "                 AND e.location_id = :location "
-            + "                 AND ((o.concept_id = ${23985} AND o.value_coded IN (${23954}, ${23984})) "
-            + "                 AND ((o2.concept_id = ${23987} AND (o2.value_coded IN (${1257}, ${1267}) "
+            + "                 AND ( (o.concept_id = ${23985} AND o.value_coded IN (${23954}, ${23984}) ) "
+            + "                 AND (  (o2.concept_id = ${23987} AND (o2.value_coded IN (${1257}, ${1267}) "
             + "                       OR o2.value_coded IS NULL)) "
-            + "                 AND o2.obs_datetime < :endDate)) "
+            + "                  "
+                .concat(
+                    duringPeriod
+                        ? " AND o2.obs_datetime >= :startDate AND o2.obs_datetime < :endDate "
+                        : " AND o2.obs_datetime < :endDate ")
+            + " )) "
             + "                 GROUP BY p.patient_id) AS filt ON p.patient_id = filt.patient_id "
             + "    AND NOT EXISTS ( SELECT pp.patient_id, e.encounter_datetime "
             + "                     FROM patient pp "
@@ -1179,10 +1259,11 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition get3HPStartC4() {
+  public CohortDefinition get3HPStartC4(Boolean duringPeriod) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("3HP Start C4");
-    compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     compositionCohortDefinition.addSearch(
@@ -1194,8 +1275,9 @@ public class TPTCompletionCohortQueries {
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.get3HPConcept().getConceptId(),
                 tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId(),
-                Collections.singletonList(hivMetadata.getStartDrugs().getConceptId())),
-            mapping));
+                Collections.singletonList(hivMetadata.getStartDrugs().getConceptId()),
+                duringPeriod),
+            mapping3));
 
     compositionCohortDefinition.setCompositionString("C4");
 
@@ -1213,10 +1295,11 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getINHStartC5Query() {
+  public CohortDefinition getINHStartC5Query(Boolean duringPeriod) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("C5 Query: all patients with Profilaxia TPT");
-    compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     compositionCohortDefinition.addSearch(
@@ -1228,8 +1311,9 @@ public class TPTCompletionCohortQueries {
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.get3HPConcept().getConceptId(),
                 tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId(),
-                Collections.singletonList(hivMetadata.getStartDrugs().getConceptId())),
-            mapping));
+                Collections.singletonList(hivMetadata.getStartDrugs().getConceptId()),
+                duringPeriod),
+            mapping3));
 
     compositionCohortDefinition.setCompositionString("C5");
 
@@ -2340,7 +2424,7 @@ public class TPTCompletionCohortQueries {
             .union(TPTEligiblePatientsQueries.getY2Query())
             .union(TPTEligiblePatientsQueries.getY3Query())
             .union(TPTEligiblePatientsQueries.getY5Query())
-            .union(TPTCompletionQueries.getInhStartOnFilt())
+            .union(TPTCompletionQueries.getInhStartOnFilt(false))
             .buildQuery();
     String query =
         "SELECT p.patient_id "
@@ -2418,7 +2502,7 @@ public class TPTCompletionCohortQueries {
     String unionQuery =
         unionBuilder
             .unionBuilder(TPTEligiblePatientsQueries.getY5QueryWithPatientIdForB5())
-            .union(TPTCompletionQueries.getInhStartOnFilt())
+            .union(TPTCompletionQueries.getInhStartOnFilt(false))
             .buildQuery();
 
     String query =
@@ -2510,7 +2594,7 @@ public class TPTCompletionCohortQueries {
             .union(TPTEligiblePatientsQueries.getY2Query())
             .union(TPTEligiblePatientsQueries.getY3Query())
             .union(TPTEligiblePatientsQueries.getY5Query())
-            .union(TPTCompletionQueries.getInhStartOnFilt())
+            .union(TPTCompletionQueries.getInhStartOnFilt(false))
             .buildQuery();
 
     String query =
