@@ -42,6 +42,7 @@ public class TPTCompletionCohortQueries {
   private final TPTInitiationCohortQueries tptInitiationCohortQueries;
 
   @Autowired private TbPrevQueries tbPrevQueries;
+  private final ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries;
 
   @Autowired
   public TPTCompletionCohortQueries(
@@ -52,7 +53,8 @@ public class TPTCompletionCohortQueries {
       TXTBCohortQueries txTbCohortQueries,
       GenericCohortQueries genericCohortQueries,
       TPTEligiblePatientListCohortQueries tptEligiblePatientListCohortQueries,
-      TPTInitiationCohortQueries tptInitiationCohortQueries) {
+      TPTInitiationCohortQueries tptInitiationCohortQueries,
+      ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
     this.tbPrevCohortQueries = tbPrevCohortQueries;
@@ -61,6 +63,7 @@ public class TPTCompletionCohortQueries {
     this.genericCohortQueries = genericCohortQueries;
     this.tptEligiblePatientListCohortQueries = tptEligiblePatientListCohortQueries;
     this.tptInitiationCohortQueries = tptInitiationCohortQueries;
+    this.listOfPatientsArtCohortCohortQueries = listOfPatientsArtCohortCohortQueries;
   }
 
   private final String mapping = "endDate=${endDate},location=${location}";
@@ -325,8 +328,8 @@ public class TPTCompletionCohortQueries {
     definition.addSearch(
         "A",
         EptsReportUtils.map(
-            genericCohortQueries.getStartedArtBeforeDate(false),
-            "onOrBefore=${endDate},location=${location}"));
+            listOfPatientsArtCohortCohortQueries.getPatientsInitiatedART(),
+                mapping3));
 
     definition.addSearch(
         "TRFOUT",
@@ -520,7 +523,6 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addSearch(
         "G", EptsReportUtils.map(getTbPrevDenominatorForTPTCompletion(), generalParameterMapping));
 
-    //    compositionCohortDefinition.setCompositionString("G");
     compositionCohortDefinition.setCompositionString("tpt1 AND G");
 
     return compositionCohortDefinition;
@@ -693,7 +695,7 @@ public class TPTCompletionCohortQueries {
             + " AND (o2.concept_id = ${165308} AND o2.value_coded IN (${states})) "
                 .concat(
                     duringPeriod
-                        ? " AND o2.obs_datetime >= :endDate AND o2.obs_datetime < :endDate "
+                        ? " AND o2.obs_datetime >= :startDate AND o2.obs_datetime < :endDate "
                         : " AND o2.obs_datetime < :endDate ")
             + " AND e.location_id = :location ";
 
