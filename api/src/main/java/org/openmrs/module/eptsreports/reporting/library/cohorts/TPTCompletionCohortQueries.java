@@ -9,6 +9,7 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.tpt.CompletedIsoniazidTPTCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
+import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.TPTCompletionQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.TPTEligiblePatientsQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.TbPrevQueries;
@@ -42,7 +43,7 @@ public class TPTCompletionCohortQueries {
   private final TPTInitiationCohortQueries tptInitiationCohortQueries;
 
   @Autowired private TbPrevQueries tbPrevQueries;
-  private final ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries;
+  private final CommonQueries commonQueries;
 
   @Autowired
   public TPTCompletionCohortQueries(
@@ -54,7 +55,7 @@ public class TPTCompletionCohortQueries {
       GenericCohortQueries genericCohortQueries,
       TPTEligiblePatientListCohortQueries tptEligiblePatientListCohortQueries,
       TPTInitiationCohortQueries tptInitiationCohortQueries,
-      ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries) {
+      CommonQueries commonQueries) {
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
     this.tbPrevCohortQueries = tbPrevCohortQueries;
@@ -63,7 +64,7 @@ public class TPTCompletionCohortQueries {
     this.genericCohortQueries = genericCohortQueries;
     this.tptEligiblePatientListCohortQueries = tptEligiblePatientListCohortQueries;
     this.tptInitiationCohortQueries = tptInitiationCohortQueries;
-    this.listOfPatientsArtCohortCohortQueries = listOfPatientsArtCohortCohortQueries;
+    this.commonQueries = commonQueries;
   }
 
   private final String mapping = "endDate=${endDate},location=${location}";
@@ -95,6 +96,7 @@ public class TPTCompletionCohortQueries {
   public CohortDefinition getTxCurrWithTPTCompletion() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("TX_CURR with TPT Completion");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -135,9 +137,10 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addSearch(
         "A4", EptsReportUtils.map(getINHStartA4(false), mapping3));
 
-    compositionCohortDefinition.addSearch("B1B", EptsReportUtils.map(getIPTB1part2(), mapping));
+    compositionCohortDefinition.addSearch(
+        "B1B", EptsReportUtils.map(getIPTB1part2(false), mapping3));
 
-    compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(getIPTB2(), mapping));
+    compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(getIPTB2(false), mapping3));
 
     compositionCohortDefinition.addSearch(
         "B5Part1",
@@ -147,8 +150,9 @@ public class TPTCompletionCohortQueries {
                 hivMetadata.getStartDrugs().getConceptId(),
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
-                hivMetadata.getYesConcept().getConceptId()),
-            mapping));
+                hivMetadata.getYesConcept().getConceptId(),
+                false),
+            mapping3));
 
     compositionCohortDefinition.addSearch(
         "B5Part2",
@@ -159,8 +163,9 @@ public class TPTCompletionCohortQueries {
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
                 tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
-                tbMetadata.getDtINHConcept().getConceptId()),
-            mapping));
+                tbMetadata.getDtINHConcept().getConceptId(),
+                false),
+            mapping3));
 
     compositionCohortDefinition.addSearch(
         "B5Part3",
@@ -171,8 +176,9 @@ public class TPTCompletionCohortQueries {
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
                 tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
-                tbMetadata.getDtINHConcept().getConceptId()),
-            mapping));
+                tbMetadata.getDtINHConcept().getConceptId(),
+                false),
+            mapping3));
 
     compositionCohortDefinition.addSearch(
         "B6Part1",
@@ -183,8 +189,9 @@ public class TPTCompletionCohortQueries {
                 tbMetadata.getIsoniazidConcept().getConceptId(),
                 tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
                 hivMetadata.getMonthlyConcept().getConceptId(),
-                tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId()),
-            mapping));
+                tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
+                false),
+            mapping3));
 
     compositionCohortDefinition.addSearch(
         "B6Part2",
@@ -195,8 +202,9 @@ public class TPTCompletionCohortQueries {
                 tbMetadata.getIsoniazidConcept().getConceptId(),
                 tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
-                hivMetadata.getQuarterlyConcept().getConceptId()),
-            mapping));
+                hivMetadata.getQuarterlyConcept().getConceptId(),
+                false),
+            mapping3));
 
     compositionCohortDefinition.addSearch(
         "B6Part3",
@@ -208,8 +216,9 @@ public class TPTCompletionCohortQueries {
                 tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
                 hivMetadata.getMonthlyConcept().getConceptId(),
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
-                hivMetadata.getQuarterlyConcept().getConceptId()),
-            mapping));
+                hivMetadata.getQuarterlyConcept().getConceptId(),
+                false),
+            mapping3));
 
     compositionCohortDefinition.addSearch(
         "C1", EptsReportUtils.map(get3HPStartC1(false), mapping3));
@@ -229,8 +238,9 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addSearch(
         "D1",
         EptsReportUtils.map(
-            tptEligiblePatientListCohortQueries.get3HPLastProfilaxyDuringM3orM1PeriodsComposition(),
-            mapping));
+            tptEligiblePatientListCohortQueries.get3HPLastProfilaxyDuringM3orM1PeriodsComposition(
+                false),
+            mapping3));
 
     compositionCohortDefinition.addSearch(
         "D2",
@@ -238,8 +248,9 @@ public class TPTCompletionCohortQueries {
             tptEligiblePatientListCohortQueries.get3HPC1(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
                 tbMetadata.get3HPConcept().getConceptId(),
-                tbMetadata.getTreatmentPrescribedConcept().getConceptId()),
-            mapping));
+                tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
+                false),
+            mapping3));
 
     compositionCohortDefinition.addSearch(
         "D3",
@@ -247,8 +258,9 @@ public class TPTCompletionCohortQueries {
             tptEligiblePatientListCohortQueries.get3HPC1part2(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
                 tbMetadata.get3HPConcept().getConceptId(),
-                tbMetadata.getTreatmentPrescribedConcept().getConceptId()),
-            mapping));
+                tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
+                false),
+            mapping3));
 
     compositionCohortDefinition.addSearch(
         "D4",
@@ -259,8 +271,9 @@ public class TPTCompletionCohortQueries {
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
-                hivMetadata.getQuarterlyConcept().getConceptId()),
-            mapping));
+                hivMetadata.getQuarterlyConcept().getConceptId(),
+                false),
+            mapping3));
 
     compositionCohortDefinition.addSearch(
         "D5",
@@ -271,8 +284,9 @@ public class TPTCompletionCohortQueries {
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
-                hivMetadata.getMonthlyConcept().getConceptId()),
-            mapping));
+                hivMetadata.getMonthlyConcept().getConceptId(),
+                false),
+            mapping3));
 
     compositionCohortDefinition.setCompositionString(
         "txcurr AND (((A1 OR A2 OR A3 OR A4) AND (B1B OR B2 OR (B5Part1 OR B5Part2 OR B5Part3) OR (B6Part1 OR B6Part2 OR B6Part3))) OR ((C1 OR C2 OR C3 OR C4 OR C5) AND (D1 OR D2 OR D3 OR D4 OR D5)))");
@@ -325,25 +339,149 @@ public class TPTCompletionCohortQueries {
     definition.addSearch("A3", EptsReportUtils.map(getINHStartA6(true), mapping3));
 
     definition.addSearch("A4", EptsReportUtils.map(getINHStartA4(true), mapping3));
-    definition.addSearch(
-        "A",
-        EptsReportUtils.map(
-            listOfPatientsArtCohortCohortQueries.getPatientsInitiatedART(),
-                mapping3));
+    definition.addSearch("A", EptsReportUtils.map(getPatientsInitiatedARTbyPeriod(), mapping));
+
+    //    TREATMENT END DEFINITIONS
+    definition.addSearch("B1B", EptsReportUtils.map(getIPTB1part2(true), mapping3));
+
+    definition.addSearch("B2", EptsReportUtils.map(getIPTB2(true), mapping3));
 
     definition.addSearch(
-        "TRFOUT",
+        "B5Part1",
         EptsReportUtils.map(
-            tbPrevCohortQueries.getPatientsTransferredOut(),
-            "startDate=${startDate+7m},endDate=${endDate},location=${location}"));
+            tptEligiblePatientListCohortQueries.getIPTB5Part1(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId(),
+                hivMetadata.getYesConcept().getConceptId(),
+                true),
+            mapping3));
+
     definition.addSearch(
-        "COMPLETED",
+        "B5Part2",
         EptsReportUtils.map(
-            tbPrevCohortQueries.getPatientsThatCompletedIsoniazidProphylacticTreatment(),
-            "startDate=${endDate-1m},endDate=${endDate},location=${location}"));
+            tptEligiblePatientListCohortQueries.getIPTB5Part2(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId(),
+                tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
+                tbMetadata.getDtINHConcept().getConceptId(),
+                true),
+            mapping3));
+
+    definition.addSearch(
+        "B5Part3",
+        EptsReportUtils.map(
+            tptEligiblePatientListCohortQueries.getIPTB5Part3(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId(),
+                tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
+                tbMetadata.getDtINHConcept().getConceptId(),
+                true),
+            mapping3));
+
+    definition.addSearch(
+        "B6Part1",
+        EptsReportUtils.map(
+            tptEligiblePatientListCohortQueries.getIPTB6Part1(
+                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.getIsoniazidConcept().getConceptId(),
+                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
+                hivMetadata.getMonthlyConcept().getConceptId(),
+                tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
+                true),
+            mapping3));
+
+    definition.addSearch(
+        "B6Part2",
+        EptsReportUtils.map(
+            getIPTB6Part2(
+                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.getIsoniazidConcept().getConceptId(),
+                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
+                tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
+                hivMetadata.getQuarterlyConcept().getConceptId(),
+                true),
+            mapping3));
+
+    definition.addSearch(
+        "B6Part3",
+        EptsReportUtils.map(
+            tptEligiblePatientListCohortQueries.getIPTB6Part3(
+                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.getIsoniazidConcept().getConceptId(),
+                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
+                hivMetadata.getMonthlyConcept().getConceptId(),
+                tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
+                hivMetadata.getQuarterlyConcept().getConceptId(),
+                true),
+            mapping3));
+
+    definition.addSearch(
+        "D1",
+        EptsReportUtils.map(
+            tptEligiblePatientListCohortQueries.get3HPLastProfilaxyDuringM3orM1PeriodsComposition(
+                true),
+            mapping3));
+
+    definition.addSearch(
+        "D2",
+        EptsReportUtils.map(
+            tptEligiblePatientListCohortQueries.get3HPC1(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                tbMetadata.get3HPConcept().getConceptId(),
+                tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
+                true),
+            mapping3));
+
+    definition.addSearch(
+        "D3",
+        EptsReportUtils.map(
+            tptEligiblePatientListCohortQueries.get3HPC1part2(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                tbMetadata.get3HPConcept().getConceptId(),
+                tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
+                true),
+            mapping3));
+
+    definition.addSearch(
+        "D4",
+        EptsReportUtils.map(
+            tptEligiblePatientListCohortQueries.get3HPC2(
+                tbMetadata.get3HPConcept().getConceptId(),
+                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
+                tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
+                hivMetadata.getQuarterlyConcept().getConceptId(),
+                true),
+            mapping3));
+
+    definition.addSearch(
+        "D5",
+        EptsReportUtils.map(
+            tptEligiblePatientListCohortQueries.get3HPC3(
+                tbMetadata.get3HPConcept().getConceptId(),
+                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
+                tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
+                hivMetadata.getMonthlyConcept().getConceptId(),
+                true),
+            mapping3));
+
+    definition.addSearch(
+        "TRFOUT", EptsReportUtils.map(tbPrevCohortQueries.getPatientsTransferredOut(), mapping3));
 
     definition.setCompositionString(
-        "A AND ( (A1 OR A2 OR A3 OR A4) OR (C1 OR C2 OR C3 OR C4 OR C5) ) AND NOT (TRFOUT AND NOT COMPLETED) ");
+        "(A AND  (A1 OR A2 OR A3 OR A4) OR (C1 OR C2 OR C3 OR C4 OR C5) ) AND NOT (TRFOUT OR B1B OR B2 OR B5Part1 OR B5Part2 OR B5Part3 OR B6Part1 OR B6Part2 OR B6Part3 OR D1 OR D2 OR D3 OR D4 OR D5)");
     return definition;
   }
 
@@ -362,6 +500,7 @@ public class TPTCompletionCohortQueries {
   public CohortDefinition getTxCurrWithoutTPTCompletion() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("TX_CURR without TPT Completion");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -372,7 +511,7 @@ public class TPTCompletionCohortQueries {
             "onOrBefore=${endDate},location=${location},locations=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "tpt0", EptsReportUtils.map(getTxCurrWithTPTCompletion(), mapping));
+        "tpt0", EptsReportUtils.map(getTxCurrWithTPTCompletion(), mapping3));
 
     compositionCohortDefinition.setCompositionString("txcurr AND NOT tpt0");
 
@@ -511,17 +650,15 @@ public class TPTCompletionCohortQueries {
   public CohortDefinition getTxCurrWithTPTInLast7Months() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("TX_CURR with TPT in last 7 months");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
-    String generalParameterMapping =
-        "startDate=${endDate-7m},endDate=${endDate},location=${location}";
+    compositionCohortDefinition.addSearch(
+        "tpt1", EptsReportUtils.map(getTxCurrWithoutTPTCompletion(), mapping3));
 
     compositionCohortDefinition.addSearch(
-        "tpt1", EptsReportUtils.map(getTxCurrWithoutTPTCompletion(), mapping));
-
-    compositionCohortDefinition.addSearch(
-        "G", EptsReportUtils.map(getTbPrevDenominatorForTPTCompletion(), generalParameterMapping));
+        "G", EptsReportUtils.map(getTbPrevDenominatorForTPTCompletion(), mapping3));
 
     compositionCohortDefinition.setCompositionString("tpt1 AND G");
 
@@ -2397,11 +2534,12 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getIPTB2() {
+  public CohortDefinition getIPTB2(Boolean duringPeriod) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Profilaxia com INH B2");
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -2422,11 +2560,11 @@ public class TPTCompletionCohortQueries {
     map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     String Y =
-        new UnionBuilder(TPTEligiblePatientsQueries.getY1Query())
-            .union(TPTEligiblePatientsQueries.getY2Query())
-            .union(TPTEligiblePatientsQueries.getY3Query())
-            .union(TPTEligiblePatientsQueries.getY5Query())
-            .union(TPTCompletionQueries.getInhStartOnFilt(false))
+        new UnionBuilder(TPTEligiblePatientsQueries.getY1Query(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getY2Query(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getY3Query(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getY5Query(duringPeriod))
+            .union(TPTCompletionQueries.getInhStartOnFilt(duringPeriod))
             .buildQuery();
     String query =
         "SELECT p.patient_id "
@@ -2472,10 +2610,12 @@ public class TPTCompletionCohortQueries {
       int isoniazidConcept,
       int isoniazidePiridoxinaConcept,
       int typeDispensationTPTConceptUuid,
-      int quarterlyConcept) {
+      int quarterlyConcept,
+      Boolean duringPeriod) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Regime de TPT B6.2");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -2503,8 +2643,8 @@ public class TPTCompletionCohortQueries {
     // this will generate one union separated query based on the given queries
     String unionQuery =
         unionBuilder
-            .unionBuilder(TPTEligiblePatientsQueries.getY5QueryWithPatientIdForB5())
-            .union(TPTCompletionQueries.getInhStartOnFilt(false))
+            .unionBuilder(TPTEligiblePatientsQueries.getY5QueryWithPatientIdForB5(duringPeriod))
+            .union(TPTCompletionQueries.getInhStartOnFilt(duringPeriod))
             .buildQuery();
 
     String query =
@@ -2569,11 +2709,12 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getIPTB1part2() {
+  public CohortDefinition getIPTB1part2(Boolean duringPeriod) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Ultima profilaxia Isoniazida (Data Fim) B1.2");
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -2592,11 +2733,11 @@ public class TPTCompletionCohortQueries {
     map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
 
     String Y =
-        new UnionBuilder(TPTEligiblePatientsQueries.getY1Query())
-            .union(TPTEligiblePatientsQueries.getY2Query())
-            .union(TPTEligiblePatientsQueries.getY3Query())
-            .union(TPTEligiblePatientsQueries.getY5Query())
-            .union(TPTCompletionQueries.getInhStartOnFilt(false))
+        new UnionBuilder(TPTEligiblePatientsQueries.getY1Query(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getY2Query(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getY3Query(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getY5Query(duringPeriod))
+            .union(TPTCompletionQueries.getInhStartOnFilt(duringPeriod))
             .buildQuery();
 
     String query =
@@ -2621,6 +2762,23 @@ public class TPTCompletionCohortQueries {
 
     sqlCohortDefinition.setQuery(sb.replace(query));
 
+    return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getPatientsInitiatedARTbyPeriod() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients who initiated the ART before cohort period");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    String arvStart = commonQueries.getARTStartDate(true);
+
+    String query =
+        "SELECT patient_id FROM ( " + arvStart + " ) initiated_art" + "   GROUP BY patient_id";
+
+    sqlCohortDefinition.setQuery(query);
+    System.out.println(sqlCohortDefinition.getQuery());
     return sqlCohortDefinition;
   }
 }
