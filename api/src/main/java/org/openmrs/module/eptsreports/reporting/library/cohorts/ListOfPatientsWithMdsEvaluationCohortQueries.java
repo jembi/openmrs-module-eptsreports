@@ -4549,11 +4549,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     query +=
         tbScreeningOrPbImc
-            ? "                      AND        o.concept_id = ${23758} "
-                + "                      AND        o.value_coded NOT IN ( ${1065}, "
-                + "                                                   ${1066} ) "
-            : " AND        ( o.concept_id IN ( ${1343}, ${1342} ) "
-                + "    AND        o.value_numeric IS NULL ) ";
+            ? "                      AND        o.concept_id != ${23758} "
+            : "                      AND        o.concept_id NOT IN ( ${1343}, ${1342} ) ";
     query +=
         "         AND        e.encounter_datetime >= mds.encounter_date "
             + "        AND        e.encounter_datetime <= date_add( tarv.art_encounter, interval 12 month ) "
