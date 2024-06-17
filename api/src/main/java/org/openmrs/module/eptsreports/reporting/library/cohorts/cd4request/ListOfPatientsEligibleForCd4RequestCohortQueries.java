@@ -10,11 +10,13 @@ import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.advancedhivillness.ListOfPatientsOnAdvancedHivIllnessQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.cd4request.ListOfPatientsEligibleForCd4RequestQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
+import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
@@ -33,6 +35,9 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
       listOfPatientsInAdvancedHivIllnessCohortQueries;
   private final ListOfPatientsOnAdvancedHivIllnessQueries listOfPatientsOnAdvancedHivIllnessQueries;
 
+  private final GenericCohortQueries genericCohortQueries;
+
+
   String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
   String MAPPING2 =
       "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}";
@@ -42,13 +47,13 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
 
   @Autowired
   public ListOfPatientsEligibleForCd4RequestCohortQueries(
-      HivMetadata hivMetadata,
-      CommonMetadata commonMetadata,
-      TbMetadata tbMetadata,
-      ResumoMensalCohortQueries resumoMensalCohortQueries,
-      ListOfPatientsInAdvancedHivIllnessCohortQueries
+          HivMetadata hivMetadata,
+          CommonMetadata commonMetadata,
+          TbMetadata tbMetadata,
+          ResumoMensalCohortQueries resumoMensalCohortQueries,
+          ListOfPatientsInAdvancedHivIllnessCohortQueries
           listOfPatientsInAdvancedHivIllnessCohortQueries,
-      ListOfPatientsOnAdvancedHivIllnessQueries listOfPatientsOnAdvancedHivIllnessQueries) {
+          ListOfPatientsOnAdvancedHivIllnessQueries listOfPatientsOnAdvancedHivIllnessQueries, GenericCohortQueries genericCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
     this.tbMetadata = tbMetadata;
@@ -56,6 +61,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     this.listOfPatientsInAdvancedHivIllnessCohortQueries =
         listOfPatientsInAdvancedHivIllnessCohortQueries;
     this.listOfPatientsOnAdvancedHivIllnessQueries = listOfPatientsOnAdvancedHivIllnessQueries;
+      this.genericCohortQueries = genericCohortQueries;
   }
 
   /**
@@ -127,8 +133,13 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     compositionCohortDefinition.addSearch(
         "DIED", map(died, "endDate=${generationDate},location=${location}"));
 
+    compositionCohortDefinition.addSearch(
+            "BASECOHORT",
+            EptsReportUtils.map(
+                    genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
+
     compositionCohortDefinition.setCompositionString(
-        "(STARTED OR RESTARTED OR HIGHVL OR ESTADIO OR ELIGIBLECD4 OR PREGNANT) AND NOT (TRANSFERREDOUT OR DIED)");
+        "((STARTED OR RESTARTED OR HIGHVL OR ESTADIO OR ELIGIBLECD4 OR PREGNANT) AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)");
 
     return compositionCohortDefinition;
   }
