@@ -18,7 +18,6 @@ import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
-import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -262,7 +261,10 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     compositionCohortDefinition.addSearch(
         "SECONDVL", map(secondVlResult, "endDate=${endDate-6m},location=${location}"));
     compositionCohortDefinition.addSearch(
-        "LASTCD4", Mapped.mapStraightThrough(lastCd4ResultAfterLastVl));
+        "LASTCD4",
+        map(
+            lastCd4ResultAfterLastVl,
+            "endDate=${endDate-6m},generationDate=${generationDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString("(LASTVL AND SECONDVL) AND NOT LASTCD4");
 
@@ -977,16 +979,11 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     return sqlCohortDefinition;
   }
 
-  /**
-   * <p>Definition to apply base cohort exclusions to each Summary Indicator
-   * @param indicator Summary Indicator to be evaluated (C1 to C6)
-   * @param mappings Each Summary Indicator Mappings
-   * @return {@link CohortDefinition}
-   */
-  public CohortDefinition getSummaryComposition(CohortDefinition indicator, String mappings) {
+  public CohortDefinition getSummaryCompositionC1() {
 
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
-    compositionCohortDefinition.setName("Definition to apply base cohort exclusions to each Summary Indicator");
+    compositionCohortDefinition.setName(
+        "Definition to apply base cohort exclusions to each Summary Indicator");
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(
@@ -996,7 +993,8 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
     CohortDefinition died = getTransferredOutPatientsByGenerationDate();
 
-    compositionCohortDefinition.addSearch("INDICATOR", map(indicator, mappings));
+    compositionCohortDefinition.addSearch("C1", map(getPatientWhoInitiatedTarvDuringPeriodC1(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "TRANSFERREDOUT",
@@ -1006,7 +1004,260 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     compositionCohortDefinition.addSearch(
         "DIED", map(died, "endDate=${generationDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString("INDICATOR AND NOT (TRANSFERREDOUT OR DIED)");
+    compositionCohortDefinition.setCompositionString("C1 AND NOT (TRANSFERREDOUT OR DIED)");
+
+    return compositionCohortDefinition;
+  }
+
+  public CohortDefinition getSummaryCompositionC2() {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName("Summary Indicator FOR C2");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("generationDate", "generationDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
+    CohortDefinition died = getTransferredOutPatientsByGenerationDate();
+
+    compositionCohortDefinition.addSearch(
+        "C2",
+        map(
+            getPatientWhoRestartedTarvAndEligibleForCd4RequestC2(),
+            "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "C1",
+        map(
+            getPatientWhoInitiatedTarvDuringPeriodC1(),
+            "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "TRANSFERREDOUT",
+        map(
+            transferredOut,
+            "startDate=${startDate},endDate=${endDate},onOrBefore=${generationDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "DIED", map(died, "endDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString(
+        "(C2 AND NOT (TRANSFERREDOUT OR DIED)) AND NOT C1");
+
+    return compositionCohortDefinition;
+  }
+
+  public CohortDefinition getSummaryCompositionC3() {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName("Summary Indicator FOR C3");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("generationDate", "generationDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
+    CohortDefinition died = getTransferredOutPatientsByGenerationDate();
+
+    compositionCohortDefinition.addSearch(
+        "C1",
+        map(
+            getPatientWhoInitiatedTarvDuringPeriodC1(),
+            "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "C2",
+        map(
+            getPatientWhoRestartedTarvAndEligibleForCd4RequestC2(),
+            "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "C3",
+        map(
+            getPatientsWithTwoHighVlResultsC3(),
+            "endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "TRANSFERREDOUT",
+        map(
+            transferredOut,
+            "startDate=${startDate},endDate=${endDate},onOrBefore=${generationDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "DIED", map(died, "endDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString(
+        "(C3 AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2)");
+
+    return compositionCohortDefinition;
+  }
+
+  public CohortDefinition getSummaryCompositionC4() {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName("Summary Indicator FOR C4");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("generationDate", "generationDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
+    CohortDefinition died = getTransferredOutPatientsByGenerationDate();
+
+    compositionCohortDefinition.addSearch(
+        "C1",
+        map(
+            getPatientWhoInitiatedTarvDuringPeriodC1(),
+            "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "C3",
+        map(
+            getPatientsWithTwoHighVlResultsC3(),
+            "endDate=${endDate},generationDate=${generationDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "C2",
+        map(
+            getPatientWhoRestartedTarvAndEligibleForCd4RequestC2(),
+            "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "C4",
+        map(
+            getPatientWithEstadiamentoIIIorIVC4(),
+            "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "TRANSFERREDOUT",
+        map(
+            transferredOut,
+            "startDate=${startDate},endDate=${endDate},onOrBefore=${generationDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "DIED", map(died, "endDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString(
+        "(C4 AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2 OR C3)");
+
+    return compositionCohortDefinition;
+  }
+
+  public CohortDefinition getSummaryCompositionC5() {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName("Summary Indicator FOR C5");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("generationDate", "generationDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
+    CohortDefinition died = getTransferredOutPatientsByGenerationDate();
+
+    compositionCohortDefinition.addSearch(
+        "C1",
+        map(
+            getPatientWhoInitiatedTarvDuringPeriodC1(),
+            "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "C2",
+        map(
+            getPatientWhoRestartedTarvAndEligibleForCd4RequestC2(),
+            "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "C3",
+        map(
+            getPatientsWithTwoHighVlResultsC3(),
+            "endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "C4",
+        map(
+            getPatientWithEstadiamentoIIIorIVC4(),
+            "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "C5",
+        map(
+            getPatientEligibleForCd4FollowupC5(),
+            "endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "TRANSFERREDOUT",
+        map(
+            transferredOut,
+            "startDate=${startDate},endDate=${endDate},onOrBefore=${generationDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "DIED", map(died, "endDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString(
+        "(C5 AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2 OR C3 OR C4)");
+
+    return compositionCohortDefinition;
+  }
+
+  public CohortDefinition getSummaryCompositionC6() {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName("Summary Indicator FOR C6");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("generationDate", "generationDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
+    CohortDefinition died = getTransferredOutPatientsByGenerationDate();
+
+    compositionCohortDefinition.addSearch(
+        "C1",
+        map(
+            getPatientWhoInitiatedTarvDuringPeriodC1(),
+            "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "C2",
+        map(
+            getPatientWhoRestartedTarvAndEligibleForCd4RequestC2(),
+            "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "C3",
+        map(
+            getPatientsWithTwoHighVlResultsC3(),
+            "endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "C4",
+        map(
+            getPatientWithEstadiamentoIIIorIVC4(),
+            "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "C5",
+        map(
+            getPatientEligibleForCd4FollowupC5(),
+            "endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "C6",
+        map(
+            getPatientPregnantEligibleForCd4RequestC6(),
+            "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "TRANSFERREDOUT",
+        map(
+            transferredOut,
+            "startDate=${startDate},endDate=${endDate},onOrBefore=${generationDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "DIED", map(died, "endDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString(
+        "(C6 AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2 OR C3 OR C4 OR C5)");
 
     return compositionCohortDefinition;
   }
