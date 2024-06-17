@@ -37,7 +37,6 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
 
   private final GenericCohortQueries genericCohortQueries;
 
-
   String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
   String MAPPING2 =
       "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}";
@@ -47,13 +46,14 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
 
   @Autowired
   public ListOfPatientsEligibleForCd4RequestCohortQueries(
-          HivMetadata hivMetadata,
-          CommonMetadata commonMetadata,
-          TbMetadata tbMetadata,
-          ResumoMensalCohortQueries resumoMensalCohortQueries,
-          ListOfPatientsInAdvancedHivIllnessCohortQueries
+      HivMetadata hivMetadata,
+      CommonMetadata commonMetadata,
+      TbMetadata tbMetadata,
+      ResumoMensalCohortQueries resumoMensalCohortQueries,
+      ListOfPatientsInAdvancedHivIllnessCohortQueries
           listOfPatientsInAdvancedHivIllnessCohortQueries,
-          ListOfPatientsOnAdvancedHivIllnessQueries listOfPatientsOnAdvancedHivIllnessQueries, GenericCohortQueries genericCohortQueries) {
+      ListOfPatientsOnAdvancedHivIllnessQueries listOfPatientsOnAdvancedHivIllnessQueries,
+      GenericCohortQueries genericCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
     this.tbMetadata = tbMetadata;
@@ -61,7 +61,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     this.listOfPatientsInAdvancedHivIllnessCohortQueries =
         listOfPatientsInAdvancedHivIllnessCohortQueries;
     this.listOfPatientsOnAdvancedHivIllnessQueries = listOfPatientsOnAdvancedHivIllnessQueries;
-      this.genericCohortQueries = genericCohortQueries;
+    this.genericCohortQueries = genericCohortQueries;
   }
 
   /**
@@ -134,9 +134,9 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
         "DIED", map(died, "endDate=${generationDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-            "BASECOHORT",
-            EptsReportUtils.map(
-                    genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
+        "BASECOHORT",
+        EptsReportUtils.map(
+            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
         "((STARTED OR RESTARTED OR HIGHVL OR ESTADIO OR ELIGIBLECD4 OR PREGNANT) AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)");
@@ -1004,7 +1004,10 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
     CohortDefinition died = getTransferredOutPatientsByGenerationDate();
 
-    compositionCohortDefinition.addSearch("C1", map(getPatientWhoInitiatedTarvDuringPeriodC1(),
+    compositionCohortDefinition.addSearch(
+        "C1",
+        map(
+            getPatientWhoInitiatedTarvDuringPeriodC1(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
