@@ -8,6 +8,7 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.data.converter.ConceptNameConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.StateOfStayArtPatientConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsEligibleForVLCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsEligibleForVLDataDefinitionQueries;
@@ -118,11 +119,12 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
         "endDate=${endDate},location=${location}",
         null);
 
+    // Data Último Pedido de Carga Viral - Sheet 1: Column J */
     pdd.addColumn(
-        "data_ultimo_pedido_vl", // TODO
-        listOfpatientsEligibleForVLDataDefinitionQueries.getPatientsAndMostRecentVLResultDate(),
-        "startDate=${startDate},location=${location}");
-        
+        "data_ultimo_pedido_vl",
+        listOfpatientsEligibleForVLDataDefinitionQueries.getPatientsLastVLRequestDate(),
+        "endDate=${endDate},location=${location}");
+
     pdd.addColumn(
         "last_vl_date",
         listOfpatientsEligibleForVLDataDefinitionQueries.getPatientsAndMostRecentVLResultDate(),
@@ -178,7 +180,11 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
         "startDate=${startDate},location=${location}",
         null);
 
-    // ??? - Sheet 1: Column T */
+    // Data da Consulta mais recente com PopChave informado - Sheet 1: Column T */
+    pdd.addColumn(
+        "keypop_last_date",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastKeyPopulationRegistrationDate(),
+        "endDate=${endDate}");
 
     // HSH - Sheet 1: Column U */
     pdd.addColumn(
@@ -235,38 +241,24 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
     pdd.addColumn(
         "ovc_estado_beneficiario",
         listOfPatientsDefaultersOrIITCohortQueries.getLastOVCDate(
-            commonMetadata.getOVCEstadoBeneficiarioPersonAttributeType(),
-            true),
+            commonMetadata.getOVCEstadoBeneficiarioPersonAttributeType(), true),
         "endDate=${endDate}",
         new NotApplicableIfNullConverter());
 
     // Saída de TARV - Sheet 1: Column AC */
     pdd.addColumn(
-        "saida_tarv",// TODO
-        listOfPatientsDefaultersOrIITCohortQueries.getLastOVCDate(
-            commonMetadata.getOVCEstadoBeneficiarioPersonAttributeType(),
-            true),
-        "endDate=${endDate}",
-        new NotApplicableIfNullConverter());
+        "saida_tarv",
+        listOfpatientsEligibleForVLDataDefinitionQueries.getARTExitStatus(),
+        "startDate=${startDate},endDate=${endDate},location=${location",
+        new StateOfStayArtPatientConverter());
 
-    // Saída de TARV - Sheet 1: Column AC */
+    // Data de Saída de TARV - Sheet 1: Column AD */
     pdd.addColumn(
-        "saida_tarv_date",// TODO
-        listOfPatientsDefaultersOrIITCohortQueries.getLastOVCDate(
-            commonMetadata.getOVCEstadoBeneficiarioPersonAttributeType(),
-            true),
-        "endDate=${endDate}",
-        new NotApplicableIfNullConverter());
+        "data_saida_tarv",
+        listOfpatientsEligibleForVLDataDefinitionQueries.getARTExitDate(),
+        "endDate=${endDate}");
 
-    // Saída de TARV - Sheet 1: Column AC */
-    pdd.addColumn(
-        "ovc_estado_beneficiario",
-        listOfPatientsDefaultersOrIITCohortQueries.getLastOVCDate(
-            commonMetadata.getOVCEstadoBeneficiarioPersonAttributeType(),
-            true),
-        "endDate=${endDate}",
-        new NotApplicableIfNullConverter());
-
+    // Observações - Sheet 1: Column AE */
     pdd.addColumn("pid", new PersonIdDataDefinition(), "");
 
     return pdd;
