@@ -272,7 +272,7 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
             .getMostRecentMdcConsultationDate(),
         "location=${location}");
 
-    //    // 26 - MDS1 - Sheet 1: Column Z */
+    // 26 - MDS1 - Sheet 1: Column Z */
     pdd.addColumn(
         "mds1",
         listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.getMdcDispensationType(
@@ -374,7 +374,8 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
     pdd.addColumn(
         "ovc_estado_beneficiario",
         listOfPatientsDefaultersOrIITCohortQueries.getLastOVCDate(
-            commonMetadata.getOVCEstadoBeneficiarioPersonAttributeType(), true),
+            commonMetadata.getOVCEstadoBeneficiarioPersonAttributeType(),
+            true),
         "endDate=${endDate}",
         new NotApplicableIfNullConverter());
 

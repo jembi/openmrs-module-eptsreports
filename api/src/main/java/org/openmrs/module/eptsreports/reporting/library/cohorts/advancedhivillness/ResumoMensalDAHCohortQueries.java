@@ -27,8 +27,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ResumoMensalDAHCohortQueries {
 
-  private final ListOfPatientsInAdvancedHivIllnessCohortQueries
-      listOfPatientsInAdvancedHivIllnessCohortQueries;
   private final HivMetadata hivMetadata;
 
   private final TbMetadata tbMetadata;
@@ -41,15 +39,11 @@ public class ResumoMensalDAHCohortQueries {
 
   @Autowired
   public ResumoMensalDAHCohortQueries(
-      ListOfPatientsInAdvancedHivIllnessCohortQueries
-          listOfPatientsInAdvancedHivIllnessCohortQueries,
       HivMetadata hivMetadata,
       TbMetadata tbMetadata,
       ResumoMensalCohortQueries resumoMensalCohortQueries,
       IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries,
       AgeCohortQueries ageCohortQueries) {
-    this.listOfPatientsInAdvancedHivIllnessCohortQueries =
-        listOfPatientsInAdvancedHivIllnessCohortQueries;
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
@@ -506,7 +500,11 @@ public class ResumoMensalDAHCohortQueries {
                     hivMetadata.getCragSoroLabsetConcept(), hivMetadata.getCragSoroConcept()),
                 Collections.singletonList(hivMetadata.getPositive()))));
 
-    cd.addSearch("onDAH", mapStraightThrough(getPatientsWhoStartedFollowupOnDAHComposition()));
+    cd.addSearch(
+        "onDAH",
+        map(
+            getPatientsWhoStartedFollowupOnDAHComposition(),
+            "startDate=${endDate},endDate={endDate},location=${location}"));
 
     cd.setCompositionString("onDAH AND cragResults AND cragPositive");
     return cd;
@@ -537,7 +535,11 @@ public class ResumoMensalDAHCohortQueries {
             getPatientsWithPositiveOrNegativeCragLCRResults(
                 Arrays.asList(hivMetadata.getPositive(), hivMetadata.getNegative()))));
 
-    cd.addSearch("onDAH", mapStraightThrough(getPatientsWhoStartedFollowupOnDAHComposition()));
+    cd.addSearch(
+        "onDAH",
+        map(
+            getPatientsWhoStartedFollowupOnDAHComposition(),
+            "startDate=${endDate},endDate={endDate},location=${location}"));
 
     cd.setCompositionString("onDAH AND cragPositive AND cragResults");
     return cd;
@@ -562,7 +564,11 @@ public class ResumoMensalDAHCohortQueries {
 
     cd.addSearch("mccPreventivo", mapStraightThrough(getPatientsWhoStartedMccPreventivo()));
 
-    cd.addSearch("onDAH", mapStraightThrough(getPatientsWhoStartedFollowupOnDAHComposition()));
+    cd.addSearch(
+        "onDAH",
+        map(
+            getPatientsWhoStartedFollowupOnDAHComposition(),
+            "startDate=${endDate},endDate={endDate},location=${location}"));
 
     cd.setCompositionString("onDAH AND cragPositive AND mccPreventivo");
     return cd;
@@ -596,7 +602,11 @@ public class ResumoMensalDAHCohortQueries {
 
     cd.addSearch("mmcTreatment", mapStraightThrough(getPatientsInMccTretament()));
 
-    cd.addSearch("onDAH", mapStraightThrough(getPatientsWhoStartedFollowupOnDAHComposition()));
+    cd.addSearch(
+        "onDAH",
+        map(
+            getPatientsWhoStartedFollowupOnDAHComposition(),
+            "startDate=${endDate},endDate={endDate},location=${location}"));
 
     cd.setCompositionString("onDAH AND cragPositive AND cragLCRPositive AND mmcTreatment");
     return cd;
@@ -1194,7 +1204,11 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "onSKIndication", mapStraightThrough(getPatientsWithSarcomaSKAndQuimiotherapyIndication()));
 
-    cd.addSearch("onDAH", mapStraightThrough(getPatientsWhoStartedFollowupOnDAHComposition()));
+    cd.addSearch(
+        "onDAH",
+        map(
+            getPatientsWhoStartedFollowupOnDAHComposition(),
+            "startDate=${endDate},endDate={endDate},location=${location}"));
 
     cd.setCompositionString("onDAH AND onSKIndication");
     return cd;
@@ -1218,7 +1232,11 @@ public class ResumoMensalDAHCohortQueries {
         "onSKIndicationStartedQuimio",
         mapStraightThrough(getPatientsWithSarcomaSKAndStartedQuimiotherapy()));
 
-    cd.addSearch("onDAH", mapStraightThrough(getPatientsWhoStartedFollowupOnDAHComposition()));
+    cd.addSearch(
+        "onDAH",
+        map(
+            getPatientsWhoStartedFollowupOnDAHComposition(),
+            "startDate=${endDate},endDate={endDate},location=${location}"));
 
     cd.setCompositionString("onDAH AND onSKIndicationStartedQuimio");
     return cd;

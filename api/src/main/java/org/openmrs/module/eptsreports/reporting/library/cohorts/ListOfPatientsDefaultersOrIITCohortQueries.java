@@ -2368,36 +2368,6 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     return sqlPatientDataDefinition;
   }
 
-  public DataDefinition getLastKeyPopulationRegistrationDate() {
-    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
-    spdd.setName("Patient's Most Recent Ficha Clinica with KPOP Registration Date");
-    spdd.addParameter(new Parameter("location", "location", Location.class));
-    spdd.addParameter(new Parameter("endDate", "endDate", Date.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("23703", hivMetadata.getKeyPopulationConcept().getConceptId());
-
-    String sql =
-        " SELECT p.patient_id AS patient_id, Max(e.encounter_datetime) AS last_date "
-            + " FROM patient p "
-            + " 	INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + " 	INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + " WHERE e.voided = 0 "
-            + " 	AND p.voided = 0 "
-            + " 	AND o.voided = 0 "
-            + " 	AND e.location_id = @location "
-            + " 	AND e.encounter_type = ${6} "
-            + " 	AND o.concept_id = ${23703} "
-            + " 	AND e.encounter_datetime <= CURRENT_DATE() "
-            + " GROUP BY p.patient_id";
-
-    StringSubstitutor substitutor = new StringSubstitutor(map);
-
-    spdd.setQuery(substitutor.replace(sql));
-    return spdd;
-  }
-
   public DataDefinition getLastRegisteredKeyPopulation(Concept keyPopConcept) {
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
     spdd.setName("Patient's Most Recent Ficha Clinica with KPOP Registered");
@@ -2417,9 +2387,10 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "   END AS S_or_N "
             + " FROM ( "
             + "   SELECT p.patient_id, value_coded "
+            + "   INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "   FROM patient p "
             + "     LEFT JOIN ( "
-            + "       SELECT p.person_id AS patient_id, Max(e.encounter_datetime) AS last_date, o.value_coded "
+            + "       SELECT p.person_id AS patient_id, Max(e.encounter_datetime) AS last_date, ${keypop} AS value_coded "
             + "   	  FROM   person p "
             + "   	  INNER JOIN encounter e  ON e.patient_id = p.person_id "
             + "   	  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -2445,6 +2416,9 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "         AND e.encounter_datetime <= CURRENT_DATE() "
             + "       GROUP  BY p.person_id "
             + "   ) AS has_kpop ON p.patient_id = has_kpop.patient_id"
+            + "   WHERE p.voided = 0 "
+            + "     AND e.location_id = :location "
+            + "   GROUP BY p.patient_id "
             + " ) S_or_N";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
@@ -2473,7 +2447,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "  INNER JOIN person_attribute_type pat ON pa.person_attribute_type_id = pat.person_attribute_type_id "
             + "  WHERE pat.person_attribute_type_id = ${ovctype} ";
     if (Boolean.TRUE.equals(checkEstado)) {
-      sql += "     AND pa.value IN ( ${165472}, ${165473}, ${165475} )";
+      sql += "     AND o.concept_id IN ( ${165472}, ${165473}, ${165475} )";
     }
     sql +=
         "          AND o.location_id = :location "
