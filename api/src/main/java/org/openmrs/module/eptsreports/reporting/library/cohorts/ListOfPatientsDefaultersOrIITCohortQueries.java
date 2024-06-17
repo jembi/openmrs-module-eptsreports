@@ -2473,7 +2473,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "  INNER JOIN person_attribute_type pat ON pa.person_attribute_type_id = pat.person_attribute_type_id "
             + "  WHERE pat.person_attribute_type_id = ${ovctype} ";
     if (Boolean.TRUE.equals(checkEstado)) {
-      sql += "     AND o.concept_id IN ( ${165472}, ${165473}, ${165475} )";
+      sql += "     AND pa.value IN ( ${165472}, ${165473}, ${165475} )";
     }
     sql +=
         "          AND o.location_id = :location "
