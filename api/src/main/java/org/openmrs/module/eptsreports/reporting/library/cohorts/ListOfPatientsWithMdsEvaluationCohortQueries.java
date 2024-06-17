@@ -359,7 +359,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     String query =
-        "         SELECT     p.patient_id, "
+        " SELECT min.patient_id, min.encounter_date "
+            + " FROM ( "
+            + "         SELECT     p.patient_id, "
             + "                    MIN(e.encounter_datetime) AS encounter_date "
             + "         FROM       patient p "
             + "         INNER JOIN encounter e "
@@ -442,7 +444,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " AND o.value_coded = ${165307} "
             + " AND e.encounter_datetime >= art.art_encounter "
             + " AND e.encounter_datetime <= DATE_ADD( art.art_encounter, INTERVAL 33 DAY ) "
-            + " GROUP  BY p.patient_id";
+            + " GROUP  BY p.patient_id"
+            + " ) min "
+            + " GROUP BY min.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1407,7 +1411,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  good_consultations.good_adhesion ) "
             + "               THEN 'Sim' "
             + "           WHEN ( bad_consultations.bad_adhesion ) "
-            + "               THEN 'Nao' "
+            + "               THEN 'Não' "
             + "          ELSE '' "
             + "           END AS adhesion "
             + "FROM   patient p "
@@ -4602,7 +4606,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "       THEN 'Sim' "
             + "         WHEN ( consultation_tb.tb_consultations <> "
             + "                consultations.nr_consultations ) "
-            + "       THEN 'Nao' "
+            + "       THEN 'Não' "
             + "       ELSE '' "
             + "       END AS tb_screening "
             + "FROM   patient p "
