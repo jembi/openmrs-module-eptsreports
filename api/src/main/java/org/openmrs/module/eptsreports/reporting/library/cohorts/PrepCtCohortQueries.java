@@ -553,7 +553,7 @@ public class PrepCtCohortQueries {
         EptsReportUtils.map(
             exclusion, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
-    cd.setCompositionString("(homosexual) AND NOT exclusion");
+    cd.setCompositionString("(homosexual AND male) AND NOT exclusion");
 
     return cd;
   }
