@@ -1543,7 +1543,7 @@ public class QualityImprovement2020Queries {
             + "      AND e.encounter_datetime >= DATE_SUB(most_recent.last_consultation, INTERVAL "
             + numberOfMonths
             + "      MONTH) "
-            + "      AND e.encounter_datetime <= most_recent.last_consultation "
+            + "      AND e.encounter_datetime < most_recent.last_consultation "
             + "      GROUP BY p.patient_id "
             + "       UNION "
             + "     SELECT p.patient_id, max(o.obs_datetime) as last_encounter FROM patient p "
@@ -1570,7 +1570,7 @@ public class QualityImprovement2020Queries {
             + "         AND o.obs_datetime >= DATE_SUB(most_recent.last_consultation, INTERVAL "
             + numberOfMonths
             + "         MONTH) "
-            + "         AND o.obs_datetime <= most_recent.last_consultation "
+            + "         AND o.obs_datetime < most_recent.last_consultation "
             + "         GROUP BY p.patient_id "
             + ") abandoned GROUP BY abandoned.patient_id";
 
