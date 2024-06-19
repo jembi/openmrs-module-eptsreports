@@ -261,6 +261,62 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
     return sqlPatientDataDefinition;
   }
 
+  /**
+   * <b>Mother’s TARV NID (NID TARV da mãe) – relacionamento em SESP
+   *
+   * <p>The NID registered in the Relacionamentos Existentes do Paciente: Mãe field on CCR: Ficha
+   * Resumo (obtained in CCR1_FR6)
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getMothersNID() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Mother’s TARV NID (NID TARV da mãe)");
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
+    map.put("1477", hivMetadata.getNidServiceTarvIdentifierType().getPatientIdentifierTypeId());
+    map.put("14", hivMetadata.getMotherToSonRelationshipType().getRelationshipTypeId());
+    map.put("2", hivMetadata.getNidServiceTarvIdentifierType().getPatientIdentifierTypeId());
+
+    String query =
+        "SELECT mother.patient_id, pi.identifier  "
+            + "  FROM patient p INNER JOIN patient_identifier pi "
+            + "                       ON p.patient_id=pi.patient_id "
+            + "               INNER JOIN patient_identifier_type pit "
+            + "                       ON pit.patient_identifier_type_id=pi.identifier_type "
+            + "               INNER JOIN ( "
+            + getPatientAndMotherIdsQuery()
+            + " ) mother ON mother.mother_id = p.patient_id "
+            + "WHERE p.voided=0 "
+            + "  AND pi.voided=0 "
+            + "  AND pit.retired=0 "
+            + "  AND pi.preferred = 1 "
+            + "  AND pit.patient_identifier_type_id = ${2} "
+            + "GROUP BY p.patient_id "
+            + "UNION "
+            + "SELECT mother.patient_id, pi.identifier  "
+            + "  FROM patient p INNER JOIN patient_identifier pi "
+            + "                       ON p.patient_id=pi.patient_id "
+            + "               INNER JOIN patient_identifier_type pit "
+            + "                       ON pit.patient_identifier_type_id=pi.identifier_type "
+            + "               INNER JOIN ( "
+            + getPatientAndMotherIdsQuery()
+            + " ) mother ON mother.mother_id = p.patient_id "
+            + "WHERE p.voided=0 "
+            + "  AND pi.voided=0 "
+            + "  AND pit.retired=0 "
+            + "  AND pit.patient_identifier_type_id = ${2} "
+            + "GROUP BY p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlPatientDataDefinition;
+  }
+
   private String getCCRResumoEnrollmentDateQuery() {
     return "SELECT p.patient_id, "
         + "                          Min(e.encounter_datetime) AS enrollment_date "
@@ -299,5 +355,29 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
         + "  AND e.encounter_datetime >= :startDate "
         + "  AND e.encounter_datetime <= :endDate "
         + "GROUP  BY p.patient_id";
+  }
+
+  private String getPatientAndMotherIdsQuery() {
+    return " SELECT p.patient_id, r.person_a as mother_id "
+        + "FROM   patient p "
+        + "       INNER JOIN encounter e "
+        + "               ON p.patient_id = e.patient_id "
+        + "       INNER JOIN patient_identifier pi "
+        + "               ON p.patient_id = pi.patient_id "
+        + "       INNER JOIN relationship r "
+        + "               ON p.patient_id = r.person_b "
+        + "       INNER JOIN ( "
+        + getCCRResumoEnrollmentDateQuery()
+        + " )ccr_enrollment "
+        + "               ON ccr_enrollment.patient_id = p.patient_id "
+        + "WHERE  p.voided = 0 "
+        + "       AND e.voided = 0 "
+        + "       AND pi.voided = 0 "
+        + "       AND r.voided = 0 "
+        + "       AND e.encounter_type = ${92} "
+        + "       AND e.encounter_datetime = ccr_enrollment.enrollment_date "
+        + "       AND r.relationship = ${14} "
+        + "       AND pi.identifier_type = ${2} "
+        + "GROUP  BY p.patient_id ";
   }
 }

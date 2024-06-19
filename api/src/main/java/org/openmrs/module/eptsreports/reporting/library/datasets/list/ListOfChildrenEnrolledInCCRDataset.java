@@ -237,6 +237,10 @@ public class ListOfChildrenEnrolledInCCRDataset extends BaseDataSet {
     patientDataSetDefinition.addColumn(
         "mother_name", listOfChildrenEnrolledInCCRDataDefinitionQueries.getMothersName(), mappings);
 
+    // Mother’s TARV NID (NID TARV da Mãe) – Sheet 1: Column X
+    patientDataSetDefinition.addColumn(
+        "mother_nid", listOfChildrenEnrolledInCCRDataDefinitionQueries.getMothersNID(), mappings);
+
     return patientDataSetDefinition;
   }
 

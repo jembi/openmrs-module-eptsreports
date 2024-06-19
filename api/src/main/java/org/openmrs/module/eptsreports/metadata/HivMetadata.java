@@ -2630,7 +2630,7 @@ public class HivMetadata extends ProgramsMetadata {
 
   // Identifier types
   /**
-   * <b>program_id = 2 </b>
+   * <b>Patient Identifier Type = 2 </b>
    *
    * <p><b>Name:</b> NID (SERVICO TARV)
    *
@@ -5928,5 +5928,21 @@ public class HivMetadata extends ProgramsMetadata {
         Context.getAdministrationService()
             .getGlobalProperty("eptsreports.ccrResumoEncounterTypeUuid");
     return getEncounterType(uuid);
+  }
+
+  /**
+   * <b>relationship_type_id = 14</b>
+   *
+   * <p><b>Name:</b> Relacionamento entre mãe e filho
+   *
+   * <p><b>Description:</b> Relacionamento entre mãe e filho
+   *
+   * @return {@link RelationshipType}
+   */
+  public RelationshipType getMotherToSonRelationshipType() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.motherToSonRelationshipTypeUuid");
+    return getRelationshipType(uuid);
   }
 }

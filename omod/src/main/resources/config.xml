@@ -4101,4 +4101,12 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.motherToSonRelationshipTypeUuid</property>
+		<defaultValue>2b00dfef-a5dc-49e6-b406-762683938efa</defaultValue>
+		<description>
+			UUID for Relacionamento entre mãe e filho Relationship Type
+		</description>
+	</globalProperty>
+
 </module>
