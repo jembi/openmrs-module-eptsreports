@@ -1011,6 +1011,11 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
+        "BASECOHORT",
+        EptsReportUtils.map(
+            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
         "TRANSFERREDOUT",
         map(
             transferredOut,
@@ -1018,7 +1023,8 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     compositionCohortDefinition.addSearch(
         "DIED", map(died, "endDate=${generationDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString("C1 AND NOT (TRANSFERREDOUT OR DIED)");
+    compositionCohortDefinition.setCompositionString(
+        "(C1 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)");
 
     return compositionCohortDefinition;
   }
@@ -1056,8 +1062,13 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     compositionCohortDefinition.addSearch(
         "DIED", map(died, "endDate=${generationDate},location=${location}"));
 
+    compositionCohortDefinition.addSearch(
+        "BASECOHORT",
+        EptsReportUtils.map(
+            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
+
     compositionCohortDefinition.setCompositionString(
-        "(C2 AND NOT (TRANSFERREDOUT OR DIED)) AND NOT C1");
+        "((C2 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)) AND NOT C1");
 
     return compositionCohortDefinition;
   }
@@ -1101,8 +1112,13 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     compositionCohortDefinition.addSearch(
         "DIED", map(died, "endDate=${generationDate},location=${location}"));
 
+    compositionCohortDefinition.addSearch(
+        "BASECOHORT",
+        EptsReportUtils.map(
+            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
+
     compositionCohortDefinition.setCompositionString(
-        "(C3 AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2)");
+        "((C3 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2)");
 
     return compositionCohortDefinition;
   }
@@ -1151,8 +1167,13 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     compositionCohortDefinition.addSearch(
         "DIED", map(died, "endDate=${generationDate},location=${location}"));
 
+    compositionCohortDefinition.addSearch(
+        "BASECOHORT",
+        EptsReportUtils.map(
+            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
+
     compositionCohortDefinition.setCompositionString(
-        "(C4 AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2 OR C3)");
+        "((C4 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2 OR C3)");
 
     return compositionCohortDefinition;
   }
@@ -1208,8 +1229,13 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     compositionCohortDefinition.addSearch(
         "DIED", map(died, "endDate=${generationDate},location=${location}"));
 
+    compositionCohortDefinition.addSearch(
+        "BASECOHORT",
+        EptsReportUtils.map(
+            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
+
     compositionCohortDefinition.setCompositionString(
-        "(C5 AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2 OR C3 OR C4)");
+        "((C5 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2 OR C3 OR C4)");
 
     return compositionCohortDefinition;
   }
@@ -1270,8 +1296,13 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     compositionCohortDefinition.addSearch(
         "DIED", map(died, "endDate=${generationDate},location=${location}"));
 
+    compositionCohortDefinition.addSearch(
+        "BASECOHORT",
+        EptsReportUtils.map(
+            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
+
     compositionCohortDefinition.setCompositionString(
-        "(C6 AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2 OR C3 OR C4 OR C5)");
+        "((C6 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2 OR C3 OR C4 OR C5)");
 
     return compositionCohortDefinition;
   }
