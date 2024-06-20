@@ -18,6 +18,7 @@ import org.openmrs.PersonAttributeType;
 import org.openmrs.Program;
 import org.openmrs.ProgramWorkflow;
 import org.openmrs.ProgramWorkflowState;
+import org.openmrs.RelationshipType;
 import org.openmrs.api.context.Context;
 import org.springframework.stereotype.Component;
 
