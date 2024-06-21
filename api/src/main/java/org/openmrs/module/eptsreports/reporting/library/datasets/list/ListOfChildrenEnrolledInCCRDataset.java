@@ -241,6 +241,12 @@ public class ListOfChildrenEnrolledInCCRDataset extends BaseDataSet {
     patientDataSetDefinition.addColumn(
         "mother_nid", listOfChildrenEnrolledInCCRDataDefinitionQueries.getMothersNID(), mappings);
 
+    // Aceita Visita Domiciliar – Sheet 1: Column Z
+    patientDataSetDefinition.addColumn(
+        "visit_consent",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getHomeVisitConsent(),
+        mappings);
+
     return patientDataSetDefinition;
   }
 

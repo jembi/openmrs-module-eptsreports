@@ -317,6 +317,52 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
     return sqlPatientDataDefinition;
   }
 
+  /**
+   * <b>Patient’s consent for home visits on CCR: Ficha Resumo
+   *
+   * <p>The response registered in the Visita Domiciliar field (Sim ou Não) on CCR: Ficha Resumo
+   * (obtained in CCR1_FR6).
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getHomeVisitConsent() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Aceita Visita Domiciliar");
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
+    map.put("2071", commonMetadata.getAcceptsHomeVisitConcept().getConceptId());
+    map.put("1065", commonMetadata.getYesConcept().getConceptId());
+    map.put("1066", commonMetadata.getNoConcept().getConceptId());
+
+    String query =
+        " SELECT p.patient_id, o.value_coded AS response "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "       INNER JOIN ( "
+            + getCCRResumoEnrollmentDateQuery()
+            + " )ccr_enrollment "
+            + "               ON ccr_enrollment.patient_id = p.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${92} "
+            + "       AND o.concept_id = ${2071} "
+            + "         AND o.value_coded IN (${1065}, ${1066}) "
+            + "       AND e.encounter_datetime = ccr_enrollment.enrollment_date "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlPatientDataDefinition;
+  }
+
   private String getCCRResumoEnrollmentDateQuery() {
     return "SELECT p.patient_id, "
         + "                          Min(e.encounter_datetime) AS enrollment_date "

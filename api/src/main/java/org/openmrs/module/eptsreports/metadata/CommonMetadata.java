@@ -896,4 +896,20 @@ public class CommonMetadata extends Metadata {
         Context.getAdministrationService().getGlobalProperty("eptsreports.mothersNameConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 2071</b>
+   *
+   * <p><b>Name:</b> ACCEPTS HOME VISIT
+   *
+   * <p><b>Description:ACCEPTS HOME VISIT
+   *
+   * @return {@link Concept}
+   */
+  public Concept getAcceptsHomeVisitConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.acceptsHomeVisitConceptUuid");
+    return getConcept(uuid);
+  }
 }

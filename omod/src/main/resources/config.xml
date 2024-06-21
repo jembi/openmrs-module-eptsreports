@@ -4109,4 +4109,12 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.acceptsHomeVisitConceptUuid</property>
+		<defaultValue>e1e0c5f0-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for ACCEPTS HOME VISIT Concept
+		</description>
+	</globalProperty>
+
 </module>
