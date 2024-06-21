@@ -644,7 +644,8 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
         " SELECT most_recent.patient_id, MAX(most_recent.encounter_datetime) most_recent "
             + " FROM (        "
             + tbScreeningQuery
-            + "                ) most_recent ";
+            + "                ) most_recent "
+            + " GROUP BY patient_id";
 
     sqlPatientDataDefinition.setQuery(query);
 
