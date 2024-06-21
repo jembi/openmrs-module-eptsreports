@@ -1808,7 +1808,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMdsDate(int minNumberOfMonths, int maxNumberOfMonths, boolean b9Orc9) {
+  public DataDefinition getMdsDate(int minNumberOfMonths, int maxNumberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "D9- Data de inscrição no MDS: (coluna CD) - Resposta = Data de Inscrição (RF54)");
@@ -1866,15 +1866,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + maxNumberOfMonths
             + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
-            + "                               AND otype.value_coded IS NOT NULL ) ";
-    query +=
-        b9Orc9
-            ? "                  AND         ( ostate.concept_id = ${165322} "
-                + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
-            : "                  AND         ( ostate.concept_id = ${165322} "
-                + "                                 AND  ostate.value_coded IN (${1256}, ${1257}, ${1267}) ) ) ";
-    query +=
-        "                  AND  otype.obs_group_id = ostate.obs_group_id "
+            + "                               AND otype.value_coded IS NOT NULL ) "
+            + "                  AND         ( ostate.concept_id = ${165322} "
+            + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
+            + "                  AND  otype.obs_group_id = ostate.obs_group_id "
             + "                  GROUP BY   p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
