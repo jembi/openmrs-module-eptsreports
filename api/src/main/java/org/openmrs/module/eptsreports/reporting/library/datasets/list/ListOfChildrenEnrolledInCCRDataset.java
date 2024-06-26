@@ -259,6 +259,12 @@ public class ListOfChildrenEnrolledInCCRDataset extends BaseDataSet {
         listOfChildrenEnrolledInCCRDataDefinitionQueries.getFirstCCRSeguimentoDate(false),
         mappings);
 
+    // Next Scheduled CCR Consultation Date – Sheet 1: Column AC
+    patientDataSetDefinition.addColumn(
+        "next_ccr_consultation",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getNextScheduledCCRConsultation(),
+        mappings);
+
     return patientDataSetDefinition;
   }
 

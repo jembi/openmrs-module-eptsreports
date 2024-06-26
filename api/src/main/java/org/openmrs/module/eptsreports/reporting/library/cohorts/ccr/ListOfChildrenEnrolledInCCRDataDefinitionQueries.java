@@ -365,13 +365,10 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
 
   /**
    * <b>First CCR Consultation Date /
-   *
-   * <li>Earliest CCR: Ficha Seguimento consultation date (Data da consulta)
-   * registered on or after the CCR enrollment date (CCR1_FR6) and during
-   * the reporting period
-   * <li> Most recent CCR: Ficha Seguimento consultation date (Data da consulta)
-   * registered on or after the CCR enrollment date (CCR1_FR6) and during the
-   * reporting period
+   * <li>Earliest CCR: Ficha Seguimento consultation date (Data da consulta) registered on or after
+   *     the CCR enrollment date (CCR1_FR6) and during the reporting period
+   * <li>Most recent CCR: Ficha Seguimento consultation date (Data da consulta) registered on or
+   *     after the CCR enrollment date (CCR1_FR6) and during the reporting period
    *
    * @return {@link DataDefinition}
    */
@@ -396,18 +393,76 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON p.patient_id = e.patient_id "
-            + "       INNER JOIN obs o "
-            + "               ON e.encounter_id = o.encounter_id "
             + "       INNER JOIN ( "
             + getChildrenEnrolledInCCRQuery()
             + " )ccr_enrollment "
             + "               ON ccr_enrollment.patient_id = p.patient_id "
             + "WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
             + "       AND e.encounter_type = ${93} "
             + "       AND e.encounter_datetime >= ccr_enrollment.enrollment_date "
             + "       AND e.encounter_datetime =< :endDate "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>Next Scheduled CCR Consultation Date </b>
+   *
+   * <p>Next consultation date (Data da consulta seguinte) registered on the most recent CCR: Ficha
+   * Seguimento consultation date (Column AB) registered on or after the CCR enrollment date
+   * (CCR1_FR6) and during the reporting period
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getNextScheduledCCRConsultation() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+
+    sqlPatientDataDefinition.setName("Next Scheduled CCR Consultation Date");
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getCCRProgram().getProgramId());
+    map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1410", hivMetadata.getReturnVisitDateConcept().getConceptId());
+
+    String query =
+        " SELECT p.patient_id, o.value_datime AS next_consultation_date "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "       INNER JOIN ( "
+            + " SELECT p.patient_id, MAX(e.encounter_datetime) AS consultation_date "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "       INNER JOIN ( "
+            + getChildrenEnrolledInCCRQuery()
+            + " )ccr_enrollment "
+            + "               ON ccr_enrollment.patient_id = p.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND e.encounter_type = ${93} "
+            + "       AND e.encounter_datetime >= ccr_enrollment.enrollment_date "
+            + "       AND e.encounter_datetime =< :endDate "
+            + "GROUP  BY p.patient_id"
+            + " )last_ccr "
+            + "               ON last_ccr.patient_id = p.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${93} "
+            + "       AND e.encounter_datetime = last_ccr.consultation_date "
+            + "       AND o.concept_id = ${1410} "
+            + "       AND o.value_datime IS NOT NULL "
             + "GROUP  BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
