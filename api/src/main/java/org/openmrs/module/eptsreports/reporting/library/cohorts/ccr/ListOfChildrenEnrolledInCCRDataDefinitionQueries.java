@@ -363,6 +363,58 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
     return sqlPatientDataDefinition;
   }
 
+  /**
+   * <b>First CCR Consultation Date /
+   *
+   * <li>Earliest CCR: Ficha Seguimento consultation date (Data da consulta)
+   * registered on or after the CCR enrollment date (CCR1_FR6) and during
+   * the reporting period
+   * <li> Most recent CCR: Ficha Seguimento consultation date (Data da consulta)
+   * registered on or after the CCR enrollment date (CCR1_FR6) and during the
+   * reporting period
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getFirstCCRSeguimentoDate(Boolean firstOrLastConsultation) {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Patient’s first CCR Seguimento Consultation date");
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getCCRProgram().getProgramId());
+    map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+
+    String query =
+        " SELECT p.patient_id, "
+                .concat(
+                    firstOrLastConsultation
+                        ? " MIN(e.encounter_datetime) AS consultation_date "
+                        : "MAX(e.encounter_datetime) AS consultation_date ")
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "       INNER JOIN ( "
+            + getChildrenEnrolledInCCRQuery()
+            + " )ccr_enrollment "
+            + "               ON ccr_enrollment.patient_id = p.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${93} "
+            + "       AND e.encounter_datetime >= ccr_enrollment.enrollment_date "
+            + "       AND e.encounter_datetime =< :endDate "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlPatientDataDefinition;
+  }
+
   private String getCCRResumoEnrollmentDateQuery() {
     return "SELECT p.patient_id, "
         + "                          Min(e.encounter_datetime) AS enrollment_date "

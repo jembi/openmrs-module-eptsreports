@@ -5946,4 +5946,20 @@ public class HivMetadata extends ProgramsMetadata {
             .getGlobalProperty("eptsreports.motherToSonRelationshipTypeUuid");
     return getRelationshipType(uuid);
   }
+
+  /**
+   * <b>encounterType_id = 93</b>
+   *
+   * <p><b>Name:</b> CCR - Seguimento
+   *
+   * <p><b>Description:</b> Consulta de Seguimento de criança em Risco
+   *
+   * @return {@link EncounterType}
+   */
+  public EncounterType getCCRSeguimentoEncounterType() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.ccrSeguimentoEncounterTypeUuid");
+    return getEncounterType(uuid);
+  }
 }
