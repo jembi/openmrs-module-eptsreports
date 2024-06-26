@@ -380,20 +380,22 @@ public class PrepCtCohortQueries {
     map.put("20426", hivMetadata.getImprisonmentConcept().getConceptId());
 
     String query =
-        " SELECT p.patient_id "
-            + " FROM   patient p "
-            + "       INNER JOIN encounter e "
-            + "               ON e.patient_id = p.patient_id "
-            + "       INNER JOIN obs o "
-            + "               ON o.encounter_id = e.encounter_id "
-            + "WHERE  e.voided = 0 "
+        " SELECT p.person_id "
+            + " FROM  person p "
+            + "       INNER JOIN encounter e ON e.patient_id = p.person_id "
+            + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + " WHERE e.voided = 0 "
             + "       AND p.voided = 0 "
-            + "       AND e.voided = 0 "
-            + "       AND e.encounter_type IN (${80}, ${81}) "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type IN ( ${80}, ${81} ) "
             + "       AND o.concept_id = ${23703} "
-            + "       AND o.value_coded IN ( ${20454}, ${1901}, ${165205}, ${1377}, ${20426} ) "
+            + "       AND ( "
+            + "             (p.gender = 'M' AND o.value_coded IN ( ${20454}, ${20426}, ${165205}, ${1377} ) )"
+            + "             OR "
+            + "             (p.gender = 'F' AND o.value_coded IN ( ${20454}, ${20426}, ${165205}, ${1901} ) )"
+            + "       ) "
             + "       AND e.encounter_datetime BETWEEN :onOrAfter AND :onOrBefore "
-            + " GROUP  BY p.patient_id ";
+            + " GROUP  BY p.person_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -413,32 +415,60 @@ public class PrepCtCohortQueries {
     map.put("80", hivMetadata.getPrepInicialEncounterType().getEncounterTypeId());
     map.put("81", hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId());
     map.put("23703", hivMetadata.getKeyPopulationConcept().getConceptId());
-    map.put("20454", hivMetadata.getDrugUseConcept().getConceptId());
     map.put("1901", hivMetadata.getSexWorkerConcept().getConceptId());
-    map.put("165205", hivMetadata.getTransGenderConcept().getConceptId());
     map.put("1377", hivMetadata.getHomosexualConcept().getConceptId());
-    map.put("20426", hivMetadata.getImprisonmentConcept().getConceptId());
     List<Integer> concepts =
         answers.stream().map(concept -> concept.getConceptId()).collect(Collectors.toList());
+    Boolean homosexual = false;
+    Boolean sexWorker = false;
+
+    if (concepts.contains(1377)) {
+      concepts.remove(concepts.indexOf(1377));
+      homosexual = true;
+    }
+    if (concepts.contains(1901)) {
+      concepts.remove(concepts.indexOf(1901));
+      sexWorker = true;
+    }
     String answer = StringUtils.join(concepts, ",");
 
     String query =
-        " SELECT p.patient_id "
-            + " FROM   patient p "
-            + "       INNER JOIN encounter e "
-            + "               ON e.patient_id = p.patient_id "
-            + "       INNER JOIN obs o "
-            + "               ON o.encounter_id = e.encounter_id "
+        " SELECT p.person_id "
+            + " FROM  person p "
+            + "       INNER JOIN encounter e ON e.patient_id = p.person_id "
+            + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
             + "       AND e.encounter_type IN (${80}, ${81}) "
             + "       AND o.concept_id = ${23703} "
-            + "       AND o.value_coded IN ( "
-            + answer
-            + " ) "
+            + " 	  AND ( ";
+    if (Boolean.TRUE.equals(homosexual)) {
+      query += "            ( p.gender = 'M' AND o.value_coded = ${1377} ) ";
+    }
+    if (Boolean.TRUE.equals(sexWorker)) {
+      if (Boolean.TRUE.equals(homosexual)) {
+        query += "      OR ";
+      }
+      query += "          ( p.gender = 'F' AND o.value_coded = ${1901} ) ";
+    }
+    if (!answer.isEmpty()) {
+      if (Boolean.TRUE.equals(homosexual) || Boolean.TRUE.equals(sexWorker)) {
+        query += "      OR ";
+      }
+      query +=
+          "                 ( p.gender = 'M' AND o.value_coded IN ( "
+              + answer
+              + "           )) "
+              + "           OR "
+              + "           ( p.gender = 'F' AND o.value_coded IN ( "
+              + answer
+              + "           )) ";
+    }
+    query +=
+        "         ) "
             + "       AND e.encounter_datetime BETWEEN :onOrAfter AND :onOrBefore "
-            + " GROUP  BY p.patient_id ";
+            + " GROUP  BY p.person_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -862,7 +892,7 @@ public class PrepCtCohortQueries {
 
   public CohortDefinition getPatientsWhoAreAdolescentAndYouth() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("adolescents And Youth At Risk");
+    cd.setName("Adolescents and Youth At Risk");
     cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
     cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));

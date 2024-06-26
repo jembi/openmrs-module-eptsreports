@@ -89,6 +89,9 @@ public class DispensationTypeMdcConverter implements DataConverter {
       case "23727":
         return "Paragem Única (PU)";
 
+      case "165340":
+        return "Dispensa Bimestral (DB)";
+
       default:
         return "";
     }

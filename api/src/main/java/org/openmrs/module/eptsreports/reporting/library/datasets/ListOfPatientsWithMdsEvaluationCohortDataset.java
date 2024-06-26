@@ -153,7 +153,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B9- Data de inscrição no MDS: (coluna R) - Resposta = Data de Inscrição (RF24)
     pdd.addColumn(
         "mds_date",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(0, 12, true),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(0, 12),
         endDateMappings,
         new GeneralDateConverter());
 
@@ -349,7 +349,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // Inscrição (RF39)
     pdd.addColumn(
         "mds_tarv_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(12, 24, false),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(12, 24),
         endDateMappings,
         new GeneralDateConverter());
 
@@ -541,7 +541,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // D.9 - Data de inscrição em algum MDS entre 24º e 36º mês de TARV: (coluna CD)
     pdd.addColumn(
         "mds_tarv_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(24, 36, false),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(24, 36),
         endDateMappings,
         new GeneralDateConverter());
 

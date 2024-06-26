@@ -82,7 +82,7 @@ public class PrepNewQueries {
             + "                         AND e.encounter_type = ${80} "
             + "                         AND o.concept_id = ${165211} "
             + "                         AND e.location_id = :location "
-            + "                         AND o.value_datetime <= :endDate "
+            + "                         AND o.obs_datetime <= :endDate "
             + "                       GROUP  BY p.patient_id) tbl "
             + "                      ON tbl.patient_id = p.patient_id "
             + "WHERE  p.voided = 0 "

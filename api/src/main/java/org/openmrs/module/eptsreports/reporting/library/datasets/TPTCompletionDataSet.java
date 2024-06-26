@@ -26,6 +26,7 @@ public class TPTCompletionDataSet extends BaseDataSet {
     dataSetDefinition.setName("TPT Completion Cascade Report");
     dataSetDefinition.addParameters(getParameters());
     String mappings = "endDate=${endDate},location=${location}";
+    String mappings2 = "startDate=${endDate-7m},endDate=${endDate},location=${location}";
 
     CohortDefinition txCurrCompositionCohort =
         txCurrCohortQueries.getTxCurrCompositionCohort("txCurrCompositionTPT", true);
@@ -70,7 +71,7 @@ public class TPTCompletionDataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "TxCurrWithTPTInLast7Months",
             EptsReportUtils.map(
-                tPTCompletionCohortQueries.getTxCurrWithTPTInLast7Months(), mappings));
+                tPTCompletionCohortQueries.getTxCurrWithTPTInLast7Months(), mappings2));
 
     CohortIndicator txCurrEligibleForTPTInitiation =
         eptsGeneralIndicator.getIndicator(
@@ -84,7 +85,7 @@ public class TPTCompletionDataSet extends BaseDataSet {
     dataSetDefinition.addColumn(
         "TPT0",
         "TX_CURR with TPT Completion",
-        EptsReportUtils.map(txCurrWithTPTCompIndicator, mappings),
+        EptsReportUtils.map(txCurrWithTPTCompIndicator, mappings2),
         "");
 
     dataSetDefinition.addColumn(
@@ -114,7 +115,7 @@ public class TPTCompletionDataSet extends BaseDataSet {
     dataSetDefinition.addColumn(
         "TPT5",
         "TX_CURR With TPT in Last 7 Months",
-        EptsReportUtils.map(txCurrWithTPTinLast7Months, mappings),
+        EptsReportUtils.map(txCurrWithTPTinLast7Months, mappings2),
         "");
 
     dataSetDefinition.addColumn(
