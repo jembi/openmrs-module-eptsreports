@@ -374,8 +374,7 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
     pdd.addColumn(
         "ovc_estado_beneficiario",
         listOfPatientsDefaultersOrIITCohortQueries.getLastOVCDate(
-            commonMetadata.getOVCEstadoBeneficiarioPersonAttributeType(),
-            true),
+            commonMetadata.getOVCEstadoBeneficiarioPersonAttributeType(), true),
         "endDate=${endDate}",
         new NotApplicableIfNullConverter());
 
