@@ -10,7 +10,6 @@ import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDe
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.ListOfPatientsDefaultersOrIITTemplateDataSet;
 import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TotalListOfPatientsDefaultersOrIITTemplateDataSet;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
@@ -27,9 +26,6 @@ public class SetupListOfPatientsDefaultersOrIITReport extends EptsDataExportMana
   protected ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries;
 
   @Autowired private ListOfPatientsDefaultersOrIITTemplateDataSet initListOfPatDefIITDataSet;
-
-  @Autowired
-  private TotalListOfPatientsDefaultersOrIITTemplateDataSet iniTotalLListOfPatDefIITDataSet;
 
   @Override
   public String getExcelDesignUuid() {
@@ -65,9 +61,13 @@ public class SetupListOfPatientsDefaultersOrIITReport extends EptsDataExportMana
             "endDate=${endDate},minDay=${minDay},maxDay=${maxDay},location=${location}"));
 
     rd.addDataSetDefinition(
-        "FATS", Mapped.mapStraightThrough(iniTotalLListOfPatDefIITDataSet.constructDataSet()));
+        "FATS",
+        Mapped.mapStraightThrough(
+            initListOfPatDefIITDataSet.listOfPatientsDefaultersOrIITTotalsDataset()));
     rd.addDataSetDefinition(
-        "FATL", Mapped.mapStraightThrough(initListOfPatDefIITDataSet.constructDataSet()));
+        "FATL",
+        Mapped.mapStraightThrough(
+            initListOfPatDefIITDataSet.listOfPatientsDefaultersOrIITColumnsDataset()));
 
     rd.addDataSetDefinition("SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
 
