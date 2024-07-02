@@ -2720,11 +2720,100 @@ public class TXTBCohortQueries {
     definition.setName("TxTB - Denominator Screened Only");
 
     definition.addSearch("art-list", EptsReportUtils.map(artList(), generalParameterMapping));
-
     definition.addSearch(
         "tb-screening", EptsReportUtils.map(yesOrNoInvestigationResult(), generalParameterMapping));
+    definition.addSearch(
+        "tb-investigation",
+        EptsReportUtils.map(positiveInvestigationResultComposition(), generalParameterMapping));
+    definition.addSearch(
+        "tb-investigation-negative",
+        EptsReportUtils.map(negativeInvestigationResultComposition(), generalParameterMapping));
+    definition.addSearch(
+        "started-tb-treatment",
+        EptsReportUtils.map(tbTreatmentStartDateWithinReportingDate(), generalParameterMapping));
+    definition.addSearch(
+        "in-tb-program", EptsReportUtils.map(getInTBProgram(), generalParameterMapping));
+    definition.addSearch(
+        "pulmonary-tb", EptsReportUtils.map(getPulmonaryTB(), generalParameterMapping));
+    definition.addSearch(
+        "marked-as-tb-treatment-start",
+        EptsReportUtils.map(getTBTreatmentStart(), generalParameterMapping));
 
-    definition.setCompositionString("art-list AND tb-screening");
+    definition.addSearch(
+        "tuberculosis-symptomys",
+        EptsReportUtils.map(getTuberculosisSymptoms(), generalParameterMapping));
+
+    definition.addSearch(
+        "active-tuberculosis",
+        EptsReportUtils.map(getActiveTuberculosis(), generalParameterMapping));
+
+    definition.addSearch(
+        "tb-observations", EptsReportUtils.map(getTBObservation(), generalParameterMapping));
+
+    definition.addSearch(
+        "application-for-laboratory-research",
+        EptsReportUtils.map(getApplicationForLaboratoryResearch(), generalParameterMapping));
+
+    definition.addSearch(
+        "tb-genexpert-test",
+        EptsReportUtils.map(getTBGenexpertTestCohort(6), generalParameterMapping));
+
+    definition.addSearch(
+        "tb-genexpert-lab-test",
+        EptsReportUtils.map(getTBGenexpertTestCohort(13), generalParameterMapping));
+    definition.addSearch(
+        "tb-xpert-mtb", EptsReportUtils.map(getXpertMtbTestCohort(), generalParameterMapping));
+
+    definition.addSearch(
+        "culture-test", EptsReportUtils.map(getCultureTest(6), generalParameterMapping));
+
+    definition.addSearch(
+        "culture-test-lab", EptsReportUtils.map(getCultureTest(13), generalParameterMapping));
+
+    definition.addSearch(
+        "test-tb-lam", EptsReportUtils.map(getTestTBLAM(6), generalParameterMapping));
+
+    definition.addSearch(
+        "test-tb-lam-lab", EptsReportUtils.map(getTestTBLAM(13), generalParameterMapping));
+
+    definition.addSearch("test-bk", EptsReportUtils.map(getTestBK(6), generalParameterMapping));
+
+    definition.addSearch(
+        "x-ray-chest", EptsReportUtils.map(getTestXRayChest(6), generalParameterMapping));
+
+    definition.addSearch(
+        "result-for-basiloscopia",
+        EptsReportUtils.map(getResultForBasiloscopia(), generalParameterMapping));
+
+    definition.addSearch(
+        "started-tb-treatment-previous-period",
+        EptsReportUtils.map(
+            tbTreatmentStartDateWithinReportingDate(),
+            "startDate=${startDate-6m},endDate=${startDate-1d},location=${location}"));
+    definition.addSearch(
+        "in-tb-program-previous-period",
+        EptsReportUtils.map(
+            getPatientsInTBProgramInThePreviousPeriod(),
+            "startDate=${startDate-6m},endDate=${startDate-1d},location=${location}"));
+    definition.addSearch(
+        "transferred-out",
+        EptsReportUtils.map(
+            getTransferredOut(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+    definition.addSearch(
+        "pulmonary-tb-date",
+        EptsReportUtils.map(
+            getPulmonaryTBDate(),
+            "startDate=${startDate-6m},endDate=${startDate-1d},location=${location}"));
+    definition.addSearch(
+        "marked-as-tratamento-tb-inicio",
+        EptsReportUtils.map(
+            getMarkedAsTratamentoTBInicio(),
+            "startDate=${startDate-6m},endDate=${startDate-1d},location=${location}"));
+
+    definition.setCompositionString(
+        "(art-list AND (tb-screening OR tb-investigation OR tb-investigation-negative OR started-tb-treatment OR in-tb-program OR pulmonary-tb OR marked-as-tb-treatment-start "
+            + "OR (tuberculosis-symptomys OR active-tuberculosis OR tb-observations OR application-for-laboratory-research OR tb-genexpert-test OR tb-genexpert-lab-test OR tb-xpert-mtb OR culture-test OR culture-test-lab "
+            + "OR test-tb-lam OR test-tb-lam-lab OR test-bk OR x-ray-chest) OR result-for-basiloscopia)) ");
 
     return definition;
   }
