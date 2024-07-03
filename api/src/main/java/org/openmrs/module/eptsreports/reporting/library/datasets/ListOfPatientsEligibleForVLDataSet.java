@@ -183,7 +183,7 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
     // Data da Consulta mais recente com PopChave informado - Sheet 1: Column T */
     pdd.addColumn(
         "keypop_last_date",
-        listOfPatientsDefaultersOrIITCohortQueries.getLastKeyPopulationRegistrationDate(),
+            listOfpatientsEligibleForVLDataDefinitionQueries.getLastKeyPopulationRegistrationDate(),
         "endDate=${endDate}");
 
     // HSH - Sheet 1: Column U */
