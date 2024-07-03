@@ -24,17 +24,14 @@ public class SetupListOfPatientsEligibleForVLReport extends EptsDataExportManage
 
   private ListOfPatientsEligibleForVLDataSet listOfPatientsEligibleForVLDataset;
   private TotalOfPatientsEligibleForVLDataSet totalOfPatientsEligibleForVLDataSet;
-  private ListOfPatientsEligibleForVLCohortQueries listOfPatientsEligibleForVLCohortQueries;
 
   @Autowired
   public SetupListOfPatientsEligibleForVLReport(
       ListOfPatientsEligibleForVLDataSet listOfPatientsEligibleForVLDataset,
-      TotalOfPatientsEligibleForVLDataSet totalOfPatientsEligibleForVLDataSet,
-      ListOfPatientsEligibleForVLCohortQueries listOfPatientsEligibleForVLCohortQueries) {
+      TotalOfPatientsEligibleForVLDataSet totalOfPatientsEligibleForVLDataSet) {
 
     this.listOfPatientsEligibleForVLDataset = listOfPatientsEligibleForVLDataset;
     this.totalOfPatientsEligibleForVLDataSet = totalOfPatientsEligibleForVLDataSet;
-    this.listOfPatientsEligibleForVLCohortQueries = listOfPatientsEligibleForVLCohortQueries;
   }
 
   @Override
