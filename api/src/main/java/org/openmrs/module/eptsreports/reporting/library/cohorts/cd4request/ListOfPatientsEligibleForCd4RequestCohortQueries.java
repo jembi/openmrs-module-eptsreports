@@ -978,7 +978,8 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
   }
 
   /**
-   * <p>Definition to apply base cohort exclusions to each Summary Indicator
+   * Definition to apply base cohort exclusions to each Summary Indicator
+   *
    * @param indicator Summary Indicator to be evaluated (C1 to C6)
    * @param mappings Each Summary Indicator Mappings
    * @return {@link CohortDefinition}
@@ -986,7 +987,8 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
   public CohortDefinition getSummaryComposition(CohortDefinition indicator, String mappings) {
 
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
-    compositionCohortDefinition.setName("Definition to apply base cohort exclusions to each Summary Indicator");
+    compositionCohortDefinition.setName(
+        "Definition to apply base cohort exclusions to each Summary Indicator");
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(
