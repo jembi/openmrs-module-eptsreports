@@ -20,7 +20,6 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
   private TxCurrCohortQueries txCurrCohortQueries;
   private HivMetadata hivMetadata;
-  private QualityImprovement2020CohortQueries qualityImprovement2020CohortQueries;
   private CommonMetadata commonMetadata;
 
   @Autowired
@@ -76,18 +75,18 @@ public class ListOfPatientsEligibleForVLCohortQueries {
         "VL1",
         EptsReportUtils.map(
             chdVL1, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch("VL2", EptsReportUtils.map(chdVL2, "startDate=${startDate},location=${location}"));
-    cd.addSearch("VL3", EptsReportUtils.map(chdVL3, "startDate=${startDate},location=${location}"));
+    cd.addSearch("VL2", EptsReportUtils.map(chdVL2, "endDate=${endDate},location=${location}"));
+    cd.addSearch("VL3", EptsReportUtils.map(chdVL3, "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "VL4",
         EptsReportUtils.map(
             chdVL4, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch("VL5", EptsReportUtils.map(chdVL5, "startDate=${startDate},location=${location}"));
+    cd.addSearch("VL5", EptsReportUtils.map(chdVL5, "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "VL6",
         EptsReportUtils.map(
             chdVL6, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch("VL7", EptsReportUtils.map(chdVL7, "startDate=${startDate},location=${location}"));
+    cd.addSearch("VL7", EptsReportUtils.map(chdVL7, "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "E1",
         EptsReportUtils.map(
@@ -344,7 +343,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("All patients with the most recent VL Numeric Result");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     String query = mostRecentVLNumericResultQuery(Sentence.LessThan, 1000, false);
@@ -374,7 +373,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("All patients with the most recent VL Qualitative Result ");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     String query = getPatientsWithMostRecentVLQuantitativeResult(false);
@@ -458,7 +457,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("All patients with the most recent VL Numeric Result");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     String query = mostRecentVLNumericResultQuery(Sentence.EqualOrGreaterThan, 1000, false);
@@ -539,7 +538,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("All patients who DO NOT have any Viral Load Result");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
@@ -574,7 +573,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
             + "        WHERE "
             + "            ee.encounter_type = ${53} "
             + "                AND oo.concept_id IN (${856} , ${1305}) "
-            + "                AND oo.obs_datetime <= :startDate "
+            + "                AND oo.obs_datetime <= :endDate "
             + "                AND ee.location_id = :location "
             + "                AND ee.voided = 0 "
             + "                AND pp.voided = 0 "
@@ -590,7 +589,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
             + "            obs oo ON oo.encounter_id = ee.encounter_id "
             + "        WHERE "
             + "            ee.encounter_type IN (${13} , ${6}, ${9}, ${51}) "
-            + "                AND ee.encounter_datetime <= :startDate "
+            + "                AND ee.encounter_datetime <= :endDate "
             + "                AND oo.concept_id IN (${856} , ${1305}) "
             + "                AND ee.location_id = :location "
             + "                AND ee.voided = 0 "
@@ -724,7 +723,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
             + "             AND e.location_id = :location "
             + "             AND o.concept_id = ${1305} "
             + "             AND e.encounter_type IN (${13},${6},${9},${51}) "
-            + "             AND DATE(e.encounter_datetime) <= :startDate "
+            + "             AND DATE(e.encounter_datetime) <= :endDate "
             + "             AND o.value_coded IS NOT NULL "
             + "         GROUP BY p.patient_id "
             + "      UNION  "
@@ -734,7 +733,8 @@ public class ListOfPatientsEligibleForVLCohortQueries {
             + "             INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
             + "         WHERE e.encounter_type = ${53}  "
             + "             AND o.concept_id = ${1305}       "
-            + "             AND o.obs_datetime <= :startDate  "
+            + "             AND o.value_coded IS NOT NULL "
+            + "             AND o.obs_datetime <= :endDate  "
             + "             AND e.location_id = :location  "
             + "             AND e.voided = 0  "
             + "             AND p.voided = 0  "
@@ -819,7 +819,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
             + "                              INNER JOIN encounter e ON p.patient_id = e.patient_id  "
             + "                              INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
             + "                              WHERE e.encounter_type IN (${13},${6},${9},${51})  "
-            + "                              AND e.encounter_datetime <= :startDate  "
+            + "                              AND e.encounter_datetime <= :endDate  "
             + "                              AND o.concept_id IN (${856},${1305})                                "
             + "                              AND e.location_id = :location  "
             + "                              AND e.voided = 0  "
@@ -835,7 +835,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
             + "                              INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
             + "                              WHERE e.encounter_type = ${53}  "
             + "                              AND o.concept_id IN (${856},${1305})                                 "
-            + "                              AND o.obs_datetime <= :startDate  "
+            + "                              AND o.obs_datetime <= :endDate  "
             + "                              AND e.location_id = :location  "
             + "                              AND e.voided = 0  "
             + "                              AND p.voided = 0  "
@@ -939,8 +939,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     String query =
         " SELECT list.patient_id "
             + "FROM   (SELECT breastfeeding.patient_id, "
-            + "               breastfeeding.last_date, "
-            + "               pregnant_table.pregnancy_date "
+            + "               breastfeeding.last_date "
             + "        FROM   (SELECT p.patient_id, "
             + "                       Max(o.value_datetime) AS last_date "
             + "                FROM   patient p "
