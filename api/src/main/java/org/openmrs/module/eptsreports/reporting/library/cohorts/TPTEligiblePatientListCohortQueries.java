@@ -204,7 +204,8 @@ public class TPTEligiblePatientListCohortQueries {
                 tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.getIsoniazidConcept().getConceptId(),
-                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId()),
+                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
+                false),
             "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
@@ -215,7 +216,8 @@ public class TPTEligiblePatientListCohortQueries {
                 hivMetadata.getStartDrugs().getConceptId(),
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
-                hivMetadata.getYesConcept().getConceptId()),
+                hivMetadata.getYesConcept().getConceptId(),
+                false),
             "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
@@ -227,7 +229,8 @@ public class TPTEligiblePatientListCohortQueries {
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
                 tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
-                tbMetadata.getDtINHConcept().getConceptId()),
+                tbMetadata.getDtINHConcept().getConceptId(),
+                false),
             mappings));
 
     compositionCohortDefinition.addSearch(
@@ -239,7 +242,8 @@ public class TPTEligiblePatientListCohortQueries {
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
                 tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
-                tbMetadata.getDtINHConcept().getConceptId()),
+                tbMetadata.getDtINHConcept().getConceptId(),
+                false),
             mappings));
 
     compositionCohortDefinition.addSearch(
@@ -251,7 +255,8 @@ public class TPTEligiblePatientListCohortQueries {
                 tbMetadata.getIsoniazidConcept().getConceptId(),
                 tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
                 hivMetadata.getMonthlyConcept().getConceptId(),
-                tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId()),
+                tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
+                false),
             mappings));
 
     compositionCohortDefinition.addSearch(
@@ -276,7 +281,8 @@ public class TPTEligiblePatientListCohortQueries {
                 tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
                 hivMetadata.getMonthlyConcept().getConceptId(),
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
-                hivMetadata.getQuarterlyConcept().getConceptId()),
+                hivMetadata.getQuarterlyConcept().getConceptId(),
+                false),
             mappings));
 
     compositionCohortDefinition.addSearch(
@@ -285,7 +291,8 @@ public class TPTEligiblePatientListCohortQueries {
             get3HPC1(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
                 tbMetadata.get3HPConcept().getConceptId(),
-                tbMetadata.getTreatmentPrescribedConcept().getConceptId()),
+                tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
+                false),
             mapping));
 
     compositionCohortDefinition.addSearch(
@@ -294,7 +301,8 @@ public class TPTEligiblePatientListCohortQueries {
             get3HPC1part2(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
                 tbMetadata.get3HPConcept().getConceptId(),
-                tbMetadata.getTreatmentPrescribedConcept().getConceptId()),
+                tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
+                false),
             mapping));
 
     compositionCohortDefinition.addSearch(
@@ -306,7 +314,8 @@ public class TPTEligiblePatientListCohortQueries {
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
-                hivMetadata.getQuarterlyConcept().getConceptId()),
+                hivMetadata.getQuarterlyConcept().getConceptId(),
+                false),
             mappings));
 
     compositionCohortDefinition.addSearch(
@@ -318,12 +327,13 @@ public class TPTEligiblePatientListCohortQueries {
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
-                hivMetadata.getMonthlyConcept().getConceptId()),
+                hivMetadata.getMonthlyConcept().getConceptId(),
+                false),
             mappings));
 
     compositionCohortDefinition.addSearch(
         "threeHPC4",
-        EptsReportUtils.map(get3HPLastProfilaxyDuringM3orM1PeriodsComposition(), mappings));
+        EptsReportUtils.map(get3HPLastProfilaxyDuringM3orM1PeriodsComposition(false), mappings));
 
     compositionCohortDefinition.addSearch(
         "TBTreatmentPart1",
@@ -1033,11 +1043,11 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
 
     String Y =
-        new UnionBuilder(TPTEligiblePatientsQueries.getY1Query())
-            .union(TPTEligiblePatientsQueries.getY2Query())
-            .union(TPTEligiblePatientsQueries.getY3Query())
+        new UnionBuilder(TPTEligiblePatientsQueries.getY1Query(false))
+            .union(TPTEligiblePatientsQueries.getY2Query(false))
+            .union(TPTEligiblePatientsQueries.getY3Query(false))
             .union(TPTEligiblePatientsQueries.getY4Query())
-            .union(TPTEligiblePatientsQueries.getY5Query())
+            .union(TPTEligiblePatientsQueries.getY5Query(false))
             .union(TPTEligiblePatientsQueries.getY6Query())
             .buildQuery();
 
@@ -1087,7 +1097,8 @@ public class TPTEligiblePatientListCohortQueries {
       int regimeTPTEncounterType,
       int regimeTPTConcept,
       int isoniazidConcept,
-      int isoniazidePiridoxinaConcept) {
+      int isoniazidePiridoxinaConcept,
+      Boolean duringPeriod) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Profilaxia com INH B2");
@@ -1112,11 +1123,11 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     String Y =
-        new UnionBuilder(TPTEligiblePatientsQueries.getY1Query())
-            .union(TPTEligiblePatientsQueries.getY2Query())
-            .union(TPTEligiblePatientsQueries.getY3Query())
+        new UnionBuilder(TPTEligiblePatientsQueries.getY1Query(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getY2Query(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getY3Query(duringPeriod))
             .union(TPTEligiblePatientsQueries.getY4Query())
-            .union(TPTEligiblePatientsQueries.getY5Query())
+            .union(TPTEligiblePatientsQueries.getY5Query(duringPeriod))
             .union(TPTEligiblePatientsQueries.getY6Query())
             .buildQuery();
     String query =
@@ -1166,10 +1177,12 @@ public class TPTEligiblePatientListCohortQueries {
       int startDrugsConcept,
       int pediatriaSeguimentoEncounterType,
       int continuaConcept,
-      int yesConcept) {
+      int yesConcept,
+      Boolean duringPeriod) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Profilaxia com INH B5.1");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -1191,7 +1204,7 @@ public class TPTEligiblePatientListCohortQueries {
         " SELECT p.patient_id   "
             + "            FROM   patient p   "
             + "            INNER JOIN(   "
-            + getPatientWithInhFromY1to3Query()
+            + getPatientWithInhFromY1to3Query(duringPeriod)
             + " ) AS tabela  ON tabela.patient_id = p.patient_id    "
             + "                    WHERE p.voided = 0 "
             + "       AND( SELECT count(patient_id) "
@@ -1212,7 +1225,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                        AND ( o2.concept_id = ${165308} "
             + "                                AND o2.value_coded IN ( ${1256}, ${1257} ) )"
             + "                        AND o2.obs_datetime <= :endDate "
-            + "                                )consultations "
+            + "                        group by ee.encounter_id )consultations "
             + "                                WHERE consultations.patient_id= p.patient_id "
             + "                                AND consultations.obs_datetime > tabela.start_date "
             + "                                AND consultations.obs_datetime <= Date_add(tabela.start_date, interval 7 month) "
@@ -1246,7 +1259,8 @@ public class TPTEligiblePatientListCohortQueries {
       int pediatriaSeguimentoEncounterType,
       int continuaConcept,
       int treatmentPrescribedConcept,
-      int dtINHConcept) {
+      int dtINHConcept,
+      Boolean duringPeriod) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Profilaxia com INH B5.2");
@@ -1270,7 +1284,7 @@ public class TPTEligiblePatientListCohortQueries {
     String query =
         "   SELECT result.patient_id    "
             + "FROM   ( "
-            + getPatientWithInhFromY1to3Query()
+            + getPatientWithInhFromY1to3Query(duringPeriod)
             + " ) result "
             + "               WHERE   ( "
             + " ( SELECT Count(e.encounter_id) AS consultations "
@@ -1334,12 +1348,13 @@ public class TPTEligiblePatientListCohortQueries {
       int pediatriaSeguimentoEncounterType,
       int continuaConcept,
       int treatmentPrescribedConcept,
-      int dtINHConcept) {
+      int dtINHConcept,
+      Boolean duringPeriod) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Profilaxia com INH B5.3");
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -1358,7 +1373,7 @@ public class TPTEligiblePatientListCohortQueries {
     String query =
         "SELECT result.patient_id "
             + "FROM   ( "
-            + getPatientWithInhFromY1to3Query()
+            + getPatientWithInhFromY1to3Query(duringPeriod)
             + " ) result "
             + "WHERE  ( (SELECT Count(e.encounter_id) "
             + "          FROM   encounter e "
@@ -1424,7 +1439,7 @@ public class TPTEligiblePatientListCohortQueries {
     return sqlCohortDefinition;
   }
 
-  private static String getPatientWithInhFromY1to3Query() {
+  private static String getPatientWithInhFromY1to3Query(Boolean duringPeriod) {
     return "SELECT p.patient_id, "
         + "               tabela.start_date "
         + "        FROM   patient p "
@@ -1447,7 +1462,10 @@ public class TPTEligiblePatientListCohortQueries {
         + "                           WHERE  o.voided = 0 "
         + "                                  AND o.concept_id = ${165308} "
         + "                                  AND o.value_coded = ${1256} "
-        + "                                  AND o.obs_datetime <= :endDate "
+            .concat(
+                duringPeriod
+                    ? " AND o.obs_datetime >= :startDate AND o.obs_datetime <= :endDate"
+                    : "AND o.obs_datetime <= :endDate")
         + "                           UNION "
         + "                           SELECT o.person_id    AS patient_id, "
         + "                                  o.obs_datetime AS start_date "
@@ -1468,7 +1486,10 @@ public class TPTEligiblePatientListCohortQueries {
         + "                           WHERE  o.voided = 0 "
         + "                                  AND o.concept_id = ${165308} "
         + "                                  AND o.value_coded = ${1256} "
-        + "                                  AND o.obs_datetime <= :endDate "
+            .concat(
+                duringPeriod
+                    ? " AND o.obs_datetime >= :startDate AND o.obs_datetime <= :endDate"
+                    : "AND o.obs_datetime <= :endDate")
         + "                           UNION "
         + "                           SELECT o.person_id    AS patient_id, "
         + "                                  o.obs_datetime AS start_date "
@@ -1489,7 +1510,11 @@ public class TPTEligiblePatientListCohortQueries {
         + "                           WHERE  o.voided = 0 "
         + "                                  AND o.concept_id = ${165308} "
         + "                                  AND o.value_coded = ${1256} "
-        + "                                  AND o.obs_datetime <= :endDate) AS tabela "
+            .concat(
+                duringPeriod
+                    ? " AND o.obs_datetime >= :startDate AND o.obs_datetime <= :endDate"
+                    : "AND o.obs_datetime <= :endDate")
+        + "                                  ) AS tabela "
         + "                       ON tabela.patient_id = p.patient_id "
         + "        WHERE  p.voided = 0";
   }
@@ -1515,10 +1540,12 @@ public class TPTEligiblePatientListCohortQueries {
       int isoniazidConcept,
       int isoniazidePiridoxinaConcept,
       int monthlyConcept,
-      int typeDispensationTPTConceptUuid) {
+      int typeDispensationTPTConceptUuid,
+      Boolean duringPeriod) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Regime de TPT B6.1");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -1545,9 +1572,8 @@ public class TPTEligiblePatientListCohortQueries {
     // this will generate one union separated query based on the given queries
     String unionQuery =
         unionBuilder
-            .unionBuilder(TPTEligiblePatientsQueries.getY4QueryWithPatientIdForB5())
-            .union(TPTEligiblePatientsQueries.getY5QueryWithPatientIdForB5())
-            .union(TPTEligiblePatientsQueries.getY6QueryWithPatientIdForB5())
+            .unionBuilder(TPTEligiblePatientsQueries.getY5QueryWithPatientIdForB5(duringPeriod))
+            .union(TPTCompletionQueries.getInhStartOnFilt(duringPeriod))
             .buildQuery();
 
     String query =
@@ -1649,7 +1675,7 @@ public class TPTEligiblePatientListCohortQueries {
     String unionQuery =
         unionBuilder
             .unionBuilder(TPTEligiblePatientsQueries.getY4QueryWithPatientIdForB5())
-            .union(TPTEligiblePatientsQueries.getY5QueryWithPatientIdForB5())
+            .union(TPTEligiblePatientsQueries.getY5QueryWithPatientIdForB5(false))
             .union(TPTEligiblePatientsQueries.getY6QueryWithPatientIdForB5())
             .buildQuery();
 
@@ -1721,10 +1747,12 @@ public class TPTEligiblePatientListCohortQueries {
       int isoniazidePiridoxinaConcept,
       int monthlyConcept,
       int typeDispensationTPTConceptUuid,
-      int quarterlyConcept) {
+      int quarterlyConcept,
+      Boolean duringPeriod) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with INH Mensal and DT-INH B6.3");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -1753,8 +1781,8 @@ public class TPTEligiblePatientListCohortQueries {
     // this will generate one union separated query based on the given queries
     String unionQuery =
         unionBuilder
-            .unionBuilder(TPTEligiblePatientsQueries.getY5QueryWithPatientIdForB5())
-            .union(TPTCompletionQueries.getInhStartOnFilt())
+            .unionBuilder(TPTEligiblePatientsQueries.getY5QueryWithPatientIdForB5(duringPeriod))
+            .union(TPTCompletionQueries.getInhStartOnFilt(duringPeriod))
             .buildQuery();
 
     String query =
@@ -1844,10 +1872,14 @@ public class TPTEligiblePatientListCohortQueries {
    * @return CohortDefinition
    */
   public CohortDefinition get3HPC1(
-      int adultoSeguimentoEncounterType, int threeHPConcept, int treatmentPrescribedConcept) {
+      int adultoSeguimentoEncounterType,
+      int threeHPConcept,
+      int treatmentPrescribedConcept,
+      Boolean duringPeriod) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Outras prescricoes C1");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -1872,8 +1904,8 @@ public class TPTEligiblePatientListCohortQueries {
     // this will generate one union separated query based on the given queries
     String unionQuery =
         unionBuilder
-            .unionBuilder(TPTEligiblePatientsQueries.getMpart4())
-            .union(TPTEligiblePatientsQueries.getMpart6())
+            .unionBuilder(TPTEligiblePatientsQueries.getMpart4(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getMpart6(duringPeriod))
             .buildQuery();
 
     String query =
@@ -1931,10 +1963,14 @@ public class TPTEligiblePatientListCohortQueries {
    * @return CohortDefinition
    */
   public CohortDefinition get3HPC1part2(
-      int adultoSeguimentoEncounterType, int threeHPConcept, int treatmentPrescribedConcept) {
+      int adultoSeguimentoEncounterType,
+      int threeHPConcept,
+      int treatmentPrescribedConcept,
+      Boolean duringPeriod) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Outras prescricoes C1");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -1959,8 +1995,8 @@ public class TPTEligiblePatientListCohortQueries {
     // this will generate one union separated query based on the given queries
     String unionQuery =
         unionBuilder
-            .unionBuilder(TPTEligiblePatientsQueries.getMpart4())
-            .union(TPTEligiblePatientsQueries.getMpart6())
+            .unionBuilder(TPTEligiblePatientsQueries.getMpart4(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getMpart6(duringPeriod))
             .buildQuery();
 
     String query =
@@ -2011,12 +2047,13 @@ public class TPTEligiblePatientListCohortQueries {
       int regimeTPTConcept,
       int hPPiridoxinaConcept,
       int typeDispensationTPTConceptUuid,
-      int quarterlyConcept) {
+      int quarterlyConcept,
+      Boolean duringPeriod) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Regime de TPT C2");
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -2042,9 +2079,9 @@ public class TPTEligiblePatientListCohortQueries {
     // this will generate one union separated query based on the given queries
     String unionFiltQuery =
         unionBuilder
-            .unionBuilder(TPTEligiblePatientsQueries.getMpart2())
-            .union(TPTEligiblePatientsQueries.getMpart7())
-            .union(TPTEligiblePatientsQueries.getMpart8())
+            .unionBuilder(TPTEligiblePatientsQueries.getMpart2(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getMpart7(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getMpart8(duringPeriod))
             .buildQuery();
 
     String query =
@@ -2114,12 +2151,13 @@ public class TPTEligiblePatientListCohortQueries {
       int regimeTPTConcept,
       int hPPiridoxinaConcept,
       int typeDispensationTPTConceptUuid,
-      int monthlyConcept) {
+      int monthlyConcept,
+      Boolean duringPeriod) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Regime de TPT C3");
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -2145,9 +2183,9 @@ public class TPTEligiblePatientListCohortQueries {
     // this will generate one union separated query based on the given queries
     String unionFiltQuery =
         unionBuilder
-            .unionBuilder(TPTEligiblePatientsQueries.getMpart2())
-            .union(TPTEligiblePatientsQueries.getMpart7())
-            .union(TPTEligiblePatientsQueries.getMpart8())
+            .unionBuilder(TPTEligiblePatientsQueries.getMpart2(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getMpart7(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getMpart8(duringPeriod))
             .buildQuery();
 
     String query =
@@ -2209,11 +2247,12 @@ public class TPTEligiblePatientListCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition get3HPLastProfilaxyDuringM3Period() {
+  public CohortDefinition get3HPLastProfilaxyDuringM3Period(Boolean duringPeriod) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
         " all patients with Última profilaxia 3HP Between 86 days and 365 days from the date of M.3");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -2235,14 +2274,14 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
 
     String threeHPStart =
-        new UnionBuilder(TPTEligiblePatientsQueries.getMpart1())
-            .union(TPTEligiblePatientsQueries.getMpart2())
-            .union(TPTEligiblePatientsQueries.getMpart3())
-            .union(TPTEligiblePatientsQueries.getMpart4())
-            .union(TPTEligiblePatientsQueries.getMpart5())
-            .union(TPTEligiblePatientsQueries.getMpart6())
-            .union(TPTEligiblePatientsQueries.getMpart7())
-            .union(TPTEligiblePatientsQueries.getMpart8())
+        new UnionBuilder(TPTEligiblePatientsQueries.getMpart1(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getMpart2(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getMpart3(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getMpart4(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getMpart5(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getMpart6(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getMpart7(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getMpart8(duringPeriod))
             .buildQuery();
 
     String query =
@@ -2283,13 +2322,13 @@ public class TPTEligiblePatientListCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition get3HPProfilaxyStatusDuringM1Period() {
+  public CohortDefinition get3HPProfilaxyStatusDuringM1Period(Boolean duringPeriod) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
         " all patients with Estado da Profilaxia = Fim Between 86 days and 365 days from the date of M.1");
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -2310,14 +2349,14 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
 
     String threeHPStart =
-        new UnionBuilder(TPTEligiblePatientsQueries.getMpart1())
-            .union(TPTEligiblePatientsQueries.getMpart2())
-            .union(TPTEligiblePatientsQueries.getMpart3())
-            .union(TPTEligiblePatientsQueries.getMpart4())
-            .union(TPTEligiblePatientsQueries.getMpart5())
-            .union(TPTEligiblePatientsQueries.getMpart6())
-            .union(TPTEligiblePatientsQueries.getMpart7())
-            .union(TPTEligiblePatientsQueries.getMpart8())
+        new UnionBuilder(TPTEligiblePatientsQueries.getMpart1(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getMpart2(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getMpart3(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getMpart4(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getMpart5(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getMpart6(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getMpart7(duringPeriod))
+            .union(TPTEligiblePatientsQueries.getMpart8(duringPeriod))
             .buildQuery();
 
     String query =
@@ -2357,26 +2396,29 @@ public class TPTEligiblePatientListCohortQueries {
   /**
    * Composition for patients who already completed 3hp during M3 OR M1 period
    *
-   * @see #get3HPLastProfilaxyDuringM3Period()
-   * @see #get3HPProfilaxyStatusDuringM1Period()
+   * @see #get3HPLastProfilaxyDuringM3Period(Boolean)
+   * @see #get3HPProfilaxyStatusDuringM1Period(Boolean)
    * @return {@link CompositionCohortDefinition}
    */
-  public CohortDefinition get3HPLastProfilaxyDuringM3orM1PeriodsComposition() {
+  public CohortDefinition get3HPLastProfilaxyDuringM3orM1PeriodsComposition(Boolean duringPeriod) {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Patients who already completed 3HP During M3 OR M1 period");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     String mapping = "endDate=${endDate},location=${location}";
 
-    String mappings = "startDate=${endDate-4m},endDate=${endDate},location=${location}";
+    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
     // M3 period indicators
-    cd.addSearch("M3", EptsReportUtils.map(get3HPLastProfilaxyDuringM3Period(), mapping));
+    cd.addSearch(
+        "M3", EptsReportUtils.map(get3HPLastProfilaxyDuringM3Period(duringPeriod), mappings));
 
     // M1 period indicators
-    cd.addSearch("M1", EptsReportUtils.map(get3HPProfilaxyStatusDuringM1Period(), mapping));
+    cd.addSearch(
+        "M1", EptsReportUtils.map(get3HPProfilaxyStatusDuringM1Period(duringPeriod), mappings));
 
     cd.setCompositionString("M1 OR M3");
 

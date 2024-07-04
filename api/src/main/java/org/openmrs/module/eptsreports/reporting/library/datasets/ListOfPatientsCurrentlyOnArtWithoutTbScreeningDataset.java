@@ -194,7 +194,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseD
 
     patientDefinition.addColumn(
         "screening_date",
-        txtbDenominatorQueries.getMostRecentTbScreeningDate(),
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.getMostRecentTbScreeningDate(),
         "endDate=${endDate},location=${location}");
 
     patientDefinition.addColumn(

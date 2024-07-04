@@ -25,6 +25,8 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
 
   String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
   String MAPPING2 = "endDate=${endDate},location=${location}";
+  String MAPPING3 =
+      "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}";
 
   private final ListOfPatientsInAdvancedHivIllnessCohortQueries
       listOfPatientsInAdvancedHivIllnessCohortQueries;
@@ -71,7 +73,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
     patientDataSetDefinition.addRowFilter(
         listOfPatientsEligibleForCd4RequestCohortQueries
             .getPatientsEligibleForCd4RequestComposition(),
-        MAPPING);
+        MAPPING3);
 
     patientDataSetDefinition.addColumn("id", new PersonIdDataDefinition(), "");
 
@@ -137,7 +139,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
     patientDataSetDefinition.addColumn(
         "eligibility_reason",
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getReasonForCd4Eligibility(),
-        MAPPING);
+        MAPPING3);
 
     // 11 - Data do último Pedido de CD4 – Sheet 1: Column K
     patientDataSetDefinition.addColumn(
@@ -254,60 +256,42 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "C1",
             EptsReportUtils.map(
-                listOfPatientsEligibleForCd4RequestCohortQueries.getSummaryComposition(
-                    listOfPatientsEligibleForCd4RequestCohortQueries
-                        .getPatientWhoInitiatedTarvDuringPeriodC1(),
-                    MAPPING),
+                listOfPatientsEligibleForCd4RequestCohortQueries.getSummaryCompositionC1(),
                 MAPPING));
 
     CohortIndicator restarted =
         eptsGeneralIndicator.getIndicator(
             "C2",
             EptsReportUtils.map(
-                listOfPatientsEligibleForCd4RequestCohortQueries.getSummaryComposition(
-                    listOfPatientsEligibleForCd4RequestCohortQueries
-                        .getPatientWhoRestartedTarvAndEligibleForCd4RequestC2(),
-                    MAPPING),
+                listOfPatientsEligibleForCd4RequestCohortQueries.getSummaryCompositionC2(),
                 MAPPING));
 
     CohortIndicator highVl =
         eptsGeneralIndicator.getIndicator(
             "C3",
             EptsReportUtils.map(
-                listOfPatientsEligibleForCd4RequestCohortQueries.getSummaryComposition(
-                    listOfPatientsEligibleForCd4RequestCohortQueries
-                        .getPatientsWithTwoHighVlResultsC3(),
-                    MAPPING2),
+                listOfPatientsEligibleForCd4RequestCohortQueries.getSummaryCompositionC3(),
                 MAPPING));
 
     CohortIndicator estadio =
         eptsGeneralIndicator.getIndicator(
             "C4",
             EptsReportUtils.map(
-                listOfPatientsEligibleForCd4RequestCohortQueries.getSummaryComposition(
-                    listOfPatientsEligibleForCd4RequestCohortQueries
-                        .getPatientWithEstadiamentoIIIorIVC4(),
-                    MAPPING),
+                listOfPatientsEligibleForCd4RequestCohortQueries.getSummaryCompositionC4(),
                 MAPPING));
 
     CohortIndicator eligibleForCd4Followup =
         eptsGeneralIndicator.getIndicator(
             "C5",
             EptsReportUtils.map(
-                listOfPatientsEligibleForCd4RequestCohortQueries.getSummaryComposition(
-                    listOfPatientsEligibleForCd4RequestCohortQueries
-                        .getPatientEligibleForCd4FollowupC5(),
-                    MAPPING2),
+                listOfPatientsEligibleForCd4RequestCohortQueries.getSummaryCompositionC5(),
                 MAPPING));
 
     CohortIndicator pregnant =
         eptsGeneralIndicator.getIndicator(
             "C6",
             EptsReportUtils.map(
-                listOfPatientsEligibleForCd4RequestCohortQueries.getSummaryComposition(
-                    listOfPatientsEligibleForCd4RequestCohortQueries
-                        .getPatientPregnantEligibleForCd4RequestC6(),
-                    MAPPING2),
+                listOfPatientsEligibleForCd4RequestCohortQueries.getSummaryCompositionC6(),
                 MAPPING));
 
     dataSetDefinition.addColumn(
