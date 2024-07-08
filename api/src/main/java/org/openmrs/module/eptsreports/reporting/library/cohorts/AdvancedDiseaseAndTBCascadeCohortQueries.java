@@ -30,6 +30,12 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
   private final String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
+  private final String inclusionPeriod =
+      "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}";
+
+  private final String pregnancyPeriod =
+      "startDate=${endDate-10m+1d},endDate=${endDate-1m},location=${location}";
+
   @Autowired
   public AdvancedDiseaseAndTBCascadeCohortQueries(
       HivMetadata hivMetadata,
@@ -70,10 +76,10 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     CohortDefinition reinitiatedArt = getPatientsWhoReinitiatedArt();
     CohortDefinition exclusion = getPatientsTransferredOutOrDead();
 
-    cd.addSearch("initiatedArt", EptsReportUtils.map(initiatedArt, mappings));
-    cd.addSearch("pregnant", EptsReportUtils.map(pregnant, mappings));
+    cd.addSearch("initiatedArt", EptsReportUtils.map(initiatedArt, inclusionPeriod));
+    cd.addSearch("pregnant", EptsReportUtils.map(pregnant, pregnancyPeriod));
     cd.addSearch("consecutiveVL", EptsReportUtils.map(consecutiveVL, mappings));
-    cd.addSearch("reinitiatedArt", EptsReportUtils.map(reinitiatedArt, mappings));
+    cd.addSearch("reinitiatedArt", EptsReportUtils.map(reinitiatedArt, inclusionPeriod));
     cd.addSearch(
         "exclusion",
         EptsReportUtils.map(exclusion, "endDate=${generationDate},location=${location}"));
@@ -1157,7 +1163,8 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addParameter(new Parameter("location", "End Date", Location.class));
 
     cd.addSearch(
-        "vlOnPeriod", EptsReportUtils.map(getPatientsUnsuppressedVLDuringInclusion(), mappings));
+        "vlOnPeriod",
+        EptsReportUtils.map(getPatientsUnsuppressedVLDuringInclusion(), inclusionPeriod));
 
     cd.addSearch(
         "vlBeforePeriod",

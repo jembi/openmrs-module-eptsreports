@@ -54,7 +54,8 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(
             advanceDiseaseAndTbCascadeDimension.getPatientWithPositiveTbLamAndGradeDimension(),
             reportingPeriod));
-    // RF11-Number of clients eligible for CD4 count during inclusion period
+
+    // TB_DA_FR13 - Number of clients eligible for CD4 count during inclusion period (Cascade 1)
     CohortIndicator eligibleCd4Ind =
         eptsGeneralIndicator.getIndicator(
             "eligibleCd4Ind",
@@ -65,13 +66,13 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         dataSetDefinition,
         "eligibleCd4",
         "ClientsEligibleCd4",
-        EptsReportUtils.map(eligibleCd4Ind, inclusionPeriod),
+        EptsReportUtils.map(eligibleCd4Ind, mappings),
         dissagregations());
 
     dataSetDefinition.addColumn(
         "eligibleCd4Total",
         "ClientsEligible4Cd4Total",
-        EptsReportUtils.map(eligibleCd4Ind, inclusionPeriod),
+        EptsReportUtils.map(eligibleCd4Ind, mappings),
         "");
 
     // Number of clients eligible for CD4 count request who have a CD4 count result during inclusion
