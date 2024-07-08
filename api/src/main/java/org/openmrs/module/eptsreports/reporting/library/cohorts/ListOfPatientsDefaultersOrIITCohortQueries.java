@@ -9,12 +9,10 @@ import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.PersonAttributeType;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
-import org.openmrs.module.eptsreports.reporting.calculation.generic.InitialArtStartDateCalculation;
-import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
+import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -33,10 +31,11 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
   @Autowired private TbMetadata tbMetadata;
 
   @Autowired private CommonMetadata commonMetadata;
+  @Autowired private CommonQueries commonQueries;
 
   private final String MAPPING = "location=${location}";
 
-  private final String MAPPING2 = "onOrBefore=${endDate},location=${location}";
+  private final String MAPPING2 = "endDate=${endDate},location=${location}";
 
   private final String MAPPING3 =
       "endDate=${endDate},location=${location},minDay=${minDay},maxDay=${maxDay}";
@@ -2084,12 +2083,14 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
   }
 
   public CohortDefinition getArtStartDate() {
-    CalculationCohortDefinition cd =
-        new CalculationCohortDefinition(
-            "Art start date",
-            Context.getRegisteredComponents(InitialArtStartDateCalculation.class).get(0));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.addParameter(new Parameter("onOrBefore", "On Or Before", Date.class));
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Art Start Date");
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+
+    String query = commonQueries.getARTStartDate(false);
+    cd.setQuery(query);
+
     return cd;
   }
 
@@ -2387,8 +2388,8 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "   END AS S_or_N "
             + " FROM ( "
             + "   SELECT p.patient_id, value_coded "
-            + "   INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "   FROM patient p "
+            + "   INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "     LEFT JOIN ( "
             + "       SELECT p.person_id AS patient_id, Max(e.encounter_datetime) AS last_date, ${keypop} AS value_coded "
             + "   	  FROM   person p "
