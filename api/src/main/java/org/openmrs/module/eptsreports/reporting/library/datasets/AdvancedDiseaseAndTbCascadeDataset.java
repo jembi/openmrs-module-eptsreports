@@ -62,6 +62,12 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
             EptsReportUtils.map(
                 advancedDiseaseAndTBCascadeCohortQueries.getClientsEligibleForCd4(), mappings));
 
+    dataSetDefinition.addColumn(
+        "eligibleCd4Total",
+        "ClientsEligible4Cd4Total",
+        EptsReportUtils.map(eligibleCd4Ind, mappings),
+        "");
+
     addRow(
         dataSetDefinition,
         "eligibleCd4",
@@ -69,14 +75,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(eligibleCd4Ind, mappings),
         dissagregations());
 
-    dataSetDefinition.addColumn(
-        "eligibleCd4Total",
-        "ClientsEligible4Cd4Total",
-        EptsReportUtils.map(eligibleCd4Ind, mappings),
-        "");
-
-    // Number of clients eligible for CD4 count request who have a CD4 count result during inclusion
-    // period (TB_DA_FR18)
+    // TB_DA_FR16 - Number of clients eligible for CD4 count who have a CD4 count within 33 days
 
     CohortIndicator cd4CountInd =
         eptsGeneralIndicator.getIndicator(
@@ -84,18 +83,15 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
             EptsReportUtils.map(
                 advancedDiseaseAndTBCascadeCohortQueries.getClientsWithCd4Count(), mappings));
 
+    dataSetDefinition.addColumn(
+        "cd4CountTotal", "ClientsWithCd4Total", EptsReportUtils.map(cd4CountInd, mappings), "");
+
     addRow(
         dataSetDefinition,
         "cd4Count",
         "ClientsWithCd4Count",
-        EptsReportUtils.map(cd4CountInd, inclusionPeriod),
+        EptsReportUtils.map(cd4CountInd, mappings),
         dissagregations());
-
-    dataSetDefinition.addColumn(
-        "cd4CountTotal",
-        "ClientsWithCd4Total",
-        EptsReportUtils.map(cd4CountInd, inclusionPeriod),
-        "");
 
     // Number of clients with CD4 count during inclusion period showing severe immunodepression
     // (TB_DA_FR19)

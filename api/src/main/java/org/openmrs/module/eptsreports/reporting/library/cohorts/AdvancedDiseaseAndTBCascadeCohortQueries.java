@@ -106,7 +106,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     CohortDefinition anyResult = getPatientsWithCD4Count();
 
     cd.addSearch("eligibleCd4", EptsReportUtils.map(eligibleCd4, mappings));
-    cd.addSearch("anyResult", EptsReportUtils.map(anyResult, mappings));
+    cd.addSearch("anyResult", EptsReportUtils.map(anyResult, inclusionPeriod));
 
     cd.setCompositionString("eligibleCd4 AND anyResult");
 
