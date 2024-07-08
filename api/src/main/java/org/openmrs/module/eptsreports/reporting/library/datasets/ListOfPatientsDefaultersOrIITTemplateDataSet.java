@@ -275,7 +275,7 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
             .getMostRecentMdcConsultationDate(),
         "location=${location}");
 
-    //    // 26 - MDS1 - Sheet 1: Column Z */
+    // 26 - MDS1 - Sheet 1: Column Z */
     pdd.addColumn(
         "mds1",
         listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.getMdcDispensationType(

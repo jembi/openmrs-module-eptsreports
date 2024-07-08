@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -19,18 +20,17 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
   private TxCurrCohortQueries txCurrCohortQueries;
   private HivMetadata hivMetadata;
-  private QualityImprovement2020CohortQueries qualityImprovement2020CohortQueries;
-  private TxNewCohortQueries txNewCohortQueries;
+  private CommonMetadata commonMetadata;
 
   @Autowired
   public ListOfPatientsEligibleForVLCohortQueries(
       TxCurrCohortQueries txCurrCohortQueries,
       HivMetadata hivMetadata,
-      TxNewCohortQueries txNewCohortQueries) {
+      CommonMetadata commonMetadata) {
 
     this.txCurrCohortQueries = txCurrCohortQueries;
     this.hivMetadata = hivMetadata;
-    this.txNewCohortQueries = txNewCohortQueries;
+    this.commonMetadata = commonMetadata;
   }
 
   public CohortDefinition getBaseCohort() {
@@ -53,8 +53,8 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     CohortDefinition chdVL6 =
         getPatientsWhoHaveRegisteredVLIgualOrGreaterThan1000ForMoreThan3Months();
     CohortDefinition chdVL7 = getPatientsWhoDontHaveAnyViralLoad();
-    CohortDefinition chdE1 = txNewCohortQueries.getTxNewBreastfeedingComposition(true);
-    CohortDefinition chdE2 = txNewCohortQueries.getPatientsPregnantEnrolledOnART(true);
+    CohortDefinition chdE1 = getPatientsWhoAreBreastfeeding();
+    CohortDefinition chdE2 = getPatientsWhoArePregnant();
 
     cd.addSearch(
         "txcurr", EptsReportUtils.map(txcurr, "onOrBefore=${startDate},location=${location}"));
@@ -75,18 +75,18 @@ public class ListOfPatientsEligibleForVLCohortQueries {
         "VL1",
         EptsReportUtils.map(
             chdVL1, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch("VL2", EptsReportUtils.map(chdVL2, "startDate=${startDate},location=${location}"));
-    cd.addSearch("VL3", EptsReportUtils.map(chdVL3, "startDate=${startDate},location=${location}"));
+    cd.addSearch("VL2", EptsReportUtils.map(chdVL2, "endDate=${endDate},location=${location}"));
+    cd.addSearch("VL3", EptsReportUtils.map(chdVL3, "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "VL4",
         EptsReportUtils.map(
             chdVL4, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch("VL5", EptsReportUtils.map(chdVL5, "startDate=${startDate},location=${location}"));
+    cd.addSearch("VL5", EptsReportUtils.map(chdVL5, "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "VL6",
         EptsReportUtils.map(
             chdVL6, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch("VL7", EptsReportUtils.map(chdVL7, "startDate=${startDate},location=${location}"));
+    cd.addSearch("VL7", EptsReportUtils.map(chdVL7, "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "E1",
         EptsReportUtils.map(
@@ -94,7 +94,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     cd.addSearch(
         "E2",
         EptsReportUtils.map(
-            chdE2, "startDate=${startDate},endDate=${endDate},location=${location}"));
+            chdE2, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.setCompositionString(
         "txcurr AND (X1 OR X2 OR X3) AND VL1 AND ( ((VL2 OR VL3) AND VL4) OR (VL5 AND VL6) OR VL7) AND NOT (E1 OR E2)");
@@ -343,7 +343,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("All patients with the most recent VL Numeric Result");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     String query = mostRecentVLNumericResultQuery(Sentence.LessThan, 1000, false);
@@ -373,7 +373,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("All patients with the most recent VL Qualitative Result ");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     String query = getPatientsWithMostRecentVLQuantitativeResult(false);
@@ -457,7 +457,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("All patients with the most recent VL Numeric Result");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     String query = mostRecentVLNumericResultQuery(Sentence.EqualOrGreaterThan, 1000, false);
@@ -538,7 +538,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("All patients who DO NOT have any Viral Load Result");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
@@ -573,7 +573,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
             + "        WHERE "
             + "            ee.encounter_type = ${53} "
             + "                AND oo.concept_id IN (${856} , ${1305}) "
-            + "                AND oo.obs_datetime <= :startDate "
+            + "                AND oo.obs_datetime <= :endDate "
             + "                AND ee.location_id = :location "
             + "                AND ee.voided = 0 "
             + "                AND pp.voided = 0 "
@@ -589,7 +589,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
             + "            obs oo ON oo.encounter_id = ee.encounter_id "
             + "        WHERE "
             + "            ee.encounter_type IN (${13} , ${6}, ${9}, ${51}) "
-            + "                AND ee.encounter_datetime <= :startDate "
+            + "                AND ee.encounter_datetime <= :endDate "
             + "                AND oo.concept_id IN (${856} , ${1305}) "
             + "                AND ee.location_id = :location "
             + "                AND ee.voided = 0 "
@@ -714,7 +714,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
     String query =
         "   FROM ( "
-            + "         SELECT  p.patient_id, MAX(e.encounter_datetime) AS max_vl FROM patient p "
+            + "         SELECT  p.patient_id, MAX(DATE(e.encounter_datetime)) AS max_vl FROM patient p "
             + "             INNER JOIN encounter e on e.patient_id = p.patient_id "
             + "             INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "         WHERE p.voided =0 "
@@ -723,8 +723,22 @@ public class ListOfPatientsEligibleForVLCohortQueries {
             + "             AND e.location_id = :location "
             + "             AND o.concept_id = ${1305} "
             + "             AND e.encounter_type IN (${13},${6},${9},${51}) "
-            + "             AND e.encounter_datetime <= :startDate "
+            + "             AND DATE(e.encounter_datetime) <= :endDate "
             + "             AND o.value_coded IS NOT NULL "
+            + "         GROUP BY p.patient_id "
+            + "      UNION  "
+            + "         SELECT p.patient_id, MAX(o.obs_datetime) AS max_vl  "
+            + "         FROM patient p   "
+            + "             INNER JOIN encounter e ON e.patient_id = p.patient_id  "
+            + "             INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
+            + "         WHERE e.encounter_type = ${53}  "
+            + "             AND o.concept_id = ${1305}       "
+            + "             AND o.value_coded IS NOT NULL "
+            + "             AND o.obs_datetime <= :endDate  "
+            + "             AND e.location_id = :location  "
+            + "             AND e.voided = 0  "
+            + "             AND p.voided = 0  "
+            + "             AND o.voided = 0     "
             + "         GROUP BY p.patient_id "
             + " ) AS recent_vl GROUP BY recent_vl.patient_id ";
     String sql =
@@ -805,7 +819,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
             + "                              INNER JOIN encounter e ON p.patient_id = e.patient_id  "
             + "                              INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
             + "                              WHERE e.encounter_type IN (${13},${6},${9},${51})  "
-            + "                              AND e.encounter_datetime <= :startDate  "
+            + "                              AND e.encounter_datetime <= :endDate  "
             + "                              AND o.concept_id IN (${856},${1305})                                "
             + "                              AND e.location_id = :location  "
             + "                              AND e.voided = 0  "
@@ -821,7 +835,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
             + "                              INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
             + "                              WHERE e.encounter_type = ${53}  "
             + "                              AND o.concept_id IN (${856},${1305})                                 "
-            + "                              AND o.obs_datetime <= :startDate  "
+            + "                              AND o.obs_datetime <= :endDate  "
             + "                              AND e.location_id = :location  "
             + "                              AND e.voided = 0  "
             + "                              AND p.voided = 0  "
@@ -872,5 +886,683 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     public String getSentence() {
       return this.sentence;
     }
+  }
+
+  /**
+   * <b>Patient is Breastfeeding</b>
+   * <li>Patient is identified as Female
+   * <li>Patient has “Delivery date” registered in the Initial or Follow-up Consultation (Processo
+   *     Clínico Parte A, Ficha de Seguimento, Ficha Resumo or Ficha Clínica) where the delivery
+   *     date occurred within the period range or
+   * <li>Patient has started ART for being breastfeeding as specified in “CRITÉRIO PARA INÍCIO DE
+   *     TARV” in the Initial or Follow-up Consultation (Processo Clínico Parte A or Ficha de
+   *     Seguimento) that occurred within the period range or
+   * <li>Patient has registered as breastfeeding in Initial or Follow-up Consultation (Ficha de
+   *     Seguimento, Ficha Resumo or Ficha Clínica) occurred within the period range or
+   * <li>Patient has been registered in the PTV/ETV program with state 27 (gave birth) within the
+   *     period range
+   * <li>Patient who have “Actualmente está a amamentar” marked as “Sim” on e-Lab Form and “Data de
+   *     Colheita” is during the period range.
+   *
+   *     <p>The system will consider the following as period range: <br>
+   *     1. start_date = report end date - 18 months <br>
+   *     2. end_date = report end date
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoAreBreastfeeding() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Breastfeeding Patients");
+    sqlCohortDefinition.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6332", commonMetadata.getBreastfeeding().getConceptId());
+    valuesMap.put("1065", hivMetadata.getYesConcept().getConceptId());
+    valuesMap.put("5599", hivMetadata.getPriorDeliveryDateConcept().getConceptId());
+    valuesMap.put("1600", hivMetadata.getPregnancyDueDate().getConceptId());
+    valuesMap.put("5", hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId());
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("6334", hivMetadata.getCriteriaForArtStart().getConceptId());
+    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    valuesMap.put("8", hivMetadata.getPtvEtvProgram().getProgramId());
+    valuesMap.put("27", hivMetadata.getPatientGaveBirthWorkflowState().getProgramWorkflowStateId());
+    valuesMap.put("1190", hivMetadata.getHistoricalDrugStartDateConcept().getConceptId());
+    valuesMap.put("1982", commonMetadata.getPregnantConcept().getConceptId());
+    valuesMap.put("1279", hivMetadata.getNumberOfWeeksPregnant().getConceptId());
+    valuesMap.put("6331", hivMetadata.getBPlusConcept().getConceptId());
+    valuesMap.put("23821", hivMetadata.getSampleCollectionDateAndTime().getConceptId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+
+    String query =
+        " SELECT list.patient_id "
+            + "FROM   (SELECT breastfeeding.patient_id, "
+            + "               breastfeeding.last_date "
+            + "        FROM   (SELECT p.patient_id, "
+            + "                       Max(o.value_datetime) AS last_date "
+            + "                FROM   patient p "
+            + "                       INNER JOIN person pe "
+            + "                               ON p.patient_id = pe.person_id "
+            + "                       INNER JOIN encounter e "
+            + "                               ON p.patient_id = e.patient_id "
+            + "                       INNER JOIN obs o "
+            + "                               ON e.encounter_id = o.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND o.voided = 0 "
+            + "                       AND concept_id = ${5599} "
+            + "                       AND e.encounter_type IN ( ${5}, ${6} ) "
+            + "                       AND o.value_datetime BETWEEN DATE_SUB(:onOrBefore, INTERVAL 18 MONTH) AND :onOrBefore "
+            + "                       AND e.location_id = :location "
+            + "                       AND pe.gender = 'F' "
+            + "                GROUP  BY p.patient_id "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       Max(e.encounter_datetime) AS last_date "
+            + "                FROM   patient p "
+            + "                       INNER JOIN person pe "
+            + "                               ON p.patient_id = pe.person_id "
+            + "                       INNER JOIN encounter e "
+            + "                               ON p.patient_id = e.patient_id "
+            + "                       INNER JOIN obs o "
+            + "                               ON e.encounter_id = o.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND o.voided = 0 "
+            + "                       AND o.concept_id = ${6332} "
+            + "                       AND o.value_coded = ${1065} "
+            + "                       AND e.encounter_type IN ( ${5}, ${6} ) "
+            + "                       AND e.encounter_datetime BETWEEN DATE_SUB(:onOrBefore, INTERVAL 18 MONTH) AND :onOrBefore "
+            + "                       AND e.location_id = :location "
+            + "                       AND pe.gender = 'F' "
+            + "                GROUP  BY p.patient_id "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       Max(e.encounter_datetime) AS last_date "
+            + "                FROM   patient p "
+            + "                       INNER JOIN person pe "
+            + "                               ON p.patient_id = pe.person_id "
+            + "                       INNER JOIN encounter e "
+            + "                               ON p.patient_id = e.patient_id "
+            + "                       INNER JOIN obs o "
+            + "                               ON e.encounter_id = o.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                       AND pe.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND o.voided = 0 "
+            + "                       AND o.concept_id = ${6334} "
+            + "                       AND o.value_coded = ${6332} "
+            + "                       AND e.encounter_type IN ( ${5}, ${6} ) "
+            + "                       AND e.encounter_datetime BETWEEN DATE_SUB(:onOrBefore, INTERVAL 18 MONTH) AND :onOrBefore "
+            + "                       AND e.location_id = :location "
+            + "                       AND pe.gender = 'F' "
+            + "                GROUP  BY p.patient_id "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       Max(Date(o.value_datetime)) AS last_date "
+            + "                FROM   patient p "
+            + "                       INNER JOIN person pe "
+            + "                               ON p.patient_id = pe.person_id "
+            + "                       INNER JOIN encounter e "
+            + "                               ON p.patient_id = e.patient_id "
+            + "                       INNER JOIN obs o "
+            + "                               ON e.encounter_id = o.encounter_id "
+            + "                       INNER JOIN obs ob "
+            + "                               ON e.encounter_id = ob.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND o.voided = 0 "
+            + "                       AND o.concept_id = ${23821} "
+            + "                       AND ob.concept_id = ${6332} "
+            + "                       AND ob.value_coded = ${1065} "
+            + "                       AND e.encounter_type = ${51} "
+            + "                       AND pe.gender = 'F' "
+            + "                       AND Date(o.value_datetime) BETWEEN DATE_SUB(:onOrBefore, INTERVAL 18 MONTH) AND :onOrBefore "
+            + "                GROUP  BY p.patient_id "
+            + "                UNION "
+            + "                SELECT pp.patient_id, "
+            + "                       Max(ps.start_date) AS last_date "
+            + "                FROM   patient_program pp "
+            + "                       INNER JOIN person pe "
+            + "                               ON pp.patient_id = pe.person_id "
+            + "                       INNER JOIN patient_state ps "
+            + "                               ON pp.patient_program_id = ps.patient_program_id "
+            + "                WHERE  pp.program_id = ${8} "
+            + "                       AND ps.state = ${27} "
+            + "                       AND pp.voided = 0 "
+            + "                       AND ps.voided = 0 "
+            + "                       AND ps.start_date BETWEEN DATE_SUB(:onOrBefore, INTERVAL 18 MONTH) AND :onOrBefore "
+            + "                       AND pp.location_id = :location "
+            + "                       AND pe.gender = 'F' "
+            + "                GROUP  BY pp.patient_id "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       Max(hist.value_datetime) AS last_date "
+            + "                FROM   patient p "
+            + "                       INNER JOIN person pe "
+            + "                               ON p.patient_id = pe.person_id "
+            + "                       INNER JOIN encounter e "
+            + "                               ON p.patient_id = e.patient_id "
+            + "                       INNER JOIN obs o "
+            + "                               ON e.encounter_id = o.encounter_id "
+            + "                       INNER JOIN obs hist "
+            + "                               ON e.encounter_id = hist.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND o.voided = 0 "
+            + "                       AND o.concept_id = ${6332} "
+            + "                       AND o.value_coded = ${1065} "
+            + "                       AND e.encounter_type = ${53} "
+            + "                       AND hist.concept_id = ${1190} "
+            + "                       AND pe.gender = 'F' "
+            + "                       AND hist.value_datetime BETWEEN DATE_SUB(:onOrBefore, INTERVAL 18 MONTH) AND :onOrBefore "
+            + "                GROUP  BY p.patient_id) AS breastfeeding "
+            + "               LEFT JOIN (SELECT patient_id, "
+            + "                                 Max(pregnancy_date) AS pregnancy_date "
+            + "                          FROM   (SELECT p.patient_id, "
+            + "                                         Max(e.encounter_datetime) AS "
+            + "                                         pregnancy_date "
+            + "                                  FROM   patient p "
+            + "                                         INNER JOIN person pe "
+            + "                                                 ON p.patient_id = pe.person_id "
+            + "                                         INNER JOIN encounter e "
+            + "                                                 ON p.patient_id = e.patient_id "
+            + "                                         INNER JOIN obs o "
+            + "                                                 ON "
+            + "                                         e.encounter_id = o.encounter_id "
+            + "                                  WHERE  p.voided = 0 "
+            + "                                         AND e.voided = 0 "
+            + "                                         AND o.voided = 0 "
+            + "                                         AND concept_id = ${1982} "
+            + "                                         AND value_coded = ${1065} "
+            + "                                         AND e.encounter_type IN ( ${5}, ${6} ) "
+            + "                                         AND e.encounter_datetime BETWEEN "
+            + "                                             Date_sub(:onOrBefore, INTERVAL "
+            + "                                             9 month) "
+            + "                                             AND "
+            + "                                             :onOrBefore "
+            + "                                         AND e.location_id = :location "
+            + "                                         AND pe.gender = 'F' "
+            + "                                  GROUP  BY p.patient_id "
+            + "                                  UNION "
+            + "                                  SELECT p.patient_id, "
+            + "                                         Max(historical_date.value_datetime) AS "
+            + "                                         pregnancy_date "
+            + "                                  FROM   patient p "
+            + "                                         INNER JOIN person pe "
+            + "                                                 ON p.patient_id = pe.person_id "
+            + "                                         INNER JOIN encounter e "
+            + "                                                 ON p.patient_id = e.patient_id "
+            + "                                         INNER JOIN obs pregnancy "
+            + "                                                 ON e.encounter_id = "
+            + "                                                    pregnancy.encounter_id "
+            + "                                         INNER JOIN obs historical_date "
+            + "                                                 ON e.encounter_id = "
+            + "                                                    historical_date.encounter_id "
+            + "                                  WHERE  p.voided = 0 "
+            + "                                         AND e.voided = 0 "
+            + "                                         AND pregnancy.voided = 0 "
+            + "                                         AND pregnancy.concept_id = ${1982} "
+            + "                                         AND pregnancy.value_coded = ${1065} "
+            + "                                         AND historical_date.voided = 0 "
+            + "                                         AND historical_date.concept_id = ${1190} "
+            + "                                         AND e.encounter_type = ${53} "
+            + "                                         AND historical_date.value_datetime "
+            + "                                             BETWEEN "
+            + "                                             Date_sub( "
+            + "                                             :onOrBefore, "
+            + "                                             INTERVAL 9 month) "
+            + "                                             AND :onOrBefore "
+            + "                                         AND e.location_id = :location "
+            + "                                         AND pe.gender = 'F' "
+            + "                                  GROUP  BY p.patient_id "
+            + "                                  UNION "
+            + "                                  SELECT p.patient_id, "
+            + "                                         Max(e.encounter_datetime) AS "
+            + "                                         pregnancy_date "
+            + "                                  FROM   patient p "
+            + "                                         INNER JOIN person pe "
+            + "                                                 ON p.patient_id = pe.person_id "
+            + "                                         INNER JOIN encounter e "
+            + "                                                 ON p.patient_id = e.patient_id "
+            + "                                         INNER JOIN obs o "
+            + "                                                 ON "
+            + "                                         e.encounter_id = o.encounter_id "
+            + "                                  WHERE  p.voided = 0 "
+            + "                                         AND e.voided = 0 "
+            + "                                         AND o.voided = 0 "
+            + "                                         AND concept_id = ${1279} "
+            + "                                         AND e.encounter_type IN ( ${5}, ${6} ) "
+            + "                                         AND e.encounter_datetime BETWEEN "
+            + "                                             Date_sub(:onOrBefore, INTERVAL "
+            + "                                             9 month) "
+            + "                                             AND "
+            + "                                             :onOrBefore "
+            + "                                         AND e.location_id = :location "
+            + "                                         AND pe.gender = 'F' "
+            + "                                  GROUP  BY p.patient_id "
+            + "                                  UNION "
+            + "                                  SELECT p.patient_id, "
+            + "                                         Max(e.encounter_datetime) AS "
+            + "                                         pregnancy_date "
+            + "                                  FROM   patient p "
+            + "                                         INNER JOIN person pe "
+            + "                                                 ON p.patient_id = pe.person_id "
+            + "                                         INNER JOIN encounter e "
+            + "                                                 ON p.patient_id = e.patient_id "
+            + "                                         INNER JOIN obs o "
+            + "                                                 ON "
+            + "                                         e.encounter_id = o.encounter_id "
+            + "                                  WHERE  p.voided = 0 "
+            + "                                         AND e.voided = 0 "
+            + "                                         AND o.voided = 0 "
+            + "                                         AND concept_id = ${1600} "
+            + "                                         AND e.encounter_type IN ( ${5}, ${6} ) "
+            + "                                         AND e.encounter_datetime BETWEEN "
+            + "                                             Date_sub(:onOrBefore, INTERVAL "
+            + "                                             9 month) "
+            + "                                             AND "
+            + "                                             :onOrBefore "
+            + "                                         AND e.location_id = :location "
+            + "                                         AND pe.gender = 'F' "
+            + "                                  GROUP  BY p.patient_id "
+            + "                                  UNION "
+            + "                                  SELECT p.patient_id, "
+            + "                                         Max(e.encounter_datetime) AS "
+            + "                                         pregnancy_date "
+            + "                                  FROM   patient p "
+            + "                                         INNER JOIN person pe "
+            + "                                                 ON p.patient_id = pe.person_id "
+            + "                                         INNER JOIN encounter e "
+            + "                                                 ON p.patient_id = e.patient_id "
+            + "                                         INNER JOIN obs o "
+            + "                                                 ON "
+            + "                                         e.encounter_id = o.encounter_id "
+            + "                                  WHERE  p.voided = 0 "
+            + "                                         AND pe.voided = 0 "
+            + "                                         AND e.voided = 0 "
+            + "                                         AND o.voided = 0 "
+            + "                                         AND concept_id = ${6334} "
+            + "                                         AND value_coded = ${6331} "
+            + "                                         AND e.encounter_type IN ( ${5}, ${6} ) "
+            + "                                         AND e.encounter_datetime BETWEEN "
+            + "                                             Date_sub(:onOrBefore, INTERVAL "
+            + "                                             9 month) "
+            + "                                             AND "
+            + "                                             :onOrBefore "
+            + "                                         AND e.location_id = :location "
+            + "                                         AND pe.gender = 'F' "
+            + "                                  GROUP  BY p.patient_id "
+            + "                                  UNION "
+            + "                                  SELECT pp.patient_id, "
+            + "                                         Max(pp.date_enrolled) AS pregnancy_date "
+            + "                                  FROM   patient_program pp "
+            + "                                         INNER JOIN person pe "
+            + "                                                 ON pp.patient_id = pe.person_id "
+            + "                                  WHERE  pp.program_id = ${8} "
+            + "                                         AND pp.voided = 0 "
+            + "                                         AND pp.date_enrolled BETWEEN "
+            + "                                             Date_sub( "
+            + "                                             :onOrBefore, "
+            + "                                             INTERVAL 9 month) "
+            + "                                             AND "
+            + "                                             :onOrBefore "
+            + "                                         AND pp.location_id = :location "
+            + "                                         AND pe.gender = 'F' "
+            + "                                  GROUP  BY pp.patient_id) AS pregnancy "
+            + "                          GROUP  BY pregnancy.patient_id) AS pregnant_table "
+            + "                      ON pregnant_table.patient_id = breastfeeding.patient_id "
+            + "        WHERE  ( breastfeeding.last_date > pregnant_table.pregnancy_date "
+            + "                  OR pregnant_table.pregnancy_date IS NULL ) "
+            + "        GROUP  BY breastfeeding.patient_id) AS list";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Patient is Pregnant</b>
+   * <li>Patient is identified as Female
+   * <li>Patient is marked as “PREGNANT” in the Initial Consultation (Processo Clínico Parte A or
+   *     Ficha Resumo – Master Card) or Follow-up Consultation (Ficha de Seguimento or Ficha Clínica
+   *     – Master Card) that occurred within the period range or
+   * <li>Patient has “Number of weeks Pregnant” registered in the Initial or Follow-up Consultation
+   *     (Ficha de Seguimento or Ficha Clínica – Master Card) that occurred within the period range
+   *     or
+   * <li>Patient has “Pregnancy Due Date” registered in the Initial or Follow-up Consultation
+   *     (Processo Clínico Parte A or Ficha de Seguimento Adulto) occurred within the period range
+   *     or
+   * <li>Patient is enrolled on Prevention of the Vertical Transmission/Elimination of the Vertical
+   *     Transmission (PTV/ETV) program within the period range or
+   * <li>Patient has started ART for being B+ as specified in “CRITÉRIO PARA INÍCIO DE TARV” in the
+   *     Follow-up Consultations (Ficha de Seguimento) occurred within the period range.
+   * <li>Patient who have “Actualmente encontra-se gravida” marked as “Sim” on e-Lab Form and “Data
+   *     de Colheita” is during the period range.
+   *
+   *     <p>The system will consider the following as period range: <br>
+   *     1. start_date = report end date - 9 months <br>
+   *     2. end_date = report end date
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoArePregnant() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Pregnant Patients");
+    sqlCohortDefinition.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6332", commonMetadata.getBreastfeeding().getConceptId());
+    valuesMap.put("1065", hivMetadata.getYesConcept().getConceptId());
+    valuesMap.put("5599", hivMetadata.getPriorDeliveryDateConcept().getConceptId());
+    valuesMap.put("1600", hivMetadata.getPregnancyDueDate().getConceptId());
+    valuesMap.put("5", hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId());
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("6334", hivMetadata.getCriteriaForArtStart().getConceptId());
+    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    valuesMap.put("8", hivMetadata.getPtvEtvProgram().getProgramId());
+    valuesMap.put("27", hivMetadata.getPatientGaveBirthWorkflowState().getProgramWorkflowStateId());
+    valuesMap.put("1190", hivMetadata.getHistoricalDrugStartDateConcept().getConceptId());
+    valuesMap.put("1982", commonMetadata.getPregnantConcept().getConceptId());
+    valuesMap.put("1279", hivMetadata.getNumberOfWeeksPregnant().getConceptId());
+    valuesMap.put("6331", hivMetadata.getBPlusConcept().getConceptId());
+    valuesMap.put("23821", hivMetadata.getSampleCollectionDateAndTime().getConceptId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+
+    String query =
+        "SELECT max_pregnant.patient_id "
+            + "FROM   (SELECT pregnant.patient_id, "
+            + "               Max(pregnant.pregnancy_date) AS pregnancy_date "
+            + "        FROM   ("
+            + "                     SELECT p.patient_id,  Max(e.encounter_datetime) AS "
+            + "                                         pregnancy_date "
+            + "                                  FROM   patient p "
+            + "                                         INNER JOIN person pe "
+            + "                                                 ON p.patient_id = pe.person_id "
+            + "                                         INNER JOIN encounter e "
+            + "                                                 ON p.patient_id = e.patient_id "
+            + "                                         INNER JOIN obs o "
+            + "                                                 ON "
+            + "                                         e.encounter_id = o.encounter_id "
+            + "                                  WHERE  p.voided = 0 "
+            + "                                         AND e.voided = 0 "
+            + "                                         AND o.voided = 0 "
+            + "                                         AND concept_id = ${1982} "
+            + "                                         AND value_coded = ${1065} "
+            + "                                         AND e.encounter_type IN ( ${5}, ${6} ) "
+            + "                                         AND e.encounter_datetime BETWEEN "
+            + "                                             Date_sub(:onOrBefore, INTERVAL "
+            + "                                             9 month) "
+            + "                                             AND "
+            + "                                             :onOrBefore "
+            + "                                         AND e.location_id = :location "
+            + "                                         AND pe.gender = 'F' "
+            + "                                  GROUP  BY p.patient_id "
+            + "                                  UNION "
+            + "                                  SELECT p.patient_id, "
+            + "                                         Max(historical_date.value_datetime) AS "
+            + "                                         pregnancy_date "
+            + "                                  FROM   patient p "
+            + "                                         INNER JOIN person pe "
+            + "                                                 ON p.patient_id = pe.person_id "
+            + "                                         INNER JOIN encounter e "
+            + "                                                 ON p.patient_id = e.patient_id "
+            + "                                         INNER JOIN obs pregnancy "
+            + "                                                 ON e.encounter_id = "
+            + "                                                    pregnancy.encounter_id "
+            + "                                         INNER JOIN obs historical_date "
+            + "                                                 ON e.encounter_id = "
+            + "                                                    historical_date.encounter_id "
+            + "                                  WHERE  p.voided = 0 "
+            + "                                         AND e.voided = 0 "
+            + "                                         AND pregnancy.voided = 0 "
+            + "                                         AND pregnancy.concept_id = ${1982} "
+            + "                                         AND pregnancy.value_coded = ${1065} "
+            + "                                         AND historical_date.voided = 0 "
+            + "                                         AND historical_date.concept_id = ${1190} "
+            + "                                         AND e.encounter_type = ${53} "
+            + "                                         AND historical_date.value_datetime "
+            + "                                             BETWEEN "
+            + "                                             Date_sub( "
+            + "                                             :onOrBefore, "
+            + "                                             INTERVAL 9 month) "
+            + "                                             AND :onOrBefore "
+            + "                                         AND e.location_id = :location "
+            + "                                         AND pe.gender = 'F' "
+            + "                                  GROUP  BY p.patient_id "
+            + "                                  UNION "
+            + "                                  SELECT p.patient_id, "
+            + "                                         Max(e.encounter_datetime) AS "
+            + "                                         pregnancy_date "
+            + "                                  FROM   patient p "
+            + "                                         INNER JOIN person pe "
+            + "                                                 ON p.patient_id = pe.person_id "
+            + "                                         INNER JOIN encounter e "
+            + "                                                 ON p.patient_id = e.patient_id "
+            + "                                         INNER JOIN obs o "
+            + "                                                 ON "
+            + "                                         e.encounter_id = o.encounter_id "
+            + "                                  WHERE  p.voided = 0 "
+            + "                                         AND e.voided = 0 "
+            + "                                         AND o.voided = 0 "
+            + "                                         AND concept_id = ${1279} "
+            + "                                         AND e.encounter_type IN ( ${5}, ${6} ) "
+            + "                                         AND e.encounter_datetime BETWEEN "
+            + "                                             Date_sub(:onOrBefore, INTERVAL "
+            + "                                             9 month) "
+            + "                                             AND "
+            + "                                             :onOrBefore "
+            + "                                         AND e.location_id = :location "
+            + "                                         AND pe.gender = 'F' "
+            + "                                  GROUP  BY p.patient_id "
+            + "                                  UNION "
+            + "                                  SELECT p.patient_id, "
+            + "                                         Max(e.encounter_datetime) AS "
+            + "                                         pregnancy_date "
+            + "                                  FROM   patient p "
+            + "                                         INNER JOIN person pe "
+            + "                                                 ON p.patient_id = pe.person_id "
+            + "                                         INNER JOIN encounter e "
+            + "                                                 ON p.patient_id = e.patient_id "
+            + "                                         INNER JOIN obs o "
+            + "                                                 ON "
+            + "                                         e.encounter_id = o.encounter_id "
+            + "                                  WHERE  p.voided = 0 "
+            + "                                         AND e.voided = 0 "
+            + "                                         AND o.voided = 0 "
+            + "                                         AND concept_id = ${1600} "
+            + "                                         AND e.encounter_type IN ( ${5}, ${6} ) "
+            + "                                         AND e.encounter_datetime BETWEEN "
+            + "                                             Date_sub(:onOrBefore, INTERVAL "
+            + "                                             9 month) "
+            + "                                             AND "
+            + "                                             :onOrBefore "
+            + "                                         AND e.location_id = :location "
+            + "                                         AND pe.gender = 'F' "
+            + "                                  GROUP  BY p.patient_id "
+            + "                                  UNION "
+            + "                                  SELECT p.patient_id, "
+            + "                                         Max(e.encounter_datetime) AS "
+            + "                                         pregnancy_date "
+            + "                                  FROM   patient p "
+            + "                                         INNER JOIN person pe "
+            + "                                                 ON p.patient_id = pe.person_id "
+            + "                                         INNER JOIN encounter e "
+            + "                                                 ON p.patient_id = e.patient_id "
+            + "                                         INNER JOIN obs o "
+            + "                                                 ON "
+            + "                                         e.encounter_id = o.encounter_id "
+            + "                                  WHERE  p.voided = 0 "
+            + "                                         AND pe.voided = 0 "
+            + "                                         AND e.voided = 0 "
+            + "                                         AND o.voided = 0 "
+            + "                                         AND concept_id = ${6334} "
+            + "                                         AND value_coded = ${6331} "
+            + "                                         AND e.encounter_type IN ( ${5}, ${6} ) "
+            + "                                         AND e.encounter_datetime BETWEEN "
+            + "                                             Date_sub(:onOrBefore, INTERVAL "
+            + "                                             9 month) "
+            + "                                             AND "
+            + "                                             :onOrBefore "
+            + "                                         AND e.location_id = :location "
+            + "                                         AND pe.gender = 'F' "
+            + "                                  GROUP  BY p.patient_id "
+            + "                                  UNION "
+            + "                                  SELECT pp.patient_id, "
+            + "                                         Max(pp.date_enrolled) AS pregnancy_date "
+            + "                                  FROM   patient_program pp "
+            + "                                         INNER JOIN person pe "
+            + "                                                 ON pp.patient_id = pe.person_id "
+            + "                                  WHERE  pp.program_id = ${8} "
+            + "                                         AND pp.voided = 0 "
+            + "                                         AND pp.date_enrolled BETWEEN "
+            + "                                             Date_sub( "
+            + "                                             :onOrBefore, "
+            + "                                             INTERVAL 9 month) "
+            + "                                             AND "
+            + "                                             :onOrBefore "
+            + "                                         AND pp.location_id = :location "
+            + "                                         AND pe.gender = 'F' "
+            + "                                  GROUP  BY pp.patient_id "
+            + ") AS pregnant "
+            + "        GROUP  BY patient_id) max_pregnant "
+            + "       LEFT JOIN (SELECT breastfeeding.patient_id, "
+            + "                         Max(breastfeeding.last_date) AS breastfeeding_date "
+            + "                  FROM   (SELECT p.patient_id, "
+            + "                                 Max(o.value_datetime) AS last_date "
+            + "                          FROM   patient p "
+            + "                                 INNER JOIN person pe "
+            + "                                         ON p.patient_id = pe.person_id "
+            + "                                 INNER JOIN encounter e "
+            + "                                         ON p.patient_id = e.patient_id "
+            + "                                 INNER JOIN obs o "
+            + "                                         ON e.encounter_id = o.encounter_id "
+            + "                          WHERE  p.voided = 0 "
+            + "                                 AND e.voided = 0 "
+            + "                                 AND o.voided = 0 "
+            + "                                 AND concept_id = ${5599} "
+            + "                                 AND e.encounter_type IN ( ${5}, ${6} ) "
+            + "                                 AND o.value_datetime BETWEEN "
+            + "                                     Date_sub(:onOrBefore, "
+            + "                                     INTERVAL 18 month) AND "
+            + "                                     :onOrBefore "
+            + "                                 AND e.location_id = :location "
+            + "                                 AND pe.gender = 'F' "
+            + "                          GROUP  BY p.patient_id "
+            + "                          UNION "
+            + "                          SELECT p.patient_id, "
+            + "                                 Max(e.encounter_datetime) AS last_date "
+            + "                          FROM   patient p "
+            + "                                 INNER JOIN person pe "
+            + "                                         ON p.patient_id = pe.person_id "
+            + "                                 INNER JOIN encounter e "
+            + "                                         ON p.patient_id = e.patient_id "
+            + "                                 INNER JOIN obs o "
+            + "                                         ON e.encounter_id = o.encounter_id "
+            + "                          WHERE  p.voided = 0 "
+            + "                                 AND e.voided = 0 "
+            + "                                 AND o.voided = 0 "
+            + "                                 AND o.concept_id = ${6332} "
+            + "                                 AND o.value_coded = ${1065} "
+            + "                                 AND e.encounter_type IN ( ${5}, ${6} ) "
+            + "                                 AND e.encounter_datetime BETWEEN Date_sub( "
+            + "                                     :onOrBefore, "
+            + "                                     INTERVAL 18 month) "
+            + "                                     AND "
+            + "                                     :onOrBefore "
+            + "                                 AND e.location_id = :location "
+            + "                                 AND pe.gender = 'F' "
+            + "                          GROUP  BY p.patient_id "
+            + "                          UNION "
+            + "                          SELECT p.patient_id, "
+            + "                                 Max(e.encounter_datetime) AS last_date "
+            + "                          FROM   patient p "
+            + "                                 INNER JOIN person pe "
+            + "                                         ON p.patient_id = pe.person_id "
+            + "                                 INNER JOIN encounter e "
+            + "                                         ON p.patient_id = e.patient_id "
+            + "                                 INNER JOIN obs o "
+            + "                                         ON e.encounter_id = o.encounter_id "
+            + "                          WHERE  p.voided = 0 "
+            + "                                 AND pe.voided = 0 "
+            + "                                 AND e.voided = 0 "
+            + "                                 AND o.voided = 0 "
+            + "                                 AND o.concept_id = ${6334} "
+            + "                                 AND o.value_coded = ${6332} "
+            + "                                 AND e.encounter_type IN ( ${5}, ${6} ) "
+            + "                                 AND e.encounter_datetime BETWEEN Date_sub( "
+            + "                                     :onOrBefore, "
+            + "                                     INTERVAL 18 month) "
+            + "                                     AND "
+            + "                                     :onOrBefore "
+            + "                                 AND e.location_id = :location "
+            + "                                 AND pe.gender = 'F' "
+            + "                          GROUP  BY p.patient_id "
+            + "                          UNION "
+            + "                          SELECT pp.patient_id, "
+            + "                                 Max(ps.start_date) AS last_date "
+            + "                          FROM   patient_program pp "
+            + "                                 INNER JOIN person pe "
+            + "                                         ON pp.patient_id = pe.person_id "
+            + "                                 INNER JOIN patient_state ps "
+            + "                                         ON "
+            + "                                 pp.patient_program_id = ps.patient_program_id "
+            + "                          WHERE  pp.program_id = ${8} "
+            + "                                 AND ps.state = ${27} "
+            + "                                 AND pp.voided = 0 "
+            + "                                 AND ps.voided = 0 "
+            + "                                 AND ps.start_date BETWEEN "
+            + "                                     Date_sub(:onOrBefore, INTERVAL "
+            + "                                     18 month) "
+            + "                                     AND "
+            + "                                     :onOrBefore "
+            + "                                 AND pp.location_id = :location "
+            + "                                 AND pe.gender = 'F' "
+            + "                          GROUP  BY pp.patient_id "
+            + "                          UNION "
+            + "                          SELECT p.patient_id, "
+            + "                                 Max(hist.value_datetime) AS last_date "
+            + "                          FROM   patient p "
+            + "                                 INNER JOIN person pe "
+            + "                                         ON p.patient_id = pe.person_id "
+            + "                                 INNER JOIN encounter e "
+            + "                                         ON p.patient_id = e.patient_id "
+            + "                                 INNER JOIN obs o "
+            + "                                         ON e.encounter_id = o.encounter_id "
+            + "                                 INNER JOIN obs hist "
+            + "                                         ON e.encounter_id = hist.encounter_id "
+            + "                          WHERE  p.voided = 0 "
+            + "                                 AND e.voided = 0 "
+            + "                                 AND o.voided = 0 "
+            + "                                 AND o.concept_id = ${6332} "
+            + "                                 AND o.value_coded = ${1065} "
+            + "                                 AND hist.concept_id = ${1190} "
+            + "                                 AND pe.gender = 'F' "
+            + "                                 AND hist.value_datetime IS NOT NULL "
+            + "                                 AND hist.value_datetime BETWEEN Date_sub( "
+            + "                                     :onOrBefore, "
+            + "                                     INTERVAL 18 month) "
+            + "                                     AND "
+            + "                                     :onOrBefore "
+            + "                          GROUP  BY p.patient_id) AS breastfeeding "
+            + "                  GROUP  BY patient_id) max_breastfeeding "
+            + "              ON max_pregnant.patient_id = max_breastfeeding.patient_id "
+            + "WHERE  ( max_pregnant.pregnancy_date IS NOT NULL "
+            + "         AND max_pregnant.pregnancy_date >= "
+            + "       max_breastfeeding.breastfeeding_date ) "
+            + "        OR ( max_breastfeeding.breastfeeding_date IS NULL )";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
   }
 }
