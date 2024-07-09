@@ -488,7 +488,7 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
     map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
     map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
     map.put("1030", hivMetadata.getHivPCRQualitativeConceptUuid().getConceptId());
-    String query = getPatientPCRResultDate();
+    String query = getPatientPCRResultDateQuery();
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
     return sqlPatientDataDefinition;
@@ -525,7 +525,7 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
             + "         JOIN obs o "
             + "              ON e.encounter_id = o.encounter_id "
             + "         JOIN ( "
-            + getPatientPCRResultDate()
+            + getPatientPCRResultDateQuery()
             + " ) last_pcr ON last_pcr.patient_id = p.patient_id "
             + "WHERE p.voided = 0 "
             + "  AND e.voided = 0 "
@@ -570,7 +570,7 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
             + "         JOIN obs o "
             + "              ON e.encounter_id = o.encounter_id "
             + "         JOIN ( "
-            + getPatientPCRResultDate()
+            + getPatientPCRResultDateQuery()
             + " ) last_pcr ON last_pcr.patient_id = p.patient_id "
             + "WHERE p.voided = 0 "
             + "  AND e.voided = 0 "
@@ -590,7 +590,7 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
             + "         JOIN obs o "
             + "              ON e.encounter_id = o.encounter_id "
             + "         JOIN ( "
-            + getPatientPCRResultDate()
+            + getPatientPCRResultDateQuery()
             + " ) last_pcr ON last_pcr.patient_id = p.patient_id "
             + "WHERE p.voided = 0 "
             + "  AND e.voided = 0 "
@@ -598,6 +598,143 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
             + "  AND e.location_id = :location "
             + "  AND e.encounter_type = ${93} "
             + "  AND e.encounter_datetime = last_pcr.most_recent "
+            + "  AND o.concept_id = ${1030} "
+            + "  AND o.value_coded IS NOT NULL "
+            + "GROUP BY p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>Date of Penultimate PCR Test Result– Sheet 1: Column AG</b>
+   * <li>Penultimate PCR test date registered on Ficha Lab Geral (Data de resultado) or encounter
+   *     date of CCR: Ficha Seguimento with (PCR- resultado)
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getPenultimatePCRTestDate() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+
+    sqlPatientDataDefinition.setName("Date of Penultimate PCR Test Result");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1030", hivMetadata.getHivPCRQualitativeConceptUuid().getConceptId());
+    String query = getPenultimatePCRResultDateQuery();
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>Sample Collection Type for Penultimate PCR Test Result – Sheet 1: Column AH</b>
+   * <li>Most recent PCR sample collection type registered on the Ficha Lab Geral (Tipo de colheita)
+   *     for the Most Recent Result Date Registered (Column AD).
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getPenultimateSampleCollectionType() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+
+    sqlPatientDataDefinition.setName("Sample Collection Type for Penultimate PCR Test Result ");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1030", hivMetadata.getHivPCRQualitativeConceptUuid().getConceptId());
+    map.put("23832", hivMetadata.getSampleTypeConcept().getConceptId());
+
+    // TODO: Investigate the types of samples available
+    //  for concept_id 23832 and update the converter answers
+
+    String query =
+        "SELECT p.patient_id, o.value_coded AS sample_type "
+            + "FROM patient p "
+            + "         JOIN encounter e "
+            + "              ON p.patient_id = e.patient_id "
+            + "         JOIN obs o "
+            + "              ON e.encounter_id = o.encounter_id "
+            + "         JOIN ( "
+            + getPenultimatePCRResultDateQuery()
+            + " ) pen_pcr ON pen_pcr.patient_id = p.patient_id "
+            + "WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ${13} "
+            + "  AND e.encounter_datetime = pen_pcr.most_recent "
+            + "  AND o.concept_id = ${23832} "
+            + "  AND o.value_coded IS NOT NULL "
+            + "GROUP BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>Most Recent PCR Test Result – Sheet 1: Column AF</b>
+   * <li>Most recent test result (Postivo, Negativo ou No Result) for the Most Recent Result Date
+   *     Registered (Column AD).
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getPenultimatePCRTestResult() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+
+    sqlPatientDataDefinition.setName("Most Recent PCR Test Result");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1030", hivMetadata.getHivPCRQualitativeConceptUuid().getConceptId());
+
+    String query =
+        " SELECT p.patient_id, "
+            + "       o.value_coded AS pcr_result "
+            + "FROM patient p "
+            + "         JOIN encounter e "
+            + "              ON p.patient_id = e.patient_id "
+            + "         JOIN obs o "
+            + "              ON e.encounter_id = o.encounter_id "
+            + "         JOIN ( "
+            + getPenultimatePCRResultDateQuery()
+            + " ) pen_pcr ON pen_pcr.patient_id = p.patient_id "
+            + "WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ${13} "
+            + "  AND e.encounter_datetime = pen_pcr.most_recent "
+            + "  AND o.concept_id = ${1030} "
+            + "  AND o.value_coded IS NOT NULL "
+            + "GROUP BY p.patient_id "
+            + "UNION "
+            + " SELECT p.patient_id, "
+            + "       o.value_coded AS pcr_result "
+            + "FROM patient p "
+            + "         JOIN encounter e "
+            + "              ON p.patient_id = e.patient_id "
+            + "         JOIN obs o "
+            + "              ON e.encounter_id = o.encounter_id "
+            + "         JOIN ( "
+            + getPenultimatePCRResultDateQuery()
+            + " ) pen_pcr ON pen_pcr.patient_id = p.patient_id "
+            + "WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ${93} "
+            + "  AND e.encounter_datetime = pen_pcr.most_recent "
             + "  AND o.concept_id = ${1030} "
             + "  AND o.value_coded IS NOT NULL "
             + "GROUP BY p.patient_id ";
@@ -678,7 +815,7 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
    *
    * @return {@link String}
    */
-  private String getPatientPCRResultDate() {
+  private String getPatientPCRResultDateQuery() {
     return " SELECT pcr.patient_id, MAX(pcr.pcr_date) AS most_recent "
         + " FROM  ( SELECT p.patient_id, "
         + "       MAX(e.encounter_datetime) AS pcr_date "
@@ -715,5 +852,57 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
         + "GROUP BY p.patient_id "
         + " ) pcr "
         + " GROUP BY pcr.patient_id ";
+  }
+
+  /**
+   *
+   * <li>Penultimate PCR test date registered on Ficha Lab Geral (Data de resultado) or encounter
+   *     date of CCR: Ficha Seguimento with (PCR- resultado)
+   *
+   * @return {@link String}
+   */
+  private String getPenultimatePCRResultDateQuery() {
+    return " SELECT pen_pcr.patient_id, MAX(pen_pcr.pen_pcr_date) AS most_recent "
+        + " FROM  ( SELECT p.patient_id, "
+        + "       MAX(e.encounter_datetime) AS pen_pcr_date "
+        + "FROM patient p "
+        + "         JOIN encounter e "
+        + "              ON p.patient_id = e.patient_id "
+        + "         JOIN obs o "
+        + "              ON e.encounter_id = o.encounter_id "
+        + "         JOIN ( "
+        + getPatientPCRResultDateQuery()
+        + " ) last_pcr ON last_pcr.patient_id = p.patient_id "
+        + "WHERE p.voided = 0 "
+        + "  AND e.voided = 0 "
+        + "  AND o.voided = 0 "
+        + "  AND e.location_id = :location "
+        + "  AND e.encounter_type = ${13} "
+        + "  AND e.encounter_datetime < last_pcr.most_recent "
+        + "  AND o.concept_id = ${1030} "
+        + "  AND o.value_coded IS NOT NULL "
+        + "GROUP BY p.patient_id "
+        + "UNION "
+        + "SELECT p.patient_id, "
+        + "       MAX(e.encounter_datetime) AS pen_pcr_date "
+        + "FROM patient p "
+        + "         JOIN encounter e "
+        + "              ON p.patient_id = e.patient_id "
+        + "         JOIN obs o "
+        + "              ON e.encounter_id = o.encounter_id "
+        + "         JOIN ( "
+        + getPatientPCRResultDateQuery()
+        + " ) last_pcr ON last_pcr.patient_id = p.patient_id "
+        + "WHERE p.voided = 0 "
+        + "  AND e.voided = 0 "
+        + "  AND o.voided = 0 "
+        + "  AND e.location_id = :location "
+        + "  AND e.encounter_type = ${93} "
+        + "  AND e.encounter_datetime < last_pcr.most_recent "
+        + "  AND o.concept_id = ${1030} "
+        + "  AND o.value_coded IS NOT NULL "
+        + "GROUP BY p.patient_id "
+        + " ) pen_pcr "
+        + " GROUP BY pen_pcr.patient_id ";
   }
 }

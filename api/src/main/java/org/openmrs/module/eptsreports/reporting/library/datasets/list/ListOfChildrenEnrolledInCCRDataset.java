@@ -7,8 +7,8 @@ import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.data.converter.DashDateFormatConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.SifNotNullAndNifNullConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.ObservationToConceptNameConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.SifNotNullAndNifNullConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.TestResultConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
@@ -253,25 +253,29 @@ public class ListOfChildrenEnrolledInCCRDataset extends BaseDataSet {
     patientDataSetDefinition.addColumn(
         "first_ccr_consultation",
         listOfChildrenEnrolledInCCRDataDefinitionQueries.getFirstCCRSeguimentoDate(true),
-        mappings);
+        mappings,
+        new DashDateFormatConverter());
 
     // Data da Última Consulta de Seguimento CCR – Sheet 1: Column AB
     patientDataSetDefinition.addColumn(
         "last_ccr_consultation",
         listOfChildrenEnrolledInCCRDataDefinitionQueries.getFirstCCRSeguimentoDate(false),
-        mappings);
+        mappings,
+        new DashDateFormatConverter());
 
     // Next Scheduled CCR Consultation Date – Sheet 1: Column AC
     patientDataSetDefinition.addColumn(
         "next_ccr_consultation",
         listOfChildrenEnrolledInCCRDataDefinitionQueries.getNextScheduledCCRConsultation(),
-        mappings);
+        mappings,
+        new DashDateFormatConverter());
 
     // Date of Most Recent PCR Test Result – Sheet 1: Column AD
     patientDataSetDefinition.addColumn(
         "last_pcr",
         listOfChildrenEnrolledInCCRDataDefinitionQueries.getMostRecentPCRTestDate(),
-        "endDate=${endDate},location=${location}");
+        "endDate=${endDate},location=${location}",
+        new DashDateFormatConverter());
 
     // Sample Collection Type for Most Recent PCR Test Result – Sheet 1: Column AE
     patientDataSetDefinition.addColumn(
@@ -283,7 +287,28 @@ public class ListOfChildrenEnrolledInCCRDataset extends BaseDataSet {
     // getMostRecentPCRTestResult – Sheet 1: Column AF
     patientDataSetDefinition.addColumn(
         "pcr_result",
-        listOfChildrenEnrolledInCCRDataDefinitionQueries.getSampleCollectionType(),
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getMostRecentPCRTestResult(),
+        "endDate=${endDate},location=${location}",
+        new TestResultConverter());
+
+    // Date of Penultimate PCR Test Result– Sheet 1: Column AG
+    patientDataSetDefinition.addColumn(
+        "penultimate_pcr",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getPenultimatePCRTestDate(),
+        "endDate=${endDate},location=${location}",
+        new DashDateFormatConverter());
+
+    // Sample Collection Type for Penultimate PCR Test Result – Sheet 1: Column AH
+    patientDataSetDefinition.addColumn(
+        "penultimate_sample_type",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getPenultimateSampleCollectionType(),
+        "endDate=${endDate},location=${location}",
+        new ObservationToConceptNameConverter());
+
+    // Penultimate PCR Test Result – Sheet 1: Column AI
+    patientDataSetDefinition.addColumn(
+        "penultimate_pcr_result",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getPenultimatePCRTestResult(),
         "endDate=${endDate},location=${location}",
         new TestResultConverter());
 
