@@ -284,7 +284,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getClientsWithSevereImmunodepression() {
+  public CohortDefinition getClientsWithSevereImmunosuppression() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("showing severe immunodepression");
@@ -300,8 +300,6 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     CohortDefinition cd750AgeUnderYear =
         getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo750mm3, null, 1);
 
-    CohortDefinition exclusion = getPatientsTransferredOutOrDead();
-
     cd.addSearch("cd4Count", EptsReportUtils.map(cd4Count, mappings));
     cd.addSearch("cd4Under200", EptsReportUtils.map(cd200AgeFiveOrOver, inclusionPeriod));
     cd.addSearch("cd4Under500", EptsReportUtils.map(cd500AgeBetweenOneAndFour, inclusionPeriod));
@@ -311,6 +309,91 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     return cd;
   }
+
+  public CohortDefinition getClientsWithSevereImmunodepressionAndInitiatedArt() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("showing severe immunosuppression and initiated art");
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+
+    CohortDefinition clientsWithSevereImmunosuppression = getClientsWithSevereImmunosuppression();
+    CohortDefinition initiatedArt = listOfPatientsArtCohortCohortQueries.getPatientsInitiatedART();
+
+    cd.addSearch(
+        "clientsWithSevereImmunosuppression",
+        EptsReportUtils.map(clientsWithSevereImmunosuppression, mappings));
+    cd.addSearch("initiatedArt", EptsReportUtils.map(initiatedArt, inclusionPeriod));
+
+    cd.setCompositionString("clientsWithSevereImmunosuppression AND initiatedArt");
+
+    return cd;
+  }
+
+  public CohortDefinition getClientsWithSevereImmunodepressionAndPregnant() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("showing severe immunosuppression and pregnant");
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+
+    CohortDefinition clientsWithSevereImmunosuppression = getClientsWithSevereImmunosuppression();
+    CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART(false);
+
+    cd.addSearch(
+        "clientsWithSevereImmunosuppression",
+        EptsReportUtils.map(clientsWithSevereImmunosuppression, mappings));
+    cd.addSearch("pregnant", EptsReportUtils.map(pregnant, pregnancyPeriod));
+
+    cd.setCompositionString("clientsWithSevereImmunosuppression AND pregnant");
+
+    return cd;
+  }
+
+  public CohortDefinition getClientsWithSevereImmunosuppressionAndConsecutiveVlResult() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("showing severe immunosuppression and consecutive Vl result");
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+
+    CohortDefinition clientsWithSevereImmunosuppression = getClientsWithSevereImmunosuppression();
+    CohortDefinition consecutiveVL = getPatientsWithTwoConsecutiveVLGreaterThan1000();
+
+    cd.addSearch(
+        "clientsWithSevereImmunosuppression",
+        EptsReportUtils.map(clientsWithSevereImmunosuppression, mappings));
+    cd.addSearch("consecutiveVL", EptsReportUtils.map(consecutiveVL, mappings));
+
+    cd.setCompositionString("clientsWithSevereImmunosuppression AND consecutiveVL");
+
+    return cd;
+  }
+
+  public CohortDefinition getClientsWithSevereImmunosuppressionAndReinitiatedArt() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("showing severe immunosuppression and reinitiated art");
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+
+    CohortDefinition clientsWithSevereImmunosuppression = getClientsWithSevereImmunosuppression();
+    CohortDefinition reinitiatedArt = getPatientsWhoReinitiatedArt();
+
+    cd.addSearch(
+        "clientsWithSevereImmunosuppression",
+        EptsReportUtils.map(clientsWithSevereImmunosuppression, mappings));
+    cd.addSearch("reinitiatedArt", EptsReportUtils.map(reinitiatedArt, inclusionPeriod));
+
+    cd.setCompositionString("clientsWithSevereImmunosuppression AND reinitiatedArt");
+
+    return cd;
+  }
+
   /**
    * Clients With Cd4 count and TB Lam Result by report generation date
    *
@@ -324,17 +407,17 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
 
-    CohortDefinition severeImmunodepression = getClientsWithSevereImmunodepression();
+    CohortDefinition severeImmunosuppression = getClientsWithSevereImmunosuppression();
 
     CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
 
-    cd.addSearch("severeImmunodepression", EptsReportUtils.map(severeImmunodepression, mappings));
+    cd.addSearch("severeImmunosuppression", EptsReportUtils.map(severeImmunosuppression, mappings));
     cd.addSearch(
         "anyTbLam",
         EptsReportUtils.map(
             anyTbLam, "startDate=${endDate-2m+1d},endDate=${generationDate},location=${location}"));
 
-    cd.setCompositionString("(severeImmunodepression AND anyTbLam)");
+    cd.setCompositionString("(severeImmunosuppression AND anyTbLam)");
 
     return cd;
   }
@@ -352,7 +435,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
 
-    CohortDefinition severeImmunodepression = getClientsWithSevereImmunodepression();
+    CohortDefinition severeImmunodepression = getClientsWithSevereImmunosuppression();
 
     CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
 
