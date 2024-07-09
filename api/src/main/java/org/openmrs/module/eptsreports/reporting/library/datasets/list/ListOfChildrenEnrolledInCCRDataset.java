@@ -312,6 +312,20 @@ public class ListOfChildrenEnrolledInCCRDataset extends BaseDataSet {
         "endDate=${endDate},location=${location}",
         new TestResultConverter());
 
+    // Date of Most Recent HIV Rapid Test Result – Sheet 1: Column AJ
+    patientDataSetDefinition.addColumn(
+        "hiv_test_date",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getPatientHivRapidTestDate(),
+        "endDate=${endDate},location=${location}",
+        new DashDateFormatConverter());
+
+    // Most Recent HIV Rapid Test Result – Sheet 1: Column AK
+    patientDataSetDefinition.addColumn(
+        "hiv_test_result",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getPatientHivRapidTestResult(),
+        "endDate=${endDate},location=${location}",
+        new TestResultConverter());
+
     return patientDataSetDefinition;
   }
 

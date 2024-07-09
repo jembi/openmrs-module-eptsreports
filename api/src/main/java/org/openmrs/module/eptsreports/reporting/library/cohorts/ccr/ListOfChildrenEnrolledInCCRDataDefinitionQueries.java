@@ -744,6 +744,102 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
     return sqlPatientDataDefinition;
   }
 
+  /**
+   * <b>Date of Most Recent HIV Rapid Test Result – Sheet 1: Column AJ</b>
+   * <li>Consultation Date (Data de consulta) registered on the most recent CCR: Ficha Seguimento
+   *     consultation date with an HIV rapid test result recorded
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getPatientHivRapidTestDate() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+
+    sqlPatientDataDefinition.setName("Date of Most Recent HIV Rapid Test Result");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1040", hivMetadata.getHivRapidTest1QualitativeConcept().getConceptId());
+
+    String query =
+        " SELECT p.patient_id, "
+            + "                          MAX(e.encounter_datetime) AS hiv_test_date "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON p.patient_id = e.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                  ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.encounter_type = ${93} "
+            + "                          AND e.encounter_datetime <= :endDate "
+            + "                          AND o.concept_id = ${1040} "
+            + "                          AND o.value_coded IS NOT NULL "
+            + "                   GROUP  BY p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>Most Recent HIV Rapid Test Result – Sheet 1: Column AK</b>
+   * <li>Most recent test result (Postivo, Negativo ou Indeterminado) for the Most Recent Result
+   *     Date Registered (Column AJ).
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getPatientHivRapidTestResult() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+
+    sqlPatientDataDefinition.setName("Most Recent HIV Rapid Test Result");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1040", hivMetadata.getHivRapidTest1QualitativeConcept().getConceptId());
+
+    String query =
+        " SELECT p.patient_id, o.value_coded AS hiv_test_result "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON p.patient_id = e.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                  ON o.encounter_id = e.encounter_id "
+            + "                          INNER JOIN ( "
+            + "                                SELECT p.patient_id, "
+            + "                                       MAX(e.encounter_datetime) AS hiv_test_date "
+            + "                                FROM   patient p "
+            + "                                       INNER JOIN encounter e "
+            + "                                               ON p.patient_id = e.patient_id "
+            + "                                       INNER JOIN obs o "
+            + "                                               ON o.encounter_id = e.encounter_id "
+            + "                                WHERE  p.voided = 0 "
+            + "                                       AND e.voided = 0 "
+            + "                                       AND o.voided = 0 "
+            + "                                       AND e.encounter_type = ${93} "
+            + "                                       AND e.encounter_datetime <= :endDate "
+            + "                                       AND o.concept_id = ${1040} "
+            + "                                       AND o.value_coded IS NOT NULL "
+            + "                                GROUP  BY p.patient_id "
+            + "                         ) hiv_test ON hiv_test.patient_id = p.patient_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.encounter_type = ${93} "
+            + "                          AND e.encounter_datetime = hiv_test.hiv_test_date "
+            + "                          AND o.concept_id = ${1040} "
+            + "                          AND o.value_coded IS NOT NULL "
+            + "                   GROUP  BY p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlPatientDataDefinition;
+  }
+
   private String getCCRResumoEnrollmentDateQuery() {
     return "SELECT p.patient_id, "
         + "                          Min(e.encounter_datetime) AS enrollment_date "

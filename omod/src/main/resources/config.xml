@@ -4118,7 +4118,7 @@
 	</globalProperty>
 
 	<globalProperty>
-		<property>@MODULE_ID@.getCCRSeguimentoEncounterType</property>
+		<property>@MODULE_ID@.ccrSeguimentoEncounterTypeUuid</property>
 		<defaultValue>aa3556c3-1c1a-49bd-8a6d-e7a0a5bc99ef</defaultValue>
 		<description>
 			UUID for CCR - Seguimento EncounterType
