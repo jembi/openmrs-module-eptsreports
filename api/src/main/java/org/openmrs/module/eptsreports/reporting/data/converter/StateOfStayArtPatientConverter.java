@@ -27,6 +27,13 @@ public class StateOfStayArtPatientConverter implements DataConverter {
 
   final String negativeDiagnosis = "HIV Negativo";
 
+  final String getTransferidoParaSectorTb = "Transferido Para Sector Tb";
+
+  final String getTransferidoParaConsultasIntegradas = "Transferido Para Consultas Integradas";
+
+  final String getTransferidoParaConsultaDeCriancaSadia =
+      "Transferido Para Consulta De Crianca Sadia";
+
   @Override
   public Object convert(Object obj) {
     if (obj == null) {
@@ -64,6 +71,12 @@ public class StateOfStayArtPatientConverter implements DataConverter {
         return transferredInForPrograms;
       case "1705":
         return restart;
+      case "165483":
+        return getTransferidoParaSectorTb;
+      case "165484":
+        return getTransferidoParaConsultasIntegradas;
+      case "165485":
+        return getTransferidoParaConsultaDeCriancaSadia;
       default:
         return "";
     }

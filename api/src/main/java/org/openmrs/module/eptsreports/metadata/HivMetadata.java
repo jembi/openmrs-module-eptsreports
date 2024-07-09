@@ -5977,4 +5977,67 @@ public class HivMetadata extends ProgramsMetadata {
         Context.getAdministrationService().getGlobalProperty("eptsreports.sampleTypeConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 1873</b>
+   *
+   * <p><b>Name:</b> TIPO DE ALTA (CCR)
+   *
+   * <p><b>Description:</b>TIPO DE ALTA (CCR)
+   *
+   * @return {@link Concept}
+   */
+  public Concept getTipoDeAltaConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.tipoDeAltaConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165483</b>
+   *
+   * <p><b>Name:</b> TRANSFERIDO PARA SECTOR DE TB
+   *
+   * <p><b>Description:</b>TRANSFERIDO PARA SECTOR DE TB
+   *
+   * @return {@link Concept}
+   */
+  public Concept getTransferidoParaSectorTbConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.transferidoParaSectorTbConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165484</b>
+   *
+   * <p><b>Name:</b> TRANSFERIDO PARA CONSULTAS INTEGRADAS
+   *
+   * <p><b>Description:</b>TRANSFERIDO PARA CONSULTAS INTEGRADAS
+   *
+   * @return {@link Concept}
+   */
+  public Concept getTransferidoParaConsultasIntegradasConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.transferidoParaConsultasIntegradasConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165485</b>
+   *
+   * <p><b>Name:</b> TRANSFERIDO PARA CONSULTA DE CRIANÇA SADIA
+   *
+   * <p><b>Description:</b>TRANSFERIDO PARA CONSULTA DE CRIANÇA SADIA
+   *
+   * @return {@link Concept}
+   */
+  public Concept getTransferidoParaConsultaDeCriancaSadiaConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.transferidoParaConsultaDeCriancaSadiaConceptUuid");
+    return getConcept(uuid);
+  }
 }

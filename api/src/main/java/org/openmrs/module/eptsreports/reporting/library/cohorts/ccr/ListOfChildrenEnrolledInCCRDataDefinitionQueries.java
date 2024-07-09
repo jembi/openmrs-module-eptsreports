@@ -840,6 +840,126 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
     return sqlPatientDataDefinition;
   }
 
+  /**
+   * <b>CCR: Programa – Sheet 1: Column AL</b>
+   * <li>Most recent state registered for CCR Program in Program Enrollment Module
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getPatientLastStateOfStayOnProgramEnrollment() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+
+    sqlPatientDataDefinition.setName("Most Recent CCR: Program in Program Enrollment");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getCCRProgram().getProgramId());
+
+    String query =
+        "SELECT p.patient_id , ps.state AS state  "
+            + "    FROM patient p   "
+            + "        INNER JOIN patient_program pg   "
+            + "            ON p.patient_id=pg.patient_id   "
+            + "        INNER JOIN patient_state ps   "
+            + "            ON pg.patient_program_id=ps.patient_program_id   "
+            + "        INNER JOIN ( "
+            + "               SELECT p.patient_id, MAX(ps.start_date) AS state_date  "
+            + "               FROM patient p   "
+            + "                   INNER JOIN patient_program pg   "
+            + "                       ON p.patient_id=pg.patient_id   "
+            + "                   INNER JOIN patient_state ps   "
+            + "                       ON pg.patient_program_id=ps.patient_program_id   "
+            + "               WHERE pg.voided = 0   "
+            + "                   AND ps.voided = 0   "
+            + "                   AND p.voided = 0   "
+            + "                   AND pg.program_id = ${6}  "
+            + "                   AND ps.state IS NOT NULL "
+            + "                   AND ps.start_date <= :endDate   "
+            + "                   AND pg.location_id = :location   "
+            + "               GROUP BY p.patient_id  "
+            + "        ) last_state ON last_state.patient_id = p.patient_id "
+            + "    WHERE pg.voided=0   "
+            + "        AND ps.voided=0   "
+            + "        AND p.voided=0   "
+            + "        AND pg.program_id = ${6}  "
+            + "        AND ps.state IS NOT NULL "
+            + "        AND ps.start_date = last_state.state_date   "
+            + "        AND pg.location_id = :location   "
+            + "         GROUP BY p.patient_id  ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>CCR: Ficha Resumo - Sheet 1: Column AM / CCR: Ficha de Seguimento – Sheet 1: Column AN </b>
+   * <li>Most recent state registered in Alta field on CCR: Ficha Resumo / Most recent state
+   *     registered in Alta field on CCR: Ficha Seguimento
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getPatientLastStateOfStayOnCCRResumoOrSeguimento(
+      Boolean isResumoOrSeguimento) {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+
+    sqlPatientDataDefinition.setName("Most Recent Patient state on CCR: Ficha Resumo / Seguimento");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
+    map.put("1873", hivMetadata.getTipoDeAltaConcept().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("1707", hivMetadata.getAbandonedConcept().getConceptId());
+    map.put("165483", hivMetadata.getTransferidoParaSectorTbConcept().getConceptId());
+    map.put("165484", hivMetadata.getTransferidoParaConsultasIntegradasConcept().getConceptId());
+    map.put("165485", hivMetadata.getTransferidoParaConsultaDeCriancaSadiaConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id, "
+            + "       o.value_coded AS state "
+            + "FROM patient p "
+            + "         JOIN encounter e "
+            + "              ON p.patient_id = e.patient_id "
+            + "         JOIN obs o "
+            + "              ON e.encounter_id = o.encounter_id "
+            + "         JOIN ( "
+            + "    SELECT p.patient_id, "
+            + "           Max(o.obs_datetime) AS state_date "
+            + "    FROM patient p "
+            + "             JOIN encounter e "
+            + "                  ON p.patient_id = e.patient_id "
+            + "             JOIN obs o "
+            + "                  ON e.encounter_id = o.encounter_id "
+            + "    WHERE p.voided = 0 "
+            + "      AND e.voided = 0 "
+            + "      AND o.voided = 0 "
+            + "      AND e.location_id = :location "
+            + "      AND e.encounter_type = ".concat(isResumoOrSeguimento ? " ${92} " : " ${93} ")
+            + "      AND e.encounter_datetime <= :endDate "
+            + "      AND o.concept_id = ${1873} "
+            + "      AND o.value_coded IN (${165484}, ${1706}, ${165485}, ${165483}, ${1707}, ${1366}) "
+            + "    GROUP BY p.patient_id "
+            + ") last_state ON last_state.patient_id = p.patient_id "
+            + "WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ".concat(isResumoOrSeguimento ? " ${92} " : " ${93} ")
+            + "  AND o.obs_datetime = last_state.state_date "
+            + "  AND o.concept_id = ${1873} "
+            + "  AND o.value_coded IN (${165484}, ${1706}, ${165485}, ${165483}, ${1707}, ${1366}) "
+            + "GROUP BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlPatientDataDefinition;
+  }
+
   private String getCCRResumoEnrollmentDateQuery() {
     return "SELECT p.patient_id, "
         + "                          Min(e.encounter_datetime) AS enrollment_date "

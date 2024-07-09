@@ -10,6 +10,7 @@ import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.ObservationToConceptNameConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.SifNotNullAndNifNullConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.TestResultConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.StateOfStayArtPatientConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ccr.ListOfChildrenEnrolledInCCRDataDefinitionQueries;
@@ -325,6 +326,30 @@ public class ListOfChildrenEnrolledInCCRDataset extends BaseDataSet {
         listOfChildrenEnrolledInCCRDataDefinitionQueries.getPatientHivRapidTestResult(),
         "endDate=${endDate},location=${location}",
         new TestResultConverter());
+
+    // CCR: Programa – Sheet 1: Column AL
+    patientDataSetDefinition.addColumn(
+        "state_program",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries
+            .getPatientLastStateOfStayOnProgramEnrollment(),
+        "endDate=${endDate},location=${location}",
+        new StateOfStayArtPatientConverter());
+
+    // CCR: Ficha Resumo  - Sheet 1: Column AM
+    patientDataSetDefinition.addColumn(
+        "state_ccr_resumo",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries
+            .getPatientLastStateOfStayOnCCRResumoOrSeguimento(true),
+        "endDate=${endDate},location=${location}",
+        new StateOfStayArtPatientConverter());
+
+    // CCR: Ficha de Seguimento – Sheet 1: Column AN
+    patientDataSetDefinition.addColumn(
+        "state_ccr_seguimento",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries
+            .getPatientLastStateOfStayOnCCRResumoOrSeguimento(false),
+        "endDate=${endDate},location=${location}",
+        new StateOfStayArtPatientConverter());
 
     return patientDataSetDefinition;
   }

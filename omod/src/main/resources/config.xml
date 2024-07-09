@@ -4133,4 +4133,36 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.tipoDeAltaConceptUuid</property>
+		<defaultValue>e1dee492-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for Tipo de Alta Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.transferidoParaSectorTbConceptUuid</property>
+		<defaultValue>4f9cf887-2e0b-4fe7-bb81-8e7acc68f50e</defaultValue>
+		<description>
+			UUID for TRANSFERIDO PARA SECTOR DE TB Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.transferidoParaConsultasIntegradasConceptUuid</property>
+		<defaultValue>95f18042-0f1c-41f8-82a5-8b82f4e52314</defaultValue>
+		<description>
+			UUID for TRANSFERIDO PARA CONSULTAS INTEGRADAS Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.transferidoParaConsultaDeCriancaSadiaConceptUuid</property>
+		<defaultValue>dba31232-a5cd-4156-a396-3c2405fe0674</defaultValue>
+		<description>
+			UUID for TRANSFERIDO PARA CONSULTA DE CRIANÇA SADIA Concept
+		</description>
+	</globalProperty>
+
 </module>
