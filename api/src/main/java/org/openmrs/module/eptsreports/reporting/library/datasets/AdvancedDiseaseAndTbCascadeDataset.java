@@ -55,6 +55,8 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
             advanceDiseaseAndTbCascadeDimension.getPatientWithPositiveTbLamAndGradeDimension(),
             reportingPeriod));
 
+    // -----------------CASCADE 1-------------------
+
     // TB_DA_FR13 - Number of clients eligible for CD4 count during inclusion period (Cascade 1)
     CohortIndicator eligibleCd4Ind =
         eptsGeneralIndicator.getIndicator(
@@ -74,6 +76,60 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         "ClientsEligibleCd4",
         EptsReportUtils.map(eligibleCd4Ind, mappings),
         dissagregations());
+
+    CohortIndicator eligibleCd4IndAndInitiatedArt =
+        eptsGeneralIndicator.getIndicator(
+            "eligibleCd4IndAndInitiatedArt",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries.getClientsEligibleForCd4AndInitiatedArt(),
+                mappings));
+
+    dataSetDefinition.addColumn(
+        "eligibleCd4IndAndInitiatedArtTotal",
+        "ClientsEligibleCd4IndAndInitiatedArt",
+        EptsReportUtils.map(eligibleCd4IndAndInitiatedArt, mappings),
+        "");
+
+    CohortIndicator eligibleCd4IndAndArePregnant =
+        eptsGeneralIndicator.getIndicator(
+            "eligibleCd4IndAndArePregnant",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries.getClientsEligibleForCd4AndArePregnant(),
+                mappings));
+
+    dataSetDefinition.addColumn(
+        "eligibleCd4IndAndArePregnantTotal",
+        "ClientsEligibleCd4IndAndArePregnantTotal",
+        EptsReportUtils.map(eligibleCd4IndAndArePregnant, mappings),
+        "");
+
+    CohortIndicator eligibleCd4IndWithConsecutiveVlResult =
+        eptsGeneralIndicator.getIndicator(
+            "eligibleCd4IndWithConsecutiveVlResult",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getClientsEligibleForCd4WithTwoConsecutiveVLResults(),
+                mappings));
+
+    dataSetDefinition.addColumn(
+        "eligibleCd4IndWithConsecutiveVlResultTotal",
+        "ClientsEligibleCd4IndWithConsecutiveVlResultTotal",
+        EptsReportUtils.map(eligibleCd4IndWithConsecutiveVlResult, mappings),
+        "");
+
+    CohortIndicator eligibleCd4IndAndReinitiatedArt =
+        eptsGeneralIndicator.getIndicator(
+            "eligibleCd4IndAndReinitiatedArt",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getClientsEligibleForCd4AndReinitiatedArt(),
+                mappings));
+
+    dataSetDefinition.addColumn(
+        "eligibleCd4IndAndReinitiatedArtTotal",
+        "ClientseEligibleCd4IndAndReinitiatedArtTotal",
+        EptsReportUtils.map(eligibleCd4IndAndReinitiatedArt, mappings),
+        "");
 
     // TB_DA_FR16 - Number of clients eligible for CD4 count who have a CD4 count within 33 days
     // (Cascade 1)

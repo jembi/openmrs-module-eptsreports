@@ -90,6 +90,78 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     return cd;
   }
 
+  public CohortDefinition getClientsEligibleForCd4AndInitiatedArt() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients who are eligible for CD4 count request and initiated art");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    CohortDefinition clientsEligibleForCd4 = getClientsEligibleForCd4();
+    CohortDefinition initiatedArt = listOfPatientsArtCohortCohortQueries.getPatientsInitiatedART();
+
+    cd.addSearch("clientsEligibleForCd4", EptsReportUtils.map(clientsEligibleForCd4, mappings));
+    cd.addSearch("initiatedArt", EptsReportUtils.map(initiatedArt, inclusionPeriod));
+
+    cd.setCompositionString("clientsEligibleForCd4 AND initiatedArt");
+
+    return cd;
+  }
+
+  public CohortDefinition getClientsEligibleForCd4AndArePregnant() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients who are eligible for CD4 count request and are pregnant");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    CohortDefinition clientsEligibleForCd4 = getClientsEligibleForCd4();
+    CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART(false);
+
+    cd.addSearch("clientsEligibleForCd4", EptsReportUtils.map(clientsEligibleForCd4, mappings));
+    cd.addSearch("pregnant", EptsReportUtils.map(pregnant, pregnancyPeriod));
+
+    cd.setCompositionString("clientsEligibleForCd4 AND pregnant");
+
+    return cd;
+  }
+
+  public CohortDefinition getClientsEligibleForCd4WithTwoConsecutiveVLResults() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("clients who are eligible for CD4 count request with two consecutive VL results");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    CohortDefinition clientsEligibleForCd4 = getClientsEligibleForCd4();
+    CohortDefinition consecutiveVL = getPatientsWithTwoConsecutiveVLGreaterThan1000();
+
+    cd.addSearch("clientsEligibleForCd4", EptsReportUtils.map(clientsEligibleForCd4, mappings));
+    cd.addSearch("consecutiveVL", EptsReportUtils.map(consecutiveVL, mappings));
+
+    cd.setCompositionString("clientsEligibleForCd4 AND consecutiveVL");
+
+    return cd;
+  }
+
+  public CohortDefinition getClientsEligibleForCd4AndReinitiatedArt() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("clients who are eligible for CD4 count request and reinitiated art");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    CohortDefinition clientsEligibleForCd4 = getClientsEligibleForCd4();
+    CohortDefinition reinitiatedArt = getPatientsWhoReinitiatedArt();
+
+    cd.addSearch("clientsEligibleForCd4", EptsReportUtils.map(clientsEligibleForCd4, mappings));
+    cd.addSearch("reinitiatedArt", EptsReportUtils.map(reinitiatedArt, inclusionPeriod));
+
+    cd.setCompositionString("clientsEligibleForCd4 AND consecutiveVL");
+
+    return cd;
+  }
+
   /**
    * TB_DA_FR18 Number of clients with a CD4 count during inclusion period
    *
