@@ -77,6 +77,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(eligibleCd4Ind, mappings),
         dissagregations());
 
+    // Clients Eligible CD4 And Initiated ART
     CohortIndicator eligibleCd4IndAndInitiatedArt =
         eptsGeneralIndicator.getIndicator(
             "eligibleCd4IndAndInitiatedArt",
@@ -90,6 +91,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(eligibleCd4IndAndInitiatedArt, mappings),
         "");
 
+    // Clients Eligible CD4 And Pregnant
     CohortIndicator eligibleCd4IndAndArePregnant =
         eptsGeneralIndicator.getIndicator(
             "eligibleCd4IndAndArePregnant",
@@ -103,6 +105,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(eligibleCd4IndAndArePregnant, mappings),
         "");
 
+    // Clients Eligible CD4 And Consecutive Vl Result
     CohortIndicator eligibleCd4IndWithConsecutiveVlResult =
         eptsGeneralIndicator.getIndicator(
             "eligibleCd4IndWithConsecutiveVlResult",
@@ -117,6 +120,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(eligibleCd4IndWithConsecutiveVlResult, mappings),
         "");
 
+    // Clients Eligible CD4 And Reinitiated Art
     CohortIndicator eligibleCd4IndAndReinitiatedArt =
         eptsGeneralIndicator.getIndicator(
             "eligibleCd4IndAndReinitiatedArt",
@@ -148,6 +152,63 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         "ClientsWithCd4Count",
         EptsReportUtils.map(cd4CountInd, mappings),
         dissagregations());
+
+    // CD4 Count And Initiated ART
+    CohortIndicator cd4CountIndAndInitiatedArt =
+        eptsGeneralIndicator.getIndicator(
+            "cd4CountIndAndInitiatedArt",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithCd4CountAndInitiatedArt(),
+                mappings));
+
+    dataSetDefinition.addColumn(
+        "cd4CountIndAndInitiatedArtTotal",
+        "ClientsCd4CountIndAndInitiatedArtTotal",
+        EptsReportUtils.map(cd4CountIndAndInitiatedArt, mappings),
+        "");
+
+    // CD4 Count And Pregnant
+    CohortIndicator cd4CountIndAndPregnant =
+        eptsGeneralIndicator.getIndicator(
+            "cd4CountIndAndPregnant",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithCd4CountAndPregnant(),
+                mappings));
+
+    dataSetDefinition.addColumn(
+        "cd4CountIndAndPregnantTotal",
+        "ClientsCd4CountIndAndPregnantTotal",
+        EptsReportUtils.map(cd4CountIndAndPregnant, mappings),
+        "");
+
+    // CD4 Count And Consecutive Vl Results
+    CohortIndicator cd4CountIndAndConsecutiveVlResult =
+        eptsGeneralIndicator.getIndicator(
+            "cd4CountIndAndConsecutiveVlResult",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getClientsWithCd4CountAndWithConsecutiveVlResult(),
+                mappings));
+
+    dataSetDefinition.addColumn(
+        "cd4CountIndAndConsecutiveVlResultTotal",
+        "ClientsCd4CountIndAndConsecutiveVlResultTotal",
+        EptsReportUtils.map(cd4CountIndAndConsecutiveVlResult, mappings),
+        "");
+
+    // CD4 Count And Reinitiated ART
+    CohortIndicator cd4CountIndAndReinitiatedArt =
+        eptsGeneralIndicator.getIndicator(
+            "cd4CountIndAndReinitiatedArt",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithCd4CountAndReinitiatedArt(),
+                mappings));
+
+    dataSetDefinition.addColumn(
+        "cd4CountIndAndReinitiatedArtTotal",
+        "Clientscd4CountIndAndReinitiatedArtTotal",
+        EptsReportUtils.map(cd4CountIndAndReinitiatedArt, mappings),
+        "");
 
     // TB_DA_FR17 - Number of eligible clients with CD4 count during inclusion period showing severe
     // immunodepression (Cascade 1)

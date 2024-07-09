@@ -185,6 +185,79 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     return cd;
   }
 
+  /** @return CohortDefinition */
+  public CohortDefinition getClientsWithCd4CountAndInitiatedArt() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("clients with a CD4 count Who Initiated Art");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+
+    CohortDefinition clientsWithCd4Count = getClientsWithCd4Count();
+    CohortDefinition initiatedArt = listOfPatientsArtCohortCohortQueries.getPatientsInitiatedART();
+
+    cd.addSearch("clientsWithCd4Count", EptsReportUtils.map(clientsWithCd4Count, mappings));
+    cd.addSearch("initiatedArt", EptsReportUtils.map(initiatedArt, inclusionPeriod));
+
+    cd.setCompositionString("clientsWithCd4Count AND initiatedArt");
+
+    return cd;
+  }
+
+  public CohortDefinition getClientsWithCd4CountAndPregnant() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("clients with a CD4 count who are pregnant");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+
+    CohortDefinition clientsWithCd4Count = getClientsWithCd4Count();
+    CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART(false);
+
+    cd.addSearch("clientsWithCd4Count", EptsReportUtils.map(clientsWithCd4Count, mappings));
+    cd.addSearch("pregnant", EptsReportUtils.map(pregnant, pregnancyPeriod));
+
+    cd.setCompositionString("clientsWithCd4Count AND pregnant");
+
+    return cd;
+  }
+
+  public CohortDefinition getClientsWithCd4CountAndWithConsecutiveVlResult() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("clients with a CD4 count and consecutive VL result");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+
+    CohortDefinition clientsWithCd4Count = getClientsWithCd4Count();
+    CohortDefinition consecutiveVL = getPatientsWithTwoConsecutiveVLGreaterThan1000();
+
+    cd.addSearch("clientsWithCd4Count", EptsReportUtils.map(clientsWithCd4Count, mappings));
+    cd.addSearch("consecutiveVL", EptsReportUtils.map(consecutiveVL, mappings));
+
+    cd.setCompositionString("clientsWithCd4Count AND consecutiveVL");
+
+    return cd;
+  }
+
+  public CohortDefinition getClientsWithCd4CountAndReinitiatedArt() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("clients with a CD4 count and Reinitiated Art");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+
+    CohortDefinition clientsWithCd4Count = getClientsWithCd4Count();
+    CohortDefinition reinitiatedArt = getPatientsWhoReinitiatedArt();
+
+    cd.addSearch("clientsWithCd4Count", EptsReportUtils.map(clientsWithCd4Count, mappings));
+    cd.addSearch("reinitiatedArt", EptsReportUtils.map(reinitiatedArt, inclusionPeriod));
+
+    cd.setCompositionString("clientsWithCd4Count AND reinitiatedArt");
+
+    return cd;
+  }
+
   public CohortDefinition getPatientsTransferredOutOrDead() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
