@@ -171,7 +171,8 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(severeIndicator, mappings),
         dissagregations());
 
-    // Severe immunodepression (TB_DA_FR19)With TB LAM
+    // TB_DA_FR18 - Number of clients eligible for CD4 with CD4 count showing severe
+    // immunosuppression and who have a TB LAM result by report generation date (Cascade 1)
     CohortIndicator severeTbLam =
         eptsGeneralIndicator.getIndicator(
             "severeTbLamInd",
@@ -179,18 +180,19 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
                 advancedDiseaseAndTBCascadeCohortQueries
                     .getClientsWithSevereImmunodepressionAndTbLamResult(),
                 mappings));
-    addRow(
-        dataSetDefinition,
-        "severeTbLam",
-        "ClientsWithSevereImmunodepressionAndTbLam",
-        EptsReportUtils.map(severeTbLam, inclusionPeriod),
-        dissagregations());
 
     dataSetDefinition.addColumn(
         "severeTbLamTotal",
         "ClientsWithSevereImmunodepressionTbLamTotal",
-        EptsReportUtils.map(severeTbLam, inclusionPeriod),
+        EptsReportUtils.map(severeTbLam, mappings),
         "");
+
+    addRow(
+        dataSetDefinition,
+        "severeTbLam",
+        "ClientsWithSevereImmunodepressionAndTbLam",
+        EptsReportUtils.map(severeTbLam, mappings),
+        dissagregations());
 
     // Severe immunodepression (TB_DA_FR19) Without TB LAM
 

@@ -259,7 +259,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addSearch(
         "anyTbLam",
         EptsReportUtils.map(
-            anyTbLam, "startDate=${startDate},endDate=${generationDate},location=${location}"));
+            anyTbLam, "startDate=${endDate-2m+1d},endDate=${generationDate},location=${location}"));
 
     cd.setCompositionString("(severeImmunodepression AND anyTbLam)");
 
