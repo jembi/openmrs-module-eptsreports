@@ -220,15 +220,15 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
                 mappings));
 
     dataSetDefinition.addColumn(
-        "severeImmunodepressionTotal",
-        "ClientsWithSevereImmunodepressionTotal",
+        "severeImmunosuppressionTotal",
+        "ClientsWithSevereImmunosuppressionTotal",
         EptsReportUtils.map(severeIndicator, mappings),
         "");
 
     addRow(
         dataSetDefinition,
-        "severeImmunodepression",
-        "ClientsWithSevereImmunodepression",
+        "severeImmunosuppression",
+        "ClientsWithSevereImmunosuppression",
         EptsReportUtils.map(severeIndicator, mappings),
         dissagregations());
 
