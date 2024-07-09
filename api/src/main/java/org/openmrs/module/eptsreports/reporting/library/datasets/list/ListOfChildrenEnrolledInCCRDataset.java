@@ -8,6 +8,8 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.data.converter.DashDateFormatConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.SifNotNullAndNifNullConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.ObservationToConceptNameConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.TestResultConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ccr.ListOfChildrenEnrolledInCCRDataDefinitionQueries;
@@ -264,6 +266,26 @@ public class ListOfChildrenEnrolledInCCRDataset extends BaseDataSet {
         "next_ccr_consultation",
         listOfChildrenEnrolledInCCRDataDefinitionQueries.getNextScheduledCCRConsultation(),
         mappings);
+
+    // Date of Most Recent PCR Test Result – Sheet 1: Column AD
+    patientDataSetDefinition.addColumn(
+        "last_pcr",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getMostRecentPCRTestDate(),
+        "endDate=${endDate},location=${location}");
+
+    // Sample Collection Type for Most Recent PCR Test Result – Sheet 1: Column AE
+    patientDataSetDefinition.addColumn(
+        "sample_type",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getSampleCollectionType(),
+        "endDate=${endDate},location=${location}",
+        new ObservationToConceptNameConverter());
+
+    // getMostRecentPCRTestResult – Sheet 1: Column AF
+    patientDataSetDefinition.addColumn(
+        "pcr_result",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getSampleCollectionType(),
+        "endDate=${endDate},location=${location}",
+        new TestResultConverter());
 
     return patientDataSetDefinition;
   }

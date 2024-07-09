@@ -4125,4 +4125,12 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.sampleTypeConceptUuid</property>
+		<defaultValue>47ee9ffd-8103-4788-ab23-e185c144cf1e</defaultValue>
+		<description>
+			UUID for Sample Type Concept
+		</description>
+	</globalProperty>
+
 </module>

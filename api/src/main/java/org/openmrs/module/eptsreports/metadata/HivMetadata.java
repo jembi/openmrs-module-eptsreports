@@ -5900,7 +5900,7 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * <b>enconter_type_id = 165439</b>
+   * <b>concept_id = 165439</b>
    *
    * <p><b>Name:</b> Termoablation
    *
@@ -5961,5 +5961,20 @@ public class HivMetadata extends ProgramsMetadata {
         Context.getAdministrationService()
             .getGlobalProperty("eptsreports.ccrSeguimentoEncounterTypeUuid");
     return getEncounterType(uuid);
+  }
+
+  /**
+   * <b>concept_id = 23832</b>
+   *
+   * <p><b>Name:</b> Sample Type
+   *
+   * <p><b>Description:</b>Sample Type
+   *
+   * @return {@link Concept}
+   */
+  public Concept getSampleTypeConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.sampleTypeConceptUuid");
+    return getConcept(uuid);
   }
 }
