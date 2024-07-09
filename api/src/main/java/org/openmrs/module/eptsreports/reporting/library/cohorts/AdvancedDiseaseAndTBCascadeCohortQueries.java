@@ -158,16 +158,11 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     CohortDefinition exclusion = getPatientsTransferredOutOrDead();
 
     cd.addSearch("cd4Count", EptsReportUtils.map(cd4Count, mappings));
-    cd.addSearch("cd4Under200", EptsReportUtils.map(cd200AgeFiveOrOver, mappings));
-    cd.addSearch("cd4Under500", EptsReportUtils.map(cd500AgeBetweenOneAndFour, mappings));
-    cd.addSearch("cd4Under750", EptsReportUtils.map(cd750AgeUnderYear, mappings));
+    cd.addSearch("cd4Under200", EptsReportUtils.map(cd200AgeFiveOrOver, inclusionPeriod));
+    cd.addSearch("cd4Under500", EptsReportUtils.map(cd500AgeBetweenOneAndFour, inclusionPeriod));
+    cd.addSearch("cd4Under750", EptsReportUtils.map(cd750AgeUnderYear, inclusionPeriod));
 
-    cd.addSearch(
-        "exclusion",
-        EptsReportUtils.map(exclusion, "endDate=${generationDate},location=${location}"));
-
-    cd.setCompositionString(
-        "((cd4Under200 OR cd4Under500 OR cd4Under750) AND cd4Count) AND NOT exclusion");
+    cd.setCompositionString("(cd4Under200 OR cd4Under500 OR cd4Under750) AND cd4Count");
 
     return cd;
   }

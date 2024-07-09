@@ -76,7 +76,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         dissagregations());
 
     // TB_DA_FR16 - Number of clients eligible for CD4 count who have a CD4 count within 33 days
-
+    // (Cascade 1)
     CohortIndicator cd4CountInd =
         eptsGeneralIndicator.getIndicator(
             "cd4CountInd",
@@ -93,8 +93,8 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(cd4CountInd, mappings),
         dissagregations());
 
-    // Number of clients with CD4 count during inclusion period showing severe immunodepression
-    // (TB_DA_FR19)
+    // TB_DA_FR17 - Number of eligible clients with CD4 count during inclusion period showing severe
+    // immunodepression (Cascade 1)
     CohortIndicator severeIndicator =
         eptsGeneralIndicator.getIndicator(
             "severeIndicator",
@@ -103,10 +103,17 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
                 mappings));
 
     dataSetDefinition.addColumn(
-        "severeImmunodepression",
+        "severeImmunodepressionTotal",
         "ClientsWithSevereImmunodepressionTotal",
-        EptsReportUtils.map(severeIndicator, inclusionPeriod),
+        EptsReportUtils.map(severeIndicator, mappings),
         "");
+
+    addRow(
+        dataSetDefinition,
+        "severeImmunodepression",
+        "ClientsWithSevereImmunodepression",
+        EptsReportUtils.map(severeIndicator, mappings),
+        dissagregations());
 
     // Severe immunodepression (TB_DA_FR19)With TB LAM
     CohortIndicator severeTbLam =
