@@ -299,21 +299,83 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
             "severeTbLamInd",
             EptsReportUtils.map(
                 advancedDiseaseAndTBCascadeCohortQueries
-                    .getClientsWithSevereImmunodepressionAndTbLamResult(),
+                    .getClientsWithSevereImmunosuppressionAndTbLamResult(),
                 mappings));
 
     dataSetDefinition.addColumn(
         "severeTbLamTotal",
-        "ClientsWithSevereImmunodepressionTbLamTotal",
+        "ClientsWithSevereImmunosuppressionTbLamTotal",
         EptsReportUtils.map(severeTbLam, mappings),
         "");
 
     addRow(
         dataSetDefinition,
         "severeTbLam",
-        "ClientsWithSevereImmunodepressionAndTbLam",
+        "ClientsWithSevereImmunosuppressionAndTbLam",
         EptsReportUtils.map(severeTbLam, mappings),
         dissagregations());
+
+    // Clients With Severe and TB Lam who Initiated Art
+    CohortIndicator severeTbLamAndInitiatedArt =
+        eptsGeneralIndicator.getIndicator(
+            "severeTbLamAndInitiatedArt",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getClientsWithSevereImmunodepressionAndTbLamResultAndInitiatedArt(),
+                mappings));
+
+    dataSetDefinition.addColumn(
+        "severeTbLamAndInitiatedArtTotal",
+        "ClientsSevereTbLamAndInitiatedArtTotal",
+        EptsReportUtils.map(severeTbLamAndInitiatedArt, mappings),
+        "");
+
+    // Clients With Severe and TB Lam who are Pregnant
+    CohortIndicator severeTbLamAndPregnant =
+        eptsGeneralIndicator.getIndicator(
+            "severeTbLamAndPregnant",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getClientsWithSevereImmunodepressionAndTbLamResultAndPregnant(),
+                mappings));
+
+    dataSetDefinition.addColumn(
+        "severeTbLamAndPregnantTotal",
+        "ClientsSevereTbLamAndPregnantTotal",
+        EptsReportUtils.map(severeTbLamAndPregnant, mappings),
+        "");
+
+    // Clients With Severe and TB Lam with Consecutive Vl Result
+    CohortIndicator severeTbLamAndConsecutiveVlResults =
+        eptsGeneralIndicator.getIndicator(
+            "severeTbLamAndConsecutiveVlResults",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getClientsWithSevereImmunodepressionAndTbLamResultAndConsecutiveVlResult(),
+                mappings));
+
+    dataSetDefinition.addColumn(
+        "severeTbLamAndConsecutiveVlResultsTotal",
+        "ClientsSevereTbLamAndConsecutiveVlResultsTotal",
+        EptsReportUtils.map(severeTbLamAndConsecutiveVlResults, mappings),
+        "");
+
+    // Clients With Severe and TB Lam and Reinitiated Art
+    CohortIndicator severeTbLamAndReinitiatedArt =
+        eptsGeneralIndicator.getIndicator(
+            "severeTbLamAndReinitiatedArt",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getClientsWithSevereImmunodepressionAndTbLamResultAndReinitiatedArt(),
+                mappings));
+
+    dataSetDefinition.addColumn(
+        "severeTbLamAndReinitiatedArtTotal",
+        "ClientsSevereTbLamAndReinitiatedArtTotal",
+        EptsReportUtils.map(severeTbLamAndReinitiatedArt, mappings),
+        "");
+
+    // -----------------CASCADE 2-------------------
 
     // Severe immunodepression (TB_DA_FR19) Without TB LAM
 
