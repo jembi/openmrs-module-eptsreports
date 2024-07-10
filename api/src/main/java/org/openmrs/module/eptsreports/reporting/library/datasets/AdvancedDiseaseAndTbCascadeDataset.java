@@ -155,7 +155,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
             "severeWithTbLam",
             EptsReportUtils.map(
                 advancedDiseaseAndTBCascadeCohortQueries
-                    .getClientsWithSevereImmunodepressionAndWithTbLamResult(),
+                    .getClientsWithSevereImmunosuppressionAndWithTbLamResult(),
                 mappings));
     addRow(
         dataSetDefinition,
@@ -168,6 +168,27 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         "severeWithoutTbLamTotal",
         "ClientsWithSevereImmunodepressionWithoutTbLamTotal",
         EptsReportUtils.map(severeWithTbLam, mappings),
+        "");
+
+    // TB_DA_FR20 - Number of clients with positive TB LAM result during the inclusion period
+    CohortIndicator severeWithTbLamPositive =
+        eptsGeneralIndicator.getIndicator(
+            "severeWithTbLamPositive",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getClientsWithSevereImmunodepressionAndWithTbLamPositiveResult(),
+                mappings));
+    addRow(
+        dataSetDefinition,
+        "severeWithTbLamPositive",
+        "ClientsWithSevereImmunosuppressionAndWithTbLamPositive",
+        EptsReportUtils.map(severeWithTbLamPositive, mappings),
+        dissagregations());
+
+    dataSetDefinition.addColumn(
+        "severeWithoutTbLamPositiveTotal",
+        "ClientsWithSevereImmunodepressionWithoutTbLamPositiveTotal",
+        EptsReportUtils.map(severeWithTbLamPositive, mappings),
         "");
 
     // Number of clients with CD4 count during inclusion period without severe immunodepression

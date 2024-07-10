@@ -219,6 +219,73 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   }
 
   /**
+   * Number of clients with CD4 count showing immunosuppression and with TB LAM results during
+   * inclusion period
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getClientsWithSevereImmunosuppressionAndWithTbLamResult() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients With Cd4 count and TB Lam Result");
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+
+    CohortDefinition cd4Count = getPatientsWithCD4Count();
+    CohortDefinition cd200AgeFiveOrOver =
+        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo200mm3AA, 5, null);
+    CohortDefinition cd500AgeBetweenOneAndFour =
+        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo500mm3, 1, 4);
+    CohortDefinition cd750AgeUnderYear =
+        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo750mm3, null, 1);
+    CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
+    CohortDefinition exclusion = getPatientsTransferredOutOrDead();
+
+    cd.addSearch("cd4Count", EptsReportUtils.map(cd4Count, inclusionPeriod));
+    cd.addSearch("cd4Under200", EptsReportUtils.map(cd200AgeFiveOrOver, inclusionPeriod));
+    cd.addSearch("cd4Under500", EptsReportUtils.map(cd500AgeBetweenOneAndFour, inclusionPeriod));
+    cd.addSearch("cd4Under750", EptsReportUtils.map(cd750AgeUnderYear, inclusionPeriod));
+    cd.addSearch("anyTbLam", EptsReportUtils.map(anyTbLam, inclusionPeriod));
+    cd.addSearch(
+        "exclusion",
+        EptsReportUtils.map(exclusion, "endDate=${generationDate},location=${location}"));
+
+    cd.setCompositionString(
+        "(cd4Count AND (cd4Under200 OR cd4Under500 OR cd4Under750) AND anyTbLam) AND NOT exclusion");
+
+    return cd;
+  }
+
+  /**
+   * Number of clients with positive TB LAM result during the inclusion period
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getClientsWithSevereImmunodepressionAndWithTbLamPositiveResult() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients With Cd4 count and TB Lam Result");
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+
+    CohortDefinition severeImmunosuppressionAndWithTbLamResult =
+        getClientsWithSevereImmunosuppressionAndWithTbLamResult();
+
+    CohortDefinition positiveTbLam = getPatientsWithTbLamResult(TbLamResult.POSITIVE);
+
+    cd.addSearch(
+        "severeImmunosuppressionAndWithTbLamResult",
+        EptsReportUtils.map(severeImmunosuppressionAndWithTbLamResult, mappings));
+    cd.addSearch("positiveTbLam", EptsReportUtils.map(positiveTbLam, inclusionPeriod));
+
+    cd.setCompositionString("severeImmunosuppressionAndWithTbLamResult AND positiveTbLam");
+
+    return cd;
+  }
+
+  /**
    * Clients With Cd4 count without- severe immunodepression by report generation date
    *
    * @return CohortDefinition
