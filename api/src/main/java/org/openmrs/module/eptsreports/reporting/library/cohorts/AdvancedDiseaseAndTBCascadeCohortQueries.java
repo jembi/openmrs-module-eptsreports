@@ -286,6 +286,35 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   }
 
   /**
+   * Number of clients with positive TB LAM result during the inclusion period
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition
+      getClientsWithSevereImmunodepressionAndWithTbLamPositiveResultAndNotTestedForGeneXpert() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients With Cd4 count and TB Lam Result");
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+
+    CohortDefinition severeImmunodepressionAndWithTbLamPositiveResult =
+        getClientsWithSevereImmunodepressionAndWithTbLamPositiveResult();
+
+    CohortDefinition genXpert = getPatientsWithAnyGeneXpertResult();
+
+    cd.addSearch(
+        "severeImmunodepressionAndWithTbLamPositiveResult",
+        EptsReportUtils.map(severeImmunodepressionAndWithTbLamPositiveResult, mappings));
+    cd.addSearch("genXpert", EptsReportUtils.map(genXpert, inclusionPeriod));
+
+    cd.setCompositionString("severeImmunodepressionAndWithTbLamPositiveResult AND NOT genXpert");
+
+    return cd;
+  }
+
+  /**
    * Clients With Cd4 count without- severe immunodepression by report generation date
    *
    * @return CohortDefinition
