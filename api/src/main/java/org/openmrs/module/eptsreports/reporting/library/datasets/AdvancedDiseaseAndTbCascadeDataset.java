@@ -213,6 +213,28 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(severeWithTbLamPositiveWithNoTestGeneXpert, mappings),
         "");
 
+    // TB_DA_FR22 - Clients with positive TB LAM result during the inclusion period and also tested
+    // with GeneXpert by report generation date
+    CohortIndicator severeWithTbLamPositiveWithGeneXpertTest =
+        eptsGeneralIndicator.getIndicator(
+            "severeWithTbLamPositiveWithGeneXpertTest",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getClientsWithSevereImmunodepressionAndWithTbLamPositiveResultAndNotTestedForGeneXpert(),
+                mappings));
+    addRow(
+        dataSetDefinition,
+        "severeWithTbLamPositiveWithGeneXpertTest",
+        "ClientsWithSevereWithTbLamPositiveWithGeneXpertTest",
+        EptsReportUtils.map(severeWithTbLamPositiveWithGeneXpertTest, mappings),
+        dissagregations());
+
+    dataSetDefinition.addColumn(
+        "severeWithTbLamPositiveWithGeneXpertTestTotal",
+        "ClientsWithSevereWithTbLamPositiveWithGeneXpertTestTotal",
+        EptsReportUtils.map(severeWithTbLamPositiveWithGeneXpertTest, mappings),
+        "");
+
     // Number of clients with CD4 count during inclusion period without severe immunodepression
     // (TB_DA_FR20)
     CohortIndicator withoutImmunodepression =
