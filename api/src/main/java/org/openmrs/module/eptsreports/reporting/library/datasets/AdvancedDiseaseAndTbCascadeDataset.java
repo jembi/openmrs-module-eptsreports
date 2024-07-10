@@ -49,11 +49,17 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
             eptsCommonDimension.age(ageDimensionCohort), "effectiveDate=${endDate}"));
 
     dataSetDefinition.addDimension("gender", EptsReportUtils.map(eptsCommonDimension.gender(), ""));
+
     dataSetDefinition.addDimension(
         "grade",
         EptsReportUtils.map(
             advanceDiseaseAndTbCascadeDimension.getPatientWithPositiveTbLamAndGradeDimension(),
             reportingPeriod));
+
+    dataSetDefinition.addDimension(
+        "cd4Eligibility",
+        EptsReportUtils.map(
+            advanceDiseaseAndTbCascadeDimension.getCd4EligibilityDisaggregations(), mappings));
 
     // -----------------CASCADE 1-------------------
 
@@ -691,7 +697,27 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         new ColumnParameters("Grade2+", "Grade 2+", "grade=2+", "2"),
         new ColumnParameters("Grade1+", "Grade 1+", "grade=1+", "1"),
         new ColumnParameters(
-            "GradeNotReporte", "Grade Not Reported", "grade=notReported", "notReported"));
+            "GradeNotReporte", "Grade Not Reported", "grade=notReported", "notReported"),
+        new ColumnParameters(
+            "cd4Eligibility-initArt",
+            "Initiated Art Disaggregation",
+            "cd4Eligibility=initArt",
+            "clientInitiatedArt"),
+        new ColumnParameters(
+            "cd4Eligibility-pregnantClient",
+            "Pregnant Disaggregation",
+            "cd4Eligibility=pregnantClient",
+            "pregnantDisaggregation"),
+        new ColumnParameters(
+            "cd4Eligibility-consecutiveVl",
+            "Consecutive Vl Disaggregation",
+            "cd4Eligibility=consecutiveVl",
+            "consecutiveVlDisaggregation"),
+        new ColumnParameters(
+            "cd4Eligibility-reinitArt",
+            "Reinitiated Art Disaggregation",
+            "cd4Eligibility=reinitArt",
+            "reinitArtDisaggregation"));
   }
 
   @Override
