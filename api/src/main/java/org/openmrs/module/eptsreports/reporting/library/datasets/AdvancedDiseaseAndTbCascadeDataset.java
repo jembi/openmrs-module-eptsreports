@@ -83,64 +83,6 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(eligibleCd4Ind, mappings),
         dissagregations());
 
-    // Clients Eligible CD4 And Initiated ART
-    CohortIndicator eligibleCd4IndAndInitiatedArt =
-        eptsGeneralIndicator.getIndicator(
-            "eligibleCd4IndAndInitiatedArt",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries.getClientsEligibleForCd4AndInitiatedArt(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "eligibleCd4IndAndInitiatedArtTotal",
-        "ClientsEligibleCd4IndAndInitiatedArt",
-        EptsReportUtils.map(eligibleCd4IndAndInitiatedArt, mappings),
-        "");
-
-    // Clients Eligible CD4 And Pregnant
-    CohortIndicator eligibleCd4IndAndArePregnant =
-        eptsGeneralIndicator.getIndicator(
-            "eligibleCd4IndAndArePregnant",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries.getClientsEligibleForCd4AndArePregnant(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "eligibleCd4IndAndArePregnantTotal",
-        "ClientsEligibleCd4IndAndArePregnantTotal",
-        EptsReportUtils.map(eligibleCd4IndAndArePregnant, mappings),
-        "");
-
-    // Clients Eligible CD4 And Consecutive Vl Result
-    CohortIndicator eligibleCd4IndWithConsecutiveVlResult =
-        eptsGeneralIndicator.getIndicator(
-            "eligibleCd4IndWithConsecutiveVlResult",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries
-                    .getClientsEligibleForCd4WithTwoConsecutiveVLResults(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "eligibleCd4IndWithConsecutiveVlResultTotal",
-        "ClientsEligibleCd4IndWithConsecutiveVlResultTotal",
-        EptsReportUtils.map(eligibleCd4IndWithConsecutiveVlResult, mappings),
-        "");
-
-    // Clients Eligible CD4 And Reinitiated Art
-    CohortIndicator eligibleCd4IndAndReinitiatedArt =
-        eptsGeneralIndicator.getIndicator(
-            "eligibleCd4IndAndReinitiatedArt",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries
-                    .getClientsEligibleForCd4AndReinitiatedArt(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "eligibleCd4IndAndReinitiatedArtTotal",
-        "ClientseEligibleCd4IndAndReinitiatedArtTotal",
-        EptsReportUtils.map(eligibleCd4IndAndReinitiatedArt, mappings),
-        "");
-
     // TB_DA_FR16 - Number of clients eligible for CD4 count who have a CD4 count within 33 days
     // (Cascade 1)
     CohortIndicator cd4CountInd =
@@ -158,63 +100,6 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         "ClientsWithCd4Count",
         EptsReportUtils.map(cd4CountInd, mappings),
         dissagregations());
-
-    // CD4 Count And Initiated ART
-    CohortIndicator cd4CountIndAndInitiatedArt =
-        eptsGeneralIndicator.getIndicator(
-            "cd4CountIndAndInitiatedArt",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithCd4CountAndInitiatedArt(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "cd4CountIndAndInitiatedArtTotal",
-        "ClientsCd4CountIndAndInitiatedArtTotal",
-        EptsReportUtils.map(cd4CountIndAndInitiatedArt, mappings),
-        "");
-
-    // CD4 Count And Pregnant
-    CohortIndicator cd4CountIndAndPregnant =
-        eptsGeneralIndicator.getIndicator(
-            "cd4CountIndAndPregnant",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithCd4CountAndPregnant(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "cd4CountIndAndPregnantTotal",
-        "ClientsCd4CountIndAndPregnantTotal",
-        EptsReportUtils.map(cd4CountIndAndPregnant, mappings),
-        "");
-
-    // CD4 Count And Consecutive Vl Results
-    CohortIndicator cd4CountIndAndConsecutiveVlResult =
-        eptsGeneralIndicator.getIndicator(
-            "cd4CountIndAndConsecutiveVlResult",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries
-                    .getClientsWithCd4CountAndWithConsecutiveVlResult(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "cd4CountIndAndConsecutiveVlResultTotal",
-        "ClientsCd4CountIndAndConsecutiveVlResultTotal",
-        EptsReportUtils.map(cd4CountIndAndConsecutiveVlResult, mappings),
-        "");
-
-    // CD4 Count And Reinitiated ART
-    CohortIndicator cd4CountIndAndReinitiatedArt =
-        eptsGeneralIndicator.getIndicator(
-            "cd4CountIndAndReinitiatedArt",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithCd4CountAndReinitiatedArt(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "cd4CountIndAndReinitiatedArtTotal",
-        "Clientscd4CountIndAndReinitiatedArtTotal",
-        EptsReportUtils.map(cd4CountIndAndReinitiatedArt, mappings),
-        "");
 
     // TB_DA_FR17 - Number of eligible clients with CD4 count during inclusion period showing severe
     // immunodepression (Cascade 1)
@@ -238,66 +123,6 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(severeIndicator, mappings),
         dissagregations());
 
-    // Clients with severe immunosuppression and Initiated Art
-    CohortIndicator severeIndicatorAndInitiatedArt =
-        eptsGeneralIndicator.getIndicator(
-            "severeIndicatorAndInitiatedArt",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries
-                    .getClientsWithSevereImmunodepressionAndInitiatedArt(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "severeIndicatorAndInitiatedArtTotal",
-        "ClientsSevereIndicatorAndInitiatedArtTotal",
-        EptsReportUtils.map(severeIndicatorAndInitiatedArt, mappings),
-        "");
-
-    // Clients with severe immunosuppression and Pregnant
-    CohortIndicator severeIndicatorAndPregnant =
-        eptsGeneralIndicator.getIndicator(
-            "severeIndicatorAndPregnant",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries
-                    .getClientsWithSevereImmunodepressionAndPregnant(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "severeIndicatorAndPregnantTotal",
-        "ClientsSevereIndicatorAndPregnantTotal",
-        EptsReportUtils.map(severeIndicatorAndPregnant, mappings),
-        "");
-
-    // Clients with severe immunosuppression and Consecutive Vl Results
-    CohortIndicator severeIndicatorAndConsecutiveVlResult =
-        eptsGeneralIndicator.getIndicator(
-            "severeIndicatorAndConsecutiveVlResult",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries
-                    .getClientsWithSevereImmunosuppressionAndConsecutiveVlResult(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "severeIndicatorAndConsecutiveVlResultTotal",
-        "ClientsSevereIndicatorAndConsecutiveVlResultTotal",
-        EptsReportUtils.map(severeIndicatorAndConsecutiveVlResult, mappings),
-        "");
-
-    // Clients with severe immunosuppression and Reinitiated Art
-    CohortIndicator severeIndicatorAndReinitiatedArt =
-        eptsGeneralIndicator.getIndicator(
-            "severeIndicatorAndReinitiatedArt",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries
-                    .getClientsWithSevereImmunosuppressionAndReinitiatedArt(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "severeIndicatorAndReinitiatedArtTotal",
-        "ClientssevereIndicatorAndReinitiatedArtTotal",
-        EptsReportUtils.map(severeIndicatorAndReinitiatedArt, mappings),
-        "");
-
     // TB_DA_FR18 - Number of clients eligible for CD4 with CD4 count showing severe
     // immunosuppression and who have a TB LAM result by report generation date (Cascade 1)
     CohortIndicator severeTbLam =
@@ -320,66 +145,6 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         "ClientsWithSevereImmunosuppressionAndTbLam",
         EptsReportUtils.map(severeTbLam, mappings),
         dissagregations());
-
-    // Clients With Severe and TB Lam who Initiated Art
-    CohortIndicator severeTbLamAndInitiatedArt =
-        eptsGeneralIndicator.getIndicator(
-            "severeTbLamAndInitiatedArt",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries
-                    .getClientsWithSevereImmunodepressionAndTbLamResultAndInitiatedArt(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "severeTbLamAndInitiatedArtTotal",
-        "ClientsSevereTbLamAndInitiatedArtTotal",
-        EptsReportUtils.map(severeTbLamAndInitiatedArt, mappings),
-        "");
-
-    // Clients With Severe and TB Lam who are Pregnant
-    CohortIndicator severeTbLamAndPregnant =
-        eptsGeneralIndicator.getIndicator(
-            "severeTbLamAndPregnant",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries
-                    .getClientsWithSevereImmunodepressionAndTbLamResultAndPregnant(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "severeTbLamAndPregnantTotal",
-        "ClientsSevereTbLamAndPregnantTotal",
-        EptsReportUtils.map(severeTbLamAndPregnant, mappings),
-        "");
-
-    // Clients With Severe and TB Lam with Consecutive Vl Result
-    CohortIndicator severeTbLamAndConsecutiveVlResults =
-        eptsGeneralIndicator.getIndicator(
-            "severeTbLamAndConsecutiveVlResults",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries
-                    .getClientsWithSevereImmunodepressionAndTbLamResultAndConsecutiveVlResult(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "severeTbLamAndConsecutiveVlResultsTotal",
-        "ClientsSevereTbLamAndConsecutiveVlResultsTotal",
-        EptsReportUtils.map(severeTbLamAndConsecutiveVlResults, mappings),
-        "");
-
-    // Clients With Severe and TB Lam and Reinitiated Art
-    CohortIndicator severeTbLamAndReinitiatedArt =
-        eptsGeneralIndicator.getIndicator(
-            "severeTbLamAndReinitiatedArt",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries
-                    .getClientsWithSevereImmunodepressionAndTbLamResultAndReinitiatedArt(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "severeTbLamAndReinitiatedArtTotal",
-        "ClientsSevereTbLamAndReinitiatedArtTotal",
-        EptsReportUtils.map(severeTbLamAndReinitiatedArt, mappings),
-        "");
 
     // -----------------CASCADE 2-------------------
 
