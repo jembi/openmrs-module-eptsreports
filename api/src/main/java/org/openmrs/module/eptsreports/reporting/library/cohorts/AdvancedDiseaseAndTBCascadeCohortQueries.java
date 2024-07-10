@@ -149,7 +149,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     CohortDefinition cd4Count = getClientsWithCd4Count();
     CohortDefinition cd200AgeFiveOrOver =
-        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo200mm3, 5, null);
+        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo200mm3AA, 5, null);
     CohortDefinition cd500AgeBetweenOneAndFour =
         getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo500mm3, 1, 4);
     CohortDefinition cd750AgeUnderYear =
@@ -1348,6 +1348,22 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
       @Override
       public String getSearchKey() {
         return "A";
+      }
+    },
+    LessThanOrEqualTo200mm3AA {
+      @Override
+      public String getProposition() {
+        return "o.value_numeric <= 200";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getSearchKey();
+      }
+
+      @Override
+      public String getSearchKey() {
+        return "AA";
       }
     },
     LessThanOrEqualTo500mm3 {

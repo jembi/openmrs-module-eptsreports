@@ -150,9 +150,6 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
 
     // TB_DA_FR19 - Number of clients with CD4 count showing immunosuppression and with TB LAM
     // results during inclusion period
-
-    // Severe immunodepression (TB_DA_FR19) Without TB LAM
-
     CohortIndicator severeWithTbLam =
         eptsGeneralIndicator.getIndicator(
             "severeWithTbLam",
