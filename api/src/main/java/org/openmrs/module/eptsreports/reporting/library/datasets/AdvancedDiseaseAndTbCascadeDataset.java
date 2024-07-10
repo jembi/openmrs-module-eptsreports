@@ -220,7 +220,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
             "severeWithTbLamPositiveWithGeneXpertTest",
             EptsReportUtils.map(
                 advancedDiseaseAndTBCascadeCohortQueries
-                    .getClientsWithSevereImmunodepressionAndWithTbLamPositiveResultAndNotTestedForGeneXpert(),
+                    .getClientsWithSevereImmunodepressionAndWithTbLamPositiveResultAndTestedForGeneXpert(),
                 mappings));
     addRow(
         dataSetDefinition,
@@ -233,6 +233,28 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         "severeWithTbLamPositiveWithGeneXpertTestTotal",
         "ClientsWithSevereWithTbLamPositiveWithGeneXpertTestTotal",
         EptsReportUtils.map(severeWithTbLamPositiveWithGeneXpertTest, mappings),
+        "");
+
+    // TB_DA_FR23 - Clients with positive TB LAM during inclusion period and GeneXpert positive for
+    // TB by report generation date
+    CohortIndicator severeWithTbLamPositiveWithGeneXpertPositiveResult =
+        eptsGeneralIndicator.getIndicator(
+            "severeWithTbLamPositiveWithGeneXpertPositiveResult",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getClientsWithSevereImmunodepressionAndWithTbLamPositiveResultAndPositiveGeneXpert(),
+                mappings));
+    addRow(
+        dataSetDefinition,
+        "severeWithTbLamPositiveWithGeneXpertPositiveResult",
+        "ClientsWithsevereWithTbLamPositiveWithGeneXpertPositiveResult",
+        EptsReportUtils.map(severeWithTbLamPositiveWithGeneXpertPositiveResult, mappings),
+        dissagregations());
+
+    dataSetDefinition.addColumn(
+        "severeWithTbLamPositiveWithGeneXpertPositiveResultTotal",
+        "ClientsWithSevereWithTbLamPositiveWithGeneXpertPositiveResultTotal",
+        EptsReportUtils.map(severeWithTbLamPositiveWithGeneXpertPositiveResult, mappings),
         "");
 
     // Number of clients with CD4 count during inclusion period without severe immunodepression
