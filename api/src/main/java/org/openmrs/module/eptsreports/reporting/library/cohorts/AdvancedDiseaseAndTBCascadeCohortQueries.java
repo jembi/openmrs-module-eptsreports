@@ -198,7 +198,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getClientsWithSevereImmunodepressionAndWithoutTbLamResult() {
+  public CohortDefinition getClientsWithSevereImmunodepressionAndWithTbLamResult() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Clients With Cd4 count and TB Lam Result");
@@ -211,12 +211,9 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
 
     cd.addSearch("severeImmunodepression", EptsReportUtils.map(severeImmunodepression, mappings));
-    cd.addSearch(
-        "anyTbLam",
-        EptsReportUtils.map(
-            anyTbLam, "startDate=${startDate},endDate=${generationDate},location=${location}"));
+    cd.addSearch("anyTbLam", EptsReportUtils.map(anyTbLam, inclusionPeriod));
 
-    cd.setCompositionString("(severeImmunodepression AND NOT anyTbLam)");
+    cd.setCompositionString("severeImmunodepression AND anyTbLam");
 
     return cd;
   }
