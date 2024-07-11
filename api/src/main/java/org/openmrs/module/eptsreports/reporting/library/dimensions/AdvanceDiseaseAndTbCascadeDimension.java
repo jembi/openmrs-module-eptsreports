@@ -20,11 +20,8 @@ public class AdvanceDiseaseAndTbCascadeDimension {
 
   private final String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
-  private final String inclusionPeriod =
-      "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}";
-
   private final String pregnancyPeriod =
-      "startDate=${endDate-10m+1d},endDate=${endDate-1m},location=${location}";
+      "startDate=${endDate-8m},endDate=${endDate},location=${location}";
 
   @Autowired
   public AdvanceDiseaseAndTbCascadeDimension(
@@ -141,7 +138,7 @@ public class AdvanceDiseaseAndTbCascadeDimension {
     dim.addCohortDefinition(
         "initArt",
         EptsReportUtils.map(
-            listOfPatientsArtCohortCohortQueries.getPatientsInitiatedART(), inclusionPeriod));
+            listOfPatientsArtCohortCohortQueries.getPatientsInitiatedART(), mappings));
 
     dim.addCohortDefinition(
         "pregnantClient",
@@ -158,8 +155,7 @@ public class AdvanceDiseaseAndTbCascadeDimension {
     dim.addCohortDefinition(
         "reinitArt",
         EptsReportUtils.map(
-            advancedDiseaseAndTBCascadeCohortQueries.getPatientsWhoReinitiatedArt(),
-            inclusionPeriod));
+            advancedDiseaseAndTBCascadeCohortQueries.getPatientsWhoReinitiatedArt(), mappings));
     return dim;
   }
 }
