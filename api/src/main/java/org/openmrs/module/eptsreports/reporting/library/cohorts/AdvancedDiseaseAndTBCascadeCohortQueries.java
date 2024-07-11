@@ -30,9 +30,6 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
   private final String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
-  //  private final String inclusionPeriod =
-  //      "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}";
-
   private final String pregnancyPeriod =
       "startDate=${endDate-8m},endDate=${endDate},location=${location}";
 
@@ -139,7 +136,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getClientsWithSevereImmunosuppression() {
+  public CohortDefinition getEligibleClientsWithSevereImmunosuppression() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("showing severe immunodepression");
@@ -170,7 +167,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getClientsWithSevereImmunosuppressionAndTbLamResult() {
+  public CohortDefinition getEligibleClientsWithSevereImmunosuppressionAndTbLamResult() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Clients With Cd4 count and TB Lam Result ");
@@ -178,7 +175,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
 
-    CohortDefinition severeImmunosuppression = getClientsWithSevereImmunosuppression();
+    CohortDefinition severeImmunosuppression = getEligibleClientsWithSevereImmunosuppression();
 
     CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
 
@@ -189,6 +186,37 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             anyTbLam, "startDate=${endDate-2m+1d},endDate=${generationDate},location=${location}"));
 
     cd.setCompositionString("severeImmunosuppression AND anyTbLam");
+
+    return cd;
+  }
+
+  /**
+   * Number of clients with CD4 count showing severe immunosuppression during the inclusion period
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getClientsWithSevereImmunosuppression() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Number of clients with CD4 count showing immunosuppression");
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+
+    CohortDefinition cd4Count = getPatientsWithCD4Count();
+    CohortDefinition cd200AgeFiveOrOver =
+        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo200mm3AA, 5, null);
+    CohortDefinition cd500AgeBetweenOneAndFour =
+        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo500mm3, 1, 4);
+    CohortDefinition cd750AgeUnderYear =
+        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo750mm3, null, 1);
+
+    cd.addSearch("cd4Count", EptsReportUtils.map(cd4Count, mappings));
+    cd.addSearch("cd4Under200", EptsReportUtils.map(cd200AgeFiveOrOver, mappings));
+    cd.addSearch("cd4Under500", EptsReportUtils.map(cd500AgeBetweenOneAndFour, mappings));
+    cd.addSearch("cd4Under750", EptsReportUtils.map(cd750AgeUnderYear, mappings));
+
+    cd.setCompositionString("cd4Count AND (cd4Under200 OR cd4Under500 OR cd4Under750)");
 
     return cd;
   }
@@ -208,27 +236,19 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
 
-    CohortDefinition cd4Count = getPatientsWithCD4Count();
-    CohortDefinition cd200AgeFiveOrOver =
-        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo200mm3AA, 5, null);
-    CohortDefinition cd500AgeBetweenOneAndFour =
-        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo500mm3, 1, 4);
-    CohortDefinition cd750AgeUnderYear =
-        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo750mm3, null, 1);
+    CohortDefinition clientsWithSevereImmunosuppression = getClientsWithSevereImmunosuppression();
     CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
     CohortDefinition exclusion = getPatientsTransferredOutOrDead();
 
-    cd.addSearch("cd4Count", EptsReportUtils.map(cd4Count, mappings));
-    cd.addSearch("cd4Under200", EptsReportUtils.map(cd200AgeFiveOrOver, mappings));
-    cd.addSearch("cd4Under500", EptsReportUtils.map(cd500AgeBetweenOneAndFour, mappings));
-    cd.addSearch("cd4Under750", EptsReportUtils.map(cd750AgeUnderYear, mappings));
+    cd.addSearch(
+        "clientsWithSevereImmunosuppression",
+        EptsReportUtils.map(clientsWithSevereImmunosuppression, mappings));
     cd.addSearch("anyTbLam", EptsReportUtils.map(anyTbLam, mappings));
     cd.addSearch(
         "exclusion",
         EptsReportUtils.map(exclusion, "endDate=${generationDate},location=${location}"));
 
-    cd.setCompositionString(
-        "(cd4Count AND (cd4Under200 OR cd4Under500 OR cd4Under750) AND anyTbLam) AND NOT exclusion");
+    cd.setCompositionString("(clientsWithSevereImmunosuppression AND anyTbLam) AND NOT exclusion");
 
     return cd;
   }
