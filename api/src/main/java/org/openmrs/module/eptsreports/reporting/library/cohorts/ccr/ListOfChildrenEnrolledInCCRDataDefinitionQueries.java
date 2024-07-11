@@ -8,6 +8,7 @@ import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
@@ -22,12 +23,14 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
 
   private final HivMetadata hivMetadata;
   private final CommonMetadata commonMetadata;
+  private final CommonQueries commonQueries;
 
   @Autowired
   public ListOfChildrenEnrolledInCCRDataDefinitionQueries(
-      HivMetadata hivMetadata, CommonMetadata commonMetadata) {
+      HivMetadata hivMetadata, CommonMetadata commonMetadata, CommonQueries commonQueries) {
     this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
+    this.commonQueries = commonQueries;
   }
 
   /**
@@ -957,6 +960,31 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>ART Start Date-child (Data Início TARV-Criança) (Sheet 1: Column AO)</b>
+   * <li>Patient’s first drugs pick-up date set in Pharmacy form (FILA) or
+   * <li>Date that patient started drugs (ARV PLAN = START DRUGS) during the pharmacy or clinical
+   *     visits or
+   * <li>Patient’s first historical start drugs date set in Pharmacy Tool (FILA) or Clinical tools
+   *     (Ficha de Seguimento Adulto and Ficha de Seguimento Pediatria) or Ficha Resumo - Master
+   *     Card or
+   * <li>Date that Patient was enrolled in ART Program, or
+   * <li>Patient’s first drug pick-up date set on Recepção Levantou ARV – Master Card
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getChildArtStartDate() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("ART Start Date-child (Data Início TARV-Criança)");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    sqlPatientDataDefinition.setQuery(commonQueries.getARTStartDate(true));
+
     return sqlPatientDataDefinition;
   }
 

@@ -9,12 +9,14 @@ import org.openmrs.module.eptsreports.reporting.data.converter.DashDateFormatCon
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.ObservationToConceptNameConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.SifNotNullAndNifNullConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.TestResultConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.StateOfStayArtPatientConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.TestResultConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ccr.ListOfChildrenEnrolledInCCRDataDefinitionQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.BaseDataSet;
+import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
+import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
@@ -39,6 +41,8 @@ public class ListOfChildrenEnrolledInCCRDataset extends BaseDataSet {
   private final CommonMetadata commonMetadata;
 
   private final HivMetadata hivMetadata;
+  private final EptsGeneralIndicator eptsGeneralIndicator;
+  private final String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
   @Autowired
   public ListOfChildrenEnrolledInCCRDataset(
@@ -48,7 +52,8 @@ public class ListOfChildrenEnrolledInCCRDataset extends BaseDataSet {
           listOfPatientsInAdvancedHivIllnessCohortQueries,
       ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries,
       CommonMetadata commonMetadata,
-      HivMetadata hivMetadata) {
+      HivMetadata hivMetadata,
+      EptsGeneralIndicator eptsGeneralIndicator) {
     this.listOfChildrenEnrolledInCCRDataDefinitionQueries =
         listOfChildrenEnrolledInCCRDataDefinitionQueries;
     this.listOfPatientsInAdvancedHivIllnessCohortQueries =
@@ -56,6 +61,7 @@ public class ListOfChildrenEnrolledInCCRDataset extends BaseDataSet {
     this.listOfPatientsDefaultersOrIITCohortQueries = listOfPatientsDefaultersOrIITCohortQueries;
     this.commonMetadata = commonMetadata;
     this.hivMetadata = hivMetadata;
+    this.eptsGeneralIndicator = eptsGeneralIndicator;
   }
 
   public DataSetDefinition listOfChildrenEnrolledInCCRColumnsDataset() {
@@ -83,7 +89,6 @@ public class ListOfChildrenEnrolledInCCRDataset extends BaseDataSet {
     DataDefinition nameDefinition =
         new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), nameFormatter);
 
-    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
     patientDataSetDefinition.addRowFilter(
         listOfChildrenEnrolledInCCRDataDefinitionQueries.getListOfChildrenEnrolledInCCR(),
         mappings);
@@ -351,6 +356,13 @@ public class ListOfChildrenEnrolledInCCRDataset extends BaseDataSet {
         "endDate=${endDate},location=${location}",
         new StateOfStayArtPatientConverter());
 
+    // ART Start Date-child (Data Início TARV-Criança) - Sheet 1: Column AO
+    patientDataSetDefinition.addColumn(
+        "art_start",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getChildArtStartDate(),
+        "endDate=${endDate},location=${location}",
+        new DashDateFormatConverter());
+
     return patientDataSetDefinition;
   }
 
@@ -360,6 +372,19 @@ public class ListOfChildrenEnrolledInCCRDataset extends BaseDataSet {
     dataSetDefinition.setName("List of Children Enrolled in CCR Totals DataSet");
 
     dataSetDefinition.addParameters(getParameters());
+
+    dataSetDefinition.addColumn(
+        "TOTAL",
+        "No. De Crianças Inscritos em CCR no Período",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "No. De Crianças Inscritos em CCR no Período",
+                EptsReportUtils.map(
+                    listOfChildrenEnrolledInCCRDataDefinitionQueries
+                        .getListOfChildrenEnrolledInCCR(),
+                    mappings)),
+            mappings),
+        "");
 
     return dataSetDefinition;
   }
