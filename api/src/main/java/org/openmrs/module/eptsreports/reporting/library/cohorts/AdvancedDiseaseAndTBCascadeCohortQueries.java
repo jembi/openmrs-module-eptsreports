@@ -282,6 +282,34 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   }
 
   /**
+   * Number of clients with negative TB LAM result during the inclusion period
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getClientsWithSevereImmunodepressionAndWithTbLamNegativeResult() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Number of clients with negative TB LAM result during");
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+
+    CohortDefinition severeImmunosuppressionAndWithTbLamResult =
+        getClientsWithSevereImmunosuppressionAndWithTbLamResult();
+
+    CohortDefinition negativeTbLam = getPatientsWithTbLamResult(TbLamResult.NEGATIVE);
+
+    cd.addSearch(
+        "severeImmunosuppressionAndWithTbLamResult",
+        EptsReportUtils.map(severeImmunosuppressionAndWithTbLamResult, mappings));
+    cd.addSearch("negativeTbLam", EptsReportUtils.map(negativeTbLam, mappings));
+
+    cd.setCompositionString("severeImmunosuppressionAndWithTbLamResult AND negativeTbLam");
+
+    return cd;
+  }
+
+  /**
    * Number of clients with positive TB LAM result during the inclusion period
    *
    * @return CohortDefinition
