@@ -7,6 +7,8 @@ import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
+import org.openmrs.module.eptsreports.reporting.library.queries.TxtbDenominatorQueries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -27,6 +29,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
   @Autowired private CommonQueries commonQueries;
 
   @Autowired private HivMetadata hivMetadata;
+  @Autowired private TxtbDenominatorQueries txtbDenominatorQueries;
 
   /**
    * <b>Technical Specs</b>
@@ -414,6 +417,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
     valuesMap.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
     valuesMap.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
+    valuesMap.put("165322", hivMetadata.getMdcState().getConceptId());
 
     String query =
         "SELECT p.patient_id, Max(e.encounter_datetime) consultation_date "
@@ -608,6 +612,44 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
+  }
+
+  public DataDefinition getMostRecentTbScreeningDate() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Most Recent TB Screening Date ");
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Location.class));
+
+    String tbScreeningQuery =
+        new EptsQueriesUtil()
+            .unionBuilder(txtbDenominatorQueries.getPatientAndScreeningDate())
+            .union(txtbDenominatorQueries.getPatientWithAtLeastOnePosDate())
+            .union(txtbDenominatorQueries.getPatientWithAtLeastTbTreatmentDate())
+            .union(txtbDenominatorQueries.getPatientWithTbProgramEnrollmentAndDate())
+            .union(txtbDenominatorQueries.getPatientWithPulmonaryTbdDate())
+            .union(txtbDenominatorQueries.getPatientMarkedAsTbTreatmentStartAndDate())
+            .union(txtbDenominatorQueries.getPatientWithTuberculosisSymptomsAndDate())
+            .union(txtbDenominatorQueries.getPatientsActiveTuberculosisDate())
+            .union(txtbDenominatorQueries.getPatientsWithTbObservationsAndDate())
+            .union(txtbDenominatorQueries.getPatientsWithApplicationsForLabResearch())
+            .union(txtbDenominatorQueries.getPatientsWithTbGenexpertAndDate())
+            .union(
+                txtbDenominatorQueries
+                    .getPatientsWithBaciloscopiaOrGenexpertOrCultureTestOrTestTbLamDate())
+            .union(txtbDenominatorQueries.getPatientsWithTbLamOnELab())
+            .buildQuery();
+
+    String query =
+        " SELECT most_recent.patient_id, MAX(most_recent.encounter_datetime) most_recent "
+            + " FROM (        "
+            + tbScreeningQuery
+            + "                ) most_recent "
+            + " GROUP BY patient_id";
+
+    sqlPatientDataDefinition.setQuery(query);
+
+    return sqlPatientDataDefinition;
   }
 
   private void addParameters(CohortDefinition cd) {

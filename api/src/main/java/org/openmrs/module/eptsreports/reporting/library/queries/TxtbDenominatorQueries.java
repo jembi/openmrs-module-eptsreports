@@ -432,12 +432,8 @@ public class TxtbDenominatorQueries {
   }
 
   /**
-   * • Encounter Type ID = 13 <br>
-   * • EXAME BASILOSCOPIA (id=307) Answers Value_coded (664 – Negative or 703 – Positive or ???-Not
-   * Found) or <br>
-   * • Teste TB GENEXPERT (id=23723) Answers Value_coded (664 – Negative, 703 – Positive) or <br>
-   * • CULTURE TEST (id = 23774) Answer Positive (id = 703) or Negative (id = 664) ) or <br>
-   * • TEST TB LAM (id = 23951) Answer Positive (id = 703) or Negative (id = 664)
+   * • Patients have ‘baciloscopia result’, ‘GeneXpert result’,’Xpert MTB result’, ‘Cultura result’
+   * or ‘ TB LAM result’”, – Ficha Laboratório
    *
    * @return {@link String}
    */
@@ -447,9 +443,8 @@ public class TxtbDenominatorQueries {
     map.put("23723", tbMetadata.getTBGenexpertTestConcept().getConceptId());
     map.put("23774", tbMetadata.getCultureTest().getConceptId());
     map.put("23951", tbMetadata.getTestTBLAM().getConceptId());
-    map.put("703", tbMetadata.getPositiveConcept().getConceptId());
-    map.put("664", tbMetadata.getNegativeConcept().getConceptId());
     map.put("307", hivMetadata.getResultForBasiloscopia().getConceptId());
+    map.put("165189", tbMetadata.getTestXpertMtbUuidConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id,e.encounter_datetime "
@@ -461,11 +456,43 @@ public class TxtbDenominatorQueries {
             + "WHERE  e.encounter_type = ${13} "
             + "       AND e.location_id = :location "
             + "       AND e.encounter_datetime <= :endDate "
-            + "       AND ( o.concept_id IN ( ${307}, ${23723}, ${23774}, ${23951} ) "
-            + "             AND o.value_coded IN( ${703}, ${664} ) ) "
+            + "       AND ( o.concept_id IN ( ${307}, ${23723}, ${165189}, ${23774}, ${23951} ) "
+            + "             AND o.value_coded IS NOT NULL ) "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    return sb.replace(query);
+  }
+
+  /**
+   * Patients who have the following results recorded in the e-Lab Form during the reporting period
+   * ‘TB LAM result’.
+   *
+   * @return {@link String}
+   */
+  public String getPatientsWithTbLamOnELab() {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("23951", tbMetadata.getTestTBLAM().getConceptId());
+
+    String query =
+        "SELECT p.patient_id, "
+            + "       e.encounter_datetime "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  e.encounter_type = ${51} "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_datetime <= :endDate "
+            + "       AND o.concept_id = ${23951} "
+            + "       AND o.value_coded IS NOT NULL "
+            + "       AND p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -492,6 +519,7 @@ public class TxtbDenominatorQueries {
             .union(getPatientsWithApplicationsForLabResearch())
             .union(getPatientsWithTbGenexpertAndDate())
             .union(getPatientsWithBaciloscopiaOrGenexpertOrCultureTestOrTestTbLamDate())
+            .union(getPatientsWithTbLamOnELab())
             .buildQuery();
 
     String query =

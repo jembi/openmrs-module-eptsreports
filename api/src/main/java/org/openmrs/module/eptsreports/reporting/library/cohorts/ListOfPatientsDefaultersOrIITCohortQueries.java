@@ -8,12 +8,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
 import org.openmrs.Location;
-import org.openmrs.api.context.Context;
+import org.openmrs.PersonAttributeType;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
-import org.openmrs.module.eptsreports.reporting.calculation.generic.InitialArtStartDateCalculation;
-import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
+import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -32,10 +31,11 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
   @Autowired private TbMetadata tbMetadata;
 
   @Autowired private CommonMetadata commonMetadata;
+  @Autowired private CommonQueries commonQueries;
 
   private final String MAPPING = "location=${location}";
 
-  private final String MAPPING2 = "onOrBefore=${endDate},location=${location}";
+  private final String MAPPING2 = "endDate=${endDate},location=${location}";
 
   private final String MAPPING3 =
       "endDate=${endDate},location=${location},minDay=${minDay},maxDay=${maxDay}";
@@ -2083,12 +2083,14 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
   }
 
   public CohortDefinition getArtStartDate() {
-    CalculationCohortDefinition cd =
-        new CalculationCohortDefinition(
-            "Art start date",
-            Context.getRegisteredComponents(InitialArtStartDateCalculation.class).get(0));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.addParameter(new Parameter("onOrBefore", "On Or Before", Date.class));
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Art Start Date");
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+
+    String query = commonQueries.getARTStartDate(false);
+    cd.setQuery(query);
+
     return cd;
   }
 
@@ -2365,5 +2367,207 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlPatientDataDefinition;
+  }
+
+  public DataDefinition getLastRegisteredKeyPopulation(Concept keyPopConcept) {
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+    spdd.setName("Patient's Most Recent Ficha Clinica with KPOP Registered");
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+    spdd.addParameter(new Parameter("endDate", "endDate", Date.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("keypop", keyPopConcept.getConceptId());
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("23703", hivMetadata.getKeyPopulationConcept().getConceptId());
+
+    String sql =
+        " SELECT patient_id, "
+            + "   CASE "
+            + "     WHEN value_coded IS NOT NULL THEN 'S' "
+            + "     ELSE 'N' "
+            + "   END AS S_or_N "
+            + " FROM ( "
+            + "   SELECT p.patient_id, value_coded "
+            + "   FROM patient p "
+            + "   INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "     LEFT JOIN ( "
+            + "       SELECT p.person_id AS patient_id, Max(e.encounter_datetime) AS last_date, ${keypop} AS value_coded "
+            + "   	  FROM   person p "
+            + "   	  INNER JOIN encounter e  ON e.patient_id = p.person_id "
+            + "   	  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "   	  WHERE e.voided = 0 "
+            + "   		  AND p.voided = 0 "
+            + "   		  AND o.voided = 0 "
+            + "   		  AND e.location_id = :location "
+            + "   		  AND e.encounter_type = ${6} "
+            + "   		  AND o.concept_id = ${23703} "
+            + "   		  AND ( ";
+    if (keyPopConcept.getConceptId() == 1377) {
+      sql += "                (p.gender = 'M' AND o.value_coded = ${keypop}) ";
+    } else if (keyPopConcept.getConceptId() == 1901) {
+      sql += "                (p.gender = 'F' AND o.value_coded = ${keypop}) ";
+    } else {
+      sql +=
+          "                   (p.gender = 'M' AND o.value_coded = ${keypop}) "
+              + "             OR "
+              + "             (p.gender = 'F' AND o.value_coded = ${keypop}) ";
+    }
+    sql +=
+        "                   ) "
+            + "         AND e.encounter_datetime <= CURRENT_DATE() "
+            + "       GROUP  BY p.person_id "
+            + "   ) AS has_kpop ON p.patient_id = has_kpop.patient_id"
+            + "   WHERE p.voided = 0 "
+            + "     AND e.location_id = :location "
+            + "   GROUP BY p.patient_id "
+            + " ) S_or_N";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(sql));
+    return spdd;
+  }
+
+  public DataDefinition getLastOVCDate(PersonAttributeType ovcType, Boolean checkEstado) {
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+    spdd.setName("OVC registered in the demographic module");
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+    spdd.addParameter(new Parameter("endDate", "endDate", Date.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("ovctype", ovcType.getPersonAttributeTypeId());
+    map.put("165472", commonMetadata.getOVCGraduadoConcept().getConceptId());
+    map.put("165473", commonMetadata.getOVCSaidaSemGraduacaoConcept().getConceptId());
+    map.put("165475", commonMetadata.getOVCActivoConcept().getConceptId());
+
+    String sql =
+        "   SELECT p.patient_id, MAX(pa.date_created) AS most_recent_ovc_date "
+            + "  FROM patient p "
+            + "  INNER JOIN obs o ON p.patient_id = o.person_id "
+            + "  INNER JOIN person_attribute pa ON p.patient_id = pa.person_id "
+            + "  INNER JOIN person_attribute_type pat ON pa.person_attribute_type_id = pat.person_attribute_type_id "
+            + "  WHERE pat.person_attribute_type_id = ${ovctype} ";
+    if (Boolean.TRUE.equals(checkEstado)) {
+      sql += "     AND o.concept_id IN ( ${165472}, ${165473}, ${165475} )";
+    }
+    sql +=
+        "          AND o.location_id = :location "
+            + "    AND p.voided = 0 "
+            + "    AND pa.voided = 0 "
+            + "  GROUP By p.patient_id ";
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    spdd.setQuery(substitutor.replace(sql));
+    return spdd;
+  }
+
+  public DataDefinition getLastAbandonoNotificado() {
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+    spdd.setName("Patients who notified IIT (Abandono Notificado)");
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+    spdd.addParameter(new Parameter("endDate", "endDate", Date.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
+    map.put("1707", hivMetadata.getAbandonedConcept().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayPriorArtPatientConcept().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+
+    String sql =
+        "   SELECT p.patient_id, abandoned_date "
+            + " FROM   patient p "
+            + " 	INNER JOIN ( "
+            + "     SELECT e.patient_id, abandoned_date "
+            + "   	FROM   encounter e "
+            + "   		INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + " 			INNER JOIN( "
+            + "     		SELECT e.patient_id, MAX(e.encounter_datetime) AS abandoned_date "
+            + " 				FROM   encounter e "
+            + "     			INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "     		WHERE  e.voided = 0 "
+            + "     			AND o.voided = 0 "
+            + " 	    		AND e.encounter_type = ${6} "
+            + "   	    	AND o.concept_id = ${6273} "
+            + "     	  	AND e.location_id = :location "
+            + "       		AND e.encounter_datetime <= CURRENT_DATE() "
+            + "     		GROUP BY e.patient_id "
+            + "   		) recent_state ON recent_state.patient_id = e.patient_id "
+            + " 	  WHERE e.voided = 0 "
+            + " 			AND o.voided = 0 "
+            + " 	    AND o.concept_id = ${6273} "
+            + "   	  AND o.value_coded = ${1707} "
+            + "     	AND e.encounter_type = ${6} "
+            + " 			AND e.location_id = :location "
+            + "   	  AND e.encounter_datetime = recent_state.abandoned_date "
+            + "   	GROUP  BY e.patient_id "
+            + "           "
+            + "     UNION "
+            + "           "
+            + " 		SELECT e.patient_id, abandoned_date "
+            + "     FROM   encounter e "
+            + "     	INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN( "
+            + "         SELECT e.patient_id, MAX(o.obs_datetime) abandoned_date "
+            + "         FROM   encounter e "
+            + "         	INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "         WHERE  e.voided = 0 "
+            + "         	AND o.voided = 0 "
+            + "           AND e.encounter_type = ${53} "
+            + "           AND o.concept_id = ${6272} "
+            + "           AND e.location_id = :location "
+            + "           AND o.obs_datetime <= CURRENT_DATE() "
+            + "           GROUP BY e.patient_id "
+            + "       ) recent_state ON recent_state.patient_id = e.patient_id "
+            + "     WHERE  e.voided = 0 "
+            + "     	AND o.voided = 0 "
+            + "       AND e.encounter_type = ${53} "
+            + "       AND o.concept_id = ${6272} "
+            + "       AND o.value_coded = ${1705} "
+            + "       AND e.location_id = :location "
+            + "       AND o.obs_datetime = recent_state.abandoned_date "
+            + "     GROUP  BY e.patient_id "
+            + "           "
+            + "     UNION "
+            + "           "
+            + "     SELECT p.patient_id, abandoned_date "
+            + "     FROM	 patient p "
+            + " 			INNER JOIN patient_program pg ON p.patient_id = pg.patient_id "
+            + " 			INNER JOIN patient_state ps ON pg.patient_program_id = ps.patient_program_id "
+            + " 			INNER JOIN ( "
+            + "     		SELECT p.patient_id, MAX(ps.start_date) AS abandoned_date "
+            + "     		FROM 	 patient p "
+            + "     			INNER JOIN patient_program pg ON p.patient_id = pg.patient_id "
+            + " 					INNER JOIN patient_state ps ON pg.patient_program_id = ps.patient_program_id "
+            + "     		WHERE p.voided = 0 "
+            + " 					AND pg.voided = 0 "
+            + " 					AND ps.voided = 0 "
+            + "       		AND pg.program_id = ${2} "
+            + "         	AND pg.location_id = :location "
+            + "       		AND ps.state IS NOT NULL "
+            + " 					AND ps.start_date <= CURRENT_DATE() "
+            + " 				GROUP BY p.patient_id "
+            + "   		) laststate ON laststate.patient_id = p.patient_id "
+            + "     WHERE pg.voided = 0 "
+            + " 			AND ps.voided = 0 "
+            + "       AND p.voided = 0 "
+            + "       AND ps.state = ${9} "
+            + "     	AND pg.program_id = ${2} "
+            + "     	AND pg.location_id = :location "
+            + "       AND ps.start_date = laststate.abandoned_date "
+            + "     GROUP BY p.patient_id "
+            + "        "
+            + "   ) abandono ON abandono.patient_id = p.patient_id "
+            + "   WHERE p.voided = 0 "
+            + "  GROUP BY p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    spdd.setQuery(substitutor.replace(sql));
+    return spdd;
   }
 }

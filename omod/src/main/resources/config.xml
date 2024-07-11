@@ -3996,6 +3996,54 @@
 	</globalProperty>
 
 	<globalProperty>
+		<property>eptsreports.dataInscricaoOVCUuid</property>
+		<defaultValue>93761ea4-5f5a-4f39-9041-41bc3e9c505d</defaultValue>
+		<description>
+			UUID for Data de Inscrição no OVC
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.dataSaidaOVCUuid</property>
+		<defaultValue>1c1d8f0e-b011-455a-a7f7-890de14ec138</defaultValue>
+		<description>
+			UUID for Data de Saída do OVC
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.estadoDoBeneficiarioOVCUuid</property>
+		<defaultValue>ce751138-3fec-48ea-80ca-a36cac927e31</defaultValue>
+		<description>
+			UUID for Estado do Beneficiário OVC
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.activoOVCUuid</property>
+		<defaultValue>c80e4bf6-0d9f-44d1-bd22-607891d6f6f8</defaultValue>
+		<description>
+			UUID for ACTIVO
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.graduadoOVCUuid</property>
+		<defaultValue>28f83e3f-0459-4520-9eba-f6b76a9e0995</defaultValue>
+		<description>
+			UUID for GRADUADO
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.saidaSemGraduacaoOVCUuid</property>
+		<defaultValue>89e073f6-f824-4964-8ae6-cbb9e9b9447d</defaultValue>
+		<description>
+			UUID for SAIDA SEM GRADUACAO
+		</description>
+	</globalProperty>
+
+	<globalProperty>
 		<property>@MODULE_ID@.ccrProgramUuid</property>
 		<defaultValue>611f0a6b-68b7-4de7-bc7a-fd021330eef8</defaultValue>
 		<description>

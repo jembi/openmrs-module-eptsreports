@@ -9,7 +9,7 @@ public class TPTEligiblePatientsQueries {
    *
    * @return {@link String}
    */
-  public static String getMpart1() {
+  public static String getMpart1(Boolean duringPeriod) {
 
     return " SELECT p.patient_id, "
         + "               e.encounter_datetime AS encounter_datetime "
@@ -25,7 +25,10 @@ public class TPTEligiblePatientsQueries {
         + "               AND e.encounter_type = ${6} "
         + "               AND o.concept_id = ${1719} "
         + "               AND o.value_coded = ${165307} "
-        + "               AND e.encounter_datetime <= :endDate ";
+            .concat(
+                duringPeriod
+                    ? " AND e.encounter_datetime >= :startDate AND e.encounter_datetime <= :endDate"
+                    : "AND e.encounter_datetime <= :endDate");
   }
 
   /**
@@ -35,7 +38,7 @@ public class TPTEligiblePatientsQueries {
    *
    * @return {@link String}
    */
-  public static String getMpart2() {
+  public static String getMpart2(Boolean duringPeriod) {
 
     return " SELECT p.patient_id, e.encounter_datetime AS encounter_datetime "
         + "                   FROM   patient p    "
@@ -50,7 +53,10 @@ public class TPTEligiblePatientsQueries {
         + "                          AND e.encounter_type = ${60}    "
         + "                          AND o.concept_id = ${23985} "
         + "                          AND o.value_coded IN ( ${23954}, ${23984} )    "
-        + "                          AND e.encounter_datetime <= :endDate ";
+            .concat(
+                duringPeriod
+                    ? " AND e.encounter_datetime >= :startDate AND e.encounter_datetime <= :endDate"
+                    : "AND e.encounter_datetime <= :endDate");
   }
 
   /**
@@ -60,7 +66,7 @@ public class TPTEligiblePatientsQueries {
    *
    * @return {@link String}
    */
-  public static String getMpart3() {
+  public static String getMpart3(Boolean duringPeriod) {
 
     return " SELECT p.patient_id, o2.obs_datetime AS encounter_datetime "
         + "FROM   patient p "
@@ -71,7 +77,12 @@ public class TPTEligiblePatientsQueries {
         + "       AND e.location_id = :location "
         + "       AND e.encounter_type = ${53} "
         + "       AND (( o.concept_id = ${23985} AND o.value_coded = ${23954} ) "
-        + "       AND ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} AND o2.obs_datetime <= :endDate )) ";
+        + "       AND ( o2.concept_id = ${165308} AND o2.value_coded = ${1256}"
+            .concat(
+                duringPeriod
+                    ? " AND o2.obs_datetime >= :startDate AND o2.obs_datetime <= :endDate"
+                    : " AND o2.obs_datetime <= :endDate")
+        + " )) ";
   }
 
   /**
@@ -81,7 +92,7 @@ public class TPTEligiblePatientsQueries {
    *
    * @return String
    */
-  public static String getMpart4() {
+  public static String getMpart4(Boolean duringPeriod) {
 
     return " SELECT p.patient_id, e.encounter_datetime AS encounter_datetime "
         + "FROM   patient p "
@@ -93,7 +104,11 @@ public class TPTEligiblePatientsQueries {
         + "       AND e.encounter_type = ${6}"
         + "       AND ((o.concept_id = ${23985} AND o.value_coded = ${23954}) "
         + "       AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
-        + "       AND o2.obs_datetime < :endDate)) ";
+            .concat(
+                duringPeriod
+                    ? " AND o2.obs_datetime >= :startDate AND o2.obs_datetime <= :endDate"
+                    : " AND o2.obs_datetime <= :endDate")
+        + ")) ";
   }
 
   /**
@@ -109,7 +124,7 @@ public class TPTEligiblePatientsQueries {
    *
    * @return String
    */
-  public static String getMpart5() {
+  public static String getMpart5(Boolean duringPeriod) {
 
     return " SELECT p.patient_id, pickup.first_pickup_date AS encounter_datetime "
         + "                 FROM  patient p "
@@ -126,7 +141,10 @@ public class TPTEligiblePatientsQueries {
         + "                          AND e.encounter_type = ${6} "
         + "                          AND o.concept_id = ${1719} "
         + "                          AND o.value_coded = ${165307} "
-        + "                          AND e.encounter_datetime <= :endDate "
+            .concat(
+                duringPeriod
+                    ? " AND e.encounter_datetime >= :startDate AND e.encounter_datetime <= :endDate "
+                    : " AND e.encounter_datetime <= :endDate")
         + "                      GROUP BY p.patient_id) AS pickup "
         + "              ON pickup.patient_id = p.patient_id "
         + "                 WHERE p.patient_id NOT IN ( SELECT pp.patient_id "
@@ -169,7 +187,7 @@ public class TPTEligiblePatientsQueries {
    *
    * @return {@link String}
    */
-  public static String getMpart6() {
+  public static String getMpart6(Boolean duringPeriod) {
 
     return "SELECT p.patient_id, e.encounter_datetime AS encounter_datetime "
         + "FROM   patient p "
@@ -182,7 +200,10 @@ public class TPTEligiblePatientsQueries {
         + "       AND e.encounter_type = ${6} "
         + "       AND o.concept_id = ${1719} "
         + "       AND o.value_coded = ${165307} "
-        + "       AND e.encounter_datetime < :endDate ";
+            .concat(
+                duringPeriod
+                    ? " AND e.encounter_datetime >= :startDate AND e.encounter_datetime <= :endDate "
+                    : " AND e.encounter_datetime <= :endDate");
   }
 
   /**
@@ -194,7 +215,7 @@ public class TPTEligiblePatientsQueries {
    *
    * @return {@link String}
    */
-  public static String getMpart7() {
+  public static String getMpart7(Boolean duringPeriod) {
 
     return "SELECT p.patient_id, e.encounter_datetime AS encounter_datetime "
         + "FROM   patient p "
@@ -205,7 +226,10 @@ public class TPTEligiblePatientsQueries {
         + "       AND e.location_id = :location "
         + "       AND e.encounter_type = ${60} "
         + "       AND ( ( o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) "
-        + "       AND o.obs_datetime <= :endDate ) "
+            .concat(
+                duringPeriod
+                    ? " AND o.obs_datetime >= :startDate AND o.obs_datetime <= :endDate ) "
+                    : "AND o.obs_datetime <= :endDate ) ")
         + "       AND ( o2.concept_id=  ${23987} AND o2.value_coded IN ( ${1256} , ${1705} ) ) ) ";
   }
 
@@ -242,7 +266,7 @@ public class TPTEligiblePatientsQueries {
    *
    * @return String
    */
-  public static String getMpart8() {
+  public static String getMpart8(Boolean duringPeriod) {
 
     return "  SELECT p.patient_id, o2.obs_datetime AS encounter_datetime "
         + "                   FROM   patient p "
@@ -256,7 +280,12 @@ public class TPTEligiblePatientsQueries {
         + "                          AND e.encounter_type = ${60} "
         + "                          AND e.location_id = :location "
         + "                          AND  ( o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) ) "
-        + "                          AND ( o2.concept_id = ${23987}  AND ( o2.value_coded IN ( ${1257}, ${1267} OR o2.value_coded IS NULL ) AND o2.obs_datetime <   :endDate  )) "
+        + "                          AND ( o2.concept_id = ${23987}  AND ( o2.value_coded IN ( ${1257}, ${1267} OR o2.value_coded IS NULL )"
+            .concat(
+                duringPeriod
+                    ? " AND o2.obs_datetime >= :startDate AND o2.obs_datetime <= :endDate"
+                    : "AND o2.obs_datetime <= :endDate")
+        + " )) "
         + "       AND NOT EXISTS (SELECT ee.encounter_id  "
         + "                       FROM  encounter ee "
         + "                              INNER JOIN obs oo ON ee.encounter_id = oo.encounter_id "
@@ -316,7 +345,7 @@ public class TPTEligiblePatientsQueries {
    *
    * @return {@link String}
    */
-  public static String getY1Query() {
+  public static String getY1Query(Boolean duringPeriod) {
     return " SELECT ee.patient_id, oo2.obs_datetime start_date "
         + "FROM   encounter ee "
         + "       JOIN obs oo "
@@ -328,7 +357,11 @@ public class TPTEligiblePatientsQueries {
         + "           AND oo.value_coded = ${656} ) "
         + "       AND ( oo2.concept_id = ${165308} "
         + "           AND oo2.value_coded = ${1256} "
-        + "           AND oo2.obs_datetime <= :endDate )) "
+            .concat(
+                duringPeriod
+                    ? " AND oo2.obs_datetime >= :startDate AND oo2.obs_datetime <= :endDate "
+                    : " AND oo2.obs_datetime <= :endDate ")
+        + " )) "
         + "       AND oo.voided = 0 "
         + "       AND oo2.voided = 0 "
         + "       AND ee.voided = 0 "
@@ -344,7 +377,7 @@ public class TPTEligiblePatientsQueries {
    *
    * @return {@link String}
    */
-  public static String getY2Query() {
+  public static String getY2Query(Boolean duringPeriod) {
     return "SELECT ee.patient_id, o3.obs_datetime start_date "
         + "FROM encounter ee "
         + "    JOIN obs o2 ON o2.encounter_id = ee.encounter_id "
@@ -359,7 +392,11 @@ public class TPTEligiblePatientsQueries {
         + "    AND o2.value_coded = ${656} ) "
         + "  AND ( o3.concept_id = ${165308} "
         + "    AND o3.value_coded = ${1256} "
-        + "    AND o3.obs_datetime <= :endDate )) ";
+            .concat(
+                duringPeriod
+                    ? " AND o3.obs_datetime >= :startDate AND o3.obs_datetime <= :endDate "
+                    : " AND o3.obs_datetime <= :endDate ")
+        + " )) ";
   }
 
   /**
@@ -372,7 +409,7 @@ public class TPTEligiblePatientsQueries {
    *
    * @return {@link String}
    */
-  public static String getY3Query() {
+  public static String getY3Query(Boolean duringPeriod) {
     return "SELECT ee.patient_id, oo2.obs_datetime start_date "
         + "FROM   encounter ee "
         + "           JOIN obs oo ON oo.encounter_id = ee.encounter_id "
@@ -382,7 +419,11 @@ public class TPTEligiblePatientsQueries {
         + "         AND oo.value_coded = ${656} ) "
         + "    AND ( oo2.concept_id = ${165308} "
         + "         AND oo2.value_coded = ${1256} "
-        + "         AND oo2.obs_datetime <= :endDate )) "
+            .concat(
+                duringPeriod
+                    ? " AND oo2.obs_datetime >= :startDate AND oo2.obs_datetime <= :endDate "
+                    : " AND oo2.obs_datetime <= :endDate ")
+        + ")) "
         + "    AND oo.voided = 0 "
         + "    AND oo2.voided = 0 "
         + "    AND ee.voided = 0 "
@@ -440,7 +481,7 @@ public class TPTEligiblePatientsQueries {
    *
    * @return {@link String}
    */
-  public static String getY5Query() {
+  public static String getY5Query(Boolean duringPeriod) {
     return "SELECT   ee.patient_id,  o2.obs_datetime start_date "
         + "FROM       encounter ee "
         + "INNER JOIN obs oo "
@@ -455,14 +496,18 @@ public class TPTEligiblePatientsQueries {
         + "AND        ( ( oo.concept_id = ${23985} "
         + "AND            oo.value_coded IN ( ${656}, ${23982} ) ) "
         + "AND          ( o2.concept_id = ${23987} AND o2.value_coded IN ( ${1256}, ${1705} ) "
-        + "AND            o2.obs_datetime <= :endDate ) )";
+            .concat(
+                duringPeriod
+                    ? " AND o2.obs_datetime >= :startDate AND o2.obs_datetime <= :endDate "
+                    : " AND o2.obs_datetime <= :endDate ")
+        + " ) )";
   }
 
   /**
-   * @see #getY5Query()
+   * @see #getY5Query(Boolean)
    * @return {@link String}
    */
-  public static String getY5QueryWithPatientIdForB5() {
+  public static String getY5QueryWithPatientIdForB5(Boolean duringPeriod) {
     return "SELECT ee.patient_id, o2.obs_datetime AS start_date "
         + "FROM       encounter ee "
         + "INNER JOIN obs oo "
@@ -480,7 +525,10 @@ public class TPTEligiblePatientsQueries {
         + "AND        o2.value_coded IN ( ${1256}, "
         + "                              ${1705} ) "
         + "AND        ee.location_id = :location "
-        + "AND        o2.obs_datetime < :endDate";
+            .concat(
+                duringPeriod
+                    ? " AND o2.obs_datetime >= :startDate AND o2.obs_datetime <= :endDate"
+                    : "AND o2.obs_datetime < :endDate");
   }
 
   /**

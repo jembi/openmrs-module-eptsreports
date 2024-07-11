@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Properties;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsEligibleForVLCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.ListOfPatientsEligibleForVLDataSet;
+import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TotalOfPatientsEligibleForVLDataSet;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.reporting.ReportingException;
@@ -22,17 +24,14 @@ public class SetupListOfPatientsEligibleForVLReport extends EptsDataExportManage
 
   private ListOfPatientsEligibleForVLDataSet listOfPatientsEligibleForVLDataset;
   private TotalOfPatientsEligibleForVLDataSet totalOfPatientsEligibleForVLDataSet;
-  private ListOfPatientsEligibleForVLCohortQueries listOfPatientsEligibleForVLCohortQueries;
 
   @Autowired
   public SetupListOfPatientsEligibleForVLReport(
       ListOfPatientsEligibleForVLDataSet listOfPatientsEligibleForVLDataset,
-      TotalOfPatientsEligibleForVLDataSet totalOfPatientsEligibleForVLDataSet,
-      ListOfPatientsEligibleForVLCohortQueries listOfPatientsEligibleForVLCohortQueries) {
+      TotalOfPatientsEligibleForVLDataSet totalOfPatientsEligibleForVLDataSet) {
 
     this.listOfPatientsEligibleForVLDataset = listOfPatientsEligibleForVLDataset;
     this.totalOfPatientsEligibleForVLDataSet = totalOfPatientsEligibleForVLDataSet;
-    this.listOfPatientsEligibleForVLCohortQueries = listOfPatientsEligibleForVLCohortQueries;
   }
 
   @Override
@@ -69,6 +68,10 @@ public class SetupListOfPatientsEligibleForVLReport extends EptsDataExportManage
     rd.addDataSetDefinition(
         "LPEVL", Mapped.mapStraightThrough(listOfPatientsEligibleForVLDataset.constructDataSet()));
 
+    rd.addDataSetDefinition("SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
+
+    rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
+
     return rd;
   }
 
@@ -84,12 +87,12 @@ public class SetupListOfPatientsEligibleForVLReport extends EptsDataExportManage
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Template_List_Patients_EligbleVL_v1.1.xls",
+              "Template_List_Patients_EligbleVL_v1.2.xls",
               "List of Patients Eligible for VL",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:7,dataset:LPEVL");
+      props.put("repeatingSections", "sheet:1,row:10,dataset:LPEVL");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {

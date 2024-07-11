@@ -10,7 +10,6 @@ import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDe
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.ListOfPatientsDefaultersOrIITTemplateDataSet;
 import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TotalListOfPatientsDefaultersOrIITTemplateDataSet;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
@@ -27,9 +26,6 @@ public class SetupListOfPatientsDefaultersOrIITReport extends EptsDataExportMana
   protected ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries;
 
   @Autowired private ListOfPatientsDefaultersOrIITTemplateDataSet initListOfPatDefIITDataSet;
-
-  @Autowired
-  private TotalListOfPatientsDefaultersOrIITTemplateDataSet iniTotalLListOfPatDefIITDataSet;
 
   @Override
   public String getExcelDesignUuid() {
@@ -65,9 +61,13 @@ public class SetupListOfPatientsDefaultersOrIITReport extends EptsDataExportMana
             "endDate=${endDate},minDay=${minDay},maxDay=${maxDay},location=${location}"));
 
     rd.addDataSetDefinition(
-        "FATS", Mapped.mapStraightThrough(iniTotalLListOfPatDefIITDataSet.constructDataSet()));
+        "FATS",
+        Mapped.mapStraightThrough(
+            initListOfPatDefIITDataSet.listOfPatientsDefaultersOrIITTotalsDataset()));
     rd.addDataSetDefinition(
-        "FATL", Mapped.mapStraightThrough(initListOfPatDefIITDataSet.constructDataSet()));
+        "FATL",
+        Mapped.mapStraightThrough(
+            initListOfPatDefIITDataSet.listOfPatientsDefaultersOrIITColumnsDataset()));
 
     rd.addDataSetDefinition("SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
 
@@ -87,12 +87,12 @@ public class SetupListOfPatientsDefaultersOrIITReport extends EptsDataExportMana
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Template_List_Patients_Defaulters_IIT_TARV_v1.5.xls",
+              "Template_List_Patients_Defaulters_IIT_TARV_v1.7.xls",
               "List Patients Defaulters IIT TARV Report",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:10,dataset:FATL");
+      props.put("repeatingSections", "sheet:1,row:11,dataset:FATL");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
