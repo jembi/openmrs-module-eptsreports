@@ -25,9 +25,13 @@ public class AdvanceDiseaseAndTbCascadeDimension {
 
   @Autowired
   public AdvanceDiseaseAndTbCascadeDimension(
-      AdvancedDiseaseAndTBCascadeCohortQueries advancedDiseaseAndTBCascadeCohortQueries) {
+      AdvancedDiseaseAndTBCascadeCohortQueries advancedDiseaseAndTBCascadeCohortQueries,
+      ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries,
+      TxNewCohortQueries txNewCohortQueries) {
 
     this.advancedDiseaseAndTBCascadeCohortQueries = advancedDiseaseAndTBCascadeCohortQueries;
+    this.listOfPatientsArtCohortCohortQueries = listOfPatientsArtCohortCohortQueries;
+    this.txNewCohortQueries = txNewCohortQueries;
   }
 
   public CohortDefinitionDimension getPatientWithPositiveTbLamAndGradeDimension() {

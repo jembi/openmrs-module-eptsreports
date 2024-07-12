@@ -80,7 +80,7 @@ public class SetupAdvancedDiseaseAndTbCascadeReport extends EptsDataExportManage
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "SESP TB7__Relatorio_da_Cascata_de_Doenca_Avancada_por_HIV_e_TB_Template_v.2.5.xls",
+              "SESP_TB7_Relatorio_da_Cascata_de_Doenca_Avancada_por_HIV_e_TB_Template_v.2.5.xls",
               "TB7: Relatório Cascata de Doença Avançada por HIV e TB",
               getExcelDesignUuid(),
               null);

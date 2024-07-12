@@ -400,7 +400,8 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             positiveGen,
             "startDate=${endDate-2m+1d},endDate=${generationDate},location=${location}"));
 
-    cd.setCompositionString("severeImmunodepressionAndWithTbLamPositiveResult AND positiveGen");
+    cd.setCompositionString(
+        "severeImmunodepressionAndWithTbLamPositiveResultAndTestedForGeneXpert AND positiveGen");
 
     return cd;
   }
