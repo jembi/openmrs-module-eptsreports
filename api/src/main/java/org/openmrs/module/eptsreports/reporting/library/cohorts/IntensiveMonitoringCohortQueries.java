@@ -2325,55 +2325,12 @@ public class IntensiveMonitoringCohortQueries {
             hivMetadata.getBreastfeeding().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
 
-    CohortDefinition b2New =
-        commonCohortQueries.getPatientsWithFirstTherapeuticLineOnLastClinicalEncounterB2NEW();
-
-    CohortDefinition changeRegimen6Months =
-        commonCohortQueries.getMOHPatientsOnTreatmentFor6Months(
-            true,
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            hivMetadata.getMasterCardEncounterType(),
-            commonMetadata.getRegimenAlternativeToFirstLineConcept(),
-            Arrays.asList(
-                commonMetadata.getAlternativeFirstLineConcept(),
-                commonMetadata.getRegimeChangeConcept(),
-                hivMetadata.getNoConcept()));
-
-    CohortDefinition B3E =
-        commonCohortQueries.getMOHPatientsToExcludeFromTreatmentIn6Months(
-            true,
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            hivMetadata.getMasterCardEncounterType(),
-            commonMetadata.getRegimenAlternativeToFirstLineConcept(),
-            commonMetadata.getAlternativeLineConcept(),
-            Arrays.asList(
-                commonMetadata.getAlternativeFirstLineConcept(),
-                commonMetadata.getRegimeChangeConcept(),
-                hivMetadata.getNoConcept()),
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            hivMetadata.getTherapeuticLineConcept(),
-            Collections.singletonList(hivMetadata.getFirstLineConcept()));
-
-    CohortDefinition B5E =
-        commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
-            false, true, 12);
-
-    CohortDefinition abandonedInTheLastSixMonthsFromFirstLineDate =
-        qualityImprovement2020CohortQueries
-            .getPatientsWhoAbandonedInTheLastSixMonthsFromFirstLineDate();
-
-    CohortDefinition restartdedExclusion =
-        qualityImprovement2020CohortQueries.getPatientsWhoRestartedTarvAtLeastSixMonths();
-
-    CohortDefinition abandonedExclusionByTarvRestartDate =
-        qualityImprovement2020CohortQueries.getPatientsWhoAbandonedTarvOnArtRestartDate();
-
-    CohortDefinition abandonedExclusionFirstLine =
-        qualityImprovement2020CohortQueries.getPatientsWhoAbandonedTarvOnOnFirstLineDate();
-
     CohortDefinition PrimeiraLinha =
         qualityImprovement2020CohortQueries.getUtentesPrimeiraLinha(
             QualityImprovement2020CohortQueries.UtentesPrimeiraLinhaPreposition.MI);
+
+    CohortDefinition tbDiagnosisActive =
+        qualityImprovement2020CohortQueries.getPatientsWithTbActiveOrTbTreatment();
 
     compositionCohortDefinition.addSearch(
         "age",
@@ -2387,12 +2344,6 @@ public class IntensiveMonitoringCohortQueries {
             lastClinical, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "B2NEW",
-        EptsReportUtils.map(
-            b2New,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
         "C",
         EptsReportUtils.map(
             pregnant, "startDate=${startDate},endDate=${endDate},location=${location}"));
@@ -2403,50 +2354,19 @@ public class IntensiveMonitoringCohortQueries {
             brestfeeding, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "B3",
-        EptsReportUtils.map(
-            changeRegimen6Months,
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "B3E",
-        EptsReportUtils.map(B3E, "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "B5E",
-        EptsReportUtils.map(B5E, "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "ABANDONEDTARV",
-        EptsReportUtils.map(
-            abandonedInTheLastSixMonthsFromFirstLineDate,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-    compositionCohortDefinition.addSearch(
-        "RESTARTED",
-        EptsReportUtils.map(
-            restartdedExclusion,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "RESTARTEDTARV",
-        EptsReportUtils.map(
-            abandonedExclusionByTarvRestartDate,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "ABANDONED1LINE",
-        EptsReportUtils.map(
-            abandonedExclusionFirstLine,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
         "PrimeiraLinha",
         EptsReportUtils.map(
             PrimeiraLinha,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
+    compositionCohortDefinition.addSearch(
+        "tbDiagnosisActive",
+        EptsReportUtils.map(
+            tbDiagnosisActive,
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
     compositionCohortDefinition.setCompositionString(
-        "((B1 AND age) OR D) AND PrimeiraLinha AND NOT C");
+        "(((B1 AND age) OR D) AND PrimeiraLinha) AND NOT (C OR tbDiagnosisActive)");
 
     return compositionCohortDefinition;
   }
