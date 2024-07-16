@@ -1192,7 +1192,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     String sql =
         " SELECT p.patient_id FROM patient p INNER JOIN "
             + "                         (SELECT last_next_pick_up.patient_id, MAX(last_next_pick_up.result_Value) AS max_datetame  FROM "
-            + "                             ( SELECT p.patient_id, MAX(o.value_datetime) AS  result_Value "
+            + "                             ( SELECT p.patient_id, o.value_datetime AS  result_Value "
             + "                               FROM  patient p "
             + "                                         INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "                                         INNER JOIN obs o ON e.encounter_id = o.encounter_id "
