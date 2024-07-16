@@ -723,8 +723,19 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
     // Category 13 Part-1
 
     // 13.1
+
     dataSetDefinition.addColumn(
         "MI13DEN1",
+        "# de adultos (15/+anos) na 1ª ou 2ª linha de TARV que tiveram consulta clínica no período de avaliação e que eram elegíveis ao pedido de CV",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getSumOfPatientsIn1stOr2ndLineOfArt(true),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI13DOT1DEN",
         "% de adultos (15/+anos) na 1a linha de TARV que tiveram consulta clínica no período de revisão, eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico",
         EptsReportUtils.map(
             customCohortIndicator(
