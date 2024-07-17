@@ -13,7 +13,6 @@ import org.openmrs.module.eptsreports.reporting.data.converter.*;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
-import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
@@ -424,24 +423,20 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
 
     CohortIndicatorDataSetDefinition dataSetDefinition = new CohortIndicatorDataSetDefinition();
     dataSetDefinition.setName("Total de Pacientes Faltosos ou Abandonos ao TARV");
-    dataSetDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    dataSetDefinition.addParameter(
-        new Parameter("minDay", "Minimum number of days", Integer.class));
-    dataSetDefinition.addParameter(
-        new Parameter("maxDay", "Maximum number of days", Integer.class));
-    dataSetDefinition.addParameter(new Parameter("location", "Location", Location.class));
+    dataSetDefinition.addParameters(getParameters());
 
-    CohortIndicator Total =
+    CohortIndicator total =
         eptsGeneralIndicator.getIndicator(
             "total",
-            EptsReportUtils.map(
-                listOfPatientsDefaultersOrIITCohortQueries.getBaseCohort(),
-                "endDate=${endDate},minDay=${minDay},maxDay=${maxDay},location=${location}"));
+            Mapped.mapStraightThrough(listOfPatientsDefaultersOrIITCohortQueries.getBaseCohort()));
+
+    total.addParameter(new Parameter("minDay", "Minimum number of days", Integer.class));
+    total.addParameter(new Parameter("maxDay", "Maximum number of days", Integer.class));
 
     dataSetDefinition.addColumn(
         "total",
         "Total de Pacientes Faltosos ou Abandonos ao TARV",
-        Mapped.mapStraightThrough(Total),
+        Mapped.mapStraightThrough(total),
         "");
 
     return dataSetDefinition;
