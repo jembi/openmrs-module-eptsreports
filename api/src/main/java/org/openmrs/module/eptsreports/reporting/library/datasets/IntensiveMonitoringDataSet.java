@@ -724,14 +724,19 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
 
     // 13.1
 
+    CohortIndicator MI13DEN1 =
+        eptsGeneralIndicator.getIndicator(
+            "MI13DEN1",
+            EptsReportUtils.map(
+                intensiveMonitoringCohortQueries.getSumOfPatientsIn1stOr2ndLineOfArt(true),
+                "revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MI13DEN1.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
     dataSetDefinition.addColumn(
         "MI13DEN1",
         "# de adultos (15/+anos) na 1ª ou 2ª linha de TARV que tiveram consulta clínica no período de avaliação e que eram elegíveis ao pedido de CV",
-        EptsReportUtils.map(
-            customCohortIndicator(
-                intensiveMonitoringCohortQueries.getSumOfPatientsIn1stOr2ndLineOfArt(true),
-                "revisionEndDate=${revisionEndDate},location=${location}"),
-            "revisionEndDate=${revisionEndDate},location=${location}"),
+        EptsReportUtils.map(MI13DEN1, "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     dataSetDefinition.addColumn(
@@ -774,8 +779,18 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
     // 13.1
+
+    CohortIndicator MI13NUM1 =
+        eptsGeneralIndicator.getIndicator(
+            "MI13NUM1",
+            EptsReportUtils.map(
+                intensiveMonitoringCohortQueries.getSumOfPatientsIn1stOr2ndLineOfArt(false),
+                "revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MI13NUM1.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
     dataSetDefinition.addColumn(
-        "MI13NUM1",
+        "MI13DOT1NUM",
         "% de adultos (15/+anos) na 1a linha de TARV que tiveram consulta clínica no período de revisão, eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico",
         EptsReportUtils.map(
             customCohortIndicator(
@@ -937,8 +952,25 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
     // ********************* PART 2 **************
 
     // 13.4
+    CohortIndicator MI13DEN4 =
+        eptsGeneralIndicator.getIndicator(
+            "MI13DEN4",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ13NewDen4(),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MI13DEN4.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
     dataSetDefinition.addColumn(
         "MI13DEN4",
+        "% de adultos (15/+anos) coinfectados TB/HIV com consulta clínica no período de revisão, elegíveis ao pedido de CV e com registo de pedido de CV",
+        EptsReportUtils.map(
+            MI13DEN4,
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI13DEN4SegundaLinha",
         "# de adultos (15/+ anos) na 2a linha de TARV elegíveis a CV.",
         EptsReportUtils.map(
             customCohortIndicator(
@@ -956,9 +988,27 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+
     // 13.4
+    CohortIndicator MI13NUM4 =
+        eptsGeneralIndicator.getIndicator(
+            "MI13NUM4",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ13NewNum4(true),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MI13NUM4.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
     dataSetDefinition.addColumn(
         "MI13NUM4",
+        "% de adultos (15/+anos) coinfectados TB/HIV com consulta clínica no período de revisão, elegíveis ao pedido de CV e com registo de pedido de CV",
+        EptsReportUtils.map(
+            MI13NUM4,
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI13NUM4SegundaLinha",
         "# de adultos (15/+ anos) na 2a linha de TARV elegíveis a CV.",
         EptsReportUtils.map(
             customCohortIndicator(
