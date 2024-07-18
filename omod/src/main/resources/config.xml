@@ -4043,4 +4043,12 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>eptsreports.patientConsentConceptUuid</property>
+		<defaultValue>c5c3fc4b-1786-433d-a1e9-1935bf4187c4</defaultValue>
+		<description>
+			UUID for DATA DE CONSENTIMENTO DO PACIENTE Concept
+		</description>
+	</globalProperty>
+
 </module>

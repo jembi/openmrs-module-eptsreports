@@ -5898,4 +5898,18 @@ public class HivMetadata extends ProgramsMetadata {
             .getGlobalProperty("eptsreports.termoablationConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id =23775 </b>
+   *
+   * <p><b>Name:</b>DATA DE CONSENTIMENTO DO PACIENTE
+   *
+   * @return {@link Concept}
+   */
+  public Concept getPatientConsentConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.patientConsentConceptUuid");
+    return getConcept(uuid);
+  }
 }

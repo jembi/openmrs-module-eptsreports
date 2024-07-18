@@ -2,14 +2,14 @@ package org.openmrs.module.eptsreports.reporting.data.converter;
 
 import org.openmrs.module.reporting.data.converter.DataConverter;
 
-/** Converter to return the Support Group Name based on the returned concept */
+/** Converter to return the Support Group State based on the returned value coded */
 public class SupportGroupsConverter implements DataConverter {
 
-  final String mentorMother = "Mães Mentoras (MM)";
+  final String startState = "Inicio";
 
-  final String youthAndTeenageMentors = "Adolescentes e Jovens Mentores (AJM)";
+  final String continueState = "Continua";
 
-  final String championMan = "Homem Campeão (HC)";
+  final String endState = "Fim";
 
   @Override
   public Object convert(Object original) {
@@ -18,12 +18,12 @@ public class SupportGroupsConverter implements DataConverter {
     }
 
     switch (original.toString()) {
-      case "24031":
-        return mentorMother;
-      case "165324":
-        return youthAndTeenageMentors;
-      case "165325":
-        return championMan;
+      case "1256":
+        return startState;
+      case "1257":
+        return continueState;
+      case "1267":
+        return endState;
       default:
         return "";
     }
