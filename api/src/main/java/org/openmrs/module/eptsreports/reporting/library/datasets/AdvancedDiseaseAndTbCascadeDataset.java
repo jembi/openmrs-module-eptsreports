@@ -49,17 +49,33 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
             eptsCommonDimension.age(ageDimensionCohort), "effectiveDate=${endDate}"));
 
     dataSetDefinition.addDimension("gender", EptsReportUtils.map(eptsCommonDimension.gender(), ""));
+
     dataSetDefinition.addDimension(
         "grade",
         EptsReportUtils.map(
             advanceDiseaseAndTbCascadeDimension.getPatientWithPositiveTbLamAndGradeDimension(),
             reportingPeriod));
-    // RF11-Number of clients eligible for CD4 count during inclusion period
+
+    dataSetDefinition.addDimension(
+        "cd4Eligibility",
+        EptsReportUtils.map(
+            advanceDiseaseAndTbCascadeDimension.getCd4EligibilityDisaggregations(),
+            inclusionPeriod));
+
+    // -----------------CASCADE 1-------------------
+
+    // TB_DA_FR13 - Number of clients eligible for CD4 count during inclusion period (Cascade 1)
     CohortIndicator eligibleCd4Ind =
         eptsGeneralIndicator.getIndicator(
             "eligibleCd4Ind",
             EptsReportUtils.map(
                 advancedDiseaseAndTBCascadeCohortQueries.getClientsEligibleForCd4(), mappings));
+
+    dataSetDefinition.addColumn(
+        "eligibleCd4Total",
+        "ClientsEligible4Cd4Total",
+        EptsReportUtils.map(eligibleCd4Ind, inclusionPeriod),
+        "");
 
     addRow(
         dataSetDefinition,
@@ -68,20 +84,19 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(eligibleCd4Ind, inclusionPeriod),
         dissagregations());
 
-    dataSetDefinition.addColumn(
-        "eligibleCd4Total",
-        "ClientsEligible4Cd4Total",
-        EptsReportUtils.map(eligibleCd4Ind, inclusionPeriod),
-        "");
-
-    // Number of clients eligible for CD4 count request who have a CD4 count result during inclusion
-    // period (TB_DA_FR18)
-
+    // TB_DA_FR16 - Number of clients eligible for CD4 count who have a CD4 count within 33 days
+    // (Cascade 1)
     CohortIndicator cd4CountInd =
         eptsGeneralIndicator.getIndicator(
             "cd4CountInd",
             EptsReportUtils.map(
                 advancedDiseaseAndTBCascadeCohortQueries.getClientsWithCd4Count(), mappings));
+
+    dataSetDefinition.addColumn(
+        "cd4CountTotal",
+        "ClientsWithCd4Total",
+        EptsReportUtils.map(cd4CountInd, inclusionPeriod),
+        "");
 
     addRow(
         dataSetDefinition,
@@ -90,253 +105,226 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(cd4CountInd, inclusionPeriod),
         dissagregations());
 
-    dataSetDefinition.addColumn(
-        "cd4CountTotal",
-        "ClientsWithCd4Total",
-        EptsReportUtils.map(cd4CountInd, inclusionPeriod),
-        "");
-
-    // Number of clients with CD4 count during inclusion period showing severe immunodepression
-    // (TB_DA_FR19)
-    CohortIndicator severeIndicator =
+    // TB_DA_FR17 - Number of eligible clients with CD4 count during inclusion period showing severe
+    // immunodepression (Cascade 1)
+    CohortIndicator eligibleWithSevereImmunosuppression =
         eptsGeneralIndicator.getIndicator(
-            "severeIndicator",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithSevereImmunodepression(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "severeImmunodepression",
-        "ClientsWithSevereImmunodepressionTotal",
-        EptsReportUtils.map(severeIndicator, inclusionPeriod),
-        "");
-
-    // Severe immunodepression (TB_DA_FR19)With TB LAM
-    CohortIndicator severeTbLam =
-        eptsGeneralIndicator.getIndicator(
-            "severeTbLamInd",
+            "eligibleWithSevereImmunosuppression",
             EptsReportUtils.map(
                 advancedDiseaseAndTBCascadeCohortQueries
-                    .getClientsWithSevereImmunodepressionAndTbLamResult(),
+                    .getEligibleClientsWithSevereImmunosuppression(),
                 mappings));
+
+    dataSetDefinition.addColumn(
+        "eligibleWithSevereImmunosuppressionTotal",
+        "ClientsEligibleWithSevereImmunosuppressionTotal",
+        EptsReportUtils.map(eligibleWithSevereImmunosuppression, inclusionPeriod),
+        "");
+
     addRow(
         dataSetDefinition,
-        "severeTbLam",
-        "ClientsWithSevereImmunodepressionAndTbLam",
-        EptsReportUtils.map(severeTbLam, inclusionPeriod),
+        "eligibleWithSevereImmunosuppression",
+        "ClientsEligibleWithSevereImmunosuppression",
+        EptsReportUtils.map(eligibleWithSevereImmunosuppression, inclusionPeriod),
         dissagregations());
+
+    // TB_DA_FR18 - Number of clients eligible for CD4 with CD4 count showing severe
+    // immunosuppression and who have a TB LAM result by report generation date (Cascade 1)
+    CohortIndicator severeTbLam =
+        eptsGeneralIndicator.getIndicator(
+            "severeTbLam",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getEligibleClientsWithSevereImmunosuppressionAndTbLamResult(),
+                mappings));
 
     dataSetDefinition.addColumn(
         "severeTbLamTotal",
-        "ClientsWithSevereImmunodepressionTbLamTotal",
+        "ClientsWithSevereImmunosuppressionTbLamTotal",
         EptsReportUtils.map(severeTbLam, inclusionPeriod),
         "");
 
-    // Severe immunodepression (TB_DA_FR19) Without TB LAM
+    addRow(
+        dataSetDefinition,
+        "severeTbLam",
+        "ClientsWithSevereImmunosuppressionAndTbLam",
+        EptsReportUtils.map(severeTbLam, inclusionPeriod),
+        dissagregations());
 
-    CohortIndicator severeWithoutTbLam =
+    // -----------------CASCADE 2-------------------
+
+    // TB_DA_FR12 - Number of clients with CD4 count showing severe immunosuppression during the
+    // inclusion period
+    CohortIndicator severeImmunosuppression =
         eptsGeneralIndicator.getIndicator(
-            "severeWithoutTbLamInd",
+            "severeImmunosuppression",
             EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries
-                    .getClientsWithSevereImmunodepressionAndWithoutTbLamResult(),
+                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithSevereImmunosuppression(),
                 mappings));
     addRow(
         dataSetDefinition,
-        "severeWithoutTbLam",
-        "ClientsWithSevereImmunodepressionAndWithoutTbLam",
-        EptsReportUtils.map(severeWithoutTbLam, inclusionPeriod),
+        "severeImmunosuppression",
+        "ClientsWithSevereImmunosuppression",
+        EptsReportUtils.map(severeImmunosuppression, inclusionPeriod),
         dissagregations());
 
     dataSetDefinition.addColumn(
-        "severeWithoutTbLamTotal",
-        "ClientsWithSevereImmunodepressionWithoutTbLamTotal",
-        EptsReportUtils.map(severeWithoutTbLam, inclusionPeriod),
+        "severeImmunosuppressionTotal",
+        "ClientsWithSevereImmunosuppressionTotal",
+        EptsReportUtils.map(severeImmunosuppression, inclusionPeriod),
         "");
 
-    // Number of clients with CD4 count during inclusion period without severe immunodepression
-    // (TB_DA_FR20)
-    CohortIndicator withoutImmunodepression =
+    // TB_DA_FR19 - Number of clients with CD4 count showing immunosuppression and with TB LAM
+    // results during inclusion period
+    CohortIndicator severeImmunosuppressionAndWithTbLam =
         eptsGeneralIndicator.getIndicator(
-            "withoutImmunodepression",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithoutSevereImmunodepression(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "withoutImmunodepressionTotal",
-        "ClientsWithoutSevereImmunodepressionTotal",
-        EptsReportUtils.map(withoutImmunodepression, inclusionPeriod),
-        "");
-
-    // without severe immunodepression (TB_DA_FR20) Without TB LAM
-    CohortIndicator withoutImmunodepressionWithoutTbLam =
-        eptsGeneralIndicator.getIndicator(
-            "withoutImmunodepressionWithoutTbLam",
+            "severeImmunosuppressionAndWithTbLam",
             EptsReportUtils.map(
                 advancedDiseaseAndTBCascadeCohortQueries
-                    .getClientsWithoutSevereImmunodepressionAndWithoutTbLamResult(),
+                    .getClientsWithSevereImmunosuppressionAndWithTbLamResult(),
                 mappings));
-
-    dataSetDefinition.addColumn(
-        "withoutImmunodepressionWithoutTbLamTotal",
-        "ClientsWithoutSevereImmunodepressionAndWithoutTbLam",
-        EptsReportUtils.map(withoutImmunodepressionWithoutTbLam, inclusionPeriod),
-        "");
-    // Without severe immunodepression (TB_DA_FR20) With TB LAM
-    CohortIndicator withoutImmunodepressionWithTbLam =
-        eptsGeneralIndicator.getIndicator(
-            "withoutImmunodepressionWithTbLam",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries
-                    .getClientsWithoutSevereImmunodepressionAndWithTbLamResult(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "withoutImmunodepressionWithTbLamTotal",
-        "ClientsWithoutSevereImmunodepressionAndWithTbLamTotal",
-        EptsReportUtils.map(withoutImmunodepressionWithTbLam, inclusionPeriod),
-        "");
-
     addRow(
         dataSetDefinition,
-        "withoutImmunodepressionWithTbLam",
-        "ClientsWithSevereImmunodepressionAndWithTbLam",
-        EptsReportUtils.map(withoutImmunodepressionWithTbLam, inclusionPeriod),
-        dissagregations());
-    // Number of clients without CD4 count but with TB LAM results during inclusion period
-    // (TB_DA_FR21)
-
-    CohortIndicator withoutCd4Tblam =
-        eptsGeneralIndicator.getIndicator(
-            "withoutCd4TbLamInd",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithoutCd4CountButWithTbLam(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "withoutCd4WithTbLamTotal",
-        "ClientsWithoutCd4CountButWithTbLamTotal",
-        EptsReportUtils.map(withoutCd4Tblam, inclusionPeriod),
-        "");
-
-    addRow(
-        dataSetDefinition,
-        "withoutCd4WithTbLam",
-        "ClientsWithoutCd4CountWithButWithTbLam",
-        EptsReportUtils.map(withoutCd4Tblam, inclusionPeriod),
-        dissagregations());
-    // Number of clients with TB LAM results by report generation date (TB_DA_FR22)
-    CohortIndicator withTbLam =
-        eptsGeneralIndicator.getIndicator(
-            "withTbLamInd",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithAnyTbLam(), mappings));
-
-    dataSetDefinition.addColumn(
-        "withTbLamTotal",
-        "ClientsWithLamTotal",
-        EptsReportUtils.map(withTbLam, reportingPeriod),
-        "");
-
-    // TB LAM (TB_DA_FR22) Positive
-    CohortIndicator positiveTbLam =
-        eptsGeneralIndicator.getIndicator(
-            "positiveTbLamInd",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithTbLamPositive(), mappings));
-
-    dataSetDefinition.addColumn(
-        "positiveTbLamTotal",
-        "ClientsWithPositiveTbLamTotal",
-        EptsReportUtils.map(positiveTbLam, reportingPeriod),
-        "");
-
-    addRow(
-        dataSetDefinition,
-        "positiveTbLam",
-        "ClientsWithPositiveTbLam",
-        EptsReportUtils.map(positiveTbLam, reportingPeriod),
+        "severeImmunosuppressionAndWithTbLam",
+        "ClientsWithSevereImmunosuppressionAndWithTbLam",
+        EptsReportUtils.map(severeImmunosuppressionAndWithTbLam, inclusionPeriod),
         dissagregations());
 
-    // TB LAM (TB_DA_FR22) Negative
-    CohortIndicator negativeTbLam =
-        eptsGeneralIndicator.getIndicator(
-            "negativeTbLamInd",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithTbLamNegative(), mappings));
-
     dataSetDefinition.addColumn(
-        "negativeTbLamTotal",
-        "ClientsWithNegativeTbLamTotal",
-        EptsReportUtils.map(negativeTbLam, reportingPeriod),
+        "severeImmunosuppressionAndWithTbLamTotal",
+        "ClientsWithSevereImmunosuppressionAndWithTbLamTotal",
+        EptsReportUtils.map(severeImmunosuppressionAndWithTbLam, inclusionPeriod),
         "");
 
-    // Clients with positive TB LAM but NOT tested by GeneXpert (TB_DA_FR23)
-    CohortIndicator positiveTbLamNotGen =
+    // TB_DA_FR20 - Number of clients with positive TB LAM result during the inclusion period
+    CohortIndicator severeImmunosuppressionAndWithTbLamPositive =
         eptsGeneralIndicator.getIndicator(
-            "positiveTbLamNotGenInd",
+            "severeImmunosuppressionAndWithTbLamPositive",
             EptsReportUtils.map(
                 advancedDiseaseAndTBCascadeCohortQueries
-                    .getClientsWithTbLamPositiveButNotTestedGeneXPert(),
+                    .getClientsWithSevereImmunodepressionAndWithTbLamPositiveResult(),
                 mappings));
-
-    dataSetDefinition.addColumn(
-        "positiveTbLamNotGen",
-        "ClientsWithPositiveButNotTestedForGenex",
-        EptsReportUtils.map(positiveTbLamNotGen, reportingPeriod),
-        "");
-
-    // Clients with positive TB LAM and also tested by GeneXpert (TB_DA_FR24)
-    CohortIndicator positiveTbLamAndGen =
-        eptsGeneralIndicator.getIndicator(
-            "positiveTbLamAndGenInd",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries
-                    .getClientsWithTbLamPositiveTestedGeneXPert(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "positiveTbLamAndGen",
-        "ClientsWithPositiveTestedForGenex",
-        EptsReportUtils.map(positiveTbLamAndGen, reportingPeriod),
-        "");
-    // Clients with positive TB LAM and GeneXpert positive for TB (TB_DA_FR25)
-    CohortIndicator positiveTbLamPositiveGen =
-        eptsGeneralIndicator.getIndicator(
-            "positiveTbLamPositiveGenInd",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries
-                    .getClientsWithTbLamPositiveTestedPositiveGeneXPert(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "positiveTbLamPositiveGen",
-        "ClientsWithPositiveTestedPositiveForGenexTb",
-        EptsReportUtils.map(positiveTbLamPositiveGen, reportingPeriod),
-        "");
-
-    // Clients with positive TB LAM and on TB treatment by report generation date (TB_DA_FR26)
-
-    CohortIndicator positiveTbLamOnTreatmentInd =
-        eptsGeneralIndicator.getIndicator(
-            "positiveTbLamOnTreatmentInd ",
-            EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithTbLamPositiveOnTbTreatment(),
-                mappings));
-
-    dataSetDefinition.addColumn(
-        "positiveTbLamOnTreatmentTotal",
-        "ClientsWithPositiveTbLamOnTbTreatment",
-        EptsReportUtils.map(positiveTbLamOnTreatmentInd, reportingPeriod),
-        "");
-
     addRow(
         dataSetDefinition,
-        "positiveTbLamOnTreatment",
-        "ClientsWithPositiveTbLamOnTbTreatment",
-        EptsReportUtils.map(positiveTbLamOnTreatmentInd, reportingPeriod),
+        "severeImmunosuppressionAndWithTbLamPositive",
+        "ClientsWithSevereImmunosuppressionAndWithTbLamPositive",
+        EptsReportUtils.map(severeImmunosuppressionAndWithTbLamPositive, inclusionPeriod),
         dissagregations());
+
+    dataSetDefinition.addColumn(
+        "severeImmunosuppressionAndWithTbLamPositiveTotal",
+        "ClientsWithSevereImmunosuppressionAndWithTbLamPositiveTotal",
+        EptsReportUtils.map(severeImmunosuppressionAndWithTbLamPositive, inclusionPeriod),
+        "");
+
+    // Number of clients with negative TB LAM result during the inclusion period
+    CohortIndicator severeImmunosuppressionAndWithTbLamNegative =
+        eptsGeneralIndicator.getIndicator(
+            "severeImmunosuppressionAndWithTbLamNegative",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getClientsWithSevereImmunodepressionAndWithTbLamNegativeResult(),
+                mappings));
+    addRow(
+        dataSetDefinition,
+        "severeImmunosuppressionAndWithTbLamNegative",
+        "ClientsWithSevereImmunosuppressionAndWithTbLamNegative",
+        EptsReportUtils.map(severeImmunosuppressionAndWithTbLamNegative, inclusionPeriod),
+        dissagregations());
+
+    dataSetDefinition.addColumn(
+        "severeImmunosuppressionAndWithTbLamNegativeTotal",
+        "ClientsWithSevereImmunosuppressionAndWithTbLamNegativeTotal",
+        EptsReportUtils.map(severeImmunosuppressionAndWithTbLamNegative, inclusionPeriod),
+        "");
+
+    // TB_DA_FR21 Number of clients with positive TB LAM result during the inclusion period but not
+    // tested with GeneXpert by report generation date
+    CohortIndicator severeWithTbLamPositiveWithNoTestGeneXpert =
+        eptsGeneralIndicator.getIndicator(
+            "severeWithTbLamPositiveWithNoTestGeneXpert",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getClientsWithSevereImmunodepressionAndWithTbLamPositiveResultAndNotTestedForGeneXpert(),
+                mappings));
+    addRow(
+        dataSetDefinition,
+        "severeWithTbLamPositiveWithNoTestGeneXpert",
+        "ClientsWithSevereWithTbLamPositiveWithNoTestGeneXpert",
+        EptsReportUtils.map(severeWithTbLamPositiveWithNoTestGeneXpert, inclusionPeriod),
+        dissagregations());
+
+    dataSetDefinition.addColumn(
+        "severeWithTbLamPositiveWithNoTestGeneXpertTotal",
+        "ClientsWithSevereWithTbLamPositiveWithNoTestGeneXpertTotal",
+        EptsReportUtils.map(severeWithTbLamPositiveWithNoTestGeneXpert, inclusionPeriod),
+        "");
+
+    // TB_DA_FR22 - Clients with positive TB LAM result during the inclusion period and also tested
+    // with GeneXpert by report generation date
+    CohortIndicator severeWithTbLamPositiveWithGeneXpertTest =
+        eptsGeneralIndicator.getIndicator(
+            "severeWithTbLamPositiveWithGeneXpertTest",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getClientsWithSevereImmunodepressionAndWithTbLamPositiveResultAndTestedForGeneXpert(),
+                mappings));
+    addRow(
+        dataSetDefinition,
+        "severeWithTbLamPositiveWithGeneXpertTest",
+        "ClientsWithSevereWithTbLamPositiveWithGeneXpertTest",
+        EptsReportUtils.map(severeWithTbLamPositiveWithGeneXpertTest, inclusionPeriod),
+        dissagregations());
+
+    dataSetDefinition.addColumn(
+        "severeWithTbLamPositiveWithGeneXpertTestTotal",
+        "ClientsWithSevereWithTbLamPositiveWithGeneXpertTestTotal",
+        EptsReportUtils.map(severeWithTbLamPositiveWithGeneXpertTest, inclusionPeriod),
+        "");
+
+    // TB_DA_FR23 - Clients with positive TB LAM during inclusion period and GeneXpert positive for
+    // TB by report generation date
+    CohortIndicator severeWithTbLamPositiveWithGeneXpertPositiveResult =
+        eptsGeneralIndicator.getIndicator(
+            "severeWithTbLamPositiveWithGeneXpertPositiveResult",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getClientsWithSevereImmunodepressionAndWithTbLamPositiveResultAndPositiveGeneXpert(),
+                mappings));
+    addRow(
+        dataSetDefinition,
+        "severeWithTbLamPositiveWithGeneXpertPositiveResult",
+        "ClientsWithsevereWithTbLamPositiveWithGeneXpertPositiveResult",
+        EptsReportUtils.map(severeWithTbLamPositiveWithGeneXpertPositiveResult, inclusionPeriod),
+        dissagregations());
+
+    dataSetDefinition.addColumn(
+        "severeWithTbLamPositiveWithGeneXpertPositiveResultTotal",
+        "ClientsWithSevereWithTbLamPositiveWithGeneXpertPositiveResultTotal",
+        EptsReportUtils.map(severeWithTbLamPositiveWithGeneXpertPositiveResult, inclusionPeriod),
+        "");
+
+    // TB_DA_FR24 - Clients with positive TB LAM during inclusion period and on TB treatment by
+    // report generation date
+    CohortIndicator severeWithTbLamPositiveOnTbTreatment =
+        eptsGeneralIndicator.getIndicator(
+            "severeWithTbLamPositiveOnTbTreatment",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getClientsWithSevereImmunodepressionAndWithTbLamPositiveResultAndOnTreatment(),
+                mappings));
+    addRow(
+        dataSetDefinition,
+        "severeWithTbLamPositiveOnTbTreatment",
+        "ClientsWithSevereWithTbLamPositiveOnTbTreatment",
+        EptsReportUtils.map(severeWithTbLamPositiveOnTbTreatment, inclusionPeriod),
+        dissagregations());
+
+    dataSetDefinition.addColumn(
+        "severeWithTbLamPositiveOnTbTreatmentTotal",
+        "ClientsWithSevereWithTbLamPositiveOnTbTreatmentTotal",
+        EptsReportUtils.map(severeWithTbLamPositiveOnTbTreatment, inclusionPeriod),
+        "");
 
     return dataSetDefinition;
   }
@@ -446,7 +434,27 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         new ColumnParameters("Grade2+", "Grade 2+", "grade=2+", "2"),
         new ColumnParameters("Grade1+", "Grade 1+", "grade=1+", "1"),
         new ColumnParameters(
-            "GradeNotReporte", "Grade Not Reported", "grade=notReported", "notReported"));
+            "GradeNotReporte", "Grade Not Reported", "grade=notReported", "notReported"),
+        new ColumnParameters(
+            "cd4Eligibility-initArt",
+            "Initiated Art Disaggregation",
+            "cd4Eligibility=initArt",
+            "clientInitiatedArt"),
+        new ColumnParameters(
+            "cd4Eligibility-pregnantClient",
+            "Pregnant Disaggregation",
+            "cd4Eligibility=pregnantClient",
+            "pregnantDisaggregation"),
+        new ColumnParameters(
+            "cd4Eligibility-consecutiveVl",
+            "Consecutive Vl Disaggregation",
+            "cd4Eligibility=consecutiveVl",
+            "consecutiveVlDisaggregation"),
+        new ColumnParameters(
+            "cd4Eligibility-reinitArt",
+            "Reinitiated Art Disaggregation",
+            "cd4Eligibility=reinitArt",
+            "reinitArtDisaggregation"));
   }
 
   @Override
