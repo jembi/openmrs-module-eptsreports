@@ -745,7 +745,7 @@ public class IntensiveMonitoringCohortQueries {
             "((B1 AND age) OR D) AND SECONDLINE AND NOT (C OR tbDiagnosisActive)");
       } else if (line == 13) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND (secondLineB2 AND NOT B2E AND NOT ABANDONED2LINE)) AND NOT B5E) AND NOT (C OR D) AND age");
+            "((B1 AND age) AND SECONDLINE) AND NOT (C OR D OR tbDiagnosisActive)");
       }
     } else {
       if (line == 1) {
@@ -758,7 +758,7 @@ public class IntensiveMonitoringCohortQueries {
             "(((B1 AND age) OR D) AND SECONDLINE AND NOT (C OR tbDiagnosisActive)) AND G");
       } else if (line == 13) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND (secondLineB2 AND NOT B2E AND NOT ABANDONED2LINE)) AND NOT B5E) AND NOT (C OR D) AND G AND age");
+            "(((B1 AND age) AND SECONDLINE) AND NOT (C OR D OR tbDiagnosisActive)) AND G");
       }
     }
     return compositionCohortDefinition;
