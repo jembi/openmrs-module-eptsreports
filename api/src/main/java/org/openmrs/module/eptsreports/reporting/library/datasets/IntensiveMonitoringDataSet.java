@@ -769,8 +769,26 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
     // 13.8
+    CohortIndicator MI13DEN8 =
+        eptsGeneralIndicator.getIndicator(
+            "MI13DEN8",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getSumOfPatientsIn1stOr2ndLineOfArtForDenNum8(
+                    true),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MI13DEN8.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
     dataSetDefinition.addColumn(
         "MI13DEN8",
+        "# de crianças na 1a linha (10-14 anos de idade) ou 2ª linha (0-14 anos) de TARV que tiveram consulta clínica no período de revisão e que eram elegíveis ao pedido de CV",
+        EptsReportUtils.map(
+            MI13DEN8,
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI13DEN8PrimeiraLinha",
         "% de crianças (10-14 anos de idade) na 1a linha de TARV que tiveram consulta clínica no período de revisão, eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico.",
         EptsReportUtils.map(
             customCohortIndicator(
@@ -819,8 +837,27 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
     // 13.8
+    CohortIndicator MI13NUM8 =
+        eptsGeneralIndicator.getIndicator(
+            "MI13NUM8",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getSumOfPatientsIn1stOr2ndLineOfArtForDenNum8(
+                    false),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MI13NUM8.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
     dataSetDefinition.addColumn(
         "MI13NUM8",
+        "# de crianças na 1a linha (10-14 anos de idade) ou 2ª linha (0-14 anos de idade) de TARV que tiveram consulta clínica no período de revisão, "
+            + "eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico",
+        EptsReportUtils.map(
+            MI13NUM8,
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI13NUM8PrimeiraLinha",
         "% de crianças (10-14 anos de idade) na 1a linha de TARV que tiveram consulta clínica no período de revisão, eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico.",
         EptsReportUtils.map(
             customCohortIndicator(

@@ -582,7 +582,11 @@ public class IntensiveMonitoringCohortQueries {
 
     CohortDefinition G = qualityImprovement2020CohortQueries.getMQ13G();
 
-    CohortDefinition secondLine = qualityImprovement2020CohortQueries.getUtentesSegundaLinha();
+    CohortDefinition FIRSTLINE =
+        qualityImprovement2020CohortQueries.getUtentesPrimeiraLinha(
+            QualityImprovement2020CohortQueries.UtentesPrimeiraLinhaPreposition.MQ);
+
+    CohortDefinition SECONDLINE = qualityImprovement2020CohortQueries.getUtentesSegundaLinha();
 
     CohortDefinition tbDiagnosisActive =
         qualityImprovement2020CohortQueries.getPatientsWithTbActiveOrTbTreatment();
@@ -715,9 +719,15 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
+        "FIRSTLINE",
+        EptsReportUtils.map(
+            FIRSTLINE,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
         "SECONDLINE",
         EptsReportUtils.map(
-            secondLine,
+            SECONDLINE,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
@@ -729,7 +739,7 @@ public class IntensiveMonitoringCohortQueries {
     if (den) {
       if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR  ( (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) )) AND NOT B5E) AND NOT (C OR D) AND age");
+            "B1 AND age AND FIRSTLINE AND NOT (C OR D OR tbDiagnosisActive)");
       } else if (line == 4) {
         compositionCohortDefinition.setCompositionString(
             "((B1 AND age) OR D) AND SECONDLINE AND NOT (C OR tbDiagnosisActive)");
@@ -742,7 +752,7 @@ public class IntensiveMonitoringCohortQueries {
         compositionCohortDefinition.setCompositionString("DENOMINATOR AND G");
       } else if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR  ( (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) )) AND NOT B5E) AND NOT (C OR D) AND G AND age");
+            "(B1 AND age AND FIRSTLINE AND NOT (C OR D OR tbDiagnosisActive)) AND G");
       } else if (line == 4) {
         compositionCohortDefinition.setCompositionString(
             "(((B1 AND age) OR D) AND SECONDLINE AND NOT (C OR tbDiagnosisActive)) AND G");
