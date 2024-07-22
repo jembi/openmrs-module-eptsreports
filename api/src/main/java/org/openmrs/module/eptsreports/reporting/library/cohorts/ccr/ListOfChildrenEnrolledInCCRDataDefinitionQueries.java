@@ -404,7 +404,7 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
             + "       AND e.voided = 0 "
             + "       AND e.encounter_type = ${93} "
             + "       AND e.encounter_datetime >= ccr_enrollment.enrollment_date "
-            + "       AND e.encounter_datetime =< :endDate "
+            + "       AND e.encounter_datetime <= :endDate "
             + "GROUP  BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -436,7 +436,7 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
     map.put("1410", hivMetadata.getReturnVisitDateConcept().getConceptId());
 
     String query =
-        " SELECT p.patient_id, o.value_datime AS next_consultation_date "
+        " SELECT p.patient_id, o.value_datetime AS next_consultation_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON p.patient_id = e.patient_id "
@@ -455,7 +455,7 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
             + "       AND e.voided = 0 "
             + "       AND e.encounter_type = ${93} "
             + "       AND e.encounter_datetime >= ccr_enrollment.enrollment_date "
-            + "       AND e.encounter_datetime =< :endDate "
+            + "       AND e.encounter_datetime <= :endDate "
             + "GROUP  BY p.patient_id"
             + " )last_ccr "
             + "               ON last_ccr.patient_id = p.patient_id "
@@ -465,7 +465,7 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
             + "       AND e.encounter_type = ${93} "
             + "       AND e.encounter_datetime = last_ccr.consultation_date "
             + "       AND o.concept_id = ${1410} "
-            + "       AND o.value_datime IS NOT NULL "
+            + "       AND o.value_datetime IS NOT NULL "
             + "GROUP  BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
