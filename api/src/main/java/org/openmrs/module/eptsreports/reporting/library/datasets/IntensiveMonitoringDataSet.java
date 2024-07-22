@@ -810,9 +810,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
     dataSetDefinition.addColumn(
         "MI13NUM1",
         "# de adultos (15/+anos) na 1a ou 2ª linha de TARV que tiveram consulta clínica no período de revisão, eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico",
-        EptsReportUtils.map(
-            MI13NUM1,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        EptsReportUtils.map(MI13NUM1, "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     dataSetDefinition.addColumn(
