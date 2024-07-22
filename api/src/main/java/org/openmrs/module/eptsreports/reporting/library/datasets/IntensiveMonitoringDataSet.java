@@ -796,8 +796,8 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
-    // 13.1
 
+    // 13.1
     CohortIndicator MI13NUM1 =
         eptsGeneralIndicator.getIndicator(
             "MI13NUM1",
@@ -806,6 +806,14 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 "revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI13NUM1.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MI13NUM1",
+        "# de adultos (15/+anos) na 1a ou 2ª linha de TARV que tiveram consulta clínica no período de revisão, eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico",
+        EptsReportUtils.map(
+            MI13NUM1,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
 
     dataSetDefinition.addColumn(
         "MI13DOT1NUM",
