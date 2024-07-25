@@ -37,12 +37,12 @@ public class SetupAdvancedDiseaseAndTbCascadeReport extends EptsDataExportManage
 
   @Override
   public String getName() {
-    return "TB7: Relatório Cascata de Doença Avançada por HIV e TB";
+    return "TB7: Advanced Disease and TB Cascades Report";
   }
 
   @Override
   public String getDescription() {
-    return "O Relatório Cascata de Doença Avançada e TB gera o número de utentes de acordo com cada uma das 9 etapas da cascata clínica de Doença Avançada por HIV e TB";
+    return "The Advanced Disease and TB Cascades Report generates the numbers of clients according to two pre-defined clinical cascades focusing on Advanced HIV disease and TB. The calculation of the inclusion periods is based on the report end date and the report generation date is also used as a parameter. ";
   }
 
   @Override
@@ -80,7 +80,7 @@ public class SetupAdvancedDiseaseAndTbCascadeReport extends EptsDataExportManage
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Template_TB7 Relatorio da Cascata de DAH e TB_v12.xls",
+              "SESP_TB7_Relatorio_da_Cascata_de_Doenca_Avancada_por_HIV_e_TB_Template_v.2.5.xls",
               "TB7: Relatório Cascata de Doença Avançada por HIV e TB",
               getExcelDesignUuid(),
               null);

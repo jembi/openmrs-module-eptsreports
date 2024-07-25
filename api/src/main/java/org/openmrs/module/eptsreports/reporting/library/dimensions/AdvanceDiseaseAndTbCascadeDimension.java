@@ -3,6 +3,8 @@ package org.openmrs.module.eptsreports.reporting.library.dimensions;
 import java.util.Date;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.AdvancedDiseaseAndTBCascadeCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsArtCohortCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.TxNewCohortQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.indicator.dimension.CohortDefinitionDimension;
@@ -13,12 +15,23 @@ import org.springframework.stereotype.Component;
 public class AdvanceDiseaseAndTbCascadeDimension {
 
   private AdvancedDiseaseAndTBCascadeCohortQueries advancedDiseaseAndTBCascadeCohortQueries;
+  private ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries;
+  private TxNewCohortQueries txNewCohortQueries;
+
+  private final String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+
+  private final String pregnancyPeriod =
+      "startDate=${endDate-8m},endDate=${endDate},location=${location}";
 
   @Autowired
   public AdvanceDiseaseAndTbCascadeDimension(
-      AdvancedDiseaseAndTBCascadeCohortQueries advancedDiseaseAndTBCascadeCohortQueries) {
+      AdvancedDiseaseAndTBCascadeCohortQueries advancedDiseaseAndTBCascadeCohortQueries,
+      ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries,
+      TxNewCohortQueries txNewCohortQueries) {
 
     this.advancedDiseaseAndTBCascadeCohortQueries = advancedDiseaseAndTBCascadeCohortQueries;
+    this.listOfPatientsArtCohortCohortQueries = listOfPatientsArtCohortCohortQueries;
+    this.txNewCohortQueries = txNewCohortQueries;
   }
 
   public CohortDefinitionDimension getPatientWithPositiveTbLamAndGradeDimension() {
@@ -116,6 +129,37 @@ public class AdvanceDiseaseAndTbCascadeDimension {
                     .GreaterThanOrEqualTo750mm3),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
+    return dim;
+  }
+
+  public CohortDefinitionDimension getCd4EligibilityDisaggregations() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.addParameter(new Parameter("startDate", "startDate", Date.class));
+    dim.addParameter(new Parameter("endDate", "endDate", Date.class));
+    dim.addParameter(new Parameter("location", "location", Location.class));
+    dim.setName("Clients with CD4 count Eligibbility");
+
+    dim.addCohortDefinition(
+        "initArt",
+        EptsReportUtils.map(
+            listOfPatientsArtCohortCohortQueries.getPatientsInitiatedART(), mappings));
+
+    dim.addCohortDefinition(
+        "pregnantClient",
+        EptsReportUtils.map(
+            txNewCohortQueries.getPatientsPregnantEnrolledOnART(false), pregnancyPeriod));
+
+    dim.addCohortDefinition(
+        "consecutiveVl",
+        EptsReportUtils.map(
+            advancedDiseaseAndTBCascadeCohortQueries
+                .getPatientsWithTwoConsecutiveVLGreaterThan1000(),
+            mappings));
+
+    dim.addCohortDefinition(
+        "reinitArt",
+        EptsReportUtils.map(
+            advancedDiseaseAndTBCascadeCohortQueries.getPatientsWhoReinitiatedArt(), mappings));
     return dim;
   }
 }

@@ -5916,6 +5916,20 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
+   * <b>concept_id =23775 </b>
+   *
+   * <p><b>Name:</b>DATA DE CONSENTIMENTO DO PACIENTE
+   *
+   * @return {@link Concept}
+   */
+  public Concept getPatientConsentConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.patientConsentConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
    * <b>encounterType_id = 92</b>
    *
    * <p><b>Name:</b> CCR - Resumo
