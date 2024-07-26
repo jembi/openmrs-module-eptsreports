@@ -119,6 +119,7 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
     map.put("6", hivMetadata.getCCRProgram().getProgramId());
+    map.put("9", hivMetadata.getCcrNidIdentifierType().getPatientIdentifierTypeId());
 
     String query = new EptsQueriesUtil().min(getChildrenEnrolledInCCRQuery()).getQuery();
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -387,6 +388,7 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
     map.put("6", hivMetadata.getCCRProgram().getProgramId());
     map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
     map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("9", hivMetadata.getCcrNidIdentifierType().getPatientIdentifierTypeId());
 
     String query =
         " SELECT p.patient_id, "
@@ -435,6 +437,7 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
     map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
     map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
     map.put("1410", hivMetadata.getReturnVisitDateConcept().getConceptId());
+    map.put("9", hivMetadata.getCcrNidIdentifierType().getPatientIdentifierTypeId());
 
     String query =
         " SELECT p.patient_id, o.value_datetime AS next_consultation_date "

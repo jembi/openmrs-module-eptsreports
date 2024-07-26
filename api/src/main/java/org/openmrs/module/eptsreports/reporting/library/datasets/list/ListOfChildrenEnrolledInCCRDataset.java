@@ -72,7 +72,7 @@ public class ListOfChildrenEnrolledInCCRDataset extends BaseDataSet {
 
     PatientIdentifierType identifierType =
         Context.getPatientService()
-            .getPatientIdentifierTypeByUuid("e2b966d0-1d5f-11e0-b929-000c29ad1d07");
+            .getPatientIdentifierTypeByUuid("e2b97b70-1d5f-11e0-b929-000c29ad1d07");
 
     PersonAttributeType contactAttributeType =
         Context.getPersonService()
