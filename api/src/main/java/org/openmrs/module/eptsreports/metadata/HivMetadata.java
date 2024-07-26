@@ -2645,6 +2645,20 @@ public class HivMetadata extends ProgramsMetadata {
     return getPatientIdentifierType(uuid);
   }
 
+  /**
+   * <b>Patient Identifier Type = 9 </b>
+   *
+   * <p><b>Name:</b> NID (SERVICO CCR)
+   *
+   * <p><b>Description:</b> Numero de Identificaçao de Doente, (SERVICO CCR)
+   *
+   * @return {@link PatientIdentifierType}
+   */
+  public PatientIdentifierType getCcrNidIdentifierType() {
+    String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.nidCcrUuid");
+    return getPatientIdentifierType(uuid);
+  }
+
   // Program Workflow States
 
   /**

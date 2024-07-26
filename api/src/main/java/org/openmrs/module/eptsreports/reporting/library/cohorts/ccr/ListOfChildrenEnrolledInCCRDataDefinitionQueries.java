@@ -52,6 +52,7 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
     map.put("6", hivMetadata.getCCRProgram().getProgramId());
+    map.put("9", hivMetadata.getCcrNidIdentifierType().getPatientIdentifierTypeId());
 
     String query =
         new EptsQueriesUtil().patientIdQueryBuilder(getChildrenEnrolledInCCRQuery()).getQuery();
@@ -1003,29 +1004,48 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
   }
 
   private String getChildrenEnrolledInCCRQuery() {
-    return "SELECT p.patient_id, "
-        + "       Min(pp.date_enrolled) AS enrollment_date "
+    return "SELECT p.patient_id, ccr_program.enrollment_date "
         + "FROM   patient p "
-        + "           INNER JOIN patient_program pp "
-        + "                      ON p.patient_id = pp.patient_id "
-        + "WHERE  p.voided = 0 "
-        + "  AND pp.voided = 0 "
-        + "  AND pp.program_id = ${6} "
-        + "  AND pp.date_enrolled >= :startDate "
-        + "  AND pp.date_enrolled <= :endDate "
-        + "GROUP  BY p.patient_id "
-        + "UNION "
-        + "SELECT p.patient_id, "
-        + "       Min(e.encounter_datetime) AS enrollment_date "
-        + "FROM   patient p "
-        + "           INNER JOIN encounter e "
-        + "                      ON p.patient_id = e.patient_id "
-        + "WHERE  p.voided = 0 "
-        + "  AND e.voided = 0 "
-        + "  AND e.encounter_type = ${92} "
-        + "  AND e.encounter_datetime >= :startDate "
-        + "  AND e.encounter_datetime <= :endDate "
-        + "GROUP  BY p.patient_id";
+        + "           INNER JOIN (SELECT p.patient_id, "
+        + "                              pi.identifier, "
+        + "                              pit.patient_identifier_type_id "
+        + "                       FROM   patient p "
+        + "                                  INNER JOIN patient_identifier pi "
+        + "                                             ON p.patient_id = pi.patient_id "
+        + "                                  INNER JOIN patient_identifier_type pit "
+        + "                                             ON pit.patient_identifier_type_id = "
+        + "                                                pi.identifier_type "
+        + "                       WHERE  p.voided = 0 "
+        + "                         AND pi.voided = 0 "
+        + "                         AND pit.retired = 0 "
+        + "                         AND pi.preferred = 1 "
+        + "                         AND pit.patient_identifier_type_id = ${9} "
+        + "                       GROUP  BY p.patient_id) ccr_nid "
+        + "                      ON ccr_nid.patient_id = p.patient_id "
+        + "           INNER JOIN (SELECT p.patient_id, "
+        + "                              Min(pp.date_enrolled) AS enrollment_date "
+        + "                       FROM   patient p "
+        + "                                  INNER JOIN patient_program pp "
+        + "                                             ON p.patient_id = pp.patient_id "
+        + "                       WHERE  p.voided = 0 "
+        + "                         AND pp.voided = 0 "
+        + "                         AND pp.program_id = ${6} "
+        + "                         AND pp.date_enrolled >= :startDate "
+        + "                         AND pp.date_enrolled <= :endDate "
+        + "                       GROUP  BY p.patient_id "
+        + "                       UNION "
+        + "                       SELECT p.patient_id, "
+        + "                              Min(e.encounter_datetime) AS enrollment_date "
+        + "                       FROM   patient p "
+        + "                                  INNER JOIN encounter e "
+        + "                                             ON p.patient_id = e.patient_id "
+        + "                       WHERE  p.voided = 0 "
+        + "                         AND e.voided = 0 "
+        + "                         AND e.encounter_type = ${92} "
+        + "                         AND e.encounter_datetime >= :startDate "
+        + "                         AND e.encounter_datetime <= :endDate "
+        + "                       GROUP  BY p.patient_id) ccr_program "
+        + "                      ON ccr_program.patient_id = p.patient_id";
   }
 
   private String getPatientAndMotherIdsQuery() {

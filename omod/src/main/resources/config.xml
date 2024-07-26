@@ -1550,6 +1550,14 @@
 			Numero de Identificaçao de Doente, serviço TARV
 		</description>
 	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.nidCcrUuid</property>
+		<defaultValue>e2b97b70-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			Numero de Identificaçao de Doente, serviço CCR
+		</description>
+	</globalProperty>
 	<!--Master card encounter type-->
 	<globalProperty>
 		<property>@MODULE_ID@.masterCardEncounterType</property>
