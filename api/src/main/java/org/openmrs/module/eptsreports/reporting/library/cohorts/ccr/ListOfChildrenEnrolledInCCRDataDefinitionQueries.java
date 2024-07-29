@@ -323,6 +323,40 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
   }
 
   /**
+   * <b>Mother’s Name (Nome da mãe) – relacionamento em SESP
+   *
+   * <p>The Name registered in the Relacionamentos Existentes do Paciente: Mãe field on CCR: Ficha
+   * Resumo (obtained in CCR1_FR6).
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getMothersNameOnSespRelationship() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Mother’s Name (Nome da mãe) – Relacionamento SESP");
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
+    map.put("14", hivMetadata.getMotherToSonRelationshipType().getRelationshipTypeId());
+    map.put("2", hivMetadata.getNidServiceTarvIdentifierType().getPatientIdentifierTypeId());
+
+    String query =
+        "SELECT mother.patient_id, CONCAT(pn.given_name, ' ', pn.middle_name, ' ', pn.family_name) as mother_name  "
+            + "  FROM  person pr INNER JOIN "
+            + "               person_name pn ON pr.person_id = pn.person_id "
+            + "               INNER JOIN ( "
+            + getPatientAndMotherIdsQuery()
+            + " ) mother ON mother.mother_id = pr.person_id "
+            + "WHERE pr.voided=0 ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlPatientDataDefinition;
+  }
+
+  /**
    * <b>Patient’s consent for home visits on CCR: Ficha Resumo
    *
    * <p>The response registered in the Visita Domiciliar field (Sim ou Não) on CCR: Ficha Resumo
@@ -1010,8 +1044,7 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
     return "SELECT p.patient_id, ccr_program.enrollment_date "
         + "FROM   patient p "
         + "           INNER JOIN (SELECT p.patient_id, "
-        + "                              pi.identifier, "
-        + "                              pit.patient_identifier_type_id "
+        + "                              pi.identifier "
         + "                       FROM   patient p "
         + "                                  INNER JOIN patient_identifier pi "
         + "                                             ON p.patient_id = pi.patient_id "
@@ -1021,7 +1054,6 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
         + "                       WHERE  p.voided = 0 "
         + "                         AND pi.voided = 0 "
         + "                         AND pit.retired = 0 "
-        + "                         AND pi.preferred = 1 "
         + "                         AND pit.patient_identifier_type_id = ${9} "
         + "                       GROUP  BY p.patient_id) ccr_nid "
         + "                      ON ccr_nid.patient_id = p.patient_id "
@@ -1033,6 +1065,7 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
         + "                       WHERE  p.voided = 0 "
         + "                         AND pp.voided = 0 "
         + "                         AND pp.program_id = ${6} "
+        + "                         AND pp.location_id = :location "
         + "                         AND pp.date_enrolled >= :startDate "
         + "                         AND pp.date_enrolled <= :endDate "
         + "                       GROUP  BY p.patient_id "
@@ -1044,6 +1077,7 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
         + "                                             ON p.patient_id = e.patient_id "
         + "                       WHERE  p.voided = 0 "
         + "                         AND e.voided = 0 "
+        + "  AND e.location_id = :location "
         + "                         AND e.encounter_type = ${92} "
         + "                         AND e.encounter_datetime >= :startDate "
         + "                         AND e.encounter_datetime <= :endDate "
@@ -1066,6 +1100,7 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
         + "               ON ccr_enrollment.patient_id = p.patient_id "
         + "WHERE  p.voided = 0 "
         + "       AND e.voided = 0 "
+        + "  AND e.location_id = :location "
         + "       AND pi.voided = 0 "
         + "       AND r.voided = 0 "
         + "       AND e.encounter_type = ${92} "

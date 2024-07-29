@@ -5,12 +5,7 @@ import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
-import org.openmrs.module.eptsreports.reporting.data.converter.DashDateFormatConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.ObservationToConceptNameConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.SifNotNullAndNifNullConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.StateOfStayArtPatientConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.TestResultConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.*;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ccr.ListOfChildrenEnrolledInCCRDataDefinitionQueries;
@@ -249,11 +244,18 @@ public class ListOfChildrenEnrolledInCCRDataset extends BaseDataSet {
     patientDataSetDefinition.addColumn(
         "mother_nid", listOfChildrenEnrolledInCCRDataDefinitionQueries.getMothersNID(), mappings);
 
+    // Mother’s Name (Nome da Mãe – Relacionamento SESP) Sheet 1: Column Y
+    patientDataSetDefinition.addColumn(
+        "mother_name_sesp",
+        listOfChildrenEnrolledInCCRDataDefinitionQueries.getMothersNameOnSespRelationship(),
+        mappings);
+
     // Aceita Visita Domiciliar – Sheet 1: Column Z
     patientDataSetDefinition.addColumn(
         "visit_consent",
         listOfChildrenEnrolledInCCRDataDefinitionQueries.getHomeVisitConsent(),
-        mappings);
+        mappings,
+        new StoYesAndNtoNoConverter());
 
     // Data da Primeira Consulta CCR – Sheet 1: Column AA
     patientDataSetDefinition.addColumn(
