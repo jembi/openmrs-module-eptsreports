@@ -1602,7 +1602,7 @@ public class EriDSDCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  private CohortDefinition getPatientsWhoAreStable(Integer atLeastXMonthsOnART) {
+  public CohortDefinition getPatientsWhoAreStable(Integer atLeastXMonthsOnART) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("Patients who are stable");
@@ -1622,8 +1622,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "C",
         EptsReportUtils.map(
-            getCD4CountAndCD4PercentCombined(),
-            "startDate=${endDate-12m},endDate=${endDate},location=${location}"));
+            getPatientsWithLastCD4Results(), "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "F",
         EptsReportUtils.map(
@@ -1649,7 +1648,7 @@ public class EriDSDCohortQueries {
         EptsReportUtils.map(
             hivCohortQueries.getPatientsViralLoadWithin12Months(),
             "endDate=${endDate},location=${location}"));
-    cd.setCompositionString("A AND (vlLess1000 OR (C AND NOT patientsWithViralLoad)) AND NOT F");
+    cd.setCompositionString("A AND (vlLess1000 OR C) AND NOT F");
 
     return cd;
   }
@@ -1807,7 +1806,7 @@ public class EriDSDCohortQueries {
             + "                            WHERE  e.voided = 0 "
             + "                              AND o.voided = 0 "
             + "                              AND ( ( o.concept_id = ${856} "
-            + "                                AND o.value_numeric < 1000 ) "
+            + "                                AND o.value_numeric IS NOT NULL ) "
             + "                                OR ( o.concept_id = ${1305} "
             + "                                    AND o.value_coded IS NOT NULL ) ) "
             + "                              AND e.location_id = :location "
@@ -1931,6 +1930,76 @@ public class EriDSDCohortQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  public CohortDefinition getCD4CountAnd2To4Age() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients 2 to 4 years of age with CD4 Count and no VL");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "Cd4Result",
+        EptsReportUtils.map(
+            getCD4CountAndCD4PercentAndCd4Quantitative(750, 750, true),
+            "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "Age",
+        EptsReportUtils.map(
+            ageCohortQueries.createXtoYAgeCohort("2-4", 2, 4), "effectiveDate=${endDate}"));
+
+    cd.setCompositionString("Cd4Result AND Age");
+
+    return cd;
+  }
+
+  public CohortDefinition getCD4CountAnd5To9Age() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients 2 to 4 years of age with CD4 Count and no VL");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "Cd4Result",
+        EptsReportUtils.map(
+            getCD4CountAndCD4PercentAndCd4Quantitative(200, 200, false),
+            "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "Age",
+        EptsReportUtils.map(
+            ageCohortQueries.createXtoYAgeCohort("5-9", 5, 9), "effectiveDate=${endDate}"));
+
+    cd.setCompositionString("Cd4Result AND Age");
+
+    return cd;
+  }
+
+  /**
+   * Only if VL does not exist: Last CD4 absolute result > 750 cells/mm3 or CD4 percentuagel > 15%
+   * in last ART year (if patients age >=2 and <=4) by reporting end date Last CD4 absolute or
+   * semi-quantitative result absolute or semi-quantitative > 200 cells/mm3 in last ART year (if
+   * patients age >=5 and <=9) by reporting end date
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithLastCD4Results() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Only if VL does not exist");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "CI",
+        EptsReportUtils.map(getCD4CountAnd2To4Age(), "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "CII",
+        EptsReportUtils.map(getCD4CountAnd5To9Age(), "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("(CI OR CII)");
 
     return cd;
   }
@@ -2235,7 +2304,6 @@ public class EriDSDCohortQueries {
 
     StringSubstitutor sb = new StringSubstitutor(map);
     String replaceQuery = sb.replace(query);
-    System.out.println(sb.replace(query));
     cd.setQuery(replaceQuery);
 
     return cd;
