@@ -2214,7 +2214,7 @@ public class EriDSDCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getPatientsWithViralLoadLessThan1000Within12Months() {
+  private CohortDefinition getPatientsWithViralLoadLessThan1000Within12Months() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
 
     cd.setName(
