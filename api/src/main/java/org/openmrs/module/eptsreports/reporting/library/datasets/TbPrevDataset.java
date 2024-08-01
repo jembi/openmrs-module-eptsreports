@@ -108,6 +108,19 @@ public class TbPrevDataset extends BaseDataSet {
         new ColumnParameters("NMUNK", "NMUNK", "art-status=new-on-art|gender=M|age=UK", "09"),
         new ColumnParameters("NF0-14", "NF0-14", "art-status=new-on-art|gender=F|age=<15", "10"),
         new ColumnParameters("NF15+", "NF15+", "art-status=new-on-art|gender=F|age=15+", "11"),
-        new ColumnParameters("NFUNK", "NFUNK", "art-status=new-on-art|gender=F|age=UK", "12"));
+        new ColumnParameters("NFUNK", "NFUNK", "art-status=new-on-art|gender=F|age=UK", "12"),
+        new ColumnParameters("Prev-Art", "Previously On ART", "art-status=previously-on-art", "13"),
+        new ColumnParameters("New-Art", "New On ART", "art-status=new-on-art", "14"),
+        new ColumnParameters(
+            "Prev-Male", "Previously On ART - Male", "art-status=previously-on-art|gender=M", "16"),
+        new ColumnParameters(
+            "Prev-Female",
+            "Previously On ART - Female",
+            "art-status=previously-on-art|gender=F",
+            "17"),
+        new ColumnParameters(
+            "New-Male", "New On ART - Male", "art-status=new-on-art|gender=M", "18"),
+        new ColumnParameters(
+            "New-Female", "New On ART - Female", "art-status=new-on-art|gender=F", "19"));
   }
 }
