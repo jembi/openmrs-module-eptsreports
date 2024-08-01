@@ -774,6 +774,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
 
     String query =
         "SELECT pa.patient_id "
@@ -798,7 +799,6 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "        (obs.concept_id = ${730} "
             + "             AND obs.value_numeric IS NOT NULL "
             + "             AND obs.value_numeric < 30) "
-            + "      ) "
             + "        OR "
             + "        (obs.concept_id = ${165515} "
             + "             AND obs.value_numeric IS NOT NULL "
