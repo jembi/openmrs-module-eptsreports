@@ -1239,9 +1239,8 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
         EptsReportUtils.map(
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString("C5");
-    //        "((C5 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2 OR C3 OR
-    // C4)");
+    compositionCohortDefinition.setCompositionString(
+        "((C5 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2 OR C3 OR  C4)");
 
     return compositionCohortDefinition;
   }
