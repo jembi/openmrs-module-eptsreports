@@ -799,6 +799,11 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "             AND obs.value_numeric IS NOT NULL "
             + "             AND obs.value_numeric < 30) "
             + "      ) "
+            + "        OR "
+            + "        (obs.concept_id = ${165515} "
+            + "             AND obs.value_numeric IS NOT NULL "
+            + "             AND obs.value_numeric < 200) "
+            + "      ) "
             + "       AND enc.encounter_datetime = cd4_date.last_cd4 "
             + "  AND enc.location_id = :location "
             + "GROUP BY pa.patient_id";
@@ -1234,8 +1239,9 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
         EptsReportUtils.map(
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString(
-        "((C5 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2 OR C3 OR C4)");
+    compositionCohortDefinition.setCompositionString("C5");
+    //        "((C5 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2 OR C3 OR
+    // C4)");
 
     return compositionCohortDefinition;
   }
