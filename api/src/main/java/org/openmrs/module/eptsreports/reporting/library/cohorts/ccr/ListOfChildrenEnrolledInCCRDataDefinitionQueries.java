@@ -194,14 +194,12 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
     map.put("1586", commonMetadata.getRecenNascidoMaeHivPositivoConcept().getConceptId());
 
     String query =
-        " SELECT p.patient_id, o2.comments AS ptv_code "
+        " SELECT p.patient_id, o.comments AS ptv_code "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON p.patient_id = e.patient_id "
             + "       INNER JOIN obs o "
             + "               ON e.encounter_id = o.encounter_id "
-            + "       INNER JOIN obs o2 "
-            + "               ON e.encounter_id = o2.encounter_id "
             + "       INNER JOIN ( "
             + getCCRResumoEnrollmentDateQuery()
             + " )ccr_enrollment "
@@ -209,12 +207,11 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
             + "WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
-            + "       AND o2.voided = 0 "
             + "       AND e.encounter_type = ${92} "
-            + "       AND (o.concept_id = ${1874} "
-            + "         AND o.value_coded = ${1586}) "
-            + "         AND (o2.concept_id = ${1586} "
-            + "         AND o2.comments IS NOT NULL) "
+            + "       AND o.concept_id = ${1874} "
+            + "         AND o.value_coded = ${1586} "
+            + "         AND o.comments IS NOT NULL "
+            + "         and e.location_id = :location "
             + "       AND e.encounter_datetime = ccr_enrollment.enrollment_date "
             + "GROUP  BY p.patient_id";
 
@@ -1035,6 +1032,7 @@ public class ListOfChildrenEnrolledInCCRDataDefinitionQueries {
         + "                   WHERE  p.voided = 0 "
         + "                          AND e.voided = 0 "
         + "                          AND e.encounter_type = ${92} "
+        + "                          and e.location_id = :location "
         + "                          AND e.encounter_datetime >= :startDate "
         + "                          AND e.encounter_datetime <= :endDate "
         + "                   GROUP  BY p.patient_id ";
