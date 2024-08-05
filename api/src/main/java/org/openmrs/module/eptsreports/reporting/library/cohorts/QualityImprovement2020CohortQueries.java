@@ -6821,7 +6821,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition startedART = getMOHArtStartDate();
 
-    CohortDefinition transferredOut = getTranferredOutPatients();
+    CohortDefinition transferredOut = getTranferredOutPatientsCat7();
     CohortDefinition pregnant =
         commonCohortQueries.getMOHPregnantORBreastfeeding(
             commonMetadata.getPregnantConcept().getConceptId(),
@@ -6832,7 +6832,7 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch("startedART", EptsReportUtils.map(startedART, MAPPING));
     cd.addSearch("pregnant", EptsReportUtils.map(pregnant, MAPPING));
-    cd.addSearch("transferredOut", EptsReportUtils.map(transferredOut, MAPPING1));
+    cd.addSearch("transferredOut", EptsReportUtils.map(transferredOut, MAPPING11));
     cd.addSearch("abandoned", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING1));
 
     cd.setCompositionString("((startedART AND pregnant) AND NOT (abandoned OR transferredOut))");

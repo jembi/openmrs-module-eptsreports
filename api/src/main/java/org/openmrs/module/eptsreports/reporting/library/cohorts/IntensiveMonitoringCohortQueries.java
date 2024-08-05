@@ -582,6 +582,15 @@ public class IntensiveMonitoringCohortQueries {
 
     CohortDefinition G = qualityImprovement2020CohortQueries.getMQ13G();
 
+    CohortDefinition FIRSTLINE =
+        qualityImprovement2020CohortQueries.getUtentesPrimeiraLinha(
+            QualityImprovement2020CohortQueries.UtentesPrimeiraLinhaPreposition.MQ);
+
+    CohortDefinition SECONDLINE = qualityImprovement2020CohortQueries.getUtentesSegundaLinha();
+
+    CohortDefinition tbDiagnosisActive =
+        qualityImprovement2020CohortQueries.getPatientsWithTbActiveOrTbTreatment();
+
     CohortDefinition denominator = getMI13DEN1();
 
     if (line == 1) {
@@ -709,23 +718,47 @@ public class IntensiveMonitoringCohortQueries {
             denominator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
+    compositionCohortDefinition.addSearch(
+        "FIRSTLINE",
+        EptsReportUtils.map(
+            FIRSTLINE,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "SECONDLINE",
+        EptsReportUtils.map(
+            SECONDLINE,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "tbDiagnosisActive",
+        EptsReportUtils.map(
+            tbDiagnosisActive,
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
     if (den) {
       if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR  ( (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) )) AND NOT B5E) AND NOT (C OR D) AND age");
-      } else if (line == 4 || line == 13) {
+            "B1 AND age AND FIRSTLINE AND NOT (C OR D OR tbDiagnosisActive)");
+      } else if (line == 4) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND (secondLineB2 AND NOT B2E AND NOT ABANDONED2LINE)) AND NOT B5E) AND NOT (C OR D) AND age");
+            "((B1 AND age) OR D) AND SECONDLINE AND NOT (C OR tbDiagnosisActive)");
+      } else if (line == 13) {
+        compositionCohortDefinition.setCompositionString(
+            "((B1 AND age) AND SECONDLINE) AND NOT (C OR D OR tbDiagnosisActive)");
       }
     } else {
       if (line == 1) {
         compositionCohortDefinition.setCompositionString("DENOMINATOR AND G");
       } else if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR  ( (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) )) AND NOT B5E) AND NOT (C OR D) AND G AND age");
-      } else if (line == 4 || line == 13) {
+            "(B1 AND age AND FIRSTLINE AND NOT (C OR D OR tbDiagnosisActive)) AND G");
+      } else if (line == 4) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND (secondLineB2 AND NOT B2E AND NOT ABANDONED2LINE)) AND NOT B5E) AND NOT (C OR D) AND G AND age");
+            "(((B1 AND age) OR D) AND SECONDLINE AND NOT (C OR tbDiagnosisActive)) AND G");
+      } else if (line == 13) {
+        compositionCohortDefinition.setCompositionString(
+            "(((B1 AND age) AND SECONDLINE) AND NOT (C OR D OR tbDiagnosisActive)) AND G");
       }
     }
     return compositionCohortDefinition;
@@ -2325,55 +2358,12 @@ public class IntensiveMonitoringCohortQueries {
             hivMetadata.getBreastfeeding().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
 
-    CohortDefinition b2New =
-        commonCohortQueries.getPatientsWithFirstTherapeuticLineOnLastClinicalEncounterB2NEW();
-
-    CohortDefinition changeRegimen6Months =
-        commonCohortQueries.getMOHPatientsOnTreatmentFor6Months(
-            true,
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            hivMetadata.getMasterCardEncounterType(),
-            commonMetadata.getRegimenAlternativeToFirstLineConcept(),
-            Arrays.asList(
-                commonMetadata.getAlternativeFirstLineConcept(),
-                commonMetadata.getRegimeChangeConcept(),
-                hivMetadata.getNoConcept()));
-
-    CohortDefinition B3E =
-        commonCohortQueries.getMOHPatientsToExcludeFromTreatmentIn6Months(
-            true,
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            hivMetadata.getMasterCardEncounterType(),
-            commonMetadata.getRegimenAlternativeToFirstLineConcept(),
-            commonMetadata.getAlternativeLineConcept(),
-            Arrays.asList(
-                commonMetadata.getAlternativeFirstLineConcept(),
-                commonMetadata.getRegimeChangeConcept(),
-                hivMetadata.getNoConcept()),
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            hivMetadata.getTherapeuticLineConcept(),
-            Collections.singletonList(hivMetadata.getFirstLineConcept()));
-
-    CohortDefinition B5E =
-        commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
-            false, true, 12);
-
-    CohortDefinition abandonedInTheLastSixMonthsFromFirstLineDate =
-        qualityImprovement2020CohortQueries
-            .getPatientsWhoAbandonedInTheLastSixMonthsFromFirstLineDate();
-
-    CohortDefinition restartdedExclusion =
-        qualityImprovement2020CohortQueries.getPatientsWhoRestartedTarvAtLeastSixMonths();
-
-    CohortDefinition abandonedExclusionByTarvRestartDate =
-        qualityImprovement2020CohortQueries.getPatientsWhoAbandonedTarvOnArtRestartDate();
-
-    CohortDefinition abandonedExclusionFirstLine =
-        qualityImprovement2020CohortQueries.getPatientsWhoAbandonedTarvOnOnFirstLineDate();
-
     CohortDefinition PrimeiraLinha =
         qualityImprovement2020CohortQueries.getUtentesPrimeiraLinha(
             QualityImprovement2020CohortQueries.UtentesPrimeiraLinhaPreposition.MI);
+
+    CohortDefinition tbDiagnosisActive =
+        qualityImprovement2020CohortQueries.getPatientsWithTbActiveOrTbTreatment();
 
     compositionCohortDefinition.addSearch(
         "age",
@@ -2387,12 +2377,6 @@ public class IntensiveMonitoringCohortQueries {
             lastClinical, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "B2NEW",
-        EptsReportUtils.map(
-            b2New,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
         "C",
         EptsReportUtils.map(
             pregnant, "startDate=${startDate},endDate=${endDate},location=${location}"));
@@ -2403,50 +2387,19 @@ public class IntensiveMonitoringCohortQueries {
             brestfeeding, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "B3",
-        EptsReportUtils.map(
-            changeRegimen6Months,
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "B3E",
-        EptsReportUtils.map(B3E, "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "B5E",
-        EptsReportUtils.map(B5E, "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "ABANDONEDTARV",
-        EptsReportUtils.map(
-            abandonedInTheLastSixMonthsFromFirstLineDate,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-    compositionCohortDefinition.addSearch(
-        "RESTARTED",
-        EptsReportUtils.map(
-            restartdedExclusion,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "RESTARTEDTARV",
-        EptsReportUtils.map(
-            abandonedExclusionByTarvRestartDate,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "ABANDONED1LINE",
-        EptsReportUtils.map(
-            abandonedExclusionFirstLine,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
         "PrimeiraLinha",
         EptsReportUtils.map(
             PrimeiraLinha,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
+    compositionCohortDefinition.addSearch(
+        "tbDiagnosisActive",
+        EptsReportUtils.map(
+            tbDiagnosisActive,
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
     compositionCohortDefinition.setCompositionString(
-        "((B1 AND age) OR D) AND PrimeiraLinha AND NOT C");
+        "(((B1 AND age) OR D) AND PrimeiraLinha) AND NOT (C OR tbDiagnosisActive)");
 
     return compositionCohortDefinition;
   }
@@ -4234,5 +4187,46 @@ public class IntensiveMonitoringCohortQueries {
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>adultos (15/+anos) na 1ª aou 2ª linha de TARV que tiveram consulta clínica no período de
+   * revisão e que eram elegíveis ao pedido de CV </b>
+   *
+   * <p>Incluindo o somatório do resultado dos seguintes indicadores - para denominador:
+   * <li>Denominador do Indicador 13.1-1ª Linha da Categoria 13 Adulto de Pedido de CV (RF16.1)
+   * <li>Denominador do Indicador 13.4-2ª Linha da Categoria 13 Adulto de Pedido de CV (RF18)
+   *
+   *     <p>Incluindo o somatório do resultado dos seguintes indicadores - para numerador:
+   * <li>Numerador do Indicador 13.1-1ª Linha da Categoria 13 Adulto de Pedido de CV (RF17.1).
+   * <li>Numerador do Indicador 13.4-2ª Linha da Categoria 13 Adulto de Pedido de CV (RF19).
+   *
+   * @param denominator boolean parameter to choose between Denominator and Numerator
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getSumOfPatientsIn1stOr2ndLineOfArt(Boolean denominator) {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName(
+        "# de adultos (15/+anos) na 1ª ou 2ª linha de TARV - Somatorio (numerador e denominador)");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    if (denominator) {
+      cd.addSearch("PRIMEIRALINHA", Mapped.mapStraightThrough(getCat13Den(1, false)));
+
+      cd.addSearch("SEGUNDALINHA", Mapped.mapStraightThrough(getCat13Den(4, false)));
+    } else {
+      cd.addSearch("PRIMEIRALINHA", Mapped.mapStraightThrough(getCat13Den(1, true)));
+
+      cd.addSearch("SEGUNDALINHA", Mapped.mapStraightThrough(getCat13Den(4, true)));
+    }
+
+    cd.setCompositionString("PRIMEIRALINHA OR SEGUNDALINHA");
+
+    return cd;
   }
 }
