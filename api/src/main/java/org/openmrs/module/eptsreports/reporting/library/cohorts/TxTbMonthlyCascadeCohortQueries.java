@@ -2036,6 +2036,38 @@ public class TxTbMonthlyCascadeCohortQueries {
         return "Select all patients from TX CURR";
       }
     },
+    FIVE_AND_TBLAM_AND_NEWART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return FIVE.getKey() + " AND " + TBLAM.getKey() + " AND " + NEWART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    FIVE_AND_TBLAM_AND_PREVIOUSLYART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return FIVE.getKey() + " AND " + TBLAM.getKey() + " AND " + PREVIOUSLYART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
     SIXA_AND_OTHER {
       @Override
       public String getKey() {

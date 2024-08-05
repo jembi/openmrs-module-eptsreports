@@ -620,6 +620,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(FIVEMWRDALREADYART, "endDate=${endDate},location=${location}"),
         getSexAndAgeDimension());
 
+    //ind. Five - TBLAM
     CohortIndicator FIVETBLAM =
         eptsGeneralIndicator.getIndicator(
             "FIVETBLAM",
@@ -632,6 +633,48 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         "FIVETBLAM",
         EptsReportUtils.map(FIVETBLAM, "endDate=${endDate},location=${location}"),
         "");
+
+    // FIVE TBLAM - NEW ON ART
+    CohortIndicator FIVETBLAMNEWART =
+            eptsGeneralIndicator.getIndicator(
+                    " FIVETBLAMNEWART",
+                    EptsReportUtils.map(
+                            txTbMonthlyCascadeCohortQueries.get5And6and7(
+                                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition
+                                            .FIVE_AND_TBLAM_AND_NEWART),
+                            "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+            "FIVETBLAMNEWART",
+            "FIVETBLAMNEWART",
+            EptsReportUtils.map(FIVETBLAMNEWART, "endDate=${endDate},location=${location}"),
+            "");
+    addRow(
+            cohortIndicatorDefinition,
+            "FIVETBLAMNEWART",
+            "FIVETBLAMNEWART",
+            EptsReportUtils.map(FIVETBLAMNEWART, "endDate=${endDate},location=${location}"),
+            getSexAndAgeDimension());
+
+    // FIVE TBLAM - ALREADY ON ART
+    CohortIndicator FIVETBLAMALREADYART =
+            eptsGeneralIndicator.getIndicator(
+                    " FIVETBLAMALREADYART",
+                    EptsReportUtils.map(
+                            txTbMonthlyCascadeCohortQueries.get5And6and7(
+                                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition
+                                            .FIVE_AND_TBLAM_AND_PREVIOUSLYART),
+                            "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+            "FIVETBLAMALREADYART",
+            "FIVETBLAMALREADYART",
+            EptsReportUtils.map(FIVETBLAMALREADYART, "endDate=${endDate},location=${location}"),
+            "");
+    addRow(
+            cohortIndicatorDefinition,
+            "FIVETBLAMALREADYART",
+            "FIVETBLAMALREADYART",
+            EptsReportUtils.map(FIVETBLAMALREADYART, "endDate=${endDate},location=${location}"),
+            getSexAndAgeDimension());
 
     CohortIndicator FIVETOTHER =
         eptsGeneralIndicator.getIndicator(
