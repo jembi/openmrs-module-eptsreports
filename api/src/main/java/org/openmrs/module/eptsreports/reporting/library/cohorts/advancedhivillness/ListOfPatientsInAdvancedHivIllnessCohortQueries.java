@@ -756,10 +756,14 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
             + " AND e.encounter_type IN ( ${6}, ${13}, ${51} ) "
-            + "                 AND o.concept_id = ${1695} "
-            + "             AND o.value_numeric IS NOT NULL "
-            + "             AND DATE(e.encounter_datetime) = last_cd4.most_recent "
-            + "       AND e.location_id = :location"
+            + " AND ( ( o.concept_id = ${1695} "
+            + "         AND o.value_numeric IS NOT NULL ) "
+            + "   OR ( o.concept_id = ${730} "
+            + "        AND o.value_numeric IS NOT NULL ) "
+            + "   OR ( o.concept_id = ${165515} "
+            + "        AND o.value_coded IS NOT NULL ) ) "
+            + " AND DATE(e.encounter_datetime) = last_cd4.most_recent "
+            + " AND e.location_id = :location"
             + " UNION "
             + " SELECT ps.person_id, o.value_numeric AS cd4_result "
             + " FROM "
@@ -779,8 +783,12 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + " ) last_cd4 ON last_cd4.person_id = ps.person_id "
             + "WHERE ps.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "  AND e.encounter_type IN (${53}, ${90}) "
-            + "  AND o.concept_id = ${1695} "
-            + "  AND o.value_numeric IS NOT NULL "
+            + "AND ( ( o.concept_id = ${1695} "
+            + "        AND o.value_numeric IS NOT NULL ) "
+            + "  OR ( o.concept_id = ${730} "
+            + "       AND o.value_numeric IS NOT NULL ) "
+            + "  OR ( o.concept_id = ${165515} "
+            + "       AND o.value_coded IS NOT NULL ) ) "
             + "  AND o.obs_datetime = last_cd4.most_recent "
             + "  AND e.location_id = :location";
 
@@ -1419,6 +1427,8 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
     return map;
   }
 
