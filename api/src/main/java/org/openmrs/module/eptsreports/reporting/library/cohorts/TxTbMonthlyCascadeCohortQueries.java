@@ -1948,7 +1948,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return SEMEAR.getKey() + " AND " + FIVE.getKey() + " AND " + NEWART.getKey();
+        return FIVE.getKey() + " AND " + SEMEAR.getKey() + " AND " + NEWART.getKey();
       }
 
       @Override
@@ -1964,7 +1964,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return SEMEAR.getKey() + " AND " + FIVE.getKey() + " AND " + PREVIOUSLYART.getKey();
+        return FIVE.getKey() + " AND " + SEMEAR.getKey() + " AND " + PREVIOUSLYART.getKey();
       }
 
       @Override
@@ -1981,6 +1981,38 @@ public class TxTbMonthlyCascadeCohortQueries {
       @Override
       public String getCompositionString() {
         return MWRD.getKey() + "  AND " + FIVE.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    FIVE_AND_MWRD_AND_NEWART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return FIVE.getKey() + " AND " + MWRD.getKey() + " AND " + NEWART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    FIVE_AND_MWRD_AND_PREVIOUSLYART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return FIVE.getKey() + " AND " + MWRD.getKey() + " AND " + PREVIOUSLYART.getKey();
       }
 
       @Override
