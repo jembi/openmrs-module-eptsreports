@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import static org.openmrs.module.eptsreports.reporting.library.cohorts.TxTbMonthlyCascadeCohortQueries.TxTbComposition.NEWART;
+import static org.openmrs.module.eptsreports.reporting.library.cohorts.TxTbMonthlyCascadeCohortQueries.TxTbComposition.PREVIOUSLYART;
+
 import java.util.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
@@ -97,12 +100,12 @@ public class TxTbMonthlyCascadeCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
-        TxTbComposition.NEWART.getKey(),
+        NEWART.getKey(),
         EptsReportUtils.map(
             newOnArt, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
-        TxTbComposition.PREVIOUSLYART.getKey(),
+        PREVIOUSLYART.getKey(),
         EptsReportUtils.map(previouslyOnArt, "endDate=${endDate-6m},location=${location}"));
 
     chd.addSearch(
@@ -132,12 +135,12 @@ public class TxTbMonthlyCascadeCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
-        TxTbComposition.NEWART.getKey(),
+        NEWART.getKey(),
         EptsReportUtils.map(
             newOnArt, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
-        TxTbComposition.PREVIOUSLYART.getKey(),
+        PREVIOUSLYART.getKey(),
         EptsReportUtils.map(previouslyOnArt, "endDate=${endDate-6m},location=${location}"));
 
     chd.addSearch(
@@ -195,6 +198,8 @@ public class TxTbMonthlyCascadeCohortQueries {
     CohortDefinition semear = txtbCohortQueries.getSmearMicroscopyOnly();
     CohortDefinition tbLam = getPetientsHaveTBLAM();
     CohortDefinition others = txtbCohortQueries.getAdditionalTest();
+    CohortDefinition newOnArt = getPatientsNewOnArt();
+    CohortDefinition previouslyOnArt = getPatientsPreviouslyOnArt();
 
     cd.addSearch(
         SemearTbLamGXPertComposition.SIXA.getKey(),
@@ -236,6 +241,15 @@ public class TxTbMonthlyCascadeCohortQueries {
         EptsReportUtils.map(
             patientsPreviouslyOnARTNumerator(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        NEWART.getKey(),
+        EptsReportUtils.map(
+            newOnArt, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        PREVIOUSLYART.getKey(),
+        EptsReportUtils.map(previouslyOnArt, "endDate=${endDate-6m},location=${location}"));
 
     cd.setCompositionString(semearTbLamGXPertComposition.getCompositionString());
     return cd;
@@ -1919,6 +1933,38 @@ public class TxTbMonthlyCascadeCohortQueries {
       @Override
       public String getCompositionString() {
         return SEMEAR.getKey() + " AND " + FIVE.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    FIVE_AND_SEMEAR_AND_NEWART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return SEMEAR.getKey() + " AND " + FIVE.getKey() + " AND " + NEWART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    FIVE_AND_SEMEAR_AND_PREVIOUSLYART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return SEMEAR.getKey() + " AND " + FIVE.getKey() + " AND " + PREVIOUSLYART.getKey();
       }
 
       @Override

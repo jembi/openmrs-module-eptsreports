@@ -8,6 +8,7 @@ import java.util.Properties;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
+import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TxTbMonthlyCascadeDataset;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -66,6 +67,9 @@ public class SetupTxTbMonthlyCascadeReport extends EptsDataExportManager {
 
     reportDefinition.addDataSetDefinition(
         "DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
+
+    reportDefinition.addDataSetDefinition(
+        "SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
 
     // add a base cohort here to help in calculations running
     reportDefinition.setBaseCohortDefinition(

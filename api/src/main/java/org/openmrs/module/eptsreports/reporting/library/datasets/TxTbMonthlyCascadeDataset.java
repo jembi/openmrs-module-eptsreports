@@ -521,6 +521,48 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(FIVESEMEAR, "endDate=${endDate},location=${location}"),
         "");
 
+    // FIVE SMEAR ONLY - NEW ON ART
+    CohortIndicator FIVESEMEARNEWART =
+        eptsGeneralIndicator.getIndicator(
+            " FIVESEMEARNEWART",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.get5And6and7(
+                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition
+                        .FIVE_AND_SEMEAR_AND_NEWART),
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+        "FIVESEMEARNEWART",
+        "FIVESEMEARNEWART",
+        EptsReportUtils.map(FIVESEMEARNEWART, "endDate=${endDate},location=${location}"),
+        "");
+    addRow(
+        cohortIndicatorDefinition,
+        "FIVESEMEARNEWART",
+        "FIVESEMEARNEWART",
+        EptsReportUtils.map(FIVESEMEARNEWART, "endDate=${endDate},location=${location}"),
+        getSexAndAgeDimension());
+
+    // FIVE SMEAR ONLY - ALREADY ON ART
+    CohortIndicator FIVESEMEARALREADYART =
+        eptsGeneralIndicator.getIndicator(
+            " FIVESEMEARALREADYART",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.get5And6and7(
+                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition
+                        .FIVE_AND_SEMEAR_AND_PREVIOUSLYART),
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+        "FIVESEMEARALREADYART",
+        "FIVESEMEARALREADYART",
+        EptsReportUtils.map(FIVESEMEARALREADYART, "endDate=${endDate},location=${location}"),
+        "");
+    addRow(
+        cohortIndicatorDefinition,
+        "FIVESEMEARALREADYART",
+        "FIVESEMEARALREADYART",
+        EptsReportUtils.map(FIVESEMEARALREADYART, "endDate=${endDate},location=${location}"),
+        getSexAndAgeDimension());
+
     CohortIndicator FIVEMWRD =
         eptsGeneralIndicator.getIndicator(
             "FIVEMWRD",
