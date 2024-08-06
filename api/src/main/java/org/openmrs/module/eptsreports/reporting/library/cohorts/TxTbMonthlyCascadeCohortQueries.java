@@ -2324,6 +2324,38 @@ public class TxTbMonthlyCascadeCohortQueries {
         return "Select all patients from TX CURR";
       }
     },
+    SIXB_AND_SEMEAR_AND_NEWART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return SIXB.getKey() + " AND " + SEMEAR.getKey() + " AND " + NEWART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    SIXB_AND_SEMEAR_AND_PREVIOUSLYART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return SIXB.getKey() + " AND " + SEMEAR.getKey() + " AND " + PREVIOUSLYART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
     SIXB_AND_MWRD {
       @Override
       public String getKey() {
@@ -2340,7 +2372,38 @@ public class TxTbMonthlyCascadeCohortQueries {
         return "Select all patients from TX CURR";
       }
     },
+    SIXB_AND_MWRD_AND_NEWART {
+      @Override
+      public String getKey() {
+        return "";
+      }
 
+      @Override
+      public String getCompositionString() {
+        return SIXB.getKey() + " AND " + MWRD.getKey() + " AND " + NEWART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    SIXB_AND_MWRD_AND_PREVIOUSLYART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return SIXB.getKey() + " AND " + MWRD.getKey() + " AND " + PREVIOUSLYART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
     SIXB_AND_TBLAM {
       @Override
       public String getKey() {
@@ -2357,6 +2420,38 @@ public class TxTbMonthlyCascadeCohortQueries {
         return "Select all patients from TX CURR";
       }
     },
+    SIXB_AND_TBLAM_AND_NEWART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return SIXB.getKey() + " AND " + TBLAM.getKey() + " AND " + NEWART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    SIXB_AND_TBLAM_AND_PREVIOUSLYART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return SIXB.getKey() + " AND " + TBLAM.getKey() + " AND " + PREVIOUSLYART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
     SIXB_AND_OTHER {
       @Override
       public String getKey() {
@@ -2366,6 +2461,38 @@ public class TxTbMonthlyCascadeCohortQueries {
       @Override
       public String getCompositionString() {
         return SIXB.getKey() + " AND " + OTHER.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    SIXB_AND_OTHER_AND_NEWART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return SIXB.getKey() + " AND " + OTHER.getKey() + " AND " + NEWART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    SIXB_AND_OTHER_AND_PREVIOUSLYART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return SIXB.getKey() + " AND " + OTHER.getKey() + " AND " + PREVIOUSLYART.getKey();
       }
 
       @Override

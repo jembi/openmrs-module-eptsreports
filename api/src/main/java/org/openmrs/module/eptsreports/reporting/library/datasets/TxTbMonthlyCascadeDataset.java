@@ -978,6 +978,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
     cohortIndicatorDefinition.addColumn(
         "SIXB", "SIXB", EptsReportUtils.map(SIXB, "endDate=${endDate},location=${location}"), "");
 
+    // SIX B - SMEAR ONLY
     CohortIndicator SIXBSEMEAR =
         eptsGeneralIndicator.getIndicator(
             "SIXBSEMEAR",
@@ -991,6 +992,49 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(SIXBSEMEAR, "endDate=${endDate},location=${location}"),
         "");
 
+    // SIX B SMEAR ONLY - NEW ON ART
+    CohortIndicator SIXBSEMEARNEWART =
+        eptsGeneralIndicator.getIndicator(
+            "SIXBSEMEARNEWART",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.get5And6and7(
+                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition
+                        .SIXB_AND_SEMEAR_AND_NEWART),
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+        "SIXBSEMEARNEWART",
+        "SIXBSEMEARNEWART",
+        EptsReportUtils.map(SIXBSEMEARNEWART, "endDate=${endDate},location=${location}"),
+        "");
+    addRow(
+        cohortIndicatorDefinition,
+        "SIXBSEMEARNEWART",
+        "SIXBSEMEARNEWART",
+        EptsReportUtils.map(SIXBSEMEARNEWART, "endDate=${endDate},location=${location}"),
+        getSexAndAgeDimension());
+
+    // SIX B SMEAR ONLY - ALREADY ON ART
+    CohortIndicator SIXBSEMEARALREADYART =
+        eptsGeneralIndicator.getIndicator(
+            "SIXBSEMEARALREADYART",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.get5And6and7(
+                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition
+                        .SIXB_AND_SEMEAR_AND_PREVIOUSLYART),
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+        "SIXBSEMEARALREADYART",
+        "SIXBSEMEARALREADYART",
+        EptsReportUtils.map(SIXBSEMEARALREADYART, "endDate=${endDate},location=${location}"),
+        "");
+    addRow(
+        cohortIndicatorDefinition,
+        "SIXBSEMEARALREADYART",
+        "SIXBSEMEARALREADYART",
+        EptsReportUtils.map(SIXBSEMEARALREADYART, "endDate=${endDate},location=${location}"),
+        getSexAndAgeDimension());
+
+    // SIXB -MWRD
     CohortIndicator SIXBMWRD =
         eptsGeneralIndicator.getIndicator(
             "SIXBMWRD",
@@ -1004,6 +1048,49 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(SIXBMWRD, "endDate=${endDate},location=${location}"),
         "");
 
+    // SIXB MWRD - NEW ON ART
+    CohortIndicator SIXBMWRDNEWART =
+        eptsGeneralIndicator.getIndicator(
+            "SIXBMWRDNEWART",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.get5And6and7(
+                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition
+                        .SIXB_AND_MWRD_AND_NEWART),
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+        "SIXBMWRDNEWART",
+        "SIXBMWRDNEWART",
+        EptsReportUtils.map(SIXBMWRDNEWART, "endDate=${endDate},location=${location}"),
+        "");
+    addRow(
+        cohortIndicatorDefinition,
+        "SIXBMWRDNEWART",
+        "SIXBMWRDNEWART",
+        EptsReportUtils.map(SIXBMWRDNEWART, "endDate=${endDate},location=${location}"),
+        getSexAndAgeDimension());
+
+    // SIXB MWRD - ALREADY ON ART
+    CohortIndicator SIXBMWRDALREADYART =
+        eptsGeneralIndicator.getIndicator(
+            "SIXBMWRDALREADYART",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.get5And6and7(
+                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition
+                        .SIXB_AND_MWRD_AND_PREVIOUSLYART),
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+        "SIXBMWRDALREADYART",
+        "SIXBMWRDALREADYART",
+        EptsReportUtils.map(SIXBMWRDALREADYART, "endDate=${endDate},location=${location}"),
+        "");
+    addRow(
+        cohortIndicatorDefinition,
+        "SIXBMWRDALREADYART",
+        "SIXBMWRDALREADYART",
+        EptsReportUtils.map(SIXBMWRDALREADYART, "endDate=${endDate},location=${location}"),
+        getSexAndAgeDimension());
+
+    // SIXB - TBLAM
     CohortIndicator SIXBTBLAM =
         eptsGeneralIndicator.getIndicator(
             "SIXBTBLAM",
@@ -1017,6 +1104,49 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(SIXBTBLAM, "endDate=${endDate},location=${location}"),
         "");
 
+    // SIXB TBLAM - NEW ON ART
+    CohortIndicator SIXBTBLAMNEWART =
+        eptsGeneralIndicator.getIndicator(
+            "SIXBTBLAMNEWART",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.get5And6and7(
+                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition
+                        .SIXB_AND_TBLAM_AND_NEWART),
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+        "SIXBTBLAMNEWART",
+        "SIXBTBLAMNEWART",
+        EptsReportUtils.map(SIXBTBLAMNEWART, "endDate=${endDate},location=${location}"),
+        "");
+    addRow(
+        cohortIndicatorDefinition,
+        "SIXBTBLAMNEWART",
+        "SIXBTBLAMNEWART",
+        EptsReportUtils.map(SIXBTBLAMNEWART, "endDate=${endDate},location=${location}"),
+        getSexAndAgeDimension());
+
+    // SIXB TBLAM - ALREADY ON ART
+    CohortIndicator SIXBTBLAMALREADYART =
+        eptsGeneralIndicator.getIndicator(
+            "SIXBTBLAMALREADYART",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.get5And6and7(
+                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition
+                        .SIXB_AND_TBLAM_AND_PREVIOUSLYART),
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+        "SIXBTBLAMALREADYART",
+        "SIXBTBLAMALREADYART",
+        EptsReportUtils.map(SIXBTBLAMALREADYART, "endDate=${endDate},location=${location}"),
+        "");
+    addRow(
+        cohortIndicatorDefinition,
+        "SIXBTBLAMALREADYART",
+        "SIXBTBLAMALREADYART",
+        EptsReportUtils.map(SIXBTBLAMALREADYART, "endDate=${endDate},location=${location}"),
+        getSexAndAgeDimension());
+
+    // SIXB - OTHER
     CohortIndicator SIXBOTHER =
         eptsGeneralIndicator.getIndicator(
             "SIXBOTHER",
@@ -1029,6 +1159,48 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         "SIXBOTHER",
         EptsReportUtils.map(SIXBOTHER, "endDate=${endDate},location=${location}"),
         "");
+
+    // SIXB OTHER - NEW ON ART
+    CohortIndicator SIXBOTHERNEWART =
+        eptsGeneralIndicator.getIndicator(
+            "SIXBOTHERNEWART",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.get5And6and7(
+                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition
+                        .SIXB_AND_OTHER_AND_NEWART),
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+        "SIXBOTHERNEWART",
+        "SIXBOTHERNEWART",
+        EptsReportUtils.map(SIXBOTHERNEWART, "endDate=${endDate},location=${location}"),
+        "");
+    addRow(
+        cohortIndicatorDefinition,
+        "SIXBOTHERNEWART",
+        "SIXBOTHERNEWART",
+        EptsReportUtils.map(SIXBOTHERNEWART, "endDate=${endDate},location=${location}"),
+        getSexAndAgeDimension());
+
+    // SIXB OTHER - ALREADY ON ART
+    CohortIndicator SIXBOTHERALREADYART =
+        eptsGeneralIndicator.getIndicator(
+            " SIXBOTHERALREADYART",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.get5And6and7(
+                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition
+                        .SIXB_AND_OTHER_AND_PREVIOUSLYART),
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+        "SIXBOTHERALREADYART",
+        "SIXBOTHERALREADYART",
+        EptsReportUtils.map(SIXBOTHERALREADYART, "endDate=${endDate},location=${location}"),
+        "");
+    addRow(
+        cohortIndicatorDefinition,
+        "SIXBOTHERALREADYART",
+        "SIXBOTHERALREADYART",
+        EptsReportUtils.map(SIXBOTHERALREADYART, "endDate=${endDate},location=${location}"),
+        getSexAndAgeDimension());
 
     CohortIndicator SEVEN =
         eptsGeneralIndicator.getIndicator(
