@@ -972,6 +972,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "            AND e.voided = 0 "
             + "            AND o.voided = 0 "
             + "            AND e.encounter_type = ${18}   "
+            + "             AND e.location_id = :location  "
             + "              AND e.encounter_datetime > lastest.deceased_date"
             + "              AND e.encounter_datetime <= :endDate"
             + " )  "
