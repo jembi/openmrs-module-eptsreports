@@ -86,7 +86,7 @@ public class SetupTxTbMonthlyCascadeReport extends EptsDataExportManager {
       rd =
           createXlsReportDesign(
               reportDefinition,
-              "SESP_TB4_TEMP_TX_TB_MonthlyCascade_v2.1_TrackChanges.xlsx",
+              "SESP_TB4_Template_TX_TB_MonthlyCascade_v2.1.xls",
               "TX TB Monthly Cascade Report",
               getExcelDesignUuid(),
               null);
