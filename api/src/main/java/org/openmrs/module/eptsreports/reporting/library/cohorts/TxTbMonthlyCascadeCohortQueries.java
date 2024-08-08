@@ -2544,7 +2544,13 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return SEVEN.getKey() + " AND " + SEMEAR.getKey() + " AND " + NEWART.getKey();
+        return SIXA.getKey()
+            + " AND "
+            + TxTbComposition.NUMERATOR.getKey()
+            + " AND "
+            + SEMEAR.getKey()
+            + " AND "
+            + NEWART.getKey();
       }
 
       @Override
@@ -2560,7 +2566,13 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return SEVEN.getKey() + " AND " + SEMEAR.getKey() + " AND " + PREVIOUSLYART.getKey();
+        return SIXA.getKey()
+            + " AND "
+            + TxTbComposition.NUMERATOR.getKey()
+            + " AND "
+            + SEMEAR.getKey()
+            + " AND "
+            + PREVIOUSLYART.getKey();
       }
 
       @Override
@@ -2596,7 +2608,13 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return SEVEN.getKey() + " AND " + MWRD.getKey() + " AND " + NEWART.getKey();
+        return SIXA.getKey()
+            + " AND "
+            + TxTbComposition.NUMERATOR.getKey()
+            + " AND "
+            + MWRD.getKey()
+            + " AND "
+            + NEWART.getKey();
       }
 
       @Override
@@ -2612,7 +2630,13 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return SEVEN.getKey() + " AND " + MWRD.getKey() + " AND " + PREVIOUSLYART.getKey();
+        return SIXA.getKey()
+            + " AND "
+            + TxTbComposition.NUMERATOR.getKey()
+            + " AND "
+            + MWRD.getKey()
+            + " AND "
+            + PREVIOUSLYART.getKey();
       }
 
       @Override
@@ -2648,7 +2672,13 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return SEVEN.getKey() + " AND " + TBLAM.getKey() + " AND " + NEWART.getKey();
+        return SIXA.getKey()
+            + " AND "
+            + TxTbComposition.NUMERATOR.getKey()
+            + " AND "
+            + TBLAM.getKey()
+            + " AND "
+            + NEWART.getKey();
       }
 
       @Override
@@ -2664,7 +2694,13 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return SEVEN.getKey() + " AND " + TBLAM.getKey() + " AND " + PREVIOUSLYART.getKey();
+        return SIXA.getKey()
+            + " AND "
+            + TxTbComposition.NUMERATOR.getKey()
+            + " AND "
+            + TBLAM.getKey()
+            + " AND "
+            + PREVIOUSLYART.getKey();
       }
 
       @Override
@@ -2700,7 +2736,13 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return SEVEN.getKey() + " AND " + OTHER.getKey() + " AND " + NEWART.getKey();
+        return SIXA.getKey()
+            + " AND "
+            + TxTbComposition.NUMERATOR.getKey()
+            + " AND "
+            + OTHER.getKey()
+            + " AND "
+            + NEWART.getKey();
       }
 
       @Override
@@ -2716,7 +2758,13 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return SEVEN.getKey() + " AND " + OTHER.getKey() + " AND " + PREVIOUSLYART.getKey();
+        return SIXA.getKey()
+            + " AND "
+            + TxTbComposition.NUMERATOR.getKey()
+            + " AND "
+            + OTHER.getKey()
+            + " AND "
+            + PREVIOUSLYART.getKey();
       }
 
       @Override
