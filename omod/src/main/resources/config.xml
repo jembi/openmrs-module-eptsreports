@@ -4229,4 +4229,12 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>eptsreports.cd4SemiQuantitativeUuid</property>
+		<defaultValue>db7f1675-8850-476d-bc09-70be975c0867</defaultValue>
+		<description>
+			UUID for the CD4 Semi-Quantitative concept
+		</description>
+	</globalProperty>
+
 </module>

@@ -41,49 +41,6 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
       "endDate=${endDate},location=${location},minDay=${minDay},maxDay=${maxDay}";
 
   /**
-   * <b>E1</b> - exclude all patients who are transferred out by end of report generation date,
-   *
-   * <p><b>1.1</b> - All transferred-outs registered in Patient Program State by reporting end date,
-   * i.e LAST Transferred out state in program enrollment by end of period.
-   * Patient_program.program_id =2 = SERVICO TARV-TRATAMENTO and Patient_State.state = 7
-   * (Transferred-out) or max(Patient_State.start_date) <= Report Generation Date => The most recent
-   * start_date by Report Generation Date. Patient_state.end_date is null
-   *
-   * <p><b>1.2</b> - All transferred-outs registered in Ficha Resumo and Ficha Clinica of Master
-   * Card by reporting end date Encounter Type ID= 6 Estado de Permanencia (Concept Id 6273) =
-   * Transferred-out (Concept ID 1706) Encounter_datetime <= Report Generation Date OR Encounter
-   * Type ID= 53 Estado de Permanencia (Concept Id 6272) = Transferred-out (Concept ID 1706)
-   * obs_datetime <= Report Generation Date
-   *
-   * <p><b>1.3</b> - Patients who have REASON PATIENT MISSED VISIT (MOTIVOS DA FALTA - concept id
-   * 2016) as “Transferido para outra US” or “Auto-transferência” ( 1706 OR 23863) marked in the
-   * last Home Visit Card by the report generation date
-   *
-   * <p><b>1.4</b> - Exclude all patients who after the most recent date from 1.1 to 1.2, have a
-   * drugs pick up or Consultation: Encounter Type ID= 6, 9, 18 and encounter_datetime> the most
-   * recent date and <= Report Generation Date or Encounter Type ID = 52 and “Data de Levantamento”
-   * (Concept Id 23866 value_datetime) > the most recent date and <= Report Generation Date
-   * Encounter Type ID= 6, 9, 18 and encounter_datetime> the most recent date and <= Report
-   * Generation Date or Encounter Type ID = 52 and “Data de Levantamento” (Concept Id 23866
-   * value_datetime) > the most recent date and <= Report Generation Date
-   *
-   * @return sqlCohortDefinition
-   */
-  public CohortDefinition getE1() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    CohortDefinition e1 = getPatientsConsultationAfterMostRecent();
-
-    cd.addSearch("e1", EptsReportUtils.map(e1, MAPPING));
-
-    cd.setCompositionString("e1");
-
-    return cd;
-  }
-
-  /**
    * <b>E2</b> - exclude all patients who died by Report Generation date,
    *
    * <p><b>2.1</b> - All deaths registered in Patient Program State by reporting end date
@@ -122,43 +79,6 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     cd.addSearch("e25", EptsReportUtils.map(e25, MAPPING));
 
     cd.setCompositionString("(e21 OR e22 OR e23 OR e24) AND e25");
-
-    return cd;
-  }
-
-  /**
-   * <b>E3</b> - exclude all patients who stopped/suspended treatment by end of the reporting
-   * period,
-   *
-   * <p><b>3.1</b> - All suspended registered in Patient Program State by reporting end date i.e
-   * LAST Transferred out state in program enrollment by end of period. Patient_program.program_id
-   * =2 = SERVICO TARV-TRATAMENTO and Patient_State.state = 8 (Suspended treatment) OR
-   * Patient_State.start_date <= ReportGenerationDate start_date by Report Generation Date.
-   * Patient_state.end_date is null
-   *
-   * <p><b>2.2</b> - All suspensions registered in Ficha Resumo and Ficha Clinica of Master Card by
-   * reporting end date Encounter Type ID= 6 Estado de Permanencia (Concept Id 6273) = Suspended
-   * (Concept ID 1709) Encounter_datetime <= Report Generation Date OR Encounter Type ID= 53 Estado
-   * de Permanencia (Concept Id 6272) = Suspended (Concept ID 1709) obs_datetime <= Report
-   * Generation Date
-   *
-   * <p><b>3.3</b> - Except all patients who after the most recent date from 3.1 to 3.2, have a
-   * drugs pick up or Consultation: Encounter Type ID= 6, 9, 18 and encounter_datetime> the most
-   * recent date and <= Report Generation Date or Encounter Type ID = 52 and “Data de Levantamento”
-   * (Concept Id 23866 value_datetime) > the most recent date and <= Report Generation Date
-   *
-   * @return sqlCohortDefinition
-   */
-  public CohortDefinition getE3() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    CohortDefinition e3 = getPatientsConsultationAfterMostRecentE3();
-
-    cd.addSearch("e3", EptsReportUtils.map(e3, MAPPING));
-
-    cd.setCompositionString("e3");
 
     return cd;
   }
@@ -533,16 +453,23 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
 
   /**
    * <b>E1</b> - exclude all patients who are transferred out by end of report generation date,
+   * <li>Patients enrolled on ART Program (Service TARV- Tratamento) with the following last status:
+   *     Transferred Out or
+   * <li>Patients whose most recently informed “Mudança no Estado de Permanência TARV” is
+   *     Transferred Out on Ficha Clinica ou Ficha Resumo – Master Card. or
+   * <li>Patients who have REASON PATIENT MISSED VISIT (MOTIVOS DA FALTA) as “Transferido para outra
+   *     US” or “Auto-transferência” marked in the last Home Visit Card by reporting end date. Use
+   *     the “data da visita” when the patient reason was marked on the home visit card as the
+   *     reference date.
+   * <li>The system will consider patient as Transferred Out as defined above only if the most
+   *     recent date between (next scheduled ART pick-up on FILA + 1 day) and (the most recent ART
+   *     pickup date on Ficha Recepção – Levantou ARVs + 31 days) falls by the report generation
+   *     date. <b>NOte</b>
+   * <li>Patients who are “marked” as transferred out who have an ARV pick-up registered in FILA
+   *     after the date the patient was “marked” as transferred out will not be considered as
+   *     transferred-out and therefore be evaluated for their days of delay
    *
-   * <p><b>1.3</b> - Exclude all patients who after the most recent date from 1.1 to 1.2, have a
-   * drugs pick up or Consultation: Encounter Type ID= 6, 9, 18 and encounter_datetime> the most
-   * recent date and <= Report Generation Date or Encounter Type ID = 52 and “Data de Levantamento”
-   * (Concept Id 23866 value_datetime) > the most recent date and <= Report Generation Date
-   * Encounter Type ID= 6, 9, 18 and encounter_datetime> the most recent date and <= Report
-   * Generation Date or Encounter Type ID = 52 and “Data de Levantamento” (Concept Id 23866
-   * value_datetime) > the most recent date and <= Report Generation Date
-   *
-   * @return sqlCohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsConsultationAfterMostRecent() {
 
@@ -625,60 +552,44 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                                  AND e.location_id = :location "
             + "                           GROUP  BY p.patient_id "
             + "                           UNION"
-            + "                           "
-            + "                           SELECT p.patient_id, Max(ps.start_date) AS transferout_date"
-            + "                             FROM   patient p"
-            + "                                 INNER JOIN patient_program pg"
-            + "                                     ON p.patient_id = pg.patient_id"
-            + "                                 INNER JOIN patient_state ps"
-            + "                                     ON pg.patient_program_id = ps.patient_program_id"
-            + "                                 INNER JOIN (SELECT p.patient_id"
-            + "                                             FROM   patient p"
-            + "                                                 INNER JOIN (SELECT pp.patient_id, Max(ps.start_date) AS max_startDate"
-            + "                                                             FROM   patient pp"
-            + "                                                                 INNER JOIN patient_program pg"
-            + "                                                                     ON pp.patient_id = pg.patient_id"
-            + "                                                                 INNER JOIN patient_state ps"
-            + "                                                                     ON pg.patient_program_id = ps.patient_program_id"
-            + "                                                 WHERE  pg.location_id = :location"
-            + "                                                   AND ps.start_date IS NOT NULL AND ps.end_date IS NULL"
-            + "                                                 GROUP  BY pp.patient_id) AS tbl"
-            + "                                                     ON p.patient_id = tbl.patient_id"
-            + "                                 WHERE  p.voided = 0"
-            + "                                   AND tbl.max_startdate <= CURRENT_DATE()"
-            + "                                 GROUP BY p.patient_id) AS max_date ON max_date.patient_id = p.patient_id"
-            + "                            WHERE  pg.location_id = :location"
-            + "                            AND pg.program_id = ${2}"
-            + "                            AND ps.state = ${7}"
-            + "                            GROUP BY p.patient_id"
+            + "                           SELECT p.patient_id, "
+            + "                                  ps.start_date AS transferout_date "
+            + "                           FROM   patient p "
+            + "                                  INNER JOIN patient_program pg "
+            + "                                          ON p.patient_id = pg.patient_id "
+            + "                                  INNER JOIN patient_state ps "
+            + "                                          ON pg.patient_program_id = ps.patient_program_id "
+            + "                                  INNER JOIN (SELECT pp.patient_id, "
+            + "                                                     Max(ps.start_date) AS max_startDate "
+            + "                                              FROM   patient pp "
+            + "                                                     INNER JOIN patient_program pg "
+            + "                                                             ON pp.patient_id = pg.patient_id "
+            + "                                                     INNER JOIN patient_state ps "
+            + "                                                             ON pg.patient_program_id = "
+            + "                                                                ps.patient_program_id "
+            + "                                              WHERE  pg.location_id = :location "
+            + "                                                     AND pg.program_id = ${2} "
+            + "                                                     AND ps.start_date <= CURRENT_DATE() "
+            + "                                                     AND ps.state IS NOT NULL "
+            + "                                              GROUP  BY pp.patient_id) AS max_date "
+            + "                                          ON max_date.patient_id = p.patient_id "
+            + "                           WHERE  pg.location_id = :location "
+            + "                                  AND pg.program_id = ${2} "
+            + "                                  AND ps.state = ${7} "
+            + "                                  AND ps.start_date = max_date.max_startdate "
+            + "                           GROUP  BY p.patient_id"
             + "                           ) transferout  "
             + "                   GROUP  BY transferout.patient_id) max_transferout  "
-            + "           WHERE  max_transferout.patient_id NOT IN (SELECT p.patient_id  "
-            + "                                                     FROM   patient p  "
-            + "                                                            JOIN encounter e  "
-            + "                                                              ON p.patient_id =  "
-            + "                                                                 e.patient_id  "
-            + "                                                     WHERE  p.voided = 0  "
-            + "                                                            AND e.voided = 0  "
-            + "                                                            AND e.encounter_type IN (${6}, ${9})   "
-            + "                                                            AND e.location_id = :location  "
-            + "                                                            AND  "
-            + "                         e.encounter_datetime > transferout_date  "
-            + "                                                            AND  "
-            + "                         e.encounter_datetime <= CURRENT_DATE()  "
-            + "                                                                UNION"
-            + "                                                          SELECT p.patient_id"
-            + "                                                            FROM   patient p"
-            + "                                                                    JOIN encounter e ON p.patient_id = e.patient_id "
-            + "                                                                    JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "                                                            WHERE  p.voided = 0"
-            + "                                                                    AND e.voided = 0 "
-            + "                                                                    AND o.voided = 0 "
-            + "                                                                    AND e.encounter_type = ${18} "
-            + "                                                                    AND o.concept_id = ${5096} "
-            + "                                                                    AND e.location_id = :location "
-            + "                                                                    AND o.value_datetime > DATE_SUB(transferout_date, INTERVAL 1 DAY) "
-            + "                                                                    AND o.value_datetime <= CURRENT_DATE()) ";
+            + "           WHERE  max_transferout.patient_id NOT IN ( "
+            + "                           SELECT p.patient_id"
+            + "                           FROM   patient p"
+            + "                                     JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                           WHERE  p.voided = 0"
+            + "                                     AND e.voided = 0 "
+            + "                                     AND e.encounter_type = ${18} "
+            + "                                     AND e.location_id = :location "
+            + "                                     AND e.encounter_datetime > transferout_date "
+            + "                                     AND e.encounter_datetime <= CURRENT_DATE()) ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -2202,17 +2113,34 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>List of Patients who are Defaulters or IIT </b>
+   *
+   * <p>From all patients who ever initiated ART (DFT_IIT_FR4) by report end date the system will
+   * include
+   * <li>Have their Next Scheduled Pick up date on the most recent (last) drug pick-up by the report
+   *     end date, and
+   * <li>Are late for their next scheduled pick-up date with the number of days of delay falling
+   *     within minimum and maximum number of days of delay (DFT_IIT_FR5) <br>
+   *
+   *     <p>The system will exclude:
+   * <li>All patients who were Transferred Out by the report generation date (DFT_IIT_FR6) and
+   * <li>All patients who are Dead by the report generation date (DFT_IIT_FR7) and
+   * <li>All patients who Stopped/Suspended Treatment by the report generation date (DFT_IIT_FR8).
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getBaseCohort() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("minDay", "minDay", Integer.class));
     cd.addParameter(new Parameter("maxDay", "maxDay", Integer.class));
-    cd.setName("FATS base cohort for totals");
+    cd.setName("List of Patients who are Defaulters or IIT ");
 
-    CohortDefinition E1 = getE1();
+    CohortDefinition E1 = getPatientsConsultationAfterMostRecent();
     CohortDefinition E2 = getE2();
-    CohortDefinition E3 = getE3();
+    CohortDefinition E3 = getPatientsConsultationAfterMostRecentE3();
     CohortDefinition X = getLastARVRegimen();
     CohortDefinition A = getArtStartDate();
 

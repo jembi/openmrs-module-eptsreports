@@ -1602,7 +1602,7 @@ public class EriDSDCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  private CohortDefinition getPatientsWhoAreStable(Integer atLeastXMonthsOnART) {
+  public CohortDefinition getPatientsWhoAreStable(Integer atLeastXMonthsOnART) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("Patients who are stable");
@@ -1622,8 +1622,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "C",
         EptsReportUtils.map(
-            getCD4CountAndCD4PercentCombined(),
-            "startDate=${endDate-12m},endDate=${endDate},location=${location}"));
+            getPatientsWithLastCD4Results(), "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "F",
         EptsReportUtils.map(
@@ -1649,7 +1648,7 @@ public class EriDSDCohortQueries {
         EptsReportUtils.map(
             hivCohortQueries.getPatientsViralLoadWithin12Months(),
             "endDate=${endDate},location=${location}"));
-    cd.setCompositionString("A AND (vlLess1000 OR (C AND NOT patientsWithViralLoad)) AND NOT F");
+    cd.setCompositionString("A AND (vlLess1000 OR C) AND NOT F");
 
     return cd;
   }
@@ -1707,6 +1706,298 @@ public class EriDSDCohortQueries {
         EptsReportUtils.map(
             getCD4CountAndCD4Percent2(),
             "startDate=${endDate-12m},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("(CI OR CII)");
+
+    return cd;
+  }
+
+  /**
+   * if VL does not exist: verify CD4 Results. 1. CD4 result > 750 cells/mm3 or > 15% in last ART
+   * year (if patients age >=2 and <=4) 2. CD4 result > 200 cells/mm3 in last ART year (if patients
+   * age >=5 and <=9)
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getCD4CountAndCD4PercentAndCd4Quantitative(
+      int cd4_absolute, int cd4_semi_quantitative, boolean age2to4) {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patient with last CD4 result without VL Result ");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
+    map.put("cd4_absolute", cd4_absolute);
+    map.put("cd4_semi_quantitative", cd4_semi_quantitative);
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "WHERE  p.patient_id NOT IN (SELECT vl_max.patient_id "
+            + "                            FROM   (SELECT vl.patient_id, "
+            + "                                           Max(vl.latest_date) max_date "
+            + "                                    FROM   (SELECT p.patient_id, "
+            + "                                                   Max(e.encounter_datetime) "
+            + "                                                       latest_date "
+            + "                                            FROM   patient p "
+            + "                                                       INNER JOIN encounter e "
+            + "                                                                  ON p.patient_id = "
+            + "                                                                     e.patient_id "
+            + "                                                       INNER JOIN obs o "
+            + "                                                                  ON e.encounter_id = "
+            + "                                                                     o.encounter_id "
+            + "                                            WHERE  e.encounter_type IN ( ${6}, ${9}, "
+            + "                                                                         ${13}, ${51} ) "
+            + "                                              AND o.concept_id IN ( ${856}, "
+            + "                                                                    ${1305} ) "
+            + "                                              AND Cast(e.encounter_datetime "
+            + "                                                AS "
+            + "                                                date) BETWEEN "
+            + "                                                Date_add(:endDate, "
+            + "                                                         INTERVAL -12 month) AND "
+            + "                                                :endDate "
+            + "                                              AND e.location_id = :location "
+            + "                                              AND p.voided = 0 "
+            + "                                              AND e.voided = 0 "
+            + "                                              AND o.voided = 0 "
+            + "                                            GROUP  BY p.patient_id "
+            + "                                            UNION "
+            + "                                            SELECT p.patient_id, "
+            + "                                                   Max(o.obs_datetime) "
+            + "                                                       latest_date "
+            + "                                            FROM   patient p "
+            + "                                                       INNER JOIN encounter e "
+            + "                                                                  ON p.patient_id = "
+            + "                                                                     e.patient_id "
+            + "                                                       INNER JOIN obs o "
+            + "                                                                  ON o.encounter_id = "
+            + "                                                                     e.encounter_id "
+            + "                                            WHERE  e.encounter_type = ${53} "
+            + "                                              AND o.concept_id IN ( ${856}, "
+            + "                                                                    ${1305} ) "
+            + "                                              AND o.obs_datetime BETWEEN "
+            + "                                                Date_add( "
+            + "                                                        :endDate, "
+            + "                                                        INTERVAL "
+            + "                                                        -12 month "
+            + "                                                ) "
+            + "                                                AND "
+            + "                                                :endDate "
+            + "                                              AND e.location_id = :location "
+            + "                                              AND p.voided = 0 "
+            + "                                              AND e.voided = 0 "
+            + "                                              AND o.voided = 0 "
+            + "                                            GROUP  BY p.patient_id) vl "
+            + "                                    GROUP  BY vl.patient_id) vl_max "
+            + "                                       INNER JOIN encounter e "
+            + "                                                  ON e.patient_id = vl_max.patient_id "
+            + "                                       INNER JOIN obs o "
+            + "                                                  ON o.encounter_id = e.encounter_id "
+            + "                            WHERE  e.voided = 0 "
+            + "                              AND o.voided = 0 "
+            + "                              AND ( ( o.concept_id = ${856} "
+            + "                                AND o.value_numeric IS NOT NULL ) "
+            + "                                OR ( o.concept_id = ${1305} "
+            + "                                    AND o.value_coded IS NOT NULL ) ) "
+            + "                              AND e.location_id = :location "
+            + "                              AND ( ( e.encounter_type IN ( ${6}, ${9}, ${13}, ${51} ) "
+            + "                                AND Cast(e.encounter_datetime AS date "
+            + "                                    ) "
+            + "                                          BETWEEN "
+            + "                                          Date_add(:endDate, "
+            + "                                                   INTERVAL -12 month) "
+            + "                                          AND :endDate "
+            + "                                AND e.encounter_datetime = "
+            + "                                    vl_max.max_date ) "
+            + "                                OR ( e.encounter_type = ${53} "
+            + "                                    AND o.obs_datetime BETWEEN "
+            + "                                         Date_add( "
+            + "                                                 :endDate, "
+            + "                                                 INTERVAL -12 month) "
+            + "                                         AND "
+            + "                                         :endDate "
+            + "                                    AND o.obs_datetime = "
+            + "                                        vl_max.max_date ) ) "
+            + "                            ORDER  BY vl_max.patient_id) "
+            + "  AND p.patient_id IN (SELECT cd4_max.patient_id "
+            + "                       FROM   (SELECT cd4.patient_id, "
+            + "                                      Max(cd4.latest_date) max_date "
+            + "                               FROM   (SELECT p.patient_id, "
+            + "                                              Max(e.encounter_datetime) "
+            + "                                                  latest_date "
+            + "                                       FROM   patient p "
+            + "                                                  INNER JOIN encounter e "
+            + "                                                             ON p.patient_id = "
+            + "                                                                e.patient_id "
+            + "                                                  INNER JOIN obs o "
+            + "                                                             ON e.encounter_id = "
+            + "                                                                o.encounter_id "
+            + "                                       WHERE  e.encounter_type IN ( ${6}, ${9}, "
+            + "                                                                    ${13}, ${51} ) "
+            + "                                         AND o.concept_id IN ( "
+            + "                                                              ${1695}, ${730}, ${165515} "
+            + "                                           ) "
+            + "                                         AND Cast(e.encounter_datetime "
+            + "                                           AS "
+            + "                                           date) "
+            + "                                           BETWEEN "
+            + "                                           Date_add(:endDate, "
+            + "                                                    INTERVAL -12 month) AND "
+            + "                                           :endDate "
+            + "                                         AND e.location_id = :location "
+            + "                                         AND p.voided = 0 "
+            + "                                         AND e.voided = 0 "
+            + "                                         AND o.voided = 0 "
+            + "                                       GROUP  BY p.patient_id "
+            + "                                       UNION "
+            + "                                       SELECT p.patient_id, "
+            + "                                              Max(o.obs_datetime) "
+            + "                                                  latest_date "
+            + "                                       FROM   patient p "
+            + "                                                  INNER JOIN encounter e "
+            + "                                                             ON p.patient_id = "
+            + "                                                                e.patient_id "
+            + "                                                  INNER JOIN obs o "
+            + "                                                             ON o.encounter_id = "
+            + "                                                                e.encounter_id "
+            + "                                       WHERE  e.encounter_type = ${53} "
+            + "                                         AND o.concept_id IN ( "
+            + "                                                              ${1695}, ${730}, ${165515} "
+            + "                                           ) "
+            + "                                         AND o.obs_datetime BETWEEN "
+            + "                                           Date_add( "
+            + "                                                   :endDate, "
+            + "                                                   INTERVAL -12 month "
+            + "                                           ) AND "
+            + "                                           :endDate "
+            + "                                         AND e.location_id = :location "
+            + "                                         AND p.voided = 0 "
+            + "                                         AND e.voided = 0 "
+            + "                                         AND o.voided = 0 "
+            + "                                       GROUP  BY p.patient_id) cd4 "
+            + "                               GROUP  BY cd4.patient_id) cd4_max "
+            + "                                  INNER JOIN encounter ee "
+            + "                                             ON ee.patient_id = cd4_max.patient_id "
+            + "                                  INNER JOIN obs oo "
+            + "                                             ON oo.encounter_id = ee.encounter_id "
+            + "                       WHERE  ee.voided = 0 "
+            + "                         AND oo.voided = 0 ";
+    query +=
+        age2to4
+            ? "                         AND ( ( oo.concept_id = ${1695} "
+                + "                           AND oo.value_numeric > ${cd4_absolute} ) "
+                + "                           OR ( oo.concept_id = ${730} "
+                + "                               AND oo.value_numeric > 15 ) "
+                + "                           OR ( oo.concept_id = ${165515} "
+                + "                               AND oo.value_numeric > ${cd4_semi_quantitative} ) ) "
+            : "                         AND ( ( oo.concept_id = ${1695} "
+                + "                           AND oo.value_numeric > ${cd4_absolute} ) "
+                + "                           OR ( oo.concept_id = ${165515} "
+                + "                               AND oo.value_numeric > ${cd4_semi_quantitative} ) ) ";
+    query +=
+        "                         AND ee.location_id = :location "
+            + "                         AND ( ( ee.encounter_type IN ( ${6}, ${9}, ${13}, ${51} ) "
+            + "                           AND Cast(ee.encounter_datetime AS "
+            + "                                     date) "
+            + "                                     BETWEEN "
+            + "                                     Date_add(:endDate, "
+            + "                                              INTERVAL -12 month) AND :endDate "
+            + "                           AND ee.encounter_datetime = "
+            + "                               cd4_max.max_date "
+            + "                                   ) "
+            + "                           OR ( ee.encounter_type = ${53} "
+            + "                               AND oo.obs_datetime BETWEEN "
+            + "                                    Date_add( "
+            + "                                            :endDate, "
+            + "                                            INTERVAL -12 month) "
+            + "                                    AND "
+            + "                                    :endDate "
+            + "                               AND oo.obs_datetime = "
+            + "                                   cd4_max.max_date ) "
+            + "                           ) "
+            + "                       ORDER  BY cd4_max.patient_id)";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  public CohortDefinition getCD4CountAnd2To4Age() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients 2 to 4 years of age with CD4 Count and no VL");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "Cd4Result",
+        EptsReportUtils.map(
+            getCD4CountAndCD4PercentAndCd4Quantitative(750, 750, true),
+            "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "Age",
+        EptsReportUtils.map(
+            ageCohortQueries.createXtoYAgeCohort("2-4", 2, 4), "effectiveDate=${endDate}"));
+
+    cd.setCompositionString("Cd4Result AND Age");
+
+    return cd;
+  }
+
+  public CohortDefinition getCD4CountAnd5To9Age() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients 2 to 4 years of age with CD4 Count and no VL");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "Cd4Result",
+        EptsReportUtils.map(
+            getCD4CountAndCD4PercentAndCd4Quantitative(200, 200, false),
+            "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "Age",
+        EptsReportUtils.map(
+            ageCohortQueries.createXtoYAgeCohort("5-9", 5, 9), "effectiveDate=${endDate}"));
+
+    cd.setCompositionString("Cd4Result AND Age");
+
+    return cd;
+  }
+
+  /**
+   * Only if VL does not exist: Last CD4 absolute result > 750 cells/mm3 or CD4 percentuagel > 15%
+   * in last ART year (if patients age >=2 and <=4) by reporting end date Last CD4 absolute or
+   * semi-quantitative result absolute or semi-quantitative > 200 cells/mm3 in last ART year (if
+   * patients age >=5 and <=9) by reporting end date
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithLastCD4Results() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Only if VL does not exist");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "CI",
+        EptsReportUtils.map(getCD4CountAnd2To4Age(), "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "CII",
+        EptsReportUtils.map(getCD4CountAnd5To9Age(), "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("(CI OR CII)");
 
@@ -2013,7 +2304,6 @@ public class EriDSDCohortQueries {
 
     StringSubstitutor sb = new StringSubstitutor(map);
     String replaceQuery = sb.replace(query);
-
     cd.setQuery(replaceQuery);
 
     return cd;
