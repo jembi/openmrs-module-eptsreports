@@ -4333,9 +4333,7 @@ public class QualityImprovement2020CohortQueries {
 
       compositionCohortDefinition.addSearch(
           "DENOMINATOR",
-          EptsReportUtils.map(
-              getMQC11DEN(2, EptsReportConstants.MIMQ.MI),
-              "revisionEndDate=${revisionEndDate},location=${location}"));
+          EptsReportUtils.map(getMQC11DEN(2, EptsReportConstants.MIMQ.MI), MAPPING1));
 
       compositionCohortDefinition.addSearch("H", EptsReportUtils.map(getMQC11NH(), MAPPING8));
     }
