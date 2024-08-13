@@ -787,7 +787,7 @@ public class IntensiveMonitoringCohortQueries {
           EptsReportUtils.map(
               qualityImprovement2020CohortQueries.getMQC11DEN(
                   indicatorFlag, EptsReportConstants.MIMQ.MI),
-              "revisionEndDate=${revisionEndDate},location=${location}"));
+              "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},revisionEndDate=${revisionEndDate},location=${location}"));
     } else if (indicatorFlag == 4 || indicatorFlag == 7) {
       cd.addSearch(
           "MI11DEN",
