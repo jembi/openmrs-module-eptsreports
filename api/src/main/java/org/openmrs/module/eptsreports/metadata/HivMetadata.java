@@ -18,6 +18,7 @@ import org.openmrs.PersonAttributeType;
 import org.openmrs.Program;
 import org.openmrs.ProgramWorkflow;
 import org.openmrs.ProgramWorkflowState;
+import org.openmrs.RelationshipType;
 import org.openmrs.api.context.Context;
 import org.springframework.stereotype.Component;
 
@@ -2571,6 +2572,21 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
+   * <b>program_id = 6</b>
+   *
+   * <p><b>Name:</b> CCR
+   *
+   * <p><b>Description:</b> Programa de consultas para criancas em risco (CCR)
+   *
+   * @return {@link Program}
+   */
+  public Program getCCRProgram() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.ccrProgramUuid");
+    return getProgram(uuid);
+  }
+
+  /**
    * <b>program_id = 8</b>
    *
    * <p><b>Name:</b> PTV/ETV
@@ -2615,7 +2631,7 @@ public class HivMetadata extends ProgramsMetadata {
 
   // Identifier types
   /**
-   * <b>program_id = 2 </b>
+   * <b>Patient Identifier Type = 2 </b>
    *
    * <p><b>Name:</b> NID (SERVICO TARV)
    *
@@ -2626,6 +2642,20 @@ public class HivMetadata extends ProgramsMetadata {
   public PatientIdentifierType getNidServiceTarvIdentifierType() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.nidServicoTarvUuid");
+    return getPatientIdentifierType(uuid);
+  }
+
+  /**
+   * <b>Patient Identifier Type = 9 </b>
+   *
+   * <p><b>Name:</b> NID (SERVICO CCR)
+   *
+   * <p><b>Description:</b> Numero de Identificaçao de Doente, (SERVICO CCR)
+   *
+   * @return {@link PatientIdentifierType}
+   */
+  public PatientIdentifierType getCcrNidIdentifierType() {
+    String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.nidCcrUuid");
     return getPatientIdentifierType(uuid);
   }
 
@@ -5884,7 +5914,7 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * <b>enconter_type_id = 165439</b>
+   * <b>concept_id = 165439</b>
    *
    * <p><b>Name:</b> Termoablation
    *
@@ -5910,6 +5940,132 @@ public class HivMetadata extends ProgramsMetadata {
     String uuid =
         Context.getAdministrationService()
             .getGlobalProperty("eptsreports.patientConsentConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>encounterType_id = 92</b>
+   *
+   * <p><b>Name:</b> CCR - Resumo
+   *
+   * <p><b>Description:</b> Consulta Inicial de criança em Risco
+   *
+   * @return {@link EncounterType}
+   */
+  public EncounterType getCCRResumoEncounterType() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.ccrResumoEncounterTypeUuid");
+    return getEncounterType(uuid);
+  }
+
+  /**
+   * <b>relationship_type_id = 14</b>
+   *
+   * <p><b>Name:</b> Relacionamento entre mãe e filho
+   *
+   * <p><b>Description:</b> Relacionamento entre mãe e filho
+   *
+   * @return {@link RelationshipType}
+   */
+  public RelationshipType getMotherToSonRelationshipType() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.motherToSonRelationshipTypeUuid");
+    return getRelationshipType(uuid);
+  }
+
+  /**
+   * <b>encounterType_id = 93</b>
+   *
+   * <p><b>Name:</b> CCR - Seguimento
+   *
+   * <p><b>Description:</b> Consulta de Seguimento de criança em Risco
+   *
+   * @return {@link EncounterType}
+   */
+  public EncounterType getCCRSeguimentoEncounterType() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.ccrSeguimentoEncounterTypeUuid");
+    return getEncounterType(uuid);
+  }
+
+  /**
+   * <b>concept_id = 23832</b>
+   *
+   * <p><b>Name:</b> Sample Type
+   *
+   * <p><b>Description:</b>Sample Type
+   *
+   * @return {@link Concept}
+   */
+  public Concept getSampleTypeConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.sampleTypeConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 1873</b>
+   *
+   * <p><b>Name:</b> TIPO DE ALTA (CCR)
+   *
+   * <p><b>Description:</b>TIPO DE ALTA (CCR)
+   *
+   * @return {@link Concept}
+   */
+  public Concept getTipoDeAltaConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.tipoDeAltaConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165483</b>
+   *
+   * <p><b>Name:</b> TRANSFERIDO PARA SECTOR DE TB
+   *
+   * <p><b>Description:</b>TRANSFERIDO PARA SECTOR DE TB
+   *
+   * @return {@link Concept}
+   */
+  public Concept getTransferidoParaSectorTbConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.transferidoParaSectorTbConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165484</b>
+   *
+   * <p><b>Name:</b> TRANSFERIDO PARA CONSULTAS INTEGRADAS
+   *
+   * <p><b>Description:</b>TRANSFERIDO PARA CONSULTAS INTEGRADAS
+   *
+   * @return {@link Concept}
+   */
+  public Concept getTransferidoParaConsultasIntegradasConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.transferidoParaConsultasIntegradasConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165485</b>
+   *
+   * <p><b>Name:</b> TRANSFERIDO PARA CONSULTA DE CRIANÇA SADIA
+   *
+   * <p><b>Description:</b>TRANSFERIDO PARA CONSULTA DE CRIANÇA SADIA
+   *
+   * @return {@link Concept}
+   */
+  public Concept getTransferidoParaConsultaDeCriancaSadiaConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.transferidoParaConsultaDeCriancaSadiaConceptUuid");
     return getConcept(uuid);
   }
 

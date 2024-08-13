@@ -16,6 +16,10 @@ public class StoYesAndNtoNoConverter implements DataConverter {
         return "Sim";
       case "N":
         return "Nao";
+      case "1065":
+        return "S";
+      case "1066":
+        return "N";
       default:
         return "";
     }
