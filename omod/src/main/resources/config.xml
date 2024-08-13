@@ -1550,6 +1550,14 @@
 			Numero de Identificaçao de Doente, serviço TARV
 		</description>
 	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.nidCcrUuid</property>
+		<defaultValue>e2b97b70-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			Numero de Identificaçao de Doente, serviço CCR
+		</description>
+	</globalProperty>
 	<!--Master card encounter type-->
 	<globalProperty>
 		<property>@MODULE_ID@.masterCardEncounterType</property>
@@ -4048,6 +4056,176 @@
 		<defaultValue>c5c3fc4b-1786-433d-a1e9-1935bf4187c4</defaultValue>
 		<description>
 			UUID for DATA DE CONSENTIMENTO DO PACIENTE Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.ccrProgramUuid</property>
+		<defaultValue>611f0a6b-68b7-4de7-bc7a-fd021330eef8</defaultValue>
+		<description>
+			UUID for CCR Program
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.ccrResumoEncounterTypeUuid</property>
+		<defaultValue>b479d374-b186-4741-bf20-1471da6a50fc</defaultValue>
+		<description>
+			UUID for CCR Resumo EncounterType
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.motivoConsultaCriancaRiscoConceptUuid</property>
+		<defaultValue>e1dee58c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for MOTIVO DE CONSULTA CRIANCA EM RISCO Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.prematuridadeConceptUuid</property>
+		<defaultValue>e1dec53e-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for PREMATURIDADE/ RN BAIXO PESO Concept
+		</description>
+	</globalProperty>
+
+
+	<globalProperty>
+		<property>@MODULE_ID@.recenNascidoMaeHivPositivoConceptUuid</property>
+		<defaultValue>e1dc9ade-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for RECÉN NASCIDO DE MÃE HIV POSITIVO Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.desmameBruscoAleitamentoArtificalConceptUuid</property>
+		<defaultValue>e1dec66a-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for DESMAME BRUSCO E/OU ALEITAMENTO ARTIFICIAL EXCLUSIVO menor 1 ANO Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.contactoTbConceptUuid</property>
+		<defaultValue>e1dec872-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for CONTACTO TB Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.twinsConceptUuid</property>
+		<defaultValue>e1dec976-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for GÉMEOS Concept
+		</description>
+	</globalProperty>
+
+
+	<globalProperty>
+		<property>@MODULE_ID@.falenciaDeCrescimentoConceptUuid</property>
+		<defaultValue>e1e2b900-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for FALÊNCIA DE CRESCIMENTO Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.pesoInferior2dot5KgConceptUuid</property>
+		<defaultValue>8bc36c10-abfb-437a-b046-6a7aab694233</defaultValue>
+		<description>
+			UUID for PESO AO NASCER INFERIOR A 2.5 KG Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.migracaoRecenteFamiliaConceptUuid</property>
+		<defaultValue>04079f35-0c37-45c8-895e-2c38674b25e8</defaultValue>
+		<description>
+			UUID for MIGRAÇÃO RECENTE DA FAMILIA Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.criancaMaeAusenteConceptUuid</property>
+		<defaultValue>e1deca70-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for CRIANÇA COM MÃE AUSENTE Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.mothersNameConceptUuid</property>
+		<defaultValue>e1dc19a6-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for NOME DE MAE Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.motherToSonRelationshipTypeUuid</property>
+		<defaultValue>2b00dfef-a5dc-49e6-b406-762683938efa</defaultValue>
+		<description>
+			UUID for Relacionamento entre mãe e filho Relationship Type
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.acceptsHomeVisitConceptUuid</property>
+		<defaultValue>e1e0c5f0-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for ACCEPTS HOME VISIT Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.ccrSeguimentoEncounterTypeUuid</property>
+		<defaultValue>aa3556c3-1c1a-49bd-8a6d-e7a0a5bc99ef</defaultValue>
+		<description>
+			UUID for CCR - Seguimento EncounterType
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.sampleTypeConceptUuid</property>
+		<defaultValue>47ee9ffd-8103-4788-ab23-e185c144cf1e</defaultValue>
+		<description>
+			UUID for Sample Type Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.tipoDeAltaConceptUuid</property>
+		<defaultValue>e1dee492-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for Tipo de Alta Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.transferidoParaSectorTbConceptUuid</property>
+		<defaultValue>4f9cf887-2e0b-4fe7-bb81-8e7acc68f50e</defaultValue>
+		<description>
+			UUID for TRANSFERIDO PARA SECTOR DE TB Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.transferidoParaConsultasIntegradasConceptUuid</property>
+		<defaultValue>95f18042-0f1c-41f8-82a5-8b82f4e52314</defaultValue>
+		<description>
+			UUID for TRANSFERIDO PARA CONSULTAS INTEGRADAS Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.transferidoParaConsultaDeCriancaSadiaConceptUuid</property>
+		<defaultValue>dba31232-a5cd-4156-a396-3c2405fe0674</defaultValue>
+		<description>
+			UUID for TRANSFERIDO PARA CONSULTA DE CRIANÇA SADIA Concept
 		</description>
 	</globalProperty>
 

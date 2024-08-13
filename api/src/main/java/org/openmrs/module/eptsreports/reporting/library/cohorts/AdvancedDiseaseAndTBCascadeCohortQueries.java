@@ -30,9 +30,6 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
   private final String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
-  private final String pregnancyPeriod =
-      "startDate=${endDate-8m},endDate=${endDate},location=${location}";
-
   @Autowired
   public AdvancedDiseaseAndTBCascadeCohortQueries(
       HivMetadata hivMetadata,
@@ -65,7 +62,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.setName("clients who are eligible for CD4 count request");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "End Date", Location.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition initiatedArt = listOfPatientsArtCohortCohortQueries.getPatientsInitiatedART();
     CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART(false);
@@ -74,7 +71,10 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     CohortDefinition exclusion = getPatientsTransferredOutOrDead();
 
     cd.addSearch("initiatedArt", EptsReportUtils.map(initiatedArt, mappings));
-    cd.addSearch("pregnant", EptsReportUtils.map(pregnant, pregnancyPeriod));
+    cd.addSearch(
+        "pregnant",
+        EptsReportUtils.map(
+            pregnant, "startDate=${startDate-8m},endDate=${endDate},location=${location}"));
     cd.addSearch("consecutiveVL", EptsReportUtils.map(consecutiveVL, mappings));
     cd.addSearch("reinitiatedArt", EptsReportUtils.map(reinitiatedArt, mappings));
     cd.addSearch(

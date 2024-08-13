@@ -7,13 +7,9 @@ public class StateOfStayArtPatientConverter implements DataConverter {
 
   final String activoPrograma = "Activo no Programa";
 
-  final String activoProgramaForPrograms = "Activo no Programa";
-
   final String transferredOut = "Transferido para";
 
   final String transferredIn = "Transferido de";
-
-  final String transferredInForPrograms = "Transferido de";
 
   final String suspended = "Suspensão";
 
@@ -26,6 +22,15 @@ public class StateOfStayArtPatientConverter implements DataConverter {
   final String restart = "Re-inicio";
 
   final String negativeDiagnosis = "HIV Negativo";
+
+  final String getTransferidoParaSectorTb = "Transferido Para Sector Tb";
+
+  final String getTransferidoParaConsultasIntegradas = "Transferido Para Consultas Integradas";
+
+  final String getTransferidoParaConsultaDeCriancaSadia =
+      "Transferido Para Consulta De Crianca Sadia";
+
+  final String ccrCured = "CCR Curado";
 
   @Override
   public Object convert(Object obj) {
@@ -42,6 +47,24 @@ public class StateOfStayArtPatientConverter implements DataConverter {
         return abandoned;
       case "10":
         return died;
+      case "11":
+        return activoPrograma;
+      case "14":
+        return abandoned;
+      case "15":
+        return died;
+      case "23":
+        return ccrCured;
+      case "31":
+        return transferredIn;
+      case "32":
+        return transferredOut;
+      case "83":
+        return getTransferidoParaSectorTb;
+      case "84":
+        return getTransferidoParaConsultasIntegradas;
+      case "85":
+        return getTransferidoParaConsultaDeCriancaSadia;
       case "1706":
         return transferredOut;
       case "1709":
@@ -59,11 +82,17 @@ public class StateOfStayArtPatientConverter implements DataConverter {
       case "6269":
         return activoPrograma;
       case "6":
-        return activoProgramaForPrograms;
+        return activoPrograma;
       case "29":
-        return transferredInForPrograms;
+        return transferredIn;
       case "1705":
         return restart;
+      case "165483":
+        return getTransferidoParaSectorTb;
+      case "165484":
+        return getTransferidoParaConsultasIntegradas;
+      case "165485":
+        return getTransferidoParaConsultaDeCriancaSadia;
       default:
         return "";
     }

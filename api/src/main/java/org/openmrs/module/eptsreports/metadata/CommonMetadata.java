@@ -815,4 +815,193 @@ public class CommonMetadata extends Metadata {
             .getGlobalProperty("eptsreports.saidaSemGraduacaoOVCUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 1874</b>
+   *
+   * <p><b>Name:</b>MOTIVO DE CONSULTA CRIANCA EM RISCO
+   *
+   * <p><b>Description: MOTIVO DE CONSULTA CRIANCA EM RISCO
+   *
+   * @return {@link Concept}
+   */
+  public Concept getMotivoConsultaCriancaRiscoConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.motivoConsultaCriancaRiscoConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 1842</b>
+   *
+   * <p><b>Name:</b>PREMATURIDADE/ RN BAIXO PESO
+   *
+   * <p><b>Description: PREMATURIDADE/ RN BAIXO PESO
+   *
+   * @return {@link Concept}
+   */
+  public Concept getPrematuridadeConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.prematuridadeConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 1586</b>
+   *
+   * <p><b>Name:</b>RECÉN NASCIDO DE MÃE HIV POSITIVO
+   *
+   * <p><b>Description: RECÉN NASCIDO DE MÃE HIV POSITIVO
+   *
+   * @return {@link Concept}
+   */
+  public Concept getRecenNascidoMaeHivPositivoConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.recenNascidoMaeHivPositivoConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 1843</b>
+   *
+   * <p><b>Name:</b>DESMAME BRUSCO E/OU ALEITAMENTO ARTIFICIAL EXCLUSIVO < 1 ANO
+   *
+   * <p><b>Description: DESMAME BRUSCO E/OU ALEITAMENTO ARTIFICIAL EXCLUSIVO < 1 ANO
+   *
+   * @return {@link Concept}
+   */
+  public Concept getDesmameBruscoAleitamentoArtificalConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.desmameBruscoAleitamentoArtificalConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 1845</b>
+   *
+   * <p><b>Name:</b CONTACTO TB
+   *
+   * <p><b>Description: CONTACTO TB
+   *
+   * @return {@link Concept}
+   */
+  public Concept getContactoTbConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.contactoTbConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 1846</b>
+   *
+   * <p><b>Name:</b GÉMEOS
+   *
+   * <p><b>Description: GÉMEOS
+   *
+   * @return {@link Concept}
+   */
+  public Concept getTwinsConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.twinsConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 5050</b>
+   *
+   * <p><b>Name:</b FALÊNCIA DE CRESCIMENTO
+   *
+   * <p><b>Description: FALÊNCIA DE CRESCIMENTO
+   *
+   * @return {@link Concept}
+   */
+  public Concept getFalenciaDeCrescimentoConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.falenciaDeCrescimentoConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 6397</b>
+   *
+   * <p><b>Name:</b PESO AO NASCER INFERIOR A 2.5 KG
+   *
+   * <p><b>Description: PESO AO NASCER INFERIOR A 2.5 KG
+   *
+   * @return {@link Concept}
+   */
+  public Concept getPesoInferior2dot5KgConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.pesoInferior2dot5KgConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 6409</b>
+   *
+   * <p><b>Name:</b MIGRAÇÃO RECENTE DA FAMILIA
+   *
+   * <p><b>Description: MIGRAÇÃO RECENTE DA FAMILIA
+   *
+   * @return {@link Concept}
+   */
+  public Concept getMigracaoRecenteFamiliaConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.migracaoRecenteFamiliaConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 1847</b>
+   *
+   * <p><b>Name:</b> CRIANÇA COM MÃE AUSENTE
+   *
+   * <p><b>Description:CRIANÇA COM MÃE AUSENTE
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCriancaMaeAusenteConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.criancaMaeAusenteConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 1477</b>
+   *
+   * <p><b>Name:</b> NOME DE MAE
+   *
+   * <p><b>Description:NOME DE MAE
+   *
+   * @return {@link Concept}
+   */
+  public Concept getMothersNameConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.mothersNameConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 2071</b>
+   *
+   * <p><b>Name:</b> ACCEPTS HOME VISIT
+   *
+   * <p><b>Description:ACCEPTS HOME VISIT
+   *
+   * @return {@link Concept}
+   */
+  public Concept getAcceptsHomeVisitConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.acceptsHomeVisitConceptUuid");
+    return getConcept(uuid);
+  }
 }

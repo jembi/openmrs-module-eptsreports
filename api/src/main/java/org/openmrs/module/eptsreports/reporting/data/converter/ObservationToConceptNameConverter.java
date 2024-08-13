@@ -28,6 +28,8 @@ public class ObservationToConceptNameConverter implements DataConverter {
       "Doença pelo HIV Resultando em Encefalopatia";
   private final String extraPulmonaryTb = "Tuberculose Extrapulmonar";
   private final String pulmonaryTb = "Tuberculose Pulmonar";
+  private final String plasmaSampleType = "Plasma";
+  private final String drayBloodSpotSampleType = "Amostra de Sangue Seco";
 
   @Override
   public Object convert(Object original) {
@@ -81,6 +83,10 @@ public class ObservationToConceptNameConverter implements DataConverter {
         return extraPulmonaryTb;
       case "42":
         return pulmonaryTb;
+      case "1002":
+        return plasmaSampleType;
+      case "23831":
+        return drayBloodSpotSampleType;
       default:
         return "";
     }

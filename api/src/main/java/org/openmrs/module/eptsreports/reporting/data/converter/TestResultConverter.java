@@ -28,6 +28,8 @@ public class TestResultConverter implements DataConverter {
         return "N/A";
       case "2093":
         return "Suspeita de Cancer";
+      case "1138":
+        return "Indeterminado";
       default:
         return "";
     }
