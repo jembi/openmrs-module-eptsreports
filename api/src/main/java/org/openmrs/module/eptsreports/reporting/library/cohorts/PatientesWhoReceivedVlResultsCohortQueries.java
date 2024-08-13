@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DQACargaViralCohortQueries {
+public class PatientesWhoReceivedVlResultsCohortQueries {
 
   private HivMetadata hivMetadata;
   private ResumoMensalCohortQueries resumoMensalCohortQueries;
@@ -26,7 +26,7 @@ public class DQACargaViralCohortQueries {
   private final GenericCohortQueries genericCohortQueries;
 
   @Autowired
-  public DQACargaViralCohortQueries(
+  public PatientesWhoReceivedVlResultsCohortQueries(
       ResumoMensalCohortQueries resumoMensalCohortQueries,
       HivMetadata hivMetadata,
       CommonQueries commonQueries,
