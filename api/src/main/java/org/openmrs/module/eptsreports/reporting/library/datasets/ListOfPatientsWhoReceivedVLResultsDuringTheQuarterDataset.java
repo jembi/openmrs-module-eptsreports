@@ -48,6 +48,9 @@ public class ListOfPatientsWhoReceivedVLResultsDuringTheQuarterDataset extends B
     /** Patient counter - Sheet 1: Column A */
     pdd.addColumn("counter", new PersonIdDataDefinition(), "", new ObjectCounterConverter());
 
+    /** Patient id - Sheet 1: Column A */
+    pdd.addColumn("id", new PersonIdDataDefinition(), "");
+
     /** 1 - NID - Sheet 1: Column B */
     pdd.addColumn(
         "nid",

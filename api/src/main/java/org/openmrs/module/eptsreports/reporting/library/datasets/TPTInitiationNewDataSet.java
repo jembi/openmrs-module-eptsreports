@@ -26,7 +26,8 @@ public class TPTInitiationNewDataSet extends BaseDataSet {
   private ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset;
   private TPTInitiationCohortQueries tptInitiationCohortQueries;
 
-  private final PatientesWhoReceivedVlResultsCohortQueries patientesWhoReceivedVlResultsCohortQueries;
+  private final PatientesWhoReceivedVlResultsCohortQueries
+      patientesWhoReceivedVlResultsCohortQueries;
 
   @Autowired
   public TPTInitiationNewDataSet(
