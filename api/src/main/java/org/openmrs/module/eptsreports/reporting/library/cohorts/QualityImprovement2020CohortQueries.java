@@ -10251,8 +10251,7 @@ public class QualityImprovement2020CohortQueries {
     map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
 
     String query =
-        ""
-            + "SELECT p.patient_id  "
+        "SELECT p.patient_id  "
             + "FROM patient p  "
             + "    INNER JOIN (  "
             + "                SELECT tpt_end.patient_id, MAX(tpt_end.last_encounter) AS tpt_end_date  "
@@ -10333,7 +10332,7 @@ public class QualityImprovement2020CohortQueries {
             + "                GROUP BY tpt_start.patient_id  "
             + "            ) AS tpt_inicio ON tpt_inicio.patient_id = p.patient_id  "
             + "WHERE p.voided = 0  "
-            + "    AND TIMESTAMPDIFF(DAY, tpt_inicio.tpt_start_date,tpt_fim.tpt_end_date) BETWEEN  170 AND 297 ";
+            + "    AND TIMESTAMPDIFF(DAY, tpt_inicio.tpt_start_date,tpt_fim.tpt_end_date) BETWEEN  170 AND 231 ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -10385,8 +10384,7 @@ public class QualityImprovement2020CohortQueries {
     map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
 
     String query =
-        ""
-            + "SELECT p.patient_id  "
+        "SELECT p.patient_id  "
             + "FROM patient p  "
             + "    INNER JOIN (  "
             + "                SELECT tpt_end.patient_id, MAX(tpt_end.last_encounter) AS tpt_end_date  "
@@ -10467,7 +10465,7 @@ public class QualityImprovement2020CohortQueries {
             + "                GROUP BY tpt_start.patient_id  "
             + "            ) AS tpt_inicio ON tpt_inicio.patient_id = p.patient_id  "
             + "WHERE p.voided = 0  "
-            + "    AND TIMESTAMPDIFF(DAY, tpt_inicio.tpt_start_date,tpt_fim.tpt_end_date) BETWEEN  80 AND 198 ";
+            + "    AND TIMESTAMPDIFF(DAY, tpt_inicio.tpt_start_date,tpt_fim.tpt_end_date) BETWEEN  80 AND 132 ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
