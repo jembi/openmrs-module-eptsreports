@@ -2741,69 +2741,85 @@ public class IntensiveMonitoringCohortQueries {
    * @param flag indicator number
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getMQ9Den(int flag) {
+  public CohortDefinition getMI9Den(int flag) {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     switch (flag) {
       case 1:
         cd.setName(
-            "% de adultos  HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição");
+            "9.1 % de adultos (15/+anos) com pedido de CD4 na primeira consulta clínica depois do diagnóstico de HIV+");
         break;
       case 2:
         cd.setName(
-            "% de adultos HIV+ ≥ 15 anos que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira consulta clínica/abertura da Ficha Mestra");
+            "9.2 % de adultos  (15/+anos) que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira consulta clínica.");
         break;
       case 3:
         cd.setName(
-            "% de crianças HIV+ ≤ 14 anos que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra");
+            "9.3 % de adultos (15/+anos) com pedido de CD4 na consulta clínica de reinício do TARV");
         break;
       case 4:
         cd.setName(
-            "% de crianças HIV+ ≤ 14 anos que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira consulta clínica/abertura da Ficha Mestra");
+            "9.4 % de adultos (15/+anos) que receberam o resultado do CD4 dentro de 33 dias após consulta clínica de reinício do TARV");
+        break;
+      case 5:
+        cd.setName(
+            "9.5 % de crianças  (0-14 anos) com pedido de CD4 na primeira consulta clínica depois do diagnóstico de HIV+");
+        break;
+      case 6:
+        cd.setName(
+            "9.6 % de crianças  (0-14 anos) HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira consulta clínica");
+        break;
+      case 7:
+        cd.setName(
+            "9.7 % de crianças (0-14 anos) com pedido de CD4 na consulta clínica de reinício do TARV");
+        break;
+      case 8:
+        cd.setName(
+            "9.8 % de crianças (0-14 anos) que receberam o resultado do CD4 dentro de 33 dias após consulta clínica de reinício do TARV");
         break;
     }
 
-    if (flag == 1) {
-      cd.addSearch(
-          "AGE",
-          EptsReportUtils.map(
-              genericCohortQueries.getAgeOnFirstClinicalConsultation(15, null),
-              "onOrAfter=${revisionEndDate-2m+1d},onOrBefore=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
-    } else if (flag == 2) {
+    if (flag == 1 || flag == 2) {
       cd.addSearch(
           "AGE",
           EptsReportUtils.map(
               genericCohortQueries.getAgeOnFirstClinicalConsultation(15, null),
               "onOrAfter=${revisionEndDate-3m+1d},onOrBefore=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"));
-    } else if (flag == 3) {
+    } else if (flag == 3 || flag == 4) {
       cd.addSearch(
           "AGE",
           EptsReportUtils.map(
-              genericCohortQueries.getAgeOnFirstClinicalConsultation(0, 14),
-              "onOrAfter=${revisionEndDate-2m+1d},onOrBefore=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
-    } else if (flag == 4) {
+              genericCohortQueries.getAgeOnRestartedStateOfStayConsultation(15, null),
+              "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}"));
+    } else if (flag == 5 || flag == 6) {
       cd.addSearch(
           "AGE",
           EptsReportUtils.map(
               genericCohortQueries.getAgeOnFirstClinicalConsultation(0, 14),
               "onOrAfter=${revisionEndDate-3m+1d},onOrBefore=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"));
+    } else if (flag == 7 || flag == 8) {
+      cd.addSearch(
+          "AGE",
+          EptsReportUtils.map(
+              genericCohortQueries.getAgeOnRestartedStateOfStayConsultation(0, 14),
+              "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}"));
     }
 
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     String inclusionRequestPeriodMappings =
-        "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}";
+        "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}";
 
     String inclusionResultPeriodMappings =
         "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}";
 
     String cd4RequestMappings =
-        "revisionEndDate={revisionEndDate},startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}";
+        "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate={revisionEndDate},location=${location}";
 
     String cd4ResultMappings =
-        "revisionEndDate={revisionEndDate},startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}";
+        "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate={revisionEndDate},location=${location}";
 
     cd.addSearch(
         "A",
@@ -2818,6 +2834,7 @@ public class IntensiveMonitoringCohortQueries {
                 commonMetadata.getPregnantConcept().getConceptId(),
                 hivMetadata.getYesConcept().getConceptId()),
             inclusionRequestPeriodMappings));
+
     cd.addSearch(
         "D",
         EptsReportUtils.map(
@@ -2825,6 +2842,7 @@ public class IntensiveMonitoringCohortQueries {
                 commonMetadata.getBreastfeeding().getConceptId(),
                 hivMetadata.getYesConcept().getConceptId()),
             inclusionRequestPeriodMappings));
+
     cd.addSearch(
         "E",
         EptsReportUtils.map(
@@ -2865,6 +2883,7 @@ public class IntensiveMonitoringCohortQueries {
                 commonMetadata.getPregnantConcept().getConceptId(),
                 hivMetadata.getYesConcept().getConceptId()),
             inclusionResultPeriodMappings));
+
     cd.addSearch(
         "DD",
         EptsReportUtils.map(
@@ -2872,6 +2891,7 @@ public class IntensiveMonitoringCohortQueries {
                 commonMetadata.getBreastfeeding().getConceptId(),
                 hivMetadata.getYesConcept().getConceptId()),
             inclusionResultPeriodMappings));
+
     cd.addSearch(
         "transferredIn",
         EptsReportUtils.map(
@@ -2899,16 +2919,38 @@ public class IntensiveMonitoringCohortQueries {
                 hivMetadata.getYesConcept().getConceptId()),
             cd4ResultMappings));
 
+    cd.addSearch(
+        "RESTARTED",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getPatientsWithRestartedStateOfStay(),
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}"));
+
+    cd.addSearch(
+        "RESULTS",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getCd4ResultAfterRestartDate(),
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}"));
+
+    cd.addSearch(
+        "RESTARTED33DAYSBEFORE",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getPatientsRestartedWithLessThan33Days(),
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}"));
+
     if (flag == 1) {
       cd.setCompositionString(
           "A AND (AGE OR D OR breastfeedingOnPeriod) AND NOT (E OR C OR pregnantOnPeriod)");
     } else if (flag == 2) {
       cd.setCompositionString(
           "AA AND (AGE OR DD OR breastfeedingOnPeriodCd4Result) AND NOT (transferredIn OR CC OR pregnantOnPeriodCd4Resul)");
-    } else if (flag == 3) {
+    } else if (flag == 3 || flag == 7) {
+      cd.setCompositionString("(RESTARTED AND AGE) AND NOT transferredIn");
+    } else if (flag == 4 || flag == 8) {
+      cd.setCompositionString("(RESTARTED AND RESULTS AND AGE) AND NOT RESTARTED33DAYSBEFORE");
+    } else if (flag == 5) {
       cd.setCompositionString(
           "A AND AGE AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod)");
-    } else if (flag == 4) {
+    } else if (flag == 6) {
       cd.setCompositionString(
           "(AA AND AGE) AND NOT (DD OR breastfeedingOnPeriodCd4Result OR transferredIn OR CC OR pregnantOnPeriodCd4Resul)");
     }
@@ -2929,16 +2971,15 @@ public class IntensiveMonitoringCohortQueries {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     String inclusionPeriodMappings =
-        "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}";
+        "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}";
 
-    if (flag == 5) {
-      cd.setName(
-          "Pedido de CD4 = “% de MG HIV+ que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra”");
+    if (flag == 9) {
+      cd.setName("9.9 % de MG  HIV+ com registo de pedido de CD4 na primeira CPN.");
       inclusionPeriodMappings =
-          "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}";
-    } else if (flag == 6) {
+          "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}";
+    } else if (flag == 10) {
       cd.setName(
-          "Resultado de CD4 = “% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez”");
+          "9.10 % de MG  HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira CPN.");
       inclusionPeriodMappings =
           "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}";
     }
@@ -2963,7 +3004,7 @@ public class IntensiveMonitoringCohortQueries {
                 hivMetadata.getPatientFoundYesConcept().getConceptId(),
                 hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
                 hivMetadata.getArtStatus().getConceptId()),
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}"));
 
     cd.setCompositionString("pregnantOnPeriod AND NOT transferredIn");
 
@@ -3067,26 +3108,42 @@ public class IntensiveMonitoringCohortQueries {
    * @param flag indicator number
    * @return CohortDefinition
    */
-  public CohortDefinition getMQ9Num(int flag) {
+  public CohortDefinition getMI9Num(int flag) {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     switch (flag) {
       case 1:
         cd.setName(
-            "% de adultos HIV+ ≥ 15 anos que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra");
+            "9.1 % de adultos  (15/+anos) com pedido de CD4 na primeira consulta clínica depois do diagnóstico de HIV+");
         break;
       case 2:
         cd.setName(
-            "% de adultos HIV+ ≥ 15 anos que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira consulta clínica/abertura da Ficha Mestra");
+            "9.2 % de adultos  (15/+anos) HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira consulta clínica");
         break;
       case 3:
         cd.setName(
-            "% de crianças HIV+ ≤ 14 anos que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra");
+            "9.3 % de adultos (15/+anos) com pedido de CD4 na consulta clínica de reinício do TARV");
         break;
       case 4:
         cd.setName(
-            "% de crianças HIV+ ≤ 14 anos que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira consulta clínica/abertura da Ficha Mestra");
+            "9.4 % de adultos (15/+anos) que receberam o resultado do CD4 dentro de 33 dias após consulta clínica de reinício do TARV");
+        break;
+      case 5:
+        cd.setName(
+            "9.5 % de crianças  (0-14 anos) com pedido de CD4 na primeira consulta clínica depois do diagnóstico de HIV+");
+        break;
+      case 6:
+        cd.setName(
+            "9.6 % de crianças  (0-14 anos) HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira consulta clínica");
+        break;
+      case 7:
+        cd.setName(
+            "9.7 % de crianças (0-14 anos) com pedido de CD4 na consulta clínica de reinício do TARV");
+        break;
+      case 8:
+        cd.setName(
+            "9.8 % de adultos HIV+ ≥ 15 anos reinícios TARV que teve conhecimento do resultado do CD4 dentro de 33 dias após a data da consulta clínica de reinício TARV");
         break;
     }
 
@@ -3098,7 +3155,7 @@ public class IntensiveMonitoringCohortQueries {
         EptsReportUtils.map(
             qualityImprovement2020CohortQueries
                 .getRequestForCd4OnFirstClinicalConsultationDuringInclusionPeriod(),
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
         "resultCd4",
@@ -3108,33 +3165,73 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
+        "REQUESTONRESTART",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getPatientsWithCd4RequestsOnRestartedTarvDate(),
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}"));
+
+    cd.addSearch(
+        "RESULTSONRESTART",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getPatientsWithCd4ResultsOnRestartedTarvDate(),
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}"));
+
+    cd.addSearch(
         "denominatorOne",
         EptsReportUtils.map(
-            getMQ9Den(1), "revisionEndDate=${revisionEndDate},location=${location}"));
+            getMI9Den(1), "revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
         "denominatorTwo",
         EptsReportUtils.map(
-            getMQ9Den(2), "revisionEndDate=${revisionEndDate},location=${location}"));
+            getMI9Den(2), "revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
         "denominatorThree",
         EptsReportUtils.map(
-            getMQ9Den(3), "revisionEndDate=${revisionEndDate},location=${location}"));
+            getMI9Den(3), "revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
         "denominatorFour",
         EptsReportUtils.map(
-            getMQ9Den(4), "revisionEndDate=${revisionEndDate},location=${location}"));
+            getMI9Den(4), "revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "denominatorFive",
+        EptsReportUtils.map(
+            getMI9Den(5), "revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "denominatorSix",
+        EptsReportUtils.map(
+            getMI9Den(6), "revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "denominatorSeven",
+        EptsReportUtils.map(
+            getMI9Den(7), "revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "denominatorEight",
+        EptsReportUtils.map(
+            getMI9Den(8), "revisionEndDate=${revisionEndDate},location=${location}"));
 
     if (flag == 1) {
       cd.setCompositionString("denominatorOne AND requestCd4");
     } else if (flag == 2) {
       cd.setCompositionString("denominatorTwo AND resultCd4");
     } else if (flag == 3) {
-      cd.setCompositionString("denominatorThree AND requestCd4");
+      cd.setCompositionString("denominatorThree AND REQUESTONRESTART");
     } else if (flag == 4) {
-      cd.setCompositionString("denominatorFour AND resultCd4");
+      cd.setCompositionString("denominatorFour AND RESULTSONRESTART");
+    } else if (flag == 5) {
+      cd.setCompositionString("denominatorFive AND requestCd4");
+    } else if (flag == 6) {
+      cd.setCompositionString("denominatorSix AND resultCd4");
+    } else if (flag == 7) {
+      cd.setCompositionString("denominatorSeven AND REQUESTONRESTART");
+    } else if (flag == 8) {
+      cd.setCompositionString("denominatorEight AND REQUESTONRESTART");
     }
 
     return cd;
@@ -3153,14 +3250,13 @@ public class IntensiveMonitoringCohortQueries {
 
     String inclusionPeriodMappings = "";
 
-    if (flag == 5) {
-      cd.setName(
-          "Pedido de CD4 = “% de MG HIV+ que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra”");
+    if (flag == 9) {
+      cd.setName("9.9 % de MG  HIV+ com registo de pedido de CD4 na primeira CPN.");
       inclusionPeriodMappings =
-          "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}";
-    } else if (flag == 6) {
+          "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}";
+    } else if (flag == 10) {
       cd.setName(
-          "Resultado de CD4 = “% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez”");
+          "9.10 % de MG  HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira CPN");
       inclusionPeriodMappings =
           "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}";
     }
@@ -3196,7 +3292,7 @@ public class IntensiveMonitoringCohortQueries {
                     hivMetadata.getYesConcept().getConceptId(),
                     hivMetadata.getApplicationForLaboratoryResearch().getConceptId(),
                     hivMetadata.getCD4AbsoluteOBSConcept().getConceptId()),
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}"));
 
     cd.addSearch(
         "resultCd4ForPregnant",
@@ -3206,9 +3302,9 @@ public class IntensiveMonitoringCohortQueries {
                 hivMetadata.getYesConcept().getConceptId()),
             inclusionPeriodMappings));
 
-    if (flag == 5) {
+    if (flag == 9) {
       cd.setCompositionString("(pregnantOnPeriod AND requestCd4ForPregnant) AND NOT transferredIn");
-    } else if (flag == 6) {
+    } else if (flag == 10) {
       cd.setCompositionString("(pregnantOnPeriod AND resultCd4ForPregnant) AND NOT transferredIn");
     }
 
