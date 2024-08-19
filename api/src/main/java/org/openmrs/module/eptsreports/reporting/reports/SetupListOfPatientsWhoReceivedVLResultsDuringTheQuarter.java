@@ -19,10 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.reporting.library.datasets.DQACargaViralDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.DQASESPDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
-import org.openmrs.module.eptsreports.reporting.library.datasets.LocationDataSetDefinition;
+import org.openmrs.module.eptsreports.reporting.library.datasets.*;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
@@ -32,17 +29,17 @@ import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Deprecated
-public class SetupDQACargaViral extends EptsDataExportManager {
+public class SetupListOfPatientsWhoReceivedVLResultsDuringTheQuarter extends EptsDataExportManager {
 
-  private DQACargaViralDataset dqaCargaViralDataset;
-
-  private DQASESPDataset dqaSESPDataset;
+  private final ListOfPatientsWhoReceivedVLResultsDuringTheQuarterDataset
+      listOfPatientsWhoReceivedVLResultsDuringTheQuarterDataset;
 
   @Autowired
-  public SetupDQACargaViral(
-      DQACargaViralDataset dqaCargaViralDataset, DQASESPDataset dqaSESPDataset) {
-    this.dqaCargaViralDataset = dqaCargaViralDataset;
-    this.dqaSESPDataset = dqaSESPDataset;
+  public SetupListOfPatientsWhoReceivedVLResultsDuringTheQuarter(
+      ListOfPatientsWhoReceivedVLResultsDuringTheQuarterDataset
+          listOfPatientsWhoReceivedVLResultsDuringTheQuarterDataset) {
+    this.listOfPatientsWhoReceivedVLResultsDuringTheQuarterDataset =
+        listOfPatientsWhoReceivedVLResultsDuringTheQuarterDataset;
   }
 
   @Override
@@ -62,12 +59,12 @@ public class SetupDQACargaViral extends EptsDataExportManager {
 
   @Override
   public String getName() {
-    return "DQA - MISAU";
+    return "Lista de Utentes que receberam Resultado de CV durante o trimestre";
   }
 
   @Override
   public String getDescription() {
-    return "DQA - MISAU Report";
+    return "Este relatório apresenta a lista de pacientes que receberam a notificação anual de carga viral durante o período de reporte.";
   }
 
   @Override
@@ -79,10 +76,12 @@ public class SetupDQACargaViral extends EptsDataExportManager {
     rd.setParameters(getParameters());
     rd.addDataSetDefinition("HF", Mapped.mapStraightThrough(new LocationDataSetDefinition()));
     rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
+    rd.addDataSetDefinition("SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
     rd.addDataSetDefinition(
-        "CV", Mapped.mapStraightThrough(dqaCargaViralDataset.constructDQACargaViralDataset()));
-    rd.addDataSetDefinition(
-        "SESP", Mapped.mapStraightThrough(dqaSESPDataset.constructDQASESPDataset()));
+        "CV",
+        Mapped.mapStraightThrough(
+            listOfPatientsWhoReceivedVLResultsDuringTheQuarterDataset
+                .constructDQACargaViralDataset()));
 
     return rd;
   }
@@ -94,12 +93,12 @@ public class SetupDQACargaViral extends EptsDataExportManager {
       rd =
           createXlsReportDesign(
               reportDefinition,
-              "DQA_Viral_Load_v1.4.1.xls",
-              "DQA - MISAU",
+              "MISAU_SESP_MASC_Lista_de_Utentes_Resultado_CV_v2.0.xls",
+              "Lista de Utentes que receberam Resultado de CV durante o trimestre",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:8,dataset:CV");
+      props.put("repeatingSections", "sheet:1,row:9,dataset:CV");
       props.put("sortWeight", "5000");
       rd.setProperties(props);
     } catch (IOException e) {

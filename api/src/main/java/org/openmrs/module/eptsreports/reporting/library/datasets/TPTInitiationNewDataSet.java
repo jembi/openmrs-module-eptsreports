@@ -5,7 +5,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.reporting.data.converter.DispensationTypeConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.EmptyToNaoAndAnyToSimConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.DQACargaViralCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.PatientesWhoReceivedVlResultsCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TPTInitiationCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TPTInitiationDataDefinitionQueries;
 import org.openmrs.module.reporting.data.DataDefinition;
@@ -26,19 +26,20 @@ public class TPTInitiationNewDataSet extends BaseDataSet {
   private ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset;
   private TPTInitiationCohortQueries tptInitiationCohortQueries;
 
-  private DQACargaViralCohortQueries dqaCargaViralCohortQueries;
+  private final PatientesWhoReceivedVlResultsCohortQueries
+      patientesWhoReceivedVlResultsCohortQueries;
 
   @Autowired
   public TPTInitiationNewDataSet(
       TPTInitiationDataDefinitionQueries tPTInitiationDataDefinitionQueries,
       ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset,
       TPTInitiationCohortQueries tptInitiationCohortQueries,
-      DQACargaViralCohortQueries dqaCargaViralCohortQueries) {
+      PatientesWhoReceivedVlResultsCohortQueries patientesWhoReceivedVlResultsCohortQueries) {
 
     this.tPTInitiationDataDefinitionQueries = tPTInitiationDataDefinitionQueries;
     this.listChildrenOnARTandFormulationsDataset = listChildrenOnARTandFormulationsDataset;
     this.tptInitiationCohortQueries = tptInitiationCohortQueries;
-    this.dqaCargaViralCohortQueries = dqaCargaViralCohortQueries;
+    this.patientesWhoReceivedVlResultsCohortQueries = patientesWhoReceivedVlResultsCohortQueries;
   }
 
   public DataSetDefinition constructDataSet() {
@@ -67,7 +68,10 @@ public class TPTInitiationNewDataSet extends BaseDataSet {
     pdd.setParameters(getParameters());
 
     pdd.addColumn(
-        "NID", dqaCargaViralCohortQueries.getNID(identifierType.getPatientIdentifierTypeId()), "");
+        "NID",
+        patientesWhoReceivedVlResultsCohortQueries.getNID(
+            identifierType.getPatientIdentifierTypeId()),
+        "");
 
     pdd.addColumn("name", nameDef, "");
 
