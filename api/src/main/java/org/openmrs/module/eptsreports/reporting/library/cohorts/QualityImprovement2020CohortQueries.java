@@ -8888,6 +8888,8 @@ public class QualityImprovement2020CohortQueries {
             + "        (obs.concept_id = ${1695} AND obs.value_numeric IS NOT NULL) "
             + "        OR "
             + "        (o2.concept_id = ${730} AND o2.value_numeric IS NOT NULL) "
+            + "        OR "
+            + "        (o2.concept_id = ${165515} AND o2.value_coded IS NOT NULL) "
             + "      ) "
             + "  AND enc.encounter_datetime >= consultation_date.first_consultation "
             + "  AND enc.encounter_datetime <= DATE_ADD(consultation_date.first_consultation, INTERVAL 33 DAY) "
@@ -8898,6 +8900,7 @@ public class QualityImprovement2020CohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
     map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
 
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(sb.replace(query));
@@ -12692,6 +12695,7 @@ public class QualityImprovement2020CohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
     map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
     map.put("question", pregnantConcept);
     map.put("answer", yesConcept);
 
@@ -12718,6 +12722,8 @@ public class QualityImprovement2020CohortQueries {
             + "        (obs.concept_id = ${1695} AND obs.value_numeric IS NOT NULL) "
             + "        OR "
             + "        (o2.concept_id = ${730} AND o2.value_numeric IS NOT NULL) "
+            + "        OR "
+            + "        (o2.concept_id = ${165515} AND o2.value_coded IS NOT NULL) "
             + "      ) "
             + "  AND enc.encounter_datetime >= consultation_date.first_consultation "
             + "  AND enc.encounter_datetime <= DATE_ADD(consultation_date.first_consultation, INTERVAL 33 DAY) "
@@ -13818,6 +13824,8 @@ public class QualityImprovement2020CohortQueries {
             + "        (obs.concept_id = ${1695} AND obs.value_numeric IS NOT NULL) "
             + "        OR "
             + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
+            + "        OR "
+            + "        (obs.concept_id = ${165515} AND obs.value_coded IS NOT NULL) "
             + "      ) "
             + "  AND e.encounter_datetime >= restarted.restart_date "
             + "  AND e.encounter_datetime <= :endDate "
@@ -13830,6 +13838,7 @@ public class QualityImprovement2020CohortQueries {
     map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("1705", hivMetadata.getRestartConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
 
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(sb.replace(query));
@@ -14128,6 +14137,7 @@ public class QualityImprovement2020CohortQueries {
     map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("1705", hivMetadata.getRestartConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
 
     String query =
         "SELECT pa.patient_id "
@@ -14149,6 +14159,8 @@ public class QualityImprovement2020CohortQueries {
             + "        (obs.concept_id = ${1695} AND obs.value_numeric IS NOT NULL) "
             + "        OR "
             + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
+            + "        OR "
+            + "        (obs.concept_id = ${165515} AND obs.value_coded IS NOT NULL) "
             + "      ) "
             + "  AND enc.encounter_datetime >= restarted.restart_date "
             + "  AND enc.encounter_datetime <= DATE_ADD(restarted.restart_date, INTERVAL 33 DAY) "
