@@ -118,7 +118,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries
             .getPregnantOrBreastfeedingFemalePatients(),
         MAPPING2,
-        new NotApplicableIfNullConverter());
+        new NoIfNullConverter());
 
     // 8 - Data da Última Consulta Clínica – Sheet 1: Column H
     patientDataSetDefinition.addColumn(
