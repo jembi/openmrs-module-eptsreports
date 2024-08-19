@@ -1689,6 +1689,7 @@ public class IntensiveMonitoringCohortQueries {
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id "
@@ -1700,8 +1701,10 @@ public class IntensiveMonitoringCohortQueries {
             + "       AND oo.voided = 0 "
             + "       AND ee.location_id = :location "
             + "       AND ee.encounter_type = ${6} "
-            + "       AND oo.concept_id = ${1695} "
-            + "       AND oo.value_numeric <= 200 "
+            + "       AND ( ( oo.concept_id = ${1695} "
+            + "       AND oo.value_numeric <= 200 ) "
+            + "       OR ( oo.concept_id = ${165515} "
+            + "       AND oo.value_coded <= 200 ) ) "
             + "       AND ee.encounter_datetime <= :endDate "
             + "       AND NOT EXISTS (SELECT e.encounter_id "
             + "                       FROM   encounter e    "
