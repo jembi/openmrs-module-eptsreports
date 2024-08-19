@@ -470,7 +470,7 @@ public class APSSResumoTrimestralCohortQueries {
             + " FROM "
             + "    (SELECT  "
             + "        most_recent.patient_id, "
-            + "            DATE_ADD(MAX(most_recent.value_datetime1), INTERVAL 60 DAY) final_encounter_date "
+            + "            DATE_ADD(MAX(most_recent.value_datetime1), INTERVAL 59 DAY) final_encounter_date "
             + "    FROM "
             + "        (SELECT  "
             + "        fila.patient_id, fila.value_datetime1 "
