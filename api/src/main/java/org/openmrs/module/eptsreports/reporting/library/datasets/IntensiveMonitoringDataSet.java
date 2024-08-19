@@ -176,6 +176,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+
     // 7.6
     dataSetDefinition.addColumn(
         "MI7DEN6",
@@ -189,7 +190,6 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
 
     // ********************* NUMERATOR CAT7 **************
     // 7.1
-
     dataSetDefinition.addColumn(
         "MI7NUM1",
         "% de adultos HIV+ em TARV elegíveis ao TPT e que iniciaram TPT",
@@ -254,47 +254,87 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
 
     dataSetDefinition.addColumn(
         "MI9DEN1",
-        "% de adultos  HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
+        "9.1 % de adultos (15/+anos) com pedido de CD4 na primeira consulta clínica depois do diagnóstico de HIV+",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMQ9Den(1),
+                intensiveMonitoringCohortQueries.getMI9Den(1),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     dataSetDefinition.addColumn(
         "MI9DEN2",
-        "% de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
+        "9.2 % de adultos  (15/+anos) que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira consulta clínica.",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMQ9Den(2),
+                intensiveMonitoringCohortQueries.getMI9Den(2),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     dataSetDefinition.addColumn(
         "MI9DEN3",
-        "% de crianças HIV+ ≤ 14 anos que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra",
+        "9.3 % de adultos (15/+anos) com pedido de CD4 na consulta clínica de reinício do TARV",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMQ9Den(3),
+                intensiveMonitoringCohortQueries.getMI9Den(3),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     dataSetDefinition.addColumn(
         "MI9DEN4",
-        "% de crianças HIV+ ≤ 14 anos que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira consulta clínica/abertura da Ficha Mestra",
+        "9.4 % de adultos (15/+anos) que receberam o resultado do CD4 dentro de 33 dias após consulta clínica de reinício do TARV",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMQ9Den(4),
+                intensiveMonitoringCohortQueries.getMI9Den(4),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     dataSetDefinition.addColumn(
         "MI9DEN5",
-        "Pedido de CD4 = “% de MG HIV+ que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra",
+        "9.5 % de crianças  (0-14 anos) com pedido de CD4 na primeira consulta clínica depois do diagnóstico de HIV+",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMI9Den(5),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI9DEN6",
+        "9.6 % de crianças  (0-14 anos) HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira consulta clínica",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMI9Den(6),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI9DEN7",
+        "9.7 % de crianças (0-14 anos) com pedido de CD4 na consulta clínica de reinício do TARV",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMI9Den(7),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI9DEN8",
+        "9.8 % de crianças (0-14 anos) que receberam o resultado do CD4 dentro de 33 dias após consulta clínica de reinício do TARV",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMI9Den(7),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI9DEN9",
+        "9.9 % de MG  HIV+ com registo de pedido de CD4 na primeira CPN.",
         EptsReportUtils.map(
             customCohortIndicator(
                 intensiveMonitoringCohortQueries.getCd4RequestAndResultForPregnantsCat9Den(5),
@@ -303,11 +343,11 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "");
 
     dataSetDefinition.addColumn(
-        "MI9DEN6",
-        "Resultado de CD4 = “% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez",
+        "MI9DEN10",
+        "9.10 % de MG  HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira CPN.",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getCd4RequestAndResultForPregnantsCat9Den(6),
+                intensiveMonitoringCohortQueries.getCd4RequestAndResultForPregnantsCat9Den(10),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
@@ -315,60 +355,100 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
     // MI indicators category 9 numerator
     dataSetDefinition.addColumn(
         "MI9NUM1",
-        "% de adultos HIV+ ≥ 15 anos que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra",
+        "9.1 % de adultos  (15/+anos) com pedido de CD4 na primeira consulta clínica depois do diagnóstico de HIV+",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMQ9Num(1),
+                intensiveMonitoringCohortQueries.getMI9Num(1),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     dataSetDefinition.addColumn(
         "MI9NUM2",
-        "% de adultos HIV+ ≥ 15 anos que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira consulta clínica/abertura da Ficha Mestra",
+        "9.2 % de adultos  (15/+anos) HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira consulta clínica",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMQ9Num(2),
+                intensiveMonitoringCohortQueries.getMI9Num(2),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     dataSetDefinition.addColumn(
         "MI9NUM3",
-        "% de adultos  HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
+        "9.3 % de adultos  (15/+anos) com pedido de CD4 na consulta clínica de reinício do TARV",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMQ9Num(3),
+                intensiveMonitoringCohortQueries.getMI9Num(3),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     dataSetDefinition.addColumn(
         "MI9NUM4",
-        "% de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
+        "9.4 % de adultos (15/+anos) que receberam o resultado do CD4 dentro de 33 dias após consulta clínica de reinício do TARV",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMQ9Num(4),
+                intensiveMonitoringCohortQueries.getMI9Num(4),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     dataSetDefinition.addColumn(
         "MI9NUM5",
-        "% de MG HIV+ em TARV com registo de pedido de CD4 na primeira CPN (Primeira consulta com registo Gravidez)",
+        "9.5 % de crianças  (0-14 anos) com pedido de CD4 na primeira consulta clínica depois do diagnóstico de HIV+",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getCd4RequestAndResultForPregnantsCat9Num(5),
+                intensiveMonitoringCohortQueries.getMI9Num(5),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     dataSetDefinition.addColumn(
         "MI9NUM6",
-        "% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez",
+        "9.6 % de crianças  (0-14 anos) HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira consulta clínica",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getCd4RequestAndResultForPregnantsCat9Num(6),
+                intensiveMonitoringCohortQueries.getMI9Num(6),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI9NUM7",
+        "9.7 % de adultos HIV+ ≥ 15 anos que reiniciaram TARV durante o período de revisão e tiveram registo de pedido do CD4 na consulta de reinício",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMI9Num(7),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI9NUM8",
+        "9.8 % de adultos HIV+ ≥ 15 anos reinícios TARV que teve conhecimento do resultado do CD4 dentro de 33 dias após a data da consulta clínica de reinício TARV",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMI9Num(8),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI9NUM9",
+        "9.9 % de MG  HIV+ com registo de pedido de CD4 na primeira CPN.",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCd4RequestAndResultForPregnantsCat9Num(9),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI9NUM10",
+        "9.10 % de MG  HIV+ que receberam o resultado do primeiro CD4 dentro de 33 dias  após a primeira CPN",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCd4RequestAndResultForPregnantsCat9Num(10),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
