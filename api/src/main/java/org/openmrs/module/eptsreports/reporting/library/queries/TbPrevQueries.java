@@ -524,7 +524,8 @@ public class TbPrevQueries {
             + "               ) start "
             + "               GROUP BY start.patient_id"
             + "            ) start on start.patient_id = tpt_completed.patient_id "
-            + "WHERE TIMESTAMPDIFF(DAY,start.start_date, tpt_completed.complete_date) >= 86 "
+            + "WHERE tpt_completed.complete_date BETWEEN :startDate AND :endDate "
+            + "AND TIMESTAMPDIFF(DAY,start.start_date, tpt_completed.complete_date) >= 86 "
             + "GROUP BY tpt_completed.patient_id ";
 
     sqlCohortDefinition.setQuery(query);
@@ -571,6 +572,7 @@ public class TbPrevQueries {
             + "                                  )tpt "
             + "                           GROUP  BY tpt.patient_id) tpt_start ON tpt_start.patient_id = profilaxy.patient_id "
             + "        WHERE  profilaxy.obs_datetime BETWEEN tpt_start.start_date AND DATE_ADD(tpt_start.start_date, INTERVAL 4 MONTH) "
+            + "        AND profilaxy.obs_datetime BETWEEN :startDate and :endDate "
             + "        GROUP  BY profilaxy.patient_id) three_encounters "
             + "WHERE  three_encounters.encounters >= 3";
 
@@ -696,6 +698,7 @@ public class TbPrevQueries {
             + "                                  )tpt "
             + "                           GROUP  BY tpt.patient_id) tpt_start ON tpt_start.patient_id = profilaxy.patient_id "
             + "        WHERE  profilaxy.encounter_datetime BETWEEN tpt_start.start_date AND DATE_ADD(tpt_start.start_date, INTERVAL 4 MONTH) "
+            + "        AND  profilaxy.encounter_datetime BETWEEN :startDate AND :endDate "
             + "        GROUP  BY profilaxy.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(getReportMetadata());
