@@ -12122,11 +12122,11 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition mdsLastClinical12Months =
+    CohortDefinition mdsLastClinical =
         getPatientsWithMdcOnMostRecentClinicalFormWithFollowingDispensationTypesAndStateBasedOnLastVl12Months(
             dispensationTypes, states);
 
-    CohortDefinition dsd12Months = getPatientsHavingTypeOfDispensationBasedOnTheirLastVlResults();
+    CohortDefinition dsd = getPatientsHavingTypeOfDispensationBasedOnTheirLastVlResults();
 
     CohortDefinition nextPickupBetween83And97 =
         QualityImprovement2020Queries.getPatientsWithPickupOnFilaBasedOnLastVl12Months(83, 97);
@@ -12137,13 +12137,11 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "MDS",
         EptsReportUtils.map(
-            mdsLastClinical12Months,
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            mdsLastClinical, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "DSDT",
-        EptsReportUtils.map(
-            dsd12Months, "startDate=${startDate},endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(dsd, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "FILA83",
@@ -12167,9 +12165,9 @@ public class QualityImprovement2020CohortQueries {
    * Denominador (FR4) e Numerador (FR5) da seguinte forma:
    *
    * <ul>
-   *   <li>Todos os utentes com registo mais recente de MDS na Ficha Clínica (MDC1 ou MDC2 ou MDC3
-   *       ou MDC4 ou MDC5) nos últimos 12 meses antesda data do resultado da CV mais recente (“Data
-   *       Última CV”), como um dos seguintes:
+   *   <li>todos os utentes que têm o último registo de pelo menos um dos seguintes modelos na
+   *       última consulta clínica (Ficha Clínica) antes da data do resultado da CV mais recente
+   *       (“Data Última CV”), como um dos seguintes:
    *       <ul>
    *         <li>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “GA” e o
    *             respectivo “Estado” = “Início” ou “Continua”, ou
@@ -12206,7 +12204,6 @@ public class QualityImprovement2020CohortQueries {
     map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId().toString());
     map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId().toString());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId().toString());
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId().toString());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId().toString());
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId().toString());
     map.put("165322", hivMetadata.getMdcState().getConceptId().toString());
@@ -12253,8 +12250,7 @@ public class QualityImprovement2020CohortQueries {
             + "                                                 AND e.location_id = :location) max_vl_date "
             + "                                                 GROUP  BY patient_id "
             + "                   ) vl_date_tbl ON pp.patient_id = vl_date_tbl.patient_id "
-            + "                 WHERE  ee.encounter_datetime >= Date_add( vl_date_tbl.vl_max_date, INTERVAL - 12 MONTH) "
-            + "                 AND ee.encounter_datetime < vl_date_tbl.vl_max_date "
+            + "                 WHERE ee.encounter_datetime < vl_date_tbl.vl_max_date "
             + "                 AND oo.concept_id = ${165174} "
             + "                 AND oo.voided = 0 "
             + "                 AND ee.voided = 0 "
