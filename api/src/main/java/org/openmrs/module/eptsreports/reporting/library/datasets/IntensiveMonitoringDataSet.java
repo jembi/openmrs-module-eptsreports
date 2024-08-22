@@ -968,7 +968,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "# de adultos (15/+anos) na 1a ou 2ª linha de TARV ou mudança de regime de 1ª linha",
         EptsReportUtils.map(
             MI13DEN2,
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-10m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     dataSetDefinition.addColumn(
@@ -997,7 +997,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "# de adultos (15/+anos) na 1a ou 2ª linha de TARV ou mudança de regime de 1ª linha, que receberam o resultado da CV entre o sexto e o nono mês após início do TARV",
         EptsReportUtils.map(
             MI13NUM2,
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-10m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     dataSetDefinition.addColumn(
@@ -1025,12 +1025,12 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "Adultos (15/+anos) na 2a linha de TARV que receberam o resultado da CV entre o sexto e o nono mês após o início da 2a linha de TARV",
         EptsReportUtils.map(
             MI13DEN5,
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},location=${location}"),
+            "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-10m},location=${location}"),
         "ageByEndDateRevision=15+");
 
     dataSetDefinition.addColumn(
         "MI13DEN5SegundaLinha",
-        "Adultos (15/+anos) com registo de início da 2a linha de TARV há 9 meses",
+        "de adultos (15/+anos) na 2a linha de TARV que receberam o resultado da CV entre o sexto e o nono mês após o início da 2a linha de TARV",
         EptsReportUtils.map(
             customCohortIndicator(
                 intensiveMonitoringCohortQueries.getMI13DEN5(5),
@@ -1053,7 +1053,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de adultos (15/+anos) coinfectados TB/HIV com resultado de CV registado na FM",
         EptsReportUtils.map(
             MI13NUM5,
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-10m},revisionEndDate=${revisionEndDate},location=${location}"),
         "ageByEndDateRevision=15+");
 
     dataSetDefinition.addColumn(
@@ -1122,7 +1122,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "# de crianças na 1a linha de TARV ou mudança de regime de 1ª linha (10-14 anos de idade) ou 2ª Linha TARV (0-14 anos de idade) que receberam o resultado da CV entre o sexto e o nono mês após início do TARV",
         EptsReportUtils.map(
             MI13DEN11,
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-10m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     dataSetDefinition.addColumn(
@@ -1151,7 +1151,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "# de crianças (10-14 anos de idade) na 1a linha de TARV ou mudança de regime de 1ª linha”, que receberam o resultado da CV entre o sexto e o nono mês após início do TARV",
         EptsReportUtils.map(
             MI13NUM11,
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-10m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     dataSetDefinition.addColumn(
@@ -1179,7 +1179,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de crianças (0-14 anos) coinfectados TB/HIV com resultado de CV registado na FM",
         EptsReportUtils.map(
             MI13DEN14,
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-10m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     dataSetDefinition.addColumn(
@@ -1207,7 +1207,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "Crianças na 2a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início da 2a linha de TARV",
         EptsReportUtils.map(
             MI13NUM14,
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-10m},revisionEndDate=${revisionEndDate},location=${location}"),
         "ageByEndDateRevision=0-14");
 
     dataSetDefinition.addColumn(
@@ -1337,7 +1337,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
     // 13.3 P4 Den
     dataSetDefinition.addColumn(
         "MI13DEN3",
-        "# de adultos na 1a linha de TARV que receberam um resultado de CV acima de 1000 cópias no período de inclusão",
+        "# de Adultos (15/+anos) na 1ª linha de TARV com registo resultado de CV acima de 1000",
         EptsReportUtils.map(
             customCohortIndicator(
                 intensiveMonitoringCohortQueries.getMICat13Part4(3, false),
@@ -1348,7 +1348,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
     // 13.12 P4 Den
     dataSetDefinition.addColumn(
         "MI13DEN12",
-        "# de crianças (>2 anos de idade) na 1a linha de TARV que receberam um resultado de CV acima de 1000 cópias no período de inclusão",
+        "# de crianças (>=2 anos de idade) na 1ª linha de TARV com registo de resultado de CV >= 1000",
         EptsReportUtils.map(
             customCohortIndicator(
                 intensiveMonitoringCohortQueries.getMICat13Part4(12, false),
@@ -1370,7 +1370,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
     // 13.3 P4 Num
     dataSetDefinition.addColumn(
         "MI13NUM3",
-        "% de Adultos (15/+anos) na 1ª linha de TARV com registo de pedido de CV entre o 3º e o 4º mês após terem recebido o último resultado de CV acima de 1000 e terem  3 sessões consecutivas de APSS/PP",
+        "# de Adultos (15/+anos) na 1ª linha de TARV com registo de pedido de CV entre o 3º e o 4º mês após terem recebido o último resultado de CV >= 1000 cps/ml ",
         EptsReportUtils.map(
             customCohortIndicator(
                 intensiveMonitoringCohortQueries.getMICat13Part4(3, true),
@@ -1381,7 +1381,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
     // 13.12 P4 Num
     dataSetDefinition.addColumn(
         "MI13NUM12",
-        "% de crianças (>2 anos de idade) na 1ª linha de TARV com registo de pedido de CV entre o 3º e o 4º mês após terem recebido o último resultado de CV acima de 1000 cópia e terem  3 sessões consecutivas de APSS/PP",
+        "# de crianças (>=2 anos de idade) na 1ª linha de TARV com registo de pedido de CV entre o 3º e o 4º mês após terem recebido o último resultado de CV >= 1000",
         EptsReportUtils.map(
             customCohortIndicator(
                 intensiveMonitoringCohortQueries.getMICat13Part4(12, true),
