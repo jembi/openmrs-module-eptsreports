@@ -9,7 +9,9 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.InitialArtStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.data.converter.CalculationResultConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
 import org.openmrs.module.eptsreports.reporting.data.definition.CalculationDataDefinition;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsArtCohortCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsEligibleForVLDataDefinitionQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TPTEligiblePatientListCohortQueries;
 import org.openmrs.module.reporting.ReportingConstants;
@@ -37,16 +39,19 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
   private final ListOfPatientsEligibleForVLDataDefinitionQueries
       listOfPatientsEligibleForVLDataDefinitionQueries;
 
+  private final ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries;
+
   @Autowired
   public TPTListOfPatientsEligibleDataSet(
-      HivMetadata hivMetadata,
-      TPTEligiblePatientListCohortQueries tPTEligiblePatientListCohortQueries,
-      ListOfPatientsEligibleForVLDataDefinitionQueries
-          listOfPatientsEligibleForVLDataDefinitionQueries) {
+          HivMetadata hivMetadata,
+          TPTEligiblePatientListCohortQueries tPTEligiblePatientListCohortQueries,
+          ListOfPatientsEligibleForVLDataDefinitionQueries
+          listOfPatientsEligibleForVLDataDefinitionQueries, ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.tPTEligiblePatientListCohortQueries = tPTEligiblePatientListCohortQueries;
     this.listOfPatientsEligibleForVLDataDefinitionQueries =
         listOfPatientsEligibleForVLDataDefinitionQueries;
+      this.listOfPatientsArtCohortCohortQueries = listOfPatientsArtCohortCohortQueries;
   }
 
   public DataSetDefinition constructDataset() throws EvaluationException {
@@ -77,7 +82,11 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
     pdd.addColumn("name", nameDef, "");
     pdd.addColumn("nid", this.getNID(identifierType.getPatientIdentifierTypeId()), "");
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
-    pdd.addColumn("age", new AgeDataDefinition(), "", null);
+    pdd.addColumn("age",
+            listOfPatientsArtCohortCohortQueries.getAge(),
+            "evaluationDate=${endDate}",
+            new NotApplicableIfNullConverter());
+
     pdd.addColumn(
         "inicio_tarv",
         getArtStartDate(),
