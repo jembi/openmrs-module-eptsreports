@@ -43,15 +43,16 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
 
   @Autowired
   public TPTListOfPatientsEligibleDataSet(
-          HivMetadata hivMetadata,
-          TPTEligiblePatientListCohortQueries tPTEligiblePatientListCohortQueries,
-          ListOfPatientsEligibleForVLDataDefinitionQueries
-          listOfPatientsEligibleForVLDataDefinitionQueries, ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries) {
+      HivMetadata hivMetadata,
+      TPTEligiblePatientListCohortQueries tPTEligiblePatientListCohortQueries,
+      ListOfPatientsEligibleForVLDataDefinitionQueries
+          listOfPatientsEligibleForVLDataDefinitionQueries,
+      ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.tPTEligiblePatientListCohortQueries = tPTEligiblePatientListCohortQueries;
     this.listOfPatientsEligibleForVLDataDefinitionQueries =
         listOfPatientsEligibleForVLDataDefinitionQueries;
-      this.listOfPatientsArtCohortCohortQueries = listOfPatientsArtCohortCohortQueries;
+    this.listOfPatientsArtCohortCohortQueries = listOfPatientsArtCohortCohortQueries;
   }
 
   public DataSetDefinition constructDataset() throws EvaluationException {
@@ -82,10 +83,11 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
     pdd.addColumn("name", nameDef, "");
     pdd.addColumn("nid", this.getNID(identifierType.getPatientIdentifierTypeId()), "");
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
-    pdd.addColumn("age",
-            listOfPatientsArtCohortCohortQueries.getAge(),
-            "evaluationDate=${endDate}",
-            new NotApplicableIfNullConverter());
+    pdd.addColumn(
+        "age",
+        listOfPatientsArtCohortCohortQueries.getAge(),
+        "evaluationDate=${endDate}",
+        new NotApplicableIfNullConverter());
 
     pdd.addColumn(
         "inicio_tarv",

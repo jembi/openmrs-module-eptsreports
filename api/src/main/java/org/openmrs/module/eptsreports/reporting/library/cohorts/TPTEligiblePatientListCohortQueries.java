@@ -40,17 +40,18 @@ public class TPTEligiblePatientListCohortQueries {
 
   @Autowired
   public TPTEligiblePatientListCohortQueries(
-          HivMetadata hivMetadata,
-          TbMetadata tbMetadata,
-          TxCurrCohortQueries txCurrCohortQueries,
-          CommonMetadata commonMetadata, GenericCohortQueries genericCohortQueries,
-          TPTInitiationCohortQueries tptInitiationCohortQueries) {
+      HivMetadata hivMetadata,
+      TbMetadata tbMetadata,
+      TxCurrCohortQueries txCurrCohortQueries,
+      CommonMetadata commonMetadata,
+      GenericCohortQueries genericCohortQueries,
+      TPTInitiationCohortQueries tptInitiationCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
     this.txCurrCohortQueries = txCurrCohortQueries;
     this.commonMetadata = commonMetadata;
-      this.genericCohortQueries = genericCohortQueries;
-      this.tptInitiationCohortQueries = tptInitiationCohortQueries;
+    this.genericCohortQueries = genericCohortQueries;
+    this.tptInitiationCohortQueries = tptInitiationCohortQueries;
   }
 
   public CohortDefinition getPatientsThatCompletedProphylaticTreatment() {
@@ -414,14 +415,13 @@ public class TPTEligiblePatientListCohortQueries {
             mapping));
 
     compositionCohortDefinition.addSearch(
-            "BASECOHORT",
-            EptsReportUtils.map(genericCohortQueries.getBaseCohort(),mapping));
+        "BASECOHORT", EptsReportUtils.map(genericCohortQueries.getBaseCohort(), mapping));
 
     compositionCohortDefinition.setCompositionString(
-        "(txcurr AND BASECOHORT) AND NOT (A1 OR A2 OR A4 OR A5 OR threeHPA1 OR threeHPA2 OR threeHPA3 OR threeHPA4 OR threeHPA5" +
-                " OR threeHPA6 OR threeHPA7 OR IPTB1Part2 OR IPTB2 OR IPTB5Part1 OR IPTB5Part2 OR IPTBPart3 OR IPTB6Part1 " +
-                "OR IPTB6Part2 OR IPTB6Part3 OR threeHPC1 OR threeHPC2 OR threeHPC3 OR threeHPC4 OR threeHPC1part2 OR " +
-                "TBTreatmentPart1 OR TBTreatmentPart2 OR TBTreatmentPart3 OR TBTreatmentPart4 OR E1 OR F)");
+        "(txcurr AND BASECOHORT) AND NOT (A1 OR A2 OR A4 OR A5 OR threeHPA1 OR threeHPA2 OR threeHPA3 OR threeHPA4 OR threeHPA5"
+            + " OR threeHPA6 OR threeHPA7 OR IPTB1Part2 OR IPTB2 OR IPTB5Part1 OR IPTB5Part2 OR IPTBPart3 OR IPTB6Part1 "
+            + "OR IPTB6Part2 OR IPTB6Part3 OR threeHPC1 OR threeHPC2 OR threeHPC3 OR threeHPC4 OR threeHPC1part2 OR "
+            + "TBTreatmentPart1 OR TBTreatmentPart2 OR TBTreatmentPart3 OR TBTreatmentPart4 OR E1 OR F)");
 
     return compositionCohortDefinition;
   }
