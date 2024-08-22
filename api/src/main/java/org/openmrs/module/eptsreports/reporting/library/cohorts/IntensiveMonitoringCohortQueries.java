@@ -787,14 +787,14 @@ public class IntensiveMonitoringCohortQueries {
           EptsReportUtils.map(
               qualityImprovement2020CohortQueries.getMQC11DEN(
                   indicatorFlag, EptsReportConstants.MIMQ.MI),
-              "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},revisionEndDate=${revisionEndDate},location=${location}"));
+              "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
     } else if (indicatorFlag == 4 || indicatorFlag == 7) {
       cd.addSearch(
           "MI11DEN",
           EptsReportUtils.map(
               qualityImprovement2020CohortQueries.getMQC11DEN(
                   indicatorFlag, EptsReportConstants.MIMQ.MI),
-              "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},revisionEndDate=${revisionEndDate},location=${location}"));
+              "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
     }
     cd.setCompositionString("MI11DEN");
     return cd;
@@ -1079,8 +1079,6 @@ public class IntensiveMonitoringCohortQueries {
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     String MAPPING =
         "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}";
-    String MAPPING1 =
-        "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},revisionEndDate=${revisionEndDate},location=${location}";
     if (indicatorFlag == 1) {
       cd.addSearch(
           "MI11NUM",
@@ -1094,7 +1092,7 @@ public class IntensiveMonitoringCohortQueries {
           EptsReportUtils.map(
               qualityImprovement2020CohortQueries.getMQC11NumB1nB2notCnotDnotEnotEnotFnHandAdultss(
                   EptsReportConstants.MIMQ.MI),
-              MAPPING1));
+              MAPPING));
     } else if (indicatorFlag == 3) {
       cd.addSearch(
           "MI11NUM",
@@ -1108,7 +1106,7 @@ public class IntensiveMonitoringCohortQueries {
           EptsReportUtils.map(
               qualityImprovement2020CohortQueries.getMQC11NumB1nB2nB3nCnotDnotEnotEnotFnH(
                   EptsReportConstants.MIMQ.MI),
-              MAPPING1));
+              MAPPING));
     } else if (indicatorFlag == 5) {
       cd.addSearch(
           "MI11NUM",
@@ -1129,7 +1127,7 @@ public class IntensiveMonitoringCohortQueries {
           EptsReportUtils.map(
               qualityImprovement2020CohortQueries.getMQC11NumB1nB2notCnotDnotEnotFnHChildren(
                   EptsReportConstants.MIMQ.MI),
-              MAPPING1));
+              MAPPING));
     }
     cd.setCompositionString("MI11NUM");
 
