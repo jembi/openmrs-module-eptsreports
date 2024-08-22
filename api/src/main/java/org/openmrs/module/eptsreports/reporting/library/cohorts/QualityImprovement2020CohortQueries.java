@@ -6167,9 +6167,9 @@ public class QualityImprovement2020CohortQueries {
             + "                                AND o.value_coded IS NOT NULL ) )) H_tbl "
             + "         ON H_tbl.patient_id = B1.patient_id "
             + "WHERE  H_tbl.encounter_datetime BETWEEN Date_add(B1.regime_date, "
-            + "                                        interval 198 days) AND "
+            + "                                        interval 198 day) AND "
             + "                                               Date_add(B1.regime_date, "
-            + "                                               interval 297 days);  ";
+            + "                                               interval 297 day);  ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
@@ -10632,8 +10632,8 @@ public class QualityImprovement2020CohortQueries {
             + "                        AND e.location_id = :location  "
             + "                        AND o.concept_id = ${856} "
             + "                        AND o.value_numeric IS NOT NULL  "
-            + "                        AND o.obs_datetime BETWEEN DATE_ADD(B1.regime_date, INTERVAL 198 DAYS)  "
-            + "                        AND DATE_ADD(B1.regime_date, INTERVAL 297 DAYS) "
+            + "                        AND o.obs_datetime BETWEEN DATE_ADD(B1.regime_date, INTERVAL 198 DAY)  "
+            + "                        AND DATE_ADD(B1.regime_date, INTERVAL 297 DAY) "
             + "                        GROUP BY p.patient_id  ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
