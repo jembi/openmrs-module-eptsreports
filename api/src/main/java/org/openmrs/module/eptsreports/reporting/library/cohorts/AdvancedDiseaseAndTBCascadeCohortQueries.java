@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -27,6 +28,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   private TransferredInCohortQueries transferredInCohortQueries;
   private ResumoMensalCohortQueries resumoMensalCohortQueries;
   private AgeCohortQueries ageCohortQueries;
+  private CommonMetadata commonMetadata;
 
   private final String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
@@ -39,7 +41,8 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
       TXTBCohortQueries txtbCohortQueries,
       ResumoMensalCohortQueries resumoMensalCohortQueries,
       TransferredInCohortQueries transferredInCohortQueries,
-      AgeCohortQueries ageCohortQueries) {
+      AgeCohortQueries ageCohortQueries,
+      CommonMetadata commonMetadata) {
 
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
@@ -49,6 +52,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
     this.transferredInCohortQueries = transferredInCohortQueries;
     this.ageCohortQueries = ageCohortQueries;
+    this.commonMetadata = commonMetadata;
   }
 
   /**
@@ -65,7 +69,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition initiatedArt = listOfPatientsArtCohortCohortQueries.getPatientsInitiatedART();
-    CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART(false);
+    CohortDefinition pregnant = getPregnantWithoutCd4();
     CohortDefinition consecutiveVL = getPatientsWithTwoConsecutiveVLGreaterThan1000();
     CohortDefinition reinitiatedArt = getPatientsWhoReinitiatedArt();
     CohortDefinition exclusion = getPatientsTransferredOutOrDead();
@@ -595,6 +599,352 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "WHERE  p.voided = 0 "
             + "GROUP  BY p.patient_id";
     StringSubstitutor sb = new StringSubstitutor(getMetadata());
+    cd.setQuery(sb.replace(query));
+    return cd;
+  }
+
+  /**
+   * <b>Pregnant Women</b>
+   *
+   * <p>Client identified as Female AND:
+   * <li>Is marked as “PREGNANT” in the initial consultation (Processo Clinico Parte A or Ficha
+   *     Resumo – Master Card) or follow-up consultation (Ficha de Seguimento Adulto o r Ficha
+   *     Clinica – Master Card) by during the period range or
+   * <li>Has “Number of weeks Pregnant” registered in the initial or follow-up consultation
+   *     (Processo Clinico Parte A or Ficha de Seguimento Adulto) during the period range or
+   * <li>Has “Delivery Due Date” registered in the initial or follow-up consultation (Processo
+   *     Clinico Parte A or Ficha de Seguimento Adulto) during the period range or
+   * <li>Is enrolled on Prevention of the Vertical Transmission/Elimination of the Vertical
+   *     Transmission (PTV/ETV) program within period range or
+   * <li>Has started ART for being B+ as specified in “CRITÉRIO PARA INÍCIO DE TARV” in the
+   *     follow-up consultations (Ficha de Seguimento) that occurred during the period range or
+   * <li>Has “Actualmente encontra-se gravida” marked as “Sim” on e-Lab Form and Data de Colheita is
+   *     during the period range.
+   *
+   *     <p>Excluding:
+   * <li>All clients who have a CD4 result recorded after the first occurrence of pregnancy recorded
+   *     during the period range from the sources listed above and before the end of Inclusion
+   *     period
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPregnantWithoutCd4() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Pregnant patients without CD4 after pregnancy date");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("1279", hivMetadata.getNumberOfWeeksPregnant().getConceptId());
+    map.put("1600", hivMetadata.getPregnancyDueDate().getConceptId());
+    map.put("5", hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("23821", hivMetadata.getSampleCollectionDateAndTime().getConceptId());
+    map.put("8", hivMetadata.getPtvEtvProgram().getProgramId());
+    map.put("6334", hivMetadata.getCriteriaForArtStart().getConceptId());
+    map.put("6331", hivMetadata.getBPlusConcept().getConceptId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("5599", commonMetadata.getPriorDeliveryDateConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("6332", hivMetadata.getBreastfeeding().getConceptId());
+    map.put("27", hivMetadata.getPatientGaveBirthWorkflowState().getProgramWorkflowStateId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+
+    String query =
+        "SELECT    min_pregnant.patient_id "
+            + "FROM      ( "
+            + "                   SELECT   pregnant.patient_id, "
+            + "                            MIN(pregnant.pregnancy_date) AS pregnancy_date "
+            + "                   FROM     ( "
+            + "                                       SELECT     p.patient_id, "
+            + "                                                  MIN(e.encounter_datetime) AS pregnancy_date "
+            + "                                       FROM       patient p "
+            + "                                       INNER JOIN person pe "
+            + "                                       ON         p.patient_id = pe.person_id "
+            + "                                       INNER JOIN encounter e "
+            + "                                       ON         p.patient_id = e.patient_id "
+            + "                                       INNER JOIN obs o "
+            + "                                       ON         e.encounter_id = o.encounter_id "
+            + "                                       WHERE      p.voided = 0 "
+            + "                                       AND        e.voided = 0 "
+            + "                                       AND        o.voided = 0 "
+            + "                                       AND        concept_id = ${1982} "
+            + "                                       AND        value_coded = ${1065} "
+            + "                                       AND        e.encounter_type IN ( ${5}, ${6} ) "
+            + "                                       AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                                       AND        e.location_id = :location "
+            + "                                       AND        pe.gender = 'F' "
+            + "                                       GROUP BY   p.patient_id "
+            + "                                       UNION "
+            + "                                       SELECT     p.patient_id, "
+            + "                                                  MIN(historical_date.value_datetime) AS pregnancy_date "
+            + "                                       FROM       patient p "
+            + "                                       INNER JOIN person pe "
+            + "                                       ON         p.patient_id = pe.person_id "
+            + "                                       INNER JOIN encounter e "
+            + "                                       ON         p.patient_id = e.patient_id "
+            + "                                       INNER JOIN obs pregnancy "
+            + "                                       ON         e.encounter_id = pregnancy.encounter_id "
+            + "                                       INNER JOIN obs historical_date "
+            + "                                       ON         e.encounter_id = historical_date.encounter_id "
+            + "                                       WHERE      p.voided = 0 "
+            + "                                       AND        e.voided = 0 "
+            + "                                       AND        pregnancy.voided = 0 "
+            + "                                       AND        pregnancy.concept_id = ${1982} "
+            + "                                       AND        pregnancy.value_coded = ${1065} "
+            + "                                       AND        historical_date.voided = 0 "
+            + "                                       AND        historical_date.concept_id = ${1190} "
+            + "                                       AND        historical_date.value_datetime IS NOT NULL "
+            + "                                       AND        historical_date.value_datetime BETWEEN :startDate AND :endDate "
+            + "                                       AND        e.location_id = :location "
+            + "                                       AND        pe.gender = 'F' "
+            + "                                       GROUP BY   p.patient_id "
+            + "                                       UNION "
+            + "                                       SELECT     p.patient_id, "
+            + "                                                  MIN(e.encounter_datetime) AS pregnancy_date "
+            + "                                       FROM       patient p "
+            + "                                       INNER JOIN person pe "
+            + "                                       ON         p.patient_id = pe.person_id "
+            + "                                       INNER JOIN encounter e "
+            + "                                       ON         p.patient_id = e.patient_id "
+            + "                                       INNER JOIN obs o "
+            + "                                       ON         e.encounter_id = o.encounter_id "
+            + "                                       WHERE      p.voided = 0 "
+            + "                                       AND        e.voided = 0 "
+            + "                                       AND        o.voided = 0 "
+            + "                                       AND        concept_id = ${1279} "
+            + "                                       AND        e.encounter_type IN ( ${5}, ${6} ) "
+            + "                                       AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                                       AND        e.location_id = :location "
+            + "                                       AND        pe.gender = 'F' "
+            + "                                       GROUP BY   p.patient_id "
+            + "                                       UNION "
+            + "                                       SELECT     p.patient_id, "
+            + "                                                  MIN(o.value_datetime) AS pregnancy_date "
+            + "                                       FROM       patient p "
+            + "                                       INNER JOIN person pe "
+            + "                                       ON         p.patient_id = pe.person_id "
+            + "                                       INNER JOIN encounter e "
+            + "                                       ON         p.patient_id = e.patient_id "
+            + "                                       INNER JOIN obs o "
+            + "                                       ON         e.encounter_id = o.encounter_id "
+            + "                                       WHERE      p.voided = 0 "
+            + "                                       AND        e.voided = 0 "
+            + "                                       AND        o.voided = 0 "
+            + "                                       AND        concept_id = ${1600} "
+            + "                                       AND        e.encounter_type IN ( ${5}, ${6} ) "
+            + "                                       AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                                       AND        e.location_id = :location "
+            + "                                       AND        pe.gender = 'F' "
+            + "                                       GROUP BY   p.patient_id "
+            + "                                       UNION "
+            + "                                       SELECT     p.patient_id, "
+            + "                                                  MIN(e.encounter_datetime) AS pregnancy_date "
+            + "                                       FROM       patient p "
+            + "                                       INNER JOIN person pe "
+            + "                                       ON         p.patient_id = pe.person_id "
+            + "                                       INNER JOIN encounter e "
+            + "                                       ON         p.patient_id = e.patient_id "
+            + "                                       INNER JOIN obs o "
+            + "                                       ON         e.encounter_id = o.encounter_id "
+            + "                                       WHERE      p.voided = 0 "
+            + "                                       AND        pe.voided = 0 "
+            + "                                       AND        e.voided = 0 "
+            + "                                       AND        o.voided = 0 "
+            + "                                       AND        concept_id = ${6334} "
+            + "                                       AND        value_coded = ${6331} "
+            + "                                       AND        e.encounter_type IN ( ${5}, ${6} ) "
+            + "                                       AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                                       AND        e.location_id = :location "
+            + "                                       AND        pe.gender = 'F' "
+            + "                                       GROUP BY   p.patient_id "
+            + "                                       UNION "
+            + "                                       SELECT     pp.patient_id, "
+            + "                                                  MIN(pp.date_enrolled) AS pregnancy_date "
+            + "                                       FROM       patient_program pp "
+            + "                                       INNER JOIN person pe "
+            + "                                       ON         pp.patient_id = pe.person_id "
+            + "                                       WHERE      pp.program_id = ${8} "
+            + "                                       AND        pp.voided = 0 "
+            + "                                       AND        pp.date_enrolled BETWEEN :startDate AND :endDate "
+            + "                                       AND        pp.location_id = :location "
+            + "                                       AND        pe.gender = 'F' "
+            + "                                       GROUP BY   pp.patient_id "
+            + "                                       UNION "
+            + "                                       SELECT     p.patient_id, "
+            + "                                                  MIN(date(o.value_datetime)) AS pregnancy_date "
+            + "                                       FROM       patient p "
+            + "                                       INNER JOIN person pe "
+            + "                                       ON         p.patient_id = pe.person_id "
+            + "                                       INNER JOIN encounter e "
+            + "                                       ON         p.patient_id = e.patient_id "
+            + "                                       INNER JOIN obs o "
+            + "                                       ON         e.encounter_id = o.encounter_id "
+            + "                                       INNER JOIN obs ob "
+            + "                                       ON         e.encounter_id = ob.encounter_id "
+            + "                                       WHERE      p.voided = 0 "
+            + "                                       AND        e.voided = 0 "
+            + "                                       AND        o.voided = 0 "
+            + "                                       AND        o.concept_id = ${23821} "
+            + "                                       AND        ob.concept_id = ${1982} "
+            + "                                       AND        ob.value_coded = ${1065} "
+            + "                                       AND        e.encounter_type = ${51} "
+            + "                                       AND        pe.gender = 'F' "
+            + "                                       AND        date(o.value_datetime) BETWEEN :startDate AND :endDate "
+            + "                                       GROUP BY   p.patient_id) AS pregnant "
+            + "                   GROUP BY patient_id) min_pregnant "
+            + "LEFT JOIN "
+            + "          ( "
+            + "                   SELECT   breastfeeding.patient_id, "
+            + "                            MIN(breastfeeding.last_date) AS breastfeeding_date "
+            + "                   FROM     ( "
+            + "                                       SELECT     p.patient_id, "
+            + "                                                  MIN(o.value_datetime) AS last_date "
+            + "                                       FROM       patient p "
+            + "                                       INNER JOIN person pe "
+            + "                                       ON         p.patient_id = pe.person_id "
+            + "                                       INNER JOIN encounter e "
+            + "                                       ON         p.patient_id = e.patient_id "
+            + "                                       INNER JOIN obs o "
+            + "                                       ON         e.encounter_id = o.encounter_id "
+            + "                                       WHERE      p.voided = 0 "
+            + "                                       AND        e.voided = 0 "
+            + "                                       AND        o.voided = 0 "
+            + "                                       AND        concept_id = ${5599} "
+            + "                                       AND        e.encounter_type IN ( ${5}, ${6} ) "
+            + "                                       AND        o.value_datetime BETWEEN :startDate AND :endDate "
+            + "                                       AND        e.location_id = :location "
+            + "                                       AND        pe.gender = 'F' "
+            + "                                       GROUP BY   p.patient_id "
+            + "                                       UNION "
+            + "                                       SELECT     p.patient_id, "
+            + "                                                  MIN(e.encounter_datetime) AS last_date "
+            + "                                       FROM       patient p "
+            + "                                       INNER JOIN person pe "
+            + "                                       ON         p.patient_id = pe.person_id "
+            + "                                       INNER JOIN encounter e "
+            + "                                       ON         p.patient_id = e.patient_id "
+            + "                                       INNER JOIN obs o "
+            + "                                       ON         e.encounter_id = o.encounter_id "
+            + "                                       WHERE      p.voided = 0 "
+            + "                                       AND        e.voided = 0 "
+            + "                                       AND        o.voided = 0 "
+            + "                                       AND        o.concept_id = ${6332} "
+            + "                                       AND        o.value_coded = ${1065} "
+            + "                                       AND        e.encounter_type IN ( ${5}, ${6} ) "
+            + "                                       AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                                       AND        e.location_id = :location "
+            + "                                       AND        pe.gender = 'F' "
+            + "                                       GROUP BY   p.patient_id "
+            + "                                       UNION "
+            + "                                       SELECT     p.patient_id, "
+            + "                                                  MIN(e.encounter_datetime) AS last_date "
+            + "                                       FROM       patient p "
+            + "                                       INNER JOIN person pe "
+            + "                                       ON         p.patient_id = pe.person_id "
+            + "                                       INNER JOIN encounter e "
+            + "                                       ON         p.patient_id = e.patient_id "
+            + "                                       INNER JOIN obs o "
+            + "                                       ON         e.encounter_id = o.encounter_id "
+            + "                                       WHERE      p.voided = 0 "
+            + "                                       AND        pe.voided = 0 "
+            + "                                       AND        e.voided = 0 "
+            + "                                       AND        o.voided = 0 "
+            + "                                       AND        o.concept_id = ${6334} "
+            + "                                       AND        o.value_coded = ${6332} "
+            + "                                       AND        e.encounter_type IN ( ${5},  ${6} ) "
+            + "                                       AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                                       AND        e.location_id = :location "
+            + "                                       AND        pe.gender = 'F' "
+            + "                                       GROUP BY   p.patient_id "
+            + "                                       UNION "
+            + "                                       SELECT     pp.patient_id, "
+            + "                                                  MIN(ps.start_date) AS last_date "
+            + "                                       FROM       patient_program pp "
+            + "                                       INNER JOIN person pe "
+            + "                                       ON         pp.patient_id = pe.person_id "
+            + "                                       INNER JOIN patient_state ps "
+            + "                                       ON         pp.patient_program_id = ps.patient_program_id "
+            + "                                       WHERE      pp.program_id = ${8} "
+            + "                                       AND        ps.state = ${27} "
+            + "                                       AND        pp.voided = 0 "
+            + "                                       AND        ps.voided = 0 "
+            + "                                       AND        ps.start_date BETWEEN :startDate AND :endDate "
+            + "                                       AND        pp.location_id = :location "
+            + "                                       AND        pe.gender = 'F' "
+            + "                                       GROUP BY   pp.patient_id "
+            + "                                       UNION "
+            + "                                       SELECT     p.patient_id, "
+            + "                                                  MIN(hist.value_datetime) AS last_date "
+            + "                                       FROM       patient p "
+            + "                                       INNER JOIN person pe "
+            + "                                       ON         p.patient_id = pe.person_id "
+            + "                                       INNER JOIN encounter e "
+            + "                                       ON         p.patient_id = e.patient_id "
+            + "                                       INNER JOIN obs o "
+            + "                                       ON         e.encounter_id = o.encounter_id "
+            + "                                       INNER JOIN obs hist "
+            + "                                       ON         e.encounter_id = hist.encounter_id "
+            + "                                       WHERE      p.voided = 0 "
+            + "                                       AND        e.voided = 0 "
+            + "                                       AND        o.voided = 0 "
+            + "                                       AND        o.concept_id = ${6332} "
+            + "                                       AND        o.value_coded = ${1065} "
+            + "                                       AND        hist.concept_id = ${1190} "
+            + "                                       AND        pe.gender = 'F' "
+            + "                                       AND        hist.value_datetime IS NOT NULL "
+            + "                                       AND        hist.value_datetime BETWEEN :startDate AND :endDate "
+            + "                                       GROUP BY   p.patient_id) AS breastfeeding "
+            + "                   GROUP BY patient_id) min_breastfeeding "
+            + "ON        min_pregnant.patient_id = min_breastfeeding.patient_id "
+            + "WHERE     ( "
+            + "                    min_pregnant.pregnancy_date IS NOT NULL "
+            + "          AND       min_pregnant.pregnancy_date >= min_breastfeeding.breastfeeding_date ) "
+            + "OR        ( "
+            + "                    min_breastfeeding.breastfeeding_date IS NULL ) "
+            + "AND       min_pregnant.patient_id NOT IN "
+            + "          ( "
+            + "                     SELECT     e.patient_id "
+            + "                     FROM       encounter e "
+            + "                     INNER JOIN obs o "
+            + "                     ON         o.encounter_id = e.encounter_id "
+            + "                     WHERE      e.voided = 0 "
+            + "                     AND        o.voided = 0 "
+            + "                     AND        e.patient_id = min_pregnant.patient_id "
+            + "                     AND        e.encounter_type IN ( ${6}, ${13}, ${51} ) "
+            + "                     AND        (( o.concept_id = ${1695} "
+            + "                                           AND        o.value_numeric IS NOT NULL) "
+            + "                                OR         ( o.concept_id = ${165515} "
+            + "                                           AND        o.value_coded IS NOT NULL ) ) "
+            + "                     AND        e.location_id = :location "
+            + "                     AND        DATE(e.encounter_datetime) BETWEEN min_pregnant.pregnancy_date AND :endDate "
+            + "                     GROUP BY   e.patient_id "
+            + "                     UNION "
+            + "                     SELECT     e.patient_id "
+            + "                     FROM       encounter e "
+            + "                     INNER JOIN obs o "
+            + "                     ON         o.encounter_id = e.encounter_id "
+            + "                     WHERE      e.voided = 0 "
+            + "                     AND        o.voided = 0 "
+            + "                     AND        e.patient_id = min_pregnant.patient_id "
+            + "                     AND        e.encounter_type IN ( ${53}, ${90} ) "
+            + "                     AND        (( o.concept_id = ${1695} "
+            + "                                           AND        o.value_numeric IS NOT NULL) "
+            + "                                OR         ( o.concept_id = ${165515} "
+            + "                                           AND        o.value_coded IS NOT NULL ) ) "
+            + "                     AND        e.location_id = :location "
+            + "                     AND        o.obs_datetime BETWEEN min_pregnant.pregnancy_date AND :endDate "
+            + "                     GROUP BY   e.patient_id ) ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
     cd.setQuery(sb.replace(query));
     return cd;
   }
@@ -1364,7 +1714,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
     map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
-    map.put("90", 90); // Should be referenced in the DAH report
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("6272", hivMetadata.getStateOfStayPriorArtPatientConcept().getConceptId());
     map.put("1705", hivMetadata.getRestartConcept().getConceptId());
@@ -1382,6 +1732,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     map.put("165186", hivMetadata.getOnePlusConcept().getConceptId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     map.put("165349", tbMetadata.getTbLamPosivityLvelConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
     return map;
   }
 
