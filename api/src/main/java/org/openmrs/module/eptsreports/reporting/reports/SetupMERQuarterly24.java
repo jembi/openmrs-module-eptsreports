@@ -18,11 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxCurrDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxMlDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxNewDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxPvlsDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxRttDataset;
+import org.openmrs.module.eptsreports.reporting.library.datasets.*;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
@@ -46,6 +42,8 @@ public class SetupMERQuarterly24 extends EptsDataExportManager {
 
   private GenericCohortQueries genericCohortQueries;
 
+  private PmtctEidDataset pmtctEidDataset;
+
   @Autowired
   public SetupMERQuarterly24(
       TxPvlsDataset txPvlsDataset,
@@ -53,13 +51,15 @@ public class SetupMERQuarterly24 extends EptsDataExportManager {
       TxCurrDataset txCurrDataset,
       TxMlDataset txMlDataset,
       TxRttDataset txRttDataset,
-      GenericCohortQueries genericCohortQueries) {
+      GenericCohortQueries genericCohortQueries,
+      PmtctEidDataset pmtctEidDataset) {
     this.txPvlsDataset = txPvlsDataset;
     this.txNewDataset = txNewDataset;
     this.txCurrDataset = txCurrDataset;
     this.txMlDataset = txMlDataset;
     this.txRttDataset = txRttDataset;
     this.genericCohortQueries = genericCohortQueries;
+    this.pmtctEidDataset = pmtctEidDataset;
   }
 
   @Override
@@ -100,6 +100,8 @@ public class SetupMERQuarterly24 extends EptsDataExportManager {
     rd.addDataSetDefinition("P", Mapped.mapStraightThrough(txPvlsDataset.constructTxPvlsDatset()));
     rd.addDataSetDefinition("TXML", Mapped.mapStraightThrough(txMlDataset.constructtxMlDataset()));
     rd.addDataSetDefinition("R", Mapped.mapStraightThrough(txRttDataset.constructTxRttDataset()));
+    rd.addDataSetDefinition(
+        "EID", Mapped.mapStraightThrough(pmtctEidDataset.constructPmtctEidDataSet()));
     // add a base cohort here to help in calculations running
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(
