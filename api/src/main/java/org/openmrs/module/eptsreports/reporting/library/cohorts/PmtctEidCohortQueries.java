@@ -198,7 +198,7 @@ public class PmtctEidCohortQueries {
 
     String query =
         "SELECT p.patient_id, "
-            + "       Min(o.value_datetime) AS enrollment_date "
+            + "       Min(o.value_datetime) AS collection_date "
             + "FROM patient p "
             + "         INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -215,6 +215,102 @@ public class PmtctEidCohortQueries {
             + "    AND (o2.concept_id = ${165502} "
             + "        AND o2.value_coded IN (${165503}, ${165506}, ${165507}, ${165510}) ) ) "
             + "GROUP BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * EID_FR6 <b>Infant`s Age (months)</b>
+   *
+   * <p>The system will identify infant age for disaggregation intervals as follows:
+   *
+   * <ul>
+   *   <li>Infants with birth date information registered in the system, the age of the infant
+   *       should be calculated as the child’s age at the specimen collection date registered on the
+   *       Laboratório Geral Form in months. (Specimen Collection Date – Birth Date)
+   * </ul>
+   *
+   * <p><b>Nota 1:</b> Infants without birth date information should be considered as unknown age
+   * and can therefore not be included in the numerator.
+   *
+   * <p><b>Nota 2:</b> Infant age will be calculated in days to determine the corresponding age
+   * disaggregation intervals as follows:
+   *
+   * <ul>
+   *   <li>(<2 months) – age between 0-59 days.
+   *   <li>( 2-12 months) – age between 60-365 days
+   * </ul>
+   *
+   * @param minAge Minimum age in Days of a patient based on Specimen Collection Date
+   * @param maxAge Maximum age in Days of a patient based on Specimen Collection Date
+   * @return CohortDefinition
+   */
+  public CohortDefinition getInfantAge(Integer minAge, Integer maxAge) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Infant Age");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("23821", hivMetadata.getSampleCollectionDateAndTime().getConceptId());
+    map.put("165502", hivMetadata.getSampleEarlyInfantDiagnosisConcept().getConceptId());
+    map.put("165503", hivMetadata.getFirstSampleInLessThan9MonthsConcept().getConceptId());
+    map.put("165506", hivMetadata.getNextSampleInLessThan9MonthsConcept().getConceptId());
+    map.put("165507", hivMetadata.getFirstSampleBetween9To17MonthsConcept().getConceptId());
+    map.put("165510", hivMetadata.getFollowingtSampleBetween9To17MonthsConcept().getConceptId());
+    map.put("minAge", minAge);
+    map.put("maxAge", maxAge);
+
+    String query =
+        "SELECT "
+            + "  pr.person_id "
+            + "FROM "
+            + "  person pr "
+            + "  INNER JOIN ( "
+            + "    SELECT "
+            + "      p.patient_id, "
+            + "      Min(o.value_datetime) AS collection_date "
+            + "    FROM "
+            + "      patient p "
+            + "      INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "      INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "      INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "    WHERE "
+            + "      p.voided = 0 "
+            + "      AND e.voided = 0 "
+            + "      AND o.voided = 0 "
+            + "      AND o2.voided = 0 "
+            + "      AND e.location_id = : location "
+            + "      AND e.encounter_type = ${13} "
+            + "      AND ( "
+            + "        ( "
+            + "          o.concept_id = ${23821} "
+            + "          AND o.value_datetime >= : startDate "
+            + "          AND o.value_datetime <= : endDate "
+            + "        ) "
+            + "        AND ( "
+            + "          o2.concept_id = ${165502} "
+            + "          AND o2.value_coded IN (${165503}, ${165506}, ${165507}, ${165510}) "
+            + "        ) "
+            + "      ) "
+            + "    GROUP BY "
+            + "      p.patient_id "
+            + "  ) specimen_collection ON pr.person_id = specimen_collection.patient_id "
+            + "WHERE "
+            + "  pr.birthdate IS NOT NULL "
+            + "  AND specimen_collection.collection_date IS NOT NULL "
+            + "  AND TIMESTAMPDIFF( "
+            + "    DAY, pr.birthdate, specimen_collection.collection_date "
+            + "  ) >= ${minAge} "
+            + "  AND TIMESTAMPDIFF( "
+            + "    DAY, pr.birthdate, specimen_collection.collection_date "
+            + "  ) <= ${maxAge}";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
