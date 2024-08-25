@@ -1004,4 +1004,84 @@ public class CommonMetadata extends Metadata {
             .getGlobalProperty("eptsreports.acceptsHomeVisitConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 165502</b>
+   *
+   * <p><b>Name:</b> Sample - Early Infant Diagnosis
+   *
+   * <p><b>Description:</b> Sample - EID
+   *
+   * @return {@link Concept}
+   */
+  public Concept getSampleEarlyInfantDiagnosisConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.sampleEarlyInfantDiagnosisConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165503</b>
+   *
+   * <p><b>Name:</b> First Sample < 9 months
+   *
+   * <p><b>Description:</b> First sample In Less Than 9 months
+   *
+   * @return {@link Concept}
+   */
+  public Concept getFirstSampleInLessThan9MonthsConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.firstSampleInLessThan9MonthsConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165506</b>
+   *
+   * <p><b>Name:</b> Next Sample < 9 months
+   *
+   * <p><b>Description:</b> Next Sample In Less Than 9 months
+   *
+   * @return {@link Concept}
+   */
+  public Concept getNextSampleInLessThan9MonthsConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.nextSampleInLessThan9MonthsConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165507</b>
+   *
+   * <p><b>Name:</b> First sample 9-17 months
+   *
+   * <p><b>Description:</b> First sample Between 9th to 17th month
+   *
+   * @return {@link Concept}
+   */
+  public Concept getFirstSampleBetween9To17MonthsConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.firstSampleBetween9To17MonthsConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165510</b>
+   *
+   * <p><b>Name:</b> Following sample 9-17 months
+   *
+   * <p><b>Description:</b> Following sample Between 9th to 17th month
+   *
+   * @return {@link Concept}
+   */
+  public Concept getFollowingtSampleBetween9To17MonthsConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.followingSampleBetween9To17MonthsConceptUuid");
+    return getConcept(uuid);
+  }
 }
