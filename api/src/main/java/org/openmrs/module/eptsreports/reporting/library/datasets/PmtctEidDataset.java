@@ -11,14 +11,23 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
+import java.util.Arrays;
+import java.util.List;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.PmtctEidCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
+import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
+import org.openmrs.module.reporting.indicator.CohortIndicator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PmtctEidDataset extends BaseDataSet {
 
-  //  private PmtctEidCohortQueries pmtctEidCohortQueries;
+  @Autowired private EptsGeneralIndicator eptsGeneralIndicator;
+
+  @Autowired private PmtctEidCohortQueries pmtctEidCohortQueries;
 
   public PmtctEidDataset() {
     //    this.pmtctEidCohortQueries = pmtctEidCohortQueries;
@@ -30,12 +39,39 @@ public class PmtctEidDataset extends BaseDataSet {
    * @return @{@link DataSetDefinition}
    */
   public DataSetDefinition constructPmtctEidDataSet() {
-
     CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
-    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
     dsd.setName("PMTCT-EID Dataset");
     dsd.addParameters(getParameters());
 
+    CohortIndicator PMTCTEID =
+        eptsGeneralIndicator.getIndicator(
+            "EID",
+            EptsReportUtils.map(
+                pmtctEidCohortQueries.getPmtctEidNumerator(),
+                "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    dsd.addColumn(
+        "PMTCTEID",
+        "The PMTCT_EID numerator reports the number of infants who had a virologic HIV test (sample collected) by 12 months of age during the reporting period.",
+        EptsReportUtils.map(
+            PMTCTEID, "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+    addRow(
+        dsd,
+        "PMTCTEID",
+        "PMTCT-EID",
+        EptsReportUtils.map(
+            PMTCTEID, "startDate=${startDate},endDate=${endDate},location=${location}"),
+        getColumns());
+
     return dsd;
+  }
+
+  public List<ColumnParameters> getColumns() {
+    return Arrays.asList(
+        new ColumnParameters(
+            "New-Male", "New On ART - Male", "art-status=new-on-art|gender=M", "01"),
+        new ColumnParameters(
+            "New-Female", "New On ART - Female", "art-status=new-on-art|gender=F", "02"));
   }
 }

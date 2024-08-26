@@ -207,7 +207,7 @@ public class PmtctEidCohortQueries {
             + "  AND e.voided = 0 "
             + "  AND o.voided = 0 "
             + "  AND o2.voided = 0 "
-            + "  AND e.location_id = : location "
+            + "  AND e.location_id = :location "
             + "  AND e.encounter_type = ${13} "
             + "  AND ( (o.concept_id = ${23821} "
             + "    AND o.value_datetime >= :startDate "
@@ -286,13 +286,13 @@ public class PmtctEidCohortQueries {
             + "      AND e.voided = 0 "
             + "      AND o.voided = 0 "
             + "      AND o2.voided = 0 "
-            + "      AND e.location_id = : location "
+            + "      AND e.location_id = :location "
             + "      AND e.encounter_type = ${13} "
             + "      AND ( "
             + "        ( "
             + "          o.concept_id = ${23821} "
-            + "          AND o.value_datetime >= : startDate "
-            + "          AND o.value_datetime <= : endDate "
+            + "          AND o.value_datetime >= :startDate "
+            + "          AND o.value_datetime <= :endDate "
             + "        ) "
             + "        AND ( "
             + "          o2.concept_id = ${165502} "
@@ -317,5 +317,47 @@ public class PmtctEidCohortQueries {
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
+  }
+
+  /**
+   * EID_FR2 <b> Indicator numerator </b>
+   *
+   * <p>The system will generate the PMTCT_EID indicator numerator as the number of infants who had
+   * a virologic HIV test (sample collected) by 12 months of age during the reporting period by
+   * considering all infants who:
+   * <li>Are enrolled in CCR by report end date (EID_FR4)
+   *
+   *     <p>AND
+   * <li>Underwent a sample collection for a virologic HIV test during the reporting period
+   *     (EID_FR5)
+   *
+   *     <p>+
+   *
+   *     <p>The system will exclude the following patients:
+   * <li>All patients older than 12 months of age at sample collection date (EID_FR6).
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPmtctEidNumerator() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("PMTCT-EID");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String mappings1 = "endDate=${endDate},location=${location}";
+
+    cd.addSearch(
+        "infantsInCcr", EptsReportUtils.map(getInfantsEnrolledInCcrByReportEndDate(), mappings1));
+
+    cd.addSearch(
+        "sampleCollectionHiv",
+        EptsReportUtils.map(
+            getPatientsWhoUnderwentASampleCollectionForVirologicHivTest(), mappings));
+
+    cd.addSearch("infantAge", EptsReportUtils.map(getInfantAge(0, 365), mappings));
+
+    cd.setCompositionString("infantsInCcr AND sampleCollectionHiv AND infantAge");
+    return cd;
   }
 }
