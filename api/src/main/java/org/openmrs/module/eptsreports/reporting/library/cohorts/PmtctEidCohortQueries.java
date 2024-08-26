@@ -11,9 +11,7 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -215,6 +213,59 @@ public class PmtctEidCohortQueries {
             + "    AND (o2.concept_id = ${165502} "
             + "        AND o2.value_coded IN (${165503}, ${165506}, ${165507}, ${165510}) ) ) "
             + "GROUP BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * identify Infants who underwent sample collection for first or second virologic HIV test
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoUnderwentFirstOrSecondSampleCollectionForVirologicHivTest(
+      boolean firstSample) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Underwent a sample collection for a virologic HIV test");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("23821", hivMetadata.getSampleCollectionDateAndTime().getConceptId());
+    map.put("165502", hivMetadata.getSampleEarlyInfantDiagnosisConcept().getConceptId());
+    map.put("165503", hivMetadata.getFirstSampleInLessThan9MonthsConcept().getConceptId());
+    map.put("165506", hivMetadata.getNextSampleInLessThan9MonthsConcept().getConceptId());
+    map.put("165507", hivMetadata.getFirstSampleBetween9To17MonthsConcept().getConceptId());
+    map.put("165510", hivMetadata.getFollowingtSampleBetween9To17MonthsConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id, "
+            + "       Min(o.value_datetime) AS collection_date "
+            + "FROM patient p "
+            + "         INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "         INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND o2.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ${13} "
+            + "  AND ( (o.concept_id = ${23821} "
+            + "    AND o.value_datetime >= :startDate "
+            + "    AND o.value_datetime <= :endDate ) "
+            + "    AND (o2.concept_id = ${165502} ";
+    if (firstSample) {
+      query = query + "        AND o2.value_coded IN (${165503}, ${165507}) ) ) ";
+    } else {
+      query = query + "        AND o2.value_coded IN (${165506}, ${165510}) ) ) ";
+    }
+    query = query + "GROUP BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 

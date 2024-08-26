@@ -14,6 +14,7 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 import java.util.Arrays;
 import java.util.List;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.PmtctEidCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
@@ -25,13 +26,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class PmtctEidDataset extends BaseDataSet {
 
+  @Autowired private EptsCommonDimension eptsCommonDimension;
+
   @Autowired private EptsGeneralIndicator eptsGeneralIndicator;
 
   @Autowired private PmtctEidCohortQueries pmtctEidCohortQueries;
-
-  public PmtctEidDataset() {
-    //    this.pmtctEidCohortQueries = pmtctEidCohortQueries;
-  }
 
   /**
    * Construction of the PMTCT - EID dataset
@@ -42,6 +41,18 @@ public class PmtctEidDataset extends BaseDataSet {
     CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
     dsd.setName("PMTCT-EID Dataset");
     dsd.addParameters(getParameters());
+
+    dsd.addDimension(
+        "infantAgeInMonths",
+        EptsReportUtils.map(
+            eptsCommonDimension.getInfantAgeInMonths(),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    dsd.addDimension(
+        "sampleCollection",
+        EptsReportUtils.map(
+            eptsCommonDimension.getInfantsWhoUnderwentSampleCollectionForFirstVirologicHivTest(),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     CohortIndicator PMTCTEID =
         eptsGeneralIndicator.getIndicator(
@@ -70,8 +81,24 @@ public class PmtctEidDataset extends BaseDataSet {
   public List<ColumnParameters> getColumns() {
     return Arrays.asList(
         new ColumnParameters(
-            "New-Male", "New On ART - Male", "art-status=new-on-art|gender=M", "01"),
+            "First-Test-2-Months",
+            "First Test < 2 months",
+            "sampleCollection=firstSample|infantAgeInMonths=lessThan2Months",
+            "01"),
         new ColumnParameters(
-            "New-Female", "New On ART - Female", "art-status=new-on-art|gender=F", "02"));
+            "First-Test-2-12-Months",
+            "First Test 2-12 months",
+            "sampleCollection=firstSample|infantAgeInMonths=from2To12Months",
+            "02"),
+        new ColumnParameters(
+            "Second-Test-2-Months",
+            "Second Test < 2 months",
+            "sampleCollection=secondSample|infantAgeInMonths=lessThan2Months",
+            "03"),
+        new ColumnParameters(
+            "Second-Test-2-12-Months",
+            "Second Test 2-12 months",
+            "sampleCollection=secondSample|infantAgeInMonths=lessThan2Months",
+            "04"));
   }
 }

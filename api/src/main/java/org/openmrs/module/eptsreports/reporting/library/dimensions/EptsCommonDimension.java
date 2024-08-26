@@ -74,6 +74,8 @@ public class EptsCommonDimension {
 
   private IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries;
 
+  private PmtctEidCohortQueries pmtctEidCohortQueries;
+
   @Autowired
   @Qualifier("commonAgeDimensionCohort")
   private AgeDimensionCohortInterface ageDimensionCohort;
@@ -100,7 +102,8 @@ public class EptsCommonDimension {
       PrepNewCohortQueries prepNewCohortQueries,
       TxPvlsBySourceLabOrFsrCohortQueries txPvlsBySourceLabOrFsrCohortQueries,
       ResumoMensalDAHCohortQueries resumoMensalDAHCohortQueries,
-      IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries) {
+      IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries,
+      PmtctEidCohortQueries pmtctEidCohortQueries) {
     this.genderCohortQueries = genderCohortQueries;
     this.txNewCohortQueries = txNewCohortQueries;
     this.genericCohortQueries = genericCohortQueries;
@@ -121,6 +124,7 @@ public class EptsCommonDimension {
     this.txPvlsBySourceLabOrFsrCohortQueries = txPvlsBySourceLabOrFsrCohortQueries;
     this.resumoMensalDAHCohortQueries = resumoMensalDAHCohortQueries;
     this.intensiveMonitoringCohortQueries = intensiveMonitoringCohortQueries;
+    this.pmtctEidCohortQueries = pmtctEidCohortQueries;
   }
 
   /**
@@ -1137,6 +1141,52 @@ public class EptsCommonDimension {
             prepCtCohortQueries.getClientsWithReasonForPrepInterruption(
                 hivMetadata.getOtherOrNonCodedConcept().getConceptId()),
             "startDate=${endDate},endDate=${endDate},location=${location}"));
+
+    return dim;
+  }
+
+  public CohortDefinitionDimension getInfantAgeInMonths() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.setName("Infant Age in Number of Days");
+    dim.addParameter(new Parameter("startDate", "startDate", Date.class));
+    dim.addParameter(new Parameter("endDate", "endDate", Date.class));
+    dim.addParameter(new Parameter("location", "location", Location.class));
+
+    dim.addCohortDefinition(
+        "lessThan2Months",
+        EptsReportUtils.map(
+            pmtctEidCohortQueries.getInfantAge(0, 59),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    dim.addCohortDefinition(
+        "from2To12Months",
+        EptsReportUtils.map(
+            pmtctEidCohortQueries.getInfantAge(60, 365),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    return dim;
+  }
+
+  public CohortDefinitionDimension
+      getInfantsWhoUnderwentSampleCollectionForFirstVirologicHivTest() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.setName("Infant Age in Number of Days");
+    dim.addParameter(new Parameter("startDate", "startDate", Date.class));
+    dim.addParameter(new Parameter("endDate", "endDate", Date.class));
+    dim.addParameter(new Parameter("location", "location", Location.class));
+
+    dim.addCohortDefinition(
+        "firstSample",
+        EptsReportUtils.map(
+            pmtctEidCohortQueries
+                .getPatientsWhoUnderwentFirstOrSecondSampleCollectionForVirologicHivTest(true),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    dim.addCohortDefinition(
+        "secondSample",
+        EptsReportUtils.map(
+            pmtctEidCohortQueries
+                .getPatientsWhoUnderwentFirstOrSecondSampleCollectionForVirologicHivTest(false),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     return dim;
   }
