@@ -42,8 +42,6 @@ public class SetupMERQuarterly24 extends EptsDataExportManager {
 
   private GenericCohortQueries genericCohortQueries;
 
-  private PmtctEidDataset pmtctEidDataset;
-
   @Autowired
   public SetupMERQuarterly24(
       TxPvlsDataset txPvlsDataset,
@@ -51,15 +49,13 @@ public class SetupMERQuarterly24 extends EptsDataExportManager {
       TxCurrDataset txCurrDataset,
       TxMlDataset txMlDataset,
       TxRttDataset txRttDataset,
-      GenericCohortQueries genericCohortQueries,
-      PmtctEidDataset pmtctEidDataset) {
+      GenericCohortQueries genericCohortQueries) {
     this.txPvlsDataset = txPvlsDataset;
     this.txNewDataset = txNewDataset;
     this.txCurrDataset = txCurrDataset;
     this.txMlDataset = txMlDataset;
     this.txRttDataset = txRttDataset;
     this.genericCohortQueries = genericCohortQueries;
-    this.pmtctEidDataset = pmtctEidDataset;
   }
 
   @Override
@@ -100,8 +96,6 @@ public class SetupMERQuarterly24 extends EptsDataExportManager {
     rd.addDataSetDefinition("P", Mapped.mapStraightThrough(txPvlsDataset.constructTxPvlsDatset()));
     rd.addDataSetDefinition("TXML", Mapped.mapStraightThrough(txMlDataset.constructtxMlDataset()));
     rd.addDataSetDefinition("R", Mapped.mapStraightThrough(txRttDataset.constructTxRttDataset()));
-    rd.addDataSetDefinition(
-        "EID", Mapped.mapStraightThrough(pmtctEidDataset.constructPmtctEidDataSet()));
     // add a base cohort here to help in calculations running
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(

@@ -54,25 +54,25 @@ public class PmtctEidDataset extends BaseDataSet {
             eptsCommonDimension.getInfantsWhoUnderwentSampleCollectionForFirstVirologicHivTest(),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
-    CohortIndicator PMTCTEID =
+    CohortIndicator TOTAL =
         eptsGeneralIndicator.getIndicator(
-            "EID",
+            "TOTAL",
             EptsReportUtils.map(
                 pmtctEidCohortQueries.getPmtctEidNumerator(),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dsd.addColumn(
-        "PMTCTEID",
+        "TOTAL",
         "The PMTCT_EID numerator reports the number of infants who had a virologic HIV test (sample collected) by 12 months of age during the reporting period.",
         EptsReportUtils.map(
-            PMTCTEID, "startDate=${startDate},endDate=${endDate},location=${location}"),
+            TOTAL, "startDate=${startDate},endDate=${endDate},location=${location}"),
         "");
     addRow(
         dsd,
-        "PMTCTEID",
-        "PMTCT-EID",
+        "TOTAL",
+        "PMTCT-EID-TOTAL",
         EptsReportUtils.map(
-            PMTCTEID, "startDate=${startDate},endDate=${endDate},location=${location}"),
+            TOTAL, "startDate=${startDate},endDate=${endDate},location=${location}"),
         getColumns());
 
     return dsd;
@@ -91,14 +91,18 @@ public class PmtctEidDataset extends BaseDataSet {
             "sampleCollection=firstSample|infantAgeInMonths=from2To12Months",
             "02"),
         new ColumnParameters(
+            "First-Test-Infants", "First Test Infants", "sampleCollection=firstSample", "03"),
+        new ColumnParameters(
             "Second-Test-2-Months",
             "Second Test < 2 months",
             "sampleCollection=secondSample|infantAgeInMonths=lessThan2Months",
-            "03"),
+            "04"),
         new ColumnParameters(
             "Second-Test-2-12-Months",
             "Second Test 2-12 months",
             "sampleCollection=secondSample|infantAgeInMonths=lessThan2Months",
-            "04"));
+            "05"),
+        new ColumnParameters(
+            "Second-Test-Infants", "Second Test Infants", "sampleCollection=secondSample", "06"));
   }
 }
