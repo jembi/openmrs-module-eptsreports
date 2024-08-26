@@ -46,13 +46,13 @@ public class PmtctEidDataset extends BaseDataSet {
         "infantAgeInMonths",
         EptsReportUtils.map(
             eptsCommonDimension.getInfantAgeInMonths(),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dsd.addDimension(
         "sampleCollection",
         EptsReportUtils.map(
             eptsCommonDimension.getInfantsWhoUnderwentSampleCollectionForFirstVirologicHivTest(),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     CohortIndicator TOTAL =
         eptsGeneralIndicator.getIndicator(
@@ -69,8 +69,8 @@ public class PmtctEidDataset extends BaseDataSet {
         "");
     addRow(
         dsd,
-        "TOTAL",
-        "PMTCT-EID-TOTAL",
+        "PMTCTEID",
+        "PMTCT-EID TOTAL",
         EptsReportUtils.map(
             TOTAL, "startDate=${startDate},endDate=${endDate},location=${location}"),
         getColumns());
@@ -81,28 +81,28 @@ public class PmtctEidDataset extends BaseDataSet {
   public List<ColumnParameters> getColumns() {
     return Arrays.asList(
         new ColumnParameters(
-            "First-Test-2-Months",
-            "First Test < 2 months",
+            "First_Test_2_Months",
+            "First Test for less than 2 months",
             "sampleCollection=firstSample|infantAgeInMonths=lessThan2Months",
             "01"),
         new ColumnParameters(
-            "First-Test-2-12-Months",
-            "First Test 2-12 months",
+            "First_Test_2_12_Months",
+            "First Test for 2 to 12 months",
             "sampleCollection=firstSample|infantAgeInMonths=from2To12Months",
             "02"),
         new ColumnParameters(
-            "First-Test-Infants", "First Test Infants", "sampleCollection=firstSample", "03"),
+            "First_Test_Infants", "First Test Infants", "sampleCollection=firstSample", "03"),
         new ColumnParameters(
-            "Second-Test-2-Months",
-            "Second Test < 2 months",
+            "Second_Test_2_Months",
+            "Second Test for less than 2 months",
             "sampleCollection=secondSample|infantAgeInMonths=lessThan2Months",
             "04"),
         new ColumnParameters(
-            "Second-Test-2-12-Months",
-            "Second Test 2-12 months",
+            "Second_Test_2_12_Months",
+            "Second Test for 2 to 12 months",
             "sampleCollection=secondSample|infantAgeInMonths=lessThan2Months",
             "05"),
         new ColumnParameters(
-            "Second-Test-Infants", "Second Test Infants", "sampleCollection=secondSample", "06"));
+            "Second_Test_Infants", "Second Test Infants", "sampleCollection=secondSample", "06"));
   }
 }
