@@ -1216,4 +1216,20 @@ public class EptsCommonDimension {
 
     return dim;
   }
+
+  public CohortDefinitionDimension getInfantArtInitiationDimension() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.setName("Infant Art Initiation");
+    dim.addParameter(new Parameter("startDate", "startDate", Date.class));
+    dim.addParameter(new Parameter("endDate", "endDate", Date.class));
+    dim.addParameter(new Parameter("location", "location", Location.class));
+
+    dim.addCohortDefinition(
+        "artInitiated",
+        EptsReportUtils.map(
+            pmtctHeiCohortQueries.getInfantsWithConfirmedArtInitiation(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    return dim;
+  }
 }

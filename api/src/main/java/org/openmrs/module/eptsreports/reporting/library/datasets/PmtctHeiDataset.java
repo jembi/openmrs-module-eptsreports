@@ -54,6 +54,12 @@ public class PmtctHeiDataset extends BaseDataSet {
             eptsCommonDimension.getPosiveOrNegativeVirologicHiv(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
+    dsd.addDimension(
+        "art",
+        EptsReportUtils.map(
+            eptsCommonDimension.getInfantArtInitiationDimension(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
     CohortIndicator TOTAL =
         eptsGeneralIndicator.getIndicator(
             "TOTAL",
@@ -109,6 +115,18 @@ public class PmtctHeiDataset extends BaseDataSet {
             "Positive_Hiv_Result",
             "Positive HIV Result",
             "virologicHivResult=positiveResult",
-            "06"));
+            "06"),
+        new ColumnParameters(
+            "Art_Initiated_2_Months",
+            "Initiated ART for less than 2 months",
+            "art=artInitiated|infantAgeInMonths=lessThan2Months",
+            "07"),
+        new ColumnParameters(
+            "Art_Initiated_2_12_Months",
+            "Initiated ART for 2 to 12 months",
+            "art=artInitiated|infantAgeInMonths=from2To12Months",
+            "08"),
+        new ColumnParameters(
+            "Art_Initiated", "Infant who Initiated ART", "art=artInitiated", "09"));
   }
 }

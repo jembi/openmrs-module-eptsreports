@@ -15,6 +15,8 @@ import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -29,12 +31,16 @@ public class PmtctHeiCohortQueries {
 
   private HivMetadata hivMetadata;
   private PmtctEidCohortQueries pmtctEidCohortQueries;
+  private CommonQueries commonQueries;
 
   @Autowired
   public PmtctHeiCohortQueries(
-      HivMetadata hivMetadata, PmtctEidCohortQueries pmtctEidCohortQueries) {
+      HivMetadata hivMetadata,
+      PmtctEidCohortQueries pmtctEidCohortQueries,
+      CommonQueries commonQueries) {
     this.hivMetadata = hivMetadata;
     this.pmtctEidCohortQueries = pmtctEidCohortQueries;
+    this.commonQueries = commonQueries;
   }
 
   /**
@@ -366,5 +372,61 @@ public class PmtctHeiCohortQueries {
     scd.setQuery(stringSubstitutor.replace(query));
 
     return scd;
+  }
+
+  /**
+   * <b> INFANT ART INITIATION </b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getInfantArtInitiation() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("INFANT ART INITIATION");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+
+    String query =
+        new EptsQueriesUtil().patientIdQueryBuilder(commonQueries.getArtInitiation()).getQuery();
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * HEI _FR9 <b> Infants with confirmed ART initiation </b>
+   *
+   * <p>The system will identify the infants with confirmed ART initiation as follows:
+   * <li>All infants with a positive virologic HIV test result returned during the reporting period
+   *     (HEI_FR7), the system will consider all infants with their first ever drug pick-up date
+   *     registered in FILA or MasterCard – Recepção Levantou ARVs forms by the end of the reporting
+   *     period.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getInfantsWithConfirmedArtInitiation() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Infants with confirmed ART initiation");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+
+    cd.addSearch(
+        "positiveHivResultInfants",
+        EptsReportUtils.map(getPositveOrNegativePcrResult(true), mappings));
+
+    cd.addSearch("artInitiation", EptsReportUtils.map(getInfantArtInitiation(), mappings));
+
+    cd.setCompositionString("positiveHivResultInfants AND artInitiation");
+    return cd;
   }
 }
