@@ -4237,4 +4237,20 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.cd4CountLessThanOrEqualTo200ConceptUuid</property>
+		<defaultValue>9395a2a8-21e9-4e06-bd2f-24c52f56cd21</defaultValue>
+		<description>
+			UUID for CD4 count less than or equal to 200 concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.cd4CountGreaterThan200ConceptUuid</property>
+		<defaultValue>9395a2a8-21e9-4e06-bd2f-24c52f56cd21</defaultValue>
+		<description>
+			UUID for CD4 count Greater than 200 concept
+		</description>
+	</globalProperty>
+
 </module>
