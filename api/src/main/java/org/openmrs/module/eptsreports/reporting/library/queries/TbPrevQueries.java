@@ -563,7 +563,7 @@ public class TbPrevQueries {
             + "                       AND e.encounter_type = ${6} "
             + "                       AND ( o.concept_id = ${23985}  AND o.value_coded = ${23954} ) "
             + "                       AND ( o2.concept_id = ${165308} AND o2.value_coded IN ( ${1256}, ${1257} ) )"
-            + "                       AND ( o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 4 MONTH) AND :endDate ) "
+            + "                       AND ( o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) "
             + "                       GROUP BY e.encounter_id "
             + " ) profilaxy "
             + "               INNER JOIN (SELECT patient_id,MIN(start_date) start_date "
@@ -572,7 +572,7 @@ public class TbPrevQueries {
             + "                                  )tpt "
             + "                           GROUP  BY tpt.patient_id) tpt_start ON tpt_start.patient_id = profilaxy.patient_id "
             + "        WHERE  profilaxy.obs_datetime BETWEEN tpt_start.start_date AND DATE_ADD(tpt_start.start_date, INTERVAL 4 MONTH) "
-            + "        AND profilaxy.obs_datetime BETWEEN :startDate and :endDate "
+            + "        AND profilaxy.obs_datetime <= :endDate "
             + "        GROUP  BY profilaxy.patient_id) three_encounters "
             + "WHERE  three_encounters.encounters >= 3";
 
@@ -689,7 +689,7 @@ public class TbPrevQueries {
             + "                       AND e.location_id = :location "
             + "                       AND e.encounter_type = ${6} "
             + "                       AND o.concept_id = ${1719} AND o.value_coded = ${165307}  "
-            + "                       AND e.encounter_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 4 MONTH) AND :endDate "
+            + "                       AND e.encounter_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate "
             + "               GROUP BY e.encounter_id "
             + "                       ) profilaxy "
             + "               INNER JOIN (SELECT patient_id,MIN(start_date) start_date "
@@ -698,7 +698,7 @@ public class TbPrevQueries {
             + "                                  )tpt "
             + "                           GROUP  BY tpt.patient_id) tpt_start ON tpt_start.patient_id = profilaxy.patient_id "
             + "        WHERE  profilaxy.encounter_datetime BETWEEN tpt_start.start_date AND DATE_ADD(tpt_start.start_date, INTERVAL 4 MONTH) "
-            + "        AND  profilaxy.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "        AND  profilaxy.encounter_datetime <= :endDate "
             + "        GROUP  BY profilaxy.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(getReportMetadata());

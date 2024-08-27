@@ -137,18 +137,18 @@ public class TbPrevCohortQueries {
     definition.addParameter(new Parameter("location", "Location", Location.class));
 
     definition.addSearch(
-        "A",
+        "COMPLETED",
         EptsReportUtils.map(
             getPatientsThatCompletedIsoniazidProphylacticTreatment(),
             "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
 
     definition.addSearch(
-        "B",
+        "DENOMINATOR",
         EptsReportUtils.map(
             getDenominator(),
             "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
-    definition.setCompositionString("A AND B");
+    definition.setCompositionString("COMPLETED AND DENOMINATOR");
 
     return definition;
   }
