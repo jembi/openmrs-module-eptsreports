@@ -73,9 +73,9 @@ public class QualityImprovement2020CohortQueries {
   private final String MAPPING6 =
       "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate},location=${location}";
   private final String MAPPING7 =
-      "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate},location=${location}";
+      "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate},location=${location}";
   private final String MAPPING8 =
-      "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},location=${location}";
+      "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}";
   private final String MAPPING9 =
       "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}";
   private final String MAPPING10 =
