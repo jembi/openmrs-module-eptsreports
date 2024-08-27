@@ -1720,7 +1720,7 @@ public class EriDSDCohortQueries {
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getCD4CountAndCD4PercentAndCd4Quantitative(
-      int cd4_absolute, int cd4_semi_quantitative, boolean age2to4) {
+      int cd4_absolute, boolean age2to4) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patient with last CD4 result without VL Result ");
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
@@ -1737,8 +1737,8 @@ public class EriDSDCohortQueries {
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
     map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
     map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
+    map.put("1254", hivMetadata.getCD4CountGreaterThan200Concept().getConceptId());
     map.put("cd4_absolute", cd4_absolute);
-    map.put("cd4_semi_quantitative", cd4_semi_quantitative);
 
     String query =
         "SELECT p.patient_id "
@@ -1747,7 +1747,7 @@ public class EriDSDCohortQueries {
             + "                            FROM   (SELECT vl.patient_id, "
             + "                                           Max(vl.latest_date) max_date "
             + "                                    FROM   (SELECT p.patient_id, "
-            + "                                                   Max(e.encounter_datetime) "
+            + "                                                   Max(DATE(e.encounter_datetime)) "
             + "                                                       latest_date "
             + "                                            FROM   patient p "
             + "                                                       INNER JOIN encounter e "
@@ -1760,9 +1760,7 @@ public class EriDSDCohortQueries {
             + "                                                                         ${13}, ${51} ) "
             + "                                              AND o.concept_id IN ( ${856}, "
             + "                                                                    ${1305} ) "
-            + "                                              AND Cast(e.encounter_datetime "
-            + "                                                AS "
-            + "                                                date) BETWEEN "
+            + "                                              AND DATE(e.encounter_datetime) BETWEEN "
             + "                                                Date_add(:endDate, "
             + "                                                         INTERVAL -12 month) AND "
             + "                                                :endDate "
@@ -1811,13 +1809,12 @@ public class EriDSDCohortQueries {
             + "                                    AND o.value_coded IS NOT NULL ) ) "
             + "                              AND e.location_id = :location "
             + "                              AND ( ( e.encounter_type IN ( ${6}, ${9}, ${13}, ${51} ) "
-            + "                                AND Cast(e.encounter_datetime AS date "
-            + "                                    ) "
+            + "                                AND DATE(e.encounter_datetime) "
             + "                                          BETWEEN "
             + "                                          Date_add(:endDate, "
             + "                                                   INTERVAL -12 month) "
             + "                                          AND :endDate "
-            + "                                AND e.encounter_datetime = "
+            + "                                AND DATE(e.encounter_datetime) = "
             + "                                    vl_max.max_date ) "
             + "                                OR ( e.encounter_type = ${53} "
             + "                                    AND o.obs_datetime BETWEEN "
@@ -1833,7 +1830,7 @@ public class EriDSDCohortQueries {
             + "                       FROM   (SELECT cd4.patient_id, "
             + "                                      Max(cd4.latest_date) max_date "
             + "                               FROM   (SELECT p.patient_id, "
-            + "                                              Max(e.encounter_datetime) "
+            + "                                              Max(DATE(e.encounter_datetime)) "
             + "                                                  latest_date "
             + "                                       FROM   patient p "
             + "                                                  INNER JOIN encounter e "
@@ -1847,9 +1844,7 @@ public class EriDSDCohortQueries {
             + "                                         AND o.concept_id IN ( "
             + "                                                              ${1695}, ${730}, ${165515} "
             + "                                           ) "
-            + "                                         AND Cast(e.encounter_datetime "
-            + "                                           AS "
-            + "                                           date) "
+            + "                                         AND DATE(e.encounter_datetime) "
             + "                                           BETWEEN "
             + "                                           Date_add(:endDate, "
             + "                                                    INTERVAL -12 month) AND "
@@ -1897,22 +1892,19 @@ public class EriDSDCohortQueries {
             ? "                         AND ( ( oo.concept_id = ${1695} "
                 + "                           AND oo.value_numeric > ${cd4_absolute} ) "
                 + "                           OR ( oo.concept_id = ${730} "
-                + "                               AND oo.value_numeric > 15 ) "
-                + "                           OR ( oo.concept_id = ${165515} "
-                + "                               AND oo.value_numeric > ${cd4_semi_quantitative} ) ) "
+                + "                               AND oo.value_numeric > 15 ) ) "
             : "                         AND ( ( oo.concept_id = ${1695} "
                 + "                           AND oo.value_numeric > ${cd4_absolute} ) "
                 + "                           OR ( oo.concept_id = ${165515} "
-                + "                               AND oo.value_numeric > ${cd4_semi_quantitative} ) ) ";
+                + "                               AND oo.value_coded = ${1254} ) ) ";
     query +=
         "                         AND ee.location_id = :location "
             + "                         AND ( ( ee.encounter_type IN ( ${6}, ${9}, ${13}, ${51} ) "
-            + "                           AND Cast(ee.encounter_datetime AS "
-            + "                                     date) "
+            + "                           AND DATE(ee.encounter_datetime) "
             + "                                     BETWEEN "
             + "                                     Date_add(:endDate, "
             + "                                              INTERVAL -12 month) AND :endDate "
-            + "                           AND ee.encounter_datetime = "
+            + "                           AND DATE(ee.encounter_datetime) = "
             + "                               cd4_max.max_date "
             + "                                   ) "
             + "                           OR ( ee.encounter_type = ${53} "
@@ -1944,7 +1936,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "Cd4Result",
         EptsReportUtils.map(
-            getCD4CountAndCD4PercentAndCd4Quantitative(750, 750, true),
+            getCD4CountAndCD4PercentAndCd4Quantitative(750, true),
             "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "Age",
@@ -1965,7 +1957,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "Cd4Result",
         EptsReportUtils.map(
-            getCD4CountAndCD4PercentAndCd4Quantitative(200, 200, false),
+            getCD4CountAndCD4PercentAndCd4Quantitative(200, false),
             "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "Age",
