@@ -13,7 +13,7 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 
 import java.util.Arrays;
 import java.util.List;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.PmtctEidCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.PmtctHeiCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -30,7 +30,7 @@ public class PmtctHeiDataset extends BaseDataSet {
 
   @Autowired private EptsGeneralIndicator eptsGeneralIndicator;
 
-  @Autowired private PmtctEidCohortQueries pmtctEidCohortQueries;
+  @Autowired private PmtctHeiCohortQueries pmtctHeiCohortQueries;
 
   /**
    * Construction of the PMTCT - EID dataset
@@ -58,7 +58,7 @@ public class PmtctHeiDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "TOTAL",
             EptsReportUtils.map(
-                pmtctEidCohortQueries.getPmtctEidNumerator(),
+                pmtctHeiCohortQueries.getPmtctHeiNumerator(),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dsd.addColumn(
