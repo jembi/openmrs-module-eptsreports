@@ -95,7 +95,7 @@ public class PmtctEidDataset extends BaseDataSet {
         new ColumnParameters(
             "Second_Test_2_Months",
             "Second Test for less than 2 months",
-            "sampleCollection=secondSample|infantAgeInMonths=lessThan2Months",
+            "sampleCollection=secondSample|infantAgeInMonths=from2To12Months",
             "04"),
         new ColumnParameters(
             "Second_Test_2_12_Months",
