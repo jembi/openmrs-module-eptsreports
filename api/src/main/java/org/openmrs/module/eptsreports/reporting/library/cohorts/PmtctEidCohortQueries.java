@@ -149,7 +149,7 @@ public class PmtctEidCohortQueries {
 
     cd.addSearch("C", EptsReportUtils.map(getPatientsWithCcrFichaResumo(), mapping));
 
-    cd.setCompositionString("A AND (B OR C)");
+    cd.setCompositionString("(A AND B) OR C");
 
     return cd;
   }

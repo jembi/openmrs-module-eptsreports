@@ -54,6 +54,8 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
 
   private PmtctEidDataset pmtctEidDataset;
 
+  private PmtctHeiDataset pmtctHeiDataset;
+
   @Autowired
   public SetupMERQuarterly27(
       TxPvlsDataset txPvlsDataset,
@@ -70,7 +72,8 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
       PrepNewDataset prepNewDataset,
       PrepCtDataset prepCtDataset,
       PrepOtherDisaggregationDataset prepOtherDisaggregationDataset,
-      PmtctEidDataset pmtctEidDataset) {
+      PmtctEidDataset pmtctEidDataset,
+      PmtctHeiDataset pmtctHeiDataset) {
     this.txPvlsDataset = txPvlsDataset;
     this.txNewDataset = txNewDataset;
     this.txCurrDataset = txCurrDataset;
@@ -83,6 +86,7 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
     this.prepCtDataset = prepCtDataset;
     this.prepOtherDisaggregationDataset = prepOtherDisaggregationDataset;
     this.pmtctEidDataset = pmtctEidDataset;
+    this.pmtctHeiDataset = pmtctHeiDataset;
   }
 
   @Override
@@ -138,6 +142,8 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
             prepOtherDisaggregationDataset.constructPrepOtherDisaggregationDataset()));
     rd.addDataSetDefinition(
         "EID", Mapped.mapStraightThrough(pmtctEidDataset.constructPmtctEidDataSet()));
+    rd.addDataSetDefinition(
+        "HEI", Mapped.mapStraightThrough(pmtctHeiDataset.constructPmtctHeiDataSet()));
 
     rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
 
