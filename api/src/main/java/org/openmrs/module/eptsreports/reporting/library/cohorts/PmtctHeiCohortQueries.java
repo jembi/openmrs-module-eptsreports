@@ -263,4 +263,108 @@ public class PmtctHeiCohortQueries {
     cd.setCompositionString("infantsInCcr AND sampleCollectionHiv AND infantAge");
     return cd;
   }
+
+  /**
+   * HEI_FR7 | HEI_FR8 <b> Positive | Negative virologic HIV test result </b>
+   *
+   * <p>The system will include all infants who have “Pos” | “Neg” HIV DNA PCR result selected on
+   * the Laboratório Geral Form <b>(HEI_FR5)</b> in the positive disaggregates.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPositveOrNegativePcrResult(boolean posiveResult) {
+    SqlCohortDefinition scd = new SqlCohortDefinition();
+    scd.setName("Positive Or Negative virologic HIV test result");
+    scd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    scd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    scd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("23821", hivMetadata.getSampleCollectionDateAndTime().getConceptId());
+    map.put("165502", hivMetadata.getSampleEarlyInfantDiagnosisConcept().getConceptId());
+    map.put("165503", hivMetadata.getFirstSampleInLessThan9MonthsConcept().getConceptId());
+    map.put("165506", hivMetadata.getNextSampleInLessThan9MonthsConcept().getConceptId());
+    map.put("165507", hivMetadata.getFirstSampleBetween9To17MonthsConcept().getConceptId());
+    map.put("165510", hivMetadata.getFollowingtSampleBetween9To17MonthsConcept().getConceptId());
+    map.put("1030", hivMetadata.getHivPCRQualitativeConceptUuid().getConceptId());
+    map.put("703", hivMetadata.getPositive().getConceptId());
+    map.put("664", hivMetadata.getNegative().getConceptId());
+
+    String query =
+        "SELECT "
+            + "  p.patient_id "
+            + "FROM "
+            + "  patient p "
+            + "  INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "  INNER JOIN ( "
+            + "    SELECT "
+            + "      p.patient_id, "
+            + "      MAX(o.value_datetime) AS pcr_result_date, "
+            + "      o2.value_coded AS pcr_result "
+            + "    FROM "
+            + "      patient p "
+            + "      INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "      INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "      INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "      INNER JOIN obs o3 ON o3.encounter_id = e.encounter_id "
+            + "      INNER JOIN ( "
+            + "        SELECT "
+            + "          p.patient_id, "
+            + "          ps.birthdate AS birtday "
+            + "        FROM "
+            + "          patient p "
+            + "          INNER JOIN person ps ON p.patient_id = ps.person_id "
+            + "        WHERE "
+            + "          p.voided = 0 "
+            + "          AND ps.voided = 0 "
+            + "      ) pat ON pat.patient_id = p.patient_id "
+            + "    WHERE "
+            + "      p.voided = 0 "
+            + "      AND e.voided = 0 "
+            + "      AND o.voided = 0 "
+            + "      AND o2.voided = 0 "
+            + "      AND o3.voided = 0 "
+            + "      AND e.encounter_type = ${13} "
+            + "      AND e.encounter_datetime >= :startDate "
+            + "      AND e.encounter_datetime <= :endDate "
+            + "      AND e.location_id = :location "
+            + "      AND ( "
+            + "        ( "
+            + "          o.concept_id = ${23821} "
+            + "          AND o.value_datetime <= DATE_ADD(pat.birtday, INTERVAL 365 DAY) "
+            + "        ) "
+            + "        AND ( "
+            + "          o2.concept_id = ${1030} "
+            + "          AND o2.value_coded IN (${703}, ${664}) "
+            + "        ) "
+            + "        AND ( "
+            + "          o3.concept_id = ${165502} "
+            + "          AND o3.value_coded IN (${165503}, ${165506}, ${165507}, ${165510}) "
+            + "        ) "
+            + "      ) "
+            + "    GROUP BY "
+            + "      p.patient_id "
+            + "  ) virologic_hiv ON virologic_hiv.patient_id = p.patient_id "
+            + "  AND p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.encounter_type = ${13} "
+            + "  AND e.encounter_datetime >= :startDate "
+            + "  AND e.encounter_datetime <= :endDate "
+            + "  AND e.location_id = :location "
+            + "  AND o.concept_id = ${1030} ";
+    if (posiveResult) {
+      query = query + "  AND virologic_hiv.pcr_result = ${703}";
+    } else {
+      query = query + "  AND virologic_hiv.pcr_result = ${664}";
+    }
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    scd.setQuery(stringSubstitutor.replace(query));
+
+    return scd;
+  }
 }

@@ -49,9 +49,9 @@ public class PmtctHeiDataset extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dsd.addDimension(
-        "sampleCollection",
+        "virologicHivResult",
         EptsReportUtils.map(
-            eptsCommonDimension.getInfantsWhoUnderwentSampleCollectionForFirstVirologicHivTest(),
+            eptsCommonDimension.getPosiveOrNegativeVirologicHiv(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     CohortIndicator TOTAL =
@@ -81,28 +81,34 @@ public class PmtctHeiDataset extends BaseDataSet {
   public List<ColumnParameters> getColumns() {
     return Arrays.asList(
         new ColumnParameters(
-            "First_Test_2_Months",
-            "First Test for less than 2 months",
-            "sampleCollection=firstSample|infantAgeInMonths=lessThan2Months",
+            "Negative_Hiv_Result_2_Months",
+            "Negative HIV Result for less than 2 months",
+            "virologicHivResult=negativeResult|infantAgeInMonths=lessThan2Months",
             "01"),
         new ColumnParameters(
-            "First_Test_2_12_Months",
-            "First Test for 2 to 12 months",
-            "sampleCollection=firstSample|infantAgeInMonths=from2To12Months",
+            "Negative_Hiv_Result_2_12_Months",
+            "Negative HIV Result for 2 to 12 months",
+            "virologicHivResult=negativeResult|infantAgeInMonths=from2To12Months",
             "02"),
         new ColumnParameters(
-            "First_Test_Infants", "First Test Infants", "sampleCollection=firstSample", "03"),
+            "Negative_Hiv_Result",
+            "Negative HIV Result",
+            "virologicHivResult=negativeResult",
+            "03"),
         new ColumnParameters(
-            "Second_Test_2_Months",
-            "Second Test for less than 2 months",
-            "sampleCollection=secondSample|infantAgeInMonths=lessThan2Months",
+            "Positive_Hiv_Result_2_Months",
+            "Positive HIV Result for less than 2 months",
+            "virologicHivResult=positiveResult|infantAgeInMonths=lessThan2Months",
             "04"),
         new ColumnParameters(
-            "Second_Test_2_12_Months",
-            "Second Test for 2 to 12 months",
-            "sampleCollection=secondSample|infantAgeInMonths=lessThan2Months",
+            "Positive_Hiv_Result_2_12_Months",
+            "Positive HIV Result for 2 to 12 months",
+            "virologicHivResult=positiveResult|infantAgeInMonths=from2To12Months",
             "05"),
         new ColumnParameters(
-            "Second_Test_Infants", "Second Test Infants", "sampleCollection=secondSample", "06"));
+            "Positive_Hiv_Result",
+            "Positive HIV Result",
+            "virologicHivResult=positiveResult",
+            "06"));
   }
 }
