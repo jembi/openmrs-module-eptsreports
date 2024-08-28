@@ -1790,7 +1790,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MI19DEN2",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ19A(2),
+                qualityImprovement2020CohortQueries.getMQ19A(1),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI19DEN2.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -1844,7 +1844,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MI19DEN5",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ19A(5),
+                qualityImprovement2020CohortQueries.getMQ19A(4),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI19DEN5.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -1898,7 +1898,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MI19NUM2",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ19B(2),
+                qualityImprovement2020CohortQueries.getMQ19B(1),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI19NUM2.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -1952,7 +1952,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MI19NUM5",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ19B(5),
+                qualityImprovement2020CohortQueries.getMQ19B(4),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI19NUM5.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
