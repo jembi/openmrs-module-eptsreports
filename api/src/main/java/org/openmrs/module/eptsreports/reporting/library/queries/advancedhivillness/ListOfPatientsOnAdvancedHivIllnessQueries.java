@@ -207,7 +207,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
     query += "  GROUP BY ps.person_id " + " UNION ";
 
     query +=
-        "  SELECT ps.person_id, o.value_numeric as cd4  "
+        "  SELECT ps.person_id, IF(o.concept_id = ${165515}, o.value_coded, o.value_numeric) as cd4  "
             + "FROM   person ps  "
             + "           INNER JOIN encounter e  "
             + "                      ON ps.person_id = e.patient_id  "

@@ -94,7 +94,7 @@ public class ObservationToConceptNameConverter implements DataConverter {
       case "1254":
         return cd4CountGreaterThan200;
       default:
-        return "";
+        return original.toString();
     }
   }
 
