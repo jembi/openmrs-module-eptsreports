@@ -30,6 +30,8 @@ public class ObservationToConceptNameConverter implements DataConverter {
   private final String pulmonaryTb = "Tuberculose Pulmonar";
   private final String plasmaSampleType = "Plasma";
   private final String drayBloodSpotSampleType = "Amostra de Sangue Seco";
+  private final String cd4CountLessThanOrEqualTo200 = "CD4 menor ou igual a 200";
+  private final String cd4CountGreaterThan200 = "CD4 Superior a 200";
 
   @Override
   public Object convert(Object original) {
@@ -87,6 +89,10 @@ public class ObservationToConceptNameConverter implements DataConverter {
         return plasmaSampleType;
       case "23831":
         return drayBloodSpotSampleType;
+      case "165513":
+        return cd4CountLessThanOrEqualTo200;
+      case "1254":
+        return cd4CountGreaterThan200;
       default:
         return "";
     }

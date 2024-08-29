@@ -47,7 +47,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "       AND o.value_numeric < "
             + valueNumeric;
     if (minAge != null && minAge >= 5) {
-      fromSQL += " OR ( o.concept_id = ${165515} AND o.value_coded ${165513} )";
+      fromSQL += " OR ( o.concept_id = ${165515} AND o.value_coded = ${165513} )";
     }
     fromSQL +=
         "       AND DATE(e.encounter_datetime) = last_cd4_result.most_recent "
@@ -90,7 +90,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "  AND o.value_numeric < "
             + valueNumeric;
     if (minAge != null && minAge >= 5) {
-      fromSQL += " OR ( o.concept_id = ${165515} AND o.value_coded ${165513} )";
+      fromSQL += " OR ( o.concept_id = ${165515} AND o.value_coded = ${165513} )";
     }
     fromSQL +=
         "  AND o.obs_datetime = last_cd4_result.most_recent " + "  AND e.location_id = :location";
@@ -179,7 +179,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
       Integer absoluteCd4Amount, Integer minAge, Integer maxAge) {
 
     String query =
-        " SELECT ps.person_id, o.value_numeric as cd4  "
+        " SELECT ps.person_id, IF(o.concept_id = ${165515}, o.value_coded, o.value_numeric) as cd4  "
             + "FROM   person ps  "
             + "           INNER JOIN encounter e  "
             + "                      ON ps.person_id = e.patient_id  "
@@ -194,8 +194,12 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "  AND e.encounter_type IN ( ${6}, ${13}, ${51} )  "
             + "  AND o.concept_id = ${1695}  "
             + "  AND o.value_numeric <  "
-            + absoluteCd4Amount
-            + "  AND Date(e.encounter_datetime) = last_cd4.most_recent  "
+            + absoluteCd4Amount;
+    if (minAge != null && minAge >= 5) {
+      query += " OR ( o.concept_id = ${165515} AND o.value_coded = ${165513} )";
+    }
+    query +=
+        "  AND Date(e.encounter_datetime) = last_cd4.most_recent  "
             + "  AND e.location_id = :location ";
 
     query = getAgeVerificationString(minAge, maxAge, query);
@@ -218,9 +222,11 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "  AND e.encounter_type IN ( ${53}, ${90} )  "
             + "  AND o.concept_id = ${1695}  "
             + "  AND o.value_numeric <  "
-            + absoluteCd4Amount
-            + "  AND o.obs_datetime = last_cd4.most_recent  "
-            + "  AND e.location_id = :location ";
+            + absoluteCd4Amount;
+    if (minAge != null && minAge >= 5) {
+      query += " OR ( o.concept_id = ${165515} AND o.value_coded = ${165513} )";
+    }
+    query += "  AND o.obs_datetime = last_cd4.most_recent  " + "  AND e.location_id = :location ";
 
     query = getAgeVerificationString(minAge, maxAge, query);
     query += "  GROUP BY ps.person_id ";
@@ -307,7 +313,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
   }
 
   public String getLastCd4OrResultDateBeforeMostRecentCd4() {
-    return " SELECT ps.person_id, o.value_numeric, DATE(last_cd4.second_date) AS second_cd4_result "
+    return " SELECT ps.person_id, IF(o.concept_id = ${165515}, o.value_coded, o.value_numeric) AS cd4_result, DATE(last_cd4.second_date) AS second_cd4_result "
         + " FROM   person ps "
         + "       INNER JOIN encounter e "
         + "               ON ps.person_id = e.patient_id "
@@ -332,7 +338,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "       AND e.location_id = :location"
         + "       GROUP BY ps.person_id "
         + " UNION "
-        + " SELECT ps.person_id, o.value_numeric, last_cd4.second_date AS second_cd4_result "
+        + " SELECT ps.person_id, IF(o.concept_id = ${165515}, o.value_coded, o.value_numeric) AS cd4_result, last_cd4.second_date AS second_cd4_result "
         + " FROM "
         + "    person ps INNER JOIN encounter e ON ps.person_id= e.patient_id "
         + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
