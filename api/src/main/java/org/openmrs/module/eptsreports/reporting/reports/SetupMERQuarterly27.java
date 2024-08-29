@@ -52,6 +52,10 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
 
   private PrepOtherDisaggregationDataset prepOtherDisaggregationDataset;
 
+  private PmtctEidDataset pmtctEidDataset;
+
+  private PmtctHeiDataset pmtctHeiDataset;
+
   @Autowired
   public SetupMERQuarterly27(
       TxPvlsDataset txPvlsDataset,
@@ -67,7 +71,9 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
       TXCXCADataset txcxcaDataset,
       PrepNewDataset prepNewDataset,
       PrepCtDataset prepCtDataset,
-      PrepOtherDisaggregationDataset prepOtherDisaggregationDataset) {
+      PrepOtherDisaggregationDataset prepOtherDisaggregationDataset,
+      PmtctEidDataset pmtctEidDataset,
+      PmtctHeiDataset pmtctHeiDataset) {
     this.txPvlsDataset = txPvlsDataset;
     this.txNewDataset = txNewDataset;
     this.txCurrDataset = txCurrDataset;
@@ -79,6 +85,8 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
     this.prepNewDataset = prepNewDataset;
     this.prepCtDataset = prepCtDataset;
     this.prepOtherDisaggregationDataset = prepOtherDisaggregationDataset;
+    this.pmtctEidDataset = pmtctEidDataset;
+    this.pmtctHeiDataset = pmtctHeiDataset;
   }
 
   @Override
@@ -128,11 +136,17 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
         "PREP", Mapped.mapStraightThrough(prepNewDataset.constructPrepNewDataset()));
     rd.addDataSetDefinition(
         "PREPNUM", Mapped.mapStraightThrough(prepCtDataset.constructPrepCtDataset()));
-    rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
     rd.addDataSetDefinition(
         "OTHERDISAGG",
         Mapped.mapStraightThrough(
             prepOtherDisaggregationDataset.constructPrepOtherDisaggregationDataset()));
+    rd.addDataSetDefinition(
+        "EID", Mapped.mapStraightThrough(pmtctEidDataset.constructPmtctEidDataSet()));
+    rd.addDataSetDefinition(
+        "HEI", Mapped.mapStraightThrough(pmtctHeiDataset.constructPmtctHeiDataSet()));
+
+    rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
+
     // add a base cohort here to help in calculations running
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(
@@ -148,7 +162,7 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
       rd =
           createXlsReportDesign(
               reportDefinition,
-              "Template_PEPFAR_MER_2.7_Quarterly_v1.1.xls",
+              "SESP_MER2.7_TEMP_Quarterly_v1.3.xls",
               "PEPFAR MER 2.7 Quarterly Report",
               getExcelDesignUuid(),
               null);

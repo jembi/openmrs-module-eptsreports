@@ -968,7 +968,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "# de adultos (15/+anos) na 1a ou 2ª linha de TARV ou mudança de regime de 1ª linha",
         EptsReportUtils.map(
             MI13DEN2,
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-10m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     dataSetDefinition.addColumn(
@@ -997,7 +997,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "# de adultos (15/+anos) na 1a ou 2ª linha de TARV ou mudança de regime de 1ª linha, que receberam o resultado da CV entre o sexto e o nono mês após início do TARV",
         EptsReportUtils.map(
             MI13NUM2,
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-10m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     dataSetDefinition.addColumn(
@@ -1025,12 +1025,12 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "Adultos (15/+anos) na 2a linha de TARV que receberam o resultado da CV entre o sexto e o nono mês após o início da 2a linha de TARV",
         EptsReportUtils.map(
             MI13DEN5,
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},location=${location}"),
+            "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-10m},location=${location}"),
         "ageByEndDateRevision=15+");
 
     dataSetDefinition.addColumn(
         "MI13DEN5SegundaLinha",
-        "Adultos (15/+anos) com registo de início da 2a linha de TARV há 9 meses",
+        "de adultos (15/+anos) na 2a linha de TARV que receberam o resultado da CV entre o sexto e o nono mês após o início da 2a linha de TARV",
         EptsReportUtils.map(
             customCohortIndicator(
                 intensiveMonitoringCohortQueries.getMI13DEN5(5),
@@ -1053,7 +1053,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de adultos (15/+anos) coinfectados TB/HIV com resultado de CV registado na FM",
         EptsReportUtils.map(
             MI13NUM5,
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-10m},revisionEndDate=${revisionEndDate},location=${location}"),
         "ageByEndDateRevision=15+");
 
     dataSetDefinition.addColumn(
@@ -1122,7 +1122,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "# de crianças na 1a linha de TARV ou mudança de regime de 1ª linha (10-14 anos de idade) ou 2ª Linha TARV (0-14 anos de idade) que receberam o resultado da CV entre o sexto e o nono mês após início do TARV",
         EptsReportUtils.map(
             MI13DEN11,
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-10m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     dataSetDefinition.addColumn(
@@ -1151,7 +1151,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "# de crianças (10-14 anos de idade) na 1a linha de TARV ou mudança de regime de 1ª linha”, que receberam o resultado da CV entre o sexto e o nono mês após início do TARV",
         EptsReportUtils.map(
             MI13NUM11,
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-10m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     dataSetDefinition.addColumn(
@@ -1179,7 +1179,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de crianças (0-14 anos) coinfectados TB/HIV com resultado de CV registado na FM",
         EptsReportUtils.map(
             MI13DEN14,
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-10m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     dataSetDefinition.addColumn(
@@ -1207,7 +1207,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "Crianças na 2a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início da 2a linha de TARV",
         EptsReportUtils.map(
             MI13NUM14,
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-10m},revisionEndDate=${revisionEndDate},location=${location}"),
         "ageByEndDateRevision=0-14");
 
     dataSetDefinition.addColumn(
@@ -1337,7 +1337,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
     // 13.3 P4 Den
     dataSetDefinition.addColumn(
         "MI13DEN3",
-        "# de adultos na 1a linha de TARV que receberam um resultado de CV acima de 1000 cópias no período de inclusão",
+        "# de Adultos (15/+anos) na 1ª linha de TARV com registo resultado de CV acima de 1000",
         EptsReportUtils.map(
             customCohortIndicator(
                 intensiveMonitoringCohortQueries.getMICat13Part4(3, false),
@@ -1348,7 +1348,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
     // 13.12 P4 Den
     dataSetDefinition.addColumn(
         "MI13DEN12",
-        "# de crianças (>2 anos de idade) na 1a linha de TARV que receberam um resultado de CV acima de 1000 cópias no período de inclusão",
+        "# de crianças (>=2 anos de idade) na 1ª linha de TARV com registo de resultado de CV >= 1000",
         EptsReportUtils.map(
             customCohortIndicator(
                 intensiveMonitoringCohortQueries.getMICat13Part4(12, false),
@@ -1370,7 +1370,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
     // 13.3 P4 Num
     dataSetDefinition.addColumn(
         "MI13NUM3",
-        "% de Adultos (15/+anos) na 1ª linha de TARV com registo de pedido de CV entre o 3º e o 4º mês após terem recebido o último resultado de CV acima de 1000 e terem  3 sessões consecutivas de APSS/PP",
+        "# de Adultos (15/+anos) na 1ª linha de TARV com registo de pedido de CV entre o 3º e o 4º mês após terem recebido o último resultado de CV >= 1000 cps/ml ",
         EptsReportUtils.map(
             customCohortIndicator(
                 intensiveMonitoringCohortQueries.getMICat13Part4(3, true),
@@ -1381,7 +1381,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
     // 13.12 P4 Num
     dataSetDefinition.addColumn(
         "MI13NUM12",
-        "% de crianças (>2 anos de idade) na 1ª linha de TARV com registo de pedido de CV entre o 3º e o 4º mês após terem recebido o último resultado de CV acima de 1000 cópia e terem  3 sessões consecutivas de APSS/PP",
+        "# de crianças (>=2 anos de idade) na 1ª linha de TARV com registo de pedido de CV entre o 3º e o 4º mês após terem recebido o último resultado de CV >= 1000",
         EptsReportUtils.map(
             customCohortIndicator(
                 intensiveMonitoringCohortQueries.getMICat13Part4(12, true),
@@ -1766,6 +1766,222 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "Adolescentes de 10 - 14 anos activos em TARV com RD Total  (T) NUM",
         EptsReportUtils.map(MI18NUM, "revisionEndDate=${revisionEndDate},location=${location}"),
         "ageBasedOnArtCat18=10-14");
+
+    // MI Category 19 DENOMINATOR 1
+    CohortIndicator MI19DEN1 =
+        eptsGeneralIndicator.getIndicator(
+            "MI19DEN1",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ19A(1),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MI19DEN1.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MI19DEN1",
+        "19.1 % de adultos (>=15 anos) presuntivos de TB com pedido de teste molecular (Xpert/Truenat) na data da 1ª consulta",
+        EptsReportUtils.map(
+            MI19DEN1,
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    // MI Category 19 DENOMINATOR 2
+    CohortIndicator MI19DEN2 =
+        eptsGeneralIndicator.getIndicator(
+            "MI19DEN2",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ19A(1),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MI19DEN2.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MI19DEN2",
+        "19.2 % de adultos (>=15 anos) HIV+ presuntivos de TB que receberam resultado do teste molecular (Xpert/Truenat) dentro de 7 dias após o pedido",
+        EptsReportUtils.map(
+            MI19DEN2,
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    // MI Category 19 DENOMINATOR 3
+    CohortIndicator MI19DEN3 =
+        eptsGeneralIndicator.getIndicator(
+            "MI19DEN3",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ19A(3),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MI19DEN3.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MI19DEN3",
+        "19.3 % de adultos (>=15 anos) HIV+ diagnosticados com TB e que iniciaram tratamento de TB na data do diagnóstico de TB",
+        EptsReportUtils.map(
+            MI19DEN3,
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    // MI Category 19 DENOMINATOR 4
+    CohortIndicator MI19DEN4 =
+        eptsGeneralIndicator.getIndicator(
+            "MI19DEN4",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ19A(4),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MI19DEN4.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MI19DEN4",
+        "19.4 % de crianças (0-14 anos) presuntivos de TB com pedido de teste molecular (Xpert/Truenat) na data da 1ª consulta.",
+        EptsReportUtils.map(
+            MI19DEN4,
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    // MI Category 19 DENOMINATOR 5
+    CohortIndicator MI19DEN5 =
+        eptsGeneralIndicator.getIndicator(
+            "MI19DEN5",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ19A(4),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MI19DEN5.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MI19DEN5",
+        "19.5 % de crianças (0-14 anos) HIV+ presuntivos de TB que receberam resultado do teste molecular (Xpert/Truenat) dentro de 7 dias após o pedido",
+        EptsReportUtils.map(
+            MI19DEN5,
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    // MI Category 19 DENOMINATOR 6
+    CohortIndicator MI19DEN6 =
+        eptsGeneralIndicator.getIndicator(
+            "MI19DEN6",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ19A(6),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MI19DEN6.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MI19DEN6",
+        "19.6 % de crianças (0 - 14 anos) HIV+ diagnosticados com TB e que iniciaram tratamento de TB na data do diagnóstico de TB",
+        EptsReportUtils.map(
+            MI19DEN6,
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    // MI Category 19 NUMERATOR 1
+    CohortIndicator MI19NUM1 =
+        eptsGeneralIndicator.getIndicator(
+            "MI19NUM1",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ19B(1),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MI19NUM1.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MI19NUM1",
+        "19.1 % de adultos (>=15 anos) presuntivos de TB com pedido de teste molecular (Xpert/Truenat) na data da 1ª consulta",
+        EptsReportUtils.map(
+            MI19NUM1,
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    // MI Category 19 NUMERATOR 2
+    CohortIndicator MI19NUM2 =
+        eptsGeneralIndicator.getIndicator(
+            "MI19NUM2",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ19B(1),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MI19NUM2.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MI19NUM2",
+        "19.2 % de adultos (>=15 anos) HIV+ presuntivos de TB que receberam resultado do teste molecular (Xpert/Truenat) dentro de 7 dias após o pedido",
+        EptsReportUtils.map(
+            MI19NUM2,
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    // MI Category 19 NUMERATOR 3
+    CohortIndicator MI19NUM3 =
+        eptsGeneralIndicator.getIndicator(
+            "MI19NUM3",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ19B(3),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MI19NUM3.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MI19NUM3",
+        "19.3 % de adultos (>=15 anos) HIV+ diagnosticados com TB e que iniciaram tratamento de TB na data do diagnóstico de TB",
+        EptsReportUtils.map(
+            MI19NUM3,
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    // MI Category 19 NUMERATOR 4
+    CohortIndicator MI19NUM4 =
+        eptsGeneralIndicator.getIndicator(
+            "MI19NUM4",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ19B(4),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MI19NUM4.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MI19NUM4",
+        "19.4 % de crianças (0-14 anos) presuntivos de TB com pedido de teste molecular (Xpert/Truenat) na data da 1ª consulta",
+        EptsReportUtils.map(
+            MI19NUM4,
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    // MI Category 19 NUMERATOR 5
+    CohortIndicator MI19NUM5 =
+        eptsGeneralIndicator.getIndicator(
+            "MI19NUM5",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ19B(4),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MI19NUM5.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MI19NUM5",
+        "19.5 % de crianças (0-14 anos) HIV+ presuntivos de TB que receberam resultado do teste molecular (Xpert/Truenat) dentro de 7 dias após o pedido",
+        EptsReportUtils.map(
+            MI19NUM5,
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    // MI Category 19 NUMERATOR 6
+    CohortIndicator MI19NUM6 =
+        eptsGeneralIndicator.getIndicator(
+            "MI19NUM6",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ19B(6),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MI19NUM6.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MI19NUM6",
+        "19.6 % de crianças (0 - 14 anos) HIV+ diagnosticados com TB e que iniciaram tratamento de TB na data do diagnóstico de TB",
+        EptsReportUtils.map(
+            MI19NUM6,
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
 
     return dataSetDefinition;
   }
