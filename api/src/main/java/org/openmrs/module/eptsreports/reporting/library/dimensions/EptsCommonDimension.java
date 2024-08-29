@@ -75,6 +75,7 @@ public class EptsCommonDimension {
   private IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries;
 
   private PmtctEidCohortQueries pmtctEidCohortQueries;
+  private PmtctHeiCohortQueries pmtctHeiCohortQueries;
 
   @Autowired
   @Qualifier("commonAgeDimensionCohort")
@@ -103,7 +104,8 @@ public class EptsCommonDimension {
       TxPvlsBySourceLabOrFsrCohortQueries txPvlsBySourceLabOrFsrCohortQueries,
       ResumoMensalDAHCohortQueries resumoMensalDAHCohortQueries,
       IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries,
-      PmtctEidCohortQueries pmtctEidCohortQueries) {
+      PmtctEidCohortQueries pmtctEidCohortQueries,
+      PmtctHeiCohortQueries pmtctHeiCohortQueries) {
     this.genderCohortQueries = genderCohortQueries;
     this.txNewCohortQueries = txNewCohortQueries;
     this.genericCohortQueries = genericCohortQueries;
@@ -125,6 +127,7 @@ public class EptsCommonDimension {
     this.resumoMensalDAHCohortQueries = resumoMensalDAHCohortQueries;
     this.intensiveMonitoringCohortQueries = intensiveMonitoringCohortQueries;
     this.pmtctEidCohortQueries = pmtctEidCohortQueries;
+    this.pmtctHeiCohortQueries = pmtctHeiCohortQueries;
   }
 
   /**
@@ -1186,6 +1189,44 @@ public class EptsCommonDimension {
         EptsReportUtils.map(
             pmtctEidCohortQueries
                 .getPatientsWhoUnderwentFirstOrSecondSampleCollectionForVirologicHivTest(false),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    return dim;
+  }
+
+  public CohortDefinitionDimension getPosiveOrNegativeVirologicHiv() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.setName("virologic HIV test result");
+    dim.addParameter(new Parameter("startDate", "startDate", Date.class));
+    dim.addParameter(new Parameter("endDate", "endDate", Date.class));
+    dim.addParameter(new Parameter("location", "location", Location.class));
+
+    dim.addCohortDefinition(
+        "positiveResult",
+        EptsReportUtils.map(
+            pmtctHeiCohortQueries.getPositveOrNegativePcrResult(true),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    dim.addCohortDefinition(
+        "negativeResult",
+        EptsReportUtils.map(
+            pmtctHeiCohortQueries.getPositveOrNegativePcrResult(false),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    return dim;
+  }
+
+  public CohortDefinitionDimension getInfantArtInitiationDimension() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.setName("Infant Art Initiation");
+    dim.addParameter(new Parameter("startDate", "startDate", Date.class));
+    dim.addParameter(new Parameter("endDate", "endDate", Date.class));
+    dim.addParameter(new Parameter("location", "location", Location.class));
+
+    dim.addCohortDefinition(
+        "artInitiated",
+        EptsReportUtils.map(
+            pmtctHeiCohortQueries.getInfantsWithConfirmedArtInitiation(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     return dim;

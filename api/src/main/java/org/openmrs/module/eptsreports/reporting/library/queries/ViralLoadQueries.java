@@ -370,7 +370,18 @@ public class ViralLoadQueries {
   }
 
   /**
-   * <b>Description:</b> Patients having viral load within the 12 months period
+   * <b>Description:</b> todos os utentes que têm o último registo de pelo menos um dos seguintes
+   * modelos na última consulta clínica (Ficha Clínica) antes da data do resultado da CV mais
+   * recente (“Data Última CV”), como um dos seguintes:
+   *
+   * <ul>
+   *   <li>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “DT” e o respectivo
+   *       “Estado” = “Início” ou “Continua”, ou último registo do “Tipo de Dispensa” = “DT” na
+   *       Ficha Clínica ou
+   *   <li>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “DS” e o respectivo
+   *       “Estado” = “Início” ou “Continua”, ou último registo do “Tipo de Dispensa” = “DS” na
+   *       Ficha Clínica ou
+   * </ul>
    *
    * @return {@link String}
    */
@@ -427,7 +438,7 @@ public class ViralLoadQueries {
             + "                                                 AND e.location_id = :location) max_vl_date "
             + "                                                 GROUP  BY patient_id"
             + "                   ) vl_date_tbl ON pp.patient_id = vl_date_tbl.patient_id "
-            + "                 WHERE  ee.encounter_datetime BETWEEN Date_add( vl_date_tbl.vl_max_date, INTERVAL - 12 MONTH) AND  DATE_ADD( vl_date_tbl.vl_max_date,INTERVAL - 1 DAY) "
+            + "                 WHERE  ee.encounter_datetime < vl_date_tbl.vl_max_date "
             + "                 AND oo.concept_id = ${23739} "
             + "                 AND oo.voided = 0 "
             + "                 AND ee.voided = 0   "

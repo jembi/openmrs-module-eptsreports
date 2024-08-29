@@ -959,4 +959,55 @@ public class CommonQueries {
         hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
         hivMetadata.getArtDatePickupMasterCard().getConceptId());
   }
+
+  public static String getArtInitiationDay() {
+    return "    SELECT "
+        + "      p.patient_id, "
+        + "      MIN(e.encounter_datetime) AS first_pick_up "
+        + "    FROM "
+        + "      patient p "
+        + "      INNER JOIN encounter e ON p.patient_id = e.patient_id "
+        + "      INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "    WHERE "
+        + "      p.voided = 0 "
+        + "      AND e.voided = 0 "
+        + "      AND o.voided = 0 "
+        + "      AND e.encounter_type = ${18} "
+        + "      AND e.location_id = :location "
+        + "      AND e.encounter_datetime >= :startDate "
+        + "      AND e.encounter_datetime <= :endDate "
+        + "    GROUP BY "
+        + "      p.patient_id "
+        + "    UNION "
+        + "    SELECT "
+        + "      p.patient_id, "
+        + "      MIN(o.value_datetime) AS first_pick_up "
+        + "    FROM "
+        + "      patient p "
+        + "      INNER JOIN encounter e ON p.patient_id = e.patient_id "
+        + "      INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "    WHERE "
+        + "      p.voided = 0 "
+        + "      AND e.voided = 0 "
+        + "      AND o.voided = 0 "
+        + "      AND e.encounter_type = ${52} "
+        + "      AND o.concept_id = ${23866} "
+        + "      AND e.location_id = :location "
+        + "      AND o.value_datetime >= :startDate "
+        + "      AND o.value_datetime <= :endDate "
+        + "    GROUP BY "
+        + "      p.patient_id ";
+  }
+
+  public String getArtInitiation() {
+    return "SELECT "
+        + "  art.patient_id, "
+        + "  MIN(art.first_pick_up) "
+        + "FROM "
+        + "  ( "
+        + getArtInitiationDay()
+        + "  ) art "
+        + "GROUP BY "
+        + "  art.patient_id";
+  }
 }
