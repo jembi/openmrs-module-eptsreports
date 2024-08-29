@@ -3,7 +3,6 @@ package org.openmrs.module.eptsreports.reporting.reports;
 import java.io.IOException;
 import java.util.*;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.TPTEligiblePatientListCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TPTListOfPatientsEligibleDataSet;
@@ -21,18 +20,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class SetupTPTListOfPatientsEligibleReport extends EptsDataExportManager {
 
   private TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet;
-  private TPTEligiblePatientListCohortQueries tPTEligiblePatientListCohortQueries;
   private TPTTotalListOfPatientsEligibleDataSet tptTotalListOfPatientsEligibleDataSet;
 
   @Autowired
   public SetupTPTListOfPatientsEligibleReport(
       TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet,
-      TPTTotalListOfPatientsEligibleDataSet tptTotalListOfPatientsEligibleDataSet,
-      TPTEligiblePatientListCohortQueries tPTEligiblePatientListCohortQueries) {
+      TPTTotalListOfPatientsEligibleDataSet tptTotalListOfPatientsEligibleDataSet) {
 
     this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
     this.tptTotalListOfPatientsEligibleDataSet = tptTotalListOfPatientsEligibleDataSet;
-    this.tPTEligiblePatientListCohortQueries = tPTEligiblePatientListCohortQueries;
   }
 
   @Override
@@ -47,7 +43,7 @@ public class SetupTPTListOfPatientsEligibleReport extends EptsDataExportManager 
 
   @Override
   public String getName() {
-    return "TPT List of Patients Elegible  Report";
+    return "TB2: List of Patients who are Eligible for TPT";
   }
 
   @Override
@@ -90,7 +86,7 @@ public class SetupTPTListOfPatientsEligibleReport extends EptsDataExportManager 
           createXlsReportDesign(
               reportDefinition,
               "Template_List_Patients_Eligibles_TPT_v1.3.xls",
-              "TPT List Patients Eligibles Report",
+              "TB2: List of Patients active on ART who are Eligible for TPT",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
