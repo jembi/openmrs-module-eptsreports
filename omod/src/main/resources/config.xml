@@ -4237,4 +4237,44 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>eptsreports.sampleEarlyInfantDiagnosisConceptUuid</property>
+		<defaultValue>a5e0eb66-c75d-4f2a-956c-3bf4e66b1a84</defaultValue>
+		<description>
+			Sample - Early Infant Diagnosis concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.firstSampleInLessThan9MonthsConceptUuid</property>
+		<defaultValue>b0c97813-1b29-4e93-adcd-985275ddeb43</defaultValue>
+		<description>
+			First Sample In Less Than 9 months concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.nextSampleInLessThan9MonthsConceptUuid</property>
+		<defaultValue>6ab70bdb-5775-4738-94f3-9f726cfcfa31</defaultValue>
+		<description>
+			Next Sample In Less Than 9 months concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.firstSampleBetween9To17MonthsConceptUuid</property>
+		<defaultValue>0f6b8555-71e6-4c61-bcc3-6815d33940e1</defaultValue>
+		<description>
+			First Sample Between 9th to 17th month
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.followingSampleBetween9To17MonthsConceptUuid</property>
+		<defaultValue>66498d73-2744-4aa0-bce0-703684002cac</defaultValue>
+		<description>
+			Following Sample Between 9th to 17th month
+		</description>
+	</globalProperty>
+
 </module>
