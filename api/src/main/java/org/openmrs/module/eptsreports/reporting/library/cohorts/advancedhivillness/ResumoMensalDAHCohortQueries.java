@@ -1709,7 +1709,7 @@ public class ResumoMensalDAHCohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
     map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
-    map.put("165513", hivMetadata.getCD4SemiQuantitativeCountLessThan200Concept().getConceptId());
+    map.put("165513", hivMetadata.getCD4CountLessThanOrEqualTo200Concept().getConceptId());
 
     String query =
         "  SELECT ps.person_id FROM   person ps "

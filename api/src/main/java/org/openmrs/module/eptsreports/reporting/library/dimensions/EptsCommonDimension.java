@@ -75,7 +75,6 @@ public class EptsCommonDimension {
   private IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries;
 
   private PmtctEidCohortQueries pmtctEidCohortQueries;
-
   private PmtctHeiCohortQueries pmtctHeiCohortQueries;
 
   @Autowired

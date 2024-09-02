@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Properties;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.TxCurrCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.EriDSDDataset;
 import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
@@ -38,16 +37,11 @@ public class SetupDsdReport extends EptsDataExportManager {
 
   private EriDSDDataset eriDSDDataset;
 
-  private TxCurrCohortQueries txCurrCohortQueries;
   private GenericCohortQueries genericCohortQueries;
 
   @Autowired
-  public SetupDsdReport(
-      EriDSDDataset eriDSDDataset,
-      TxCurrCohortQueries txCurrCohortQueries,
-      GenericCohortQueries genericCohortQueries) {
+  public SetupDsdReport(EriDSDDataset eriDSDDataset, GenericCohortQueries genericCohortQueries) {
     this.eriDSDDataset = eriDSDDataset;
-    this.txCurrCohortQueries = txCurrCohortQueries;
     this.genericCohortQueries = genericCohortQueries;
   }
 
