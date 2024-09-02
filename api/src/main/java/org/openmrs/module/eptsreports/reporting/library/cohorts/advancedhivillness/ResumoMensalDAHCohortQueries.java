@@ -916,6 +916,7 @@ public class ResumoMensalDAHCohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id "
@@ -926,8 +927,10 @@ public class ResumoMensalDAHCohortQueries {
             + "  AND e.voided = 0 "
             + "  AND o.voided = 0 "
             + "  AND e.location_id = :location "
-            + "  AND o.concept_id = ${1695} "
-            + "  AND o.value_numeric IS NOT NULL "
+            + "  AND ( (o.concept_id = ${1695} "
+            + "  AND o.value_numeric IS NOT NULL ) "
+            + "  OR ( o.concept_id = ${165515} "
+            + "  AND  o.value_coded IS NOT NULL ) ) "
             + " AND ( "
             + "  ( e.encounter_type = ${90} "
             + " AND o.obs_datetime >= :startDate "
@@ -947,9 +950,9 @@ public class ResumoMensalDAHCohortQueries {
   /**
    * Filtrando os utentes com o respectivo “Resultado de CD4” (identificado nos critérios acima
    * definidos) de acordo com a seguinte definição:
-   * <li>< 750 para os utentes com idade < 1 ano
-   * <li>< 500 para os utentes com idade entre 1 a 4anos
-   * <li><200 para os utentes com idade >= 5 anos
+   * <li> < 750 para os utentes com idade < 1 ano
+   * <li> < 500 para os utentes com idade entre 1 a 4anos
+   * <li> < 200 (absoluto) ou “<=200” (semi-quantitativo) para os utentes com idade >= 5 anos
    *
    * @return {@link CohortDefinition}
    */
@@ -965,12 +968,15 @@ public class ResumoMensalDAHCohortQueries {
         getPatientsWithCD4BasedOnAgeAndCd4(Cd4CountComparison.LessThanOrEqualTo500mm3, 1, 4);
     CohortDefinition cd750bellowOneYear =
         getPatientsWithCD4BasedOnAgeAndCd4(Cd4CountComparison.LessThanOrEqualTo750mm3, null, 1);
+    CohortDefinition semiQuantiativeUnder200 =
+        getPatientsWithCD4BasedOnAgeAndSemiQuantitaiveCd4(5, null);
 
     cd.addSearch("cd4Under200", mapStraightThrough(cd200overOrEqualTo5years));
     cd.addSearch("cd4Under500", mapStraightThrough(cd500betweenOneAnd5years));
     cd.addSearch("cd4Under750", mapStraightThrough(cd750bellowOneYear));
+    cd.addSearch("semiQuantiativeUnder200", mapStraightThrough(semiQuantiativeUnder200));
 
-    cd.setCompositionString("cd4Under200 OR cd4Under500 OR cd4Under750");
+    cd.setCompositionString("cd4Under200 OR cd4Under500 OR cd4Under750 OR semiQuantiativeUnder200");
     return cd;
   }
 
@@ -996,6 +1002,29 @@ public class ResumoMensalDAHCohortQueries {
     cd.setCompositionString("cd4Result AND age");
     return cd;
   }
+
+  /**
+   * @param minAge Minimum age to check
+   * @param maxAge Maximum age to check
+   * @return {@link CohortDefinition}
+   */
+  private CohortDefinition getPatientsWithCD4BasedOnAgeAndSemiQuantitaiveCd4(
+      Integer minAge, Integer maxAge) {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Semi Quantitaive Cd4 Result and Age Combination");
+    cd.addParameters(getCohortParameters());
+
+    CohortDefinition semiQuantitaivecd4LessOrEqualThan200ul = getCd4SemiQuantitativoLessThanOrEqual200ul();
+    CohortDefinition age = ageCohortQueries.createXtoYAgeCohort("Age", minAge, maxAge);
+
+    cd.addSearch("semiQuantitaivecd4LessOrEqualThan200ul", mapStraightThrough(semiQuantitaivecd4LessOrEqualThan200ul));
+    cd.addSearch("age", EptsReportUtils.map(age, "effectiveDate=${endDate}"));
+
+    cd.setCompositionString("semiQuantitaivecd4LessOrEqualThan200ul AND age");
+    return cd;
+  }
+
   /**
    * Filtrando todos os utentes
    * <li>que tiveram registo de "TB LAM urina” registada na secção B (Exames Laboratoriais à e
@@ -1647,6 +1676,49 @@ public class ResumoMensalDAHCohortQueries {
             + "       AND o.voided = 0 "
             + "       AND o.concept_id = ${1695}  "
             + "       AND ".concat(cd4.getProposition())
+            + " AND ( "
+            + "  ( e.encounter_type = ${90} "
+            + " AND o.obs_datetime >= :startDate "
+            + "  AND o.obs_datetime <= :endDate)"
+            + "OR "
+            + " ( e.encounter_type = ${6} "
+            + " AND e.encounter_datetime >= :startDate "
+            + "  AND e.encounter_datetime <= :endDate) "
+            + " ) "
+            + "  AND e.location_id = :location"
+            + "  GROUP BY ps.person_id ";
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(substitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /** @return {@link CohortDefinition} */
+  public CohortDefinition getCd4SemiQuantitativoLessThanOrEqual200ul() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Resultado de CD4");
+    sqlCohortDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
+    map.put("165513", hivMetadata.getCD4SemiQuantitativeCountLessThan200Concept().getConceptId());
+
+    String query =
+        "  SELECT ps.person_id FROM   person ps "
+            + "       INNER JOIN encounter e "
+            + "               ON ps.person_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "WHERE  ps.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND  o.concept_id = ${165515} "
+            + "       AND  o.value_coded = ${165513} "
             + " AND ( "
             + "  ( e.encounter_type = ${90} "
             + " AND o.obs_datetime >= :startDate "
