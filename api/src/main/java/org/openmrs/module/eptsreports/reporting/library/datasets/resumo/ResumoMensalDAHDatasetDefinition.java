@@ -386,7 +386,7 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
   private Mapped<CohortIndicator> getEnrolledInDAHbyEndOfMonth() {
     return mapStraightThrough(
         eptsGeneralIndicator.getIndicator(
-            "Relatório – Indicador 4 – Saídas do seguimento de DAH",
+            "Relatório- Indicador 5 Utentes em DAH até o fim do mês",
             mapStraightThrough(
                 resumoMensalDAHCohortQueries.getPatientsEnrolledInDAHbyEndOfMonth())));
   }
