@@ -23,7 +23,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * @return {@link String}
    */
   public String getPatientsWithCD4AbsoluteResultOnPeriodQuery(
-      int valueNumeric, boolean mostRecentDateOrCd4Result) {
+      int valueNumeric, boolean mostRecentDateOrCd4Result, Integer minAge) {
 
     String fromSQL =
         " FROM   person ps "
@@ -45,13 +45,18 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "       AND e.encounter_type IN ( ${6}, ${13}, ${51} ) "
             + "       AND o.concept_id = ${1695}  "
             + "       AND o.value_numeric < "
-            + valueNumeric
-            + "       AND DATE(e.encounter_datetime) = last_cd4_result.most_recent "
+            + valueNumeric;
+    if (minAge != null && minAge >= 5) {
+      fromSQL += " OR ( o.concept_id = ${165515} AND o.value_coded = ${165513} )";
+    }
+    fromSQL +=
+        "       AND DATE(e.encounter_datetime) = last_cd4_result.most_recent "
             + "       AND e.location_id = :location";
 
     return mostRecentDateOrCd4Result
         ? " SELECT ps.person_id, Max(DATE(e.encounter_datetime)) AS most_recent ".concat(fromSQL)
-        : " SELECT ps.person_id, o.value_numeric AS cd4_result ".concat(fromSQL);
+        : " SELECT ps.person_id, IF(o.concept_id = ${165515}, o.value_coded, o.value_numeric) AS cd4_result "
+            .concat(fromSQL);
   }
 
   /**
@@ -65,7 +70,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * @return {@link String}
    */
   public String getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(
-      int valueNumeric, boolean mostRecentDateOrCd4Result) {
+      int valueNumeric, boolean mostRecentDateOrCd4Result, Integer minAge) {
 
     String fromSQL =
         " FROM "
@@ -83,13 +88,17 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "  AND e.encounter_type IN ( ${53}, ${90} ) "
             + "  AND o.concept_id = ${1695} "
             + "  AND o.value_numeric < "
-            + valueNumeric
-            + "  AND o.obs_datetime = last_cd4_result.most_recent "
-            + "  AND e.location_id = :location";
+            + valueNumeric;
+    if (minAge != null && minAge >= 5) {
+      fromSQL += " OR ( o.concept_id = ${165515} AND o.value_coded = ${165513} )";
+    }
+    fromSQL +=
+        "  AND o.obs_datetime = last_cd4_result.most_recent " + "  AND e.location_id = :location";
 
     return mostRecentDateOrCd4Result
         ? " SELECT ps.person_id, max(o.obs_datetime) as most_recent ".concat(fromSQL)
-        : " SELECT ps.person_id, o.value_numeric AS cd4_result ".concat(fromSQL);
+        : " SELECT ps.person_id, IF(o.concept_id = ${165515}, o.value_coded, o.value_numeric) AS cd4_result "
+            .concat(fromSQL);
   }
 
   /**
@@ -116,7 +125,8 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
       Integer maxAge) {
 
     String query =
-        getPatientsWithCD4AbsoluteResultOnPeriodQuery(absoluteCd4Amount, mostRecentDateOrCd4Result);
+        getPatientsWithCD4AbsoluteResultOnPeriodQuery(
+            absoluteCd4Amount, mostRecentDateOrCd4Result, minAge);
 
     query = getAgeVerificationString(minAge, maxAge, query);
 
@@ -124,7 +134,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
 
     query +=
         getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(
-            absoluteCd4Amount, mostRecentDateOrCd4Result);
+            absoluteCd4Amount, mostRecentDateOrCd4Result, minAge);
 
     query = getAgeVerificationString(minAge, maxAge, query);
 
@@ -169,7 +179,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
       Integer absoluteCd4Amount, Integer minAge, Integer maxAge) {
 
     String query =
-        " SELECT ps.person_id, o.value_numeric as cd4  "
+        " SELECT ps.person_id, IF(o.concept_id = ${165515}, o.value_coded, o.value_numeric) as cd4  "
             + "FROM   person ps  "
             + "           INNER JOIN encounter e  "
             + "                      ON ps.person_id = e.patient_id  "
@@ -184,8 +194,12 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "  AND e.encounter_type IN ( ${6}, ${13}, ${51} )  "
             + "  AND o.concept_id = ${1695}  "
             + "  AND o.value_numeric <  "
-            + absoluteCd4Amount
-            + "  AND Date(e.encounter_datetime) = last_cd4.most_recent  "
+            + absoluteCd4Amount;
+    if (minAge != null && minAge >= 5) {
+      query += " OR ( o.concept_id = ${165515} AND o.value_coded = ${165513} )";
+    }
+    query +=
+        "  AND Date(e.encounter_datetime) = last_cd4.most_recent  "
             + "  AND e.location_id = :location ";
 
     query = getAgeVerificationString(minAge, maxAge, query);
@@ -193,7 +207,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
     query += "  GROUP BY ps.person_id " + " UNION ";
 
     query +=
-        "  SELECT ps.person_id, o.value_numeric as cd4  "
+        "  SELECT ps.person_id, IF(o.concept_id = ${165515}, o.value_coded, o.value_numeric) as cd4  "
             + "FROM   person ps  "
             + "           INNER JOIN encounter e  "
             + "                      ON ps.person_id = e.patient_id  "
@@ -208,9 +222,11 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "  AND e.encounter_type IN ( ${53}, ${90} )  "
             + "  AND o.concept_id = ${1695}  "
             + "  AND o.value_numeric <  "
-            + absoluteCd4Amount
-            + "  AND o.obs_datetime = last_cd4.most_recent  "
-            + "  AND e.location_id = :location ";
+            + absoluteCd4Amount;
+    if (minAge != null && minAge >= 5) {
+      query += " OR ( o.concept_id = ${165515} AND o.value_coded = ${165513} )";
+    }
+    query += "  AND o.obs_datetime = last_cd4.most_recent  " + "  AND e.location_id = :location ";
 
     query = getAgeVerificationString(minAge, maxAge, query);
     query += "  GROUP BY ps.person_id ";
@@ -255,7 +271,8 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
 
     return mostRecentDateOrCd4Result
         ? " SELECT ps.person_id, Max(DATE(e.encounter_datetime)) AS most_recent ".concat(fromSQL)
-        : " SELECT ps.person_id, o.value_numeric AS cd4_result ".concat(fromSQL);
+        : " SELECT ps.person_id, IF(o.concept_id = ${165515}, o.value_coded, o.value_numeric) AS cd4_result "
+            .concat(fromSQL);
   }
 
   /**
@@ -291,11 +308,12 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
 
     return mostRecentDateOrCd4Result
         ? " SELECT ps.person_id, max(o.obs_datetime) as most_recent ".concat(fromSQL)
-        : " SELECT ps.person_id, o.value_numeric AS cd4_result ".concat(fromSQL);
+        : " SELECT ps.person_id, IF(o.concept_id = ${165515}, o.value_coded, o.value_numeric) AS cd4_result "
+            .concat(fromSQL);
   }
 
   public String getLastCd4OrResultDateBeforeMostRecentCd4() {
-    return " SELECT ps.person_id, o.value_numeric, DATE(last_cd4.second_date) AS second_cd4_result "
+    return " SELECT ps.person_id, IF(o.concept_id = ${165515}, o.value_coded, o.value_numeric) AS cd4_result, DATE(last_cd4.second_date) AS second_cd4_result "
         + " FROM   person ps "
         + "       INNER JOIN encounter e "
         + "               ON ps.person_id = e.patient_id "
@@ -320,7 +338,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "       AND e.location_id = :location"
         + "       GROUP BY ps.person_id "
         + " UNION "
-        + " SELECT ps.person_id, o.value_numeric, last_cd4.second_date AS second_cd4_result "
+        + " SELECT ps.person_id, IF(o.concept_id = ${165515}, o.value_coded, o.value_numeric) AS cd4_result, last_cd4.second_date AS second_cd4_result "
         + " FROM "
         + "    person ps INNER JOIN encounter e ON ps.person_id= e.patient_id "
         + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "

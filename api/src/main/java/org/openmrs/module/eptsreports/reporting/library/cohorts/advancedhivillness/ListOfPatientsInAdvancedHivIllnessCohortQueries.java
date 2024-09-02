@@ -734,7 +734,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     Map<String, Integer> map = getStringIntegerMap();
 
     String query =
-        " SELECT ps.person_id, o.value_numeric AS cd4_result "
+        " SELECT ps.person_id, IF(o.concept_id = ${165515}, o.value_coded, o.value_numeric) AS cd4_result "
             + " FROM   person ps "
             + "       INNER JOIN encounter e "
             + "               ON ps.person_id = e.patient_id "
@@ -765,7 +765,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + " AND DATE(e.encounter_datetime) = last_cd4.most_recent "
             + " AND e.location_id = :location"
             + " UNION "
-            + " SELECT ps.person_id, o.value_numeric AS cd4_result "
+            + " SELECT ps.person_id, IF(o.concept_id = ${165515}, o.value_coded, o.value_numeric) AS cd4_result "
             + " FROM "
             + "    person ps INNER JOIN encounter e ON ps.person_id= e.patient_id "
             + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
@@ -852,14 +852,13 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     Map<String, Integer> map = getStringIntegerMap();
 
     String query =
-        " SELECT result.person_id, result.value_numeric FROM ( "
+        " SELECT result.person_id, result.cd4_result FROM ( "
             + listOfPatientsOnAdvancedHivIllnessQueries.getLastCd4OrResultDateBeforeMostRecentCd4()
             + " ) result ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
-    System.out.println(sqlPatientDataDefinition.getQuery());
 
     return sqlPatientDataDefinition;
   }
@@ -1429,6 +1428,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
     map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
     map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
+    map.put("165513", hivMetadata.getCD4CountLessThanOrEqualTo200Concept().getConceptId());
     return map;
   }
 

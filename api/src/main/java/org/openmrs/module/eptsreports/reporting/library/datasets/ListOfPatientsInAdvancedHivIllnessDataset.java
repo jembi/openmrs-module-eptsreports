@@ -176,7 +176,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "cd4_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getCd4Result(),
         mappings,
-        new NotApplicableIfNullConverter());
+        new ObservationToConceptNameConverter());
 
     //     15 - Data de Registo de Estadio – Sheet 1: Column O
     pdd.addColumn(
@@ -211,7 +211,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "last_cd4_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4Result(),
         mappings,
-        new NotApplicableIfNullConverter());
+        new ObservationToConceptNameConverter());
 
     // 20 - Data do Último CD4 – Sheet 1: Column T
     pdd.addColumn(
@@ -225,7 +225,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "second_cd4_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultBeforeMostRecentCd4(),
         mappings,
-        new NotApplicableIfNullConverter());
+        new ObservationToConceptNameConverter());
 
     // 22 - Data do Penúltimo CD4 – Sheet 1: Column V
     pdd.addColumn(
