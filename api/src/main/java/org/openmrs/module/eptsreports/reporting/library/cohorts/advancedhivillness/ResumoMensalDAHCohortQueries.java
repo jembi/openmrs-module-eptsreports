@@ -950,9 +950,9 @@ public class ResumoMensalDAHCohortQueries {
   /**
    * Filtrando os utentes com o respectivo “Resultado de CD4” (identificado nos critérios acima
    * definidos) de acordo com a seguinte definição:
-   * <li> < 750 para os utentes com idade < 1 ano
-   * <li> < 500 para os utentes com idade entre 1 a 4anos
-   * <li> < 200 (absoluto) ou “<=200” (semi-quantitativo) para os utentes com idade >= 5 anos
+   * <li>< 750 para os utentes com idade < 1 ano
+   * <li>< 500 para os utentes com idade entre 1 a 4anos
+   * <li>< 200 (absoluto) ou “<=200” (semi-quantitativo) para os utentes com idade >= 5 anos
    *
    * @return {@link CohortDefinition}
    */
@@ -1015,10 +1015,13 @@ public class ResumoMensalDAHCohortQueries {
     cd.setName("Semi Quantitaive Cd4 Result and Age Combination");
     cd.addParameters(getCohortParameters());
 
-    CohortDefinition semiQuantitaivecd4LessOrEqualThan200ul = getCd4SemiQuantitativoLessThanOrEqual200ul();
+    CohortDefinition semiQuantitaivecd4LessOrEqualThan200ul =
+        getCd4SemiQuantitativoLessThanOrEqual200ul();
     CohortDefinition age = ageCohortQueries.createXtoYAgeCohort("Age", minAge, maxAge);
 
-    cd.addSearch("semiQuantitaivecd4LessOrEqualThan200ul", mapStraightThrough(semiQuantitaivecd4LessOrEqualThan200ul));
+    cd.addSearch(
+        "semiQuantitaivecd4LessOrEqualThan200ul",
+        mapStraightThrough(semiQuantitaivecd4LessOrEqualThan200ul));
     cd.addSearch("age", EptsReportUtils.map(age, "effectiveDate=${endDate}"));
 
     cd.setCompositionString("semiQuantitaivecd4LessOrEqualThan200ul AND age");
