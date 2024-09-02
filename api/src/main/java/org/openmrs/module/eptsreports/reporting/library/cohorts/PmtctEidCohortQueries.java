@@ -259,7 +259,8 @@ public class PmtctEidCohortQueries {
     map.put("165510", hivMetadata.getFollowingtSampleBetween9To17MonthsConcept().getConceptId());
 
     String query =
-        "SELECT p.patient_id, "
+        "SELECT patient_id FROM ( "
+            + " SELECT p.patient_id, "
             + "       Min(o.value_datetime) AS collection_date "
             + "FROM patient p "
             + "         INNER JOIN encounter e ON p.patient_id = e.patient_id "
@@ -280,7 +281,7 @@ public class PmtctEidCohortQueries {
     } else {
       query = query + "        AND o2.value_coded IN (${165506}, ${165510}) ) ) ";
     }
-    query = query + "GROUP BY p.patient_id";
+    query = query + "GROUP BY p.patient_id ) hiv_sample";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
