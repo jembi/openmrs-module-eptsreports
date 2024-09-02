@@ -1773,6 +1773,133 @@ public class ResumoMensalDAHCohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * <b>Relatório- Indicador 5 Utentes em DAH até o fim do mês</b>
+   *
+   * <p>O sistema irá produzir o indicador 5) Número total de utentes em seguimento para Doença
+   * Avançada por HIV no fim do mês, da seguinte forma:
+   * <li>Incluindo todos os utentes
+   *
+   *     <ul>
+   *       <li>Com registo de “Data de Início no Modelo de DAH”, na Ficha de DAH, ocorrida até fim
+   *           do mês [“Data de Início no Modelo de DAH” <= “Data Fim”].
+   *           <p><b>Nota 1:</b>em caso de existirem mais que uma Ficha de DAH, será considerada a
+   *           data mais recente do início no modelo DAH (“Última Data de Início no Modelo de DAH”).
+   *     </ul>
+   *
+   * <li>Excluindo todos os utentes
+   *
+   *     <ul>
+   *       <li>Com registo de pelo menos um motivo (Óbito/ Abandono/ Transferido Para) e “Data de
+   *           Saída de TARV na US” (secção J), na Ficha de DAH, ocorrida após a data mais recente
+   *           da “Data de Início no Modelo de DAH” e até o fim do mês [“Data de Saída de TARV na
+   *           US” >= “Última Data de Início no Modelo de DAH” e <= “Data Fim”] ou
+   *       <li>Com registo de “Data de Saída” (secção I), registada na Ficha de DAH e ocorrida após
+   *           a data mais recente da “Data de Início no Modelo de DAH” e até o fim do mês [“Data de
+   *           Saída de TARV na US” >= “Última Data de Início no Modelo de DAH” e <= “Data Fim”]
+   *     </ul>
+   *
+   *     <p><b>Nota 2:</b>O resultado deste indicador pode não ser igual a fórmula matemática
+   *     (1+2+3-4) devido a completude de dados. Por exemplo, os utentes sem informação do “estado
+   *     tarv” não serão incluídos nos indicadores 1 ou 2 ou 3, mas serão incluídos no indicador 5
+   *     caso tenha registo do início DAH.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsEnrolledInDAHbyEndOfMonth() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Indicador 5 Utentes em DAH até o fim do mês");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    map.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("1707", hivMetadata.getAbandonedConcept().getConceptId());
+    map.put("1708", hivMetadata.getExitFromArvTreatmentConcept().getConceptId());
+    map.put("165386", hivMetadata.getExitDateFromArvTreatmentConcept().getConceptId());
+
+    String query =
+        "SELECT "
+            + "  dah.patient_id "
+            + "FROM "
+            + "  ( "
+            + "    SELECT "
+            + "      p.patient_id, "
+            + "      MAX(e.encounter_datetime) AS dah_date "
+            + "    FROM "
+            + "      patient p "
+            + "      INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "      INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "    WHERE "
+            + "      p.voided = 0 "
+            + "      AND e.voided = 0 "
+            + "      AND o.voided = 0 "
+            + "      AND e.encounter_type = ${90} "
+            + "      AND e.encounter_datetime <= :endDate "
+            + "      AND e.location_id = :location "
+            + "    GROUP BY "
+            + "      p.patient_id "
+            + "  ) dah "
+            + "  LEFT JOIN ( "
+            + "    SELECT "
+            + "      p.patient_id "
+            + "    FROM "
+            + "      patient p "
+            + "      INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "      INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "      INNER JOIN ( "
+            + "          SELECT "
+            + "            p2.patient_id, "
+            + "            MAX(e2.encounter_datetime) AS dah_date "
+            + "          FROM "
+            + "            patient p2 "
+            + "            INNER JOIN encounter e2 ON p2.patient_id = e2.patient_id "
+            + "            INNER JOIN obs o2 ON e2.encounter_id = o2.encounter_id "
+            + "          WHERE "
+            + "            p2.voided = 0 "
+            + "            AND e2.voided = 0 "
+            + "            AND o2.voided = 0 "
+            + "            AND e2.encounter_type = ${90} "
+            + "            AND e2.encounter_datetime <= :endDate "
+            + "            AND e2.location_id = :location "
+            + "          GROUP BY "
+            + "            p2.patient_id "
+            + "      ) latest_dah ON p.patient_id = latest_dah.patient_id "
+            + "    WHERE "
+            + "      p.voided = 0 "
+            + "      AND e.voided = 0 "
+            + "      AND o.voided = 0 "
+            + "      AND e.encounter_type = ${90} "
+            + "      AND ( "
+            + "        ( "
+            + "          o.concept_id = ${1708} "
+            + "          AND o.value_coded IN (${1366}, ${1707}, ${1706}) "
+            + "          AND o.obs_datetime BETWEEN latest_dah.dah_date "
+            + "          AND :endDate "
+            + "        ) "
+            + "        OR ( "
+            + "          o.concept_id = ${165386} "
+            + "          AND o.value_datetime BETWEEN latest_dah.dah_date "
+            + "          AND :endDate "
+            + "        ) "
+            + "      ) "
+            + "      AND e.location_id = :location "
+            + "    GROUP BY "
+            + "      p.patient_id "
+            + "  ) exclusion ON dah.patient_id = exclusion.patient_id "
+            + "WHERE "
+            + "  exclusion.patient_id IS NULL";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
   private List<Parameter> getCohortParameters() {
     return Arrays.asList(
         ReportingConstants.START_DATE_PARAMETER,
