@@ -524,7 +524,7 @@ public class TbPrevQueries {
             + "               ) start "
             + "               GROUP BY start.patient_id"
             + "            ) start on start.patient_id = tpt_completed.patient_id "
-            + "WHERE tpt_completed.complete_date BETWEEN :startDate AND :endDate "
+            + "WHERE tpt_completed.complete_date <= :endDate "
             + "AND TIMESTAMPDIFF(DAY,start.start_date, tpt_completed.complete_date) >= 86 "
             + "GROUP BY tpt_completed.patient_id ";
 
