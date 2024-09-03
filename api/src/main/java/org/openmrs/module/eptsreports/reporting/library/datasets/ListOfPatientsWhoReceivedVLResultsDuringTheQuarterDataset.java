@@ -4,7 +4,7 @@ import java.util.Date;
 import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.eptsreports.reporting.data.converter.ForwardSlashDateConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.DashDateFormatConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.ObjectCounterConverter;
@@ -73,7 +73,7 @@ public class ListOfPatientsWhoReceivedVLResultsDuringTheQuarterDataset extends B
         "inicio_tarv",
         patientesWhoReceivedVlResultsCohortQueries.getArtStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
+        new DashDateFormatConverter());
 
     /**
      * 5 - Data de Consulta onde Notificou o Resultado de CV dentro do Período de Revisão - Sheet 1:
@@ -83,7 +83,7 @@ public class ListOfPatientsWhoReceivedVLResultsDuringTheQuarterDataset extends B
         "data_consulta_resultado_cv",
         patientesWhoReceivedVlResultsCohortQueries.getDataNotificouCV(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new ForwardSlashDateConverter());
+        new DashDateFormatConverter());
 
     /** 6 - Resultado da Carga Viral (Resultado Quantitativo) - Sheet 1: Column G */
     pdd.addColumn(
