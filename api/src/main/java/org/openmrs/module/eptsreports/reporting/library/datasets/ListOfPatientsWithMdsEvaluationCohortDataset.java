@@ -144,6 +144,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
             3, 9),
         endDateMappings);
 
+    // B7 - Condição Clínica Activa de Estadio III ou IV entre a Data Inscrição no MDS e 12º mês de
+    // TARV
+    pdd.addColumn(
+        "clinical_condiction_b",
+        listOfPatientsWithMdsEvaluationCohortQueries.getActiveClinicalCondiction(0, 12, true),
+        endDateMappings,
+        new NotApplicableIfNullConverter());
+
     // B8- Teve TB nos 1˚s 12 meses de TARV: (coluna Q) - Resposta = Sim ou Não (RF23)
     pdd.addColumn(
         "tb_tarv_b",
@@ -339,6 +347,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
             12, 24),
         endDateMappings);
 
+    // C7 - Condição Clínica Activa de Estadio III ou IV entre 12˚ e 24˚ mês de TARV
+    pdd.addColumn(
+        "clinical_condiction_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getActiveClinicalCondiction(12, 24, false),
+        endDateMappings,
+        new NotApplicableIfNullConverter());
+
     // C8 - Teve TB entre 12˚ e 24 ˚ meses de TARV: (coluna AW) - Resposta = Sim ou Não (RF38)
     pdd.addColumn(
         "tb_tarv_c",
@@ -531,6 +546,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsPregnantBreastfeeding3MonthsTarv(
             24, 36),
         endDateMappings);
+
+    // D7 - Condição Clínica Activa de Estadio III ou IV entre 24º e 36º mês de TARV
+    pdd.addColumn(
+        "clinical_condiction_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getActiveClinicalCondiction(24, 36, false),
+        endDateMappings,
+        new NotApplicableIfNullConverter());
 
     // D.8 - Teve TB entre 24˚ e 36 ˚ meses de TARV: (coluna CC)
     pdd.addColumn(

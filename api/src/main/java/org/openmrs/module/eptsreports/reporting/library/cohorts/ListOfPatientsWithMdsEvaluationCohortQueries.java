@@ -5151,4 +5151,130 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     return sqlPatientDataDefinition;
   }
+
+  public DataDefinition getActiveClinicalCondiction(
+      int minNumberOfMonths, int maxNumberOfMonths, boolean b7pedriod) {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName(
+        "Identificação da condição clínica activa de estadio III ou IV – B7. C7 e D7");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
+    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
+    map.put("6276", hivMetadata.getArtStatus().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("1066", hivMetadata.getNoConcept().getConceptId());
+    map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
+    map.put("165322", hivMetadata.getMdcState().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
+    map.put("42", tbMetadata.getPulmonaryTB().getConceptId());
+    map.put("5334", hivMetadata.getCandidiaseOralConcept().getConceptId());
+    map.put("1294", hivMetadata.getCryptococcalMeningitisConcept().getConceptId());
+    map.put("1570", hivMetadata.getCervicalCancerConcept().getConceptId());
+    map.put("5340", hivMetadata.getCandidiaseEsofagicaConcept().getConceptId());
+    map.put("5344", hivMetadata.getHerpesSimplesConcept().getConceptId());
+    map.put("14656", hivMetadata.getCachexiaConcept().getConceptId());
+    map.put("7180", hivMetadata.getToxoplasmoseConcept().getConceptId());
+    map.put("6990", hivMetadata.getHivDiseaseResultingInEncephalopathyConcept().getConceptId());
+    map.put("507", commonMetadata.getKaposiSarcomaConcept().getConceptId());
+    map.put("5042", tbMetadata.getExtraPulmonaryTbConcept().getConceptId());
+    map.put("60", hivMetadata.getMeningitisConcept().getConceptId());
+    map.put("5018", hivMetadata.getChronicDiarrheaConcept().getConceptId());
+    map.put("5945", hivMetadata.getFeverConcept().getConceptId());
+
+    String query =
+        "SELECT     p.patient_id, "
+            + " 'Condição Clínica Activa de Estadio III ou IV' "
+            + "FROM       patient p "
+            + "INNER JOIN "
+            + "           ( "
+            + "                      SELECT     e.patient_id, "
+            + "                                 MAX(e.encounter_datetime) AS clinical_condiction_date"
+            + "                      FROM       encounter e "
+            + "                      INNER JOIN obs o "
+            + "                      ON         o.encounter_id = e.encounter_id "
+            + "                      INNER JOIN ( "
+            + " SELECT start.patient_id, "
+            + "         start.first_pickup AS art_encounter "
+            + "  FROM ( "
+            + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
+            + "        ) start   "
+            + ") tarv ON tarv.patient_id = e.patient_id "
+            + "                      INNER JOIN( "
+            + "                  SELECT     p.patient_id, "
+            + "                             MIN(e.encounter_datetime) AS encounter_date "
+            + "                  FROM       patient p "
+            + "                  INNER JOIN encounter e "
+            + "                  ON         e.patient_id = p.patient_id "
+            + "                  INNER JOIN obs otype "
+            + "                  ON         otype.encounter_id = e.encounter_id "
+            + "                  INNER JOIN obs ostate "
+            + "                  ON         ostate.encounter_id = e.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = p.patient_id "
+            + "                  WHERE      p.voided = 0 "
+            + "                  AND        e.voided = 0 "
+            + "                  AND        otype.voided = 0 "
+            + "                  AND        ostate.voided = 0 "
+            + "                  AND        e.encounter_type = ${6} "
+            + "                  AND        e.location_id = :location "
+            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
+            + minNumberOfMonths
+            + " MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + maxNumberOfMonths
+            + " MONTH ) "
+            + "                  AND    (   ( otype.concept_id = ${165174} "
+            + "                               AND otype.value_coded IS NOT NULL ) "
+            + "                  AND         ( ostate.concept_id = ${165322} "
+            + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
+            + "                  AND  otype.obs_group_id = ostate.obs_group_id "
+            + "                  GROUP BY   p.patient_id ) mds "
+            + "                 ON mds.patient_id = e.patient_id "
+            + "                      WHERE      e.voided = 0 "
+            + "                      AND        o.voided = 0 "
+            + "                      AND        e.encounter_type = ${6} "
+            + "                      AND        e.location_id = :location "
+            + "                      AND        o.concept_id = ${1406} "
+            + "                      AND        o.value_coded IN ( ${14656}, ${7180}, ${6990}, ${5344}, ${5340}, "
+            + "                                                    ${1294}, ${5042}, ${507}, ${1570}, ${60}, "
+            + "                                                    ${5018}, ${5945}, ${42} ) ";
+    query +=
+        b7pedriod
+            ? "         AND        e.encounter_datetime >= mds.encounter_date "
+                + "         AND        e.encounter_datetime <= date_add( tarv.art_encounter, interval 12 month ) "
+            : "AND e.encounter_datetime > Date_add(tarv.art_encounter, INTERVAL "
+                + minNumberOfMonths
+                + " MONTH ) "
+                + "AND e.encounter_datetime <= Date_add(tarv.art_encounter, INTERVAL "
+                + maxNumberOfMonths
+                + " MONTH ) ";
+    query +=
+        "GROUP  BY e.patient_id) clinical_condiction "
+            + "ON         clinical_condiction.patient_id = p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
 }
