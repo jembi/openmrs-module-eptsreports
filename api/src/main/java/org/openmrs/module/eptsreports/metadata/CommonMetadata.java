@@ -1084,4 +1084,148 @@ public class CommonMetadata extends Metadata {
             .getGlobalProperty("eptsreports.followingSampleBetween9To17MonthsConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 374</b>
+   *
+   * <p><b>Name:</b> METHOD OF FAMILY PLANNING
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getMethodOfFamilyPlanningConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.methodOfFamilyPlanningUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 190</b>
+   *
+   * <p><b>Name:</b> CONDOMS
+   *
+   * <p><b>Description:</b> Methods for preventing pregnancy.
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCondomsConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.condomsConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 780</b>
+   *
+   * <p><b>Name:</b> ORAL CONTRACEPTION
+   *
+   * <p><b>Description:</b> Female contraception method. Ultimately will make a good MedSet.
+   *
+   * @return {@link Concept}
+   */
+  public Concept getOralContraceptionConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.oralContraceptionConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 5279</b>
+   *
+   * <p><b>Name:</b> INJECTABLE CONTRACEPTIVES
+   *
+   * <p><b>Description:</b> Injectable medicines which enable deliberate prevention of conception or
+   * impregnation.
+   *
+   * @return {@link Concept}
+   */
+  public Concept getInjectibleContraceptiveConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.injectibleContraceptiveConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 21928</b>
+   *
+   * <p><b>Name:</b> Implant
+   *
+   * <p><b>Description:</b> Is a small flexible plastic rod that is placed under the skin in upper
+   * arm
+   *
+   * @return {@link Concept}
+   */
+  public Concept getImplantConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.implantConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 5275</b>
+   *
+   * <p><b>Name:</b> INTRAUTERINE DEVICE
+   *
+   * <p><b>Description:</b> A device (as a spiral of plastic or a ring of stainless steel) inserted
+   * and left in the uterus to prevent effective conception.
+   *
+   * @return {@link Concept}
+   */
+  public Concept getIntrauterineDeviceConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.intrauterineDeviceConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 5276</b>
+   *
+   * <p><b>Name:</b> FEMALE STERILIZATION
+   *
+   * <p><b>Description:</b> Surgical removal of the uterus.
+   *
+   * @return {@link Concept}
+   */
+  public Concept getFemaleSterilizationConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.femaleSterilizationConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 23714</b>
+   *
+   * <p><b>Name:</b> VASECTOMY
+   *
+   * <p><b>Description:</b> anti-conceptive method
+   *
+   * @return {@link Concept}
+   */
+  public Concept getVasectomyConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.vasectomyConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 23728</b>
+   *
+   * <p><b>Name:</b> OTHER FAMILY PLANNING
+   *
+   * <p><b>Description:</b> other family planning
+   *
+   * @return {@link Concept}
+   */
+  public Concept getOtherFamilyPlanningConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.otherFamilyPlanningConceptUuid");
+    return getConcept(uuid);
+  }
 }
