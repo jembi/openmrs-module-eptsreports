@@ -86,8 +86,7 @@ public class QualityImprovement2020CohortQueries {
       "revisionStartDate=${revisionEndDate-5m+1d},revisionEndDate=${revisionEndDate},location=${location}";
   private final String MAPPING13 =
       "revisionStartDate=${revisionEndDate-4m+1d},revisionEndDate=${revisionEndDate},location=${location}";
-  private final String MAPPING14 =
-      "revisionEndDate=${revisionEndDate},location=${location}";
+  private final String MAPPING14 = "revisionEndDate=${revisionEndDate},location=${location}";
 
   @Autowired
   public QualityImprovement2020CohortQueries(
@@ -15728,14 +15727,14 @@ public class QualityImprovement2020CohortQueries {
     if (num == 1) {
       compositionCohortDefinition.setCompositionString("MQ19DEN1 AND pedidoXpertOnPresuntivoTb");
     } else if (num == 2) {
-      compositionCohortDefinition.setCompositionString("MQ19DEN2 AND resultadoXpertEm7Dias");
+      compositionCohortDefinition.setCompositionString("MQ19DEN1 AND resultadoXpertEm7Dias");
     } else if (num == 3) {
       compositionCohortDefinition.setCompositionString(
           "MQ19DEN3 AND tratamentoDeTbNaDataDeDiagnosticoTb");
     } else if (num == 4) {
       compositionCohortDefinition.setCompositionString("MQ19DEN4 AND pedidoXpertOnPresuntivoTb");
     } else if (num == 5) {
-      compositionCohortDefinition.setCompositionString("MQ19DEN5 AND resultadoXpertEm7Dias");
+      compositionCohortDefinition.setCompositionString("MQ19DEN4 AND resultadoXpertEm7Dias");
     } else if (num == 6) {
       compositionCohortDefinition.setCompositionString(
           "MQ19DEN6 AND tratamentoDeTbNaDataDeDiagnosticoTb");
