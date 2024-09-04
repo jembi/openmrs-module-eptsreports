@@ -483,8 +483,7 @@ public class TXTBCohortQueries {
                 encounterType,
                 tbMetadata.getTestTBLAM().getConceptId(),
                 commonMetadata.getPositive().getConceptId(),
-                commonMetadata.getNegative().getConceptId(),
-                commonMetadata.getIndeterminate().getConceptId()));
+                commonMetadata.getNegative().getConceptId()));
     addGeneralParameters(cd);
     return cd;
   }
@@ -1292,10 +1291,13 @@ public class TXTBCohortQueries {
             getMarkedAsTratamentoTBInicio(),
             "startDate=${startDate-6m},endDate=${startDate-1d},location=${location}"));
 
+    definition.addSearch(
+        "test-tb-lam-elab", EptsReportUtils.map(getTestTBLAM(51), generalParameterMapping));
+
     definition.setCompositionString(
         "(art-list AND (tb-screening OR tb-investigation OR tb-investigation-negative OR started-tb-treatment OR in-tb-program OR pulmonary-tb OR marked-as-tb-treatment-start "
             + "OR (tuberculosis-symptomys OR active-tuberculosis OR tb-observations OR application-for-laboratory-research OR tb-genexpert-test OR tb-genexpert-lab-test OR tb-xpert-mtb OR culture-test OR culture-test-lab "
-            + "OR test-tb-lam OR test-tb-lam-lab OR test-bk OR x-ray-chest) OR result-for-basiloscopia)) "
+            + "OR test-tb-lam OR test-tb-lam-lab OR test-tb-lam-elab OR test-bk OR x-ray-chest) OR result-for-basiloscopia)) "
             + "NOT ((transferred-out NOT (marked-as-tb-treatment-start OR started-tb-treatment OR pulmonary-tb OR in-tb-program)) OR started-tb-treatment-previous-period OR in-tb-program-previous-period OR pulmonary-tb-date OR marked-as-tratamento-tb-inicio)");
 
     return definition;
