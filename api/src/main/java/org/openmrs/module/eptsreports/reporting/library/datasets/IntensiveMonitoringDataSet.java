@@ -854,7 +854,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MI13DEN8",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getSumOfPatientsIn1stOr2ndLineOfArtForDenNum8(
+                intensiveMonitoringCohortQueries.getSumOfPatientsIn1stOr2ndLineOfArtForDenNum8(
                     true),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
@@ -928,7 +928,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MI13NUM8",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getSumOfPatientsIn1stOr2ndLineOfArtForDenNum8(
+                intensiveMonitoringCohortQueries.getSumOfPatientsIn1stOr2ndLineOfArtForDenNum8(
                     false),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 

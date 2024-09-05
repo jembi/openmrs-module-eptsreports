@@ -2531,6 +2531,14 @@ public class IntensiveMonitoringCohortQueries {
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
+
     cd.addSearch(
         "B2",
         EptsReportUtils.map(
@@ -2544,13 +2552,9 @@ public class IntensiveMonitoringCohortQueries {
                 .getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt(),
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    cd.addSearch(
-        "J",
-        EptsReportUtils.map(
-            qualityImprovement2020CohortQueries.getgetMQC13P2DenB4(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch("TRANSFERREDIN", EptsReportUtils.map(transferredIn, "location=${location}"));
 
-    cd.setCompositionString("(B2 AND NOT ABANDONED) AND J");
+    cd.setCompositionString("B2 AND NOT (ABANDONED OR TRANSFERREDIN)");
 
     return cd;
   }
@@ -2574,24 +2578,18 @@ public class IntensiveMonitoringCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     cd.addSearch(
-        "B2",
+        "DENOMINATOR",
         EptsReportUtils.map(
-            qualityImprovement2020CohortQueries.getMQC13P2DenB2(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            getMQC13P2DenMGInIncluisionPeriod33Month(),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
     cd.addSearch(
-        "J",
+        "REQUEST",
         EptsReportUtils.map(
             qualityImprovement2020CohortQueries.getgetMQC13P2DenB4(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.addSearch(
-        "ABANDONED",
-        EptsReportUtils.map(
-            qualityImprovement2020CohortQueries
-                .getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt(),
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-
-    cd.setCompositionString("(B2 AND NOT ABANDONED) AND J");
+    cd.setCompositionString("DENOMINATOR AND REQUEST");
 
     return cd;
   }
@@ -4462,6 +4460,47 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.setCompositionString("DENOMINATOR AND EXAMREQUEST");
+
+    return cd;
+  }
+
+  /**
+   * <b># de crianças na 1a linha (10-14 anos de idade) ou 2ª linha (0-14 anos) de TARV que tiveram
+   * consulta clínica no período de revisão e que eram elegíveis ao pedido de CV</b>
+   *
+   * <p>Incluindo o somatório do resultado dos seguintes indicadores - para denominador:
+   * <li>Denominador do Indicador 13.8-1ª Linha da Categoria 13 Pediátrico de Pedido de CV (RF24.1).
+   * <li>Denominador do Indicador 13.13-2ª Linha da Categoria 13 Pediátrico de Pedido de CV (RF26).
+   *
+   *     <p>Incluindo o somatório do resultado dos seguintes indicadores - para numerador:
+   * <li>Numerador do Indicador 13.8-1ª Linha da Categoria 13 Pediátrico de Pedido de CV (RF25.1).
+   * <li>Numerador do Indicador 13.13-2ª Linha da Categoria 13 Pediátrico de Pedido de CV (RF27).
+   *
+   * @param denominator boolean parameter to choose between Denominator and Numerator
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getSumOfPatientsIn1stOr2ndLineOfArtForDenNum8(Boolean denominator) {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName(
+        "# criancas (10-14 anos de idade) na 1ª ou 2ª linha de TARV - Somatorio (numerador e denominador)");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    if (denominator) {
+      cd.addSearch("PRIMEIRALINHA", Mapped.mapStraightThrough(getCat13Den(8, false)));
+
+      cd.addSearch("SEGUNDALINHA", Mapped.mapStraightThrough(getCat13Den(13, false)));
+    } else {
+      cd.addSearch("PRIMEIRALINHA", Mapped.mapStraightThrough(getCat13Den(8, true)));
+
+      cd.addSearch("SEGUNDALINHA", Mapped.mapStraightThrough(getCat13Den(13, true)));
+    }
+
+    cd.setCompositionString("PRIMEIRALINHA OR SEGUNDALINHA");
 
     return cd;
   }
