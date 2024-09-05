@@ -6039,7 +6039,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getPatientsWhithCacumScreening(
+  public DataDefinition getPatientsWithCacumScreening(
       int minNumberOfMonths, int maxNumberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
@@ -6155,6 +6155,138 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "AND pe.gender = 'F' "
             + "GROUP BY p.patient_id ) no_cacum "
             + " ON no_cacum.patient_id = p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b> RF29.2 </b> Resultado positivo para CACUM entre o 1˚ e 12 meses de TARV? – B.19 (Coluna AT)
+   *
+   * <p>O sistema irá identificar se o utente teve “Resultado positivo para CACUM entre o 1˚ e 12
+   * meses de TARV?” com as seguintes respostas:
+   * <li>Resposta= Sim, se o utente é do sexo feminino e teve registo de resultado do exame “Via” =
+   *     “Positivo” em pelo menos uma consulta clínica (“Ficha Clinica”) decorrida entre 1˚ e 12
+   *     meses de TARV (Data da Consulta >= “Data Início TARV” e <= “Data Início TARV” + 12 meses)
+   * <li>Resposta= Não, se o utente é do sexo feminino e não teve registo de resultado do exame
+   *     “Via” = “Positivo” em todas as consultas clínicas (“Ficha Clinica”) decorridas entre 1˚ e
+   *     12º meses de TARV (Data da Consulta >= “Data Início TARV” e <= “Data Início TARV” + 12
+   *     meses). Ou, se o utente não teve nenhuma consulta clínica entre 1º e 12º meses de TARV.
+   * <li>Resposta= N/A, se o utente não teve registo do início do MDS (Data Início MDS);
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getPatientsWithPositiveCacum(int minNumberOfMonths, int maxNumberOfMonths) {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName(
+        "Identificação de utentes que receberam resultado positivo para CACUM durante o período de avaliação (B19, C19, D19)");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
+    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
+    map.put("6276", hivMetadata.getArtStatus().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("1066", hivMetadata.getNoConcept().getConceptId());
+    map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
+    map.put("165322", hivMetadata.getMdcState().getConceptId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2094", hivMetadata.getResultadoViaConcept().getConceptId());
+    map.put("703", hivMetadata.getPositive().getConceptId());
+
+    String query =
+        "SELECT     p.patient_id, "
+            + " 'Sim' "
+            + "FROM       patient p "
+            + "INNER JOIN "
+            + "           ( "
+            + "                      SELECT     p.patient_id, "
+            + "                                 e.encounter_datetime AS positive_cacum_date"
+            + "                      FROM       patient p "
+            + "                      INNER JOIN person pe  "
+            + "                      ON         p.patient_id = pe.person_id "
+            + "                      INNER JOIN encounter e "
+            + "                      ON         p.patient_id = e.patient_id "
+            + "                      INNER JOIN obs o "
+            + "                      ON         o.encounter_id = e.encounter_id "
+            + "                      INNER JOIN ( "
+            + " SELECT start.patient_id, "
+            + "         start.first_pickup AS art_encounter "
+            + "  FROM ( "
+            + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
+            + "        ) start   "
+            + ") tarv ON tarv.patient_id = p.patient_id "
+            + "                      WHERE      p.voided = 0 "
+            + "                      AND        e.voided = 0 "
+            + "                      AND        o.voided = 0 "
+            + "                      AND        pe.gender = 'F' "
+            + "                      AND        e.encounter_type = ${6} "
+            + "                      AND        e.location_id = :location "
+            + "                      AND        o.concept_id = ${2094} AND o.value_coded = ${703} "
+            + "AND e.encounter_datetime > Date_add(tarv.art_encounter, INTERVAL "
+            + minNumberOfMonths
+            + " MONTH ) "
+            + "AND e.encounter_datetime <= Date_add(tarv.art_encounter, INTERVAL "
+            + maxNumberOfMonths
+            + " MONTH ) "
+            + "GROUP  BY p.patient_id) cacum_positive "
+            + "ON         cacum_positive.patient_id = p.patient_id "
+            + " UNION "
+            + "SELECT     p.patient_id, "
+            + " 'Não' "
+            + "FROM       patient p "
+            + "INNER JOIN "
+            + "           ( "
+            + "                      SELECT     p.patient_id, "
+            + "                                 e.encounter_datetime AS cacum_date"
+            + "                      FROM       patient p "
+            + "                      INNER JOIN person pe  "
+            + "                      ON         p.patient_id = pe.person_id "
+            + "                      INNER JOIN encounter e "
+            + "                      ON         p.patient_id = e.patient_id "
+            + "                      INNER JOIN ( "
+            + " SELECT start.patient_id, "
+            + "         start.first_pickup AS art_encounter "
+            + "  FROM ( "
+            + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
+            + "        ) start   "
+            + ") tarv ON tarv.patient_id = p.patient_id "
+            + "WHERE p.patient_id IN ( "
+            + "    SELECT p.patient_id "
+            + "    FROM patient p "
+            + "             INNER JOIN person pe ON p.patient_id = pe.person_id  "
+            + "             INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "             INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "    WHERE p.voided = 0 "
+            + "      AND e.voided = 0 "
+            + "      AND o.voided = 0 "
+            + "      AND pe.gender = 'F' "
+            + "      AND e.encounter_type = ${6} "
+            + "      AND e.location_id = :location "
+            + "      AND o.concept_id = ${2094} AND o.value_coded NOT IN (${703}) "
+            + "AND e.encounter_datetime >= Date_add(Date_add(tarv.art_encounter, INTERVAL "
+            + minNumberOfMonths
+            + " MONTH ), INTERVAL 1 DAY) "
+            + "AND e.encounter_datetime <= Date_add(tarv.art_encounter, INTERVAL "
+            + maxNumberOfMonths
+            + " MONTH ) ) "
+            + "AND p.voided = 0 "
+            + "AND e.voided = 0 "
+            + "AND pe.gender = 'F' "
+            + "GROUP BY p.patient_id ) no_positive_cacum "
+            + " ON no_positive_cacum.patient_id = p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 

@@ -323,11 +323,18 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B18 - Rastreado para CACUM entre o 1˚ e 12 meses de TARV?
     pdd.addColumn(
         "cacum_screening_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhithCacumScreening(0, 12),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithCacumScreening(0, 12),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
-    // B18 - Estado de permanência no 12˚ mês de TARV: (coluna AO)
+    // B19 - Resultado positivo para CACUM entre o 1˚ e 12 meses de TARV?
+    pdd.addColumn(
+        "positive_cacum_screening_b",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithPositiveCacum(0, 12),
+        endDateMappings,
+        new NotApplicableIfNullConverter());
+
+    // B20 - Estado de permanência no 12˚ mês de TARV: (coluna AO)
     pdd.addColumn(
         "permanence_state_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(),
@@ -552,11 +559,18 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C18 - Rastreado para CACUM entre 12˚ e 24˚ mês de TARV?
     pdd.addColumn(
         "cacum_screening_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhithCacumScreening(12, 24),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithCacumScreening(12, 24),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
-    // C18 - Estado de permanência no 24˚ mês de TARV: (coluna BU)
+    // C19 - Resultado positivo para CACUM entre 12˚ e 24˚ mês de TARV?
+    pdd.addColumn(
+        "positive_cacum_screening_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithPositiveCacum(12, 24),
+        endDateMappings,
+        new NotApplicableIfNullConverter());
+
+    // C20 - Estado de permanência no 24˚ mês de TARV: (coluna BU)
     pdd.addColumn(
         "permanence_state_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(),
@@ -778,11 +792,18 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // D18 - Rastreado para CACUM entre 24˚ e 36˚ mês de TARV?
     pdd.addColumn(
         "cacum_screening_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhithCacumScreening(24, 36),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithCacumScreening(24, 36),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
-    // D18 - Estado de permanência no 36˚ mês de TARV: (coluna DA)
+    // D19 - Resultado positivo para CACUM entre 24˚ e 36˚ mês de TARV?
+    pdd.addColumn(
+        "positive_cacum_screening_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithPositiveCacum(24, 36),
+        endDateMappings,
+        new NotApplicableIfNullConverter());
+
+    // D20 - Estado de permanência no 36˚ mês de TARV: (coluna DA)
     pdd.addColumn(
         "permanence_state_d",
         listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(),
