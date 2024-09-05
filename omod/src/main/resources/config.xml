@@ -4366,4 +4366,20 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>eptsreports.systolicBoodPressureConceptUuid</property>
+		<defaultValue>5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</defaultValue>
+		<description>
+			Systolic blood pressure Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.diastolicBoodPressureConceptUuid</property>
+		<defaultValue>5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</defaultValue>
+		<description>
+			Diastolic blood pressure Concept
+		</description>
+	</globalProperty>
+
 </module>

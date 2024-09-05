@@ -5721,4 +5721,301 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     return sqlPatientDataDefinition;
   }
+
+  /**
+   * <b>RF27.1 - Rastreado para Tensão Arterial em todas as consultas entre a data de inscrição no
+   * MDS e 12 ̊ mês de TARV? – B.15 (Coluna AP</b><br>
+   * <br>
+   *
+   * <p>O sistema irá identificar se o utente foi “Rastreado para Tensão Arterial em todas as
+   * consultas entre a data de inscrição no MDS e 12 ̊ mês de TARV?” com as seguintes respostas:
+   * <br>
+   * <br>
+   * <li>Resposta= Sim, se o utente foi teve registo de “Tensão Arterial” em todas as consultas
+   *     clínicas (“Ficha Clinica”) decorridas entre a data de inscrição no MDS e 12˚ mês de TARV
+   *     (Data da Consulta >= “Data Inscrição MDS (“Ficha Clinica”) decorridas entre a data de
+   *     inscrição no MDS e 12˚ mês de TARV (Data da Consulta >= “Data Inscrição MDS
+   * <li>Resposta= Não, se o utente não teve registo de “Tensão Arterial” em todas consultas
+   *     clínicas (“Ficha Clinica”) decorridas entre a data de inscrição no MDS e 12˚ mês de TARV
+   *     (Data da Consulta >= “Data Incrição MDS e <= “Data Início TARV” + 12 meses). Ou, se o
+   *     utente não teve nenhuma consulta clínica entre data de inscrição no MDS e 12˚ mês de TARV.
+   * <li>Resposta= N/A, se o utente não teve registo do início do MDS.
+   *
+   *     <p>Nota 1: A “Data Início TARV” é definida no RF61<br>
+   *     <br>
+   *
+   *     <p>Nota 2: A “Data Início MDS” (RF24) é a data mais antiga (primeira) entre as “Data Início
+   *     1º MDS”, “Data Início 2º MDS”, “Data Início 3º MDS”, “Data Início 4º MDS”, “Data Início 5º
+   *     MDS”..
+   *
+   *     <p>Nota 3: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses
+   *     ou na coorte de 24 meses ou na coorte de 36 meses, conforme definido no RF4. <br>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public DataDefinition getPatientWithArterialPressure(
+      int minNumberOfMonths, int maxNumberOfMonths, boolean b15pedriod) {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName(
+        "Identificação de utentes rastreados para TA em todas as consultas durante o período de avaliação (B15, C15, D15)");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
+    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
+    map.put("6276", hivMetadata.getArtStatus().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("1066", hivMetadata.getNoConcept().getConceptId());
+    map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
+    map.put("165322", hivMetadata.getMdcState().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("5085", commonMetadata.getSystolicBoodPressureConcept().getConceptId());
+    map.put("5086", commonMetadata.getDiastolicBoodPressureConcept().getConceptId());
+
+    String query =
+        "SELECT     p.patient_id, "
+            + " 'Sim' "
+            + "FROM       patient p "
+            + "INNER JOIN "
+            + "           ( "
+            + "                      SELECT     e.patient_id, "
+            + "                                 Count(e.encounter_id) AS arterial_tension_consultations "
+            + "                      FROM       encounter e "
+            + "                      INNER JOIN obs o "
+            + "                      ON         o.encounter_id = e.encounter_id "
+            + "                      INNER JOIN obs o2 "
+            + "                      ON         o2.encounter_id = e.encounter_id "
+            + "                      INNER JOIN ( "
+            + " SELECT start.patient_id, "
+            + "         start.first_pickup AS art_encounter "
+            + "  FROM ( "
+            + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
+            + "        ) start   "
+            + ") tarv ON tarv.patient_id = e.patient_id "
+            + "                      INNER JOIN( "
+            + "                  SELECT     p.patient_id, "
+            + "                             MIN(e.encounter_datetime) AS encounter_date "
+            + "                  FROM       patient p "
+            + "                  INNER JOIN encounter e "
+            + "                  ON         e.patient_id = p.patient_id "
+            + "                  INNER JOIN obs otype "
+            + "                  ON         otype.encounter_id = e.encounter_id "
+            + "                  INNER JOIN obs ostate "
+            + "                  ON         ostate.encounter_id = e.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = p.patient_id "
+            + "                  WHERE      p.voided = 0 "
+            + "                  AND        e.voided = 0 "
+            + "                  AND        otype.voided = 0 "
+            + "                  AND        ostate.voided = 0 "
+            + "                  AND        e.encounter_type = ${6} "
+            + "                  AND        e.location_id = :location "
+            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
+            + minNumberOfMonths
+            + " MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + maxNumberOfMonths
+            + " MONTH ) "
+            + "                  AND    (   ( otype.concept_id = ${165174} "
+            + "                               AND otype.value_coded IS NOT NULL ) "
+            + "                  AND         ( ostate.concept_id = ${165322} "
+            + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
+            + "                  AND  otype.obs_group_id = ostate.obs_group_id "
+            + "                  GROUP BY   p.patient_id ) mds "
+            + "                 ON mds.patient_id = e.patient_id "
+            + "                      WHERE      e.voided = 0 "
+            + "                      AND        o.voided = 0 "
+            + "                      AND        o2.voided = 0 "
+            + "                      AND        e.encounter_type = ${6} "
+            + "                      AND        e.location_id = :location "
+            + "                      AND        o.concept_id = ${5085} AND o.value_numeric IS NOT NULL"
+            + "                      AND        o2.concept_id = ${5086} AND o2.value_numeric IS NOT NULL";
+    query +=
+        b15pedriod
+            ? "         AND        e.encounter_datetime >= mds.encounter_date "
+                + "         AND        e.encounter_datetime <= date_add( tarv.art_encounter, interval 12 month ) "
+            : " AND e.encounter_datetime > Date_add(tarv.art_encounter, INTERVAL "
+                + minNumberOfMonths
+                + " MONTH ) "
+                + " AND e.encounter_datetime <= Date_add(tarv.art_encounter, INTERVAL "
+                + maxNumberOfMonths
+                + " MONTH ) ";
+    query +=
+        "GROUP  BY e.patient_id) arterial_consultation "
+            + "ON         arterial_consultation.patient_id = p.patient_id "
+            + "INNER JOIN "
+            + "           ( "
+            + "                      SELECT     e.patient_id, "
+            + "                                 count(e.encounter_id) AS nr_consultations "
+            + "                      FROM       encounter e "
+            + "                      INNER JOIN ( "
+            + " SELECT start.patient_id, "
+            + "         start.first_pickup AS art_encounter "
+            + "  FROM ( "
+            + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
+            + "        ) start   "
+            + ") tarv ON tarv.patient_id = e.patient_id "
+            + "                      INNER JOIN( "
+            + "                  SELECT     p.patient_id, "
+            + "                             MIN(e.encounter_datetime) AS encounter_date "
+            + "                  FROM       patient p "
+            + "                  INNER JOIN encounter e "
+            + "                  ON         e.patient_id = p.patient_id "
+            + "                  INNER JOIN obs otype "
+            + "                  ON         otype.encounter_id = e.encounter_id "
+            + "                  INNER JOIN obs ostate "
+            + "                  ON         ostate.encounter_id = e.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = e.patient_id "
+            + "                  WHERE      p.voided = 0 "
+            + "                  AND        e.voided = 0 "
+            + "                  AND        otype.voided = 0 "
+            + "                  AND        ostate.voided = 0 "
+            + "                  AND        e.encounter_type = ${6} "
+            + "                  AND        e.location_id = :location "
+            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
+            + minNumberOfMonths
+            + " MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + maxNumberOfMonths
+            + " MONTH ) "
+            + "                  AND    (   ( otype.concept_id = ${165174} "
+            + "                               AND otype.value_coded IS NOT NULL ) "
+            + "                  AND         ( ostate.concept_id = ${165322} "
+            + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
+            + "                  AND  otype.obs_group_id = ostate.obs_group_id "
+            + "                  GROUP BY   p.patient_id ) mds "
+            + "                 ON mds.patient_id = e.patient_id "
+            + "                      WHERE      e.voided = 0 "
+            + "                      AND        e.encounter_type = ${6} "
+            + "                      AND        e.location_id = :location ";
+    query +=
+        b15pedriod
+            ? "         AND        e.encounter_datetime >= mds.encounter_date "
+                + "         AND        e.encounter_datetime <= date_add( tarv.art_encounter, interval 12 month ) "
+            : " AND e.encounter_datetime > Date_add(tarv.art_encounter, INTERVAL "
+                + minNumberOfMonths
+                + " MONTH ) "
+                + " AND e.encounter_datetime <= Date_add(tarv.art_encounter, INTERVAL "
+                + maxNumberOfMonths
+                + " MONTH ) ";
+    query +=
+        "        GROUP BY   e.patient_id ) consultations "
+            + "ON         consultations.patient_id = p.patient_id "
+            + "WHERE      p.voided = 0 "
+            + " AND arterial_consultation.arterial_tension_consultations = consultations.nr_consultations "
+            + " UNION "
+            + "SELECT     p.patient_id, "
+            + " 'Não' "
+            + "FROM       patient p "
+            + "INNER JOIN "
+            + "           ( "
+            + "                      SELECT     e.patient_id, "
+            + "                                 Count(e.encounter_id) AS arterial_tension_consultations "
+            + "                      FROM       encounter e "
+            + "                      INNER JOIN obs o "
+            + "                      ON         o.encounter_id = e.encounter_id "
+            + "                      INNER JOIN obs o2 "
+            + "                      ON         o2.encounter_id = e.encounter_id "
+            + "                      INNER JOIN ( "
+            + " SELECT start.patient_id, "
+            + "         start.first_pickup AS art_encounter "
+            + "  FROM ( "
+            + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
+            + "        ) start   "
+            + ") tarv ON tarv.patient_id = e.patient_id "
+            + "                      INNER JOIN( "
+            + "                  SELECT     p.patient_id, "
+            + "                             MIN(e.encounter_datetime) AS encounter_date "
+            + "                  FROM       patient p "
+            + "                  INNER JOIN encounter e "
+            + "                  ON         e.patient_id = p.patient_id "
+            + "                  INNER JOIN obs otype "
+            + "                  ON         otype.encounter_id = e.encounter_id "
+            + "                  INNER JOIN obs ostate "
+            + "                  ON         ostate.encounter_id = e.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.first_pickup AS art_encounter "
+            + "                           FROM   ( "
+            + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
+            + "                           ) art_patient "
+            + "                             ) art "
+            + "                  ON         art.patient_id = p.patient_id "
+            + "                  WHERE      p.voided = 0 "
+            + "                  AND        e.voided = 0 "
+            + "                  AND        otype.voided = 0 "
+            + "                  AND        ostate.voided = 0 "
+            + "                  AND        e.encounter_type = ${6} "
+            + "                  AND        e.location_id = :location "
+            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
+            + minNumberOfMonths
+            + " MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + maxNumberOfMonths
+            + " MONTH ) "
+            + "                  AND    (   ( otype.concept_id = ${165174} "
+            + "                               AND otype.value_coded IS NOT NULL ) "
+            + "                  AND         ( ostate.concept_id = ${165322} "
+            + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
+            + "                  AND  otype.obs_group_id = ostate.obs_group_id "
+            + "                  GROUP BY   p.patient_id ) mds "
+            + "                 ON mds.patient_id = e.patient_id "
+            + "WHERE e.patient_id NOT IN ( "
+            + "    SELECT p.patient_id "
+            + "    FROM patient p "
+            + "             INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "             INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "             INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "    WHERE p.voided = 0 "
+            + "    AND        e.voided = 0 "
+            + "    AND        o.voided = 0 "
+            + "    AND        o2.voided = 0 "
+            + "    AND        e.encounter_type = ${6} "
+            + "    AND        e.location_id = :location "
+            + "    AND        o.concept_id = ${5085} AND o.value_numeric IS NOT NULL "
+            + "    AND        o2.concept_id  = ${5086} AND o2.value_numeric IS NOT NULL ";
+    query +=
+        b15pedriod
+            ? "         AND        e.encounter_datetime >= mds.encounter_date "
+                + "         AND        e.encounter_datetime <= date_add( tarv.art_encounter, interval 12 month ) ) "
+            : " AND e.encounter_datetime >= Date_add(Date_add(tarv.art_encounter, INTERVAL "
+                + minNumberOfMonths
+                + " MONTH ), INTERVAL 1 DAY) "
+                + " AND e.encounter_datetime <= Date_add(tarv.art_encounter, INTERVAL "
+                + maxNumberOfMonths
+                + " MONTH ) ) ";
+    query +=
+        "AND e.voided = 0 "
+            + "GROUP BY e.patient_id ) no_arterial_tension "
+            + " ON no_arterial_tension.patient_id = p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
 }

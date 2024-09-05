@@ -1228,4 +1228,38 @@ public class CommonMetadata extends Metadata {
             .getGlobalProperty("eptsreports.otherFamilyPlanningConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 5085</b>
+   *
+   * <p><b>Name:</b> Systolic blood pressure
+   *
+   * <p><b>Description:</b> A patient's systolic blood pressure measurement (taken with a manual
+   * cuff in either a sitting or standing position)
+   *
+   * @return {@link Concept}
+   */
+  public Concept getSystolicBoodPressureConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.systolicBoodPressureConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 5086</b>
+   *
+   * <p><b>Name:</b> Diastolic blood pressure
+   *
+   * <p><b>Description:</b> A patient's diastolic blood pressure measurement (taken with a manual
+   * cuff in either a sitting or standing position)
+   *
+   * @return {@link Concept}
+   */
+  public Concept getDiastolicBoodPressureConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.diastolicBoodPressureConceptUuid");
+    return getConcept(uuid);
+  }
 }
