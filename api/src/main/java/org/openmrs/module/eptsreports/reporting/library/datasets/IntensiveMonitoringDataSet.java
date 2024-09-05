@@ -1228,7 +1228,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MI13DEN4",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ13NewDen4(),
+                intensiveMonitoringCohortQueries.getMI13NewDen4(),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI13DEN4.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -1284,7 +1284,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MI13NUM4",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ13NewNum4(true),
+                intensiveMonitoringCohortQueries.getMI13NewNum4(),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI13NUM4.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
