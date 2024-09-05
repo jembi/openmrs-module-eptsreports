@@ -270,11 +270,17 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         endDateMappings,
         new GeneralDateConverter());
 
-    // B11 - Rastreado para TB em TODAS as consultas entre a data de inscrição no MDS e 12˚ mês de
-    // TARV?: Coluna AH
+    // B11 - Rastreado para TB em TODAS as consultas entre a data de inscrição no MDS e 12˚ mês de TARV
     pdd.addColumn(
         "tb_screening_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionB(0, 12, true),
+        endDateMappings,
+        new NotApplicableIfNullConverter());
+
+    // B12 - Recebeu uma forma de PF entre a data de inscrição no MDS e 12˚ mês de TARV?
+    pdd.addColumn(
+        "family_planning_b",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedPf(0, 12, true),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -479,6 +485,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(true, 12, 24),
         endDateMappings);
 
+    // C12 - Recebeu uma forma de PF entre 12˚ e 24˚ mês de TARV?
+    pdd.addColumn(
+        "family_planning_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedPf(12, 24, false),
+        endDateMappings,
+        new NotApplicableIfNullConverter());
+
     // C14 - PB/IMC registado em TODAS as consultas entre o 12˚ a 24º mês de TARV? (coluna BQ) -
     // Resposta = Sim ou Não ou N/A (RF27)
     pdd.addColumn(
@@ -677,6 +690,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "tb_screening_d",
         listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(true, 24, 36),
         endDateMappings);
+
+    // D12 - Recebeu uma forma de PF entre 24˚ e 36˚ mês de TARV?
+    pdd.addColumn(
+        "family_planning_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedPf(24, 36, false),
+        endDateMappings,
+        new NotApplicableIfNullConverter());
 
     // D14 - PB/IMC registado em TODAS as consultas entre o 24˚ a 36º mês de TARV?- D.14 (Coluna CW)
     pdd.addColumn(
