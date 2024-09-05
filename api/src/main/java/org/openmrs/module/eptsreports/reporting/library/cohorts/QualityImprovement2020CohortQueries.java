@@ -5452,6 +5452,14 @@ public class QualityImprovement2020CohortQueries {
         commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
             false, true, 12);
 
+    CohortDefinition transferredIn =
+            QualityImprovement2020Queries.getTransferredInPatients(
+                    hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                    commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+                    hivMetadata.getPatientFoundYesConcept().getConceptId(),
+                    hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+                    hivMetadata.getArtStatus().getConceptId());
+
     compositionCohortDefinition.addSearch(
         "B2NEW",
         EptsReportUtils.map(
@@ -5497,6 +5505,9 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             B5EMI, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
+    compositionCohortDefinition.addSearch(
+            "TRANSFERREDIN", EptsReportUtils.map(transferredIn, "location=${location}"));
+
     compositionCohortDefinition.setCompositionString(preposition.getCompositionString());
 
     return compositionCohortDefinition;
@@ -5517,7 +5528,7 @@ public class QualityImprovement2020CohortQueries {
     MI {
       @Override
       public String getCompositionString() {
-        return "(B2NEW OR RESTARTED OR (B3MI AND NOT B3EMI) ) AND NOT (ABANDONEDTARV OR B5EMI)";
+        return "(B2NEW OR RESTARTED OR (B3MI AND NOT B3EMI) ) AND NOT (ABANDONEDTARV OR B5EMI OR TRANSFERREDIN)";
       }
 
       @Override
