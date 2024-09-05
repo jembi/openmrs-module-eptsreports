@@ -5453,12 +5453,12 @@ public class QualityImprovement2020CohortQueries {
             false, true, 12);
 
     CohortDefinition transferredIn =
-            QualityImprovement2020Queries.getTransferredInPatients(
-                    hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                    commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-                    hivMetadata.getPatientFoundYesConcept().getConceptId(),
-                    hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-                    hivMetadata.getArtStatus().getConceptId());
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
 
     compositionCohortDefinition.addSearch(
         "B2NEW",
@@ -5506,7 +5506,7 @@ public class QualityImprovement2020CohortQueries {
             B5EMI, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-            "TRANSFERREDIN", EptsReportUtils.map(transferredIn, "location=${location}"));
+        "TRANSFERREDIN", EptsReportUtils.map(transferredIn, "location=${location}"));
 
     compositionCohortDefinition.setCompositionString(preposition.getCompositionString());
 
@@ -5542,6 +5542,35 @@ public class QualityImprovement2020CohortQueries {
     public abstract String getDescription();
   }
 
+  public enum UtentesSegundaLinhaPreposition {
+    MQ {
+      @Override
+      public String getCompositionString() {
+        return "(secondLineB2 AND NOT B2E) AND NOT (ABANDONEDTARV OR B5E)";
+      }
+
+      @Override
+      public String getDescription() {
+        return "Utentes em Segunda Linha For MQ";
+      }
+    },
+    MI {
+      @Override
+      public String getCompositionString() {
+        return "(secondLineB2 AND NOT B2E) AND NOT (ABANDONEDTARV OR B5E OR TRANSFERREDIN)";
+      }
+
+      @Override
+      public String getDescription() {
+        return "Utentes em Segunda Linha For MI";
+      }
+    };
+
+    public abstract String getCompositionString();
+
+    public abstract String getDescription();
+  }
+
   /**
    * <b>RF15</b>: Utentes em 2ª Linha elegíveis ao pedido de CV <br>
    * <i></i><br>
@@ -5567,7 +5596,7 @@ public class QualityImprovement2020CohortQueries {
    * Consulta” é a data da última consulta clínica ocorrida durante o período de revisão.</i> <br>
    * <br>
    */
-  public CohortDefinition getUtentesSegundaLinha() {
+  public CohortDefinition getUtentesSegundaLinha(UtentesSegundaLinhaPreposition preposition) {
 
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
@@ -5589,6 +5618,14 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition B5E =
         commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
             false, true, 12);
+
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
 
     compositionCohortDefinition.addSearch(
         "secondLineB2",
@@ -5613,8 +5650,10 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             B5E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString(
-        "(secondLineB2 AND NOT B2E) AND NOT (ABANDONEDTARV OR B5E)");
+    compositionCohortDefinition.addSearch(
+        "TRANSFERREDIN", EptsReportUtils.map(transferredIn, "location=${location}"));
+
+    compositionCohortDefinition.setCompositionString(preposition.getCompositionString());
 
     return compositionCohortDefinition;
   }
@@ -5704,7 +5743,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition PrimeiraLinha = getUtentesPrimeiraLinha(UtentesPrimeiraLinhaPreposition.MQ);
 
-    CohortDefinition SegundaLinha = getUtentesSegundaLinha();
+    CohortDefinition SegundaLinha = getUtentesSegundaLinha(UtentesSegundaLinhaPreposition.MQ);
 
     CohortDefinition tbDiagnosisActive = getPatientsWithTbActiveOrTbTreatment();
 
@@ -14709,7 +14748,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition firstLine = getUtentesPrimeiraLinha(UtentesPrimeiraLinhaPreposition.MQ);
 
-    CohortDefinition secondLine = getUtentesSegundaLinha();
+    CohortDefinition secondLine = getUtentesSegundaLinha(UtentesSegundaLinhaPreposition.MQ);
 
     CohortDefinition tbDiagnosisActive = getPatientsWithTbActiveOrTbTreatment();
 
@@ -14831,7 +14870,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition firstLine = getUtentesPrimeiraLinha(UtentesPrimeiraLinhaPreposition.MQ);
 
-    CohortDefinition secondLine = getUtentesSegundaLinha();
+    CohortDefinition secondLine = getUtentesSegundaLinha(UtentesSegundaLinhaPreposition.MQ);
 
     CohortDefinition tbDiagnosisActive = getPatientsWithTbActiveOrTbTreatment();
 
@@ -15032,7 +15071,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition firstLine = getUtentesPrimeiraLinha(UtentesPrimeiraLinhaPreposition.MQ);
 
-    CohortDefinition secondLine = getUtentesSegundaLinha();
+    CohortDefinition secondLine = getUtentesSegundaLinha(UtentesSegundaLinhaPreposition.MQ);
 
     CohortDefinition arvRegimen = getPatientsOnRegimeArvSecondLine();
 
