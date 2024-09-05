@@ -270,7 +270,8 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         endDateMappings,
         new GeneralDateConverter());
 
-    // B11 - Rastreado para TB em TODAS as consultas entre a data de inscrição no MDS e 12˚ mês de TARV
+    // B11 - Rastreado para TB em TODAS as consultas entre a data de inscrição no MDS e 12˚ mês de
+    // TARV
     pdd.addColumn(
         "tb_screening_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionB(0, 12, true),
@@ -281,6 +282,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "family_planning_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedPf(0, 12, true),
+        endDateMappings,
+        new NotApplicableIfNullConverter());
+
+    // B13 - Recebeu TPT entre a data de inscrição no MDS e 12˚ mês de TARV?
+    pdd.addColumn(
+        "received_tpt_b",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedTpt(0, 12, true),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -492,6 +500,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         endDateMappings,
         new NotApplicableIfNullConverter());
 
+    // C13 - Recebeu TPT entre 12˚ e 24˚ mês de TARV?
+    pdd.addColumn(
+        "received_tpt_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedTpt(12, 24, false),
+        endDateMappings,
+        new NotApplicableIfNullConverter());
+
     // C14 - PB/IMC registado em TODAS as consultas entre o 12˚ a 24º mês de TARV? (coluna BQ) -
     // Resposta = Sim ou Não ou N/A (RF27)
     pdd.addColumn(
@@ -695,6 +710,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "family_planning_d",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedPf(24, 36, false),
+        endDateMappings,
+        new NotApplicableIfNullConverter());
+
+    // D13 - Recebeu TPT entre 24˚ e 36˚ mês de TARV?
+    pdd.addColumn(
+        "received_tpt_d",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedTpt(24, 36, false),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
