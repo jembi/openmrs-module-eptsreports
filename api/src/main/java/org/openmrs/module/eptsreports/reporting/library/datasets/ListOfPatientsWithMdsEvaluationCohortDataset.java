@@ -329,7 +329,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
 
     // B19 - Resultado positivo para CACUM entre o 1˚ e 12 meses de TARV?
     pdd.addColumn(
-        "positive_cacum_screening_b",
+        "positive_cacum_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithPositiveCacum(0, 12),
         endDateMappings,
         new NotApplicableIfNullConverter());
@@ -565,7 +565,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
 
     // C19 - Resultado positivo para CACUM entre 12˚ e 24˚ mês de TARV?
     pdd.addColumn(
-        "positive_cacum_screening_c",
+        "positive_cacum_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithPositiveCacum(12, 24),
         endDateMappings,
         new NotApplicableIfNullConverter());
@@ -798,7 +798,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
 
     // D19 - Resultado positivo para CACUM entre 24˚ e 36˚ mês de TARV?
     pdd.addColumn(
-        "positive_cacum_screening_d",
+        "positive_cacum_d",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithPositiveCacum(24, 36),
         endDateMappings,
         new NotApplicableIfNullConverter());
