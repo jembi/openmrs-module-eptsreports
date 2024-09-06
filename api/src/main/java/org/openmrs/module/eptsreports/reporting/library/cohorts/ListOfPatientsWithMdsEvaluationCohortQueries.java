@@ -1827,19 +1827,19 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     query +=
         b8Period
             ? "          AND e.encounter_datetime NOT BETWEEN "
-                + "            Date_add(tarv.art_encounter, INTERVAL "
+                + "            Date_add(art.art_encounter, INTERVAL "
                 + minNumberOfMonths
                 + " MONTH ) "
                 + "          AND  "
-                + "            Date_add(tarv.art_encounter, INTERVAL "
+                + "            Date_add(art.art_encounter, INTERVAL "
                 + maxNumberOfMonths
                 + " MONTH ) "
             : "          AND e.encounter_datetime NOT BETWEEN "
-                + "            Date_add(Date_add(tarv.art_encounter, INTERVAL "
+                + "            Date_add(Date_add(art.art_encounter, INTERVAL "
                 + minNumberOfMonths
                 + " MONTH ), INTERVAL 1 DAY) "
                 + "          AND "
-                + "            Date_add(tarv.art_encounter, INTERVAL "
+                + "            Date_add(art.art_encounter, INTERVAL "
                 + maxNumberOfMonths
                 + " MONTH ) ";
     query +=
