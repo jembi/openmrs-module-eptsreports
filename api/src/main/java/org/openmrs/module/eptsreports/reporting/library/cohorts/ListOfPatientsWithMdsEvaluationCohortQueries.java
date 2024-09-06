@@ -1352,7 +1352,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "       AND enc.location_id = :location "
             + "       AND obs.concept_id = ${1695} "
             + "       AND obs.value_numeric IS NOT NULL "
-            + "       AND enc.encounter_datetime >= DATE_ADD(art.art_encounter, INTERVAL "
+            + "       AND enc.encounter_datetime > DATE_ADD(art.art_encounter, INTERVAL "
             + minNumberOfMonths
             + " MONTH ) "
             + "       AND enc.encounter_datetime <= DATE_ADD(art.art_encounter, INTERVAL "
@@ -1464,7 +1464,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
         b5Orc5
             ? "                         AND e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL 33 DAY) "
                 + "                         AND e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL 3 MONTH) "
-            : " AND        e.encounter_datetime >= DATE_ADD( tarv.art_encounter, INTERVAL "
+            : " AND        e.encounter_datetime > DATE_ADD( tarv.art_encounter, INTERVAL "
                 + minNumberOfMonths
                 + " MONTH ) "
                 + " AND        e.encounter_datetime <= DATE_ADD( tarv.art_encounter, INTERVAL "
@@ -1558,7 +1558,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * @return {DataDefinition}
    */
   public DataDefinition getPatientsPregnantBreastfeeding3MonthsTarv(
-      int minNumberOfMonths, int maxNumberOfMonths) {
+      int minNumberOfMonths, int maxNumberOfMonths, boolean b6Period) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "B6- Esteve grávida ou foi lactante entre 3˚ e 9º mês de TARV?: (coluna M)- Resposta = Sim ou Não");
@@ -1608,16 +1608,27 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "          AND p.gender = 'F' "
             + "          AND Timestampdiff(year, p.birthdate, art.art_encounter) > 9 "
             + "          AND o.concept_id IN ( ${1982}, ${6332} ) "
-            + "          AND o.value_coded = ( ${1065} ) "
-            + "          AND e.encounter_datetime BETWEEN "
-            + "            Date_add(art.art_encounter, INTERVAL "
-            + minNumberOfMonths
-            + " MONTH ) "
-            + "            AND "
-            + "            Date_add(art.art_encounter, INTERVAL "
-            + maxNumberOfMonths
-            + " MONTH ) "
-            + "        GROUP  BY p.person_id) final_query "
+            + "          AND o.value_coded = ( ${1065} ) ";
+    query +=
+        b6Period
+            ? "          AND e.encounter_datetime >= "
+                + "            Date_add(art.art_encounter, INTERVAL "
+                + minNumberOfMonths
+                + " MONTH ) "
+                + "          AND e.encounter_datetime <= "
+                + "            Date_add(art.art_encounter, INTERVAL "
+                + maxNumberOfMonths
+                + " MONTH ) "
+            : "          AND e.encounter_datetime > "
+                + "            Date_add(art.art_encounter, INTERVAL "
+                + minNumberOfMonths
+                + " MONTH ) "
+                + "          AND e.encounter_datetime <= "
+                + "            Date_add(art.art_encounter, INTERVAL "
+                + maxNumberOfMonths
+                + " MONTH ) ";
+    query +=
+        "        GROUP  BY p.person_id) final_query "
             + " UNION "
             + "SELECT final_query.person_id, "
             + "       'Não' "
@@ -1644,16 +1655,26 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "          AND p.gender = 'F' "
             + "          AND Timestampdiff(year, p.birthdate, art.art_encounter) > 9 "
             + "          AND o.concept_id IN ( ${1982}, ${6332} ) "
-            + "          AND o.value_coded = ( ${1065} ) "
-            + "          AND e.encounter_datetime NOT BETWEEN "
-            + "            Date_add(art.art_encounter, INTERVAL "
-            + minNumberOfMonths
-            + " MONTH ) "
-            + "            AND "
-            + "            Date_add(art.art_encounter, INTERVAL "
-            + maxNumberOfMonths
-            + " MONTH ) "
-            + "        GROUP  BY p.person_id) final_query ";
+            + "          AND o.value_coded = ( ${1065} ) ";
+    query +=
+        b6Period
+            ? "          AND e.encounter_datetime NOT BETWEEN "
+                + "            Date_add(tarv.art_encounter, INTERVAL "
+                + minNumberOfMonths
+                + " MONTH ) "
+                + " AND "
+                + "            Date_add(tarv.art_encounter, INTERVAL "
+                + maxNumberOfMonths
+                + " MONTH ) "
+            : "          AND e.encounter_datetime NOT BETWEEN "
+                + "            Date_add(Date_add(tarv.art_encounter, INTERVAL "
+                + minNumberOfMonths
+                + " MONTH ), INTERVAL 1 DAY) "
+                + "          AND "
+                + "            Date_add(tarv.art_encounter, INTERVAL "
+                + maxNumberOfMonths
+                + " MONTH ) ";
+    query += "        GROUP  BY p.person_id) final_query ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1699,7 +1720,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * @return {DataDefinition}
    */
   public DataDefinition getPatientsWithTbThirdToNineMonth(
-      int minNumberOfMonths, int maxNumberOfMonths) {
+      int minNumberOfMonths, int maxNumberOfMonths, boolean b8Period) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "B8-Teve TB nos 1˚s 12 meses de TARV: (coluna Q) - Resposta = Sim ou Não (RF23)");
@@ -1752,16 +1773,27 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " AND        o.voided = 0 "
             + " AND        o2.voided = 0 "
             + " AND        e.encounter_type = ${6} "
-            + " AND        e.location_id = :location "
-            + " AND        e.encounter_datetime BETWEEN "
-            + " date_add( art.art_encounter, INTERVAL "
-            + minNumberOfMonths
-            + " MONTH ) "
-            + " AND "
-            + " date_add( art.art_encounter, INTERVAL "
-            + maxNumberOfMonths
-            + " MONTH ) "
-            + " AND    (   ( o.concept_id = ${23761} "
+            + " AND        e.location_id = :location ";
+    query +=
+        b8Period
+            ? " AND        e.encounter_datetime >= "
+                + " date_add( art.art_encounter, INTERVAL "
+                + minNumberOfMonths
+                + " MONTH ) "
+                + " AND        e.encounter_datetime <= "
+                + " date_add( art.art_encounter, INTERVAL "
+                + maxNumberOfMonths
+                + " MONTH ) "
+            : " AND        e.encounter_datetime > "
+                + " date_add( art.art_encounter, INTERVAL "
+                + minNumberOfMonths
+                + " MONTH ) "
+                + " AND        e.encounter_datetime <= "
+                + " date_add( art.art_encounter, INTERVAL "
+                + maxNumberOfMonths
+                + " MONTH ) ";
+    query +=
+        " AND    (   ( o.concept_id = ${23761} "
             + "              AND o.value_coded IN ( ${1065} ) ) "
             + " OR         ( o2.concept_id = ${1268} "
             + "                AND  o2.value_coded IN ( ${1256}, ${1257} ) ) ) "
@@ -1791,16 +1823,27 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " AND        o.voided = 0 "
             + " AND        o2.voided = 0 "
             + " AND        e.encounter_type = ${6} "
-            + " AND        e.location_id = :location "
-            + " AND        e.encounter_datetime NOT BETWEEN "
-            + " date_add( art.art_encounter, INTERVAL "
-            + minNumberOfMonths
-            + " MONTH ) "
-            + " AND "
-            + " date_add( art.art_encounter, INTERVAL "
-            + maxNumberOfMonths
-            + " MONTH ) "
-            + " AND    (   ( o.concept_id = ${23761} "
+            + " AND        e.location_id = :location ";
+    query +=
+        b8Period
+            ? "          AND e.encounter_datetime NOT BETWEEN "
+                + "            Date_add(tarv.art_encounter, INTERVAL "
+                + minNumberOfMonths
+                + " MONTH ) "
+                + "          AND  "
+                + "            Date_add(tarv.art_encounter, INTERVAL "
+                + maxNumberOfMonths
+                + " MONTH ) "
+            : "          AND e.encounter_datetime NOT BETWEEN "
+                + "            Date_add(Date_add(tarv.art_encounter, INTERVAL "
+                + minNumberOfMonths
+                + " MONTH ), INTERVAL 1 DAY) "
+                + "          AND "
+                + "            Date_add(tarv.art_encounter, INTERVAL "
+                + maxNumberOfMonths
+                + " MONTH ) ";
+    query +=
+        " AND    (   ( o.concept_id = ${23761} "
             + "              AND o.value_coded NOT IN ( ${1065} ) ) "
             + " OR         ( o2.concept_id = ${1268} "
             + "                AND  o2.value_coded NOT IN ( ${1256}, ${1257} ) ) ) "
@@ -1840,7 +1883,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMdsDate(int minNumberOfMonths, int maxNumberOfMonths) {
+  public DataDefinition getMdsDate(int minNumberOfMonths, int maxNumberOfMonths, boolean b9perido) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "D9- Data de inscrição no MDS: (coluna CD) - Resposta = Data de Inscrição (RF54)");
@@ -1890,19 +1933,27 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        otype.voided = 0 "
             + "                  AND        ostate.voided = 0 "
             + "                  AND        e.encounter_type = ${6} "
-            + "                  AND        e.location_id = :location "
-            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
-            + minNumberOfMonths
-            + " MONTH ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + maxNumberOfMonths
-            + " MONTH ) "
-            + "                  AND    (   ( otype.concept_id = ${165174} "
-            + "                               AND otype.value_coded IS NOT NULL ) "
-            + "                  AND         ( ostate.concept_id = ${165322} "
-            + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
-            + "                  AND  otype.obs_group_id = ostate.obs_group_id "
-            + "                  GROUP BY   p.patient_id";
+            + "                  AND        e.location_id = :location ";
+    query +=
+        b9perido
+            ? "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
+                + minNumberOfMonths
+                + " MONTH ) "
+                + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+                + maxNumberOfMonths
+                + " MONTH ) "
+            : "                  AND        e.encounter_datetime > date_add( art.art_encounter, INTERVAL "
+                + minNumberOfMonths
+                + " MONTH ) "
+                + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+                + maxNumberOfMonths
+                + " MONTH ) "
+                + "                  AND    (   ( otype.concept_id = ${165174} "
+                + "                               AND otype.value_coded IS NOT NULL ) "
+                + "                  AND         ( ostate.concept_id = ${165322} "
+                + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
+                + "                  AND  otype.obs_group_id = ostate.obs_group_id "
+                + "                  GROUP BY   p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -4682,7 +4733,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "WHERE  e.voided = 0 "
             + "AND e.encounter_type = ${6} "
             + "AND e.location_id = :location "
-            + "AND e.encounter_datetime >= Date_add(tarv.art_encounter, INTERVAL "
+            + "AND e.encounter_datetime > Date_add(tarv.art_encounter, INTERVAL "
             + minNumberOfMonths
             + " MONTH ) "
             + "AND e.encounter_datetime <= Date_add(tarv.art_encounter, INTERVAL "
@@ -5521,7 +5572,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             : "AND e.encounter_datetime >= Date_add(Date_add(tarv.art_encounter, INTERVAL "
                 + minNumberOfMonths
                 + " MONTH ), INTERVAL 1 DAY) "
-                + "AND e.encounter_datetime <= Date_add(tarv.art_encounter, INTERVAL "
+                + " AND e.encounter_datetime <= Date_add(tarv.art_encounter, INTERVAL "
                 + maxNumberOfMonths
                 + " MONTH ) ) ";
     query +=

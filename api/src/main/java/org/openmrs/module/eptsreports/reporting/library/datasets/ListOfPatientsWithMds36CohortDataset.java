@@ -77,7 +77,7 @@ public class ListOfPatientsWithMds36CohortDataset extends BaseDataSet {
     pdd.addColumn(
         "pregnant_breastfeeding_d",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsPregnantBreastfeeding3MonthsTarv(
-            24, 36),
+            24, 36, false),
         endDateMappings);
 
     // D7 - Condição Clínica Activa de Estadio III ou IV entre 24º e 36º mês de TARV
@@ -90,13 +90,14 @@ public class ListOfPatientsWithMds36CohortDataset extends BaseDataSet {
     // D.8 - Teve TB entre 24˚ e 36 ˚ meses de TARV: (coluna CC)
     pdd.addColumn(
         "tb_tarv_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithTbThirdToNineMonth(24, 36),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithTbThirdToNineMonth(
+            24, 36, false),
         endDateMappings);
 
     // D.9 - Data de inscrição em algum MDS entre 24º e 36º mês de TARV: (coluna CD)
     pdd.addColumn(
         "mds_tarv_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(24, 36),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(24, 36, false),
         endDateMappings,
         new GeneralDateConverter());
 

@@ -139,7 +139,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "pregnant_breastfeeding_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsPregnantBreastfeeding3MonthsTarv(
-            3, 9),
+            3, 9, true),
         endDateMappings);
 
     // B7 - Condição Clínica Activa de Estadio III ou IV entre a Data Inscrição no MDS e 12º mês de
@@ -153,13 +153,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B8- Teve TB nos 1˚s 12 meses de TARV: (coluna Q) - Resposta = Sim ou Não (RF23)
     pdd.addColumn(
         "tb_tarv_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithTbThirdToNineMonth(3, 9),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithTbThirdToNineMonth(3, 9, true),
         endDateMappings);
 
     // B9- Data de inscrição no MDS: (coluna R) - Resposta = Data de Inscrição (RF24)
     pdd.addColumn(
         "mds_date",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(0, 12),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(0, 12, true),
         endDateMappings,
         new GeneralDateConverter());
 
