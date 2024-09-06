@@ -97,6 +97,38 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     return cd;
   }
 
+  public CohortDefinition getCoort24Or36month() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients who initiated the ART between the cohort period");
+    cd.addParameter(new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition twentyFourMonths = getCoort(3, 2, false);
+    CohortDefinition thirtySixMonths = getCoort(4, 3, false);
+
+    cd.addSearch("twentyFourMonths", Mapped.mapStraightThrough(twentyFourMonths));
+    cd.addSearch("thirtySixMonths", Mapped.mapStraightThrough(thirtySixMonths));
+
+    cd.setCompositionString("twentyFourMonths OR thirtySixMonths");
+
+    return cd;
+  }
+
+  public CohortDefinition getCoort36month() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients who initiated the ART between the cohort period");
+    cd.addParameter(new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition thirtySixMonths = getCoort(4, 3, false);
+
+    cd.addSearch("thirtySixMonths", Mapped.mapStraightThrough(thirtySixMonths));
+
+    cd.setCompositionString("thirtySixMonths");
+
+    return cd;
+  }
+
   private String getCoort12Or24Or36Query(
       int numberOfYearsStartDate, int numberOfYearsEndDate, boolean coortName) {
 
