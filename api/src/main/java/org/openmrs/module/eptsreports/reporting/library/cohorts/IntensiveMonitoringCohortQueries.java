@@ -4450,8 +4450,7 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch(
         "EXAMREQUEST",
         EptsReportUtils.map(
-            cvExamRequest,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            cvExamRequest, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "DENOMINATOR",
