@@ -1141,11 +1141,11 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         + "    art_patient.first_pickup >= DATE_SUB( "
         + "            :endDate, INTERVAL "
         + maxCohortNumberOfYears
-        + "YEAR ) "
+        + " YEAR ) "
         + "  AND art_patient.first_pickup <= DATE_SUB( "
-        + "        :endDate, INTERVAL"
+        + "        :endDate, INTERVAL "
         + minCohortNumberOfYears
-        + "YEAR ) "
+        + " YEAR ) "
         + "  AND art_patient.patient_id NOT IN ( "
         + "    SELECT "
         + "        patient_id "
@@ -1175,7 +1175,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         + "                      AND ps.start_date <= DATE_SUB( "
         + "        :endDate, INTERVAL "
         + minCohortNumberOfYears
-        + "YEAR) "
+        + " YEAR ) "
         + "                    GROUP BY "
         + "                        p.patient_id "
         + "                ) pgEnrollment ON pgEnrollment.patient_id = p.patient_id "
@@ -1209,7 +1209,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         + "              AND o2.value_datetime <= DATE_SUB( "
         + "        :endDate, INTERVAL "
         + minCohortNumberOfYears
-        + "YEAR) "
+        + " YEAR ) "
         + "            GROUP BY "
         + "                p.patient_id "
         + "        ) transferido_de "

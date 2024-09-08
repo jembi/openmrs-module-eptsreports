@@ -1202,7 +1202,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "ON         o.encounter_id = e.encounter_id "
             + "INNER JOIN "
             + "           ( "
-            + getLastVlDateBetweenPeriods(firstMonth, lastMonth, 2, 4)
+            + getLastVlDateBetweenPeriods(firstMonth, lastMonth, 4, 2)
             + "                     ) last_vl ON last_vl.patient_id = p.patient_id "
             + "       WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
