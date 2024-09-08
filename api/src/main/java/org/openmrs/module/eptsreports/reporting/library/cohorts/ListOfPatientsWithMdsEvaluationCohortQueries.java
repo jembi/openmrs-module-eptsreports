@@ -3075,6 +3075,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("2", hivMetadata.getARTProgram().getProgramId());
     map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
     map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
 
     String query =
         "                  SELECT     mds3_end.patient_id, "
