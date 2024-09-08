@@ -1743,7 +1743,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
                 + " MONTH ) ";
     query +=
         "        GROUP  BY p.person_id) final_query "
-            + " AND final_query.person_id IN ( "
+            + " WHERE final_query.person_id IN ( "
             + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) ";
