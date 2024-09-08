@@ -18,18 +18,11 @@ public class SetupListOfPatientsWithMdsEvaluation extends EptsDataExportManager 
   @Autowired
   private ListOfPatientsWithMdsEvaluationCohortDataset listOfPatientsWithMdsEvaluationCohortDataset;
 
-  private ListOfPatientsWithMds24To36CohortDataset listOfPatientsWithMds24To36CohortDataset;
-  private ListOfPatientsWithMds36CohortDataset listOfPatientsWithMds36CohortDataset;
-
   @Autowired
   public SetupListOfPatientsWithMdsEvaluation(
-      ListOfPatientsWithMdsEvaluationCohortDataset listOfPatientsWithMdsEvaluationCohortDataset,
-      ListOfPatientsWithMds24To36CohortDataset listOfPatientsWithMds24To36CohortDataset,
-      ListOfPatientsWithMds36CohortDataset listOfPatientsWithMds36CohortDataset) {
+      ListOfPatientsWithMdsEvaluationCohortDataset listOfPatientsWithMdsEvaluationCohortDataset) {
     this.listOfPatientsWithMdsEvaluationCohortDataset =
         listOfPatientsWithMdsEvaluationCohortDataset;
-    this.listOfPatientsWithMds24To36CohortDataset = listOfPatientsWithMds24To36CohortDataset;
-    this.listOfPatientsWithMds36CohortDataset = listOfPatientsWithMds36CohortDataset;
   }
 
   @Override
@@ -66,18 +59,10 @@ public class SetupListOfPatientsWithMdsEvaluation extends EptsDataExportManager 
     rd.addParameters(getParameters());
     rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
     rd.addDataSetDefinition("SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
-    // MDS Section A and B Columns
+    rd.addDataSetDefinition("HF", Mapped.mapStraightThrough(new LocationDataSetDefinition()));
     rd.addDataSetDefinition(
         "MDS",
         Mapped.mapStraightThrough(listOfPatientsWithMdsEvaluationCohortDataset.contructDataset()));
-    // MDS Section C Columns
-    rd.addDataSetDefinition(
-        "MDS24TO236TCOHORT",
-        Mapped.mapStraightThrough(listOfPatientsWithMds24To36CohortDataset.contructDataset()));
-    // MDS Section D Columns
-    rd.addDataSetDefinition(
-        "MDS36COHORT",
-        Mapped.mapStraightThrough(listOfPatientsWithMds36CohortDataset.contructDataset()));
 
     return rd;
   }

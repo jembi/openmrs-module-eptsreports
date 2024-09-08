@@ -837,7 +837,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {DataDefinition}
    */
-  public DataDefinition getLastViralLoadOnThePeriod(int minNumberOfMonths, int maxNumberOfMonths) {
+  public DataDefinition getLastViralLoadOnThePeriod(
+      int minNumberOfMonths, int maxNumberOfMonths, boolean cOrDCohort) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Data do pedido da CV de entre 12º e 24º mês de TARV");
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -889,8 +890,16 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + maxNumberOfMonths
             + " MONTH ) "
             + "       AND o.concept_id = ${23722} "
-            + "       AND o.value_coded = ${856} "
-            + "       GROUP BY p.patient_id";
+            + "       AND o.value_coded = ${856} ";
+    query +=
+        cOrDCohort
+            ? " AND p.patient_id IN ( "
+                + listOfPatientsWithMdsEvaluationQueries.getCohort24To36MonthsPatients()
+                + " ) "
+            : " AND p.patient_id IN ( "
+                + listOfPatientsWithMdsEvaluationQueries.get36MonthsCohortPatients()
+                + " ) ";
+    query += "       GROUP BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
