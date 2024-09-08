@@ -577,11 +577,6 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(),
         c18Mappings);
 
-    // coorte de 36 meses
-    pdd.addRowFilter(
-        listOfPatientsWithMdsEvaluationCohortQueries.getCoort36month(),
-        "evaluationYear=${evaluationYear},location=${location}");
-
     // D.1 - Data do pedido da CV de seguimento - D.1 (coluna BV)
     pdd.addColumn(
         "cv_date_d",
