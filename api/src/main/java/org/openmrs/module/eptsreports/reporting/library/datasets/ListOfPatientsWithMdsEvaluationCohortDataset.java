@@ -282,14 +282,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B12 - Recebeu uma forma de PF entre a data de inscrição no MDS e 12˚ mês de TARV?
     pdd.addColumn(
         "family_planning_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedPf(0, 12, true),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedPf(0, 12, true, 4, 1),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // B13 - Recebeu TPT entre a data de inscrição no MDS e 12˚ mês de TARV?
     pdd.addColumn(
         "received_tpt_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedTpt(0, 12, true),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedTpt(0, 12, true, 4, 1),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -305,33 +305,34 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // 12 ̊ mês de TARV?
     pdd.addColumn(
         "arterial_pressure_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientWithArterialPressure(0, 12, true),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientWithArterialPressure(
+            0, 12, true, 4, 1),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // B16 - Identificação de n˚ de consultas clínicas entre 6˚ e 12˚ mês de TARV Coluna AM
     pdd.addColumn(
         "clinical_consultations_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(6, 12),
+        listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(6, 12, 4, 1),
         endDateMappings);
 
     // B17 - N˚ de consultas de APSS/PP entre 6˚ e 12˚ mês de TARV - Coluna AN
     pdd.addColumn(
         "apss_pp_consultations_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(6, 12),
+        listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(6, 12, 4, 1),
         endDateMappings);
 
     // B18 - Rastreado para CACUM entre o 1˚ e 12 meses de TARV?
     pdd.addColumn(
         "cacum_screening_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithCacumScreening(0, 12),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithCacumScreening(0, 12, 4, 1),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // B19 - Resultado positivo para CACUM entre o 1˚ e 12 meses de TARV?
     pdd.addColumn(
         "positive_cacum_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithPositiveCacum(0, 12),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithPositiveCacum(0, 12, 4, 1),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -516,20 +517,20 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C11 - Rastreado para TB em TODAS as consultas entre 12˚ e 24˚ mês de TARV?- C.11 (Coluna BN)
     pdd.addColumn(
         "tb_screening_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(true, 12, 24),
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(true, 12, 24, 4, 2),
         endDateMappings);
 
     // C12 - Recebeu uma forma de PF entre 12˚ e 24˚ mês de TARV?
     pdd.addColumn(
         "family_planning_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedPf(12, 24, false),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedPf(12, 24, false, 4, 2),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // C13 - Recebeu TPT entre 12˚ e 24˚ mês de TARV?
     pdd.addColumn(
         "received_tpt_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedTpt(12, 24, false),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedTpt(12, 24, false, 4, 2),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -537,40 +538,41 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // Resposta = Sim ou Não ou N/A (RF27)
     pdd.addColumn(
         "pb_imc_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(false, 12, 24),
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(false, 12, 24, 4, 2),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // C15 - Rastreado para Tensão Arterial em todas as consultas entre 12˚ e 24˚ mês de TARV?
     pdd.addColumn(
         "arterial_pressure_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientWithArterialPressure(12, 24, false),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientWithArterialPressure(
+            12, 24, false, 4, 2),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // C16 - Identificação de n˚ de consultas clínicas entre 6˚ e 12˚ mês de TARV Coluna AJ
     pdd.addColumn(
         "clinical_consultations_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(12, 24),
+        listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(12, 24, 4, 2),
         endDateMappings);
 
     // C17 - N˚ de consultas de APSS/PP tre 12˚ e 24˚ mês de TARV - Coluna BT
     pdd.addColumn(
         "apss_pp_consultations_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(12, 24),
+        listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(12, 24, 4, 2),
         endDateMappings);
 
     // C18 - Rastreado para CACUM entre 12˚ e 24˚ mês de TARV?
     pdd.addColumn(
         "cacum_screening_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithCacumScreening(12, 24),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithCacumScreening(12, 24, 4, 2),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // C19 - Resultado positivo para CACUM entre 12˚ e 24˚ mês de TARV?
     pdd.addColumn(
         "positive_cacum_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithPositiveCacum(12, 24),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithPositiveCacum(12, 24, 4, 2),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -753,60 +755,61 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // D11 - Rastreado para TB em TODAS as consultas entre 24˚ e 36˚ mês de TARV?- D.11 (Coluna CT)
     pdd.addColumn(
         "tb_screening_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(true, 24, 36),
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(true, 24, 36, 4, 3),
         endDateMappings);
 
     // D12 - Recebeu uma forma de PF entre 24˚ e 36˚ mês de TARV?
     pdd.addColumn(
         "family_planning_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedPf(24, 36, false),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedPf(24, 36, false, 4, 3),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // D13 - Recebeu TPT entre 24˚ e 36˚ mês de TARV?
     pdd.addColumn(
         "received_tpt_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedTpt(24, 36, false),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedTpt(24, 36, false, 4, 3),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // D14 - PB/IMC registado em TODAS as consultas entre o 24˚ a 36º mês de TARV?- D.14 (Coluna CW)
     pdd.addColumn(
         "pb_imc_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(false, 24, 36),
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(false, 24, 36, 4, 3),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // D15 - Rastreado para Tensão Arterial em todas as consultas entre 24˚ e 36˚ mês de TARV?
     pdd.addColumn(
         "arterial_pressure_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientWithArterialPressure(24, 36, false),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientWithArterialPressure(
+            24, 36, false, 4, 3),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // D16 - N˚ de consultas clínicas entre 24˚ e 36˚ mês de TARV- D.16 (Coluna CY)
     pdd.addColumn(
         "clinical_consultations_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(24, 36),
+        listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(24, 36, 4, 3),
         endDateMappings);
 
     // D17 - N˚ de consultas de APSS/PP tre 24˚ e 36˚ mês de TARV- D.18 (Coluna CZ)
     pdd.addColumn(
         "apss_pp_consultations_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(24, 36),
+        listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(24, 36, 4, 3),
         endDateMappings);
 
     // D18 - Rastreado para CACUM entre 24˚ e 36˚ mês de TARV?
     pdd.addColumn(
         "cacum_screening_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithCacumScreening(24, 36),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithCacumScreening(24, 36, 4, 3),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // D19 - Resultado positivo para CACUM entre 24˚ e 36˚ mês de TARV?
     pdd.addColumn(
         "positive_cacum_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithPositiveCacum(24, 36),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithPositiveCacum(24, 36, 4, 3),
         endDateMappings,
         new NotApplicableIfNullConverter());
 

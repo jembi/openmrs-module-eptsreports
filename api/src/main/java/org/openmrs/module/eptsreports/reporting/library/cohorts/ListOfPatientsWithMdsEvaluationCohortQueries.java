@@ -4858,7 +4858,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   }
 
   public DataDefinition getTbScreeningSectionC(
-      boolean tbScreeningOrPbImc, int minNumberOfMonths, int maxNumberOfMonths) {
+      boolean tbScreeningOrPbImc,
+      int minNumberOfMonths,
+      int maxNumberOfMonths,
+      int minCohortNumberOfYears,
+      int maxCohortNumberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "B11 - Identificação de Utente Rastreado para TB em TODAS as consultas entre a data de inscrição no MDS e 12˚ mês de TARV");
@@ -4955,7 +4959,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " MONTH ) "
             + "GROUP  BY e.patient_id) consultations "
             + "ON consultations.patient_id = p.patient_id "
-            + "WHERE  p.voided = 0";
+            + "WHERE  p.voided = 0"
+            + " AND p.patient_id IN ( "
+            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+                minCohortNumberOfYears, maxCohortNumberOfYears)
+            + " ) ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -4979,7 +4987,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {DataDefinition}
    */
-  public DataDefinition getNrClinicalConsultations(int minNumberOfMonths, int maxNumberOfMonths) {
+  public DataDefinition getNrClinicalConsultations(
+      int minNumberOfMonths,
+      int maxNumberOfMonths,
+      int minCohortNumberOfYears,
+      int maxCohortNumberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B16- Identificação de n˚ de consultas clínicas");
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -5030,6 +5042,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + maxNumberOfMonths
             + " MONTH ) "
+            + " AND p.patient_id IN ( "
+            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+                minCohortNumberOfYears, maxCohortNumberOfYears)
+            + " ) "
             + "                  GROUP BY   p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -5054,7 +5070,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {DataDefinition}
    */
-  public DataDefinition getNrApssPpConsultations(int minNumberOfMonths, int maxNumberOfMonths) {
+  public DataDefinition getNrApssPpConsultations(
+      int minNumberOfMonths,
+      int maxNumberOfMonths,
+      int minCohortNumberOfYears,
+      int maxCohortNumberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B17- Identificação de n˚ de consultas apss/pp");
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -5106,6 +5126,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
             + maxNumberOfMonths
             + " MONTH ) "
+            + " AND p.patient_id IN ( "
+            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+                minCohortNumberOfYears, maxCohortNumberOfYears)
+            + " ) "
             + "                  GROUP BY   p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -5617,7 +5641,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * @return {@link DataDefinition}
    */
   public DataDefinition getPatientsWhoReceivedPf(
-      int minNumberOfMonths, int maxNumberOfMonths, boolean b12pedriod) {
+      int minNumberOfMonths,
+      int maxNumberOfMonths,
+      boolean b12pedriod,
+      int minCohortNumberOfYears,
+      int maxCohortNumberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "Identificação de utentes que receberam uma forma de PF durante o período de avaliação (B12, C12, D12)");
@@ -5732,6 +5760,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     query +=
         "GROUP  BY e.patient_id) planeamento_familiar "
             + "ON         planeamento_familiar.patient_id = p.patient_id "
+            + " WHERE p.patient_id IN ( "
+            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+                minCohortNumberOfYears, maxCohortNumberOfYears)
+            + " ) "
             + " UNION "
             + "SELECT     p.patient_id, "
             + " 'Não' "
@@ -5814,7 +5846,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     query +=
         "AND e.voided = 0 "
             + "GROUP BY e.patient_id ) no_pf "
-            + " ON no_pf.patient_id = p.patient_id ";
+            + " ON no_pf.patient_id = p.patient_id "
+            + " WHERE p.patient_id IN ( "
+            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+                minCohortNumberOfYears, maxCohortNumberOfYears)
+            + " ) ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -5844,7 +5880,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * @return {@link DataDefinition}
    */
   public DataDefinition getPatientsWhoReceivedTpt(
-      int minNumberOfMonths, int maxNumberOfMonths, boolean b13pedriod) {
+      int minNumberOfMonths,
+      int maxNumberOfMonths,
+      boolean b13pedriod,
+      int minCohortNumberOfYears,
+      int maxCohortNumberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "Identificação de utentes que receberam TPT durante o período de avaliação (B13, C13, D13)");
@@ -5953,6 +5993,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     query +=
         "GROUP  BY e.patient_id) received_tpt "
             + "ON         received_tpt.patient_id = p.patient_id "
+            + " WHERE p.patient_id IN ( "
+            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+                minCohortNumberOfYears, maxCohortNumberOfYears)
+            + " ) "
             + " UNION "
             + "SELECT     p.patient_id, "
             + " 'Não' "
@@ -6035,7 +6079,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     query +=
         "AND e.voided = 0 "
             + "GROUP BY e.patient_id ) no_tpt "
-            + " ON no_tpt.patient_id = p.patient_id ";
+            + " ON no_tpt.patient_id = p.patient_id "
+            + " WHERE p.patient_id IN ( "
+            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+                minCohortNumberOfYears, maxCohortNumberOfYears)
+            + " ) ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -6076,7 +6124,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * @return {@link CohortDefinition}
    */
   public DataDefinition getPatientWithArterialPressure(
-      int minNumberOfMonths, int maxNumberOfMonths, boolean b15pedriod) {
+      int minNumberOfMonths,
+      int maxNumberOfMonths,
+      boolean b15pedriod,
+      int minCohortNumberOfYears,
+      int maxCohortNumberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "Identificação de utentes rastreados para TA em todas as consultas durante o período de avaliação (B15, C15, D15)");
@@ -6251,6 +6303,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "ON         consultations.patient_id = p.patient_id "
             + "WHERE      p.voided = 0 "
             + " AND arterial_consultation.arterial_tension_consultations = consultations.nr_consultations "
+            + " AND p.patient_id IN ( "
+            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+                minCohortNumberOfYears, maxCohortNumberOfYears)
+            + " ) "
             + " UNION "
             + "SELECT     p.patient_id, "
             + " 'Não' "
@@ -6335,7 +6391,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     query +=
         "AND e.voided = 0 "
             + "GROUP BY e.patient_id ) no_arterial_tension "
-            + " ON no_arterial_tension.patient_id = p.patient_id ";
+            + " ON no_arterial_tension.patient_id = p.patient_id "
+            + " AND p.patient_id IN ( "
+            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+                minCohortNumberOfYears, maxCohortNumberOfYears)
+            + " ) ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -6365,7 +6425,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * @return {@link DataDefinition}
    */
   public DataDefinition getPatientsWithCacumScreening(
-      int minNumberOfMonths, int maxNumberOfMonths) {
+      int minNumberOfMonths,
+      int maxNumberOfMonths,
+      int minCohortNumberOfYears,
+      int maxCohortNumberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "Identificação de utentes rastreados para CACUM durante o período de avaliação (B18, C18, D18)");
@@ -6436,6 +6499,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " MONTH ) "
             + "GROUP  BY p.patient_id) cacum "
             + "ON         cacum.patient_id = p.patient_id "
+            + " WHERE p.patient_id IN ( "
+            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+                minCohortNumberOfYears, maxCohortNumberOfYears)
+            + " ) "
             + " UNION "
             + "SELECT     p.patient_id, "
             + " 'Não' "
@@ -6482,7 +6549,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "AND e.voided = 0 "
             + "AND pe.gender = 'F' "
             + "GROUP BY p.patient_id ) no_cacum "
-            + " ON no_cacum.patient_id = p.patient_id ";
+            + " ON no_cacum.patient_id = p.patient_id "
+            + " WHERE p.patient_id IN ( "
+            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+                minCohortNumberOfYears, maxCohortNumberOfYears)
+            + " ) ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -6507,7 +6578,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getPatientsWithPositiveCacum(int minNumberOfMonths, int maxNumberOfMonths) {
+  public DataDefinition getPatientsWithPositiveCacum(
+      int minNumberOfMonths,
+      int maxNumberOfMonths,
+      int minCohortNumberOfYears,
+      int maxCohortNumberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "Identificação de utentes que receberam resultado positivo para CACUM durante o período de avaliação (B19, C19, D19)");
@@ -6574,6 +6649,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " MONTH ) "
             + "GROUP  BY p.patient_id) cacum_positive "
             + "ON         cacum_positive.patient_id = p.patient_id "
+            + " WHERE p.patient_id IN ( "
+            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+                minCohortNumberOfYears, maxCohortNumberOfYears)
+            + " ) "
             + " UNION "
             + "SELECT     p.patient_id, "
             + " 'Não' "
@@ -6617,7 +6696,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "AND e.voided = 0 "
             + "AND pe.gender = 'F' "
             + "GROUP BY p.patient_id ) no_positive_cacum "
-            + " ON no_positive_cacum.patient_id = p.patient_id ";
+            + " ON no_positive_cacum.patient_id = p.patient_id "
+            + " WHERE p.patient_id IN ( "
+            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+                minCohortNumberOfYears, maxCohortNumberOfYears)
+            + " ) ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
