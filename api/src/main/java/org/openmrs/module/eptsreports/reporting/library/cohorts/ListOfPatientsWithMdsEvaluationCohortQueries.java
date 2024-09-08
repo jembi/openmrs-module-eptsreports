@@ -838,7 +838,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * @return {DataDefinition}
    */
   public DataDefinition getLastViralLoadOnThePeriod(
-      int minNumberOfMonths, int maxNumberOfMonths, boolean cOrDCohort) {
+      int minNumberOfMonths,
+      int maxNumberOfMonths,
+      int minCohortNumberOfYears,
+      int maxCohortNumberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Data do pedido da CV de entre 12º e 24º mês de TARV");
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -893,16 +896,12 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + maxNumberOfMonths
             + " MONTH ) "
             + "       AND o.concept_id = ${23722} "
-            + "       AND o.value_coded = ${856} ";
-    query +=
-        cOrDCohort
-            ? " AND p.patient_id IN ( "
-                + listOfPatientsWithMdsEvaluationQueries.getCohort24To36MonthsPatients()
-                + " ) "
-            : " AND p.patient_id IN ( "
-                + listOfPatientsWithMdsEvaluationQueries.get36MonthsCohortPatients()
-                + " ) ";
-    query += "       GROUP BY p.patient_id";
+            + "       AND o.value_coded = ${856} "
+            + " AND p.patient_id IN ( "
+            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+                maxCohortNumberOfYears, minCohortNumberOfYears)
+            + " ) "
+            + "       GROUP BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1011,7 +1010,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * @return {DataDefinition}
    */
   public DataDefinition getLastViralLoadResultDateBetweenPeriodsInMonthsAfterTarv(
-      int minNumberOfMonths, int maxNumberOfMonths) {
+      int minNumberOfMonths,
+      int maxNumberOfMonths,
+      int minCohortNumberOfYears,
+      int maxCohortNumberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "C2 - Data de registo do resultado da entre 12º e 24º mês do TARV");
@@ -1026,8 +1028,15 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
-    String query = getLastVlDateBetweenPeriods(minNumberOfMonths, maxNumberOfMonths);
+    String query =
+        getLastVlDateBetweenPeriods(
+            minNumberOfMonths, maxNumberOfMonths, minCohortNumberOfYears, maxCohortNumberOfYears);
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1036,7 +1045,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     return sqlPatientDataDefinition;
   }
 
-  private String getLastVlDateBetweenPeriods(int minNumberOfMonths, int maxNumberOfMonths) {
+  private String getLastVlDateBetweenPeriods(
+      int minNumberOfMonths,
+      int maxNumberOfMonths,
+      int minCohortNumberOfYears,
+      int maxCohortNumberOfYears) {
     return " SELECT     p.patient_id, "
         + "           MAX(e.encounter_datetime) AS last_vl_date  "
         + "FROM       patient p "
@@ -1068,6 +1081,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
         + "           OR         ( "
         + "                                 o.concept_id = ${1305} "
         + "                      AND        o.value_coded IS NOT NULL)) "
+        + " AND p.patient_id IN ( "
+        + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            minCohortNumberOfYears, maxCohortNumberOfYears)
+        + " ) "
         + "GROUP BY   p.patient_id";
   }
 
@@ -1155,7 +1172,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * @return {DataDefinition}
    */
   public DataDefinition getSecondViralLoadResultBetweenPeriodsOfMonthsAfterTarv(
-      int firstMonth, int lastMonth) {
+      int firstMonth, int lastMonth, int minCohortNumberOfYears, int maxCohortNumberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("C3- Resultado da CV entre 12º e 24º mês do TARV ");
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -1169,6 +1186,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "SELECT     p.patient_id, "
@@ -1180,7 +1202,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "ON         o.encounter_id = e.encounter_id "
             + "INNER JOIN "
             + "           ( "
-            + getLastVlDateBetweenPeriods(firstMonth, lastMonth)
+            + getLastVlDateBetweenPeriods(firstMonth, lastMonth, 2, 4)
             + "                     ) last_vl ON last_vl.patient_id = p.patient_id "
             + "       WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
@@ -1197,6 +1219,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "AND        p.voided = 0 "
             + "AND        e.voided = 0 "
             + "AND        o.voided = 0 "
+            + " AND p.patient_id IN ( "
+            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+                minCohortNumberOfYears, maxCohortNumberOfYears)
+            + " ) "
             + "GROUP BY   p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -1331,6 +1357,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "       SELECT cd4.patient_id, "
@@ -1447,6 +1476,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id, "
@@ -1593,6 +1625,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "SELECT final_query.person_id, "
@@ -1759,6 +1794,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
     map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
     map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "SELECT final_query.patient_id, "
@@ -1922,6 +1960,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "  SELECT     p.patient_id, MIN(e.encounter_datetime) AS encounter_date "
@@ -2006,6 +2047,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "                  SELECT     mds1.patient_id, "
@@ -2105,6 +2149,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "                  SELECT     p.patient_id, "
@@ -2180,6 +2227,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "                  SELECT     mds2.patient_id, "
@@ -2293,6 +2343,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "                  SELECT     mds2_end.patient_id, "
@@ -2443,6 +2496,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "                  SELECT     mds1_end.patient_id, "
@@ -2522,6 +2578,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "                  SELECT     mds2.patient_id, "
@@ -2634,6 +2693,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "                  SELECT     mds3.patient_id, "
@@ -2783,6 +2845,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "                  SELECT     mds3.patient_id, "
@@ -2929,10 +2994,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("165322", hivMetadata.getMdcState().getConceptId());
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
     map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
-    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
-    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
-    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "                  SELECT     mds3_end.patient_id, "
@@ -3118,6 +3182,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "                  SELECT     mds4.patient_id, "
@@ -3304,6 +3371,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "                  SELECT     mds4.patient_id, "
@@ -3491,6 +3561,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "                  SELECT     mds4_end.patient_id, "
@@ -3713,6 +3786,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "                  SELECT     mds5.patient_id, "
@@ -3936,6 +4012,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "                  SELECT     mds5.patient_id, "
@@ -4160,6 +4239,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "                  SELECT     mds5_end.patient_id, "
@@ -4687,6 +4769,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23758", hivMetadata.getTBSymptomsConcept().getConceptId());
     map.put("1343", commonMetadata.getMidUpperArmCircumferenceConcept().getConceptId());
     map.put("1342", commonMetadata.getBodyMassIndexConcept().getConceptId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         " SELECT p.patient_id, "
@@ -4799,6 +4884,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "                  SELECT     p.patient_id, "
@@ -4871,6 +4960,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "                  SELECT     p.patient_id, "
@@ -5288,6 +5381,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("60", hivMetadata.getMeningitisConcept().getConceptId());
     map.put("5018", hivMetadata.getChronicDiarrheaConcept().getConceptId());
     map.put("5945", hivMetadata.getFeverConcept().getConceptId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "SELECT     p.patient_id, "
@@ -5430,6 +5526,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("5276", commonMetadata.getFemaleSterilizationConcept().getConceptId());
     map.put("23714", commonMetadata.getVasectomyConcept().getConceptId());
     map.put("23728", commonMetadata.getOtherFamilyPlanningConcept().getConceptId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "SELECT     p.patient_id, "
@@ -5648,6 +5747,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
     map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "SELECT     p.patient_id, "
@@ -5876,6 +5978,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("5085", commonMetadata.getSystolicBoodPressureConcept().getConceptId());
     map.put("5086", commonMetadata.getDiastolicBoodPressureConcept().getConceptId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "SELECT     p.patient_id, "
@@ -6161,6 +6266,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
     map.put("2094", hivMetadata.getResultadoViaConcept().getConceptId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "SELECT     p.patient_id, "
@@ -6300,6 +6408,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("2094", hivMetadata.getResultadoViaConcept().getConceptId());
     map.put("703", hivMetadata.getPositive().getConceptId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
         "SELECT     p.patient_id, "

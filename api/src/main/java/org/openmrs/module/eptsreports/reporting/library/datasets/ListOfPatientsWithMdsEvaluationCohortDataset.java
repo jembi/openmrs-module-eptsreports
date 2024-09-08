@@ -343,7 +343,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C1 - Data do pedido da CV entre 12º e 24º mês de TARV: (coluna AP)
     pdd.addColumn(
         "cv_date_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getLastViralLoadOnThePeriod(12, 24, true),
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastViralLoadOnThePeriod(12, 24, 2, 4),
         endDateMappings,
         new GeneralDateConverter());
 
@@ -351,7 +351,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "cv_result_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries
-            .getLastViralLoadResultDateBetweenPeriodsInMonthsAfterTarv(12, 24),
+            .getLastViralLoadResultDateBetweenPeriodsInMonthsAfterTarv(12, 24, 2, 4),
         endDateMappings,
         new GeneralDateConverter());
 
@@ -359,7 +359,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "cv_result_c",
         listOfPatientsWithMdsEvaluationCohortQueries
-            .getSecondViralLoadResultBetweenPeriodsOfMonthsAfterTarv(12, 24),
+            .getSecondViralLoadResultBetweenPeriodsOfMonthsAfterTarv(12, 24, 2, 4),
         endDateMappings,
         new ViralLoadQualitativeLabelConverter());
 
@@ -580,7 +580,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // D.1 - Data do pedido da CV de seguimento - D.1 (coluna BV)
     pdd.addColumn(
         "cv_date_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getLastViralLoadOnThePeriod(24, 36, false),
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastViralLoadOnThePeriod(24, 36, 3, 4),
         endDateMappings,
         new GeneralDateConverter());
 
@@ -588,7 +588,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "cv_result_date_d",
         listOfPatientsWithMdsEvaluationCohortQueries
-            .getLastViralLoadResultDateBetweenPeriodsInMonthsAfterTarv(24, 36),
+            .getLastViralLoadResultDateBetweenPeriodsInMonthsAfterTarv(24, 36, 3, 4),
         endDateMappings,
         new GeneralDateConverter());
 
@@ -596,7 +596,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "cv_result_d",
         listOfPatientsWithMdsEvaluationCohortQueries
-            .getSecondViralLoadResultBetweenPeriodsOfMonthsAfterTarv(24, 36),
+            .getSecondViralLoadResultBetweenPeriodsOfMonthsAfterTarv(24, 36, 3, 4),
         endDateMappings,
         new ViralLoadQualitativeLabelConverter());
 
