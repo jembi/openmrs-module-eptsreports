@@ -18,9 +18,9 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
   private ListOfPatientsWithMdsEvaluationCohortQueries listOfPatientsWithMdsEvaluationCohortQueries;
 
   private String endDateMappings = "endDate=${evaluationYear}-06-20,location=${location}";
-  private String b18Mappings = "endDate=${evaluationYear-1}-06-20,location=${location}";
-  private String c18Mappings = "endDate=${evaluationYear-2}-06-20,location=${location}";
-  private String d18Mappings = "endDate=${evaluationYear-3}-06-20,location=${location}";
+  private String b20Mappings = "endDate=${evaluationYear-1}-06-20,location=${location}";
+  private String c20Mappings = "endDate=${evaluationYear-2}-06-20,location=${location}";
+  private String d20Mappings = "endDate=${evaluationYear-3}-06-20,location=${location}";
 
   @Autowired
   public ListOfPatientsWithMdsEvaluationCohortDataset(
@@ -339,8 +339,8 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B20 - Estado de permanência no 12˚ mês de TARV: (coluna AO)
     pdd.addColumn(
         "permanence_state_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(),
-        b18Mappings);
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(3, 0),
+        b20Mappings);
 
     // C1 - Data do pedido da CV entre 12º e 24º mês de TARV: (coluna AP)
     pdd.addColumn(
@@ -579,8 +579,8 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C20 - Estado de permanência no 24˚ mês de TARV: (coluna BU)
     pdd.addColumn(
         "permanence_state_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(),
-        c18Mappings);
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(2, -1),
+        c20Mappings);
 
     // D.1 - Data do pedido da CV de seguimento - D.1 (coluna BV)
     pdd.addColumn(
@@ -816,8 +816,8 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // D20 - Estado de permanência no 36˚ mês de TARV: (coluna DA)
     pdd.addColumn(
         "permanence_state_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(),
-        d18Mappings);
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(1, -2),
+        d20Mappings);
 
     return pdd;
   }

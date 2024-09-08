@@ -5144,7 +5144,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getLastStateOfStayOnTarv() {
+  public DataDefinition getLastStateOfStayOnTarv(
+      int minCohortNumberOfYears, int maxCohortNumberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
 
     sqlPatientDataDefinition.setName("Get the Last State of stay ");
@@ -5189,8 +5190,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     String query =
         new EptsQueriesUtil()
             .unionBuilder(
-                listOfPatientsWithMdsEvaluationQueries.getPatientsWhoAbandonedTarvQuery(true))
-            .union(listOfPatientsWithMdsEvaluationQueries.getPatientsWhoDied(true))
+                listOfPatientsWithMdsEvaluationQueries.getPatientsWhoAbandonedTarvQuery(
+                    true, minCohortNumberOfYears, maxCohortNumberOfYears))
+            .union(
+                listOfPatientsWithMdsEvaluationQueries.getPatientsWhoDied(
+                    true, minCohortNumberOfYears, maxCohortNumberOfYears))
             .union(
                 listOfPatientsWithMdsEvaluationQueries
                     .getPatientsWhoSuspendedTarvOrAreTransferredOut(
@@ -5199,11 +5203,16 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
                             .getProgramWorkflowStateId(),
                         hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
                         false,
-                        false))
+                        false,
+                        minCohortNumberOfYears,
+                        maxCohortNumberOfYears))
             .union(
                 listOfPatientsWithMdsEvaluationQueries
-                    .getPatientsWhoHaveTransferredOutAsPermananceState())
-            .union(listOfPatientsWithMdsEvaluationQueries.getPatientsActiveOnTarv())
+                    .getPatientsWhoHaveTransferredOutAsPermananceState(
+                        minCohortNumberOfYears, maxCohortNumberOfYears))
+            .union(
+                listOfPatientsWithMdsEvaluationQueries.getPatientsActiveOnTarv(
+                    minCohortNumberOfYears, maxCohortNumberOfYears))
             .buildQuery();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
