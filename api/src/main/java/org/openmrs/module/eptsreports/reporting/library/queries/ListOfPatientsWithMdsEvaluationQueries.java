@@ -772,7 +772,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "                                              last_next_scheduled_pick_up "
             + "                                                                ON last_next_scheduled_pick_up.patient_id = p.patient_id "
             + "                                          WHERE  last_next_scheduled_pick_up.max_datetame > :endDate ) "
-            + " WHERE transferred_out.patient_id IN ( "
+            + " AND transferred_out.patient_id IN ( "
             + getCohortPatientsByYear(minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + "GROUP  BY transferred_out.patient_id";
