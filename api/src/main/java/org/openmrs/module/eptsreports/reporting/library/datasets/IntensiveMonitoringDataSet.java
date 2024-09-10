@@ -328,7 +328,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "9.8 % de crianças (0-14 anos) que receberam o resultado do CD4 dentro de 33 dias após consulta clínica de reinício do TARV",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMI9Den(7),
+                intensiveMonitoringCohortQueries.getMI9Den(8),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
@@ -338,7 +338,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "9.9 % de MG  HIV+ com registo de pedido de CD4 na primeira CPN.",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getCd4RequestAndResultForPregnantsCat9Den(5),
+                intensiveMonitoringCohortQueries.getCd4RequestAndResultForPregnantsCat9Den(9),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
