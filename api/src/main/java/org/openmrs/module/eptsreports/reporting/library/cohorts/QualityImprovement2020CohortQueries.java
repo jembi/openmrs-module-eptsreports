@@ -14566,7 +14566,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getMQ13NewDen4() {
+  public CohortDefinition getMQ13NewDen4(MIMQ reportSource) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName(
@@ -14621,7 +14621,14 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch("SECONDLINE", EptsReportUtils.map(secondLine, MAPPING1));
 
-    cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING));
+    if (reportSource.equals(MIMQ.MQ)) {
+
+      cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING3));
+
+    } else if (reportSource.equals(MIMQ.MI)) {
+
+      cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING));
+    }
 
     cd.setCompositionString(
         "((CONSULTATION OR BREASTFEEDING) AND (FIRSTLINE OR SECONDLINE) AND TBACTIVE AND AGE) AND NOT PREGNANT");
@@ -14660,7 +14667,9 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("EXAMREQUEST", EptsReportUtils.map(cvExamRequest, MAPPING3));
 
     if (numerator4) {
-      cd.addSearch("DENOMINATOR", EptsReportUtils.map(getMQ13NewDen4(), MAPPING1));
+      cd.addSearch(
+          "DENOMINATOR",
+          EptsReportUtils.map(getMQ13NewDen4(EptsReportConstants.MIMQ.MQ), MAPPING1));
     } else {
       cd.addSearch("DENOMINATOR", EptsReportUtils.map(getMQ13NewDen13(), MAPPING1));
     }
