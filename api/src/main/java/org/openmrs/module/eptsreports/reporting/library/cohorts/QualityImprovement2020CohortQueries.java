@@ -5410,8 +5410,9 @@ public class QualityImprovement2020CohortQueries {
    * a “Carga Viral”, na Ficha Clínica nos últimos 12 meses da última consulta clínica (“Data Pedido
    * CV” >= “Data Última Consulta” menos (-) 12meses e < “Data Última Consulta”).</i> <br>
    * <br>
-   * <i> <b>Nota: “Data Última Consulta” é a data da última consulta clínica ocorrida durante o
-   * período de revisão.</i> <br>
+   * <i> <b>excluindo todos os utentes transferidos “de” outra US (seguindo os critérios definidos
+   * no RF6)</b></i> <i> <b>Nota: “Data Última Consulta” é a data da última consulta clínica
+   * ocorrida durante o período de revisão.</i> <br>
    * <br>
    *
    * @param preposition composition string and description
@@ -5448,6 +5449,14 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition B5EMI =
         commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
             false, true, 12);
+
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
 
     compositionCohortDefinition.addSearch(
         "B2NEW",
@@ -5494,6 +5503,9 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             B5EMI, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
+    compositionCohortDefinition.addSearch(
+        "transferredIn", EptsReportUtils.map(transferredIn, MAPPING));
+
     compositionCohortDefinition.setCompositionString(preposition.getCompositionString());
 
     return compositionCohortDefinition;
@@ -5503,7 +5515,7 @@ public class QualityImprovement2020CohortQueries {
     MQ {
       @Override
       public String getCompositionString() {
-        return "(B2NEW OR RESTARTED OR (B3MQ AND NOT B3EMQ) ) AND NOT (ABANDONEDTARV OR B5EMQ)";
+        return "(B2NEW OR RESTARTED OR (B3MQ AND NOT B3EMQ) ) AND NOT (ABANDONEDTARV OR B5EMQ OR transferredIn)";
       }
 
       @Override
@@ -5514,7 +5526,7 @@ public class QualityImprovement2020CohortQueries {
     MI {
       @Override
       public String getCompositionString() {
-        return "(B2NEW OR RESTARTED OR (B3MI AND NOT B3EMI) ) AND NOT (ABANDONEDTARV OR B5EMI)";
+        return "(B2NEW OR RESTARTED OR (B3MI AND NOT B3EMI) ) AND NOT (ABANDONEDTARV OR B5EMI OR transferredIn)";
       }
 
       @Override
@@ -5551,7 +5563,8 @@ public class QualityImprovement2020CohortQueries {
    * a “Carga Viral”, na Ficha Clínica nos últimos 12 meses da última consulta clínica (“Data Pedido
    * CV”>= “Data Última Consulta” menos (-) 12meses e < “Data Última Consulta”). Nota: “Data Última
    * Consulta” é a data da última consulta clínica ocorrida durante o período de revisão.</i> <br>
-   * <br>
+   * <i> <b>excluindo todos os utentes transferidos “de” outra US (seguindo os critérios definidos
+   * no RF6)</b></i> <br>
    */
   public CohortDefinition getUtentesSegundaLinha() {
 
@@ -5576,6 +5589,14 @@ public class QualityImprovement2020CohortQueries {
         commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
             false, true, 12);
 
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
+
     compositionCohortDefinition.addSearch(
         "secondLineB2",
         EptsReportUtils.map(
@@ -5599,8 +5620,11 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             B5E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
+    compositionCohortDefinition.addSearch(
+        "transferredIn", EptsReportUtils.map(transferredIn, MAPPING));
+
     compositionCohortDefinition.setCompositionString(
-        "(secondLineB2 AND NOT B2E) AND NOT (ABANDONEDTARV OR B5E)");
+        "(secondLineB2 AND NOT B2E) AND NOT (ABANDONEDTARV OR B5E OR transferredIn)");
 
     return compositionCohortDefinition;
   }
