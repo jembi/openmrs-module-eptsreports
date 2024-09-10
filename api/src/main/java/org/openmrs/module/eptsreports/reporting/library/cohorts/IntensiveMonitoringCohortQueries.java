@@ -4425,11 +4425,10 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch(
         "TBACTIVE",
         EptsReportUtils.map(
-            tbDiagnosisActive,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            tbDiagnosisActive, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "((CONSULTATION OR BREASTFEEDING) AND (FIRSTLINE OR SECONDLINE) AND TBACTIVE AND AGE) AND NOT PREGNANT ");
+        "(((CONSULTATION AND AGE) OR BREASTFEEDING) AND (FIRSTLINE OR SECONDLINE) AND TBACTIVE) AND NOT PREGNANT");
 
     return cd;
   }
