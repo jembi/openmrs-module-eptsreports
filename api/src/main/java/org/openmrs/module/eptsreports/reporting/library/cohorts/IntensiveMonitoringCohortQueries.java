@@ -2955,7 +2955,7 @@ public class IntensiveMonitoringCohortQueries {
     } else if (flag == 3 || flag == 7) {
       cd.setCompositionString("(RESTARTED AND AGE) AND NOT transferredIn");
     } else if (flag == 4 || flag == 8) {
-      cd.setCompositionString("(RESTARTED AND RESULTS AND AGE) AND NOT RESTARTED33DAYSBEFORE");
+      cd.setCompositionString("(RESTARTED AND AGE) AND NOT transferredIn");
     } else if (flag == 5) {
       cd.setCompositionString(
           "A AND AGE AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod)");
