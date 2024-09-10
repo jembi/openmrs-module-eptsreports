@@ -2445,7 +2445,6 @@ public class QualityImprovement2020Queries {
             + "                             GROUP BY patient_id )vl "
             + "             ON  vl.patient_id=p.patient_id "
             + "             WHERE e.encounter_type = ${18} "
-            + "             AND os.concept_id = ${5096} "
             + "             AND e.location_id = :location "
             + "             AND e.voided = 0 "
             + "             AND p.voided = 0 "
