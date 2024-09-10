@@ -2730,16 +2730,10 @@ public class QualityImprovement2020CohortQueries {
         compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
         compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
         compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING7));
-        compositionCohortDefinition.addSearch(
-            "F",
-            EptsReportUtils.map(
-                transfOut, MAPPING14));
+        compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING14));
       }
       if (indicatorFlag == 3 || indicatorFlag == 5 || indicatorFlag == 6) {
-        compositionCohortDefinition.addSearch(
-            "F",
-            EptsReportUtils.map(
-                transfOut, MAPPING14));
+        compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING14));
       }
     }
 
@@ -14627,10 +14621,10 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch("SECONDLINE", EptsReportUtils.map(secondLine, MAPPING1));
 
-    cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING3));
+    cd.addSearch("TBACTIVE", EptsReportUtils.map(tbDiagnosisActive, MAPPING));
 
     cd.setCompositionString(
-        "((CONSULTATION OR BREASTFEEDING) AND (FIRSTLINE OR SECONDLINE) AND TBACTIVE AND AGE) AND NOT PREGNANT ");
+        "((CONSULTATION OR BREASTFEEDING) AND (FIRSTLINE OR SECONDLINE) AND TBACTIVE AND AGE) AND NOT PREGNANT");
 
     return cd;
   }
