@@ -148,7 +148,8 @@ public class EriDSDCohortQueries {
             resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13(),
             "endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("B13 AND NOT activeAndStablePatients");
+    cd.setCompositionString("B13");
+    //    cd.setCompositionString("B13 AND NOT activeAndStablePatients");
 
     return cd;
   }
@@ -876,7 +877,7 @@ public class EriDSDCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition dispensaDescentralizada =
-        DsdQueries.getPatientsWithTypeOfDispensationOnMdcInTheMostRecentFichaClinicaAndFila(
+        DsdQueries.getPatientsWithTypeOfDispensationOnMdcDDInTheMostRecentFichaClinicaAndFila(
             Arrays.asList(hivMetadata.getLastRecordOfFarmacConcept().getConceptId()),
             Arrays.asList(hivMetadata.getDescentralizedArvDispensationConcept().getConceptId()));
 
