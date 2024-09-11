@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Deprecated
 public class SetupResumoMensalDAHReport extends EptsDataExportManager {
 
-  private GenericCohortQueries genericCohortQueries;
   private ResumoMensalDAHDatasetDefinition resumoMensalDAHDatasetDefinition;
 
   @Autowired
