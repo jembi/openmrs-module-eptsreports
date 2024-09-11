@@ -369,6 +369,12 @@ public class ResumoMensalDAHCohortQueries {
             "startDate=${startDate-1m},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
+        "cd4ByAgeAndResult",
+        map(
+            getPatientsWithCD4BasedOnAgeAndCd4Results(),
+            "startDate=${startDate-1m},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
         "tbLamResults",
         mapStraightThrough(
             getPatientsWithPositiveOrNegativeTestResults(
@@ -381,7 +387,7 @@ public class ResumoMensalDAHCohortQueries {
             getPatientsWhoStartedFollowupOnDAHComposition(),
             "startDate=${endDate},endDate={endDate},location=${location}"));
 
-    cd.setCompositionString("onDAH AND haveCd4Results AND tbLamResults");
+    cd.setCompositionString("onDAH AND haveCd4Results AND cd4ByAgeAndResult AND tbLamResults");
     return cd;
   }
 
@@ -805,7 +811,7 @@ public class ResumoMensalDAHCohortQueries {
   public CohortDefinition getPatientsWhoAreMarkedAsDeadDOnSixMonthsCohortAndAfterFollowupDate() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("");
+    sqlCohortDefinition.setName("Motivo de Saída” = “Óbito”");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("reportEndDate", "reportEndDate", Date.class));
@@ -815,7 +821,6 @@ public class ResumoMensalDAHCohortQueries {
     map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
     map.put("1708", hivMetadata.getExitFromArvTreatmentConcept().getConceptId());
     map.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
-    map.put("165386", hivMetadata.getExitDateFromArvTreatmentConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id "
@@ -829,8 +834,8 @@ public class ResumoMensalDAHCohortQueries {
             + "                      INNER JOIN obs o on e.encounter_id = o.encounter_id "
             + "        WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "          AND e.encounter_type = ${90} "
-            + "  AND e.encounter_datetime >= :startDate "
-            + "  AND e.encounter_datetime <= :endDate "
+            + "          AND e.encounter_datetime >= :startDate "
+            + "          AND e.encounter_datetime <= :endDate "
             + "          AND e.location_id = :location "
             + "        GROUP BY p.patient_id "
             + "    ) last_dah ON last_dah.patient_id = p.patient_id "
@@ -838,15 +843,10 @@ public class ResumoMensalDAHCohortQueries {
             + "  AND e.voided = 0 "
             + "  AND o.voided = 0 "
             + "  AND e.encounter_type = ${90} "
-            + "  AND ( "
-            + "        (o.concept_id = ${1708} "
-            + "            AND o.value_coded = ${1366} "
-            + "            AND o.obs_datetime >= last_dah.last_date "
-            + "            AND o.obs_datetime <= :reportEndDate) "
-            + "        OR  (o.concept_id = ${165386} "
-            + "        AND o.value_datetime >= last_dah.last_date "
-            + "        AND o.value_datetime <= :reportEndDate) "
-            + "    ) "
+            + "  AND o.concept_id = ${1708} "
+            + "  AND o.value_coded = ${1366} "
+            + "  AND o.obs_datetime >= last_dah.last_date "
+            + "  AND o.obs_datetime <= :reportEndDate "
             + "  AND e.location_id = :location "
             + "GROUP BY p.patient_id";
 
