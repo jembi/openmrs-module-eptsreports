@@ -880,7 +880,8 @@ public class TXTBCohortQueries {
     cd.addSearch("H", mapStraightThrough(getPulmonaryTB()));
     cd.addSearch("I", mapStraightThrough(getPatientsWithAtLeastOneResponseForPositiveScreeningI()));
     cd.addSearch("J", mapStraightThrough(getXpertMtbTestCohort()));
-    cd.setCompositionString("A OR B OR C OR D OR E OR F OR G OR H OR I OR J");
+    cd.addSearch("TBLAM", mapStraightThrough(getTestTBLAM(51)));
+    cd.setCompositionString("A OR B OR C OR D OR E OR F OR G OR H OR I OR J OR TBLAM");
     addGeneralParameters(cd);
     return cd;
   }
