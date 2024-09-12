@@ -529,7 +529,7 @@ public class DsdQueries {
     map.put("dispensationTypesFichaClinica", StringUtils.join(dispensationTypesFichaClinica, ","));
 
     String query =
-            "SELECT "
+        "SELECT "
             + "    p.patient_id "
             + "FROM "
             + "    patient p "
@@ -615,7 +615,6 @@ public class DsdQueries {
             + "            AND otype.value_coded IN (${dispensationTypesFila}) "
             + "        ) "
             + "    )";
-
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
