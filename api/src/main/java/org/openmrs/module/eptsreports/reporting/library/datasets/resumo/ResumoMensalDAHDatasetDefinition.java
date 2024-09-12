@@ -142,7 +142,18 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         resumoMensalDAHDisaggregations.get0to7ColumnDisaggregations());
 
     // INDICATOR 5 IS A DISAGREGATIONCALCULATION
-    // PERFORMED DIRECTLY ON THE TEMPLATE
+    dd.addColumn(
+        "TOTALI5",
+        "Indicador 5 Utentes em DAH até o fim do mês",
+        getEnrolledInDAHbyEndOfMonth(),
+        "");
+
+    addRow(
+        dd,
+        "I5",
+        "Indicador 5 Utentes em DAH até o fim do mês",
+        getEnrolledInDAHbyEndOfMonth(),
+        resumoMensalDAHDisaggregations.get0to7ColumnDisaggregations());
 
     // INDICATOR 6
     dd.addColumn(
@@ -370,6 +381,14 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
             "Relatório – Indicador 4 – Saídas do seguimento de DAH",
             mapStraightThrough(
                 resumoMensalDAHCohortQueries.getPatientsWhoLeftFollowupOnDAHByDuringMonth())));
+  }
+
+  private Mapped<CohortIndicator> getEnrolledInDAHbyEndOfMonth() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Relatório- Indicador 5 Utentes em DAH até o fim do mês",
+            mapStraightThrough(
+                resumoMensalDAHCohortQueries.getPatientsEnrolledInDAHbyEndOfMonth())));
   }
 
   private Mapped<CohortIndicator> getPatientsWhoAreMarkedAsDeadDOnSixMonthsCohort() {

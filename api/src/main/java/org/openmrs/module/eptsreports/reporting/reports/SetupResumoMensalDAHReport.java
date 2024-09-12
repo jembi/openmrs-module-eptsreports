@@ -93,7 +93,7 @@ public class SetupResumoMensalDAHReport extends EptsDataExportManager {
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Resumo_Mensal_DAH_v2.0.2.xls",
+              "MISAU_SESP_MASC_Resumo_Mensal_DAH_v2.1.xls",
               "Resumo Mensal de DAH",
               getExcelDesignUuid(),
               null);
