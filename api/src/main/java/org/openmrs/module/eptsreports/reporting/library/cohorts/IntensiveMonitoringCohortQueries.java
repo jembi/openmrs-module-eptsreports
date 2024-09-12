@@ -4957,7 +4957,7 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch(
         "tbDiagnosisActive",
         EptsReportUtils.map(
-            qualityImprovement2020CohortQueries.getPatientsWithTbActiveOrTbTreatment(), MAPPING));
+            qualityImprovement2020CohortQueries.getPatientsWithTbActiveOrTbTreatment(), "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     if (indicator == 2 || indicator == 9 || indicator == 10 || indicator == 11)
       cd.setCompositionString(
