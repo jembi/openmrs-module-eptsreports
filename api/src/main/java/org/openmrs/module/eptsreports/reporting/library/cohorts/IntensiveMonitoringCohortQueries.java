@@ -39,6 +39,8 @@ public class IntensiveMonitoringCohortQueries {
 
   private final EriDSDCohortQueries eriDSDCohortQueries;
 
+  private AgeCohortQueries ageCohortQueries;
+
   private final String MAPPING2 = "revisionEndDate=${revisionEndDate},location=${location}";
 
   private final String MAPPING3 =
@@ -55,7 +57,8 @@ public class IntensiveMonitoringCohortQueries {
       TbMetadata tbMetadata,
       GenericCohortQueries genericCohortQueries,
       ResumoMensalCohortQueries resumoMensalCohortQueries,
-      EriDSDCohortQueries eriDSDCohortQueries) {
+      EriDSDCohortQueries eriDSDCohortQueries,
+      AgeCohortQueries ageCohortQueries) {
     this.qualityImprovement2020CohortQueries = qualityImprovement2020CohortQueries;
     this.hivMetadata = hivMetadata;
     this.commonCohortQueries = commonCohortQueries;
@@ -64,6 +67,7 @@ public class IntensiveMonitoringCohortQueries {
     this.genericCohortQueries = genericCohortQueries;
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
     this.eriDSDCohortQueries = eriDSDCohortQueries;
+    this.ageCohortQueries = ageCohortQueries;
   }
 
   @PostConstruct
@@ -4499,6 +4503,468 @@ public class IntensiveMonitoringCohortQueries {
     }
 
     cd.setCompositionString("PRIMEIRALINHA OR SEGUNDALINHA");
+
+    return cd;
+  }
+
+  /**
+   * <b># de crianças (15/+anos) na 1a ou 2ª linha de TARV ou mudança de regime de 1ª linhaV</b>
+   *
+   * <p>Incluindo o somatório do resultado dos seguintes indicadores - para denominador:
+   * <li>Denominador do Indicador 13.2-1ª Linha da Categoria 13 Adulto de Resultado de CV (RF34.1).
+   *     <liDenominador do Indicador 13.5-2ª Linha da Categoria 13 Adulto de Resultado de CV (RF42).
+   *
+   *     <p>Incluindo o somatório do resultado dos seguintes indicadores - para numerador:
+   * <li>Numerador do Indicador 13.2-1ª Linha da Categoria 13 Adulto de Resultado de CV (RF35.1).
+   * <li>Numerador do Indicador 13.5-2ª Linha da Categoria 13 Adulto de Resultado de CV (RF43).
+   *
+   * @param denominator boolean parameter to choose between Denominator and Numerator
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getMiSumOfPatientsIn1stOr2ndLineOfArtForDenNum2(Boolean denominator) {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName(
+        "# criancas de (15/+anos) na 1a ou 2ª linha de TARV ou mudança de regime de 1ª linha");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    if (denominator) {
+      cd.addSearch("PRIMEIRALINHA", Mapped.mapStraightThrough(getMIC13P3DEN(2)));
+
+      cd.addSearch("SEGUNDALINHA", Mapped.mapStraightThrough(getMIC13P3DEN(5)));
+    } else {
+      cd.addSearch("PRIMEIRALINHA", Mapped.mapStraightThrough(getMIC13P3NUM(2)));
+
+      cd.addSearch("SEGUNDALINHA", Mapped.mapStraightThrough(getMIC13P3NUM(5)));
+    }
+
+    cd.setCompositionString("PRIMEIRALINHA OR SEGUNDALINHA");
+
+    return cd;
+  }
+
+  /**
+   * <b>MQC11B1B2</b>: Melhoria de Qualidade Category 11 Deniminator B1 and B2 <br>
+   * /** <b>MQC13</b>: Melhoria de Qualidade Category 13 Part 3 Denominator <br>
+   * <i> DENOMINATORS: A,B1,B2,B3,C,D and E</i> <br>
+   *
+   * <ul>
+   *   <li>A - Select all patients who initiated ART during the Inclusion period (startDateInclusion
+   *       and endDateInclusion)
+   *   <li>
+   *   <li>B1 - B1= (BI1 and not B1E) : MUDANCA DE REGIME
+   *   <li>
+   *   <li>B2 = (BI2 and not B2E) - PACIENTES 2a LINHA
+   *   <li>
+   *   <li>C - All female patients registered as “Pregnant” on a clinical consultation during the
+   *       inclusion period (startDateInclusion and endDateInclusion)
+   *   <li>
+   *   <li>D - All female patients registered as “Breastfeeding” on a clinical consultation during
+   *       the inclusion period (startDateInclusion and endDateInclusion)
+   *   <li>
+   *   <li>E - All transferred IN patients
+   *   <li>
+   *   <li>F - All Transferred Out patients
+   * </ul>
+   *
+   * @param indicator indicator number
+   * @return CohortDefinition
+   * @params indicatorFlag A to F For inicator 13.2 to 13.14 accordingly to the specs
+   */
+  public CohortDefinition getMIC13P3DEN(int indicator) {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    if (indicator == 2)
+      compositionCohortDefinition.setName(
+          "Adultos (15/+anos) que iniciaram a 1a linha de TARV ou novo regime da 1ª linha há 9 meses atrás");
+    if (indicator == 9)
+      compositionCohortDefinition.setName(
+          "Crianças (0-4 anos de idade) com registo de início da 1a linha de TARV há 9 meses");
+    if (indicator == 10)
+      compositionCohortDefinition.setName(
+          "Crianças  (5-9 anos de idade) com registo de início da 1a linha de TARV ou novo regime de TARV há 9 meses");
+    if (indicator == 11)
+      compositionCohortDefinition.setName(
+          "Crianças  (10-14 anos de idade) com registo de início da 1a linha de TARV ou novo regime da 1ª linha de TARV no mês de avaliação");
+    if (indicator == 5)
+      compositionCohortDefinition.setName(
+          "Adultos (15/+ anos) com registo de início da 2a linha de TARV há 9 meses");
+    if (indicator == 14)
+      compositionCohortDefinition.setName(
+          "Crianças com registo de início da 2a linha de TARV no mês de avaliação");
+
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    String mapping2 =
+        "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}";
+
+    CohortDefinition startedART = qualityImprovement2020CohortQueries.getMOHArtStartDate();
+
+    CohortDefinition b1Patients =
+        qualityImprovement2020CohortQueries.getPatientsOnRegimeChangeBI1AndNotB1E_B1();
+
+    CohortDefinition b2NewPatients =
+        qualityImprovement2020CohortQueries.getPatientsOnRegimeArvSecondLine();
+
+    CohortDefinition pregnant =
+        commonCohortQueries.getMOHPregnantORBreastfeeding(
+            commonMetadata.getPregnantConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId());
+
+    CohortDefinition breastfeeding =
+        commonCohortQueries.getMOHPregnantORBreastfeeding(
+            commonMetadata.getBreastfeeding().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId());
+
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
+
+    CohortDefinition transfOut = qualityImprovement2020CohortQueries.getTranferredOutPatientsCat7();
+
+    CohortDefinition abandonedTarv =
+        qualityImprovement2020CohortQueries
+            .getPatientsWhoAbandonedOrRestartedTarvOnLast6MonthsArt();
+    CohortDefinition abandonedFirstLine =
+        qualityImprovement2020CohortQueries.getPatientsWhoAbandonedTarvOnOnFirstLineDate();
+    CohortDefinition abandonedSecondLine =
+        qualityImprovement2020CohortQueries.getPatientsWhoAbandonedTarvOnOnSecondLineDate();
+    CohortDefinition tbDiagnosisActive =
+        qualityImprovement2020CohortQueries.getPatientsWithTbActiveOrTbTreatment();
+
+    if (indicator == 2) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(
+              ageCohortQueries.createXtoYAgeCohort(
+                  "Adultos (15/+anos) que iniciaram a 1a linha de TARV ou novo regime da 1ª linha há 9 meses atrás",
+                  15,
+                  null),
+              "effectiveDate=${revisionEndDate}"));
+    } else if (indicator == 5) {
+
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(
+              qualityImprovement2020CohortQueries.getAgeOnObsDatetime(15, null),
+              "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    } else if (indicator == 9) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(
+              ageCohortQueries.createXtoYAgeCohort(
+                  "Crianças (0-4 anos de idade) com registo de início da 1a linha de TARV há 9 meses",
+                  0,
+                  4),
+              "effectiveDate=${revisionEndDate}"));
+    } else if (indicator == 10) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(
+              ageCohortQueries.createXtoYAgeCohort(
+                  "Crianças  (5-9 anos de idade) com registo de início da 1a linha de TARV ou novo regime de TARV há 9 meses",
+                  5,
+                  9),
+              "effectiveDate=${revisionEndDate}"));
+    } else if (indicator == 11) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(
+              ageCohortQueries.createXtoYAgeCohort(
+                  "Crianças  (10-14 anos de idade) com registo de início da 1a linha de TARV ou novo regime da 1ª linha de TARV no mês de avaliação",
+                  10,
+                  14),
+              "effectiveDate=${revisionEndDate}"));
+    } else if (indicator == 14) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(
+              qualityImprovement2020CohortQueries.getAgeOnObsDatetime(2, 14),
+              "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    }
+
+    compositionCohortDefinition.addSearch(
+        "A",
+        EptsReportUtils.map(
+            startedART, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "B1",
+        EptsReportUtils.map(
+            b1Patients,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "B2New",
+        EptsReportUtils.map(
+            b2NewPatients, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "C",
+        EptsReportUtils.map(
+            pregnant, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "D",
+        EptsReportUtils.map(
+            breastfeeding, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "DD",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getDeadPatientsCompositionMQ13(),
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "E",
+        EptsReportUtils.map(
+            transferredIn, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "F",
+        EptsReportUtils.map(
+            transfOut,
+            "revisionStartDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "ABANDONEDTARV",
+        EptsReportUtils.map(
+            abandonedTarv,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "ABANDONED1LINE",
+        EptsReportUtils.map(
+            abandonedFirstLine,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "ABANDONED2LINE",
+        EptsReportUtils.map(
+            abandonedSecondLine,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "tbDiagnosisActive",
+        EptsReportUtils.map(
+            tbDiagnosisActive, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    if (indicator == 2 || indicator == 9 || indicator == 10 || indicator == 11)
+      compositionCohortDefinition.setCompositionString(
+          "((A AND NOT C) OR B1) AND NOT (F OR E OR DD OR ABANDONEDTARV OR tbDiagnosisActive) AND age");
+    if (indicator == 5 || indicator == 14)
+      compositionCohortDefinition.setCompositionString(
+          "B2New AND NOT (F OR E OR DD OR ABANDONEDTARV OR tbDiagnosisActive) AND age");
+    return compositionCohortDefinition;
+  }
+
+  public CohortDefinition getMIC13P3NUM(int indicator) {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    if (indicator == 2)
+      cd.setName(
+          "Adultos (15/+anos) na 1a linha de TARV que receberam o resultado da CV entre o sexto e o nono mês após início do TARV");
+    if (indicator == 9)
+      cd.setName(
+          "Crianças  (0-4 anos de idade) na 1a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início do TARV");
+    if (indicator == 10)
+      cd.setName(
+          "Crianças  (5-9 anos de idade) na 1a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início do TARV");
+    if (indicator == 11)
+      cd.setName(
+          "Crianças  (10-14 anos de idade) na 1a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início do TARV");
+    if (indicator == 5)
+      cd.setName(
+          "Adultos (15/+anos) na 2a linha de TARV que receberam o resultado da CV entre o sexto e o nono mês após o início da 2a linha de TARV");
+    if (indicator == 14)
+      cd.setName(
+          "Crianças na 2a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início da 2a linha de TARV");
+
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Data final de Revisao", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    String mapping =
+        "startDate=${startDate},endDate=${endDate},less3mDate=${startDate-3m},location=${location}";
+
+    if (indicator == 2) {
+      cd.addSearch(
+          "age",
+          EptsReportUtils.map(
+              ageCohortQueries.createXtoYAgeCohort(
+                  "Adultos (15/+anos) na 2a linha de TARV que receberam o resultado da CV entre o sexto e o nono mês após o início da 2a linha de TARV",
+                  15,
+                  null),
+              "effectiveDate=${revisionEndDate}"));
+    } else if (indicator == 5) {
+      cd.addSearch(
+          "age",
+          EptsReportUtils.map(
+              qualityImprovement2020CohortQueries.getAgeOnObsDatetime(15, null),
+              "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    } else if (indicator == 9) {
+      cd.addSearch(
+          "age",
+          EptsReportUtils.map(
+              ageCohortQueries.createXtoYAgeCohort(
+                  "Crianças (0-4 anos de idade) na 1a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início do TARV",
+                  0,
+                  4),
+              "effectiveDate=${revisionEndDate}"));
+    } else if (indicator == 10) {
+      cd.addSearch(
+          "age",
+          EptsReportUtils.map(
+              ageCohortQueries.createXtoYAgeCohort(
+                  "Crianças  (5-9 anos de idade) na 1a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início do TARV",
+                  5,
+                  9),
+              "effectiveDate=${revisionEndDate}"));
+    } else if (indicator == 11) {
+      cd.addSearch(
+          "age",
+          EptsReportUtils.map(
+              ageCohortQueries.createXtoYAgeCohort(
+                  "Crianças  (10-14 anos de idade) na 1a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início do TARV",
+                  10,
+                  14),
+              "effectiveDate=${revisionEndDate}"));
+    } else if (indicator == 14) {
+      cd.addSearch(
+          "age",
+          EptsReportUtils.map(
+              qualityImprovement2020CohortQueries.getAgeOnObsDatetime(2, 14),
+              "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    }
+
+    // Start adding the definitions based on the requirements
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMOHArtStartDate(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "B1",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getPatientsOnRegimeChangeBI1AndNotB1E_B1(),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "B2New",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getPatientsOnRegimeArvSecondLine(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "C",
+        EptsReportUtils.map(
+            commonCohortQueries.getMOHPregnantORBreastfeeding(
+                commonMetadata.getPregnantConcept().getConceptId(),
+                hivMetadata.getYesConcept().getConceptId()),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "D",
+        EptsReportUtils.map(
+            commonCohortQueries.getMOHPregnantORBreastfeeding(
+                commonMetadata.getBreastfeeding().getConceptId(),
+                hivMetadata.getYesConcept().getConceptId()),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "E",
+        EptsReportUtils.map(
+            QualityImprovement2020Queries.getTransferredInPatients(
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+                hivMetadata.getPatientFoundYesConcept().getConceptId(),
+                hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+                hivMetadata.getArtStatus().getConceptId()),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "ABANDONEDTARV",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries
+                .getPatientsWhoAbandonedOrRestartedTarvOnLast6MonthsArt(),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "ABANDONED1LINE",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getPatientsWhoAbandonedTarvOnOnFirstLineDate(),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "ABANDONED2LINE",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getPatientsWhoAbandonedTarvOnOnSecondLineDate(),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "F",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getTranferredOutPatientsCat7(),
+            "revisionStartDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "G",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMQC13P3NUM_G(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "H",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMQC13P3NUM_H(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "I",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMQC13P3NUM_I(),
+            "startDate=${startDate},endDate=${endDate},less3mDate=${startDate-3m},location=${location}"));
+    cd.addSearch(
+        "J",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMQC13P3NUM_J(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "K",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMQC13P3NUM_K(),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    cd.addSearch(
+        "L",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMQC13P3NUM_L(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "DD",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getDeadPatientsCompositionMQ13(),
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+    cd.addSearch(
+        "tbDiagnosisActive",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getPatientsWithTbActiveOrTbTreatment(), MAPPING));
+
+    if (indicator == 2 || indicator == 9 || indicator == 10 || indicator == 11)
+      cd.setCompositionString(
+          "((A AND NOT C AND (G OR J)) OR (B1 AND (H OR K))) AND NOT (F OR E OR DD OR ABANDONEDTARV OR tbDiagnosisActive) AND age");
+    if (indicator == 5 || indicator == 14)
+      cd.setCompositionString(
+          "(B2New AND (I OR L)) AND NOT (F OR E OR DD OR ABANDONEDTARV OR tbDiagnosisActive) AND age");
 
     return cd;
   }

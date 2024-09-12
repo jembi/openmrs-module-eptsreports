@@ -9635,7 +9635,7 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
-  private CohortDefinition getAgeOnObsDatetime(Integer minAge, Integer maxAge) {
+  public CohortDefinition getAgeOnObsDatetime(Integer minAge, Integer maxAge) {
     CalculationCohortDefinition cd =
         new CalculationCohortDefinition(
             Context.getRegisteredComponents(AgeOnObsDatetimeCalculation.class).get(0));
@@ -10529,7 +10529,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return CohortDefinition
    */
-  private CohortDefinition getMQC13P3NUM_J() {
+  public CohortDefinition getMQC13P3NUM_J() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("All patients with HIV Carga Viral - J");
@@ -10599,7 +10599,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return CohortDefinition
    */
-  private CohortDefinition getMQC13P3NUM_K() {
+  public CohortDefinition getMQC13P3NUM_K() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("All patients with HIV Carga Viral - K");
@@ -10702,7 +10702,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return CohortDefinition
    */
-  private CohortDefinition getMQC13P3NUM_L() {
+  public CohortDefinition getMQC13P3NUM_L() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("All patients with HIV Carga Viral - L");
