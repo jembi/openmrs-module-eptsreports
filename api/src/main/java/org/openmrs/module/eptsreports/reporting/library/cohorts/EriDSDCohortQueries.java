@@ -148,7 +148,7 @@ public class EriDSDCohortQueries {
             resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13(),
             "endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("B13");
+    cd.setCompositionString("B13 AND NOT activeAndStablePatients");
     //    cd.setCompositionString("B13 AND NOT activeAndStablePatients");
 
     return cd;
