@@ -877,7 +877,7 @@ public class EriDSDCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition dispensaDescentralizada =
-        DsdQueries.getPatientsWithTypeOfDispensationOnMdcDDInTheMostRecentFichaClinicaAndFila(
+        DsdQueries.getPatientsWithTypeOfDispensationOnMdcInTheMostRecentFichaClinicaAndFila(
             Arrays.asList(hivMetadata.getLastRecordOfFarmacConcept().getConceptId()),
             Arrays.asList(hivMetadata.getDescentralizedArvDispensationConcept().getConceptId()));
 

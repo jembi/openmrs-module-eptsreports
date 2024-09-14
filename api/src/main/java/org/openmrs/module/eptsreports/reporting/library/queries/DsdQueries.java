@@ -359,8 +359,22 @@ public class DsdQueries {
     return cd;
   }
 
-  // ! TO DO organize javadoc
-  /** @return {@link CohortDefinition} */
+  /**
+   * The system will select all patients
+   * <li>Patients who have one of the MDCs marked as “DD – Dispensa Descentralizada de ARV” with
+   *     Estado do MDC marked as Iniciar (I) or Continuar (C) in the most recent Ficha Clinica or
+   * <li>Patients who have Modo de Dispensa with value “FARMAC/Farmacia Privada” in the most recent
+   *     pick-up with in FILA by reporting end date The system will select the most recent date
+   *     between Ficha Clìnica and FILA prior toby the reporting end date, as follows:
+   * <li>Most recent consultation date in Ficha Clinica and
+   * <li>Next Scheduled Pick up date registered in the most recent pick up date in FILA If the most
+   *     recent date falls on the same day for Ficha Clinica and FILA, the system will prioritize
+   *     FILA.
+   *
+   * @param dispensationTypesFila
+   * @param dispensationTypesFichaClinica
+   * @return {@link CohortDefinition}
+   */
   public static SqlCohortDefinition
       getPatientsWithTypeOfDispensationOnMdcInTheMostRecentFichaClinicaAndFila(
           List<Integer> dispensationTypesFila, List<Integer> dispensationTypesFichaClinica) {
@@ -384,237 +398,142 @@ public class DsdQueries {
     map.put("dispensationTypesFichaClinica", StringUtils.join(dispensationTypesFichaClinica, ","));
 
     String query =
-        "SELECT p.patient_id"
-            + "      FROM   patient p "
-            + "                 INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                 INNER JOIN obs otype ON otype.encounter_id = e.encounter_id "
-            + "                 INNER JOIN obs ostate ON ostate.encounter_id = e.encounter_id "
-            + "                 INNER JOIN ( "
-            + "          SELECT last_encounter.patient_id, MAX(last_encounter.last_encounter_datetime) as last_encounter "
-            + "          FROM ( "
-            + "                   SELECT p.patient_id, e.encounter_datetime as last_encounter_datetime "
-            + "                   FROM   patient p "
-            + "                              INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "                              INNER JOIN obs otype ON otype.encounter_id = e.encounter_id "
-            + "                              INNER JOIN obs ostate ON ostate.encounter_id = e.encounter_id "
-            + "                              INNER JOIN ( "
-            + "                       SELECT p.patient_id, MAX(e.encounter_datetime) AS last_encounter "
-            + "                       FROM patient p "
-            + "                                INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                       WHERE p.voided = 0 "
-            + "                         AND e.voided = 0 "
-            + "                         AND e.location_id = :location "
-            + "                         AND e.encounter_type = ${6} "
-            + "                         AND e.encounter_datetime <= :endDate "
-            + "                       GROUP BY p.patient_id "
-            + "                   ) last_ficha ON p.patient_id = last_ficha.patient_id "
-            + "                   WHERE p.voided = 0 "
-            + "                     AND e.voided = 0 "
-            + "                     AND otype.voided = 0 "
-            + "                     AND ostate.voided = 0 "
-            + "                     AND e.encounter_type = ${6} "
-            + "                     AND otype.concept_id = ${165174} "
-            + "                     AND otype.value_coded IS NOT NULL "
-            + "                     AND ostate.concept_id = ${165322} "
-            + "                     AND ostate.value_coded IS NOT NULL "
-            + "                     AND otype.obs_group_id = ostate.obs_group_id "
-            + "                     AND e.encounter_datetime = last_ficha.last_encounter "
-            + "                     AND e.location_id = :location "
-            + "       "
-            + "                   UNION "
-            + "       "
-            + "                   SELECT p.patient_id, MAX(oo.value_datetime) as last_encounter_datetime "
-            + "                   FROM   patient p "
-            + "                              INNER JOIN encounter e "
-            + "                                         ON e.patient_id = p.patient_id "
-            + "                              INNER JOIN obs oo "
-            + "                                         ON e.encounter_id = oo.encounter_id "
-            + "                              INNER JOIN (SELECT p.patient_id, MAX(e.encounter_datetime) AS last_encounter "
-            + "                                          FROM patient p "
-            + "                                                   INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                                          WHERE p.voided = 0 "
-            + "                                            AND e.voided = 0 "
-            + "                                            AND e.location_id = :location "
-            + "                                            AND e.encounter_type = ${18} "
-            + "                                            AND e.encounter_datetime <= :endDate "
-            + "                                          GROUP BY p.patient_id "
-            + "                   ) last_fila ON p.patient_id = last_fila.patient_id "
-            + "                   WHERE "
-            + "                           e.location_id = :location "
-            + "                     AND e.encounter_type = ${18} "
-            + "                     AND e.voided = 0 "
-            + "                     AND oo.voided = 0 "
-            + "                     AND oo.concept_id = ${5096} "
-            + "                     AND oo.value_datetime IS NOT NULL "
-            + "                     AND e.encounter_datetime = last_fila.last_encounter GROUP BY p.patient_id"
-            + "               ) last_encounter "
-            + "                     GROUP BY last_encounter.patient_id "
-            + "      ) last_mdc ON last_mdc.patient_id = p.patient_id "
-            + "      WHERE e.voided = 0 "
-            + "        AND p.voided = 0 "
-            + "        AND otype.voided = 0 "
-            + "        AND ostate.voided = 0 "
-            + "        AND e.location_id = :location"
-            + "        AND ((e.encounter_type = ${18} "
-            + "          AND e.encounter_dateTime <= :endDate "
-            + "          AND ostate.value_datetime = last_mdc.last_encounter "
-            + "          AND ostate.concept_id = ${5096}"
-            + "          AND otype.concept_id = ${165174} "
-            + "          AND otype.value_coded IN (${dispensationTypesFila}))"
-            + "          "
-            + "          OR "
-            + "             (e.encounter_type = ${6} "
-            + "                 AND e.encounter_datetime = last_mdc.last_encounter "
-            + "                 AND e.encounter_datetime <= :endDate "
-            + "                 AND otype.concept_id = ${165174} "
-            + "                 AND otype.value_coded IN (${dispensationTypesFichaClinica}) "
-            + "                 AND ostate.concept_id = ${165322} "
-            + "                 AND otype.obs_group_id = ostate.obs_group_id "
-            + "                 AND ostate.value_coded IN (${1256}, ${1257}) "
-            + "                 AND NOT EXISTS (SELECT e.patient_id "
-            + "                                          FROM encounter e "
-            + "                                                   INNER JOIN obs o ON e.encounter_id=o.encounter_id"
-            + "                                          WHERE e.voided = 0 "
-            + "                                            AND o.voided = 0 "
-            + "                                            AND e.encounter_type = ${18} "
-            + "                                            AND o.value_datetime = last_mdc.last_encounter "
-            + "                                            AND e.encounter_dateTime <= :endDate "
-            + "                                            AND e.patient_id = p.patient_id "
-            + "                                            AND e.location_id = :location "
-            + "                                            AND o.concept_id = ${5096}) ))";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    cd.setQuery(stringSubstitutor.replace(query));
-
-    return cd;
-  }
-
-  /**
-   * The system will select all patients
-   * <li>Patients who have one of the MDCs marked as “DD – Dispensa Descentralizada de ARV” with
-   *     Estado do MDC marked as Iniciar (I) or Continuar (C) in the most recent Ficha Clinica or
-   * <li>Patients who have Modo de Dispensa with value “FARMAC/Farmacia Privada” in the most recent
-   *     pick-up with in FILA by reporting end date The system will select the most recent date
-   *     between Ficha Clìnica and FILA prior toby the reporting end date, as follows:
-   * <li>Most recent consultation date in Ficha Clinica and
-   * <li>Next Scheduled Pick up date registered in the most recent pick up date in FILA If the most
-   *     recent date falls on the same day for Ficha Clinica and FILA, the system will prioritize
-   *     FILA.
-   *
-   * @param dispensationTypesFila
-   * @param dispensationTypesFichaClinica
-   * @return
-   */
-  public static SqlCohortDefinition
-      getPatientsWithTypeOfDispensationOnMdcDDInTheMostRecentFichaClinicaAndFila(
-          List<Integer> dispensationTypesFila, List<Integer> dispensationTypesFichaClinica) {
-
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName(
-        "Patients With Type Of Dispensation On Mdc In The Most Recent Ficha Clinica And Fila");
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
-
-    Map<String, String> map = new HashMap<>();
-    HivMetadata hivMetadata = new HivMetadata();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId().toString());
-    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId().toString());
-    map.put("1256", hivMetadata.getStartDrugs().getConceptId().toString());
-    map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId().toString());
-    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId().toString());
-    map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId().toString());
-    map.put("165322", hivMetadata.getMdcState().getConceptId().toString());
-    map.put("dispensationTypesFila", StringUtils.join(dispensationTypesFila, ","));
-    map.put("dispensationTypesFichaClinica", StringUtils.join(dispensationTypesFichaClinica, ","));
-
-    String query =
         "SELECT "
-            + "    p.patient_id "
+            + "  p.patient_id "
             + "FROM "
-            + "    patient p "
-            + "        INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "        INNER JOIN obs otype ON otype.encounter_id = e.encounter_id "
-            + "        INNER JOIN obs ostate ON ostate.encounter_id = e.encounter_id "
-            + "        INNER JOIN ( "
+            + "  patient p "
+            + "  INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "  INNER JOIN obs otype ON otype.encounter_id = e.encounter_id "
+            + "  INNER JOIN obs ostate ON ostate.encounter_id = e.encounter_id "
+            + "  INNER JOIN ( "
+            + "    SELECT "
+            + "      last_encounter.patient_id, "
+            + "      MAX( "
+            + "        last_encounter.last_record_date "
+            + "      ) AS max_record_date, "
+            + "      MAX( "
+            + "        last_encounter.last_encounter_datetime "
+            + "      ) as last_encounter "
+            + "    FROM "
+            + "      ( "
             + "        SELECT "
-            + "            last_visit.patient_id, "
-            + "            MAX(last_visit.last_visit_datetime) AS max_date "
+            + "          p.patient_id, "
+            + "          e.encounter_datetime AS last_record_date, "
+            + "          e.encounter_datetime as last_encounter_datetime "
             + "        FROM "
-            + "            ( "
-            + "                SELECT "
-            + "                    p.patient_id, "
-            + "                    Max(e.encounter_datetime) AS last_visit_datetime "
-            + "                FROM "
-            + "                    patient p "
-            + "                        INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                WHERE "
-            + "                    p.voided = 0 "
-            + "                  AND e.voided = 0 "
-            + "                  AND e.location_id = :location "
-            + "                  AND e.encounter_type = ${6} "
-            + "                  AND e.encounter_datetime <= :endDate "
-            + "                GROUP BY "
-            + "                    p.patient_id "
-            + "                UNION "
-            + "                SELECT "
-            + "                    p.patient_id, "
-            + "                    Max(e.encounter_datetime) AS last_visit_datetime "
-            + "                FROM "
-            + "                    patient p "
-            + "                        INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                WHERE "
-            + "                    p.voided = 0 "
-            + "                  AND e.voided = 0 "
-            + "                  AND e.location_id = :location "
-            + "                  AND e.encounter_type = ${18} "
-            + "                  AND e.encounter_datetime <= :endDate "
-            + "                GROUP BY "
-            + "                    p.patient_id "
-            + "            ) last_visit "
+            + "          patient p "
+            + "          INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "          INNER JOIN obs otype ON otype.encounter_id = e.encounter_id "
+            + "          INNER JOIN obs ostate ON ostate.encounter_id = e.encounter_id "
+            + "          INNER JOIN ( "
+            + "            SELECT "
+            + "              p.patient_id, "
+            + "              MAX(e.encounter_datetime) AS last_encounter "
+            + "            FROM "
+            + "              patient p "
+            + "              INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "            WHERE "
+            + "              p.voided = 0 "
+            + "              AND e.voided = 0 "
+            + "              AND e.location_id = :location "
+            + "              AND e.encounter_type = ${6} "
+            + "              AND e.encounter_datetime <= :endDate "
+            + "            GROUP BY "
+            + "              p.patient_id "
+            + "          ) last_ficha ON p.patient_id = last_ficha.patient_id "
+            + "        WHERE "
+            + "          p.voided = 0 "
+            + "          AND e.voided = 0 "
+            + "          AND otype.voided = 0 "
+            + "          AND ostate.voided = 0 "
+            + "          AND e.encounter_type = ${6} "
+            + "          AND otype.concept_id = ${165174} "
+            + "          AND otype.value_coded IS NOT NULL "
+            + "          AND ostate.concept_id = ${165322} "
+            + "          AND ostate.value_coded IS NOT NULL "
+            + "          AND otype.obs_group_id = ostate.obs_group_id "
+            + "          AND e.encounter_datetime = last_ficha.last_encounter "
+            + "          AND e.location_id = :location "
+            + "        UNION "
+            + "        SELECT "
+            + "          p.patient_id, "
+            + "          e.encounter_datetime AS last_record_date, "
+            + "          MAX(oo.value_datetime) as last_encounter_datetime "
+            + "        FROM "
+            + "          patient p "
+            + "          INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "          INNER JOIN obs oo ON e.encounter_id = oo.encounter_id "
+            + "          INNER JOIN ( "
+            + "            SELECT "
+            + "              p.patient_id, "
+            + "              MAX(e.encounter_datetime) AS last_encounter "
+            + "            FROM "
+            + "              patient p "
+            + "              INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "            WHERE "
+            + "              p.voided = 0 "
+            + "              AND e.voided = 0 "
+            + "              AND e.location_id = :location "
+            + "              AND e.encounter_type = ${18} "
+            + "              AND e.encounter_datetime <= :endDate "
+            + "            GROUP BY "
+            + "              p.patient_id "
+            + "          ) last_fila ON p.patient_id = last_fila.patient_id "
+            + "        WHERE "
+            + "          e.location_id = :location "
+            + "          AND e.encounter_type = ${18} "
+            + "          AND e.voided = 0 "
+            + "          AND oo.voided = 0 "
+            + "          AND oo.concept_id = ${5096} "
+            + "          AND oo.value_datetime IS NOT NULL "
+            + "          AND e.encounter_datetime = last_fila.last_encounter "
             + "        GROUP BY "
-            + "            last_visit.patient_id "
-            + "    ) last_mdc ON last_mdc.patient_id = p.patient_id "
+            + "          p.patient_id "
+            + "      ) last_encounter "
+            + "    GROUP BY "
+            + "      last_encounter.patient_id "
+            + "  ) last_mdc ON last_mdc.patient_id = p.patient_id "
             + "WHERE "
-            + "    p.voided = 0 "
-            + "  AND e.voided = 0 "
+            + "  e.voided = 0 "
+            + "  AND p.voided = 0 "
             + "  AND otype.voided = 0 "
             + "  AND ostate.voided = 0 "
             + "  AND e.location_id = :location "
             + "  AND ( "
             + "    ( "
-            + "        e.encounter_type = ${6} "
-            + "            AND e.encounter_datetime = last_mdc.max_date "
-            + "            AND otype.concept_id = ${165174} "
-            + "            AND otype.value_coded IN (${dispensationTypesFichaClinica}) "
-            + "            AND ostate.concept_id = ${165322} "
-            + "            AND ostate.value_coded IN (${1256}, ${1257}) "
-            + "            AND otype.obs_group_id = ostate.obs_group_id "
-            + "            AND NOT EXISTS ( "
-            + "            SELECT "
-            + "                e.patient_id "
-            + "            FROM "
-            + "                encounter e "
-            + "                    INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "            WHERE "
-            + "                e.voided = 0 "
-            + "              AND o.voided = 0 "
-            + "              AND e.encounter_type = ${18} "
-            + "              AND e.encounter_datetime = last_mdc.max_date "
-            + "              AND e.patient_id = p.patient_id "
-            + "              AND e.location_id = :location "
-            + "              AND o.concept_id = ${165174} "
-            + "              AND o.value_coded IN (${dispensationTypesFila}) "
-            + "        ) "
-            + "        ) "
-            + "        OR ( "
-            + "        e.encounter_type = ${18} "
-            + "            AND e.encounter_datetime <= :endDate "
-            + "            AND e.encounter_datetime = last_mdc.max_date "
-            + "            AND otype.concept_id = ${165174} "
-            + "            AND otype.value_coded IN (${dispensationTypesFila}) "
-            + "        ) "
-            + "    )";
+            + "      e.encounter_type = ${18} "
+            + "      AND e.encounter_dateTime = last_mdc.max_record_date "
+            + "      AND ostate.value_datetime = last_mdc.last_encounter "
+            + "      AND ostate.concept_id = ${5096} "
+            + "      AND otype.concept_id = ${165174} "
+            + "      AND otype.value_coded IN (${dispensationTypesFila}) "
+            + "    ) "
+            + "    OR ( "
+            + "      e.encounter_type = ${6} "
+            + "      AND e.encounter_datetime = last_mdc.max_record_date "
+            + "      AND otype.concept_id = ${165174} "
+            + "      AND otype.value_coded IN (${dispensationTypesFichaClinica}) "
+            + "      AND ostate.concept_id = ${165322} "
+            + "      AND otype.obs_group_id = ostate.obs_group_id "
+            + "      AND ostate.value_coded IN (${1256}, ${1257}) "
+            + "      AND NOT EXISTS ( "
+            + "        SELECT "
+            + "          e.patient_id "
+            + "        FROM "
+            + "          encounter e "
+            + "          INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "        WHERE "
+            + "          e.voided = 0 "
+            + "          AND o.voided = 0 "
+            + "          AND e.encounter_type = ${18} "
+            + "          AND o.value_datetime = last_mdc.last_encounter "
+            + "          AND e.encounter_datetime = last_mdc.max_record_date "
+            + "          AND e.patient_id = p.patient_id "
+            + "          AND e.location_id = :location "
+            + "          AND o.concept_id = ${5096} "
+            + "      ) "
+            + "    ) "
+            + "  )";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
