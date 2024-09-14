@@ -4966,4 +4966,463 @@ public class IntensiveMonitoringCohortQueries {
 
     return cd;
   }
+
+  public CohortDefinition getMiSumOfPatientsIn1stOr2ndLineOfArtForDenNum11(Boolean denominator) {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName(
+        "# de crianças na 1a linha de TARV ou mudança de regime de 1ª linha (10-14 anos de idade) "
+            + "ou 2ª Linha TARV (0-14 anos de idade) que receberam o resultado da CV entre o sexto"
+            + " e o nono mês após início do TARV");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    if (denominator) {
+      cd.addSearch("PRIMEIRALINHA", Mapped.mapStraightThrough(getMIC13P3DEN(11)));
+
+      cd.addSearch("SEGUNDALINHA", Mapped.mapStraightThrough(getMIC13P3DEN(14)));
+    } else {
+      cd.addSearch("PRIMEIRALINHA", Mapped.mapStraightThrough(getMIC13P3NUM(11)));
+
+      cd.addSearch("SEGUNDALINHA", Mapped.mapStraightThrough(getMIC13P3NUM(14)));
+    }
+
+    cd.setCompositionString("PRIMEIRALINHA OR SEGUNDALINHA");
+
+    return cd;
+  }
+
+  public CohortDefinition getMI13NewNum5(Boolean numerator5) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("adultos (15/+anos) coinfectados TB/HIV com resultado de CV registado na FM");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition vlOnSecondLine = getVlOnSecondLine();
+    CohortDefinition vlOnTarv = getVlOnTarv();
+
+    cd.addSearch(
+        "VL2LINE",
+        EptsReportUtils.map(
+            vlOnSecondLine, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "VLTARV",
+        EptsReportUtils.map(
+            vlOnTarv, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    if (numerator5) {
+      cd.addSearch(
+          "DENOMINATOR",
+          EptsReportUtils.map(
+              qualityImprovement2020CohortQueries.getMQ13NewDen5(),
+              "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    } else {
+      cd.addSearch(
+          "DENOMINATOR",
+          EptsReportUtils.map(
+              qualityImprovement2020CohortQueries.getMQ13NewDen14(),
+              "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    }
+
+    cd.setCompositionString("DENOMINATOR AND (VL2LINE OR VLTARV)");
+
+    return cd;
+  }
+
+  /**
+   * filtrando os utentes que tiveram um registo do Resultado de Carga Viral (quantitativo ou
+   * qualitativo) na Ficha Clínica ou Ficha Resumo (última carga viral) entre “Data última 2ª Linha”
+   * mais (+) 198 dias e “Data de Início TARV” mais (+) 298 dias. Nota: “Data do Início TARV” está
+   * definida no RF5.1 e a “Data última 2ª Linha” estão definidas no RF58.
+   *
+   * @return @{@link CohortDefinition}
+   */
+  public CohortDefinition getVlOnSecondLine() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("less3mDate", "Less3months date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    sqlCohortDefinition.setName("VL ON 2nd Line");
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1982", commonMetadata.getPregnantConcept().getConceptId());
+    map.put("21187", hivMetadata.getRegArvSecondLine().getConceptId());
+    map.put("1792", hivMetadata.getJustificativeToChangeArvTreatment().getConceptId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("1190", hivMetadata.getHistoricalDrugStartDateConcept().getConceptId());
+
+    String query =
+        "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "        INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "        INNER JOIN ( "
+            + "        SELECT "
+            + "            p.patient_id, "
+            + "            Max(e.encounter_datetime) AS last_consultation "
+            + "        FROM "
+            + "            patient p "
+            + "                INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "        WHERE "
+            + "            e.voided = 0 "
+            + "          AND p.voided = 0 "
+            + "          AND o.voided = 0 "
+            + "          AND o2.voided = 0 "
+            + "          AND e.encounter_type = ${53} "
+            + "          AND e.location_id = :location "
+            + "          AND ( "
+            + "            o.concept_id = ${21187} "
+            + "                AND o.value_coded IS NOT NULL "
+            + "            ) "
+            + "          AND ( "
+            + "            ( "
+            + "                o2.concept_id = ${1792} "
+            + "                    AND o2.value_coded <> ${1982} "
+            + "                ) "
+            + "                OR ( "
+            + "                o2.concept_id = ${1792} "
+            + "                    AND o2.value_coded IS NULL "
+            + "                ) "
+            + "                OR ( "
+            + "                NOT EXISTS ( "
+            + "                    SELECT "
+            + "                        * "
+            + "                    FROM "
+            + "                        obs oo "
+            + "                    WHERE "
+            + "                        oo.voided = 0 "
+            + "                      AND oo.encounter_id = e.encounter_id "
+            + "                      AND oo.concept_id = ${1792} "
+            + "                ) "
+            + "                ) "
+            + "            ) "
+            + "          AND o.obs_datetime >= :startDate "
+            + "          AND o.obs_datetime <= :endDate "
+            + "        GROUP BY "
+            + "            p.patient_id "
+            + "    ) B2NEW ON B2NEW.patient_id = p.patient_id "
+            + "        INNER JOIN ( "
+            + "        SELECT "
+            + "            patient_id, "
+            + "            union_tbl.art_date AS art_start "
+            + "        FROM "
+            + "            ( "
+            + "                SELECT "
+            + "                    p.patient_id, "
+            + "                    Min(value_datetime) art_date "
+            + "                FROM "
+            + "                    patient p "
+            + "                        INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                        INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                WHERE "
+            + "                    p.voided = 0 "
+            + "                  AND e.voided = 0 "
+            + "                  AND o.voided = 0 "
+            + "                  AND e.encounter_type = ${53} "
+            + "                  AND o.concept_id = ${1190} "
+            + "                  AND o.value_datetime IS NOT NULL "
+            + "                  AND o.value_datetime <= :endDate "
+            + "                  AND e.location_id = :location "
+            + "                GROUP BY "
+            + "                    p.patient_id "
+            + "            ) union_tbl "
+            + "        WHERE "
+            + "            union_tbl.art_date BETWEEN :startDate "
+            + "                AND :endDate "
+            + "    ) tarv ON tarv.patient_id = p.patient_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.encounter_type = ${53} "
+            + "  AND e.location_id = :location "
+            + "  AND ( "
+            + "    ( "
+            + "        o.concept_id = ${856} "
+            + "            AND o.value_numeric IS NOT NULL "
+            + "        ) "
+            + "        OR ( "
+            + "               o.concept_id = ${1305} "
+            + "                   AND o.value_coded IS NOT NULL "
+            + "               ) "
+            + "        AND o.obs_datetime BETWEEN DATE_ADD( "
+            + "                B2NEW.last_consultation, INTERVAL 198 DAY "
+            + "                                   ) "
+            + "               AND DATE_ADD( "
+            + "                    tarv.art_start, INTERVAL 297 DAY "
+            + "                   ) "
+            + "    ) "
+            + "GROUP BY "
+            + "    p.patient_id "
+            + "UNION "
+            + "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "        INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "        INNER JOIN ( "
+            + "        SELECT "
+            + "            p.patient_id, "
+            + "            Max(e.encounter_datetime) AS last_consultation "
+            + "        FROM "
+            + "            patient p "
+            + "                INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "        WHERE "
+            + "            e.voided = 0 "
+            + "          AND p.voided = 0 "
+            + "          AND o.voided = 0 "
+            + "          AND o2.voided = 0 "
+            + "          AND e.encounter_type = ${53} "
+            + "          AND e.location_id = :location "
+            + "          AND ( "
+            + "            o.concept_id = ${21187} "
+            + "                AND o.value_coded IS NOT NULL "
+            + "            ) "
+            + "          AND ( "
+            + "            ( "
+            + "                o2.concept_id = ${1792} "
+            + "                    AND o2.value_coded <> ${1982} "
+            + "                ) "
+            + "                OR ( "
+            + "                o2.concept_id = ${1792} "
+            + "                    AND o2.value_coded IS NULL "
+            + "                ) "
+            + "                OR ( "
+            + "                NOT EXISTS ( "
+            + "                    SELECT "
+            + "                        * "
+            + "                    FROM "
+            + "                        obs oo "
+            + "                    WHERE "
+            + "                        oo.voided = 0 "
+            + "                      AND oo.encounter_id = e.encounter_id "
+            + "                      AND oo.concept_id = ${1792} "
+            + "                ) "
+            + "                ) "
+            + "            ) "
+            + "          AND o.obs_datetime >= :startDate "
+            + "          AND o.obs_datetime <= :endDate "
+            + "        GROUP BY "
+            + "            p.patient_id "
+            + "    ) B2NEW ON B2NEW.patient_id = p.patient_id "
+            + "        INNER JOIN ( "
+            + "        SELECT "
+            + "            patient_id, "
+            + "            union_tbl.art_date AS art_start "
+            + "        FROM "
+            + "            ( "
+            + "                SELECT "
+            + "                    p.patient_id, "
+            + "                    Min(value_datetime) art_date "
+            + "                FROM "
+            + "                    patient p "
+            + "                        INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                        INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                WHERE "
+            + "                    p.voided = 0 "
+            + "                  AND e.voided = 0 "
+            + "                  AND o.voided = 0 "
+            + "                  AND e.encounter_type = ${53} "
+            + "                  AND o.concept_id = ${1190} "
+            + "                  AND o.value_datetime IS NOT NULL "
+            + "                  AND o.value_datetime <= :endDate "
+            + "                  AND e.location_id = :location "
+            + "                GROUP BY "
+            + "                    p.patient_id "
+            + "            ) union_tbl "
+            + "        WHERE "
+            + "            union_tbl.art_date BETWEEN :startDate "
+            + "                AND :endDate "
+            + "    ) tarv ON tarv.patient_id = p.patient_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.encounter_type = ${6} "
+            + "  AND e.location_id = :location "
+            + "  AND ( "
+            + "    ( "
+            + "        o.concept_id = ${856} "
+            + "            AND o.value_numeric IS NOT NULL "
+            + "        ) "
+            + "        OR ( "
+            + "               o.concept_id = ${1305} "
+            + "                   AND o.value_coded IS NOT NULL "
+            + "               ) "
+            + "        AND o.obs_datetime BETWEEN DATE_ADD( "
+            + "                B2NEW.last_consultation, INTERVAL 198 DAY "
+            + "                                   ) "
+            + "               AND DATE_ADD( "
+            + "                    tarv.art_start, INTERVAL 297 DAY "
+            + "                   ) "
+            + "    ) "
+            + "GROUP BY "
+            + "    p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * filtrando os utentes que tiveram um registo do Resultado de Carga Viral (quantitativo ou
+   * qualitativo) na Ficha Clínica ou Ficha Resumo (última carga viral) entre “Data de Início TARV”
+   * mais (+) 198 dias e “Data de Início TARV” mais (+) 297 dias. Nota: “Data do Início TARV” está
+   * definida no RF5.1.
+   *
+   * @return @{@link CohortDefinition}
+   */
+  public CohortDefinition getVlOnTarv() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("All patients with HIV Carga Viral On TARV");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("1190", hivMetadata.getHistoricalDrugStartDateConcept().getConceptId());
+
+    String query =
+        "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "        INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "        INNER JOIN ( "
+            + "        SELECT "
+            + "            patient_id, "
+            + "            union_tbl.art_date AS art_start "
+            + "        FROM "
+            + "            ( "
+            + "                SELECT "
+            + "                    p.patient_id, "
+            + "                    Min(value_datetime) art_date "
+            + "                FROM "
+            + "                    patient p "
+            + "                        INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                        INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                WHERE "
+            + "                    p.voided = 0 "
+            + "                  AND e.voided = 0 "
+            + "                  AND o.voided = 0 "
+            + "                  AND e.encounter_type = ${53} "
+            + "                  AND o.concept_id = ${1190} "
+            + "                  AND o.value_datetime IS NOT NULL "
+            + "                  AND o.value_datetime <= :endDate "
+            + "                  AND e.location_id = :location "
+            + "                GROUP BY "
+            + "                    p.patient_id "
+            + "            ) union_tbl "
+            + "        WHERE "
+            + "            union_tbl.art_date BETWEEN :startDate "
+            + "                AND :endDate "
+            + "    ) tarv ON tarv.patient_id = p.patient_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.encounter_type = ${53} "
+            + "  AND e.location_id = :location "
+            + "  AND ( "
+            + "    ( "
+            + "        o.concept_id = ${856} "
+            + "            AND o.value_numeric IS NOT NULL "
+            + "        ) "
+            + "        OR ( "
+            + "               o.concept_id = ${1305} "
+            + "                   AND o.value_coded IS NOT NULL "
+            + "               ) "
+            + "        AND o.obs_datetime BETWEEN DATE_ADD(tarv.art_start, INTERVAL 198 DAY) "
+            + "               AND DATE_ADD(tarv.art_start, INTERVAL 297 DAY) "
+            + "    ) "
+            + "GROUP BY "
+            + "    p.patient_id "
+            + "UNION "
+            + "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "        INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "        INNER JOIN ( "
+            + "        SELECT "
+            + "            patient_id, "
+            + "            union_tbl.art_date AS art_start "
+            + "        FROM "
+            + "            ( "
+            + "                SELECT "
+            + "                    p.patient_id, "
+            + "                    Min(value_datetime) art_date "
+            + "                FROM "
+            + "                    patient p "
+            + "                        INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                        INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                WHERE "
+            + "                    p.voided = 0 "
+            + "                  AND e.voided = 0 "
+            + "                  AND o.voided = 0 "
+            + "                  AND e.encounter_type = ${53} "
+            + "                  AND o.concept_id = ${1190} "
+            + "                  AND o.value_datetime IS NOT NULL "
+            + "                  AND o.value_datetime <= :endDate "
+            + "                  AND e.location_id = :location "
+            + "                GROUP BY "
+            + "                    p.patient_id "
+            + "            ) union_tbl "
+            + "        WHERE "
+            + "            union_tbl.art_date BETWEEN :startDate "
+            + "                AND :endDate "
+            + "    ) tarv ON tarv.patient_id = p.patient_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.encounter_type = ${6} "
+            + "  AND e.location_id = :location "
+            + "  AND ( "
+            + "    ( "
+            + "        o.concept_id = ${856} "
+            + "            AND o.value_numeric IS NOT NULL "
+            + "        ) "
+            + "        OR ( "
+            + "               o.concept_id = ${1305} "
+            + "                   AND o.value_coded IS NOT NULL "
+            + "               ) "
+            + "        AND o.obs_datetime BETWEEN DATE_ADD(tarv.art_start, INTERVAL 198 DAY) "
+            + "               AND DATE_ADD(tarv.art_start, INTERVAL 297 DAY) "
+            + "    ) "
+            + "GROUP BY "
+            + "    p.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
 }
