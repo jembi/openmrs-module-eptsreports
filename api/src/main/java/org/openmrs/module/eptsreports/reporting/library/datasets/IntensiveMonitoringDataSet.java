@@ -1026,7 +1026,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "Adultos (15/+anos) na 2a linha de TARV que receberam o resultado da CV entre o sexto e o nono mês após o início da 2a linha de TARV",
         EptsReportUtils.map(
             MI13DEN5,
-            "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-10m},location=${location}"),
+            "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-10m},revisionEndDate=${revisionEndDate},location=${location}"),
         "ageByEndDateRevision=15+");
 
     dataSetDefinition.addColumn(

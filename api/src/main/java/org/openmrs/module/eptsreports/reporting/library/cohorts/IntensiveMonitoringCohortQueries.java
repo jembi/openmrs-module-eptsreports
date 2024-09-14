@@ -2403,8 +2403,7 @@ public class IntensiveMonitoringCohortQueries {
     compositionCohortDefinition.addSearch(
         "tbDiagnosisActive",
         EptsReportUtils.map(
-            tbDiagnosisActive,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            tbDiagnosisActive, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
         "(((B1 AND age) OR D) AND PrimeiraLinha) AND NOT (C OR tbDiagnosisActive)");
@@ -4632,7 +4631,7 @@ public class IntensiveMonitoringCohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transfOut = qualityImprovement2020CohortQueries.getTranferredOutPatientsCat7();
+    CohortDefinition transfOut = getTranferredOutPatientsForMI7();
 
     CohortDefinition abandonedTarv =
         qualityImprovement2020CohortQueries
@@ -4734,9 +4733,7 @@ public class IntensiveMonitoringCohortQueries {
 
     compositionCohortDefinition.addSearch(
         "F",
-        EptsReportUtils.map(
-            transfOut,
-            "revisionStartDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+        EptsReportUtils.map(transfOut, "revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "ABANDONEDTARV",
@@ -4957,7 +4954,8 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch(
         "tbDiagnosisActive",
         EptsReportUtils.map(
-            qualityImprovement2020CohortQueries.getPatientsWithTbActiveOrTbTreatment(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+            qualityImprovement2020CohortQueries.getPatientsWithTbActiveOrTbTreatment(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     if (indicator == 2 || indicator == 9 || indicator == 10 || indicator == 11)
       cd.setCompositionString(
