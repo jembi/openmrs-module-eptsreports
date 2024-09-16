@@ -893,7 +893,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "       AND o.concept_id = ${23722} "
             + "       AND o.value_coded = ${856} "
             + " AND p.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 maxCohortNumberOfYears, minCohortNumberOfYears)
             + " ) "
             + "       GROUP BY p.patient_id";
@@ -1077,7 +1077,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
         + "                                 o.concept_id = ${1305} "
         + "                      AND        o.value_coded IS NOT NULL)) "
         + " AND p.patient_id IN ( "
-        + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+        + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
             minCohortNumberOfYears, maxCohortNumberOfYears)
         + " ) "
         + "GROUP BY   p.patient_id";
@@ -1215,7 +1215,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "AND        e.voided = 0 "
             + "AND        o.voided = 0 "
             + " AND p.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + "GROUP BY   p.patient_id";
@@ -1408,7 +1408,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "       AND obs.concept_id = ${1695} "
             + "       AND obs.value_numeric IS NOT NULL "
             + " AND cd4.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + "       GROUP BY cd4.patient_id ";
@@ -1573,7 +1573,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                      ON bad_consultations.patient_id = p.patient_id "
             + "WHERE  p.voided = 0"
             + " AND p.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) ";
 
@@ -1739,7 +1739,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     query +=
         "        GROUP  BY p.person_id) final_query "
             + " WHERE final_query.person_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) ";
 
@@ -1923,7 +1923,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                AND  o2.value_coded NOT IN ( ${1256}, ${1257} ) ) ) "
             + " GROUP BY   p.patient_id ) AS final_query "
             + " WHERE final_query.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) ";
 
@@ -2040,7 +2040,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
                 + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
                 + "                  AND  otype.obs_group_id = ostate.obs_group_id "
                 + " AND p.patient_id IN ( "
-                + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+                + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                     minCohortNumberOfYears, maxCohortNumberOfYears)
                 + " ) "
                 + "                  GROUP BY   p.patient_id";
@@ -2147,7 +2147,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                 AND  ostate1.value_coded IN (${1256}) ) ) "
             + "                  AND  otype1.obs_group_id = ostate1.obs_group_id "
             + " AND mds1.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + "       GROUP BY mds1.patient_id";
@@ -2230,7 +2230,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
             + "                  AND  otype.obs_group_id = ostate.obs_group_id "
             + " AND p.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + "                  GROUP BY   p.patient_id";
@@ -2350,7 +2350,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                 AND  ostate2.value_coded = ${1256} ) ) "
             + "                  AND  otype2.obs_group_id = ostate2.obs_group_id "
             + " AND mds2.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + "       GROUP BY mds2.patient_id";
@@ -2508,7 +2508,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                 AND  os22.value_coded = ${1267} ) ) "
             + "                  AND  ot22.obs_group_id = os22.obs_group_id "
             + " AND mds2_end.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + "       GROUP BY mds2_end.patient_id";
@@ -2596,7 +2596,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                 AND  os.value_coded IN (${1267}) ) ) "
             + "                  AND  ot.obs_group_id = os.obs_group_id "
             + " AND mds1_end.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + "                  GROUP BY   mds1_end.patient_id";
@@ -2716,7 +2716,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                 AND  ostate2.value_coded = ${1256} ) ) "
             + "                  AND  otype2.obs_group_id = ostate2.obs_group_id "
             + " AND mds2.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + "       GROUP BY mds2.patient_id";
@@ -2873,7 +2873,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                 AND  ostate3.value_coded = ${1256} ) ) "
             + "                  AND  otype3.obs_group_id = ostate3.obs_group_id "
             + " AND mds3.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + "       GROUP BY mds3.patient_id";
@@ -3030,7 +3030,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                 AND  ostate3.value_coded = ${1256} ) ) "
             + "                  AND  otype3.obs_group_id = ostate3.obs_group_id "
             + " AND mds3.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + "       GROUP BY mds3.patient_id";
@@ -3224,7 +3224,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                 AND  os33.value_coded = ${1267} ) ) "
             + "                  AND  ot33.obs_group_id = os33.obs_group_id "
             + " AND mds3_end.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + "       GROUP BY mds3_end.patient_id";
@@ -3418,7 +3418,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                 AND  ostate4.value_coded = ${1256} ) ) "
             + "                  AND  otype4.obs_group_id = ostate4.obs_group_id "
             + " AND mds4.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + "       GROUP BY mds4.patient_id";
@@ -3612,7 +3612,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                 AND  ostate4.value_coded = ${1256} ) ) "
             + "                  AND  otype4.obs_group_id = ostate4.obs_group_id "
             + " AND mds4.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + "       GROUP BY mds4.patient_id";
@@ -3843,7 +3843,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                 AND  os44.value_coded = ${1267} ) ) "
             + "                  AND  ot44.obs_group_id = os44.obs_group_id "
             + " AND mds4_end.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + "       GROUP BY mds4_end.patient_id";
@@ -4074,7 +4074,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                 AND  ostate5.value_coded = ${1256} ) ) "
             + "                  AND  otype5.obs_group_id = ostate5.obs_group_id "
             + " AND mds5.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + "       GROUP BY mds5.patient_id";
@@ -4305,7 +4305,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                 AND  ostate5.value_coded = ${1256} ) ) "
             + "                  AND  otype5.obs_group_id = ostate5.obs_group_id "
             + " AND mds5.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + "       GROUP BY mds5.patient_id";
@@ -4574,7 +4574,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                 AND  os55.value_coded = ${1267} ) ) "
             + "                  AND  ot55.obs_group_id = os55.obs_group_id "
             + " AND mds5_end.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + "       GROUP BY mds5_end.patient_id";
@@ -4960,7 +4960,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "ON consultations.patient_id = p.patient_id "
             + "WHERE  p.voided = 0"
             + " AND p.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) ";
 
@@ -5042,7 +5042,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + maxNumberOfMonths
             + " MONTH ) "
             + " AND p.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + "                  GROUP BY   p.patient_id";
@@ -5126,7 +5126,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + maxNumberOfMonths
             + " MONTH ) "
             + " AND p.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + "                  GROUP BY   p.patient_id";
@@ -5352,7 +5352,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
         "GROUP  BY e.patient_id) clinical_condiction "
             + "ON         clinical_condiction.patient_id = p.patient_id "
             + " WHERE p.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) ";
 
@@ -5506,7 +5506,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
         "GROUP  BY e.patient_id) planeamento_familiar "
             + "ON         planeamento_familiar.patient_id = p.patient_id "
             + " WHERE p.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + " UNION "
@@ -5593,7 +5593,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "GROUP BY e.patient_id ) no_pf "
             + " ON no_pf.patient_id = p.patient_id "
             + " WHERE p.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) ";
 
@@ -5739,7 +5739,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
         "GROUP  BY e.patient_id) received_tpt "
             + "ON         received_tpt.patient_id = p.patient_id "
             + " WHERE p.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + " UNION "
@@ -5826,7 +5826,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "GROUP BY e.patient_id ) no_tpt "
             + " ON no_tpt.patient_id = p.patient_id "
             + " WHERE p.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) ";
 
@@ -6049,7 +6049,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "WHERE      p.voided = 0 "
             + " AND arterial_consultation.arterial_tension_consultations = consultations.nr_consultations "
             + " AND p.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + " UNION "
@@ -6138,7 +6138,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "GROUP BY e.patient_id ) no_arterial_tension "
             + " ON no_arterial_tension.patient_id = p.patient_id "
             + " AND p.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) ";
 
@@ -6245,7 +6245,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "GROUP  BY p.patient_id) cacum "
             + "ON         cacum.patient_id = p.patient_id "
             + " WHERE p.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + " UNION "
@@ -6296,7 +6296,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "GROUP BY p.patient_id ) no_cacum "
             + " ON no_cacum.patient_id = p.patient_id "
             + " WHERE p.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) ";
 
@@ -6395,7 +6395,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "GROUP  BY p.patient_id) cacum_positive "
             + "ON         cacum_positive.patient_id = p.patient_id "
             + " WHERE p.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + " UNION "
@@ -6443,7 +6443,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "GROUP BY p.patient_id ) no_positive_cacum "
             + " ON no_positive_cacum.patient_id = p.patient_id "
             + " WHERE p.patient_id IN ( "
-            + listOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
                 minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) ";
 
