@@ -2033,17 +2033,18 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
                 + " MONTH ) "
                 + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
                 + maxNumberOfMonths
-                + " MONTH ) "
-                + "                  AND    (   ( otype.concept_id = ${165174} "
-                + "                               AND otype.value_coded IS NOT NULL ) "
-                + "                  AND         ( ostate.concept_id = ${165322} "
-                + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
-                + "                  AND  otype.obs_group_id = ostate.obs_group_id "
-                + " AND p.patient_id IN ( "
-                + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
-                    minCohortNumberOfYears, maxCohortNumberOfYears)
-                + " ) "
-                + "                  GROUP BY   p.patient_id";
+                + " MONTH ) ";
+    query +=
+        "                  AND    (   ( otype.concept_id = ${165174} "
+            + "                               AND otype.value_coded IS NOT NULL ) "
+            + "                  AND         ( ostate.concept_id = ${165322} "
+            + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
+            + "                  AND  otype.obs_group_id = ostate.obs_group_id "
+            + " AND p.patient_id IN ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+                minCohortNumberOfYears, maxCohortNumberOfYears)
+            + " ) "
+            + "                  GROUP BY   p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
