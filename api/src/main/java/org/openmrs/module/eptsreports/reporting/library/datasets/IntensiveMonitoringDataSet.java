@@ -1388,7 +1388,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMICat13Part4(12, true),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=2-14");
+        "");
 
     // 13.18 P4 Num
     dataSetDefinition.addColumn(
