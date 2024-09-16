@@ -1044,7 +1044,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MI13NUM5",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ13NewNum5(true),
+                intensiveMonitoringCohortQueries.getMI13NewNum5(true),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI13NUM5.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -1112,7 +1112,8 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MI13DEN11",
             EptsReportUtils.map(
-                intensiveMonitoringCohortQueries.getMI13NewNum5(false),
+                intensiveMonitoringCohortQueries.getMiSumOfPatientsIn1stOr2ndLineOfArtForDenNum11(
+                    true),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI13DEN11.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -1140,7 +1141,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MI13NUM11",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getSumOfPatientsIn1stOr2ndLineOfArtForDenNum11(
+                intensiveMonitoringCohortQueries.getMiSumOfPatientsIn1stOr2ndLineOfArtForDenNum11(
                     false),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
@@ -1255,7 +1256,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MI13DEN13",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ13NewDen13(),
+                intensiveMonitoringCohortQueries.getMI13NewDen13(),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI13DEN13.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));

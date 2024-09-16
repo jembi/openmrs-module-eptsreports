@@ -4405,7 +4405,7 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch(
         "PREGNANT",
         EptsReportUtils.map(
-            pregnant, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            pregnant, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "BREASTFEEDING",
@@ -5422,6 +5422,84 @@ public class IntensiveMonitoringCohortQueries {
     StringSubstitutor sb = new StringSubstitutor(map);
 
     cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  public CohortDefinition getMI13NewDen13() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName(
+        " adultos (15/+anos) coinfectados TB/HIV com consulta clínica no período de revisão");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition lastClinical = commonCohortQueries.getMOHPatientsLastClinicalConsultation();
+
+    CohortDefinition pregnant =
+        commonCohortQueries.getNewMQPregnantORBreastfeeding(
+            hivMetadata.getPregnantConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId());
+
+    CohortDefinition breastfeeding =
+        commonCohortQueries.getNewMQPregnantORBreastfeeding(
+            hivMetadata.getBreastfeeding().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId());
+
+    CohortDefinition firstLine =
+        qualityImprovement2020CohortQueries.getUtentesPrimeiraLinha(
+            QualityImprovement2020CohortQueries.UtentesPrimeiraLinhaPreposition.MQ);
+
+    CohortDefinition secondLine =
+        qualityImprovement2020CohortQueries.getUtentesSegundaLinha(
+            QualityImprovement2020CohortQueries.UtentesSegundaLinhaPreposition.MQ);
+
+    CohortDefinition tbDiagnosisActive =
+        qualityImprovement2020CohortQueries.getPatientsWithTbActiveOrTbTreatment();
+
+    cd.addSearch(
+        "AGE",
+        EptsReportUtils.map(
+            commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(0, 14),
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "CONSULTATION",
+        EptsReportUtils.map(
+            lastClinical, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "PREGNANT",
+        EptsReportUtils.map(
+            pregnant, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "BREASTFEEDING",
+        EptsReportUtils.map(
+            breastfeeding,
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "FIRSTLINE",
+        EptsReportUtils.map(
+            firstLine,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "SECONDLINE",
+        EptsReportUtils.map(
+            secondLine,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "TBACTIVE",
+        EptsReportUtils.map(
+            tbDiagnosisActive, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "(CONSULTATION AND (FIRSTLINE OR SECONDLINE) AND TBACTIVE AND AGE) AND NOT (PREGNANT OR BREASTFEEDING)");
 
     return cd;
   }
