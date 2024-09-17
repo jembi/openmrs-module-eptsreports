@@ -502,7 +502,7 @@ public class DsdQueries {
             + "      AND ostate.concept_id = ${5096} "
             + "      AND otype.concept_id = ${165174} "
             + "      AND otype.value_coded IN (${dispensationTypesFila}) "
-            + "      AND e.encounter_id = ( "
+            + "      AND e.encounter_id IN ( "
             + "        SELECT "
             + "          ee.encounter_id "
             + "        FROM "
@@ -533,8 +533,6 @@ public class DsdQueries {
             + "          AND oo1.concept_id = ${5096} "
             + "          AND oo1.value_datetime IS NOT NULL "
             + "          AND ee.encounter_datetime = last_fila.last_encounter "
-            + "        LIMIT "
-            + "          1 "
             + "      ) "
             + "    ) OR ( "
             + "      e.encounter_type = ${6} "
@@ -565,6 +563,8 @@ public class DsdQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     cd.setQuery(stringSubstitutor.replace(query));
+
+    System.out.println(stringSubstitutor.replace(query));
 
     return cd;
   }
