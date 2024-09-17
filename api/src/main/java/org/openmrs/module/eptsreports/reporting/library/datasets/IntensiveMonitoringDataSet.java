@@ -1016,7 +1016,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MI13DEN5",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ13NewDen5(),
+                intensiveMonitoringCohortQueries.getMI13NewDen5(),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI13DEN5.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));

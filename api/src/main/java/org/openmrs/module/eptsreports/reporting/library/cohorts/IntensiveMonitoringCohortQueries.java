@@ -5019,7 +5019,7 @@ public class IntensiveMonitoringCohortQueries {
       cd.addSearch(
           "DENOMINATOR",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQ13NewDen5(),
+              getMI13NewDen5(),
               "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     } else {
       cd.addSearch(
@@ -5500,6 +5500,92 @@ public class IntensiveMonitoringCohortQueries {
 
     cd.setCompositionString(
         "(CONSULTATION AND (FIRSTLINE OR SECONDLINE) AND TBACTIVE AND AGE) AND NOT (PREGNANT OR BREASTFEEDING)");
+
+    return cd;
+  }
+
+  public CohortDefinition getMI13NewDen5() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("% de adultos (15/+anos) coinfectados TB/HIV com resultado de CV registado na FM");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition startedART = qualityImprovement2020CohortQueries.getMOHArtStartDate();
+
+    CohortDefinition pregnant =
+        commonCohortQueries.getMOHPregnantORBreastfeeding(
+            commonMetadata.getPregnantConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId());
+
+    CohortDefinition tbDiagnosisActive =
+        qualityImprovement2020CohortQueries.getPatientsWithTbActiveOrTbTreatment();
+
+    CohortDefinition arvRegimen =
+        qualityImprovement2020CohortQueries.getPatientsOnRegimeArvSecondLine();
+
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
+
+    CohortDefinition transferredOut =
+        qualityImprovement2020CohortQueries.getTranferredOutPatients();
+
+    CohortDefinition dead = qualityImprovement2020CohortQueries.getDeadPatientsCompositionMQ13();
+
+    CohortDefinition abandonedOrRestartedTarv =
+        qualityImprovement2020CohortQueries
+            .getPatientsWhoAbandonedOrRestartedTarvOnLast6MonthsArt();
+
+    cd.addSearch(
+        "ARTSTART",
+        EptsReportUtils.map(
+            startedART, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "PREGNANT",
+        EptsReportUtils.map(
+            pregnant, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "ARVREGIMEN",
+        EptsReportUtils.map(
+            arvRegimen, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "TRANSFERREDIN",
+        EptsReportUtils.map(
+            transferredIn, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "TRANSFERREDOUT",
+        EptsReportUtils.map(
+            transferredOut,
+            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "TBACTIVE",
+        EptsReportUtils.map(
+            tbDiagnosisActive, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "DEAD",
+        EptsReportUtils.map(
+            dead, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "ABANDONED",
+        EptsReportUtils.map(
+            abandonedOrRestartedTarv, "revisionEndDate=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "((ARTSTART AND NOT PREGNANT) OR ARVREGIMEN) AND TBACTIVE AND NOT (TRANSFERREDIN OR TRANSFERREDOUT OR DEAD OR ABANDONED)");
 
     return cd;
   }
