@@ -5589,4 +5589,93 @@ public class IntensiveMonitoringCohortQueries {
 
     return cd;
   }
+
+  public CohortDefinition getMI13Den15MGInIncluisionPeriod() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(" CAT 13 DEN - part 2 - 13.15. % de MG elegíveis ");
+    cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition startedART = qualityImprovement2020CohortQueries.getMOHArtStartDate();
+
+    CohortDefinition transferredOut = getTranferredOutPatientsForMI7();
+    CohortDefinition pregnant =
+        commonCohortQueries.getMOHPregnantORBreastfeeding(
+            commonMetadata.getPregnantConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId());
+
+    CohortDefinition pregnantAbandonedDuringPeriod =
+        qualityImprovement2020CohortQueries
+            .getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt();
+
+    cd.addSearch(
+        "startedART",
+        EptsReportUtils.map(
+            startedART, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "pregnant",
+        EptsReportUtils.map(
+            pregnant, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "transferredOut",
+        EptsReportUtils.map(transferredOut, "revisionEndDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "abandoned",
+        EptsReportUtils.map(
+            pregnantAbandonedDuringPeriod,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.setCompositionString("((startedART AND pregnant) AND NOT (abandoned OR transferredOut))");
+
+    return cd;
+  }
+
+  public CohortDefinition getMI13Num15() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("13.15 - MG elegíveis a CV com registo de pedido de CV");
+    cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition pregnant =
+        commonCohortQueries.getMOHPregnantORBreastfeeding(
+            commonMetadata.getPregnantConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId());
+
+    CohortDefinition transferredOut = getTranferredOutPatientsForMI7();
+
+    CohortDefinition pregnantAbandonedDuringPeriod =
+        qualityImprovement2020CohortQueries
+            .getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt();
+
+    cd.addSearch(
+        "startedART",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMOHArtStartDate(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "pregnant",
+        EptsReportUtils.map(
+            pregnant, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "transferredOut",
+        EptsReportUtils.map(transferredOut, "revisionEndDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "investLab",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMQC13P2DenB3(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "abandoned",
+        EptsReportUtils.map(
+            pregnantAbandonedDuringPeriod,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.setCompositionString(
+        "((startedART AND pregnant AND investLab) AND NOT (abandoned OR transferredOut))");
+    return cd;
+  }
 }

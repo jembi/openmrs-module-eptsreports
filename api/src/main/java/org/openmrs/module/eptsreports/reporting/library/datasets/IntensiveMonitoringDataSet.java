@@ -735,14 +735,21 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
 
     // CAT 13 P2 DENOMINATOR
     // 13.15
+    CohortIndicator MI13DEN15 =
+        eptsGeneralIndicator.getIndicator(
+            "MI13DEN15",
+            EptsReportUtils.map(
+                intensiveMonitoringCohortQueries.getMI13Den15MGInIncluisionPeriod(),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MI13DEN15.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
     dataSetDefinition.addColumn(
         "MI13DEN15",
         "% de MG elegíveis a CV com registo de pedido de CV feito pelo clínico (MG que iniciaram TARV na CPN) Denominator: # de MG com registo de início do TARV na CPN dentro do período de inclusão. (Line 90,Column F in the Template) as following",
         EptsReportUtils.map(
-            customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMICat13Part2(15, "DEN15"),
-                "revisionEndDate=${revisionEndDate},location=${location}"),
-            "revisionEndDate=${revisionEndDate},location=${location}"),
+            MI13DEN15,
+            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     // 13.16
@@ -769,14 +776,21 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
 
     // CAT 13 P2 NUMERATOR
     // 13.15
+    CohortIndicator MI13NUM15 =
+        eptsGeneralIndicator.getIndicator(
+            "MI13NUM15",
+            EptsReportUtils.map(
+                intensiveMonitoringCohortQueries.getMI13Num15(),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MI13NUM15.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
     dataSetDefinition.addColumn(
         "MI13NUM15",
         "% de MG elegíveis a CV com registo de pedido de CV feito pelo clínico (MG que iniciaram TARV na CPN) Denominator: # de MG com registo de início do TARV na CPN dentro do período de inclusão. (Line 90,Column F in the Template) as following",
         EptsReportUtils.map(
-            customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMICat13Part2(15, "NUM15"),
-                "revisionEndDate=${revisionEndDate},location=${location}"),
-            "revisionEndDate=${revisionEndDate},location=${location}"),
+            MI13NUM15,
+            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     // 13.16
