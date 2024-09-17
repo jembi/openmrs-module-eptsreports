@@ -564,8 +564,6 @@ public class DsdQueries {
 
     cd.setQuery(stringSubstitutor.replace(query));
 
-    System.out.println(stringSubstitutor.replace(query));
-
     return cd;
   }
 
