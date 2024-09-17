@@ -5610,6 +5610,14 @@ public class IntensiveMonitoringCohortQueries {
         qualityImprovement2020CohortQueries
             .getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt();
 
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
+
     cd.addSearch(
         "startedART",
         EptsReportUtils.map(
@@ -5627,7 +5635,13 @@ public class IntensiveMonitoringCohortQueries {
             pregnantAbandonedDuringPeriod,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    cd.setCompositionString("((startedART AND pregnant) AND NOT (abandoned OR transferredOut))");
+    cd.addSearch(
+        "transferredIn",
+        EptsReportUtils.map(
+            transferredIn, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "((startedART AND pregnant) AND NOT (abandoned OR transferredOut OR transferredIn))");
 
     return cd;
   }
@@ -5650,6 +5664,14 @@ public class IntensiveMonitoringCohortQueries {
     CohortDefinition pregnantAbandonedDuringPeriod =
         qualityImprovement2020CohortQueries
             .getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt();
+
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
 
     cd.addSearch(
         "startedART",
@@ -5674,8 +5696,13 @@ public class IntensiveMonitoringCohortQueries {
             pregnantAbandonedDuringPeriod,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
+    cd.addSearch(
+        "transferredIn",
+        EptsReportUtils.map(
+            transferredIn, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
     cd.setCompositionString(
-        "((startedART AND pregnant AND investLab) AND NOT (abandoned OR transferredOut))");
+        "((startedART AND pregnant AND investLab) AND NOT (abandoned OR transferredOut OR transferredIn))");
     return cd;
   }
 }
