@@ -147,7 +147,8 @@ public class AdvanceDiseaseAndTbCascadeDimension {
     dim.addCohortDefinition(
         "pregnantClient",
         EptsReportUtils.map(
-            txNewCohortQueries.getPatientsPregnantEnrolledOnART(false), pregnancyPeriod));
+            advancedDiseaseAndTBCascadeCohortQueries.getPregnantWithoutCd4(),
+                pregnancyPeriod));
 
     dim.addCohortDefinition(
         "consecutiveVl",
