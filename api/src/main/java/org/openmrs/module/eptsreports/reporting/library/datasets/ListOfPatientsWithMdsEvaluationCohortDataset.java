@@ -391,8 +391,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "clinical_condiction_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getActiveClinicalCondiction(
             12, 24, false, 2, 4),
-        endDateMappings,
-        new NotApplicableIfNullConverter());
+        endDateMappings);
 
     // C8 - Teve TB entre 12˚ e 24 ˚ meses de TARV: (coluna AW) - Resposta = Sim ou Não (RF38)
     pdd.addColumn(

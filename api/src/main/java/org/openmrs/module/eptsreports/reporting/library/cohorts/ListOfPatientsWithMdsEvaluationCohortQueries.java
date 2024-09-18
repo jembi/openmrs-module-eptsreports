@@ -1691,6 +1691,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
                 + " MONTH ) ";
     query +=
         "        GROUP  BY p.person_id) final_query "
+            + " WHERE final_query.person_id IN ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
+                minCohortNumberOfYears, maxCohortNumberOfYears)
+            + " ) "
             + " UNION "
             + "SELECT final_query.person_id, "
             + "       'Não' "
@@ -1717,10 +1721,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "          AND p.gender = 'F' "
             + "          AND Timestampdiff(year, p.birthdate, art.art_encounter) > 9 "
             + "          AND o.concept_id IN ( ${1982}, ${6332} ) "
-            + "          AND o.value_coded = ( ${1065} ) ";
+            + "          AND o.value_coded != ( ${1065} ) ";
     query +=
         b6Period
-            ? "          AND e.encounter_datetime NOT BETWEEN "
+            ? "          AND e.encounter_datetime BETWEEN "
                 + "            Date_add(art.art_encounter, INTERVAL "
                 + minNumberOfMonths
                 + " MONTH ) "
@@ -1728,7 +1732,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
                 + "            Date_add(art.art_encounter, INTERVAL "
                 + maxNumberOfMonths
                 + " MONTH ) "
-            : "          AND e.encounter_datetime NOT BETWEEN "
+            : "          AND e.encounter_datetime BETWEEN "
                 + "            Date_add(Date_add(art.art_encounter, INTERVAL "
                 + minNumberOfMonths
                 + " MONTH ), INTERVAL 1 DAY) "
