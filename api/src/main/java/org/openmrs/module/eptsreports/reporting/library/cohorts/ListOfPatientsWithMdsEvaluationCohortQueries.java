@@ -386,7 +386,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     String query =
-        " SELECT min.patient_id, min.encounter_date "
+        " SELECT min.patient_id, MIN(min.encounter_date) AS tpt_start "
             + " FROM ( "
             + "         SELECT     p.patient_id, "
             + "                    MIN(e.encounter_datetime) AS encounter_date "
@@ -894,7 +894,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "       AND o.value_coded = ${856} "
             + " AND p.patient_id IN ( "
             + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
-                maxCohortNumberOfYears, minCohortNumberOfYears)
+                minCohortNumberOfYears, maxCohortNumberOfYears)
             + " ) "
             + "       GROUP BY p.patient_id";
 
@@ -1197,7 +1197,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "ON         o.encounter_id = e.encounter_id "
             + "INNER JOIN "
             + "           ( "
-            + getLastVlDateBetweenPeriods(firstMonth, lastMonth, 4, 2)
+            + getLastVlDateBetweenPeriods(firstMonth, lastMonth, 2, 4)
             + "                     ) last_vl ON last_vl.patient_id = p.patient_id "
             + "       WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
