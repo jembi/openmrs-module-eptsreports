@@ -202,7 +202,6 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
 
-    CohortDefinition cd4Count = getPatientsWithCD4Count();
     CohortDefinition cd200AgeFiveOrOver =
         getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo200mm3AA, 5, null);
     CohortDefinition cd500AgeBetweenOneAndFour =
@@ -210,12 +209,11 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     CohortDefinition cd750AgeUnderYear =
         getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo750mm3, null, 1);
 
-    cd.addSearch("cd4Count", EptsReportUtils.map(cd4Count, mappings));
     cd.addSearch("cd4Under200", EptsReportUtils.map(cd200AgeFiveOrOver, mappings));
     cd.addSearch("cd4Under500", EptsReportUtils.map(cd500AgeBetweenOneAndFour, mappings));
     cd.addSearch("cd4Under750", EptsReportUtils.map(cd750AgeUnderYear, mappings));
 
-    cd.setCompositionString("cd4Count AND (cd4Under200 OR cd4Under500 OR cd4Under750)");
+    cd.setCompositionString("cd4Under200 OR cd4Under500 OR cd4Under750");
 
     return cd;
   }
