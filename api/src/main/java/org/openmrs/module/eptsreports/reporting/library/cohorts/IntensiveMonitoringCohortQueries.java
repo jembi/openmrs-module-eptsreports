@@ -5628,7 +5628,8 @@ public class IntensiveMonitoringCohortQueries {
             pregnant, "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "transferredOut",
-        EptsReportUtils.map(transferredOut, "revisionEndDate=${endDate},location=${location}"));
+        EptsReportUtils.map(
+            transferredOut, "revisionEndDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "abandoned",
         EptsReportUtils.map(
@@ -5648,7 +5649,7 @@ public class IntensiveMonitoringCohortQueries {
 
   public CohortDefinition getMI13Num15() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("13.15 - MG elegíveis a CV com registo de pedido de CV");
+    cd.setName("13.15 NUM - MG elegíveis a CV com registo de pedido de CV");
     cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
     cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -5684,7 +5685,8 @@ public class IntensiveMonitoringCohortQueries {
             pregnant, "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "transferredOut",
-        EptsReportUtils.map(transferredOut, "revisionEndDate=${endDate},location=${location}"));
+        EptsReportUtils.map(
+            transferredOut, "revisionEndDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "investLab",
         EptsReportUtils.map(
