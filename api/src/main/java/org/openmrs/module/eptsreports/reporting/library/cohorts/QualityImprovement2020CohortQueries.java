@@ -2730,16 +2730,10 @@ public class QualityImprovement2020CohortQueries {
         compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
         compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
         compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING7));
-        compositionCohortDefinition.addSearch(
-            "F",
-            EptsReportUtils.map(
-                transfOut, MAPPING14));
+        compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING14));
       }
       if (indicatorFlag == 3 || indicatorFlag == 5 || indicatorFlag == 6) {
-        compositionCohortDefinition.addSearch(
-            "F",
-            EptsReportUtils.map(
-                transfOut, MAPPING14));
+        compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING14));
       }
     }
 

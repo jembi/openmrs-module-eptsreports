@@ -23,10 +23,14 @@ public class ListOfPatientsWhoReceivedVLResultsDuringTheQuarterDataset extends B
   private final PatientesWhoReceivedVlResultsCohortQueries
       patientesWhoReceivedVlResultsCohortQueries;
 
+  private TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet;
+
   @Autowired
   public ListOfPatientsWhoReceivedVLResultsDuringTheQuarterDataset(
-      PatientesWhoReceivedVlResultsCohortQueries patientesWhoReceivedVlResultsCohortQueries) {
+      PatientesWhoReceivedVlResultsCohortQueries patientesWhoReceivedVlResultsCohortQueries,
+      TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet) {
     this.patientesWhoReceivedVlResultsCohortQueries = patientesWhoReceivedVlResultsCohortQueries;
+    this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
   }
 
   public DataSetDefinition constructDQACargaViralDataset() {
@@ -54,8 +58,7 @@ public class ListOfPatientsWhoReceivedVLResultsDuringTheQuarterDataset extends B
     /** 1 - NID - Sheet 1: Column B */
     pdd.addColumn(
         "nid",
-        patientesWhoReceivedVlResultsCohortQueries.getNID(
-            identifierType.getPatientIdentifierTypeId()),
+        tptListOfPatientsEligibleDataSet.getNID(identifierType.getPatientIdentifierTypeId()),
         "");
 
     /** 2 - Sexo - Sheet 1: Column C */
