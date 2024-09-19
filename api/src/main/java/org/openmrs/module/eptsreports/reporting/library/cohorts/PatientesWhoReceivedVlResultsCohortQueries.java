@@ -475,7 +475,7 @@ public class PatientesWhoReceivedVlResultsCohortQueries {
             + "                                                                  INNER JOIN encounter e on p.patient_id = e.patient_id "
             + "                                                                  INNER JOIN obs o on e.encounter_id = o.encounter_id "
             + "                                                                  INNER JOIN ( "
-            + "    SELECT p.patient_id, MIN(e.encounter_datetime) AS first_occurrence "
+            + "    SELECT p.patient_id, e.encounter_datetime AS encounter_date "
             + "    FROM   patient p "
             + "               INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "               INNER JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -484,7 +484,7 @@ public class PatientesWhoReceivedVlResultsCohortQueries {
             + "      AND o.voided = 0 "
             + "      AND e.location_id = :location "
             + "      AND e.encounter_type = ${6} "
-            + "      AND o.concept_id in (${856}, ${1305}) "
+            + "      AND o.concept_id = ${856} "
             + "      AND ( "
             + "            (e.encounter_datetime >= :startDate "
             + "                AND e.encounter_datetime <= DATE_SUB(DATE_ADD(:startDate, INTERVAL 1 MONTH), INTERVAL 1 DAY)) "
@@ -500,7 +500,7 @@ public class PatientesWhoReceivedVlResultsCohortQueries {
             + "   AND o.concept_id = ${856} "
             + "   AND e.location_id = :location "
             + "   AND e.encounter_type = ${6} "
-            + "   AND e.encounter_datetime = vl.first_occurrence "
+            + "   AND e.encounter_datetime = vl.encounter_date "
             + " GROUP BY p.patient_id";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
@@ -526,12 +526,11 @@ public class PatientesWhoReceivedVlResultsCohortQueries {
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
-        " SELECT p.patient_id, cn.name as first_vl_result  FROM patient p "
+        " SELECT p.patient_id, o.value_coded as first_vl_result  FROM patient p "
             + "                                                                  INNER JOIN encounter e on p.patient_id = e.patient_id "
             + "                                                                  INNER JOIN obs o on e.encounter_id = o.encounter_id "
-            + "                                                                  INNER JOIN concept_name cn ON cn.concept_id = o.value_coded "
             + "                                                                  INNER JOIN ( "
-            + "    SELECT p.patient_id, MIN(e.encounter_datetime) AS first_occurrence "
+            + "    SELECT p.patient_id, e.encounter_datetime AS encounter_date "
             + "    FROM   patient p "
             + "               INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "               INNER JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -540,7 +539,7 @@ public class PatientesWhoReceivedVlResultsCohortQueries {
             + "      AND o.voided = 0 "
             + "      AND e.location_id = :location "
             + "      AND e.encounter_type = ${6} "
-            + "      AND o.concept_id in (${856}, ${1305}) "
+            + "      AND o.concept_id = ${1305} "
             + "      AND ( "
             + "            (e.encounter_datetime >= :startDate "
             + "                AND e.encounter_datetime <= DATE_SUB(DATE_ADD(:startDate, INTERVAL 1 MONTH), INTERVAL 1 DAY)) "
@@ -556,7 +555,7 @@ public class PatientesWhoReceivedVlResultsCohortQueries {
             + "   AND o.concept_id = ${1305} "
             + "   AND e.location_id = :location "
             + "   AND e.encounter_type = ${6} "
-            + "   AND e.encounter_datetime = vl.first_occurrence AND cn.locale = 'pt' "
+            + "   AND e.encounter_datetime = vl.encounter_date "
             + " GROUP BY p.patient_id";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);

@@ -4,10 +4,7 @@ import java.util.Date;
 import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.eptsreports.reporting.data.converter.DashDateFormatConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.ObjectCounterConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.*;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.PatientesWhoReceivedVlResultsCohortQueries;
 import org.openmrs.module.reporting.data.person.definition.GenderDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonIdDataDefinition;
@@ -100,7 +97,7 @@ public class ListOfPatientsWhoReceivedVLResultsDuringTheQuarterDataset extends B
         "resultado_cv_qualitativo",
         patientesWhoReceivedVlResultsCohortQueries.getViralLoadQualitativeResults(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ViralLoadQualitativeLabelConverter());
 
     return pdd;
   }
