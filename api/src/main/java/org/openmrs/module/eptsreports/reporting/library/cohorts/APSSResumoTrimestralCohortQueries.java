@@ -39,10 +39,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class APSSResumoTrimestralCohortQueries {
 
-  private HivMetadata hivMetadata;
+  private static HivMetadata hivMetadata;
   private TbMetadata tbMetadata;
   private GenericCohortQueries genericCohortQueries;
-  private ResumoMensalCohortQueries resumoMensalCohortQueries;
+  private static ResumoMensalCohortQueries resumoMensalCohortQueries;
 
   @Autowired
   public APSSResumoTrimestralCohortQueries(
@@ -212,7 +212,7 @@ public class APSSResumoTrimestralCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getC1() {
+  public static CohortDefinition getC1() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
@@ -223,7 +223,7 @@ public class APSSResumoTrimestralCohortQueries {
     String mapping = "endDate=${endDate},location=${location}";
 
     CohortDefinition activeInART =
-        this.resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
+        resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
 
     cd.addSearch("activeInART", EptsReportUtils.map(activeInART, mapping));
 
@@ -1085,7 +1085,7 @@ public class APSSResumoTrimestralCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getFichaAPSSAndMinArtStartDate() {
+  public static CohortDefinition getFichaAPSSAndMinArtStartDate() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("All Patients Registered In Encounter Ficha APSS AND PP");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -1162,6 +1162,7 @@ public class APSSResumoTrimestralCohortQueries {
             + "        AND ps.voided = 0  "
             + "        AND pp.voided = 0  "
             + "        AND pgr.program_id = ${artProgram}   "
+            + "        AND pp.location_id = :location  "
             + "    GROUP BY p.patient_id  "
             + "    UNION  "
             + "    SELECT p.patient_id as patient_id, min(o.value_datetime)  AS min_date  "
@@ -1175,6 +1176,7 @@ public class APSSResumoTrimestralCohortQueries {
             + "        AND o.voided = 0  "
             + "        AND e.encounter_type IN (${adultoSeguimentoEncounterType}, ${pediatriaSeguimentoEncounterType}, ${arvPharmaciaEncounterType}, ${masterCardEncounterType})  "
             + "        AND o.concept_id = ${arvStartDateConcept}  "
+            + "        AND e.location_id = :location  "
             + "        GROUP BY p.patient_id  "
             + "    UNION  "
             + "    SELECT p.patient_id as patient_id,  min(e.encounter_datetime) AS min_date  "
@@ -1185,6 +1187,7 @@ public class APSSResumoTrimestralCohortQueries {
             + "        AND e.voided = 0  "
             + "        AND e.encounter_type  = ${arvPharmaciaEncounterType}  "
             + "        AND e.encounter_datetime <= :endDate  "
+            + "        AND e.location_id = :location  "
             + "        GROUP BY p.patient_id  "
             + "    UNION  "
             + "    SELECT p.patient_id as patient_id, min(e.encounter_datetime)   "
@@ -1199,6 +1202,7 @@ public class APSSResumoTrimestralCohortQueries {
             + "        AND e.encounter_type  IN (${adultoSeguimentoEncounterType},${pediatriaSeguimentoEncounterType},${arvPharmaciaEncounterType})  "
             + "        AND e.encounter_datetime <= :endDate  "
             + "        AND o.concept_id = ${arvPlanConcept} AND o.value_coded = ${startDrugs}  "
+            + "        AND e.location_id = :location  "
             + "        GROUP BY p.patient_id  "
             + "    UNION  "
             + "    SELECT p.patient_id as patient_id, min(e.encounter_datetime) AS min_date  "
@@ -1227,6 +1231,7 @@ public class APSSResumoTrimestralCohortQueries {
             + "        AND e.voided = 0  "
             + "        AND o1.voided = 0  "
             + "        AND o2.voided = 0  "
+            + "        AND e.location_id = :location  "
             + "        AND e.encounter_type = ${masterCardDrugPickupEncounterType}  "
             + "        AND o1.concept_id = ${artPickupConcept} AND o1.value_coded = ${yesConcept}  "
             + "        AND o2.concept_id = ${artDatePickupMasterCard} AND o2.value_datetime <= :endDate  "
