@@ -229,8 +229,6 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     definition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     definition.addParameter(new Parameter("location", "location", Location.class));
 
-    System.out.println(definition.getQuery());
-
     return definition;
   }
 
