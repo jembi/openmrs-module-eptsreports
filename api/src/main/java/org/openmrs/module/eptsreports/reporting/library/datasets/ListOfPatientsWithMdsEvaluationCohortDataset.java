@@ -282,7 +282,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B12 - Recebeu uma forma de PF entre a data de inscrição no MDS e 12˚ mês de TARV?
     pdd.addColumn(
         "family_planning_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedPf(0, 12, true, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedPf(0, 12, 1, 4),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -522,7 +522,8 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C12 - Recebeu uma forma de PF entre 12˚ e 24˚ mês de TARV?
     pdd.addColumn(
         "family_planning_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedPf(12, 24, false, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedPf12to24MonthTarv(
+            12, 24, 2, 4),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -760,7 +761,8 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // D12 - Recebeu uma forma de PF entre 24˚ e 36˚ mês de TARV?
     pdd.addColumn(
         "family_planning_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedPf(24, 36, false, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedPf12to24MonthTarv(
+            24, 36, 3, 4),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
