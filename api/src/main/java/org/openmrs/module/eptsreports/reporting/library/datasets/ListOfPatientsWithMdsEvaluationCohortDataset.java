@@ -289,7 +289,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B13 - Recebeu TPT entre a data de inscrição no MDS e 12˚ mês de TARV?
     pdd.addColumn(
         "received_tpt_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedTpt(0, 12, true, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedTpt(0, 12, 1, 4),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -530,7 +530,8 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C13 - Recebeu TPT entre 12˚ e 24˚ mês de TARV?
     pdd.addColumn(
         "received_tpt_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedTpt(12, 24, false, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedTpt24to36MonthsTarv(
+            12, 24, 2, 4),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -769,7 +770,8 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // D13 - Recebeu TPT entre 24˚ e 36˚ mês de TARV?
     pdd.addColumn(
         "received_tpt_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedTpt(24, 36, false, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedTpt24to36MonthsTarv(
+            24, 36, 3, 4),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
