@@ -6816,7 +6816,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
             + "        ) start   "
             + ") tarv ON tarv.patient_id = p.patient_id "
-            + "WHERE p.patient_id IN ( "
+            + "WHERE p.patient_id NOT IN ( "
             + "    SELECT p.patient_id "
             + "    FROM patient p "
             + "             INNER JOIN person pe ON p.patient_id = pe.person_id  "
@@ -6828,7 +6828,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "      AND pe.gender = 'F' "
             + "      AND e.encounter_type = ${6} "
             + "      AND e.location_id = :location "
-            + "      AND o.concept_id = ${2094} AND o.value_coded NOT IN (${703}) "
+            + "      AND o.concept_id = ${2094} AND o.value_coded = ${703} "
             + "AND e.encounter_datetime >= Date_add(Date_add(tarv.art_encounter, INTERVAL "
             + minNumberOfMonths
             + " MONTH ), INTERVAL 1 DAY) "
