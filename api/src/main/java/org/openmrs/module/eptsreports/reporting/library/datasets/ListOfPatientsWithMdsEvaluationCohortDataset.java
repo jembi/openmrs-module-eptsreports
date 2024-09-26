@@ -305,8 +305,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // 12 ̊ mês de TARV?
     pdd.addColumn(
         "arterial_pressure_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientWithArterialPressure(
-            0, 12, true, 4, 1),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientWithArterialPressure(0, 12, 4, 1),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -546,8 +545,8 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C15 - Rastreado para Tensão Arterial em todas as consultas entre 12˚ e 24˚ mês de TARV?
     pdd.addColumn(
         "arterial_pressure_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientWithArterialPressure(
-            12, 24, false, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientWithArterialPressure24To36MonthTarv(
+            12, 24, 2, 4),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -785,8 +784,8 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // D15 - Rastreado para Tensão Arterial em todas as consultas entre 24˚ e 36˚ mês de TARV?
     pdd.addColumn(
         "arterial_pressure_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientWithArterialPressure(
-            24, 36, false, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientWithArterialPressure24To36MonthTarv(
+            24, 36, 3, 4),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
