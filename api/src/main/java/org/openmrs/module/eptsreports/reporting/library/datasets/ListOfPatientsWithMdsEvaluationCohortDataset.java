@@ -313,13 +313,15 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "clinical_consultations_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(6, 12, 1, 4),
-        endDateMappings);
+        endDateMappings,
+        new ZeroResultConverter());
 
     // B17 - N˚ de consultas de APSS/PP entre 6˚ e 12˚ mês de TARV - Coluna AN
     pdd.addColumn(
         "apss_pp_consultations_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(6, 12, 1, 4),
-        endDateMappings);
+        endDateMappings,
+        new ZeroResultConverter());
 
     // B18 - Rastreado para CACUM entre o 1˚ e 12 meses de TARV?
     pdd.addColumn(
@@ -554,13 +556,15 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "clinical_consultations_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(12, 24, 2, 4),
-        endDateMappings);
+        endDateMappings,
+        new ZeroResultConverter());
 
     // C17 - N˚ de consultas de APSS/PP tre 12˚ e 24˚ mês de TARV - Coluna BT
     pdd.addColumn(
         "apss_pp_consultations_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(12, 24, 2, 4),
-        endDateMappings);
+        endDateMappings,
+        new ZeroResultConverter());
 
     // C18 - Rastreado para CACUM entre 12˚ e 24˚ mês de TARV?
     pdd.addColumn(
@@ -793,13 +797,15 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "clinical_consultations_d",
         listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(24, 36, 3, 4),
-        endDateMappings);
+        endDateMappings,
+        new ZeroResultConverter());
 
     // D17 - N˚ de consultas de APSS/PP tre 24˚ e 36˚ mês de TARV- D.18 (Coluna CZ)
     pdd.addColumn(
         "apss_pp_consultations_d",
         listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(24, 36, 3, 4),
-        endDateMappings);
+        endDateMappings,
+        new ZeroResultConverter());
 
     // D18 - Rastreado para CACUM entre 24˚ e 36˚ mês de TARV?
     pdd.addColumn(
