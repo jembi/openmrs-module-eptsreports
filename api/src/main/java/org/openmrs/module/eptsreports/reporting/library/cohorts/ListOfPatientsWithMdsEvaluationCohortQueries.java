@@ -5282,7 +5282,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     String query =
         "SELECT     p.patient_id, "
-            + " 'Condição Clínica Activa de Estadio III ou IV' "
+            + " '“Estadio III” ou “Estadio IV”' "
             + "FROM       patient p "
             + "INNER JOIN "
             + "           ( "

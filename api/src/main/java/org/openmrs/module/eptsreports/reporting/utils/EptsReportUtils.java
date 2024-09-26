@@ -171,4 +171,11 @@ public class EptsReportUtils {
 
     return formatter.format(date);
   }
+
+  public static String formatHashDate(Date date) {
+
+    Format formatter = new SimpleDateFormat("dd/MM/yyyy");
+
+    return formatter.format(date);
+  }
 }

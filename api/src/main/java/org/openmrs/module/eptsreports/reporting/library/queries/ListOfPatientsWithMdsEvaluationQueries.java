@@ -578,7 +578,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
 
     String query =
         " SELECT patient_id, "
-            + " 'Transferido Para' "
+            + " 'TRANSFERIDO PARA' "
             + "FROM   ("
             + "SELECT     latest.patient_id, "
             + "           Max(latest.last_date) AS last_date "
@@ -801,7 +801,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
     String query =
         isForCohortDefinition
             ? "  SELECT mostrecent.patient_id "
-            : " SELECT mostrecent.patient_id, 'Suspenso' ";
+            : " SELECT mostrecent.patient_id, 'SUSPENSO' ";
     query +=
         "FROM ("
             + " SELECT lastest.patient_id ,Max(lastest.last_date) as  last_date "
@@ -963,7 +963,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
    * @return {@link String}
    */
   public String getPatientsActiveOnTarv(int minCohortNumberOfYears, int maxCohortNumberOfYears) {
-    return "SELECT  final.patient_id, 'Activo' "
+    return "SELECT  final.patient_id, 'ACTIVO' "
         + "FROM "
         + "    ( "
         + resumoMensalCohortQueries.getPatientStartedTarvBeforeQuery()
@@ -1100,7 +1100,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + " GROUP BY mostrecent.patient_id";
 
     return isForDataDefinition
-        ? "  SELECT mostrecent.patient_id, 'Óbito'  ".concat(fromSQL)
+        ? "  SELECT mostrecent.patient_id, 'OBITO'  ".concat(fromSQL)
         : " SELECT mostrecent.patient_id ".concat(fromSQL);
   }
 
@@ -1214,7 +1214,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "GROUP BY final.patient_id";
 
     return isForDataDefinition
-        ? "SELECT final.patient_id, 'Abandono' ".concat(fromSQL)
+        ? "SELECT final.patient_id, 'ABANDONO' ".concat(fromSQL)
         : " SELECT final.patient_id ".concat(fromSQL);
   }
 
