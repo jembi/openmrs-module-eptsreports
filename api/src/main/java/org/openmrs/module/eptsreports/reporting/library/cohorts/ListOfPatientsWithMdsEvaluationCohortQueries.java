@@ -5154,7 +5154,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * @return {@link DataDefinition}
    */
   public DataDefinition getLastStateOfStayOnTarv(
-      int minCohortNumberOfYears, int maxCohortNumberOfYears) {
+      int abandonoMonths, int minCohortNumberOfYears, int maxCohortNumberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
 
     sqlPatientDataDefinition.setName("Get the Last State of stay ");
@@ -5200,7 +5200,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
         new EptsQueriesUtil()
             .unionBuilder(
                 listOfPatientsWithMdsEvaluationQueries.getPatientsWhoAbandonedTarvQuery(
-                    true, minCohortNumberOfYears, maxCohortNumberOfYears))
+                    true, abandonoMonths, minCohortNumberOfYears, maxCohortNumberOfYears))
             .union(
                 listOfPatientsWithMdsEvaluationQueries.getPatientsWhoDied(
                     true, minCohortNumberOfYears, maxCohortNumberOfYears))
@@ -5221,7 +5221,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
                         minCohortNumberOfYears, maxCohortNumberOfYears))
             .union(
                 listOfPatientsWithMdsEvaluationQueries.getPatientsActiveOnTarv(
-                    minCohortNumberOfYears, maxCohortNumberOfYears))
+                    abandonoMonths, minCohortNumberOfYears, maxCohortNumberOfYears))
             .buildQuery();
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);

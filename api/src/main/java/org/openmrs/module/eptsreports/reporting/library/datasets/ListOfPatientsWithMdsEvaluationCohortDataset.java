@@ -340,7 +340,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B20 - Estado de permanência no 12˚ mês de TARV: (coluna AO)
     pdd.addColumn(
         "permanence_state_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(0, 3),
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(12, 0, 3),
         b20Mappings);
 
     // C1 - Data do pedido da CV entre 12º e 24º mês de TARV: (coluna AP)
@@ -583,7 +583,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C20 - Estado de permanência no 24˚ mês de TARV: (coluna BU)
     pdd.addColumn(
         "permanence_state_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(0, 2),
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(24, 0, 2),
         c20Mappings);
 
     // D.1 - Data do pedido da CV de seguimento - D.1 (coluna BV)
@@ -824,7 +824,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // D20 - Estado de permanência no 36˚ mês de TARV: (coluna DA)
     pdd.addColumn(
         "permanence_state_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(0, 1),
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(36, 0, 1),
         d20Mappings);
 
     return pdd;
