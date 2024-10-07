@@ -7,9 +7,9 @@ public class YesOrNoConverter implements DataConverter {
   @Override
   public Object convert(Object o) {
     if (o == null) {
-      return "Sim";
+      return "Não";
     }
-    return "Não";
+    return "Sim";
   }
 
   @Override
