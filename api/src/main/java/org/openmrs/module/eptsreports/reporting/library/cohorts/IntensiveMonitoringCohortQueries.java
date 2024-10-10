@@ -3243,7 +3243,7 @@ public class IntensiveMonitoringCohortQueries {
     } else if (flag == 7) {
       cd.setCompositionString("denominatorSeven AND REQUESTONRESTART");
     } else if (flag == 8) {
-      cd.setCompositionString("denominatorEight AND REQUESTONRESTART");
+      cd.setCompositionString("denominatorEight AND RESULTSONRESTART");
     }
 
     return cd;
