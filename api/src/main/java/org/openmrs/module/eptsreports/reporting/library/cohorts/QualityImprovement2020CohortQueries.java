@@ -12315,7 +12315,6 @@ public class QualityImprovement2020CohortQueries {
             + "                                                 GROUP  BY patient_id "
             + "                   ) vl_date_tbl ON pp.patient_id = vl_date_tbl.patient_id "
             + "                 WHERE ee.encounter_datetime < vl_date_tbl.vl_max_date "
-            + "                 AND oo.concept_id = ${165174} "
             + "                 AND oo.voided = 0 "
             + "                 AND ee.voided = 0 "
             + "                 AND ee.location_id = :location "
