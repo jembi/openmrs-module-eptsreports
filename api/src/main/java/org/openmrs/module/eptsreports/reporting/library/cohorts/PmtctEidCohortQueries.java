@@ -259,29 +259,52 @@ public class PmtctEidCohortQueries {
     map.put("165510", hivMetadata.getFollowingtSampleBetween9To17MonthsConcept().getConceptId());
 
     String query =
-        "SELECT patient_id FROM ( "
-            + " SELECT p.patient_id, "
-            + "       Min(o.value_datetime) AS collection_date "
-            + "FROM patient p "
-            + "         INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "         INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
-            + "WHERE p.voided = 0 "
-            + "  AND e.voided = 0 "
-            + "  AND o.voided = 0 "
-            + "  AND o2.voided = 0 "
-            + "  AND e.location_id = :location "
-            + "  AND e.encounter_type = ${13} "
-            + "  AND ( (o.concept_id = ${23821} "
-            + "    AND o.value_datetime >= :startDate "
-            + "    AND o.value_datetime <= :endDate ) "
-            + "    AND (o2.concept_id = ${165502} ";
+        "SELECT "
+            + "  hiv_sample.patient_id "
+            + "FROM "
+            + "  ( "
+            + "    SELECT "
+            + "      p.patient_id, "
+            + "      Min(o.value_datetime) AS collection_date "
+            + "    FROM patient p "
+            + "      INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "      INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "      INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "    WHERE p.voided = 0 "
+            + "      AND e.voided = 0 "
+            + "      AND o.voided = 0 "
+            + "      AND o2.voided = 0 "
+            + "      AND e.location_id = :location "
+            + "      AND e.encounter_type = ${13} "
+            + "      AND ( "
+            + "        ( "
+            + "          o.concept_id = ${23821} "
+            + "          AND o.value_datetime >= :startDate "
+            + "          AND o.value_datetime <= :endDate "
+            + "        ) "
+            + "        AND ( "
+            + "          o2.concept_id = ${165502} "
+            + "          AND o2.value_coded IN (${165503}, ${165506}, ${165507}, ${165510}) "
+            + "        ) "
+            + "      ) "
+            + "    GROUP BY p.patient_id "
+            + "  ) hiv_sample "
+            + "  INNER JOIN encounter ee ON hiv_sample.patient_id = ee.patient_id "
+            + "  INNER JOIN obs oo ON oo.encounter_id = ee.encounter_id "
+            + "  INNER JOIN obs oo2 ON oo2.encounter_id = ee.encounter_id "
+            + "WHERE ee.voided = 0 "
+            + "  AND oo.voided = 0 "
+            + "  AND oo2.voided = 0 "
+            + "  AND ee.location_id = :location "
+            + "  AND ee.encounter_type = ${13} "
+            + "  AND oo.concept_id = ${23821} "
+            + "  AND oo.value_datetime = hiv_sample.collection_date "
+            + "  AND oo2.concept_id = ${165502} ";
     if (firstSample) {
-      query = query + "        AND o2.value_coded IN (${165503}, ${165507}) ) ) ";
+      query = query + " AND oo2.value_coded IN (${165503}, ${165507}) ";
     } else {
-      query = query + "        AND o2.value_coded IN (${165506}, ${165510}) ) ) ";
+      query = query + " AND oo2.value_coded IN (${165506}, ${165510}) ";
     }
-    query = query + "GROUP BY p.patient_id ) hiv_sample";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
