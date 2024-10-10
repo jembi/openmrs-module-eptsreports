@@ -141,7 +141,6 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
         getPatientsWhoLeftFollowupOnDAHByDuringMonth(),
         resumoMensalDAHDisaggregations.get0to7ColumnDisaggregations());
 
-    // INDICATOR 5 IS A DISAGREGATIONCALCULATION
     dd.addColumn(
         "TOTALI5",
         "Indicador 5 Utentes em DAH até o fim do mês",
