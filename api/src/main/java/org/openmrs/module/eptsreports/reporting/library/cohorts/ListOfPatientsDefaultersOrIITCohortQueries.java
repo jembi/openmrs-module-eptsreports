@@ -32,6 +32,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
 
   @Autowired private CommonMetadata commonMetadata;
   @Autowired private CommonQueries commonQueries;
+  @Autowired private GenericCohortQueries genericCohortQueries;
 
   private final String MAPPING = "location=${location}";
 
@@ -108,7 +109,6 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + " WHERE  pg.program_id = ${2}  "
             + " AND ps.state = ${10} "
             + " AND ps.start_date <= CURRENT_DATE() "
-            + " AND ps.end_date IS NULL "
             + " AND pg.location_id = :location";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -194,7 +194,8 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "            (o.concept_id = ${reasonPatientNotFoundByActivist2ndVisit} AND o.value_coded = ${patientIsDead}) OR "
             + "            (o.concept_id = ${reasonPatientNotFoundByActivist3rdVisit} AND o.value_coded = ${patientIsDead} ) "
             + "        )  "
-            + "    AND o.voided=0 "
+            + "      AND ee.encounter_type  in( ${buscaActiva},${visitaApoioReintegracaoParteA},${visitaApoioReintegracaoParteB})  "
+            + "    AND o.voided=0 AND ee.encounter_datetime = max_date.last"
             + "    AND ee.voided = 0 "
             + "    GROUP BY  max_date.patient_id";
 
@@ -399,7 +400,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                INNER JOIN patient_program pg ON p.patient_id=pg.patient_id "
             + "                INNER JOIN patient_state ps ON pg.patient_program_id=ps.patient_program_id "
             + "                WHERE pg.voided=0 AND ps.voided=0 AND p.voided=0 "
-            + "                AND pg.program_id=${2} AND ps.state=${10} AND ps.end_date is null "
+            + "                AND pg.program_id=${2} AND ps.state=${10} "
             + "                AND ps.start_date <= curdate() AND location_id=:location "
             + " "
             + "                UNION "
@@ -1393,9 +1394,9 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     map.put("23775", hivMetadata.getPatientConsentConcept().getConceptId());
 
     String query =
-        "SELECT p.patient_id, CASE WHEN patient_yes.patient_id IS NOT NULL THEN 'S' WHEN patient_no.patient_id IS NOT NULL THEN 'N' ELSE ''  END  "
-            + " FROM   patient p  "
-            + "             LEFT JOIN (SELECT  p.patient_id, MAX(o2.value_datetime) last_consent FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id  "
+        " SELECT patient_yes.patient_id, 'S' "
+            + " FROM  "
+            + "    (SELECT  p.patient_id, MAX(o2.value_datetime) last_consent FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id  "
             + "               INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
             + "               INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id INNER JOIN   "
             + "             (SELECT p.patient_id, MAX(e.encounter_datetime) most_recent   "
@@ -1425,8 +1426,10 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                  AND e.voided = 0  "
             + "                  AND o.voided = 0  "
             + "                  AND o2.voided = 0  "
-            + "                GROUP BY p.patient_id ) AS patient_yes  ON p.patient_id = patient_yes.patient_id"
-            + "            LEFT JOIN (SELECT  p.patient_id, MAX(o2.value_datetime) last_consent FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id  "
+            + "                GROUP BY p.patient_id ) AS patient_yes "
+            + "                UNION  "
+            + "            SELECT patient_no.patient_id, 'N' FROM ("
+            + "           SELECT  p.patient_id, MAX(o2.value_datetime) last_consent FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id  "
             + "               INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
             + "               INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id INNER JOIN   "
             + "             (SELECT p.patient_id, MAX(e.encounter_datetime) most_recent   "
@@ -1456,7 +1459,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                  AND e.voided = 0  "
             + "                  AND o.voided = 0  "
             + "                  AND o2.voided = 0  "
-            + "                  GROUP BY p.patient_id ) AS patient_no  ON p.patient_id = patient_no.patient_id ";
+            + "                  GROUP BY p.patient_id ) AS patient_no ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -2143,14 +2146,16 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     CohortDefinition E3 = getPatientsConsultationAfterMostRecentE3();
     CohortDefinition X = getLastARVRegimen();
     CohortDefinition A = getArtStartDate();
+    CohortDefinition baseCohort = genericCohortQueries.getBaseCohort();
 
     cd.addSearch("E1", EptsReportUtils.map(E1, MAPPING));
     cd.addSearch("E2", EptsReportUtils.map(E2, MAPPING));
     cd.addSearch("E3", EptsReportUtils.map(E3, MAPPING));
     cd.addSearch("X", EptsReportUtils.map(X, MAPPING3));
     cd.addSearch("A", EptsReportUtils.map(A, MAPPING2));
+    cd.addSearch("BASECOHORT", EptsReportUtils.map(baseCohort, MAPPING2));
 
-    cd.setCompositionString("((A AND X) AND NOT (E1 OR E2 OR E3))");
+    cd.setCompositionString("((A AND X) AND BASECOHORT) AND NOT (E1 OR E2 OR E3)");
 
     return cd;
   }
