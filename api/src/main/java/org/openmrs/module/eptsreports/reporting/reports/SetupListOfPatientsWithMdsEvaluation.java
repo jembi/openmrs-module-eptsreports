@@ -3,9 +3,7 @@ package org.openmrs.module.eptsreports.reporting.reports;
 import java.io.IOException;
 import java.util.*;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
-import org.openmrs.module.eptsreports.reporting.library.datasets.ListOfPatientsWithMdsEvaluationCohortDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
+import org.openmrs.module.eptsreports.reporting.library.datasets.*;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
@@ -61,6 +59,7 @@ public class SetupListOfPatientsWithMdsEvaluation extends EptsDataExportManager 
     rd.addParameters(getParameters());
     rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
     rd.addDataSetDefinition("SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
+    rd.addDataSetDefinition("HF", Mapped.mapStraightThrough(new LocationDataSetDefinition()));
     rd.addDataSetDefinition(
         "MDS",
         Mapped.mapStraightThrough(listOfPatientsWithMdsEvaluationCohortDataset.contructDataset()));
@@ -75,7 +74,7 @@ public class SetupListOfPatientsWithMdsEvaluation extends EptsDataExportManager 
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Template_MDS_v2.0.1.xls",
+              "MISAU_SESP_MASC_MDS_v3.1.xls",
               "Relatório de Avaliação de MDS",
               getExcelDesignUuid(),
               null);

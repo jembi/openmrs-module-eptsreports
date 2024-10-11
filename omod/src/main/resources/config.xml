@@ -4309,4 +4309,93 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>eptsreports.methodOfFamilyPlanningUuid</property>
+		<defaultValue>e1d1a6d8-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			METHOD OF FAMILY PLANNING Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.condomsConceptUuid</property>
+		<defaultValue>e1cff2ac-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			CONDOMS Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.oralContraceptionConceptUuid</property>
+		<defaultValue>e1d5c786-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			ORAL CONTRACEPTION Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.injectibleContraceptiveConceptUuid</property>
+		<defaultValue>e1e492ca-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			INJECTABLE CONTRACEPTIVES Concept
+		</description>
+	</globalProperty>
+
+
+	<globalProperty>
+		<property>eptsreports.implantConceptUuid</property>
+		<defaultValue>b69a31ae-ef74-4daa-b7fe-5a153948a2cd</defaultValue>
+		<description>
+			Implant Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.intrauterineDeviceConceptUuid</property>
+		<defaultValue>e1e485fa-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			INTRAUTERINE DEVICE Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.femaleSterilizationConceptUuid</property>
+		<defaultValue>e1e486f4-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			FEMALE STERILIZATION Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.vasectomyConceptUuid</property>
+		<defaultValue>0b9a8904-3c82-4b9a-9f15-50a2509cacf9</defaultValue>
+		<description>
+			VASECTOMY Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.otherFamilyPlanningConceptUuid</property>
+		<defaultValue>20ba316b-ef66-4f39-a1af-1e978aa02d18</defaultValue>
+		<description>
+			OTHER FAMILY PLANNING Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.systolicBoodPressureConceptUuid</property>
+		<defaultValue>5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</defaultValue>
+		<description>
+			Systolic blood pressure Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.diastolicBoodPressureConceptUuid</property>
+		<defaultValue>5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</defaultValue>
+		<description>
+			Diastolic blood pressure Concept
+		</description>
+	</globalProperty>
+
 </module>
