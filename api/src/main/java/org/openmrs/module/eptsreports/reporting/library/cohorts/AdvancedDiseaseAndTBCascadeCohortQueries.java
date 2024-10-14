@@ -1781,7 +1781,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                          WHERE  e.encounter_type IN ( ${6}, ${13}, ${51} ) "
             + "                                 AND e.location_id = :location "
             + "                                 AND Date(e.encounter_datetime) BETWEEN :startDate AND :endDate "
-            + "                                 AND o.concept_id = ${1695} "
+            + "                                 AND o.concept_id IN (${1695},${165515}) "
             + "                                 AND e.voided = 0 "
             + "                                 AND o.voided = 0 "
             + "                          UNION "
@@ -1792,7 +1792,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                                 AND e.location_id = :location "
             + "                                 AND e.voided = 0 "
             + "                                 AND o.voided = 0 "
-            + "                                 AND o.concept_id = ${1695} "
+            + "                                 AND o.concept_id IN (${1695},${165515},${165519}) "
             + "                                 AND o.obs_datetime BETWEEN :startDate AND :endDate "
             + "                           ) recent_cd4 "
             + "                   GROUP  BY recent_cd4.patient_id) cd4 "
@@ -1801,8 +1801,19 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
             + "       AND e.location_id = :location "
-            + "       AND o.concept_id = ${1695} "
+            + "       AND ( (o.concept_id = ${1695} "
             + "       AND  ".concat(cd4CountComparison.getProposition())
+            + " ) "
+            + "      OR   ( o.concept_id IN (${165515},${165519}) AND o.value_coded = ";
+
+    if (cd4CountComparison.name().contains("Greater")) {
+      query += "${1254}";
+    } else {
+      query += "${165513}";
+    }
+
+    query +=
+        " ) ) "
             + "       AND ( ( Date(e.encounter_datetime) = cd4.recent_date AND e.encounter_type IN ( ${6}, ${13}, ${51} ) ) "
             + "              OR ( Date(o.obs_datetime) = cd4.recent_date  AND e.encounter_type IN ( ${90}, ${53} ) )"
             + "    ) "
@@ -1810,6 +1821,10 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     StringSubstitutor sb = new StringSubstitutor(getMetadata());
     cd.setQuery(sb.replace(query));
+    //    if (cd4CountComparison.name().contains("Greater")) {
+    //      System.out.println("PASSOU..: " + cd4CountComparison.name());
+    //    }
+
     return cd;
   }
 
@@ -2545,7 +2560,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     LessThanOrEqualTo200mm3AA {
       @Override
       public String getProposition() {
-        return "o.value_numeric <= 200";
+        return "o.value_numeric < 200";
       }
 
       @Override
@@ -2686,6 +2701,9 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     map.put("5599", hivMetadata.getPriorDeliveryDateConcept().getConceptId());
     map.put("6332", hivMetadata.getBreastfeeding().getConceptId());
     map.put("27", hivMetadata.getPatientGaveBirthWorkflowState().getProgramWorkflowStateId());
+    map.put("165513", hivMetadata.getCD4CountLessThanOrEqualTo200Concept().getConceptId());
+    map.put("165519", hivMetadata.getCD4SemiQuantitativeAtArtStartingConcept().getConceptId());
+    map.put("1254", hivMetadata.getCD4CountGreaterThan200Concept().getConceptId());
     return map;
   }
 
