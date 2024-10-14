@@ -86,6 +86,7 @@ public class QualityImprovement2020CohortQueries {
       "revisionStartDate=${revisionEndDate-5m+1d},revisionEndDate=${revisionEndDate},location=${location}";
   private final String MAPPING13 =
       "revisionStartDate=${revisionEndDate-4m+1d},revisionEndDate=${revisionEndDate},location=${location}";
+  private final String MAPPING14 = "revisionEndDate=${revisionEndDate},location=${location}";
 
   @Autowired
   public QualityImprovement2020CohortQueries(
@@ -2669,7 +2670,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transfOut = getTranferredOutPatientsCat7();
+    CohortDefinition transfOut = intensiveMonitoringCohortQueries.getTranferredOutPatientsForMI7();
 
     if (reportSource.equals(MIMQ.MQ)) {
       compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
@@ -2688,7 +2689,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING11));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING14));
       compositionCohortDefinition.addSearch(
           "ADULT",
           EptsReportUtils.map(
@@ -2697,7 +2698,7 @@ public class QualityImprovement2020CohortQueries {
     } else if (reportSource.equals(MIMQ.MI)) {
 
       if (indicatorFlag == 1) {
-        compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING12));
+        compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING14));
       }
       if (indicatorFlag == 1 || indicatorFlag == 3 || indicatorFlag == 5 || indicatorFlag == 6) {
         compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING4));
@@ -2729,10 +2730,10 @@ public class QualityImprovement2020CohortQueries {
         compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
         compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
         compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING7));
-        compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING13));
+        compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING14));
       }
       if (indicatorFlag == 3 || indicatorFlag == 5 || indicatorFlag == 6) {
-        compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING12));
+        compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING14));
       }
     }
 
@@ -4276,7 +4277,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition f = getTranferredOutPatientsCat7();
+    CohortDefinition f = intensiveMonitoringCohortQueries.getTranferredOutPatientsForMI7();
     CohortDefinition g = getPatientsWith3MonthlyApssConsultationsWithin99Days();
 
     if (reportResource.equals(EptsReportConstants.MIMQ.MQ)) {
@@ -4284,14 +4285,14 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING11));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING14));
       compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING1));
     } else if (reportResource.equals(EptsReportConstants.MIMQ.MI)) {
       compositionCohortDefinition.addSearch("A", EptsReportUtils.map(a, MAPPING4));
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING6));
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING6));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING6));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING12));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING14));
       compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING10));
     }
 
@@ -4426,7 +4427,7 @@ public class QualityImprovement2020CohortQueries {
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
 
-    CohortDefinition f = getTranferredOutPatientsCat7();
+    CohortDefinition f = intensiveMonitoringCohortQueries.getTranferredOutPatientsForMI7();
     CohortDefinition h = getMQC11NH(true);
 
     if (reportSource.equals(EptsReportConstants.MIMQ.MQ)) {
@@ -4434,14 +4435,14 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("B4", EptsReportUtils.map(b4, MAPPING1));
       compositionCohortDefinition.addSearch("B5", EptsReportUtils.map(b5, MAPPING));
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING11));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING14));
       compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING));
     } else if (reportSource.equals(EptsReportConstants.MIMQ.MI)) {
       compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(b1, MAPPING8));
       compositionCohortDefinition.addSearch("B4", EptsReportUtils.map(b4, MAPPING8));
       compositionCohortDefinition.addSearch("B5", EptsReportUtils.map(b5, MAPPING8));
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING13));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING14));
       compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING8));
     }
 
@@ -4486,7 +4487,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getPatientFoundYesConcept().getConceptId(),
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
-    CohortDefinition f = getTranferredOutPatientsCat7();
+    CohortDefinition f = intensiveMonitoringCohortQueries.getTranferredOutPatientsForMI7();
     CohortDefinition g = getPatientsWith3MonthlyApssConsultationsWithin99Days();
 
     if (reportSource.equals(EptsReportConstants.MIMQ.MQ)) {
@@ -4494,14 +4495,14 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING11));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING14));
       compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING1));
     } else if (reportSource.equals(EptsReportConstants.MIMQ.MI)) {
       compositionCohortDefinition.addSearch("A", EptsReportUtils.map(a, MAPPING4));
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING6));
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING6));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING6));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING12));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING14));
       compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING10));
     }
 
@@ -4546,7 +4547,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getPatientFoundYesConcept().getConceptId(),
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
-    CohortDefinition f = getTranferredOutPatientsCat7();
+    CohortDefinition f = intensiveMonitoringCohortQueries.getTranferredOutPatientsForMI7();
     CohortDefinition i = getPatientWhoHadThreeApssAfterArtStart();
     CohortDefinition babies = genericCohortQueries.getAgeInMonths(0, 9);
 
@@ -4555,7 +4556,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING11));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING14));
       compositionCohortDefinition.addSearch(
           "I",
           EptsReportUtils.map(i, "startDate=${startDate},endDate=${endDate},location=${location}"));
@@ -4565,7 +4566,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING6));
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING6));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING6));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING12));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING14));
       compositionCohortDefinition.addSearch(
           "I",
           EptsReportUtils.map(
@@ -4618,7 +4619,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getBreastfeeding().getConceptId());
 
-    CohortDefinition f = getTranferredOutPatientsCat7();
+    CohortDefinition f = intensiveMonitoringCohortQueries.getTranferredOutPatientsForMI7();
     CohortDefinition h = getMQC11NH();
 
     if (reportSource.equals(EptsReportConstants.MIMQ.MQ)) {
@@ -4626,14 +4627,14 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(b2, MAPPING1));
       compositionCohortDefinition.addSearch("B4", EptsReportUtils.map(b4, MAPPING));
       compositionCohortDefinition.addSearch("B5", EptsReportUtils.map(b5, MAPPING));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING11));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING14));
       compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING));
     } else if (reportSource.equals(EptsReportConstants.MIMQ.MI)) {
       compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(b1, MAPPING5));
       compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(b2, MAPPING8));
       compositionCohortDefinition.addSearch("B4", EptsReportUtils.map(b4, MAPPING8));
       compositionCohortDefinition.addSearch("B5", EptsReportUtils.map(b5, MAPPING8));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING13));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING14));
       compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING8));
     }
 
@@ -4730,7 +4731,8 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transferredOut = getTranferredOutPatientsCat7();
+    CohortDefinition transferredOut =
+        intensiveMonitoringCohortQueries.getTranferredOutPatientsForMI7();
 
     comp.addSearch("startedART", EptsReportUtils.map(startedART, MAPPING));
 
@@ -4744,11 +4746,7 @@ public class QualityImprovement2020CohortQueries {
             transferredIn,
             "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
-    comp.addSearch(
-        "transferredOut",
-        EptsReportUtils.map(
-            transferredOut,
-            "revisionStartDate=${revisionEndDate-14m},revisionEndDate=${revisionEndDate},location=${location}"));
+    comp.addSearch("transferredOut", EptsReportUtils.map(transferredOut, MAPPING14));
 
     comp.addSearch(
         "ADULT",
@@ -5451,6 +5449,14 @@ public class QualityImprovement2020CohortQueries {
         commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
             false, true, 12);
 
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
+
     compositionCohortDefinition.addSearch(
         "B2NEW",
         EptsReportUtils.map(
@@ -5496,6 +5502,9 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             B5EMI, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
+    compositionCohortDefinition.addSearch(
+        "TRANSFERREDIN", EptsReportUtils.map(transferredIn, "location=${location}"));
+
     compositionCohortDefinition.setCompositionString(preposition.getCompositionString());
 
     return compositionCohortDefinition;
@@ -5516,12 +5525,41 @@ public class QualityImprovement2020CohortQueries {
     MI {
       @Override
       public String getCompositionString() {
-        return "(B2NEW OR RESTARTED OR (B3MI AND NOT B3EMI) ) AND NOT (ABANDONEDTARV OR B5EMI)";
+        return "(B2NEW OR RESTARTED OR (B3MI AND NOT B3EMI) ) AND NOT (ABANDONEDTARV OR B5EMI OR TRANSFERREDIN)";
       }
 
       @Override
       public String getDescription() {
         return "Utentes em Primeira Linha For MI";
+      }
+    };
+
+    public abstract String getCompositionString();
+
+    public abstract String getDescription();
+  }
+
+  public enum UtentesSegundaLinhaPreposition {
+    MQ {
+      @Override
+      public String getCompositionString() {
+        return "(secondLineB2 AND NOT B2E) AND NOT (ABANDONEDTARV OR B5E)";
+      }
+
+      @Override
+      public String getDescription() {
+        return "Utentes em Segunda Linha For MQ";
+      }
+    },
+    MI {
+      @Override
+      public String getCompositionString() {
+        return "(secondLineB2 AND NOT B2E) AND NOT (ABANDONEDTARV OR B5E OR TRANSFERREDIN)";
+      }
+
+      @Override
+      public String getDescription() {
+        return "Utentes em Segunda Linha For MI";
       }
     };
 
@@ -5555,7 +5593,7 @@ public class QualityImprovement2020CohortQueries {
    * Consulta” é a data da última consulta clínica ocorrida durante o período de revisão.</i> <br>
    * <br>
    */
-  public CohortDefinition getUtentesSegundaLinha() {
+  public CohortDefinition getUtentesSegundaLinha(UtentesSegundaLinhaPreposition preposition) {
 
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
@@ -5577,6 +5615,14 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition B5E =
         commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
             false, true, 12);
+
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
 
     compositionCohortDefinition.addSearch(
         "secondLineB2",
@@ -5601,8 +5647,10 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             B5E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString(
-        "(secondLineB2 AND NOT B2E) AND NOT (ABANDONEDTARV OR B5E)");
+    compositionCohortDefinition.addSearch(
+        "TRANSFERREDIN", EptsReportUtils.map(transferredIn, "location=${location}"));
+
+    compositionCohortDefinition.setCompositionString(preposition.getCompositionString());
 
     return compositionCohortDefinition;
   }
@@ -5692,7 +5740,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition PrimeiraLinha = getUtentesPrimeiraLinha(UtentesPrimeiraLinhaPreposition.MQ);
 
-    CohortDefinition SegundaLinha = getUtentesSegundaLinha();
+    CohortDefinition SegundaLinha = getUtentesSegundaLinha(UtentesSegundaLinhaPreposition.MQ);
 
     CohortDefinition tbDiagnosisActive = getPatientsWithTbActiveOrTbTreatment();
 
@@ -6436,7 +6484,8 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transferOut = getTranferredOutPatients();
+    CohortDefinition transferOut =
+        intensiveMonitoringCohortQueries.getTranferredOutPatientsForMI7();
 
     CohortDefinition H = getMQ13P4H(1000);
 
@@ -6509,7 +6558,10 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
 
-    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
+    compositionCohortDefinition.addSearch(
+        "F",
+        EptsReportUtils.map(
+            transferOut, "revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "DD", EptsReportUtils.map(getDeadPatientsCompositionMQ13(), MAPPING3));
@@ -9584,7 +9636,7 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
-  private CohortDefinition getAgeOnObsDatetime(Integer minAge, Integer maxAge) {
+  public CohortDefinition getAgeOnObsDatetime(Integer minAge, Integer maxAge) {
     CalculationCohortDefinition cd =
         new CalculationCohortDefinition(
             Context.getRegisteredComponents(AgeOnObsDatetimeCalculation.class).get(0));
@@ -10478,7 +10530,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return CohortDefinition
    */
-  private CohortDefinition getMQC13P3NUM_J() {
+  public CohortDefinition getMQC13P3NUM_J() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("All patients with HIV Carga Viral - J");
@@ -10548,7 +10600,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return CohortDefinition
    */
-  private CohortDefinition getMQC13P3NUM_K() {
+  public CohortDefinition getMQC13P3NUM_K() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("All patients with HIV Carga Viral - K");
@@ -10651,7 +10703,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return CohortDefinition
    */
-  private CohortDefinition getMQC13P3NUM_L() {
+  public CohortDefinition getMQC13P3NUM_L() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("All patients with HIV Carga Viral - L");
@@ -11645,22 +11697,39 @@ public class QualityImprovement2020CohortQueries {
             + "INNER JOIN obs otype ON otype.encounter_id = e.encounter_id "
             + "INNER JOIN obs ostate ON ostate.encounter_id = e.encounter_id "
             + "INNER JOIN ( "
-            + "                      SELECT     p.patient_id, MAX(e.encounter_datetime) consultation_date "
-            + "                      FROM       patient p "
-            + "                      INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                      WHERE      e.encounter_type = ${6} "
-            + "                      AND        e.location_id = :location "
-            + "                      AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
-            + "                      AND        p.voided = 0 "
-            + "                      AND        e.voided = 0 "
-            + "                      GROUP BY   p.patient_id ) consultation ON consultation.patient_id = p.patient_id "
+            + "                   SELECT     p.patient_id, "
+            + "                              Max(e.encounter_datetime) second_consultation_date "
+            + "                   FROM       patient p "
+            + "                   INNER JOIN encounter e "
+            + "                   ON         e.patient_id = p.patient_id "
+            + "                   INNER JOIN "
+            + "                              ( "
+            + "                                         SELECT     p.patient_id, "
+            + "                                                    Max(e.encounter_datetime) consultation_date "
+            + "                                         FROM       patient p "
+            + "                                         INNER JOIN encounter e "
+            + "                                         ON         e.patient_id = p.patient_id "
+            + "                                         WHERE      e.encounter_type = ${6} "
+            + "                                         AND        e.location_id = :location "
+            + "                                         AND        e.encounter_datetime BETWEEN :startDate AND        :endDate "
+            + "                                         AND        p.voided = 0 "
+            + "                                         AND        e.voided = 0 "
+            + "                                         GROUP BY   p.patient_id ) last_clinical "
+            + "                   ON         last_clinical.patient_id = p.patient_id "
+            + "                   WHERE      e.encounter_type = ${6} "
+            + "                   AND        e.location_id = :location "
+            + "                   AND        e.encounter_datetime < last_clinical.consultation_date "
+            + "                   AND        p.voided = 0 "
+            + "                   AND        e.voided = 0 "
+            + "                   GROUP BY   p.patient_id"
+            + "                      ) second_consultation ON second_consultation.patient_id = p.patient_id "
             + "WHERE      e.encounter_type = ${6} "
             + "AND        e.location_id = :location "
             + "AND        otype.concept_id = ${165174} "
             + "AND        otype.value_coded IN (${dispensationTypes}) "
             + "AND        ostate.concept_id = ${165322} "
             + "AND        ostate.value_coded IN (${states}) "
-            + "AND        e.encounter_datetime < consultation.consultation_date "
+            + "AND        e.encounter_datetime = second_consultation.second_consultation_date "
             + "AND        otype.obs_group_id = ostate.obs_group_id "
             + "AND        e.voided = 0 "
             + "AND        p.voided = 0 "
@@ -12246,7 +12315,6 @@ public class QualityImprovement2020CohortQueries {
             + "                                                 GROUP  BY patient_id "
             + "                   ) vl_date_tbl ON pp.patient_id = vl_date_tbl.patient_id "
             + "                 WHERE ee.encounter_datetime < vl_date_tbl.vl_max_date "
-            + "                 AND oo.concept_id = ${165174} "
             + "                 AND oo.voided = 0 "
             + "                 AND ee.voided = 0 "
             + "                 AND ee.location_id = :location "
@@ -14575,7 +14643,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition firstLine = getUtentesPrimeiraLinha(UtentesPrimeiraLinhaPreposition.MQ);
 
-    CohortDefinition secondLine = getUtentesSegundaLinha();
+    CohortDefinition secondLine = getUtentesSegundaLinha(UtentesSegundaLinhaPreposition.MQ);
 
     CohortDefinition tbDiagnosisActive = getPatientsWithTbActiveOrTbTreatment();
 
@@ -14697,7 +14765,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition firstLine = getUtentesPrimeiraLinha(UtentesPrimeiraLinhaPreposition.MQ);
 
-    CohortDefinition secondLine = getUtentesSegundaLinha();
+    CohortDefinition secondLine = getUtentesSegundaLinha(UtentesSegundaLinhaPreposition.MQ);
 
     CohortDefinition tbDiagnosisActive = getPatientsWithTbActiveOrTbTreatment();
 
@@ -14898,7 +14966,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition firstLine = getUtentesPrimeiraLinha(UtentesPrimeiraLinhaPreposition.MQ);
 
-    CohortDefinition secondLine = getUtentesSegundaLinha();
+    CohortDefinition secondLine = getUtentesSegundaLinha(UtentesSegundaLinhaPreposition.MQ);
 
     CohortDefinition arvRegimen = getPatientsOnRegimeArvSecondLine();
 
@@ -15056,6 +15124,8 @@ public class QualityImprovement2020CohortQueries {
 
     sqlCohortDefinition.setQuery((query));
 
+    System.out.println(query);
+
     return sqlCohortDefinition;
   }
 
@@ -15164,6 +15234,67 @@ public class QualityImprovement2020CohortQueries {
 
     sqlCohortDefinition.setQuery((query));
 
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * O sistema irá identificar os utentes que tiveram registo do resultado Xpert dentro de 7 dias do
+   * pedido de Xpert, selecionado:
+   *
+   * <ul>
+   *   <li>os utentes que tiveram registo do “Resultado de Xpert” na consulta clínica (Ficha
+   *       Clínica) – secção investigações resultados laboratoriais, ocorrida durante o período de
+   *       revisão, sete (7) dias após o registo do “Pedido de Xpert” na consulta clínica (Ficha
+   *       Clínica) – secção investigações pedidos laboratoriais, ocorrida durante o período de
+   *       revisão. Ou seja, “Data Resultado Xpert” menos (-) a “Data Pedido Xpert” >=0 e <=7 dias.
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getUtentesComResultadoDeXpertEm7DiasAfterDataPresuntivo(
+      boolean sevenDays) {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes com Resultado de Xpert dentro de 7 dias após Pedido");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    HivMetadata hivMetadata = new HivMetadata();
+    TbMetadata tbMetadata = new TbMetadata();
+
+    int encounterType = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    int concept = hivMetadata.getApplicationForLaboratoryResearch().getConceptId();
+    List<Integer> values = Arrays.asList(tbMetadata.getTBGenexpertTestConcept().getConceptId());
+
+    int encounterType2 = hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId();
+    int concept2 = tbMetadata.getTBGenexpertTestConcept().getConceptId();
+    List<Integer> values2 =
+        Arrays.asList(
+            tbMetadata.getPositiveConcept().getConceptId(),
+            tbMetadata.getNegativeConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN ( "
+            + getUnionQueryUtentesPresuntivos()
+            + "                   ) pedidoXpert "
+            + "               ON pedidoXpert.patient_id = p.patient_id "
+            + "       INNER JOIN ( "
+            + QualityImprovement2020Queries.getPatientsWithConsulationObservationsAndEarliestDate(
+                encounterType2, concept2, values2, true)
+            + "                   ) resultadoXpert "
+            + "               ON resultadoXpert.patient_id = p.patient_id ";
+    query +=
+        sevenDays
+            ? "WHERE  resultadoXpert.the_date >= "
+                + "       pedidoXpert.the_date "
+                + "       AND Timestampdiff(day, pedidoXpert.the_date, "
+                + "               resultadoXpert.the_date) <= 7"
+            : "WHERE  resultadoXpert.the_date >= " + "       pedidoXpert.the_date ";
+
+    sqlCohortDefinition.setQuery((query));
     return sqlCohortDefinition;
   }
 
@@ -15333,7 +15464,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * @param den indicator number
    */
-  public CohortDefinition getMQ19A(Integer den) {
+  public CohortDefinition getMQ19A(Integer den, MIMQ reportSource) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
     if (den == 1) {
@@ -15356,51 +15487,103 @@ public class QualityImprovement2020CohortQueries {
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    if (den == 1) {
+    if (reportSource.equals(MIMQ.MQ)) {
+
+      if (den == 1) {
+        compositionCohortDefinition.addSearch(
+            "age",
+            EptsReportUtils.map(genericCohortQueries.getAgeOnPresuntivoTbDate(15, 200), MAPPING3));
+      } else if (den == 2) {
+        compositionCohortDefinition.addSearch(
+            "age",
+            EptsReportUtils.map(genericCohortQueries.getAgeOnXpertRequestDate(15, 200), MAPPING3));
+      } else if (den == 3) {
+        compositionCohortDefinition.addSearch(
+            "age",
+            EptsReportUtils.map(genericCohortQueries.getAgeOnTbDiagnosisDate(15, 200), MAPPING3));
+      } else if (den == 4) {
+        compositionCohortDefinition.addSearch(
+            "age",
+            EptsReportUtils.map(genericCohortQueries.getAgeOnPresuntivoTbDate(0, 14), MAPPING3));
+      } else if (den == 5) {
+        compositionCohortDefinition.addSearch(
+            "age",
+            EptsReportUtils.map(genericCohortQueries.getAgeOnXpertRequestDate(0, 14), MAPPING3));
+      } else if (den == 6) {
+        compositionCohortDefinition.addSearch(
+            "age",
+            EptsReportUtils.map(genericCohortQueries.getAgeOnTbDiagnosisDate(0, 14), MAPPING3));
+      }
+
+      CohortDefinition transferOut =
+          intensiveMonitoringCohortQueries.getTranferredOutPatientsForMI7();
+
+      CohortDefinition presuntivosTb = getUtentesPresuntivosDeTb();
+
+      CohortDefinition resultadoXpert = getUtentesComResultadoDeXpertEm7Dias(false);
+
+      CohortDefinition diagnosticoTbActivo = getUtentesComDiagnosticoTbActivo();
+
       compositionCohortDefinition.addSearch(
-          "age",
-          EptsReportUtils.map(genericCohortQueries.getAgeOnPresuntivoTbDate(15, 200), MAPPING3));
-    } else if (den == 2) {
+          "transferredOut", EptsReportUtils.map(transferOut, MAPPING14));
+
       compositionCohortDefinition.addSearch(
-          "age",
-          EptsReportUtils.map(genericCohortQueries.getAgeOnXpertRequestDate(15, 200), MAPPING3));
-    } else if (den == 3) {
+          "presuntivosTb", EptsReportUtils.map(presuntivosTb, MAPPING3));
+
       compositionCohortDefinition.addSearch(
-          "age",
-          EptsReportUtils.map(genericCohortQueries.getAgeOnTbDiagnosisDate(15, 200), MAPPING3));
-    } else if (den == 4) {
+          "resultadoXpert", EptsReportUtils.map(resultadoXpert, MAPPING3));
+
       compositionCohortDefinition.addSearch(
-          "age",
-          EptsReportUtils.map(genericCohortQueries.getAgeOnPresuntivoTbDate(0, 14), MAPPING3));
-    } else if (den == 5) {
+          "diagnosticoTbActivo", EptsReportUtils.map(diagnosticoTbActivo, MAPPING3));
+    } else if (reportSource.equals(MIMQ.MI)) {
+
+      if (den == 1) {
+        compositionCohortDefinition.addSearch(
+            "age",
+            EptsReportUtils.map(genericCohortQueries.getAgeOnPresuntivoTbDate(15, 200), MAPPING));
+      } else if (den == 2) {
+        compositionCohortDefinition.addSearch(
+            "age",
+            EptsReportUtils.map(genericCohortQueries.getAgeOnXpertRequestDate(15, 200), MAPPING));
+      } else if (den == 3) {
+        compositionCohortDefinition.addSearch(
+            "age",
+            EptsReportUtils.map(genericCohortQueries.getAgeOnTbDiagnosisDate(15, 200), MAPPING));
+      } else if (den == 4) {
+        compositionCohortDefinition.addSearch(
+            "age",
+            EptsReportUtils.map(genericCohortQueries.getAgeOnPresuntivoTbDate(0, 14), MAPPING));
+      } else if (den == 5) {
+        compositionCohortDefinition.addSearch(
+            "age",
+            EptsReportUtils.map(genericCohortQueries.getAgeOnXpertRequestDate(0, 14), MAPPING));
+      } else if (den == 6) {
+        compositionCohortDefinition.addSearch(
+            "age",
+            EptsReportUtils.map(genericCohortQueries.getAgeOnTbDiagnosisDate(0, 14), MAPPING));
+      }
+
+      CohortDefinition transferOut =
+          intensiveMonitoringCohortQueries.getTranferredOutPatientsForMI7();
+
+      CohortDefinition presuntivosTb = getUtentesPresuntivosDeTb();
+
+      CohortDefinition resultadoXpert = getUtentesComResultadoDeXpertEm7Dias(false);
+
+      CohortDefinition diagnosticoTbActivo = getUtentesComDiagnosticoTbActivo();
+
       compositionCohortDefinition.addSearch(
-          "age",
-          EptsReportUtils.map(genericCohortQueries.getAgeOnXpertRequestDate(0, 14), MAPPING3));
-    } else if (den == 6) {
+          "transferredOut", EptsReportUtils.map(transferOut, MAPPING14));
+
       compositionCohortDefinition.addSearch(
-          "age",
-          EptsReportUtils.map(genericCohortQueries.getAgeOnTbDiagnosisDate(0, 14), MAPPING3));
+          "presuntivosTb", EptsReportUtils.map(presuntivosTb, MAPPING));
+
+      compositionCohortDefinition.addSearch(
+          "resultadoXpert", EptsReportUtils.map(resultadoXpert, MAPPING));
+
+      compositionCohortDefinition.addSearch(
+          "diagnosticoTbActivo", EptsReportUtils.map(diagnosticoTbActivo, MAPPING));
     }
-
-    CohortDefinition transferOut = getTranferredOutPatientsCat7();
-
-    CohortDefinition presuntivosTb = getUtentesPresuntivosDeTb();
-
-    CohortDefinition resultadoXpert = getUtentesComResultadoDeXpertEm7Dias(false);
-
-    CohortDefinition diagnosticoTbActivo = getUtentesComDiagnosticoTbActivo();
-
-    compositionCohortDefinition.addSearch(
-        "transferredOut", EptsReportUtils.map(transferOut, MAPPING11));
-
-    compositionCohortDefinition.addSearch(
-        "presuntivosTb", EptsReportUtils.map(presuntivosTb, MAPPING3));
-
-    compositionCohortDefinition.addSearch(
-        "resultadoXpert", EptsReportUtils.map(resultadoXpert, MAPPING3));
-
-    compositionCohortDefinition.addSearch(
-        "diagnosticoTbActivo", EptsReportUtils.map(diagnosticoTbActivo, MAPPING3));
 
     if (den == 1 || den == 4) {
       compositionCohortDefinition.setCompositionString(
@@ -15428,76 +15611,141 @@ public class QualityImprovement2020CohortQueries {
    * @param num indicator number
    * @return CohortDefinition
    */
-  public CohortDefinition getMQ19B(Integer num) {
+  public CohortDefinition getMQ19B(Integer num, MIMQ reportSource) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
-    if (num == 1) {
-      compositionCohortDefinition.setName("Categoria 19 Numerador – Pedido XPert Adulto");
-    } else if (num == 2) {
-      compositionCohortDefinition.setName("Categoria 19 Numerador – Resultado XPert Adulto");
-    } else if (num == 3) {
-      compositionCohortDefinition.setName("Categoria 19 Numerador – Tratamento TB Adulto");
-    } else if (num == 4) {
-      compositionCohortDefinition.setName("Categoria 19 Numerador – Pedido XPert Pediátrico");
-    } else if (num == 5) {
-      compositionCohortDefinition.setName("Categoria 19 Numerador – Resultado XPert Pediátrico");
-    } else if (num == 6) {
-      compositionCohortDefinition.setName("Categoria 19 Numerador – Tratamento TB - Pediátrico");
+    if (reportSource.equals(MIMQ.MQ)) {
+      if (num == 1) {
+        compositionCohortDefinition.setName("Categoria 19 Numerador – Pedido XPert Adulto");
+      } else if (num == 2) {
+        compositionCohortDefinition.setName("Categoria 19 Numerador – Resultado XPert Adulto");
+      } else if (num == 3) {
+        compositionCohortDefinition.setName("Categoria 19 Numerador – Tratamento TB Adulto");
+      } else if (num == 4) {
+        compositionCohortDefinition.setName("Categoria 19 Numerador – Pedido XPert Pediátrico");
+      } else if (num == 5) {
+        compositionCohortDefinition.setName("Categoria 19 Numerador – Resultado XPert Pediátrico");
+      } else if (num == 6) {
+        compositionCohortDefinition.setName("Categoria 19 Numerador – Tratamento TB - Pediátrico");
+      }
+
+      compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+      compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+      compositionCohortDefinition.addParameter(
+          new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+      compositionCohortDefinition.addParameter(
+          new Parameter("location", "location", Location.class));
+
+      CohortDefinition mq19DenOne = getMQ19A(1, EptsReportConstants.MIMQ.MQ);
+      CohortDefinition mq19DenTwo = getMQ19A(2, EptsReportConstants.MIMQ.MQ);
+      CohortDefinition mq19DenThree = getMQ19A(3, EptsReportConstants.MIMQ.MQ);
+      CohortDefinition mq19DenFour = getMQ19A(4, EptsReportConstants.MIMQ.MQ);
+      CohortDefinition mq19DenFive = getMQ19A(5, EptsReportConstants.MIMQ.MQ);
+      CohortDefinition mq19DenSix = getMQ19A(6, EptsReportConstants.MIMQ.MQ);
+
+      CohortDefinition pedidoXpertOnPresuntivoTb = getUtentesComPedidoXpertNaDataPresuntivoDeTB();
+
+      CohortDefinition resultadoXpertEm7Dias = getUtentesComResultadoDeXpertEm7Dias(true);
+
+      CohortDefinition tratamentoDeTbNaDataDeDiagnosticoTb =
+          getUtentesComInicioDeTratamentoDeTbNaDataDeDiagnosticoTb();
+
+      compositionCohortDefinition.addSearch("MQ19DEN1", EptsReportUtils.map(mq19DenOne, MAPPING1));
+
+      compositionCohortDefinition.addSearch("MQ19DEN2", EptsReportUtils.map(mq19DenTwo, MAPPING1));
+
+      compositionCohortDefinition.addSearch(
+          "MQ19DEN3", EptsReportUtils.map(mq19DenThree, MAPPING1));
+
+      compositionCohortDefinition.addSearch("MQ19DEN4", EptsReportUtils.map(mq19DenFour, MAPPING1));
+
+      compositionCohortDefinition.addSearch("MQ19DEN5", EptsReportUtils.map(mq19DenFive, MAPPING1));
+
+      compositionCohortDefinition.addSearch("MQ19DEN6", EptsReportUtils.map(mq19DenSix, MAPPING1));
+
+      compositionCohortDefinition.addSearch(
+          "pedidoXpertOnPresuntivoTb", EptsReportUtils.map(pedidoXpertOnPresuntivoTb, MAPPING3));
+
+      compositionCohortDefinition.addSearch(
+          "resultadoXpertEm7Dias", EptsReportUtils.map(resultadoXpertEm7Dias, MAPPING3));
+
+      compositionCohortDefinition.addSearch(
+          "tratamentoDeTbNaDataDeDiagnosticoTb",
+          EptsReportUtils.map(tratamentoDeTbNaDataDeDiagnosticoTb, MAPPING3));
+
+    } else if (reportSource.equals(MIMQ.MI)) {
+
+      if (num == 1) {
+        compositionCohortDefinition.setName("Categoria 19 Numerador – Pedido XPert Adulto");
+      } else if (num == 2) {
+        compositionCohortDefinition.setName("Categoria 19 Numerador – Resultado XPert Adulto");
+      } else if (num == 3) {
+        compositionCohortDefinition.setName("Categoria 19 Numerador – Tratamento TB Adulto");
+      } else if (num == 4) {
+        compositionCohortDefinition.setName("Categoria 19 Numerador – Pedido XPert Pediátrico");
+      } else if (num == 5) {
+        compositionCohortDefinition.setName("Categoria 19 Numerador – Resultado XPert Pediátrico");
+      } else if (num == 6) {
+        compositionCohortDefinition.setName("Categoria 19 Numerador – Tratamento TB - Pediátrico");
+      }
+
+      compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+      compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+      compositionCohortDefinition.addParameter(
+          new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+      compositionCohortDefinition.addParameter(
+          new Parameter("location", "location", Location.class));
+
+      CohortDefinition mq19DenOne = getMQ19A(1, EptsReportConstants.MIMQ.MQ);
+      CohortDefinition mq19DenTwo = getMQ19A(2, EptsReportConstants.MIMQ.MQ);
+      CohortDefinition mq19DenThree = getMQ19A(3, EptsReportConstants.MIMQ.MQ);
+      CohortDefinition mq19DenFour = getMQ19A(4, EptsReportConstants.MIMQ.MQ);
+      CohortDefinition mq19DenFive = getMQ19A(5, EptsReportConstants.MIMQ.MQ);
+      CohortDefinition mq19DenSix = getMQ19A(6, EptsReportConstants.MIMQ.MQ);
+
+      CohortDefinition pedidoXpertOnPresuntivoTb = getUtentesComPedidoXpertNaDataPresuntivoDeTB();
+
+      CohortDefinition resultadoXpertEm7Dias =
+          getUtentesComResultadoDeXpertEm7DiasAfterDataPresuntivo(true);
+
+      CohortDefinition tratamentoDeTbNaDataDeDiagnosticoTb =
+          getUtentesComInicioDeTratamentoDeTbNaDataDeDiagnosticoTb();
+
+      compositionCohortDefinition.addSearch("MQ19DEN1", EptsReportUtils.map(mq19DenOne, MAPPING1));
+
+      compositionCohortDefinition.addSearch("MQ19DEN2", EptsReportUtils.map(mq19DenTwo, MAPPING1));
+
+      compositionCohortDefinition.addSearch(
+          "MQ19DEN3", EptsReportUtils.map(mq19DenThree, MAPPING1));
+
+      compositionCohortDefinition.addSearch("MQ19DEN4", EptsReportUtils.map(mq19DenFour, MAPPING1));
+
+      compositionCohortDefinition.addSearch("MQ19DEN5", EptsReportUtils.map(mq19DenFive, MAPPING1));
+
+      compositionCohortDefinition.addSearch("MQ19DEN6", EptsReportUtils.map(mq19DenSix, MAPPING1));
+
+      compositionCohortDefinition.addSearch(
+          "pedidoXpertOnPresuntivoTb", EptsReportUtils.map(pedidoXpertOnPresuntivoTb, MAPPING));
+
+      compositionCohortDefinition.addSearch(
+          "resultadoXpertEm7Dias", EptsReportUtils.map(resultadoXpertEm7Dias, MAPPING));
+
+      compositionCohortDefinition.addSearch(
+          "tratamentoDeTbNaDataDeDiagnosticoTb",
+          EptsReportUtils.map(tratamentoDeTbNaDataDeDiagnosticoTb, MAPPING));
     }
-
-    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    compositionCohortDefinition.addParameter(
-        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
-    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-
-    CohortDefinition mq19DenOne = getMQ19A(1);
-    CohortDefinition mq19DenTwo = getMQ19A(2);
-    CohortDefinition mq19DenThree = getMQ19A(3);
-    CohortDefinition mq19DenFour = getMQ19A(4);
-    CohortDefinition mq19DenFive = getMQ19A(5);
-    CohortDefinition mq19DenSix = getMQ19A(6);
-
-    CohortDefinition pedidoXpertOnPresuntivoTb = getUtentesComPedidoXpertNaDataPresuntivoDeTB();
-
-    CohortDefinition resultadoXpertEm7Dias = getUtentesComResultadoDeXpertEm7Dias(true);
-
-    CohortDefinition tratamentoDeTbNaDataDeDiagnosticoTb =
-        getUtentesComInicioDeTratamentoDeTbNaDataDeDiagnosticoTb();
-
-    compositionCohortDefinition.addSearch("MQ19DEN1", EptsReportUtils.map(mq19DenOne, MAPPING1));
-
-    compositionCohortDefinition.addSearch("MQ19DEN2", EptsReportUtils.map(mq19DenTwo, MAPPING1));
-
-    compositionCohortDefinition.addSearch("MQ19DEN3", EptsReportUtils.map(mq19DenThree, MAPPING1));
-
-    compositionCohortDefinition.addSearch("MQ19DEN4", EptsReportUtils.map(mq19DenFour, MAPPING1));
-
-    compositionCohortDefinition.addSearch("MQ19DEN5", EptsReportUtils.map(mq19DenFive, MAPPING1));
-
-    compositionCohortDefinition.addSearch("MQ19DEN6", EptsReportUtils.map(mq19DenSix, MAPPING1));
-
-    compositionCohortDefinition.addSearch(
-        "pedidoXpertOnPresuntivoTb", EptsReportUtils.map(pedidoXpertOnPresuntivoTb, MAPPING3));
-
-    compositionCohortDefinition.addSearch(
-        "resultadoXpertEm7Dias", EptsReportUtils.map(resultadoXpertEm7Dias, MAPPING3));
-
-    compositionCohortDefinition.addSearch(
-        "tratamentoDeTbNaDataDeDiagnosticoTb",
-        EptsReportUtils.map(tratamentoDeTbNaDataDeDiagnosticoTb, MAPPING3));
 
     if (num == 1) {
       compositionCohortDefinition.setCompositionString("MQ19DEN1 AND pedidoXpertOnPresuntivoTb");
     } else if (num == 2) {
-      compositionCohortDefinition.setCompositionString("MQ19DEN2 AND resultadoXpertEm7Dias");
+      compositionCohortDefinition.setCompositionString("MQ19DEN1 AND resultadoXpertEm7Dias");
     } else if (num == 3) {
       compositionCohortDefinition.setCompositionString(
           "MQ19DEN3 AND tratamentoDeTbNaDataDeDiagnosticoTb");
     } else if (num == 4) {
       compositionCohortDefinition.setCompositionString("MQ19DEN4 AND pedidoXpertOnPresuntivoTb");
     } else if (num == 5) {
-      compositionCohortDefinition.setCompositionString("MQ19DEN5 AND resultadoXpertEm7Dias");
+      compositionCohortDefinition.setCompositionString("MQ19DEN4 AND resultadoXpertEm7Dias");
     } else if (num == 6) {
       compositionCohortDefinition.setCompositionString(
           "MQ19DEN6 AND tratamentoDeTbNaDataDeDiagnosticoTb");

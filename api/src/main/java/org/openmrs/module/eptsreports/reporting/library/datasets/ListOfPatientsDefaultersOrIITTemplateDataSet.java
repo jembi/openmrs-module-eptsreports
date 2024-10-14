@@ -12,6 +12,7 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.data.converter.*;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.PatientesWhoReceivedVlResultsCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.DataConverter;
@@ -38,6 +39,9 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
   private ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
       listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries;
 
+  private final PatientesWhoReceivedVlResultsCohortQueries
+      patientesWhoReceivedVlResultsCohortQueries;
+
   private HivMetadata hivMetadata;
 
   private CommonMetadata commonMetadata;
@@ -50,6 +54,7 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
       ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries,
       ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
           listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries,
+      PatientesWhoReceivedVlResultsCohortQueries patientesWhoReceivedVlResultsCohortQueries,
       HivMetadata hivMetadata,
       CommonMetadata commonMetadata,
       EptsGeneralIndicator eptsGeneralIndicator) {
@@ -58,6 +63,7 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
     this.listOfPatientsDefaultersOrIITCohortQueries = listOfPatientsDefaultersOrIITCohortQueries;
     this.listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries =
         listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries;
+    this.patientesWhoReceivedVlResultsCohortQueries = patientesWhoReceivedVlResultsCohortQueries;
     this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
     this.eptsGeneralIndicator = eptsGeneralIndicator;
@@ -98,9 +104,9 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
     // 3 - ART Start Date - Sheet 1: Column C
     pdd.addColumn(
         "inicio_tarv",
-        listChildrenOnARTandFormulationsDataset.getArtStartDate(),
-        "onOrBefore=${endDate},location=${location}",
-        new CalculationResultConverter());
+        patientesWhoReceivedVlResultsCohortQueries.getArtStartDate(),
+        "endDate=${endDate},location=${location}",
+        new DashDateFormatConverter());
 
     // 5 - Sex - Sheet 1: Column E
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
@@ -127,7 +133,8 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
     pdd.addColumn(
         "patient_informed_consent",
         listOfPatientsDefaultersOrIITCohortQueries.getPatientConsent(),
-        "location=${location}");
+        "location=${location}",
+        new EmptyIfNullConverter());
 
     // 9 - Consentimento Informado do Confidente - Sheet 1: Column I
     pdd.addColumn(

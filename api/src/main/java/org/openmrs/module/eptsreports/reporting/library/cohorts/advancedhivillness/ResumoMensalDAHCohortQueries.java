@@ -369,6 +369,12 @@ public class ResumoMensalDAHCohortQueries {
             "startDate=${startDate-1m},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
+        "cd4ByAgeAndResult",
+        map(
+            getPatientsWithCD4BasedOnAgeAndCd4Results(),
+            "startDate=${startDate-1m},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
         "tbLamResults",
         mapStraightThrough(
             getPatientsWithPositiveOrNegativeTestResults(
@@ -381,7 +387,7 @@ public class ResumoMensalDAHCohortQueries {
             getPatientsWhoStartedFollowupOnDAHComposition(),
             "startDate=${endDate},endDate={endDate},location=${location}"));
 
-    cd.setCompositionString("onDAH AND haveCd4Results AND tbLamResults");
+    cd.setCompositionString("onDAH AND haveCd4Results AND cd4ByAgeAndResult AND tbLamResults");
     return cd;
   }
 
@@ -805,7 +811,7 @@ public class ResumoMensalDAHCohortQueries {
   public CohortDefinition getPatientsWhoAreMarkedAsDeadDOnSixMonthsCohortAndAfterFollowupDate() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("");
+    sqlCohortDefinition.setName("Motivo de Saída” = “Óbito”");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("reportEndDate", "reportEndDate", Date.class));
@@ -815,7 +821,6 @@ public class ResumoMensalDAHCohortQueries {
     map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
     map.put("1708", hivMetadata.getExitFromArvTreatmentConcept().getConceptId());
     map.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
-    map.put("165386", hivMetadata.getExitDateFromArvTreatmentConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id "
@@ -829,8 +834,8 @@ public class ResumoMensalDAHCohortQueries {
             + "                      INNER JOIN obs o on e.encounter_id = o.encounter_id "
             + "        WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "          AND e.encounter_type = ${90} "
-            + "  AND e.encounter_datetime >= :startDate "
-            + "  AND e.encounter_datetime <= :endDate "
+            + "          AND e.encounter_datetime >= :startDate "
+            + "          AND e.encounter_datetime <= :endDate "
             + "          AND e.location_id = :location "
             + "        GROUP BY p.patient_id "
             + "    ) last_dah ON last_dah.patient_id = p.patient_id "
@@ -838,15 +843,10 @@ public class ResumoMensalDAHCohortQueries {
             + "  AND e.voided = 0 "
             + "  AND o.voided = 0 "
             + "  AND e.encounter_type = ${90} "
-            + "  AND ( "
-            + "        (o.concept_id = ${1708} "
-            + "            AND o.value_coded = ${1366} "
-            + "            AND o.obs_datetime >= last_dah.last_date "
-            + "            AND o.obs_datetime <= :reportEndDate) "
-            + "        OR  (o.concept_id = ${165386} "
-            + "        AND o.value_datetime >= last_dah.last_date "
-            + "        AND o.value_datetime <= :reportEndDate) "
-            + "    ) "
+            + "  AND o.concept_id = ${1708} "
+            + "  AND o.value_coded = ${1366} "
+            + "  AND o.obs_datetime >= last_dah.last_date "
+            + "  AND o.obs_datetime <= :reportEndDate "
             + "  AND e.location_id = :location "
             + "GROUP BY p.patient_id";
 
@@ -916,6 +916,7 @@ public class ResumoMensalDAHCohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id "
@@ -926,8 +927,10 @@ public class ResumoMensalDAHCohortQueries {
             + "  AND e.voided = 0 "
             + "  AND o.voided = 0 "
             + "  AND e.location_id = :location "
-            + "  AND o.concept_id = ${1695} "
-            + "  AND o.value_numeric IS NOT NULL "
+            + "  AND ( (o.concept_id = ${1695} "
+            + "  AND o.value_numeric IS NOT NULL ) "
+            + "  OR ( o.concept_id = ${165515} "
+            + "  AND  o.value_coded IS NOT NULL ) ) "
             + " AND ( "
             + "  ( e.encounter_type = ${90} "
             + " AND o.obs_datetime >= :startDate "
@@ -949,7 +952,7 @@ public class ResumoMensalDAHCohortQueries {
    * definidos) de acordo com a seguinte definição:
    * <li>< 750 para os utentes com idade < 1 ano
    * <li>< 500 para os utentes com idade entre 1 a 4anos
-   * <li><200 para os utentes com idade >= 5 anos
+   * <li>< 200 (absoluto) ou “<=200” (semi-quantitativo) para os utentes com idade >= 5 anos
    *
    * @return {@link CohortDefinition}
    */
@@ -965,12 +968,15 @@ public class ResumoMensalDAHCohortQueries {
         getPatientsWithCD4BasedOnAgeAndCd4(Cd4CountComparison.LessThanOrEqualTo500mm3, 1, 4);
     CohortDefinition cd750bellowOneYear =
         getPatientsWithCD4BasedOnAgeAndCd4(Cd4CountComparison.LessThanOrEqualTo750mm3, null, 1);
+    CohortDefinition semiQuantiativeUnder200 =
+        getPatientsWithCD4BasedOnAgeAndSemiQuantitaiveCd4(5, null);
 
     cd.addSearch("cd4Under200", mapStraightThrough(cd200overOrEqualTo5years));
     cd.addSearch("cd4Under500", mapStraightThrough(cd500betweenOneAnd5years));
     cd.addSearch("cd4Under750", mapStraightThrough(cd750bellowOneYear));
+    cd.addSearch("semiQuantiativeUnder200", mapStraightThrough(semiQuantiativeUnder200));
 
-    cd.setCompositionString("cd4Under200 OR cd4Under500 OR cd4Under750");
+    cd.setCompositionString("cd4Under200 OR cd4Under500 OR cd4Under750 OR semiQuantiativeUnder200");
     return cd;
   }
 
@@ -996,6 +1002,32 @@ public class ResumoMensalDAHCohortQueries {
     cd.setCompositionString("cd4Result AND age");
     return cd;
   }
+
+  /**
+   * @param minAge Minimum age to check
+   * @param maxAge Maximum age to check
+   * @return {@link CohortDefinition}
+   */
+  private CohortDefinition getPatientsWithCD4BasedOnAgeAndSemiQuantitaiveCd4(
+      Integer minAge, Integer maxAge) {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Semi Quantitaive Cd4 Result and Age Combination");
+    cd.addParameters(getCohortParameters());
+
+    CohortDefinition semiQuantitaivecd4LessOrEqualThan200ul =
+        getCd4SemiQuantitativoLessThanOrEqual200ul();
+    CohortDefinition age = ageCohortQueries.createXtoYAgeCohort("Age", minAge, maxAge);
+
+    cd.addSearch(
+        "semiQuantitaivecd4LessOrEqualThan200ul",
+        mapStraightThrough(semiQuantitaivecd4LessOrEqualThan200ul));
+    cd.addSearch("age", EptsReportUtils.map(age, "effectiveDate=${endDate}"));
+
+    cd.setCompositionString("semiQuantitaivecd4LessOrEqualThan200ul AND age");
+    return cd;
+  }
+
   /**
    * Filtrando todos os utentes
    * <li>que tiveram registo de "TB LAM urina” registada na secção B (Exames Laboratoriais à e
@@ -1666,6 +1698,49 @@ public class ResumoMensalDAHCohortQueries {
     return sqlCohortDefinition;
   }
 
+  /** @return {@link CohortDefinition} */
+  public CohortDefinition getCd4SemiQuantitativoLessThanOrEqual200ul() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Resultado de CD4");
+    sqlCohortDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
+    map.put("165513", hivMetadata.getCD4CountLessThanOrEqualTo200Concept().getConceptId());
+
+    String query =
+        "  SELECT ps.person_id FROM   person ps "
+            + "       INNER JOIN encounter e "
+            + "               ON ps.person_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "WHERE  ps.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND  o.concept_id = ${165515} "
+            + "       AND  o.value_coded = ${165513} "
+            + " AND ( "
+            + "  ( e.encounter_type = ${90} "
+            + " AND o.obs_datetime >= :startDate "
+            + "  AND o.obs_datetime <= :endDate)"
+            + "OR "
+            + " ( e.encounter_type = ${6} "
+            + " AND e.encounter_datetime >= :startDate "
+            + "  AND e.encounter_datetime <= :endDate) "
+            + " ) "
+            + "  AND e.location_id = :location"
+            + "  GROUP BY ps.person_id ";
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(substitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
   /**
    * Get Patients who do not have “Situação do TARV no início do seguimento” (Secção A) da Ficha de
    * DAH que tem o registo de “Data de Início no Modelo de DAH” ocorrida durante o período (“Data de
@@ -1769,6 +1844,129 @@ public class ResumoMensalDAHCohortQueries {
     StringSubstitutor substitutor = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(substitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Relatório- Indicador 5 Utentes em DAH até o fim do mês</b>
+   *
+   * <p>O sistema irá produzir o indicador 5) Número total de utentes em seguimento para Doença
+   * Avançada por HIV no fim do mês, da seguinte forma:
+   * <li>Incluindo todos os utentes
+   *
+   *     <ul>
+   *       <li>Com registo de “Data de Início no Modelo de DAH”, na Ficha de DAH, ocorrida até fim
+   *           do mês [“Data de Início no Modelo de DAH” <= “Data Fim”].
+   *           <p><b>Nota 1:</b>em caso de existirem mais que uma Ficha de DAH, será considerada a
+   *           data mais recente do início no modelo DAH (“Última Data de Início no Modelo de DAH”).
+   *     </ul>
+   *
+   * <li>Excluindo todos os utentes
+   *
+   *     <ul>
+   *       <li>Com registo de pelo menos um motivo (Óbito/ Abandono/ Transferido Para) e “Data de
+   *           Saída de TARV na US” (secção J), na Ficha de DAH, ocorrida após a data mais recente
+   *           da “Data de Início no Modelo de DAH” e até o fim do mês [“Data de Saída de TARV na
+   *           US” >= “Última Data de Início no Modelo de DAH” e <= “Data Fim”] ou
+   *       <li>Com registo de “Data de Saída” (secção I), registada na Ficha de DAH e ocorrida após
+   *           a data mais recente da “Data de Início no Modelo de DAH” e até o fim do mês [“Data de
+   *           Saída de TARV na US” >= “Última Data de Início no Modelo de DAH” e <= “Data Fim”]
+   *     </ul>
+   *
+   *     <p><b>Nota 2:</b>O resultado deste indicador pode não ser igual a fórmula matemática
+   *     (1+2+3-4) devido a completude de dados. Por exemplo, os utentes sem informação do “estado
+   *     tarv” não serão incluídos nos indicadores 1 ou 2 ou 3, mas serão incluídos no indicador 5
+   *     caso tenha registo do início DAH.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsEnrolledInDAHbyEndOfMonth() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Indicador 5 Utentes em DAH até o fim do mês");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    map.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("1707", hivMetadata.getAbandonedConcept().getConceptId());
+    map.put("1708", hivMetadata.getExitFromArvTreatmentConcept().getConceptId());
+    map.put("165386", hivMetadata.getExitDateFromArvTreatmentConcept().getConceptId());
+
+    String query =
+        "SELECT "
+            + "  dah.patient_id "
+            + "FROM "
+            + "  ( "
+            + "    SELECT "
+            + "      p.patient_id, "
+            + "      MAX(e.encounter_datetime) AS dah_date "
+            + "    FROM "
+            + "      patient p "
+            + "      INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    WHERE "
+            + "      p.voided = 0 "
+            + "      AND e.voided = 0 "
+            + "      AND e.encounter_type = ${90} "
+            + "      AND e.encounter_datetime <= :endDate "
+            + "      AND e.location_id = :location "
+            + "    GROUP BY "
+            + "      p.patient_id "
+            + "  ) dah "
+            + "  LEFT JOIN ( "
+            + "    SELECT "
+            + "      p.patient_id "
+            + "    FROM "
+            + "      patient p "
+            + "      INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "      INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "      INNER JOIN ( "
+            + "          SELECT "
+            + "            p2.patient_id, "
+            + "            MAX(e2.encounter_datetime) AS dah_date "
+            + "          FROM "
+            + "            patient p2 "
+            + "            INNER JOIN encounter e2 ON p2.patient_id = e2.patient_id "
+            + "          WHERE "
+            + "            p2.voided = 0 "
+            + "            AND e2.voided = 0 "
+            + "            AND e2.encounter_type = ${90} "
+            + "            AND e2.encounter_datetime <= :endDate "
+            + "            AND e2.location_id = :location "
+            + "          GROUP BY "
+            + "            p2.patient_id "
+            + "      ) latest_dah ON p.patient_id = latest_dah.patient_id "
+            + "    WHERE "
+            + "      p.voided = 0 "
+            + "      AND e.voided = 0 "
+            + "      AND o.voided = 0 "
+            + "      AND e.encounter_type = ${90} "
+            + "      AND ( "
+            + "        ( "
+            + "          o.concept_id = ${1708} "
+            + "          AND o.value_coded IN (${1366}, ${1707}, ${1706}) "
+            + "          AND o.obs_datetime BETWEEN latest_dah.dah_date "
+            + "          AND :endDate "
+            + "        ) "
+            + "        OR ( "
+            + "          o.concept_id = ${165386} "
+            + "          AND o.value_datetime BETWEEN latest_dah.dah_date "
+            + "          AND :endDate "
+            + "        ) "
+            + "      ) "
+            + "      AND e.location_id = :location "
+            + "    GROUP BY "
+            + "      p.patient_id "
+            + "  ) exclusion ON dah.patient_id = exclusion.patient_id "
+            + "WHERE "
+            + "  exclusion.patient_id IS NULL";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(sb.replace(query));
 
     return sqlCohortDefinition;
   }

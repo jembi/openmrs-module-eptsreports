@@ -3237,7 +3237,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ19DEN1",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ19A(1),
+                qualityImprovement2020CohortQueries.getMQ19A(1, EptsReportConstants.MIMQ.MQ),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ19DEN1.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -3255,7 +3255,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ19DEN2",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ19A(2),
+                qualityImprovement2020CohortQueries.getMQ19A(2, EptsReportConstants.MIMQ.MQ),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ19DEN2.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -3273,7 +3273,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ19DEN3",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ19A(3),
+                qualityImprovement2020CohortQueries.getMQ19A(3, EptsReportConstants.MIMQ.MQ),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ19DEN3.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -3291,7 +3291,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ19DEN4",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ19A(4),
+                qualityImprovement2020CohortQueries.getMQ19A(4, EptsReportConstants.MIMQ.MQ),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ19DEN4.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -3309,7 +3309,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ19DEN5",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ19A(5),
+                qualityImprovement2020CohortQueries.getMQ19A(5, EptsReportConstants.MIMQ.MQ),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ19DEN5.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -3327,7 +3327,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ19DEN6",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ19A(6),
+                qualityImprovement2020CohortQueries.getMQ19A(6, EptsReportConstants.MIMQ.MQ),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ19DEN6.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -3347,7 +3347,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ19NUM1",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ19B(1),
+                qualityImprovement2020CohortQueries.getMQ19B(1, EptsReportConstants.MIMQ.MQ),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ19NUM1.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -3365,7 +3365,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ19NUM2",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ19B(2),
+                qualityImprovement2020CohortQueries.getMQ19B(2, EptsReportConstants.MIMQ.MQ),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ19NUM2.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -3383,7 +3383,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ19NUM3",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ19B(3),
+                qualityImprovement2020CohortQueries.getMQ19B(3, EptsReportConstants.MIMQ.MQ),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ19NUM3.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -3401,7 +3401,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ19NUM4",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ19B(4),
+                qualityImprovement2020CohortQueries.getMQ19B(4, EptsReportConstants.MIMQ.MQ),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ19NUM4.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -3419,7 +3419,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ19NUM5",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ19B(5),
+                qualityImprovement2020CohortQueries.getMQ19B(5, EptsReportConstants.MIMQ.MQ),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ19NUM5.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -3437,7 +3437,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ19NUM6",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ19B(6),
+                qualityImprovement2020CohortQueries.getMQ19B(6, EptsReportConstants.MIMQ.MQ),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ19NUM6.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));

@@ -483,8 +483,7 @@ public class TXTBCohortQueries {
                 encounterType,
                 tbMetadata.getTestTBLAM().getConceptId(),
                 commonMetadata.getPositive().getConceptId(),
-                commonMetadata.getNegative().getConceptId(),
-                commonMetadata.getIndeterminate().getConceptId()));
+                commonMetadata.getNegative().getConceptId()));
     addGeneralParameters(cd);
     return cd;
   }
@@ -881,7 +880,8 @@ public class TXTBCohortQueries {
     cd.addSearch("H", mapStraightThrough(getPulmonaryTB()));
     cd.addSearch("I", mapStraightThrough(getPatientsWithAtLeastOneResponseForPositiveScreeningI()));
     cd.addSearch("J", mapStraightThrough(getXpertMtbTestCohort()));
-    cd.setCompositionString("A OR B OR C OR D OR E OR F OR G OR H OR I OR J");
+    cd.addSearch("TBLAM", mapStraightThrough(getTestTBLAM(51)));
+    cd.setCompositionString("A OR B OR C OR D OR E OR F OR G OR H OR I OR J OR TBLAM");
     addGeneralParameters(cd);
     return cd;
   }
@@ -1292,10 +1292,13 @@ public class TXTBCohortQueries {
             getMarkedAsTratamentoTBInicio(),
             "startDate=${startDate-6m},endDate=${startDate-1d},location=${location}"));
 
+    definition.addSearch(
+        "test-tb-lam-elab", EptsReportUtils.map(getTestTBLAM(51), generalParameterMapping));
+
     definition.setCompositionString(
         "(art-list AND (tb-screening OR tb-investigation OR tb-investigation-negative OR started-tb-treatment OR in-tb-program OR pulmonary-tb OR marked-as-tb-treatment-start "
             + "OR (tuberculosis-symptomys OR active-tuberculosis OR tb-observations OR application-for-laboratory-research OR tb-genexpert-test OR tb-genexpert-lab-test OR tb-xpert-mtb OR culture-test OR culture-test-lab "
-            + "OR test-tb-lam OR test-tb-lam-lab OR test-bk OR x-ray-chest) OR result-for-basiloscopia)) "
+            + "OR test-tb-lam OR test-tb-lam-lab OR test-tb-lam-elab OR test-bk OR x-ray-chest) OR result-for-basiloscopia)) "
             + "NOT ((transferred-out NOT (marked-as-tb-treatment-start OR started-tb-treatment OR pulmonary-tb OR in-tb-program)) OR started-tb-treatment-previous-period OR in-tb-program-previous-period OR pulmonary-tb-date OR marked-as-tratamento-tb-inicio)");
 
     return definition;
@@ -1817,9 +1820,13 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Get patients who have specimen sent
-   *
-   * <p><b>Technical Specs</b>
+   * <b> Get patients who sent specimen within date boundaries </b>
+   * <li>Have Diagnóstico Laboratorial para TB (ANY RESULT) registered for ‘Baciloscopia’,
+   *     ‘GeneXpert’, ‘Xpert MTB’, ‘Cultura’, ’TB LAM’ on the Laboratory Form or e-Lab Form OR
+   * <li>If the Investigações - Pedidos Laboratoriais request is marked for ‘TB LAM’, ‘GeneXpert’ ,
+   *     ‘Cultura’ or ‘BK’ on Ficha Clinica OR
+   * <li>If Investigações - Resultados Laboratoriais results (ANY RESULT) is recorded for ‘TB LAM’ ,
+   *     ‘GeneXpert’, ‘Cultura’, or ‘BK’ on Ficha Clinica.
    *
    * @return {@link CohortDefinition}
    */
@@ -1836,7 +1843,8 @@ public class TXTBCohortQueries {
             commonMetadata.getPositive(),
             commonMetadata.getNegative(),
             commonMetadata.getNotFoundConcept(),
-            commonMetadata.getIndeterminate());
+            commonMetadata.getIndeterminate(),
+            hivMetadata.getFsrEncounterType());
     return cd;
   }
 
@@ -2106,7 +2114,13 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Get patients who sent specimen within date boundaries
+   * <b> Get patients who sent specimen within date boundaries </b>
+   * <li>Have Diagnóstico Laboratorial para TB (ANY RESULT) registered for ‘Baciloscopia’,
+   *     ‘GeneXpert’, ‘Xpert MTB’, ‘Cultura’, ’TB LAM’ on the Laboratory Form or e-Lab Form OR
+   * <li>If the Investigações - Pedidos Laboratoriais request is marked for ‘TB LAM’, ‘GeneXpert’ ,
+   *     ‘Cultura’ or ‘BK’ on Ficha Clinica OR
+   * <li>If Investigações - Resultados Laboratoriais results (ANY RESULT) is recorded for ‘TB LAM’ ,
+   *     ‘GeneXpert’, ‘Cultura’, or ‘BK’ on Ficha Clinica.
    *
    * @return {@link CohortDefinition}
    */
@@ -2121,7 +2135,8 @@ public class TXTBCohortQueries {
       Concept positive,
       Concept negative,
       Concept notFound,
-      Concept indeterminate) {
+      Concept indeterminate,
+      EncounterType eLabFormFSR) {
 
     CohortDefinition basiloscopiaExamCohort =
         genericCohortQueries.generalSql(
@@ -2188,6 +2203,13 @@ public class TXTBCohortQueries {
                 Arrays.asList(genexpertTest, cultureTest, tbLamTest, basiloscopiaExam)));
     addGeneralParameters(applicationForLaboratoryResearchCohort);
 
+    CohortDefinition tbLamElabTest =
+        genericCohortQueries.generalSql(
+            "tbLam-elab",
+            genericCohortQueries.getPatientsWithObsBetweenDates(
+                eLabFormFSR, tbLamTest, Arrays.asList(negative, positive)));
+    addGeneralParameters(tbLamElabTest);
+
     CompositionCohortDefinition definition = new CompositionCohortDefinition();
     definition.setName("specimenSent()");
     addGeneralParameters(definition);
@@ -2217,8 +2239,12 @@ public class TXTBCohortQueries {
     definition.addSearch(
         "tb-xpert-mtb", EptsReportUtils.map(getXpertMtbTestCohort(), generalParameterMapping));
 
+    definition.addSearch("tbLam-elab", EptsReportUtils.map(tbLamElabTest, generalParameterMapping));
+
     definition.setCompositionString(
-        "basiloscopiaExamCohort OR basiloscopiaLabExamCohort OR genexpertTestCohort OR genexpertLabTestCohort OR tbLamTestCohort OR tbLamLabTestCohort OR cultureTestCohort OR cultureLabTestCohort OR applicationForLaboratoryResearchCohort OR tb-xpert-mtb");
+        "basiloscopiaExamCohort OR basiloscopiaLabExamCohort OR genexpertTestCohort OR genexpertLabTestCohort"
+            + " OR tbLamTestCohort OR tbLamLabTestCohort OR cultureTestCohort OR cultureLabTestCohort "
+            + "OR applicationForLaboratoryResearchCohort OR tb-xpert-mtb OR tbLam-elab");
     return definition;
   }
 

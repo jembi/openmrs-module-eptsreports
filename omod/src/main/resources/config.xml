@@ -4238,6 +4238,22 @@
 	</globalProperty>
 
 	<globalProperty>
+		<property>eptsreports.cd4SemiQuantitativeCountLessThan200Uuid</property>
+		<defaultValue>9395a2a8-21e9-4e06-bd2f-24c52f56cd21</defaultValue>
+		<description>
+			UUID for the CD4 count less than or equal to 200 concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.cd4SemiQuantitativeCountGreaterThan200Uuid</property>
+		<defaultValue>e1d9ecf8-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for the CD4 count greater than to 200 concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
 		<property>eptsreports.sampleEarlyInfantDiagnosisConceptUuid</property>
 		<defaultValue>a5e0eb66-c75d-4f2a-956c-3bf4e66b1a84</defaultValue>
 		<description>

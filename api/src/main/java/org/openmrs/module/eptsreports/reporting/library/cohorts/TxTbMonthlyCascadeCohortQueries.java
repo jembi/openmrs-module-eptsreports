@@ -918,6 +918,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     map.put("664", tbMetadata.getNegativeConcept().getConceptId());
     map.put("23951", tbMetadata.getTestTBLAM().getConceptId());
     map.put("1138", tbMetadata.getIndeterminate().getConceptId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
 
     String query =
         "SELECT p.patient_id "
@@ -961,11 +962,11 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
-            + "       AND e.encounter_type = ${13} "
+            + "       AND e.encounter_type IN (${13},${51}) "
             + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${23951} "
             + "       AND o.value_coded IN ( ${703}, ${664}, ${1138} ) "
-            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "       AND DATE(e.encounter_datetime) BETWEEN :startDate AND :endDate "
             + "GROUP  BY p.patient_id";
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(sb.replace(query));
@@ -1018,11 +1019,11 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
-            + "       AND e.encounter_type = ${13} "
+            + "       AND e.encounter_type IN (${13}, ${51}) "
             + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${23951} "
             + "       AND o.value_coded IN ( ${results} ) "
-            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "       AND DATE(e.encounter_datetime) BETWEEN :startDate AND :endDate "
             + "GROUP  BY p.patient_id";
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(sb.replace(query));
@@ -1043,6 +1044,7 @@ public class TxTbMonthlyCascadeCohortQueries {
         "6", String.valueOf(hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()));
     map.put(
         "13", String.valueOf(hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId()));
+    map.put("51", String.valueOf(hivMetadata.getFsrEncounterType().getEncounterTypeId()));
     map.put("23951", String.valueOf(tbMetadata.getTestTBLAM().getConceptId()));
     map.put("results", StringUtils.join(answerIds, ','));
     return map;

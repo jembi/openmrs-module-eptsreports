@@ -149,6 +149,7 @@ public class EriDSDCohortQueries {
             "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("B13 AND NOT activeAndStablePatients");
+    //    cd.setCompositionString("B13 AND NOT activeAndStablePatients");
 
     return cd;
   }

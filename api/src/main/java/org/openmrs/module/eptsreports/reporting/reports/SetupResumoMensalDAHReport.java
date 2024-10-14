@@ -8,13 +8,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.LocationDataSetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.resumo.ResumoMensalDAHDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
-import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
@@ -24,14 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Deprecated
 public class SetupResumoMensalDAHReport extends EptsDataExportManager {
 
-  private GenericCohortQueries genericCohortQueries;
   private ResumoMensalDAHDatasetDefinition resumoMensalDAHDatasetDefinition;
 
   @Autowired
   public SetupResumoMensalDAHReport(
-      GenericCohortQueries genericCohortQueries,
       ResumoMensalDAHDatasetDefinition resumoMensalDAHDatasetDefinition) {
-    this.genericCohortQueries = genericCohortQueries;
     this.resumoMensalDAHDatasetDefinition = resumoMensalDAHDatasetDefinition;
   }
 
@@ -78,11 +73,6 @@ public class SetupResumoMensalDAHReport extends EptsDataExportManager {
     rd.addDataSetDefinition("HF", mapStraightThrough(new LocationDataSetDefinition()));
     rd.addDataSetDefinition("SM", mapStraightThrough(new SismaCodeDatasetDefinition()));
 
-    // Report Base Cohort
-    rd.setBaseCohortDefinition(
-        EptsReportUtils.map(
-            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
-
     return rd;
   }
 
@@ -93,7 +83,7 @@ public class SetupResumoMensalDAHReport extends EptsDataExportManager {
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Resumo_Mensal_DAH_v2.0.2.xls",
+              "MISAU_SESP_MASC_Resumo_Mensal_DAH_v2.1.xls",
               "Resumo Mensal de DAH",
               getExcelDesignUuid(),
               null);

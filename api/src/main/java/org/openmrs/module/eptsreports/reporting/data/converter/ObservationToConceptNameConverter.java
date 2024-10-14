@@ -19,7 +19,7 @@ public class ObservationToConceptNameConverter implements DataConverter {
   private final String estomatiteUlcerativaNecrotizante = "Estomatite Ulcerativa Necrotizante";
   private final String candidiaseOral = "Candidiase Oral";
   private final String cryptococcalMeningitis = "Meningite Criptocócica (MCC)";
-  private final String ccu = "Cancro do Colo do Uterino";
+  private final String ccu = "Cancro do Colo do Útero";
   private final String candidiaseEsofagica = "Candidiase Esofágica";
   private final String herpesSimples = "Hérpes Simples";
   private final String cachexia = "Caquexia";

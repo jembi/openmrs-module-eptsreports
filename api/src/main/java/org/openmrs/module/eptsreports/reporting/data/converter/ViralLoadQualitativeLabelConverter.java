@@ -26,6 +26,8 @@ public class ViralLoadQualitativeLabelConverter implements DataConverter {
         return "MENOR QUE 400 COPIAS/ML";
       case "23904":
         return "MENOR QUE 839 COPIAS/ML";
+      case "165331":
+        return "<";
       default:
         return obj;
     }
