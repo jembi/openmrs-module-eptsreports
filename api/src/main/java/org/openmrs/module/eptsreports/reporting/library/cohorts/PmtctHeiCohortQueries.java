@@ -332,8 +332,6 @@ public class PmtctHeiCohortQueries {
             + "          AND ( "
             + "            o.concept_id = ${23821} "
             + "                AND o.value_datetime <= DATE_ADD(pat.birthday, INTERVAL 365 DAY) "
-            + "                AND o.value_datetime >= :startDate "
-            + "                AND o.value_datetime <= :endDate "
             + "            ) "
             + "          AND ( "
             + "            o2.concept_id = ${165502} "
