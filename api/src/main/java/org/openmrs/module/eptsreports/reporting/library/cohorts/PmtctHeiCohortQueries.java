@@ -166,7 +166,7 @@ public class PmtctHeiCohortQueries {
             + "            ) "
             + "        GROUP BY "
             + "            p.patient_id "
-            + "    ) virologic_hiv;";
+            + "    ) virologic_hiv";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -264,7 +264,8 @@ public class PmtctHeiCohortQueries {
         EptsReportUtils.map(getPatientsWhoHaveVirologivHivTestResult(), mappings));
 
     cd.addSearch(
-        "infantAge", EptsReportUtils.map(pmtctEidCohortQueries.getInfantAge(0, 365), mappings));
+        "infantAge",
+        EptsReportUtils.map(pmtctEidCohortQueries.getInfantAge(0, 365, false), mappings));
 
     cd.setCompositionString("infantsInCcr AND sampleCollectionHiv AND infantAge");
     return cd;
@@ -299,72 +300,59 @@ public class PmtctHeiCohortQueries {
 
     String query =
         "SELECT "
-            + "  p.patient_id "
+            + "    hiv_sample.patient_id "
             + "FROM "
-            + "  patient p "
-            + "  INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "  INNER JOIN ( "
-            + "    SELECT "
-            + "      p.patient_id, "
-            + "      MAX(o.value_datetime) AS pcr_result_date, "
-            + "      o2.value_coded AS pcr_result "
-            + "    FROM "
-            + "      patient p "
-            + "      INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "      INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "      INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
-            + "      INNER JOIN obs o3 ON o3.encounter_id = e.encounter_id "
-            + "      INNER JOIN ( "
+            + "    ( "
             + "        SELECT "
-            + "          p.patient_id, "
-            + "          ps.birthdate AS birtday "
+            + "            p.patient_id, "
+            + "            MAX(e.encounter_datetime) AS collection_date "
             + "        FROM "
-            + "          patient p "
-            + "          INNER JOIN person ps ON p.patient_id = ps.person_id "
+            + "            patient p "
+            + "                INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "                INNER JOIN ( "
+            + "                SELECT "
+            + "                    p.patient_id, "
+            + "                    ps.birthdate AS birthday "
+            + "                FROM "
+            + "                    patient p "
+            + "                        INNER JOIN person ps ON p.patient_id = ps.person_id "
+            + "                WHERE "
+            + "                    p.voided = 0 "
+            + "                  AND ps.voided = 0 "
+            + "            ) pat ON pat.patient_id = p.patient_id "
             + "        WHERE "
-            + "          p.voided = 0 "
-            + "          AND ps.voided = 0 "
-            + "      ) pat ON pat.patient_id = p.patient_id "
-            + "    WHERE "
-            + "      p.voided = 0 "
-            + "      AND e.voided = 0 "
-            + "      AND o.voided = 0 "
-            + "      AND o2.voided = 0 "
-            + "      AND o3.voided = 0 "
-            + "      AND e.encounter_type = ${13} "
-            + "      AND e.encounter_datetime >= :startDate "
-            + "      AND e.encounter_datetime <= :endDate "
-            + "      AND e.location_id = :location "
-            + "      AND ( "
-            + "        ( "
-            + "          o.concept_id = ${23821} "
-            + "          AND o.value_datetime <= DATE_ADD(pat.birtday, INTERVAL 365 DAY) "
-            + "        ) "
-            + "        AND ( "
-            + "          o2.concept_id = ${1030} "
-            + "          AND o2.value_coded IN (${703}, ${664}) "
-            + "        ) "
-            + "        AND ( "
-            + "          o3.concept_id = ${165502} "
-            + "          AND o3.value_coded IN (${165503}, ${165506}, ${165507}, ${165510}) "
-            + "        ) "
-            + "      ) "
-            + "    GROUP BY "
-            + "      p.patient_id "
-            + "  ) virologic_hiv ON virologic_hiv.patient_id = p.patient_id "
-            + "  AND p.voided = 0 "
-            + "  AND e.voided = 0 "
-            + "  AND o.voided = 0 "
-            + "  AND e.encounter_type = ${13} "
-            + "  AND e.encounter_datetime >= :startDate "
-            + "  AND e.encounter_datetime <= :endDate "
-            + "  AND e.location_id = :location "
-            + "  AND o.concept_id = ${1030} ";
+            + "            p.voided = 0 "
+            + "          AND e.voided = 0 "
+            + "          AND o.voided = 0 "
+            + "          AND o2.voided = 0 "
+            + "          AND e.location_id = :location "
+            + "          AND e.encounter_type = ${13} "
+            + "          AND ( "
+            + "            o.concept_id = ${23821} "
+            + "                AND o.value_datetime <= DATE_ADD(pat.birthday, INTERVAL 365 DAY) "
+            + "            ) "
+            + "          AND ( "
+            + "            o2.concept_id = ${165502} "
+            + "                AND o2.value_coded IN (${165503}, ${165506}, ${165507}, ${165510}) "
+            + "            ) "
+            + "        GROUP BY "
+            + "            p.patient_id "
+            + "    ) hiv_sample "
+            + "        INNER JOIN encounter ee ON hiv_sample.patient_id = ee.patient_id "
+            + "        INNER JOIN obs oo ON oo.encounter_id = ee.encounter_id "
+            + "WHERE "
+            + "    ee.voided = 0 "
+            + "  AND oo.voided = 0 "
+            + "  AND ee.encounter_type = ${13} "
+            + "  AND ee.encounter_datetime = hiv_sample.collection_date "
+            + "  AND ee.location_id = :location "
+            + "  AND oo.concept_id = ${1030} ";
     if (posiveResult) {
-      query = query + "  AND virologic_hiv.pcr_result = ${703}";
+      query = query + " AND oo.value_coded = ${703} ";
     } else {
-      query = query + "  AND virologic_hiv.pcr_result = ${664}";
+      query = query + " AND oo.value_coded = ${664} ";
     }
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
