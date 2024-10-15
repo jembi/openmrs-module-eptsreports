@@ -13,7 +13,7 @@ public class ViralLoadQualitativeLabelConverter implements DataConverter {
 
     switch (obj.toString()) {
       case "23814":
-        return "INDETECTÁVEL";
+        return "INDETECTAVEL";
       case "1306":
         return "NIVEL BAIXO DE DETECÇÃO";
       case "23905":
