@@ -339,7 +339,7 @@ public class PmtctEidCohortQueries {
    * @param maxAge Maximum age in Days of a patient based on Specimen Collection Date
    * @return CohortDefinition
    */
-  public CohortDefinition getInfantAge(Integer minAge, Integer maxAge, boolean minValueDateTime) {
+  public CohortDefinition getInfantAge(Integer minAge, Integer maxAge, boolean eidOrHei) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Infant Age");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -359,7 +359,7 @@ public class PmtctEidCohortQueries {
 
     String query = "SELECT pr.person_id " + "FROM person pr " + "INNER JOIN ( ";
     query +=
-        minValueDateTime
+        eidOrHei
             ? "    SELECT p.patient_id, MIN(o.value_datetime) AS collection_date "
             : "    SELECT p.patient_id, MAX(o.value_datetime) AS collection_date ";
     query +=
@@ -372,15 +372,23 @@ public class PmtctEidCohortQueries {
             + "    AND o.voided = 0 "
             + "    AND o2.voided = 0 "
             + "    AND e.location_id = :location "
-            + "    AND e.encounter_type = ${13} "
-            + "    AND ( "
-            + "        (o.concept_id = ${23821} "
-            + "        AND o.value_datetime >= :startDate "
-            + "        AND o.value_datetime <= :endDate) "
-            + "        AND (o2.concept_id = ${165502} "
-            + "        AND o2.value_coded IN (${165503}, ${165506}, ${165507}, ${165510})) "
-            + "    ) "
-            + "    GROUP BY p.patient_id "
+            + "    AND e.encounter_type = ${13} ";
+    query +=
+        eidOrHei
+            ? "    AND ( "
+                + "        (o.concept_id = ${23821} "
+                + "        AND o.value_datetime >= :startDate "
+                + "        AND o.value_datetime <= :endDate) "
+                + "        AND (o2.concept_id = ${165502} "
+                + "        AND o2.value_coded IN (${165503}, ${165506}, ${165507}, ${165510})) "
+                + "    ) "
+            : "    AND ( "
+                + "        o.concept_id = ${23821} "
+                + "        AND (o2.concept_id = ${165502} "
+                + "        AND o2.value_coded IN (${165503}, ${165506}, ${165507}, ${165510})) "
+                + "    ) ";
+    query +=
+        "    GROUP BY p.patient_id "
             + ") specimen_collection ON pr.person_id = specimen_collection.patient_id "
             + "WHERE pr.birthdate IS NOT NULL "
             + "AND specimen_collection.collection_date IS NOT NULL "
