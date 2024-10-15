@@ -166,7 +166,7 @@ public class PmtctHeiCohortQueries {
             + "            ) "
             + "        GROUP BY "
             + "            p.patient_id "
-            + "    ) virologic_hiv;";
+            + "    ) virologic_hiv";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -264,7 +264,8 @@ public class PmtctHeiCohortQueries {
         EptsReportUtils.map(getPatientsWhoHaveVirologivHivTestResult(), mappings));
 
     cd.addSearch(
-        "infantAge", EptsReportUtils.map(pmtctEidCohortQueries.getInfantAge(0, 365), mappings));
+        "infantAge",
+        EptsReportUtils.map(pmtctEidCohortQueries.getInfantAge(0, 365, false), mappings));
 
     cd.setCompositionString("infantsInCcr AND sampleCollectionHiv AND infantAge");
     return cd;

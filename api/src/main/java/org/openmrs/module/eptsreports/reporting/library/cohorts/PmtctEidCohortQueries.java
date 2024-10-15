@@ -339,7 +339,7 @@ public class PmtctEidCohortQueries {
    * @param maxAge Maximum age in Days of a patient based on Specimen Collection Date
    * @return CohortDefinition
    */
-  public CohortDefinition getInfantAge(Integer minAge, Integer maxAge) {
+  public CohortDefinition getInfantAge(Integer minAge, Integer maxAge, boolean minValueDateTime) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Infant Age");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -357,50 +357,35 @@ public class PmtctEidCohortQueries {
     map.put("minAge", minAge);
     map.put("maxAge", maxAge);
 
-    String query =
-        "SELECT "
-            + "  pr.person_id "
-            + "FROM "
-            + "  person pr "
-            + "  INNER JOIN ( "
-            + "    SELECT "
-            + "      p.patient_id, "
-            + "      Min(o.value_datetime) AS collection_date "
-            + "    FROM "
-            + "      patient p "
-            + "      INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "      INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "      INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
-            + "    WHERE "
-            + "      p.voided = 0 "
-            + "      AND e.voided = 0 "
-            + "      AND o.voided = 0 "
-            + "      AND o2.voided = 0 "
-            + "      AND e.location_id = :location "
-            + "      AND e.encounter_type = ${13} "
-            + "      AND ( "
-            + "        ( "
-            + "          o.concept_id = ${23821} "
-            + "          AND o.value_datetime >= :startDate "
-            + "          AND o.value_datetime <= :endDate "
-            + "        ) "
-            + "        AND ( "
-            + "          o2.concept_id = ${165502} "
-            + "          AND o2.value_coded IN (${165503}, ${165506}, ${165507}, ${165510}) "
-            + "        ) "
-            + "      ) "
-            + "    GROUP BY "
-            + "      p.patient_id "
-            + "  ) specimen_collection ON pr.person_id = specimen_collection.patient_id "
-            + "WHERE "
-            + "  pr.birthdate IS NOT NULL "
-            + "  AND specimen_collection.collection_date IS NOT NULL "
-            + "  AND TIMESTAMPDIFF( "
-            + "    DAY, pr.birthdate, specimen_collection.collection_date "
-            + "  ) >= ${minAge} "
-            + "  AND TIMESTAMPDIFF( "
-            + "    DAY, pr.birthdate, specimen_collection.collection_date "
-            + "  ) <= ${maxAge}";
+    String query = "SELECT pr.person_id " + "FROM person pr " + "INNER JOIN ( ";
+    query +=
+        minValueDateTime
+            ? "    SELECT p.patient_id, MIN(o.value_datetime) AS collection_date "
+            : "    SELECT p.patient_id, MAX(o.value_datetime) AS collection_date ";
+    query +=
+        "    FROM patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "    INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "    WHERE p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND o2.voided = 0 "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_type = ${13} "
+            + "    AND ( "
+            + "        (o.concept_id = ${23821} "
+            + "        AND o.value_datetime >= :startDate "
+            + "        AND o.value_datetime <= :endDate) "
+            + "        AND (o2.concept_id = ${165502} "
+            + "        AND o2.value_coded IN (${165503}, ${165506}, ${165507}, ${165510})) "
+            + "    ) "
+            + "    GROUP BY p.patient_id "
+            + ") specimen_collection ON pr.person_id = specimen_collection.patient_id "
+            + "WHERE pr.birthdate IS NOT NULL "
+            + "AND specimen_collection.collection_date IS NOT NULL "
+            + "AND TIMESTAMPDIFF(DAY, pr.birthdate, specimen_collection.collection_date) >= ${minAge} "
+            + "AND TIMESTAMPDIFF(DAY, pr.birthdate, specimen_collection.collection_date) <= ${maxAge}";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -445,7 +430,7 @@ public class PmtctEidCohortQueries {
         EptsReportUtils.map(
             getPatientsWhoUnderwentASampleCollectionForVirologicHivTest(), mappings));
 
-    cd.addSearch("infantAge", EptsReportUtils.map(getInfantAge(0, 365), mappings));
+    cd.addSearch("infantAge", EptsReportUtils.map(getInfantAge(0, 365, true), mappings));
 
     cd.setCompositionString("infantsInCcr AND sampleCollectionHiv AND infantAge");
     return cd;
