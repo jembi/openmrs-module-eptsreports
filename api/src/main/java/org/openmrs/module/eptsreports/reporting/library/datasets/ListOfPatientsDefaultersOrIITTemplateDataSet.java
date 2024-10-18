@@ -89,6 +89,8 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         listOfPatientsDefaultersOrIITCohortQueries.getBaseCohort(),
         "endDate=${endDate},minDay=${minDay},maxDay=${maxDay},location=${location}");
 
+    pdd.addColumn("counter", new PersonIdDataDefinition(), "", new ObjectCounterConverter());
+
     pdd.addColumn("id", new PersonIdDataDefinition(), "");
 
     // 1 - NID - Sheet 1: Column A

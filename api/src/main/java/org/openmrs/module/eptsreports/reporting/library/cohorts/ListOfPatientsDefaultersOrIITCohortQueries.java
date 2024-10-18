@@ -33,6 +33,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
   @Autowired private CommonMetadata commonMetadata;
   @Autowired private CommonQueries commonQueries;
   @Autowired private GenericCohortQueries genericCohortQueries;
+  @Autowired private HivCohortQueries hivCohortQueries;
 
   private final String MAPPING = "location=${location}";
 
@@ -568,7 +569,10 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                                                     INNER JOIN patient_state ps "
             + "                                                             ON pg.patient_program_id = "
             + "                                                                ps.patient_program_id "
-            + "                                              WHERE  pg.location_id = :location "
+            + "                                              WHERE pp.voided = 0 "
+            + "                                                     AND pg.voided = 0 "
+            + "                                                     AND ps.voided = 0 "
+            + "                                                     AND pg.location_id = :location "
             + "                                                     AND pg.program_id = ${2} "
             + "                                                     AND ps.start_date <= CURRENT_DATE() "
             + "                                                     AND ps.state IS NOT NULL "
@@ -1187,7 +1191,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                  AND e.location_id = :location "
             + "                  AND e.encounter_type = ${6} "
             + "                  AND o.concept_id = ${1268} AND o.value_coded = ${1256} "
-            + "                  AND o.obs_datetime BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 210 DAY) AND CURRENT_DATE() "
+            + "                  AND o.obs_datetime BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 7 MONTH) AND CURRENT_DATE() "
             + "                  AND e.encounter_datetime <= CURRENT_DATE() "
             + "                UNION  "
             + "                SELECT p.patient_id, o.value_datetime AS result_Value "
@@ -1201,7 +1205,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                  AND e.encounter_type IN (${6},${9}) "
             + "                  AND o.concept_id = ${1113} "
             + "                  AND o.value_datetime "
-            + "                            BETWEEN DATE_SUB( CURRENT_DATE(), INTERVAL 210 DAY ) AND CURRENT_DATE() "
+            + "                            BETWEEN DATE_SUB( CURRENT_DATE(), INTERVAL 7 MONTH ) AND CURRENT_DATE() "
             + "                  AND e.encounter_datetime <= CURRENT_DATE() "
             + "                UNION  "
             + "                SELECT p.patient_id, o.value_coded AS result_Value "
@@ -1216,7 +1220,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                  AND o.concept_id = ${1406} "
             + "                  AND o.value_coded = ${42} "
             + "                  AND o.obs_datetime "
-            + "                    BETWEEN DATE_SUB( CURRENT_DATE(), INTERVAL 210 DAY ) AND CURRENT_DATE() "
+            + "                    BETWEEN DATE_SUB( CURRENT_DATE(), INTERVAL 7 MONTH ) AND CURRENT_DATE() "
             + "                UNION  "
             + "                SELECT p.patient_id , cn.name AS result_Value "
             + "                FROM patient p "
@@ -1231,7 +1235,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                  AND ps.state = ${6269} "
             + "                  AND pgr.program_id = ${5} "
             + "                  AND cn.locale = 'pt' "
-            + "                  AND ps.start_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 210 DAY) "
+            + "                  AND ps.start_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 MONTH) "
             + "                  AND ps.end_date <= CURRENT_DATE() "
             + "               UNION  "
             + "                SELECT p.patient_id, o.value_coded  AS result_Value "
@@ -1246,7 +1250,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                  AND o.concept_id = ${23761} "
             + "                  AND o.value_coded = ${1065} "
             + "                  AND e.encounter_datetime "
-            + "                    BETWEEN DATE_SUB( CURRENT_DATE(), INTERVAL 210 DAY ) AND CURRENT_DATE() "
+            + "                    BETWEEN DATE_SUB( CURRENT_DATE(), INTERVAL 7 MONTH ) AND CURRENT_DATE() "
             + ") AS final_query";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
@@ -2142,6 +2146,8 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     cd.setName("List of Patients who are Defaulters or IIT ");
 
     CohortDefinition E1 = getPatientsConsultationAfterMostRecent();
+    CohortDefinition E11 =
+        hivCohortQueries.getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(false);
     CohortDefinition E2 = getE2();
     CohortDefinition E3 = getPatientsConsultationAfterMostRecentE3();
     CohortDefinition X = getLastARVRegimen();
@@ -2149,13 +2155,14 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     CohortDefinition baseCohort = genericCohortQueries.getBaseCohort();
 
     cd.addSearch("E1", EptsReportUtils.map(E1, MAPPING));
+    cd.addSearch("E11", EptsReportUtils.map(E11, MAPPING));
     cd.addSearch("E2", EptsReportUtils.map(E2, MAPPING));
     cd.addSearch("E3", EptsReportUtils.map(E3, MAPPING));
     cd.addSearch("X", EptsReportUtils.map(X, MAPPING3));
     cd.addSearch("A", EptsReportUtils.map(A, MAPPING2));
     cd.addSearch("BASECOHORT", EptsReportUtils.map(baseCohort, MAPPING2));
 
-    cd.setCompositionString("((A AND X) AND BASECOHORT) AND NOT (E1 OR E2 OR E3)");
+    cd.setCompositionString("((A AND X) AND BASECOHORT) AND NOT ((E1 AND E11) OR E2 OR E3)");
 
     return cd;
   }
