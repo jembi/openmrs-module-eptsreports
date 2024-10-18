@@ -922,37 +922,20 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
 
     String query =
-        "SELECT p.patient_id, o.value_datetime  "
-            + "             FROM   patient p   "
-            + "                 INNER JOIN encounter e   "
-            + "                     ON p.patient_id = e.patient_id   "
-            + "                 INNER JOIN obs o   "
-            + "                     ON e.encounter_id = o.encounter_id   "
-            + "                 INNER JOIN ( "
-            + "                         SELECT pp.patient_id, MAX(ee.encounter_datetime) as e_datetime  "
-            + "                         FROM   patient pp   "
-            + "                             INNER JOIN encounter ee   "
-            + "                                 ON pp.patient_id = ee.patient_id   "
-            + "                             INNER JOIN obs oo   "
-            + "                                 ON ee.encounter_id =oo.encounter_id   "
-            + "                         WHERE  pp.voided = 0   "
-            + "                             AND ee.voided = 0   "
-            + "                             AND oo.voided = 0   "
-            + "                             AND ee.location_id = :location  "
-            + "                             AND ee.encounter_type = ${52}  "
-            + "                             AND ee.encounter_datetime <= :endDate  "
-            + "                             AND oo.concept_id = ${23865} "
-            + "                             AND oo.value_coded = ${1065} "
-            + "                         GROUP BY pp.patient_id  "
-            + "                               ) most_recent  ON p.patient_id = most_recent.patient_id    "
-            + "             WHERE  p.voided = 0   "
-            + "                 AND e.voided = 0   "
-            + "                 AND o.voided = 0   "
-            + "                 AND e.location_id = :location  "
-            + "                 AND e.encounter_type = ${52}  "
-            + "                 AND o.concept_id = ${23866} "
-            + "                 AND o.value_datetime <= :endDate  "
-            + "                 AND e.encounter_datetime = most_recent.e_datetime ;";
+        " SELECT pp.patient_id, MAX(oo.value_datetime) as e_datetime  "
+            + "  FROM   patient pp   "
+            + "      INNER JOIN encounter ee   "
+            + "          ON pp.patient_id = ee.patient_id   "
+            + "      INNER JOIN obs oo   "
+            + "          ON ee.encounter_id =oo.encounter_id   "
+            + "  WHERE  pp.voided = 0   "
+            + "      AND ee.voided = 0   "
+            + "      AND oo.voided = 0   "
+            + "      AND ee.location_id = :location  "
+            + "      AND ee.encounter_type = ${52}  "
+            + "      AND ee.encounter_datetime <= :endDate  "
+            + "      AND oo.concept_id = ${23866} "
+            + "  GROUP BY pp.patient_id  ";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
 
@@ -2521,7 +2504,6 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
     map.put("1707", hivMetadata.getAbandonedConcept().getConceptId());
     map.put("6272", hivMetadata.getStateOfStayPriorArtPatientConcept().getConceptId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
@@ -2575,7 +2557,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "     	AND o.voided = 0 "
             + "       AND e.encounter_type = ${53} "
             + "       AND o.concept_id = ${6272} "
-            + "       AND o.value_coded = ${1705} "
+            + "       AND o.value_coded = ${1707} "
             + "       AND e.location_id = :location "
             + "       AND o.obs_datetime = recent_state.abandoned_date "
             + "     GROUP  BY e.patient_id "
