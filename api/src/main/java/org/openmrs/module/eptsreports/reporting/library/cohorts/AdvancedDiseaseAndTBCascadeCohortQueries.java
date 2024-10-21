@@ -1821,9 +1821,6 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     StringSubstitutor sb = new StringSubstitutor(getMetadata());
     cd.setQuery(sb.replace(query));
-    //    if (cd4CountComparison.name().contains("Greater")) {
-    //      System.out.println("PASSOU..: " + cd4CountComparison.name());
-    //    }
 
     return cd;
   }
