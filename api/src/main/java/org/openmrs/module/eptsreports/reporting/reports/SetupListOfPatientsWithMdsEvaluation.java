@@ -3,8 +3,10 @@ package org.openmrs.module.eptsreports.reporting.reports;
 import java.io.IOException;
 import java.util.*;
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsWithMdsEvaluationCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.*;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
+import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -14,6 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Deprecated
 public class SetupListOfPatientsWithMdsEvaluation extends EptsDataExportManager {
+
+  @Autowired
+  private ListOfPatientsWithMdsEvaluationCohortQueries listOfPatientsWithMdsEvaluationCohortQueries;
 
   @Autowired
   private ListOfPatientsWithMdsEvaluationCohortDataset listOfPatientsWithMdsEvaluationCohortDataset;
@@ -60,9 +65,31 @@ public class SetupListOfPatientsWithMdsEvaluation extends EptsDataExportManager 
     rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
     rd.addDataSetDefinition("SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
     rd.addDataSetDefinition("HF", Mapped.mapStraightThrough(new LocationDataSetDefinition()));
+
+    // add a base cohort here
+    rd.setBaseCohortDefinition(
+        EptsReportUtils.map(
+            listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24Or36(),
+            "evaluationYear=${evaluationYear},location=${location}"));
+
     rd.addDataSetDefinition(
         "MDS",
         Mapped.mapStraightThrough(listOfPatientsWithMdsEvaluationCohortDataset.contructDataset()));
+
+    rd.addDataSetDefinition(
+        "MDSB",
+        Mapped.mapStraightThrough(
+            listOfPatientsWithMdsEvaluationCohortDataset.contructDatasetSectionB()));
+
+    rd.addDataSetDefinition(
+        "MDSC",
+        Mapped.mapStraightThrough(
+            listOfPatientsWithMdsEvaluationCohortDataset.contructDatasetSectionC()));
+
+    rd.addDataSetDefinition(
+        "MDSD",
+        Mapped.mapStraightThrough(
+            listOfPatientsWithMdsEvaluationCohortDataset.contructDatasetSectionD()));
 
     return rd;
   }

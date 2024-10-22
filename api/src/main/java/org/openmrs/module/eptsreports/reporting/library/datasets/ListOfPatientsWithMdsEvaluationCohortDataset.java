@@ -35,9 +35,9 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.setName("MDS");
     pdd.setParameters(getParameters());
 
-    pdd.addRowFilter(
-        listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24Or36(),
-        "evaluationYear=${evaluationYear},location=${location}");
+    //    pdd.addRowFilter(
+    //        listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24Or36(),
+    //        "evaluationYear=${evaluationYear},location=${location}");
 
     //  SECÇÃO A
     //  INFORMAÇÃO DO PACIENTE
@@ -97,6 +97,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         listOfPatientsWithMdsEvaluationCohortQueries.getCd4Result(),
         endDateMappings);
 
+    return pdd;
+  }
+
+  public DataSetDefinition contructDatasetSectionB() {
+    PatientDataSetDefinition pdd = new PatientDataSetDefinition();
+    pdd.setName("MDSB");
+    pdd.setParameters(getParameters());
     //  SECÇÃO B
     //  12 MESES DEPOIS DO INÍCIO DO TARV: ELIGIBILIDADE A MDS
 
@@ -131,7 +138,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B5- Teve registo de boa adesão em TODAS consultas entre 1˚ e 3˚ mês de TARV?
     pdd.addColumn(
         "good_adherence_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(true, 1, 3, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(true, 1, 3),
         // minNumberOfMonths and MaxNumberOfMonths has no effect here because the boolean b5OrC5 is
         // set to true
         endDateMappings);
@@ -141,28 +148,27 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "pregnant_breastfeeding_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsPregnantBreastfeeding3MonthsTarv(
-            3, 9, true, 1, 4),
+            3, 9, true),
         endDateMappings);
 
     // B7 - Condição Clínica Activa de Estadio III ou IV entre a Data Inscrição no MDS e 12º mês de
     // TARV
     pdd.addColumn(
         "clinical_condiction_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getActiveClinicalCondiction(0, 12, true, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getActiveClinicalCondiction(0, 12, true),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // B8- Teve TB nos 1˚s 12 meses de TARV: (coluna Q) - Resposta = Sim ou Não (RF23)
     pdd.addColumn(
         "tb_tarv_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithTbThirdToNineMonth(
-            3, 9, true, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithTbThirdToNineMonth(3, 9, true),
         endDateMappings);
 
     // B9- Data de inscrição no MDS: (coluna R) - Resposta = Data de Inscrição (RF24)
     pdd.addColumn(
         "mds_date",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(0, 12, true, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(0, 12, true),
         endDateMappings,
         new HashDateConverter());
 
@@ -343,6 +349,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(12, 0, 3),
         b20Mappings);
 
+    return pdd;
+  }
+
+  public DataSetDefinition contructDatasetSectionC() {
+    PatientDataSetDefinition pdd = new PatientDataSetDefinition();
+    pdd.setName("MDSC");
+    pdd.setParameters(getParameters());
+
     // C1 - Data do pedido da CV entre 12º e 24º mês de TARV: (coluna AP)
     pdd.addColumn(
         "cv_date_c",
@@ -375,8 +389,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C5- Teve registo de boa adesão em TODAS consultas entre 12˚ e 24˚ mês de TARV?
     pdd.addColumn(
         "good_adherence_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(
-            false, 12, 24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(false, 12, 24),
         endDateMappings);
 
     // C6 - Esteve grávida ou foi lactante entre 12˚ e 24º mês de TARV?: (coluna AU) - Resposta =
@@ -384,28 +397,27 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "pregnant_breastfeeding_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsPregnantBreastfeeding3MonthsTarv(
-            12, 24, false, 2, 4),
+            12, 24, false),
         endDateMappings);
 
     // C7 - Condição Clínica Activa de Estadio III ou IV entre 12˚ e 24˚ mês de TARV
     pdd.addColumn(
         "clinical_condiction_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getActiveClinicalCondiction(
-            12, 24, false, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getActiveClinicalCondiction(12, 24, false),
         endDateMappings);
 
     // C8 - Teve TB entre 12˚ e 24 ˚ meses de TARV: (coluna AW) - Resposta = Sim ou Não (RF38)
     pdd.addColumn(
         "tb_tarv_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithTbThirdToNineMonth(
-            12, 24, false, 2, 4),
+            12, 24, false),
         endDateMappings);
 
     // C9 - Data de inscrição no MDS entre 12º e 24º mês de TAV: (coluna AX) - Resposta = Data de
     // Inscrição (RF39)
     pdd.addColumn(
         "mds_tarv_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(12, 24, false, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(12, 24, false),
         endDateMappings,
         new HashDateConverter());
 
@@ -586,6 +598,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(24, 0, 2),
         c20Mappings);
 
+    return pdd;
+  }
+
+  public DataSetDefinition contructDatasetSectionD() {
+    PatientDataSetDefinition pdd = new PatientDataSetDefinition();
+    pdd.setName("MDSD");
+    pdd.setParameters(getParameters());
+
     // D.1 - Data do pedido da CV de seguimento - D.1 (coluna BV)
     pdd.addColumn(
         "cv_date_d",
@@ -618,22 +638,20 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // D.5- Teve registo de boa adesão em TODAS consultas entre 24˚ e 36˚ mês de TARV?
     pdd.addColumn(
         "good_adherence_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(
-            false, 24, 36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(false, 24, 36),
         endDateMappings);
 
     // D.6 - Esteve grávida ou foi lactante entre 24˚ e 36º mês de TARV?: (coluna CA)
     pdd.addColumn(
         "pregnant_breastfeeding_d",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsPregnantBreastfeeding3MonthsTarv(
-            24, 36, false, 3, 4),
+            24, 36, false),
         endDateMappings);
 
     // D7 - Condição Clínica Activa de Estadio III ou IV entre 24º e 36º mês de TARV
     pdd.addColumn(
         "clinical_condiction_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getActiveClinicalCondiction(
-            24, 36, false, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getActiveClinicalCondiction(24, 36, false),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -641,13 +659,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "tb_tarv_d",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithTbThirdToNineMonth(
-            24, 36, false, 3, 4),
+            24, 36, false),
         endDateMappings);
 
     // D.9 - Data de inscrição em algum MDS entre 24º e 36º mês de TARV: (coluna CD)
     pdd.addColumn(
         "mds_tarv_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(24, 36, false, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(24, 36, false),
         endDateMappings,
         new HashDateConverter());
 
