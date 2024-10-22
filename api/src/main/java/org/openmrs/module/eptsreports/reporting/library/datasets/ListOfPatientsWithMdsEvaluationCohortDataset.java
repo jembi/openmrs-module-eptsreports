@@ -29,11 +29,15 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         listOfPatientsWithMdsEvaluationCohortQueries;
   }
 
-  public DataSetDefinition contructDataset() {
-
+  public DataSetDefinition contructDatasetSectionB() {
     PatientDataSetDefinition pdd = new PatientDataSetDefinition();
-    pdd.setName("MDS");
+    pdd.setName("MDSB");
     pdd.setParameters(getParameters());
+
+    // SECTION B - 12 Months Cohort
+    pdd.addRowFilter(
+        listOfPatientsWithMdsEvaluationCohortQueries.getCoort(2, 1, false),
+        "evaluationYear=${evaluationYear},location=${location}");
 
     //  SECÇÃO A
     //  INFORMAÇÃO DO PACIENTE
@@ -92,19 +96,6 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "initial_cd4_result",
         listOfPatientsWithMdsEvaluationCohortQueries.getCd4Result(),
         endDateMappings);
-
-    return pdd;
-  }
-
-  public DataSetDefinition contructDatasetSectionB() {
-    PatientDataSetDefinition pdd = new PatientDataSetDefinition();
-    pdd.setName("MDSB");
-    pdd.setParameters(getParameters());
-
-    // SECTION B - 12 Months Cohort
-    pdd.addRowFilter(
-        listOfPatientsWithMdsEvaluationCohortQueries.getCoort(2, 1, false),
-        "evaluationYear=${evaluationYear},location=${location}");
 
     //  SECÇÃO B
     //  12 MESES DEPOIS DO INÍCIO DO TARV: ELIGIBILIDADE A MDS
@@ -364,6 +355,64 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         listOfPatientsWithMdsEvaluationCohortQueries.getCoort(3, 2, false),
         "evaluationYear=${evaluationYear},location=${location}");
 
+    //  SECÇÃO A
+    //  INFORMAÇÃO DO PACIENTE
+
+    // Patient_ID
+    pdd.addColumn("pid", new PersonIdDataDefinition(), "");
+
+    // A1- Nr. Sequencial: (Coluna A)
+    pdd.addColumn("counter", new PersonIdDataDefinition(), "", new ObjectCounterConverter());
+
+    // A2- Coorte: (coluna B)
+    pdd.addColumn(
+        "coort",
+        listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24Or36Months(),
+        "evaluationYear=${evaluationYear},location=${location}");
+
+    // A3- Sexo: (coluna C)
+    pdd.addColumn("gender", new GenderDataDefinition(), "");
+
+    // A4- Idade: (coluna D)
+    pdd.addColumn(
+        "age",
+        listOfPatientsWithMdsEvaluationCohortQueries.getAgeOnMOHArtStartDate(),
+        endDateMappings);
+
+    // A5- Data início TARV: (coluna E)
+    pdd.addColumn(
+        "art_start",
+        listOfPatientsWithMdsEvaluationCohortQueries.getArtStartDate(),
+        endDateMappings,
+        new HashDateConverter());
+
+    // A6- Elegível ao TPT no Início do TARV: (coluna F)
+    pdd.addColumn(
+        "tpt_eligible_tarv",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsTptNotEligible(),
+        endDateMappings,
+        new YesOrNoConverter());
+
+    // A7- Data de início do TPT: (coluna G)
+    pdd.addColumn(
+        "tpt_start_date",
+        listOfPatientsWithMdsEvaluationCohortQueries.getTptInitiationDate(),
+        endDateMappings,
+        new HashDateConverter());
+
+    // A8- Data de registo do resultado de CD4 inicial: (coluna H)
+    pdd.addColumn(
+        "cd4_register_date",
+        listOfPatientsWithMdsEvaluationCohortQueries.getCd4ResultDate(),
+        endDateMappings,
+        new HashDateConverter());
+
+    // A9- Resultado do CD4 Inicial: (coluna I)
+    pdd.addColumn(
+        "initial_cd4_result",
+        listOfPatientsWithMdsEvaluationCohortQueries.getCd4Result(),
+        endDateMappings);
+
     // C1 - Data do pedido da CV entre 12º e 24º mês de TARV: (coluna AP)
     pdd.addColumn(
         "cv_date_c",
@@ -617,6 +666,64 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addRowFilter(
         listOfPatientsWithMdsEvaluationCohortQueries.getCoort(4, 3, false),
         "evaluationYear=${evaluationYear},location=${location}");
+
+    //  SECÇÃO A
+    //  INFORMAÇÃO DO PACIENTE
+
+    // Patient_ID
+    pdd.addColumn("pid", new PersonIdDataDefinition(), "");
+
+    // A1- Nr. Sequencial: (Coluna A)
+    pdd.addColumn("counter", new PersonIdDataDefinition(), "", new ObjectCounterConverter());
+
+    // A2- Coorte: (coluna B)
+    pdd.addColumn(
+        "coort",
+        listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24Or36Months(),
+        "evaluationYear=${evaluationYear},location=${location}");
+
+    // A3- Sexo: (coluna C)
+    pdd.addColumn("gender", new GenderDataDefinition(), "");
+
+    // A4- Idade: (coluna D)
+    pdd.addColumn(
+        "age",
+        listOfPatientsWithMdsEvaluationCohortQueries.getAgeOnMOHArtStartDate(),
+        endDateMappings);
+
+    // A5- Data início TARV: (coluna E)
+    pdd.addColumn(
+        "art_start",
+        listOfPatientsWithMdsEvaluationCohortQueries.getArtStartDate(),
+        endDateMappings,
+        new HashDateConverter());
+
+    // A6- Elegível ao TPT no Início do TARV: (coluna F)
+    pdd.addColumn(
+        "tpt_eligible_tarv",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsTptNotEligible(),
+        endDateMappings,
+        new YesOrNoConverter());
+
+    // A7- Data de início do TPT: (coluna G)
+    pdd.addColumn(
+        "tpt_start_date",
+        listOfPatientsWithMdsEvaluationCohortQueries.getTptInitiationDate(),
+        endDateMappings,
+        new HashDateConverter());
+
+    // A8- Data de registo do resultado de CD4 inicial: (coluna H)
+    pdd.addColumn(
+        "cd4_register_date",
+        listOfPatientsWithMdsEvaluationCohortQueries.getCd4ResultDate(),
+        endDateMappings,
+        new HashDateConverter());
+
+    // A9- Resultado do CD4 Inicial: (coluna I)
+    pdd.addColumn(
+        "initial_cd4_result",
+        listOfPatientsWithMdsEvaluationCohortQueries.getCd4Result(),
+        endDateMappings);
 
     // D.1 - Data do pedido da CV de seguimento - D.1 (coluna BV)
     pdd.addColumn(

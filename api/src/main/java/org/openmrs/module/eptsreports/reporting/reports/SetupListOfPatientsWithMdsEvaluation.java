@@ -73,10 +73,6 @@ public class SetupListOfPatientsWithMdsEvaluation extends EptsDataExportManager 
             "evaluationYear=${evaluationYear},location=${location}"));
 
     rd.addDataSetDefinition(
-        "MDS",
-        Mapped.mapStraightThrough(listOfPatientsWithMdsEvaluationCohortDataset.contructDataset()));
-
-    rd.addDataSetDefinition(
         "MDSB",
         Mapped.mapStraightThrough(
             listOfPatientsWithMdsEvaluationCohortDataset.contructDatasetSectionB()));
@@ -108,7 +104,7 @@ public class SetupListOfPatientsWithMdsEvaluation extends EptsDataExportManager 
       Properties props = new Properties();
       props.put(
           "repeatingSections",
-          "sheet:1,row:13,dataset:MDS | sheet:1,row:13,dataset:MDSB | sheet:1,row:13,dataset:MDSC | sheet:1,row:13,dataset:MDSD");
+          "sheet:1,row:13,dataset:MDSB | sheet:2,row:13,dataset:MDSC | sheet:3,row:13,dataset:MDSD");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
