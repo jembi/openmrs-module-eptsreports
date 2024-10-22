@@ -106,7 +106,9 @@ public class SetupListOfPatientsWithMdsEvaluation extends EptsDataExportManager 
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:13,dataset:MDS");
+      props.put(
+          "repeatingSections",
+          "sheet:1,row:13,dataset:MDS | sheet:1,row:13,dataset:MDSB | sheet:1,row:13,dataset:MDSC | sheet:1,row:13,dataset:MDSD");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
