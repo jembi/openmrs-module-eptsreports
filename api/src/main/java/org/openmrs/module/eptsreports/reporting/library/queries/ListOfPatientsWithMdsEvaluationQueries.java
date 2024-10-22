@@ -551,8 +551,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
    *
    * @return String
    */
-  public String getPatientsWhoHaveTransferredOutAsPermananceState(
-      int minCohortNumberOfYears, int maxCohortNumberOfYears) {
+  public String getPatientsWhoHaveTransferredOutAsPermananceState() {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("2", hivMetadata.getARTProgram().getProgramId());
@@ -772,9 +771,6 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "                                              last_next_scheduled_pick_up "
             + "                                                                ON last_next_scheduled_pick_up.patient_id = p.patient_id "
             + "                                          WHERE  last_next_scheduled_pick_up.max_datetame > :endDate ) "
-            + " AND transferred_out.patient_id IN ( "
-            + getCohortPatientsByYear(minCohortNumberOfYears, maxCohortNumberOfYears)
-            + " ) "
             + "GROUP  BY transferred_out.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -795,9 +791,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
       int stateOnProgram,
       int stateOnEncounters,
       boolean transferredOut,
-      boolean isForCohortDefinition,
-      int minCohortNumberOfYears,
-      int maxCohortNumberOfYears) {
+      boolean isForCohortDefinition) {
     String query =
         isForCohortDefinition
             ? "  SELECT mostrecent.patient_id "
@@ -941,12 +935,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
               + "              AND e.encounter_datetime <= :endDate ";
     }
     query +=
-        " )  "
-            + " GROUP BY lastest.patient_id )mostrecent "
-            + " WHERE mostrecent.patient_id IN ( "
-            + getCohortPatientsByYear(minCohortNumberOfYears, maxCohortNumberOfYears)
-            + " ) "
-            + " GROUP BY mostrecent.patient_id";
+        " )  " + " GROUP BY lastest.patient_id )mostrecent " + " GROUP BY mostrecent.patient_id";
     return query;
   }
 
@@ -962,8 +951,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
    *
    * @return {@link String}
    */
-  public String getPatientsActiveOnTarv(
-      int abandonoMonths, int minCohortNumberOfYears, int maxCohortNumberOfYears) {
+  public String getPatientsActiveOnTarv(int abandonoMonths) {
     return "SELECT  final.patient_id, 'ACTIVO' "
         + "FROM "
         + "    ( "
@@ -971,26 +959,17 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         + " ) final "
         + "WHERE final.patient_id NOT IN ("
         + new EptsQueriesUtil()
-            .unionBuilder(
-                getPatientsWhoAbandonedTarvQuery(
-                    false, abandonoMonths, minCohortNumberOfYears, maxCohortNumberOfYears))
-            .union(
-                getB13PatientsWhoHaveTransferredOutAsPermananceState(
-                    minCohortNumberOfYears, maxCohortNumberOfYears))
+            .unionBuilder(getPatientsWhoAbandonedTarvQuery(false, abandonoMonths))
+            .union(getB13PatientsWhoHaveTransferredOutAsPermananceState())
             .union(
                 getPatientsWhoSuspendedTarvOrAreTransferredOut(
                     hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId(),
                     hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
                     false,
-                    true,
-                    minCohortNumberOfYears,
-                    maxCohortNumberOfYears))
-            .union(getPatientsWhoDied(false, minCohortNumberOfYears, maxCohortNumberOfYears))
+                    true))
+            .union(getPatientsWhoDied(false))
             .buildQuery()
         + "     ) "
-        + " AND final.patient_id IN ( "
-        + getCohortPatientsByYear(minCohortNumberOfYears, maxCohortNumberOfYears)
-        + " ) "
         + "GROUP BY final.patient_id ";
   }
 
@@ -1006,8 +985,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
    *
    * @return {@link String}
    */
-  public String getPatientsWhoDied(
-      boolean isForDataDefinition, int minCohortNumberOfYears, int maxCohortNumberOfYears) {
+  public String getPatientsWhoDied(boolean isForDataDefinition) {
     String fromSQL =
         "FROM ("
             + " SELECT lastest.patient_id ,Max(lastest.deceased_date) as  deceased_date "
@@ -1095,9 +1073,6 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "              AND e.encounter_datetime <= :endDate"
             + " )  "
             + " GROUP BY lastest.patient_id )mostrecent "
-            + " WHERE mostrecent.patient_id IN ( "
-            + getCohortPatientsByYear(minCohortNumberOfYears, maxCohortNumberOfYears)
-            + " ) "
             + " GROUP BY mostrecent.patient_id";
 
     return isForDataDefinition
@@ -1119,11 +1094,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
    *
    * @return {@link String}
    */
-  public String getPatientsWhoAbandonedTarvQuery(
-      boolean isForDataDefinition,
-      int abandonoMonths,
-      int minCohortNumberOfYears,
-      int maxCohortNumberOfYears) {
+  public String getPatientsWhoAbandonedTarvQuery(boolean isForDataDefinition, int abandonoMonths) {
     String fromSQL =
         "FROM     ( "
             + "         SELECT "
@@ -1259,9 +1230,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
                             .getProgramWorkflowStateId(),
                         hivMetadata.getTransferredOutConcept().getConceptId(),
                         true,
-                        true,
-                        minCohortNumberOfYears,
-                        maxCohortNumberOfYears))
+                        true))
                 .union(
                     getPatientsWhoSuspendedTarvOrAreTransferredOut(
                         hivMetadata
@@ -1269,15 +1238,10 @@ public class ListOfPatientsWithMdsEvaluationQueries {
                             .getProgramWorkflowStateId(),
                         hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
                         false,
-                        true,
-                        minCohortNumberOfYears,
-                        maxCohortNumberOfYears))
-                .union(getPatientsWhoDied(false, minCohortNumberOfYears, maxCohortNumberOfYears))
+                        true))
+                .union(getPatientsWhoDied(false))
                 .buildQuery()
             + ") "
-            + " AND final.patient_id IN ( "
-            + getCohortPatientsByYear(minCohortNumberOfYears, maxCohortNumberOfYears)
-            + " ) "
             + "GROUP BY final.patient_id";
 
     return isForDataDefinition
@@ -1285,8 +1249,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         : " SELECT final.patient_id ".concat(fromSQL);
   }
 
-  public String getB13PatientsWhoHaveTransferredOutAsPermananceState(
-      int minCohortNumberOfYears, int maxCohortNumberOfYears) {
+  public String getB13PatientsWhoHaveTransferredOutAsPermananceState() {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("2", hivMetadata.getARTProgram().getProgramId());
@@ -1505,9 +1468,6 @@ public class ListOfPatientsWithMdsEvaluationQueries {
             + "                                              last_next_scheduled_pick_up "
             + "                                                                ON last_next_scheduled_pick_up.patient_id = p.patient_id "
             + "                                          WHERE  last_next_scheduled_pick_up.max_datetame > :endDate ) "
-            + " AND transferred_out.patient_id IN ( "
-            + getCohortPatientsByYear(minCohortNumberOfYears, maxCohortNumberOfYears)
-            + " ) "
             + "GROUP  BY transferred_out.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
