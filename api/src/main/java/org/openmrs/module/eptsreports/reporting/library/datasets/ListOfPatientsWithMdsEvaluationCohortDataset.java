@@ -177,21 +177,21 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B10.1 -Tipo de MDS: (MDS1) Coluna S
     pdd.addColumn(
         "mds_one_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds1(12, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1(12),
         endDateMappings,
         new MdcDispensationTypeConverter());
 
     // B10.2 - Data Início de MDS1: Coluna T
     pdd.addColumn(
         "mds_one_start_date_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds1StartDate(12, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1StartDate(12),
         endDateMappings,
         new HashDateConverter());
 
     // B10.3 - Data Fim de MDS1: Coluna U
     pdd.addColumn(
         "mds_one_end_date_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds1EndDate(12, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1EndDate(12),
         endDateMappings,
         new HashDateConverter());
 
@@ -431,21 +431,21 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C10.1 -Tipo de MDS: (MDS1) Coluna AY
     pdd.addColumn(
         "mds_one_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds1(24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1(24),
         endDateMappings,
         new MdcDispensationTypeConverter());
 
     // C10.2 - Data Início de MDS1: Coluna AZ
     pdd.addColumn(
         "mds_one_start_date_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds1StartDate(24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1StartDate(24),
         endDateMappings,
         new HashDateConverter());
 
     // C10.3 - Data Fim de MDS1: Coluna BA
     pdd.addColumn(
         "mds_one_end_date_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds1EndDate(24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1EndDate(24),
         endDateMappings,
         new HashDateConverter());
 
@@ -684,21 +684,21 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // D10.1 -Tipo de MDS: (MDS1) Coluna CE
     pdd.addColumn(
         "mds_one_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds1(36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1(36),
         endDateMappings,
         new MdcDispensationTypeConverter());
 
     // D10.2 - Data Início de MDS1: Coluna CF
     pdd.addColumn(
         "mds_one_start_date_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds1StartDate(36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1StartDate(36),
         endDateMappings,
         new HashDateConverter());
 
     // D10.3 - Data Fim de MDS1: Coluna CG
     pdd.addColumn(
         "mds_one_end_date_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds1EndDate(36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1EndDate(36),
         endDateMappings,
         new HashDateConverter());
 

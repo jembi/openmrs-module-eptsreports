@@ -2026,8 +2026,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds1(
-      int numberOfMonths, int minCohortNumberOfYears, int maxCohortNumberOfYears) {
+  public DataDefinition getMds1(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Tipo de MDS - (MDS1) Coluna S");
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -2113,10 +2112,6 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND         ( ostate1.concept_id = ${165322} "
             + "                                 AND  ostate1.value_coded IN (${1256}) ) ) "
             + "                  AND  otype1.obs_group_id = ostate1.obs_group_id "
-            + " AND mds1.patient_id IN ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
-                minCohortNumberOfYears, maxCohortNumberOfYears)
-            + " ) "
             + "       GROUP BY mds1.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -2133,8 +2128,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds1StartDate(
-      int numberOfYears, int minCohortNumberOfYears, int maxCohortNumberOfYears) {
+  public DataDefinition getMds1StartDate(int numberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Data Início de MDS1: Coluna T");
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -2196,10 +2190,6 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND         ( ostate.concept_id = ${165322} "
             + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
             + "                  AND  otype.obs_group_id = ostate.obs_group_id "
-            + " AND p.patient_id IN ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
-                minCohortNumberOfYears, maxCohortNumberOfYears)
-            + " ) "
             + "                  GROUP BY   p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -2494,8 +2484,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds1EndDate(
-      int numberOfMonths, int minCohortNumberOfYears, int maxCohortNumberOfYears) {
+  public DataDefinition getMds1EndDate(int numberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Data Fim de MDS1: Coluna U");
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -2562,10 +2551,6 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND         ( os.concept_id = ${165322} "
             + "                                 AND  os.value_coded IN (${1267}) ) ) "
             + "                  AND  ot.obs_group_id = os.obs_group_id "
-            + " AND mds1_end.patient_id IN ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getCohortPatientsByYear(
-                minCohortNumberOfYears, maxCohortNumberOfYears)
-            + " ) "
             + "                  GROUP BY   mds1_end.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
