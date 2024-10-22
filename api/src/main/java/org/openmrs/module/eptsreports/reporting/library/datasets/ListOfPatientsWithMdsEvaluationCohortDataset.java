@@ -35,10 +35,6 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.setName("MDS");
     pdd.setParameters(getParameters());
 
-    //    pdd.addRowFilter(
-    //        listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24Or36(),
-    //        "evaluationYear=${evaluationYear},location=${location}");
-
     //  SECÇÃO A
     //  INFORMAÇÃO DO PACIENTE
 
@@ -104,6 +100,12 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     PatientDataSetDefinition pdd = new PatientDataSetDefinition();
     pdd.setName("MDSB");
     pdd.setParameters(getParameters());
+
+    // SECTION B - 12 Months Cohort
+    pdd.addRowFilter(
+        listOfPatientsWithMdsEvaluationCohortQueries.getCoort(2, 1, false),
+        "evaluationYear=${evaluationYear},location=${location}");
+
     //  SECÇÃO B
     //  12 MESES DEPOIS DO INÍCIO DO TARV: ELIGIBILIDADE A MDS
 
@@ -357,6 +359,11 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.setName("MDSC");
     pdd.setParameters(getParameters());
 
+    // SECTION C - 24 Months Cohort
+    pdd.addRowFilter(
+        listOfPatientsWithMdsEvaluationCohortQueries.getCoort(3, 2, false),
+        "evaluationYear=${evaluationYear},location=${location}");
+
     // C1 - Data do pedido da CV entre 12º e 24º mês de TARV: (coluna AP)
     pdd.addColumn(
         "cv_date_c",
@@ -605,6 +612,11 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     PatientDataSetDefinition pdd = new PatientDataSetDefinition();
     pdd.setName("MDSD");
     pdd.setParameters(getParameters());
+
+    // SECTION D - 36 Months Cohort
+    pdd.addRowFilter(
+        listOfPatientsWithMdsEvaluationCohortQueries.getCoort(4, 3, false),
+        "evaluationYear=${evaluationYear},location=${location}");
 
     // D.1 - Data do pedido da CV de seguimento - D.1 (coluna BV)
     pdd.addColumn(
