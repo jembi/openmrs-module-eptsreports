@@ -367,7 +367,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C1 - Data do pedido da CV entre 12º e 24º mês de TARV: (coluna AP)
     pdd.addColumn(
         "cv_date_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getLastViralLoadOnThePeriod(12, 24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastViralLoadOnThePeriod(12, 24),
         endDateMappings,
         new HashDateConverter());
 
@@ -375,7 +375,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "cv_result_date_c",
         listOfPatientsWithMdsEvaluationCohortQueries
-            .getLastViralLoadResultDateBetweenPeriodsInMonthsAfterTarv(12, 24, 2, 4),
+            .getLastViralLoadResultDateBetweenPeriodsInMonthsAfterTarv(12, 24),
         endDateMappings,
         new HashDateConverter());
 
@@ -383,14 +383,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "cv_result_c",
         listOfPatientsWithMdsEvaluationCohortQueries
-            .getSecondViralLoadResultBetweenPeriodsOfMonthsAfterTarv(12, 24, 2, 4),
+            .getSecondViralLoadResultBetweenPeriodsOfMonthsAfterTarv(12, 24),
         endDateMappings,
         new ViralLoadQualitativeLabelConverter());
 
     // C4 - Resultado do CD4 feito entre 12˚ e 24˚ mês de TARV- C.4 (Coluna AS)
     pdd.addColumn(
         "cd4_result_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getCd4ResultSectionC(12, 24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getCd4ResultSectionC(12, 24),
         endDateMappings);
 
     // C5- Teve registo de boa adesão em TODAS consultas entre 12˚ e 24˚ mês de TARV?
@@ -536,14 +536,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C11 - Rastreado para TB em TODAS as consultas entre 12˚ e 24˚ mês de TARV?- C.11 (Coluna BN)
     pdd.addColumn(
         "tb_screening_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(true, 12, 24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(true, 12, 24),
         endDateMappings);
 
     // C12 - Recebeu uma forma de PF entre 12˚ e 24˚ mês de TARV?
     pdd.addColumn(
         "family_planning_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedPf12to24MonthTarv(
-            12, 24, 2, 4),
+            12, 24),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -551,7 +551,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "received_tpt_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedTpt24to36MonthsTarv(
-            12, 24, 2, 4),
+            12, 24),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -559,7 +559,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // Resposta = Sim ou Não ou N/A (RF27)
     pdd.addColumn(
         "pb_imc_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(false, 12, 24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(false, 12, 24),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -567,7 +567,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "arterial_pressure_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientWithArterialPressure24To36MonthTarv(
-            12, 24, 2, 4),
+            12, 24),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -621,7 +621,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // D.1 - Data do pedido da CV de seguimento - D.1 (coluna BV)
     pdd.addColumn(
         "cv_date_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getLastViralLoadOnThePeriod(24, 36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastViralLoadOnThePeriod(24, 36),
         endDateMappings,
         new HashDateConverter());
 
@@ -629,7 +629,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "cv_result_date_d",
         listOfPatientsWithMdsEvaluationCohortQueries
-            .getLastViralLoadResultDateBetweenPeriodsInMonthsAfterTarv(24, 36, 3, 4),
+            .getLastViralLoadResultDateBetweenPeriodsInMonthsAfterTarv(24, 36),
         endDateMappings,
         new HashDateConverter());
 
@@ -637,14 +637,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "cv_result_d",
         listOfPatientsWithMdsEvaluationCohortQueries
-            .getSecondViralLoadResultBetweenPeriodsOfMonthsAfterTarv(24, 36, 3, 4),
+            .getSecondViralLoadResultBetweenPeriodsOfMonthsAfterTarv(24, 36),
         endDateMappings,
         new ViralLoadQualitativeLabelConverter());
 
     // D.4 - Resultado do CD4 feito entre 24˚ e 36˚ mês de TARV- D.4 (Coluna BY)
     pdd.addColumn(
         "cd4_result_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getCd4ResultSectionC(24, 36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getCd4ResultSectionC(24, 36),
         endDateMappings);
 
     // D.5- Teve registo de boa adesão em TODAS consultas entre 24˚ e 36˚ mês de TARV?
@@ -789,14 +789,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // D11 - Rastreado para TB em TODAS as consultas entre 24˚ e 36˚ mês de TARV?- D.11 (Coluna CT)
     pdd.addColumn(
         "tb_screening_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(true, 24, 36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(true, 24, 36),
         endDateMappings);
 
     // D12 - Recebeu uma forma de PF entre 24˚ e 36˚ mês de TARV?
     pdd.addColumn(
         "family_planning_d",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedPf12to24MonthTarv(
-            24, 36, 3, 4),
+            24, 36),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -804,14 +804,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "received_tpt_d",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedTpt24to36MonthsTarv(
-            24, 36, 3, 4),
+            24, 36),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // D14 - PB/IMC registado em TODAS as consultas entre o 24˚ a 36º mês de TARV?- D.14 (Coluna CW)
     pdd.addColumn(
         "pb_imc_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(false, 24, 36, 4, 3),
+        listOfPatientsWithMdsEvaluationCohortQueries.getTbScreeningSectionC(false, 24, 36),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -819,7 +819,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "arterial_pressure_d",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientWithArterialPressure24To36MonthTarv(
-            24, 36, 3, 4),
+            24, 36),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
