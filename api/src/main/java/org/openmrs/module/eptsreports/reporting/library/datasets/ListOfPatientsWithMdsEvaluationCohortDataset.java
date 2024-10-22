@@ -198,84 +198,84 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B10.4 - Tipo de MDS: (MDS2) Coluna V
     pdd.addColumn(
         "mds_two_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds2(12, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2(12),
         endDateMappings,
         new MdcDispensationTypeConverter());
 
     // B10.5 - Data Início de MDS2: Coluna W
     pdd.addColumn(
         "mds_two_start_date_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds2StartDate(12, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2StartDate(12),
         endDateMappings,
         new HashDateConverter());
 
     // B10.6 - Data Fim de MDS2: Coluna X
     pdd.addColumn(
         "mds_two_end_date_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds2EndDate(12, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2EndDate(12),
         endDateMappings,
         new HashDateConverter());
 
     // B10.7 - Tipo de MDS: (MDS3) Coluna Y
     pdd.addColumn(
         "mds_three_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds3(12, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3(12),
         endDateMappings,
         new MdcDispensationTypeConverter());
 
     // B10.8 - Data Início de MDS3: Coluna Z
     pdd.addColumn(
         "mds_three_start_date_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds3StartDate(12, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3StartDate(12),
         endDateMappings,
         new HashDateConverter());
 
     // B10.9 - Data Fim de MDS3: Coluna AA
     pdd.addColumn(
         "mds_three_end_date_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds3EndDate(12, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3EndDate(12),
         endDateMappings,
         new HashDateConverter());
 
     // B10.10 - Tipo de MDS: (MDS4) Coluna AB
     pdd.addColumn(
         "mds_four_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds4(12, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4(12),
         endDateMappings,
         new MdcDispensationTypeConverter());
 
     // B10.11 - Data Início de MDS4: Coluna AC
     pdd.addColumn(
         "mds_four_start_date_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds4StartDate(12, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4StartDate(12),
         endDateMappings,
         new HashDateConverter());
 
     // B10.12 - Data Fim de MDS4: Coluna AD
     pdd.addColumn(
         "mds_four_end_date_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds4EndDate(12, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4EndDate(12),
         endDateMappings,
         new HashDateConverter());
 
     // B10.13 - Tipo de MDS: (MDS5) Coluna AE
     pdd.addColumn(
         "mds_five_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds5(12, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5(12),
         endDateMappings,
         new MdcDispensationTypeConverter());
 
     // B10.14 - Data Início de MDS5: Coluna AF
     pdd.addColumn(
         "mds_five_start_date_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds5StartDate(12, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5StartDate(12),
         endDateMappings,
         new HashDateConverter());
 
     // B10.15 - Data Fim de MDS5: Coluna AG
     pdd.addColumn(
         "mds_five_end_date_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds5EndDate(12, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5EndDate(12),
         endDateMappings,
         new HashDateConverter());
 
@@ -290,14 +290,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B12 - Recebeu uma forma de PF entre a data de inscrição no MDS e 12˚ mês de TARV?
     pdd.addColumn(
         "family_planning_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedPf(0, 12, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedPf(0, 12),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // B13 - Recebeu TPT entre a data de inscrição no MDS e 12˚ mês de TARV?
     pdd.addColumn(
         "received_tpt_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedTpt(0, 12, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWhoReceivedTpt(0, 12),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
@@ -313,42 +313,42 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // 12 ̊ mês de TARV?
     pdd.addColumn(
         "arterial_pressure_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientWithArterialPressure(0, 12, 4, 1),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientWithArterialPressure(0, 12),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // B16 - Identificação de n˚ de consultas clínicas entre 6˚ e 12˚ mês de TARV Coluna AM
     pdd.addColumn(
         "clinical_consultations_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(6, 12, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(6, 12),
         endDateMappings,
         new ZeroResultConverter());
 
     // B17 - N˚ de consultas de APSS/PP entre 6˚ e 12˚ mês de TARV - Coluna AN
     pdd.addColumn(
         "apss_pp_consultations_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(6, 12, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(6, 12),
         endDateMappings,
         new ZeroResultConverter());
 
     // B18 - Rastreado para CACUM entre o 1˚ e 12 meses de TARV?
     pdd.addColumn(
         "cacum_screening_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithCacumScreening(0, 12, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithCacumScreening(0, 12),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // B19 - Resultado positivo para CACUM entre o 1˚ e 12 meses de TARV?
     pdd.addColumn(
         "positive_cacum_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithPositiveCacum(0, 12, 1, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithPositiveCacum(0, 12),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // B20 - Estado de permanência no 12˚ mês de TARV: (coluna AO)
     pdd.addColumn(
         "permanence_state_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(12, 0, 3),
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(12),
         b20Mappings);
 
     return pdd;
@@ -452,84 +452,84 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C10.4 - Tipo de MDS: (MDS2) Coluna BB
     pdd.addColumn(
         "mds_two_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds2(24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2(24),
         endDateMappings,
         new MdcDispensationTypeConverter());
 
     // C10.5 - Data Início de MDS2: Coluna BC
     pdd.addColumn(
         "mds_two_start_date_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds2StartDate(24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2StartDate(24),
         endDateMappings,
         new HashDateConverter());
 
     // C10.6 - Data Fim de MDS2: Coluna BD
     pdd.addColumn(
         "mds_two_end_date_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds2EndDate(24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2EndDate(24),
         endDateMappings,
         new HashDateConverter());
 
     // C10.7 - Tipo de MDS: (MDS3) Coluna BE
     pdd.addColumn(
         "mds_three_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds3(24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3(24),
         endDateMappings,
         new MdcDispensationTypeConverter());
 
     // C10.8 - Data Início de MDS3: Coluna BF
     pdd.addColumn(
         "mds_three_start_date_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds3StartDate(24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3StartDate(24),
         endDateMappings,
         new HashDateConverter());
 
     // C10.9 - Data Fim de MDS3: Coluna BG
     pdd.addColumn(
         "mds_three_end_date_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds3EndDate(24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3EndDate(24),
         endDateMappings,
         new HashDateConverter());
 
     // C10.10 - Tipo de MDS: (MDS4) Coluna BH
     pdd.addColumn(
         "mds_four_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds4(24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4(24),
         endDateMappings,
         new MdcDispensationTypeConverter());
 
     // C10.11 - Data Início de MDS4: Coluna BI
     pdd.addColumn(
         "mds_four_start_date_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds4StartDate(24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4StartDate(24),
         endDateMappings,
         new HashDateConverter());
 
     // C10.12 - Data Fim de MDS4: Coluna BJ
     pdd.addColumn(
         "mds_four_end_date_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds4EndDate(24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4EndDate(24),
         endDateMappings,
         new HashDateConverter());
 
     // C10.13 - Tipo de MDS: (MDS5) Coluna BK
     pdd.addColumn(
         "mds_five_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds5(24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5(24),
         endDateMappings,
         new MdcDispensationTypeConverter());
 
     // C10.14 - Data Início de MDS5: Coluna BL
     pdd.addColumn(
         "mds_five_start_date_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds5StartDate(24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5StartDate(24),
         endDateMappings,
         new HashDateConverter());
 
     // C10.15 - Data Fim de MDS5: Coluna BM
     pdd.addColumn(
         "mds_five_end_date_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds5EndDate(24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5EndDate(24),
         endDateMappings,
         new HashDateConverter());
 
@@ -574,35 +574,35 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // C16 - Identificação de n˚ de consultas clínicas entre 6˚ e 12˚ mês de TARV Coluna AJ
     pdd.addColumn(
         "clinical_consultations_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(12, 24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(12, 24),
         endDateMappings,
         new ZeroResultConverter());
 
     // C17 - N˚ de consultas de APSS/PP tre 12˚ e 24˚ mês de TARV - Coluna BT
     pdd.addColumn(
         "apss_pp_consultations_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(12, 24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(12, 24),
         endDateMappings,
         new ZeroResultConverter());
 
     // C18 - Rastreado para CACUM entre 12˚ e 24˚ mês de TARV?
     pdd.addColumn(
         "cacum_screening_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithCacumScreening(12, 24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithCacumScreening(12, 24),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // C19 - Resultado positivo para CACUM entre 12˚ e 24˚ mês de TARV?
     pdd.addColumn(
         "positive_cacum_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithPositiveCacum(12, 24, 2, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithPositiveCacum(12, 24),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // C20 - Estado de permanência no 24˚ mês de TARV: (coluna BU)
     pdd.addColumn(
         "permanence_state_c",
-        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(24, 0, 2),
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(24),
         c20Mappings);
 
     return pdd;
@@ -705,84 +705,84 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // D10.4 - Tipo de MDS: (MDS2) Coluna CH
     pdd.addColumn(
         "mds_two_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds2(36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2(36),
         endDateMappings,
         new MdcDispensationTypeConverter());
 
     // D10.5 - Data Início de MDS2: Coluna CI
     pdd.addColumn(
         "mds_two_start_date_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds2StartDate(36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2StartDate(36),
         endDateMappings,
         new HashDateConverter());
 
     // D10.6 - Data Fim de MDS2: Coluna CJ
     pdd.addColumn(
         "mds_two_end_date_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds2EndDate(36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2EndDate(36),
         endDateMappings,
         new HashDateConverter());
 
     // D10.7 - Tipo de MDS: (MDS3) Coluna CK
     pdd.addColumn(
         "mds_three_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds3(36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3(36),
         endDateMappings,
         new MdcDispensationTypeConverter());
 
     // D10.8 - Data Início de MDS3: Coluna CL
     pdd.addColumn(
         "mds_three_start_date_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds3StartDate(36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3StartDate(36),
         endDateMappings,
         new HashDateConverter());
 
     // D10.9 - Data Fim de MDS3: Coluna CM
     pdd.addColumn(
         "mds_three_end_date_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds3EndDate(36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3EndDate(36),
         endDateMappings,
         new HashDateConverter());
 
     // D10.10 - Tipo de MDS: (MDS4) Coluna CN
     pdd.addColumn(
         "mds_four_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds4(36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4(36),
         endDateMappings,
         new MdcDispensationTypeConverter());
 
     // D10.11 - Data Início de MDS4: Coluna CO
     pdd.addColumn(
         "mds_four_start_date_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds4StartDate(36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4StartDate(36),
         endDateMappings,
         new HashDateConverter());
 
     // D10.12 - Data Fim de MDS4: Coluna CP
     pdd.addColumn(
         "mds_four_end_date_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds4EndDate(36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4EndDate(36),
         endDateMappings,
         new HashDateConverter());
 
     // D10.13 - Tipo de MDS: (MDS5) Coluna CQ
     pdd.addColumn(
         "mds_five_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds5(36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5(36),
         endDateMappings,
         new MdcDispensationTypeConverter());
 
     // D10.14 - Data Início de MDS5: Coluna CR
     pdd.addColumn(
         "mds_five_start_date_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds5StartDate(36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5StartDate(36),
         endDateMappings,
         new HashDateConverter());
 
     // D10.15 - Data Fim de MDS5: Coluna CS
     pdd.addColumn(
         "mds_five_end_date_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds5EndDate(36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5EndDate(36),
         endDateMappings,
         new HashDateConverter());
 
@@ -826,35 +826,35 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // D16 - N˚ de consultas clínicas entre 24˚ e 36˚ mês de TARV- D.16 (Coluna CY)
     pdd.addColumn(
         "clinical_consultations_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(24, 36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getNrClinicalConsultations(24, 36),
         endDateMappings,
         new ZeroResultConverter());
 
     // D17 - N˚ de consultas de APSS/PP tre 24˚ e 36˚ mês de TARV- D.18 (Coluna CZ)
     pdd.addColumn(
         "apss_pp_consultations_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(24, 36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getNrApssPpConsultations(24, 36),
         endDateMappings,
         new ZeroResultConverter());
 
     // D18 - Rastreado para CACUM entre 24˚ e 36˚ mês de TARV?
     pdd.addColumn(
         "cacum_screening_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithCacumScreening(24, 36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithCacumScreening(24, 36),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // D19 - Resultado positivo para CACUM entre 24˚ e 36˚ mês de TARV?
     pdd.addColumn(
         "positive_cacum_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithPositiveCacum(24, 36, 3, 4),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithPositiveCacum(24, 36),
         endDateMappings,
         new NotApplicableIfNullConverter());
 
     // D20 - Estado de permanência no 36˚ mês de TARV: (coluna DA)
     pdd.addColumn(
         "permanence_state_d",
-        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(36, 0, 1),
+        listOfPatientsWithMdsEvaluationCohortQueries.getLastStateOfStayOnTarv(36),
         d20Mappings);
 
     return pdd;
