@@ -13700,6 +13700,7 @@ public class QualityImprovement2020CohortQueries {
             + "                         AND o.voided = 0 "
             + "                         AND e.encounter_type = ${6} "
             + "                         AND e.location_id = :location "
+            + "                         AND e.encounter_datetime <= :revisionEndDate "
             + "                         AND o.concept_id = ${1268} "
             + "                         AND o.value_coded = ${1267} "
             + "                       GROUP  BY p.patient_id) tb_end "
