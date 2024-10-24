@@ -691,12 +691,31 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     compositionCohortDefinition.addSearch(
-        "tpt4", EptsReportUtils.map(getTxCurrEligibleForTPTCompletion(), mapping));
+        "tpt1", EptsReportUtils.map(getTxCurrWithoutTPTCompletion(), mapping));
+
+    compositionCohortDefinition.addSearch(
+        "TBtreatment",
+        EptsReportUtils.map(
+            txTbCohortQueries.txTbNumerator(),
+            "startDate=${endDate-1095d},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "TbScreening",
+        EptsReportUtils.map(
+            txTbCohortQueries.getDenominator(),
+            "startDate=${endDate-14d},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "TbPositive",
+        EptsReportUtils.map(
+            txTbCohortQueries.positiveScreening(),
+            "startDate=${endDate-14d},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "tpt5", EptsReportUtils.map(getTxCurrWithTPTInLast7Months(), mapping));
 
-    compositionCohortDefinition.setCompositionString("tpt4 AND NOT tpt5");
+    compositionCohortDefinition.setCompositionString(
+        "(tpt1 AND TBtreatment AND (TbScreening AND TbPositive)) AND NOT tpt5");
 
     return compositionCohortDefinition;
   }
@@ -2785,7 +2804,6 @@ public class TPTCompletionCohortQueries {
         "SELECT patient_id FROM ( " + arvStart + " ) initiated_art" + "   GROUP BY patient_id";
 
     sqlCohortDefinition.setQuery(query);
-    System.out.println(sqlCohortDefinition.getQuery());
     return sqlCohortDefinition;
   }
 }
