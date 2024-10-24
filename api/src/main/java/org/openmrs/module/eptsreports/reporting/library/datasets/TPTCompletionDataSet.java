@@ -27,6 +27,7 @@ public class TPTCompletionDataSet extends BaseDataSet {
     dataSetDefinition.addParameters(getParameters());
     String mappings = "endDate=${endDate},location=${location}";
     String mappings2 = "startDate=${endDate-7m},endDate=${endDate},location=${location}";
+    String mappings3 = "startDate=${endDate-210d},endDate=${endDate},location=${location}";
 
     CohortDefinition txCurrCompositionCohort =
         txCurrCohortQueries.getTxCurrCompositionCohort("txCurrCompositionTPT", true);
@@ -71,7 +72,7 @@ public class TPTCompletionDataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "TxCurrWithTPTInLast7Months",
             EptsReportUtils.map(
-                tPTCompletionCohortQueries.getTxCurrWithTPTInLast7Months(), mappings2));
+                tPTCompletionCohortQueries.getTxCurrWithTPTInLast7Months(), mappings3));
 
     CohortIndicator txCurrEligibleForTPTInitiation =
         eptsGeneralIndicator.getIndicator(

@@ -15124,8 +15124,6 @@ public class QualityImprovement2020CohortQueries {
 
     sqlCohortDefinition.setQuery((query));
 
-    System.out.println(query);
-
     return sqlCohortDefinition;
   }
 
