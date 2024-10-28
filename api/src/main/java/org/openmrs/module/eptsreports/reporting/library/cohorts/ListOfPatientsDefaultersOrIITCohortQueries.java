@@ -903,9 +903,14 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
   }
 
   /**
-   * Print the Date (value_datetime) of the most recent “Recepcao Levantou ARV” (encounter type 52)
-   * with concept “Levantou ARV” (concept_id 23865) set to “SIM” (Concept id 1065) until report end
-   * date (encounter_datetime <= endDate)
+   * Last Drug Pick up Date on Recepcao Levantou ARV (Data do último Levantamento Recepção Levantou
+   * ARV) (Sheet 1: Column AN)
+   *
+   * <ul>
+   *   <li>Last Drug Pick Up Date on Recepção Levantou ARV – – Sheet 1: Column AN The most recent
+   *       Date of the last Drug Pick Up registered on Ficha Recepção Levantou ARV by report end
+   *       date.
+   * </ul>
    *
    * @return sqlCohortDefinition
    */
@@ -933,7 +938,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "      AND oo.voided = 0   "
             + "      AND ee.location_id = :location  "
             + "      AND ee.encounter_type = ${52}  "
-            + "      AND ee.encounter_datetime <= :endDate  "
+            + "      AND oo.value_datetime <= :endDate  "
             + "      AND oo.concept_id = ${23866} "
             + "  GROUP BY pp.patient_id  ";
 
