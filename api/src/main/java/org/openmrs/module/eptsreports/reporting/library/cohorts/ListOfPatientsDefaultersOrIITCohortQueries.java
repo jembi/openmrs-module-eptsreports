@@ -916,7 +916,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
    */
   public DataDefinition getLastDrugPickUpDate() {
     SqlPatientDataDefinition sqlCohortDefinition = new SqlPatientDataDefinition();
-    sqlCohortDefinition.setName("All with “Diagnótico TB activo” on Ficha clinica");
+    sqlCohortDefinition.setName("Last Drug Pick up Date on Recepcao Levantou ARV");
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
 
@@ -950,22 +950,24 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
   }
 
   /**
-   * Print the Date (value_datetime) of the most recent “Recepcao Levantou ARV” (encounter type 52)
-   * with concept “Levantou ARV” (concept_id 23865) set to “SIM” (Concept id 1065) until report end
-   * date (encounter_datetime <= endDate)
+   * Next Scheduled Drug Pick up Date recepcao/ levantou (Data ultimo levantamento + 30 days)
+   *
+   * <ul>
+   *   <li>Next Scheduled Drug Pick up Date (Ficha Recepção Levantou – Sheet 1: Column AP)
+   *       <p>Next scheduled Drug Pick up Date = Last Drug Pick up Date registered on Ficha Recepção
+   *       Levantou ARV by report end date (value of Column Z) + 30 days.
+   * </ul>
    *
    * @return sqlCohortDefinition
    */
   public DataDefinition getNextDrugPickUpDateARV() {
     SqlPatientDataDefinition sqlCohortDefinition = new SqlPatientDataDefinition();
-    sqlCohortDefinition.setName("All with “Diagnótico TB activo” on Ficha clinica");
+    sqlCohortDefinition.setName("Next Scheduled Drug Pick up Date (Ficha Recepção Levantou)");
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
 
     String query =
@@ -976,7 +978,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                 INNER JOIN obs o   "
             + "                     ON e.encounter_id = o.encounter_id   "
             + "                 INNER JOIN ( "
-            + "                         SELECT pp.patient_id, MAX(ee.encounter_datetime) as e_datetime  "
+            + "                         SELECT pp.patient_id, MAX(oo.value_datetime) as e_datetime  "
             + "                         FROM   patient pp   "
             + "                             INNER JOIN encounter ee   "
             + "                                 ON pp.patient_id = ee.patient_id   "
@@ -987,9 +989,8 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                             AND oo.voided = 0   "
             + "                             AND ee.location_id = :location  "
             + "                             AND ee.encounter_type = ${52}  "
-            + "                             AND ee.encounter_datetime <= :endDate  "
-            + "                             AND oo.concept_id = ${23865} "
-            + "                             AND oo.value_coded = ${1065} "
+            + "                             AND oo.value_datetime <= :endDate  "
+            + "                             AND oo.concept_id = ${23866} "
             + "                         GROUP BY pp.patient_id  "
             + "                               ) most_recent  ON p.patient_id = most_recent.patient_id    "
             + "             WHERE  p.voided = 0   "
@@ -998,8 +999,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                 AND e.location_id = :location  "
             + "                 AND e.encounter_type = ${52}  "
             + "                 AND o.concept_id = ${23866} "
-            + "                 AND o.value_datetime <= :endDate  "
-            + "                 AND e.encounter_datetime = most_recent.e_datetime ;";
+            + "                 AND o.value_datetime = most_recent.e_datetime";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
 
