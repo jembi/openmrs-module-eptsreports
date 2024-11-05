@@ -84,7 +84,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(eligibleCd4Ind, inclusionPeriod),
         dissagregations());
 
-    // TB_DA_FR16 - Number of clients eligible for CD4 count who have a CD4 count within 33 days
+    // TB_DA_FR15 - Number of clients eligible for CD4 count who have a CD4 count within 33 days
     // (Cascade 1)
     CohortIndicator cd4CountInd =
         eptsGeneralIndicator.getIndicator(
