@@ -450,7 +450,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
 
-    CohortDefinition absoluteCd4 = getPatientsWithAbsoluteCd4Count(cd4);
+    CohortDefinition absoluteCd4 = getPatientsWithAbsoluteCd4CountIn33DaysofEligibility(cd4);
     CohortDefinition age = ageCohortQueries.createXtoYAgeCohort("Age", minAge, maxAge);
 
     cd.addSearch("absoluteCd4", EptsReportUtils.map(absoluteCd4, mappings));
@@ -551,6 +551,74 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                          AND ((o.concept_id = ${1695} "
             + "                          AND o.value_numeric IS NOT NULL)"
             + "                             OR (o.concept_id = ${165515} AND o.value_coded IS NOT NULL ) ) "
+            + "                          AND e.location_id = :location "
+            + "                          AND o.obs_datetime BETWEEN eligible.eligibility_date AND DATE_ADD(eligible.eligibility_date, INTERVAL 33 DAY)"
+            + "                   GROUP  BY p.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(getMetadata());
+    cd.setQuery(sb.replace(query));
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWithCD4CountShowingImmunosupression(
+      Cd4CountComparison cd4CountComparison) {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Number of clients with a CD4 count during inclusion period");
+    cd.addParameter(new Parameter("inclusionStartDate", "Inclusion Start Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "         INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "         INNER JOIN ( "
+            + getEligibilityDateQuery()
+            + "         ) eligible ON eligible.patient_id = p.patient_id  "
+            + "                   WHERE  e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.encounter_type IN ( ${6}, ${13}, ${51} ) "
+            + "                          AND ((o.concept_id = ${1695} "
+            + "       AND  ".concat(cd4CountComparison.getProposition())
+            + " ) "
+            + "      OR   ( o.concept_id IN (${165515},${165519}) AND o.value_coded = ";
+
+    if (cd4CountComparison.name().contains("Greater")) {
+      query += "${1254}";
+    } else {
+      query += "${165513}";
+    }
+    query +=
+        " ) ) "
+            + "                          AND e.location_id = :location "
+            + "                          AND DATE(e.encounter_datetime) BETWEEN eligible.eligibility_date AND DATE_ADD(eligible.eligibility_date, INTERVAL 33 DAY) "
+            + "                   GROUP  BY p.patient_id "
+            + " UNION "
+            + "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "         INNER JOIN   encounter e ON e.patient_id = p.patient_id "
+            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "         INNER JOIN ( "
+            + getEligibilityDateQuery()
+            + "         ) eligible ON eligible.patient_id = p.patient_id  "
+            + "                   WHERE  e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.encounter_type IN ( ${53}, ${90} ) "
+            + "                          AND ((o.concept_id = ${1695} "
+            + "       AND  ".concat(cd4CountComparison.getProposition())
+            + " ) "
+            + "      OR   ( o.concept_id IN (${165515},${165519}) AND o.value_coded = ";
+
+    if (cd4CountComparison.name().contains("Greater")) {
+      query += "${1254}";
+    } else {
+      query += "${165513}";
+    }
+    query +=
+        " ) ) "
             + "                          AND e.location_id = :location "
             + "                          AND o.obs_datetime BETWEEN eligible.eligibility_date AND DATE_ADD(eligible.eligibility_date, INTERVAL 33 DAY)"
             + "                   GROUP  BY p.patient_id";
@@ -1844,6 +1912,24 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addSearch(
         cd4CountComparison.getSearchKey(),
         EptsReportUtils.map(getPatientsWithCd4Count(cd4CountComparison), mappings));
+
+    cd.setCompositionString(cd4CountComparison.getCompositionString());
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWithAbsoluteCd4CountIn33DaysofEligibility(
+      Cd4CountComparison cd4CountComparison) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients with Absolute CD4 Count");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    cd.addSearch(
+        cd4CountComparison.getSearchKey(),
+        EptsReportUtils.map(
+            getPatientsWithCD4CountShowingImmunosupression(cd4CountComparison),
+            "inclusionStartDate=${startDate},startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(cd4CountComparison.getCompositionString());
     return cd;
