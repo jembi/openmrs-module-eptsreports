@@ -600,6 +600,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
             + "                   AND        o.value_coded = ${1065} "
             + "                   AND  o2.concept_id = ${23866} "
             + "                   AND        o2.value_datetime IS NOT NULL "
+            + "                   AND        o2.value_datetime <= :startDate "
             + "                   AND        e.location_id =  :location "
             + "                 GROUP BY   p.patient_id "
             + "             ) last_recep ON p.patient_id = last_recep.patient_id "
