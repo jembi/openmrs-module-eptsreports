@@ -149,11 +149,11 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     CohortDefinition cd4Count = getClientsWithCd4Count();
     CohortDefinition cd200AgeFiveOrOver =
-        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo200mm3AA, 5, null);
+        getPatientsWithCd4AndAge(Cd4CountComparison.LessThan200mm3, 5, null);
     CohortDefinition cd500AgeBetweenOneAndFour =
-        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo500mm3, 1, 4);
+        getPatientsWithCd4AndAge(Cd4CountComparison.LessThan500mm3, 1, 4);
     CohortDefinition cd750AgeUnderYear =
-        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo750mm3, null, 1);
+        getPatientsWithCd4AndAge(Cd4CountComparison.LessThan750mm3, null, 1);
 
     cd.addSearch("cd4Count", EptsReportUtils.map(cd4Count, mappings));
     cd.addSearch("cd4Under200", EptsReportUtils.map(cd200AgeFiveOrOver, mappings));
@@ -207,11 +207,11 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
 
     CohortDefinition cd200AgeFiveOrOver =
-        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo200mm3AA, 5, null);
+        getPatientsWithCd4AndAge(Cd4CountComparison.LessThan200mm3, 5, null);
     CohortDefinition cd500AgeBetweenOneAndFour =
-        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo500mm3, 1, 4);
+        getPatientsWithCd4AndAge(Cd4CountComparison.LessThan500mm3, 1, 4);
     CohortDefinition cd750AgeUnderYear =
-        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo750mm3, null, 1);
+        getPatientsWithCd4AndAge(Cd4CountComparison.LessThan750mm3, null, 1);
 
     cd.addSearch("cd4Under200", EptsReportUtils.map(cd200AgeFiveOrOver, mappings));
     cd.addSearch("cd4Under500", EptsReportUtils.map(cd500AgeBetweenOneAndFour, mappings));
@@ -2744,7 +2744,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   }
 
   public enum Cd4CountComparison {
-    LessThanOrEqualTo200mm3 {
+    LessThan200mm3 {
       @Override
       public String getProposition() {
         return "o.value_numeric < 200";
@@ -2760,23 +2760,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
         return "A";
       }
     },
-    LessThanOrEqualTo200mm3AA {
-      @Override
-      public String getProposition() {
-        return "o.value_numeric < 200";
-      }
-
-      @Override
-      public String getCompositionString() {
-        return getSearchKey();
-      }
-
-      @Override
-      public String getSearchKey() {
-        return "AA";
-      }
-    },
-    LessThanOrEqualTo500mm3 {
+    LessThan500mm3 {
       @Override
       public String getProposition() {
         return "o.value_numeric < 500";
@@ -2792,7 +2776,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
         return "B";
       }
     },
-    LessThanOrEqualTo750mm3 {
+    LessThan750mm3 {
       @Override
       public String getProposition() {
         return "o.value_numeric < 750";

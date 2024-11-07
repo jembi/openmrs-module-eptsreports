@@ -87,23 +87,20 @@ public class AdvanceDiseaseAndTbCascadeDimension {
         "200-",
         EptsReportUtils.map(
             advancedDiseaseAndTBCascadeCohortQueries.getPatientsWithAbsoluteCd4Count(
-                AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison
-                    .LessThanOrEqualTo200mm3),
+                AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     dim.addCohortDefinition(
         "500-",
         EptsReportUtils.map(
             advancedDiseaseAndTBCascadeCohortQueries.getPatientsWithAbsoluteCd4Count(
-                AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison
-                    .LessThanOrEqualTo500mm3),
+                AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan500mm3),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dim.addCohortDefinition(
         "750-",
         EptsReportUtils.map(
             advancedDiseaseAndTBCascadeCohortQueries.getPatientsWithAbsoluteCd4Count(
-                AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison
-                    .LessThanOrEqualTo750mm3),
+                AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan750mm3),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dim.addCohortDefinition(
