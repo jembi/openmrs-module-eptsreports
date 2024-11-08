@@ -2180,7 +2180,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
-    // System.out.println(sqlPatientDataDefinition.getQuery());
+
     return sqlPatientDataDefinition;
   }
 
