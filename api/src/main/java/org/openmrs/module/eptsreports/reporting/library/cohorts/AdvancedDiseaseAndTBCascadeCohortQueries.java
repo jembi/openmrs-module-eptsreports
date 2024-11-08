@@ -139,7 +139,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getEligibleClientsWithSevereImmunosuppression() {
+  public CohortDefinition getEligibleClientsWithSevereImmunosuppressionWithin33Days() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("showing severe immunodepression");
@@ -149,11 +149,14 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     CohortDefinition cd4Count = getClientsWithCd4Count();
     CohortDefinition cd200AgeFiveOrOver =
-        getPatientsWithCd4AndAge(Cd4CountComparison.LessThan200mm3, 5, null);
+        getPatientsWithImmunusupresiveCd4AndAgeWithin33Days(
+            Cd4CountComparison.LessThan200mm3, 5, null);
     CohortDefinition cd500AgeBetweenOneAndFour =
-        getPatientsWithCd4AndAge(Cd4CountComparison.LessThan500mm3, 1, 4);
+        getPatientsWithImmunusupresiveCd4AndAgeWithin33Days(
+            Cd4CountComparison.LessThan500mm3, 1, 4);
     CohortDefinition cd750AgeUnderYear =
-        getPatientsWithCd4AndAge(Cd4CountComparison.LessThan750mm3, null, 1);
+        getPatientsWithImmunusupresiveCd4AndAgeWithin33Days(
+            Cd4CountComparison.LessThan750mm3, null, 1);
 
     cd.addSearch("cd4Count", EptsReportUtils.map(cd4Count, mappings));
     cd.addSearch("cd4Under200", EptsReportUtils.map(cd200AgeFiveOrOver, mappings));
@@ -178,7 +181,8 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
 
-    CohortDefinition severeImmunosuppression = getEligibleClientsWithSevereImmunosuppression();
+    CohortDefinition severeImmunosuppression =
+        getEligibleClientsWithSevereImmunosuppressionWithin33Days();
 
     CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
 
@@ -436,13 +440,34 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     return cd;
   }
+
+  private CohortDefinition getPatientsWithCd4AndAge(
+      Cd4CountComparison cd4, Integer minAge, Integer maxAge) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Absolute Cd4");
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+
+    CohortDefinition absoluteCd4 = getPatientsWithAbsoluteCd4Count(cd4);
+    CohortDefinition age = ageCohortQueries.createXtoYAgeCohort("Age", minAge, maxAge);
+
+    cd.addSearch("absoluteCd4", EptsReportUtils.map(absoluteCd4, mappings));
+
+    cd.addSearch("age", EptsReportUtils.map(age, "effectiveDate=${endDate}"));
+
+    cd.setCompositionString("absoluteCd4 AND age");
+
+    return cd;
+  }
+
   /**
    * @param cd4 - Absolute CD4 count
    * @param minAge minimum age of patient base on effective date
    * @param maxAge maximum age of patent base on effective date
    * @return CohortDefinition
    */
-  private CohortDefinition getPatientsWithCd4AndAge(
+  private CohortDefinition getPatientsWithImmunusupresiveCd4AndAgeWithin33Days(
       Cd4CountComparison cd4, Integer minAge, Integer maxAge) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Absolute Cd4");
@@ -636,6 +661,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "  AND e.location_id = :location ";
 
     StringSubstitutor sb = new StringSubstitutor(getMetadata());
+    System.out.println(sb.replace(query));
     cd.setQuery(sb.replace(query));
 
     return cd;

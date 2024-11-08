@@ -112,7 +112,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
             "eligibleWithSevereImmunosuppression",
             EptsReportUtils.map(
                 advancedDiseaseAndTBCascadeCohortQueries
-                    .getEligibleClientsWithSevereImmunosuppression(),
+                    .getEligibleClientsWithSevereImmunosuppressionWithin33Days(),
                 mappings));
 
     dataSetDefinition.addColumn(
