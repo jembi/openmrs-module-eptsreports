@@ -539,13 +539,13 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
       @Override
       public String getQuery() {
         return "( SELECT o1.value_coded "
-        + "  FROM   obs o1 JOIN obs o2 ON o1.encounter_id = o2.encounter_id "
-        + "  WHERE  o1.encounter_id = dispensation.encounter_id "
-        + "    AND o1.concept_id = ${165174} "
-        + "    AND o2.concept_id = ${165322} "
-        + "    AND o2.value_coded != ${1267} "
-        + "    AND o1.obs_group_id = o2.obs_group_id "
-        + "  LIMIT  1,1 ) MDC2";
+            + "  FROM   obs o1 JOIN obs o2 ON o1.encounter_id = o2.encounter_id "
+            + "  WHERE  o1.encounter_id = dispensation.encounter_id "
+            + "    AND o1.concept_id = ${165174} "
+            + "    AND o2.concept_id = ${165322} "
+            + "    AND o2.value_coded != ${1267} "
+            + "    AND o1.obs_group_id = o2.obs_group_id "
+            + "  LIMIT  1,1 ) MDC2";
       }
     },
     MDC3 {
