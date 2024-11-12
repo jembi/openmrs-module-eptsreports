@@ -2647,6 +2647,48 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     public abstract String getSearchKey();
   }
 
+  public enum semiQuantitativeCd4CountComparison {
+    LessThanOrEqualTo200mm3 {
+      @Override
+      public String getProposition() {
+        return "o.value_coded = ${165513}";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getSearchKey();
+      }
+
+      @Override
+      public String getSearchKey() {
+        return "AA";
+      }
+    },
+
+    GreaterThanOrEqualTo200mm3 {
+      @Override
+      public String getProposition() {
+        return "o.value_coded =${1254}";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getSearchKey();
+      }
+
+      @Override
+      public String getSearchKey() {
+        return "BB";
+      }
+    };
+
+    public abstract String getProposition();
+
+    public abstract String getCompositionString();
+
+    public abstract String getSearchKey();
+  }
+
   private Map<String, Integer> getMetadata() {
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
