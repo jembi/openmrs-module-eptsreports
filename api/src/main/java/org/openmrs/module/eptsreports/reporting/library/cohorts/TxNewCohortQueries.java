@@ -424,9 +424,9 @@ public class TxNewCohortQueries {
    *   <li>CD4 absolute result or semi-quantitative registered on the e-Lab Form
    * </ul>
    *
-   * <p>The system will consider the oldest CD4 result date between patient ART Start Date -
-   * 90 days and ART Start Date + 28 days from the different sources listed above for the evaluation
-   * of the result (< 200).
+   * <p>The system will consider the oldest CD4 result date between patient ART Start Date - 90 days
+   * and ART Start Date + 28 days from the different sources listed above for the evaluation of the
+   * result (< 200).
    *
    * <p><b>Notes: </b>For the CD4 at ART initiation registered on Ficha Resumo, the “ART Start Date”
    * that is registered on the same Ficha Resumo will be considered as the CD4 result date. For
