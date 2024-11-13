@@ -125,7 +125,6 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     compositionCohortDefinition.addSearch(
         "B13", map(rmB13, "endDate=${endDate},location=${location}"));
 
-
     compositionCohortDefinition.setCompositionString(
         "((STARTED OR RESTARTED OR HIGHVL OR ESTADIO OR ELIGIBLECD4 OR PREGNANT) AND B13) AND BASECOHORT");
 
@@ -423,6 +422,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("1705", hivMetadata.getRestartConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
 
     String query =
         "SELECT pa.patient_id "
@@ -440,6 +440,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "        (obs.concept_id = ${1695} AND obs.value_numeric IS NOT NULL) "
             + "        OR "
             + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
+            + "        OR ( obs.concept_id = ${165515} AND obs.value_coded IS NOT NULL ) "
             + "      ) "
                 .concat(
                     duringPeriod
