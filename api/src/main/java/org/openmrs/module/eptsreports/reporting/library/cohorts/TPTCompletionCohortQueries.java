@@ -1180,7 +1180,7 @@ public class TPTCompletionCohortQueries {
             + "  AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1256} , ${1705})) "
                 .concat(
                     duringPeriod
-                        ? " AND o2.obs_datetime >= :startDate AND o2.obs_datetime <= :endDate "
+                        ? " AND o2.obs_datetime >= :startDate AND o2.obs_datetime < :endDate "
                         : " AND o2.obs_datetime <= :endDate ")
             + "  AND e.location_id = :location ";
 
