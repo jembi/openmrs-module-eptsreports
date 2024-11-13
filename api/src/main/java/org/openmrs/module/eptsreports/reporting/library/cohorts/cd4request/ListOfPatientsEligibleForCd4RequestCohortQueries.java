@@ -1144,8 +1144,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
         new Parameter("generationDate", "generationDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
-    CohortDefinition died = getTransferredOutPatientsByGenerationDate();
+    CohortDefinition rmB13 = resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
 
     compositionCohortDefinition.addSearch(
         "C1",
@@ -1159,15 +1158,9 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "TRANSFERREDOUT",
-        map(
-            transferredOut,
-            "startDate=${startDate},endDate=${endDate},onOrBefore=${generationDate},location=${location}"));
-    compositionCohortDefinition.addSearch(
-        "DIED", map(died, "endDate=${generationDate},location=${location}"));
+        "B13", map(rmB13, "endDate=${endDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString(
-        "(C1 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)");
+    compositionCohortDefinition.setCompositionString("(C1 AND B13) AND BASECOHORT");
 
     return compositionCohortDefinition;
   }
@@ -1182,8 +1175,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
         new Parameter("generationDate", "generationDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
-    CohortDefinition died = getTransferredOutPatientsByGenerationDate();
+    CohortDefinition rmB13 = resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
 
     compositionCohortDefinition.addSearch(
         "C2",
@@ -1198,20 +1190,14 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "TRANSFERREDOUT",
-        map(
-            transferredOut,
-            "startDate=${startDate},endDate=${endDate},onOrBefore=${generationDate},location=${location}"));
-    compositionCohortDefinition.addSearch(
-        "DIED", map(died, "endDate=${generationDate},location=${location}"));
+        "B13", map(rmB13, "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "BASECOHORT",
         EptsReportUtils.map(
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString(
-        "((C2 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)) AND NOT C1");
+    compositionCohortDefinition.setCompositionString("((C2 AND B13) AND BASECOHORT) AND NOT C1");
 
     return compositionCohortDefinition;
   }
@@ -1226,8 +1212,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
         new Parameter("generationDate", "generationDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
-    CohortDefinition died = getTransferredOutPatientsByGenerationDate();
+    CohortDefinition rmB13 = resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
 
     compositionCohortDefinition.addSearch(
         "C1",
@@ -1248,12 +1233,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             "endDate=${endDate},generationDate=${generationDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "TRANSFERREDOUT",
-        map(
-            transferredOut,
-            "startDate=${startDate},endDate=${endDate},onOrBefore=${generationDate},location=${location}"));
-    compositionCohortDefinition.addSearch(
-        "DIED", map(died, "endDate=${generationDate},location=${location}"));
+        "B13", map(rmB13, "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "BASECOHORT",
@@ -1261,7 +1241,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
-        "((C3 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2)");
+        "((C3 AND B13) AND BASECOHORT) AND NOT (C1 OR C2)");
 
     return compositionCohortDefinition;
   }
@@ -1276,8 +1256,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
         new Parameter("generationDate", "generationDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
-    CohortDefinition died = getTransferredOutPatientsByGenerationDate();
+    CohortDefinition rmB13 = resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
 
     compositionCohortDefinition.addSearch(
         "C1",
@@ -1303,12 +1282,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "TRANSFERREDOUT",
-        map(
-            transferredOut,
-            "startDate=${startDate},endDate=${endDate},onOrBefore=${generationDate},location=${location}"));
-    compositionCohortDefinition.addSearch(
-        "DIED", map(died, "endDate=${generationDate},location=${location}"));
+        "B13", map(rmB13, "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "BASECOHORT",
@@ -1316,7 +1290,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
-        "((C4 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2 OR C3)");
+        "((C4 AND B13) AND BASECOHORT) AND NOT (C1 OR C2 OR C3)");
 
     return compositionCohortDefinition;
   }
@@ -1331,8 +1305,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
         new Parameter("generationDate", "generationDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
-    CohortDefinition died = getTransferredOutPatientsByGenerationDate();
+    CohortDefinition rmB13 = resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
 
     compositionCohortDefinition.addSearch(
         "C1",
@@ -1365,12 +1338,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             "endDate=${endDate},generationDate=${generationDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "TRANSFERREDOUT",
-        map(
-            transferredOut,
-            "startDate=${startDate},endDate=${endDate},onOrBefore=${generationDate},location=${location}"));
-    compositionCohortDefinition.addSearch(
-        "DIED", map(died, "endDate=${generationDate},location=${location}"));
+        "B13", map(rmB13, "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "BASECOHORT",
@@ -1378,7 +1346,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
-        "((C5 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2 OR C3 OR  C4)");
+        "((C5 AND B13) AND BASECOHORT) AND NOT (C1 OR C2 OR C3 OR  C4)");
 
     return compositionCohortDefinition;
   }
@@ -1393,8 +1361,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
         new Parameter("generationDate", "generationDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
-    CohortDefinition died = getTransferredOutPatientsByGenerationDate();
+    CohortDefinition rmB13 = resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
 
     compositionCohortDefinition.addSearch(
         "C1",
@@ -1432,12 +1399,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "TRANSFERREDOUT",
-        map(
-            transferredOut,
-            "startDate=${startDate},endDate=${endDate},onOrBefore=${generationDate},location=${location}"));
-    compositionCohortDefinition.addSearch(
-        "DIED", map(died, "endDate=${generationDate},location=${location}"));
+        "B13", map(rmB13, "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "BASECOHORT",
@@ -1445,7 +1407,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
-        "((C6 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2 OR C3 OR C4 OR C5)");
+        "((C6 AND B13) AND BASECOHORT) AND NOT (C1 OR C2 OR C3 OR C4 OR C5)");
 
     return compositionCohortDefinition;
   }
