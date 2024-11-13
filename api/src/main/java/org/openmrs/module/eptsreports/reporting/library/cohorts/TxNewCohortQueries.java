@@ -402,7 +402,8 @@ public class TxNewCohortQueries {
 
     cd.addSearch(
         "getCd4Result",
-        EptsReportUtils.map(getCd4Result, "endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(
+            getCd4Result, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch("age", EptsReportUtils.map(age, "effectiveDate=${endDate}"));
 
@@ -424,9 +425,9 @@ public class TxNewCohortQueries {
    *   <li>CD4 absolute result or semi-quantitative registered on the e-Lab Form
    * </ul>
    *
-   * <p>The system will consider the oldest CD4 result date between patient ART Start Date -
-   * 90 days and ART Start Date + 28 days from the different sources listed above for the evaluation
-   * of the result (< 200).
+   * <p>The system will consider the oldest CD4 result date between patient ART Start Date - 90 days
+   * and ART Start Date + 28 days from the different sources listed above for the evaluation of the
+   * result (< 200).
    *
    * <p><b>Notes: </b>For the CD4 at ART initiation registered on Ficha Resumo, the “ART Start Date”
    * that is registered on the same Ficha Resumo will be considered as the CD4 result date. For
@@ -443,6 +444,7 @@ public class TxNewCohortQueries {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("CD4 Results");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -485,7 +487,7 @@ public class TxNewCohortQueries {
             + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "WHERE e.encounter_type IN (${6}, ${13}, ${51}) "
             + "AND e.location_id = :location "
-            + "AND DATE(e.encounter_datetime) <= :endDate "
+            + "AND DATE(e.encounter_datetime) BETWEEN :startDate AND :endDate "
             + "AND o.concept_id IN (${1695}, ${165515}) "
             + "AND e.voided = 0 "
             + "AND o.voided = 0 "
@@ -498,7 +500,7 @@ public class TxNewCohortQueries {
             + "AND e.voided = 0 "
             + "AND o.voided = 0 "
             + "AND o.concept_id IN (${1695}, ${165515}) "
-            + "AND o.obs_datetime <= :endDate "
+            + "AND o.obs_datetime BETWEEN :startDate AND :endDate "
             + "UNION "
             + "SELECT e.patient_id, DATE(o2.value_datetime) AS cd4_date "
             + "FROM encounter e "
@@ -511,7 +513,7 @@ public class TxNewCohortQueries {
             + "AND o2.voided = 0 "
             + "AND o.concept_id = ${23896} "
             + "AND o2.concept_id = ${1190} "
-            + "AND o2.value_datetime <= :endDate "
+            + "AND o2.value_datetime BETWEEN :startDate AND :endDate "
             + ") cd4 ON cd4.patient_id = e.patient_id "
             + "WHERE e.voided = 0 "
             + "AND o.voided = 0 "
@@ -557,7 +559,10 @@ public class TxNewCohortQueries {
             + ") "
             + "OR ( "
             + "DATE(o2.value_datetime) = min_cd4.cd4_date AND e.encounter_type = ${53} "
-            + "AND o.concept_id = ${23896} AND o2.concept_id = ${1190} AND o2.voided = 0 "
+            + "AND o.concept_id = ${23896} "
+            + "AND "
+            + cd4CountComparison.getProposition()
+            + " AND o2.concept_id = ${1190} AND o2.voided = 0 "
             + ") "
             + ") "
             + "GROUP BY p.patient_id";
@@ -627,8 +632,7 @@ public class TxNewCohortQueries {
             null);
 
     cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping1));
-    cd.addSearch(
-        "cd4Under200", EptsReportUtils.map(cd4Under200, "endDate=${endDate},location=${location}"));
+    cd.addSearch("cd4Under200", EptsReportUtils.map(cd4Under200, mapping1));
 
     cd.setCompositionString("txnew AND cd4Under200");
 
