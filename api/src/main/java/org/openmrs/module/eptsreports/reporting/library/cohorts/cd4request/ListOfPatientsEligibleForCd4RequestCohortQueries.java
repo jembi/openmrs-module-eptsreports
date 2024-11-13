@@ -80,12 +80,8 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
    * <p>São elegíveis ao pedido de CD4 de seguimento (CD4_RF7); ou
    *
    * <p>São mulheres grávidas e elegíveis ao pedido de CD4 (CD4_RF8). <br>
-   * Excluindo todos os utentes que: <br>
-   *
-   * <p>Tenham sido transferidos para outra unidade sanitária até a data geração do relatório
-   * (DAH_RF22);
-   *
-   * <p>Tenham registo de óbito até a data geração do relatório (DAH_RF23)
+   * Filtrando todos os utentes activos em TARV no fim do período (seguindo os critérios do
+   * indicador B13 - Nº activos em TARV no fim do mês, do relatório “Resumo Mensal)<br>
    *
    * @see #getPatientWhoInitiatedTarvDuringPeriodC1() Iniciaram TARV
    * @see #getPatientWhoRestartedTarvAndEligibleForCd4RequestC2() Reiniciaram TARV
@@ -93,6 +89,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
    * @see #getPatientWithEstadiamentoIIIorIVC4() Condição activa de estadiamento clinico
    * @see #getPatientEligibleForCd4FollowupC5() Elegiveis ao pedido de CD4 Seguimento
    * @see #getPatientPregnantEligibleForCd4RequestC6() Elegiveis ao pedido de CD4 Seguimento
+   * @see ResumoMensalCohortQueries#getPatientsWhoWereActiveByEndOfMonthB13() Resumo Mensal B13
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsEligibleForCd4RequestComposition() {
@@ -112,6 +109,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     CohortDefinition estadio = getPatientWithEstadiamentoIIIorIVC4();
     CohortDefinition eligibleForCd4Followup = getPatientEligibleForCd4FollowupC5();
     CohortDefinition pregnant = getPatientPregnantEligibleForCd4RequestC6();
+    CohortDefinition rmB13 = resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
 
     compositionCohortDefinition.addSearch("STARTED", map(started, MAPPING2));
     compositionCohortDefinition.addSearch("RESTARTED", map(restarted, MAPPING2));
@@ -124,8 +122,12 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
         EptsReportUtils.map(
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
+    compositionCohortDefinition.addSearch(
+        "B13", map(rmB13, "endDate=${endDate},location=${location}"));
+
+
     compositionCohortDefinition.setCompositionString(
-        "(STARTED OR RESTARTED OR HIGHVL OR ESTADIO OR ELIGIBLECD4 OR PREGNANT) AND BASECOHORT");
+        "((STARTED OR RESTARTED OR HIGHVL OR ESTADIO OR ELIGIBLECD4 OR PREGNANT) AND B13) AND BASECOHORT");
 
     return compositionCohortDefinition;
   }
