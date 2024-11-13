@@ -782,6 +782,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
 
     String query =
         "SELECT pa.patient_id "
@@ -802,6 +803,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "        (obs.concept_id = ${1695} AND obs.value_numeric IS NOT NULL) "
             + "        OR "
             + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
+            + "        OR ( obs.concept_id = ${165515} AND obs.value_coded IS NOT NULL ) "
             + "      ) "
             + "       AND enc.encounter_datetime >= last_vl.most_recent "
             + "  AND enc.encounter_datetime <= :generationDate "
@@ -851,6 +853,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     map.put("42", tbMetadata.getPulmonaryTB().getConceptId());
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
     map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
 
     String query =
         "SELECT pa.patient_id "
@@ -871,6 +874,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "        (obs.concept_id = ${1695} AND obs.value_numeric IS NOT NULL) "
             + "        OR "
             + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
+            + "        OR ( obs.concept_id = ${165515} AND obs.value_coded IS NOT NULL ) "
             + "      ) "
             + "       AND enc.encounter_datetime >= estadio.first_date "
             + "  AND enc.encounter_datetime <= :generationDate "
@@ -963,6 +967,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
 
     String query =
         "SELECT pa.patient_id "
@@ -983,6 +988,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "        (obs.concept_id = ${1695} AND obs.value_numeric IS NOT NULL) "
             + "        OR "
             + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
+            + "        OR ( obs.concept_id = ${165515} AND obs.value_coded IS NOT NULL ) "
             + "      ) "
             + "       AND enc.encounter_datetime >= DATE_ADD(cd4_date.last_cd4, INTERVAL 1 DAY) "
             + "  AND enc.encounter_datetime <= :generationDate "
@@ -1049,6 +1055,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
 
     String query =
         "SELECT pa.patient_id "
@@ -1071,6 +1078,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "        OR "
             + "        (obs.concept_id = ${730} "
             + "             AND obs.value_numeric IS NOT NULL ) "
+            + "        OR ( obs.concept_id = ${165515} AND obs.value_coded IS NOT NULL ) "
             + "      ) "
             + "  AND enc.encounter_datetime >= pregnant.pregnancy_date "
             + "  AND enc.encounter_datetime <= :generationDate "

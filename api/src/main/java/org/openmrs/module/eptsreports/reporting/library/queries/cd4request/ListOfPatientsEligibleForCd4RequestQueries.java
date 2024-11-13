@@ -251,6 +251,7 @@ public class ListOfPatientsEligibleForCd4RequestQueries {
         + "        (obs.concept_id = ${1695} AND obs.value_numeric IS NOT NULL) "
         + "        OR "
         + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
+        + "        OR ( obs.concept_id = ${165515} AND obs.value_coded IS NOT NULL ) "
         + "      ) "
         + "  AND enc.encounter_datetime <= :endDate "
         + "  AND enc.location_id = :location "
