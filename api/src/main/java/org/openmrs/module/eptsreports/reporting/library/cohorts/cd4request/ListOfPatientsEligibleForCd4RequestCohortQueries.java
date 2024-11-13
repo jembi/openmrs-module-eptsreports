@@ -220,17 +220,16 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
   }
 
   /**
-   * <b>C3 - Utentes com 2 CV Altas</b>
+   * <b>C3 - Grupo de Utentes com 2 CVs Altas na Ficha Clínica</b>
    *
    * <p>incluindo todos os utentes com registo do último “Resultado de CV” numa consulta clínica
-   * (Ficha Clínica – Ficha Mestra) ocorrida 6 meses antes do período de reporte, cujo resultado é >
-   * 1000cps/ml (“Data Último Resultado CV” <= “Data Fim” – 6 meses e “Último Resultado CV”
-   * >1000cps/ml);
+   * (Ficha Clínica – Ficha Mestra) ocorrida até o fim período de reporte, cujo resultado é >
+   * 1000cps/ml (“Data Último Resultado CV” <= “Data Fim” e “Último Resultado CV” >1000cps/ml);
    *
    * <p>filtrando as utentes que tiveram registo do penúltimo “Resultado de CV” numa consulta
-   * clínica (Ficha Clínica – Ficha Mestra) ocorrida 6 meses antes do período de reporte, e cujo
-   * resultado também é >1000 cps/ml (“Data Penúltimo Resultado CV” <= “Data Fim” – 6 meses e
-   * “Penúltimo Resultado CV” >1000cps/ml);
+   * clínica (Ficha Clínica – Ficha Mestra) 3 meses antes da data do último resultado de CV até fim
+   * do período, e cujo resultado também é >1000 cps/ml (“Data Penúltimo Resultado CV” <= “data do
+   * último resultado de CV” – 3 meses e “Penúltimo Resultado CV” >1000cps/ml);
    *
    * <p>exluindo as utentes que tiveram registo do resultado do CD4 numa consulta clínica (Ficha
    * Clínica – Ficha Mestra) ocorrida entre “Data Último Resultado CV” e a data geração do
@@ -239,6 +238,96 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
    * @see #getPatientsWithVlResultGreaterThan1000Copies() Ultimo Resultado VL > 1000
    * @see #getPatientsWithSecondVlResultGreaterThan1000Copies() Penultimo Resultado VL > 1000
    * @see #getPatientsWithCd4ResultsOnLastVlDate() Ultimo Resultado CD4 apos Ultimo Resultado VL
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithTwoHighVlResultsOnFCC3() {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName("C3 - Grupo de Utentes com 2 CVs Altas na FC");
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("generationDate", "generationDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition lastVlResult = getPatientsWithVlResultGreaterThan1000Copies();
+    CohortDefinition secondVlResult = getPatientsWithSecondVlResultGreaterThan1000Copies();
+    CohortDefinition lastCd4ResultAfterLastVl = getPatientsWithCd4ResultsOnLastVlDate();
+
+    compositionCohortDefinition.addSearch(
+        "LASTVL", map(lastVlResult, "endDate=${endDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "SECONDVL", map(secondVlResult, "endDate=${endDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "LASTCD4",
+        map(
+            lastCd4ResultAfterLastVl,
+            "endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString("(LASTVL AND SECONDVL) AND NOT LASTCD4");
+
+    return compositionCohortDefinition;
+  }
+
+  /**
+   * <b>C3 - Grupo de Utentes com 2 CVs Altas na Fonte de Laboratório</b>
+   *
+   * <p>incluindo todos os utentes com registo do último “Resultado de CV” numa “Ficha de
+   * Labóratorio” ou “Ficha e-Lab” registada até o fim período de reporte, cujo resultado é >
+   * 1000cps/ml (“Data Último Resultado CV” <= “Data Fim” e “Último Resultado CV” >1000cps/ml);
+   *
+   * <p>filtrando as utentes que tiveram registo do penúltimo “Resultado de CV” numa consulta
+   * clínica “Ficha de Labóratorio” ou “Ficha e-Lab” resgistada 3 meses antes da data do último
+   * resultado de CV até fim do período, e cujo resultado também é >1000 cps/ml (“Data Penúltimo
+   * Resultado CV” <= “data do último resultado de CV” – 3 meses e “Penúltimo Resultado CV”
+   * >1000cps/ml);
+   *
+   * <p>excluindo as utentes que tiveram registo do resultado do CD4 numa consulta clínica (Ficha
+   * Clínica – Ficha Mestra) ocorrida entre “Data Último Resultado CV” e a data geração do
+   * relatório.
+   *
+   * @see #getPatientsWithVlResultOnLabGreaterThan1000Copies() Ultimo Resultado VL > 1000
+   * @see #getPatientsWithSecondVlResultOnLabGreaterThan1000Copies() Penultimo Resultado VL > 1000
+   * @see #getPatientsWithCd4ResultsOnLastVlDate() Ultimo Resultado CD4 apos Ultimo Resultado VL
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithTwoHighVlResultsOnLabC3() {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName(
+        "C3 - Grupo de Utentes com 2 CVs Altas na Fonte de Laboratório");
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("generationDate", "generationDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition lastVlResultLab = getPatientsWithVlResultOnLabGreaterThan1000Copies();
+    CohortDefinition secondVlResultLab = getPatientsWithSecondVlResultOnLabGreaterThan1000Copies();
+    CohortDefinition lastCd4ResultAfterLastVl = getPatientsWithCd4ResultsOnLastVlDate();
+
+    compositionCohortDefinition.addSearch(
+        "LASTVL", map(lastVlResultLab, "endDate=${endDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "SECONDVL", map(secondVlResultLab, "endDate=${endDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "LASTCD4",
+        map(
+            lastCd4ResultAfterLastVl,
+            "endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString("(LASTVL AND SECONDVL) AND NOT LASTCD4");
+
+    return compositionCohortDefinition;
+  }
+
+  /**
+   * <b>C3 - Grupo de Utentes com 2 CVs Altas na Ficha Clínica</b>
+   *
+   * <p>Grupo de Utentes com 2 CVs Altas na Ficha Clínica OU
+   *
+   * <p>Grupo de Utentes com 2 CVs Altas na Fonte de Laboratório
+   *
+   * @see #getPatientsWithTwoHighVlResultsOnFCC3() Último Resultado VL > 1000 FC
+   * @see #getPatientsWithTwoHighVlResultsOnLabC3() Último Resultado VL > 1000 LAB
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithTwoHighVlResultsC3() {
@@ -250,21 +339,13 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
         new Parameter("generationDate", "generationDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition lastVlResult = getPatientsWithVlResultGreaterThan1000Copies();
-    CohortDefinition secondVlResult = getPatientsWithSecondVlResultGreaterThan1000Copies();
-    CohortDefinition lastCd4ResultAfterLastVl = getPatientsWithCd4ResultsOnLastVlDate();
+    CohortDefinition twoHighVlResultsOnFC = getPatientsWithTwoHighVlResultsOnFCC3();
+    CohortDefinition twoHighVlResultsOnLab = getPatientsWithTwoHighVlResultsOnLabC3();
 
-    compositionCohortDefinition.addSearch(
-        "LASTVL", map(lastVlResult, "endDate=${endDate-6m},location=${location}"));
-    compositionCohortDefinition.addSearch(
-        "SECONDVL", map(secondVlResult, "endDate=${endDate-6m},location=${location}"));
-    compositionCohortDefinition.addSearch(
-        "LASTCD4",
-        map(
-            lastCd4ResultAfterLastVl,
-            "endDate=${endDate-6m},generationDate=${generationDate},location=${location}"));
+    compositionCohortDefinition.addSearch("LASTVLFC", map(twoHighVlResultsOnFC, MAPPING5));
+    compositionCohortDefinition.addSearch("SECONDVLLAB", map(twoHighVlResultsOnLab, MAPPING5));
 
-    compositionCohortDefinition.setCompositionString("(LASTVL AND SECONDVL) AND NOT LASTCD4");
+    compositionCohortDefinition.setCompositionString("LASTVLFC OR SECONDVLLAB");
 
     return compositionCohortDefinition;
   }
@@ -594,10 +675,40 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
   }
 
   /**
+   * incluindo todos os utentes com registo do último “Resultado de CV” numa consulta clínica (Ficha
+   * Clínica – Ficha Mestra) ocorrida 6 meses antes do período de reporte, cujo resultado é >
+   * 1000cps/ml (“Data Último Resultado CV” <= “Data Fim” – 6 meses e “Último Resultado CV”
+   * >1000cps/ml);
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithVlResultOnLabGreaterThan1000Copies() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("utentes com registo do último “Resultado de CV” > 1000cps/ml");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+
+    String lastVlOnLabQuery = ListOfPatientsEligibleForCd4RequestQueries.getLastVlResultOnLab();
+    String query = new EptsQueriesUtil().patientIdQueryBuilder(lastVlOnLabQuery).getQuery();
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
    * utentes que tiveram registo do penúltimo “Resultado de CV” numa consulta clínica (Ficha Clínica
-   * – Ficha Mestra) ocorrida 6 meses antes do período de reporte, e cujo resultado também é >1000
-   * cps/ml (“Data Penúltimo Resultado CV” <= “Data Fim” – 6 meses e “Penúltimo Resultado CV”
-   * >1000cps/ml)
+   * – Ficha Mestra) 3 meses antes da data do último resultado de CV até fim do período, e cujo
+   * resultado também é >1000 cps/ml (“Data Penúltimo Resultado CV” <= “data do último resultado de
+   * CV” – 3 meses e “Penúltimo Resultado CV” >1000cps/ml)
    *
    * @return {@link CohortDefinition}
    */
@@ -615,6 +726,36 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
 
     String secondVlQuery = ListOfPatientsEligibleForCd4RequestQueries.getSecondVlResult();
     String query = new EptsQueriesUtil().patientIdQueryBuilder(secondVlQuery).getQuery();
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * utentes que tiveram registo do penúltimo “Resultado de CV” numa consulta clínica (Ficha Clínica
+   * – Ficha Mestra) 3 meses antes da data do último resultado de CV até fim do período, e cujo
+   * resultado também é >1000 cps/ml (“Data Penúltimo Resultado CV” <= “data do último resultado de
+   * CV” – 3 meses e “Penúltimo Resultado CV” >1000cps/ml)
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithSecondVlResultOnLabGreaterThan1000Copies() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("utentes com registo do penúltimo “Resultado de CV” > 1000cps/ml");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+
+    String secondVlOnLabQuery = ListOfPatientsEligibleForCd4RequestQueries.getSecondVlResultOnLab();
+    String query = new EptsQueriesUtil().patientIdQueryBuilder(secondVlOnLabQuery).getQuery();
 
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(sb.replace(query));
