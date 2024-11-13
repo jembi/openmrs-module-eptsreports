@@ -93,10 +93,6 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
    * @see #getPatientWithEstadiamentoIIIorIVC4() Condição activa de estadiamento clinico
    * @see #getPatientEligibleForCd4FollowupC5() Elegiveis ao pedido de CD4 Seguimento
    * @see #getPatientPregnantEligibleForCd4RequestC6() Elegiveis ao pedido de CD4 Seguimento
-   * @see ResumoMensalCohortQueries#getTranferredOutPatients() Tenham sido transferidos para outra
-   *     unidade sanitária
-   * @see #getTransferredOutPatientsByGenerationDate() Tenham registo de óbito até a data geração do
-   *     relatório
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsEligibleForCd4RequestComposition() {
@@ -116,8 +112,6 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     CohortDefinition estadio = getPatientWithEstadiamentoIIIorIVC4();
     CohortDefinition eligibleForCd4Followup = getPatientEligibleForCd4FollowupC5();
     CohortDefinition pregnant = getPatientPregnantEligibleForCd4RequestC6();
-    CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
-    CohortDefinition died = getTransferredOutPatientsByGenerationDate();
 
     compositionCohortDefinition.addSearch("STARTED", map(started, MAPPING2));
     compositionCohortDefinition.addSearch("RESTARTED", map(restarted, MAPPING2));
@@ -126,20 +120,12 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     compositionCohortDefinition.addSearch("ELIGIBLECD4", map(eligibleForCd4Followup, MAPPING5));
     compositionCohortDefinition.addSearch("PREGNANT", map(pregnant, MAPPING2));
     compositionCohortDefinition.addSearch(
-        "TRANSFERREDOUT",
-        map(
-            transferredOut,
-            "startDate=${startDate},endDate=${endDate},onOrBefore=${generationDate},location=${location}"));
-    compositionCohortDefinition.addSearch(
-        "DIED", map(died, "endDate=${generationDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
         "BASECOHORT",
         EptsReportUtils.map(
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
-        "((STARTED OR RESTARTED OR HIGHVL OR ESTADIO OR ELIGIBLECD4 OR PREGNANT) AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)");
+        "(STARTED OR RESTARTED OR HIGHVL OR ESTADIO OR ELIGIBLECD4 OR PREGNANT) AND BASECOHORT");
 
     return compositionCohortDefinition;
   }
