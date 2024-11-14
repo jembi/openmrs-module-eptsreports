@@ -2,7 +2,9 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts.cd4request;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
@@ -924,5 +926,259 @@ public class ListOfPatientsEligibleForCd4RequestDataDefinitionQueries {
         + "      AND pa.patient_id = pregnancy.patient_id "
         + "    GROUP BY pa.patient_id "
         + ") ";
+  }
+
+  /**
+   * <b> Data do Último CD4 </b>
+   * <li>A data do registo mais recente de resultado de CD4 (absoluto) ocorrido até o fim do período
+   *     de avaliação, registado na “Ficha Clínica – Ficha Mestra” ou “Ficha e-Lab” ou “Ficha de
+   *     Laboratório”
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getLastCd4ResultDate(List<Integer> encounterTypes) {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Resultado do Último CD4 Absoluto");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, String> map = new HashMap<>();
+    map.put("encounterTypes", StringUtils.join(encounterTypes, ","));
+    map.put("1695", String.valueOf(hivMetadata.getCD4AbsoluteOBSConcept().getConceptId()));
+    map.put("730", String.valueOf(hivMetadata.getCD4PercentConcept().getConceptId()));
+    map.put("165515", String.valueOf(hivMetadata.getCD4SemiQuantitativeConcept().getConceptId()));
+    map.put(
+        "165513",
+        String.valueOf(hivMetadata.getCD4CountLessThanOrEqualTo200Concept().getConceptId()));
+
+    String query =
+        " SELECT result.person_id, Max(result.most_recent) AS most_recent FROM ( "
+            + getPatientsWithCD4AbsoluteResultOnPeriodQuery(true)
+            + " ) result GROUP BY result.person_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b> Resultado do Último CD4 </b>
+   * <li>O registo mais recente de resultado de CD4 (absoluto) ocorrido até o fim do período de
+   *     avaliação, registado na “Ficha Clínica – Ficha Mestra” ou “Ficha e-Lab” ou “Ficha de
+   *     Laboratório”
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getLastCd4Result(List<Integer> encounterTypes) {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Resultado do Último CD4 Absoluto");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, String> map = new HashMap<>();
+    map.put("encounterTypes", StringUtils.join(encounterTypes, ","));
+    map.put("1695", String.valueOf(hivMetadata.getCD4AbsoluteOBSConcept().getConceptId()));
+    map.put("730", String.valueOf(hivMetadata.getCD4PercentConcept().getConceptId()));
+    map.put("165515", String.valueOf(hivMetadata.getCD4SemiQuantitativeConcept().getConceptId()));
+    map.put(
+        "165513",
+        String.valueOf(hivMetadata.getCD4CountLessThanOrEqualTo200Concept().getConceptId()));
+
+    String query =
+        " SELECT ps.person_id, IF(o.concept_id = ${165515}, o.value_coded, o.value_numeric) AS cd4_result "
+            + " FROM   person ps "
+            + "       INNER JOIN encounter e "
+            + "               ON ps.person_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + " INNER JOIN ( "
+            + " SELECT result.person_id, Max(result.most_recent) AS most_recent FROM ( "
+            + getPatientsWithCD4AbsoluteResultOnPeriodQuery(true)
+            + " ) result GROUP BY result.person_id "
+            + " ) last_cd4 ON last_cd4.person_id = ps.person_id "
+            + "WHERE  ps.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + " AND e.encounter_type IN ( ${encounterTypes} ) "
+            + " AND ( ( o.concept_id = ${1695} "
+            + "         AND o.value_numeric IS NOT NULL ) "
+            + "   OR ( o.concept_id = ${730} "
+            + "        AND o.value_numeric IS NOT NULL ) "
+            + "   OR ( o.concept_id = ${165515} "
+            + "        AND o.value_coded IS NOT NULL ) ) "
+            + " AND DATE(e.encounter_datetime) = last_cd4.most_recent "
+            + " AND e.location_id = :location";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b> Data do Resultado do Penúltimo CD4 </b>
+   * <li>A data do registo que antecede o registo mais recente de resultado de CD4 (absoluto)
+   *     ocorrido até o fim do período de avaliação, registado na “Ficha Clínica – Ficha Mestra” ou
+   *     “Ficha e-Lab” ou “Ficha de Laboratório”
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getLastCd4ResultDateBeforeMostRecentCd4(List<Integer> encounterTypes) {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Data do Resultado do Penúltimo CD4 Absoluto");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, String> map = new HashMap<>();
+    map.put("encounterTypes", StringUtils.join(encounterTypes, ","));
+    map.put("1695", String.valueOf(hivMetadata.getCD4AbsoluteOBSConcept().getConceptId()));
+    map.put("730", String.valueOf(hivMetadata.getCD4PercentConcept().getConceptId()));
+    map.put("165515", String.valueOf(hivMetadata.getCD4SemiQuantitativeConcept().getConceptId()));
+    map.put(
+        "165513",
+        String.valueOf(hivMetadata.getCD4CountLessThanOrEqualTo200Concept().getConceptId()));
+    String query =
+        " SELECT result.person_id, MAX(result.second_cd4_result) FROM ( "
+            + getLastCd4OrResultDateBeforeMostRecentCd4()
+            + " ) result GROUP BY result.person_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b> Resultado do Penúltimo CD4 </b>
+   * <li>O registo que antecede o registo mais recente de resultado de CD4 (absoluto) ocorrido até o
+   *     fim do período de avaliação, registado na “Ficha Clínica – Ficha Mestra” ou “Ficha e-Lab”
+   *     ou “Ficha de Laboratório”
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getLastCd4ResultBeforeMostRecentCd4(List<Integer> encounterTypes) {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Resultado do Penúltimo CD4 Absoluto");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, String> map = new HashMap<>();
+    map.put("encounterTypes", StringUtils.join(encounterTypes, ","));
+    map.put("1695", String.valueOf(hivMetadata.getCD4AbsoluteOBSConcept().getConceptId()));
+    map.put("730", String.valueOf(hivMetadata.getCD4PercentConcept().getConceptId()));
+    map.put("165515", String.valueOf(hivMetadata.getCD4SemiQuantitativeConcept().getConceptId()));
+    map.put(
+        "165513",
+        String.valueOf(hivMetadata.getCD4CountLessThanOrEqualTo200Concept().getConceptId()));
+
+    String query =
+        " SELECT result.person_id, result.cd4_result FROM ( "
+            + getLastCd4OrResultDateBeforeMostRecentCd4()
+            + " ) result ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  private String getLastCd4OrResultDateBeforeMostRecentCd4() {
+    return " SELECT ps.person_id, IF(o.concept_id = ${165515}, o.value_coded, o.value_numeric) AS cd4_result, DATE(last_cd4.second_date) AS second_cd4_result "
+        + " FROM   person ps "
+        + "       INNER JOIN encounter e "
+        + "               ON ps.person_id = e.patient_id "
+        + "       INNER JOIN obs o "
+        + "               ON e.encounter_id = o.encounter_id "
+        + " INNER JOIN ( "
+        + " SELECT second.person_id, MAX(second.cd4_result) as second_date FROM ( "
+        + getLastCd4OrResultDateBeforeMostRecentQuery()
+        + " ) second GROUP BY second.person_id "
+        + " ) last_cd4 ON last_cd4.person_id = ps.person_id "
+        + "WHERE  ps.voided = 0 "
+        + "       AND e.voided = 0 "
+        + "       AND o.voided = 0 "
+        + "       AND e.encounter_type IN ( ${encounterTypes} ) "
+        + "  AND ( (o.concept_id = ${1695} "
+        + "         AND o.value_numeric IS NOT NULL ) "
+        + "   OR ( o.concept_id = ${730} "
+        + "        AND o.value_numeric IS NOT NULL ) "
+        + "   OR ( o.concept_id = ${165515} "
+        + "        AND o.value_coded IS NOT NULL ) ) "
+        + "             AND DATE(e.encounter_datetime) = last_cd4.second_date "
+        + "       AND e.location_id = :location"
+        + "       GROUP BY ps.person_id ";
+  }
+
+  private String getLastCd4OrResultDateBeforeMostRecentQuery() {
+    return " SELECT ps.person_id, MAX(DATE(e.encounter_datetime)) AS cd4_result "
+        + " FROM   person ps "
+        + "       INNER JOIN encounter e "
+        + "               ON ps.person_id = e.patient_id "
+        + "       INNER JOIN obs o "
+        + "               ON e.encounter_id = o.encounter_id "
+        + " INNER JOIN ( "
+        + " SELECT result.person_id, Max(result.most_recent) AS most_recent FROM ( "
+        + getPatientsWithCD4AbsoluteResultOnPeriodQuery(true)
+        + " ) result GROUP BY result.person_id ) "
+        + " last_cd4 ON last_cd4.person_id = ps.person_id "
+        + "WHERE  ps.voided = 0 "
+        + "       AND e.voided = 0 "
+        + "       AND o.voided = 0 "
+        + "       AND e.encounter_type IN ( ${encounterTypes} ) "
+        + "  AND ( (o.concept_id = ${1695} "
+        + "         AND o.value_numeric IS NOT NULL ) "
+        + "   OR ( o.concept_id = ${730} "
+        + "        AND o.value_numeric IS NOT NULL ) "
+        + "   OR ( o.concept_id = ${165515} "
+        + "        AND o.value_coded IS NOT NULL ) ) "
+        + "             AND DATE(e.encounter_datetime) < last_cd4.most_recent  "
+        + "       AND e.location_id = :location"
+        + "       GROUP BY ps.person_id ";
+  }
+
+  /**
+   *
+   * <li>Utentes com registo do resultado de CD4 (absoluto) na “Ficha Clínica – Ficha Mestra” ou
+   *     “Ficha e-Lab” ou “Ficha de Laboratório” até o fim do período de avaliação (“Data Resultado
+   *     CD4” <= “Data Fim Avaliação”)
+   *
+   * @param mostRecentDateOrCd4Result Flag to return Most Recent date or Cd4 Result
+   * @return {@link String}
+   */
+  private String getPatientsWithCD4AbsoluteResultOnPeriodQuery(boolean mostRecentDateOrCd4Result) {
+
+    String fromSQL =
+        " FROM   person ps "
+            + "       INNER JOIN encounter e "
+            + "               ON ps.person_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "WHERE  ps.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type IN ( ${encounterTypes} ) "
+            + "       AND ( ( o.concept_id = ${1695} "
+            + "             AND o.value_numeric IS NOT NULL ) "
+            + "        OR ( o.concept_id = ${730} "
+            + "             AND o.value_numeric IS NOT NULL ) "
+            + "        OR ( o.concept_id = ${165515} "
+            + "             AND o.value_coded IS NOT NULL ) ) "
+            + "      AND DATE(e.encounter_datetime) <= :endDate "
+            + "      AND e.location_id = :location "
+            + " GROUP BY ps.person_id ";
+
+    return mostRecentDateOrCd4Result
+        ? " SELECT ps.person_id, Max(DATE(e.encounter_datetime)) AS most_recent ".concat(fromSQL)
+        : " SELECT ps.person_id, IF(o.concept_id = ${165515}, o.value_coded, o.value_numeric) AS cd4_result "
+            .concat(fromSQL);
   }
 }

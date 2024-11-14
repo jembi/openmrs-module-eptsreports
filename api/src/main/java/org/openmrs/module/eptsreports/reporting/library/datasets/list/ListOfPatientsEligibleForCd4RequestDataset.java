@@ -1,7 +1,10 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets.list;
 
+import java.util.Arrays;
+import java.util.Collections;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.data.converter.*;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.cd4request.ListOfPatientsEligibleForCd4RequestCohortQueries;
@@ -36,6 +39,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
   private final ListOfPatientsEligibleForCd4RequestDataDefinitionQueries
       listOfPatientsEligibleForCd4RequestDataDefinitionQueries;
   private final EptsGeneralIndicator eptsGeneralIndicator;
+  private final HivMetadata hivMetadata;
 
   @Autowired
   public ListOfPatientsEligibleForCd4RequestDataset(
@@ -45,7 +49,8 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
           listOfPatientsEligibleForCd4RequestCohortQueries,
       ListOfPatientsEligibleForCd4RequestDataDefinitionQueries
           listOfPatientsEligibleForCd4RequestDataDefinitionQueries,
-      EptsGeneralIndicator eptsGeneralIndicator) {
+      EptsGeneralIndicator eptsGeneralIndicator,
+      HivMetadata hivMetadata) {
     this.listOfPatientsInAdvancedHivIllnessCohortQueries =
         listOfPatientsInAdvancedHivIllnessCohortQueries;
     this.listOfPatientsEligibleForCd4RequestCohortQueries =
@@ -53,6 +58,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
     this.listOfPatientsEligibleForCd4RequestDataDefinitionQueries =
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries;
     this.eptsGeneralIndicator = eptsGeneralIndicator;
+    this.hivMetadata = hivMetadata;
   }
 
   public DataSetDefinition listOfPatientsEligibleForCd4RequestColumnsDataset() {
@@ -148,35 +154,87 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         MAPPING2,
         new DashDateFormatConverter());
 
-    // 12 - Data do Último CD4 – Sheet 1: Column L
+    // 12 - Data do Último CD4 (Ficha Clínica) – Sheet 1: Column L
     patientDataSetDefinition.addColumn(
         "last_cd4_resultdate",
-        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultDate(),
+        listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getLastCd4ResultDate(
+            Collections.singletonList(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId())),
         MAPPING2,
-        new DashDateFormatConverter());
+        new ForwardSlashDateConverter());
 
-    // 13 - Resultado do Último CD4 – Sheet 1: Column M
+    // 13 - Resultado do Último CD4 (Ficha Clínica) – Sheet 1: Column M
     patientDataSetDefinition.addColumn(
         "last_cd4_result",
-        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4Result(),
+        listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getLastCd4Result(
+            Collections.singletonList(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId())),
         MAPPING2,
         new NotApplicableIfNullConverter());
 
-    // 14 - Data do Penúltimo CD4 – Sheet 1: Column N
+    // 14 - Data do Penúltimo CD4 (Ficha Clínica) – Sheet 1: Column N
     patientDataSetDefinition.addColumn(
         "second_cd4_resultdate",
-        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultDateBeforeMostRecentCd4(),
+        listOfPatientsEligibleForCd4RequestDataDefinitionQueries
+            .getLastCd4ResultDateBeforeMostRecentCd4(
+                Collections.singletonList(
+                    hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId())),
+        MAPPING2,
+        new ForwardSlashDateConverter());
+
+    // 15 - Resultado do Penúltimo CD4 (Ficha Clínica) – Sheet 1: Column O
+    patientDataSetDefinition.addColumn(
+        "second_cd4_result",
+        listOfPatientsEligibleForCd4RequestDataDefinitionQueries
+            .getLastCd4ResultBeforeMostRecentCd4(
+                Collections.singletonList(
+                    hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId())),
+        MAPPING2,
+        new NotApplicableIfNullConverter());
+
+    // 16 - Data do Último CD4 (Ficha de Laboratório/Ficha e-Lab)  – Sheet 1: Column P
+    patientDataSetDefinition.addColumn(
+        "last_cd4_resultdate_lab",
+        listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getLastCd4ResultDate(
+            Arrays.asList(
+                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
+                hivMetadata.getFsrEncounterType().getEncounterTypeId())),
+        MAPPING2,
+        new ForwardSlashDateConverter());
+
+    // 17 - Resultado do Último CD4 (Ficha de Laboratório/Ficha e-Lab)  – Sheet 1: Column Q
+    patientDataSetDefinition.addColumn(
+        "last_cd4_result_lab",
+        listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getLastCd4Result(
+            Arrays.asList(
+                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
+                hivMetadata.getFsrEncounterType().getEncounterTypeId())),
+        MAPPING2,
+        new NotApplicableIfNullConverter());
+
+    // 18 - Data do Penúltimo CD4 (Ficha de Laboratório/Ficha e-Lab) – Sheet 1: Column R
+    patientDataSetDefinition.addColumn(
+        "second_cd4_resultdate_lab",
+        listOfPatientsEligibleForCd4RequestDataDefinitionQueries
+            .getLastCd4ResultDateBeforeMostRecentCd4(
+                Arrays.asList(
+                    hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
+                    hivMetadata.getFsrEncounterType().getEncounterTypeId())),
         MAPPING2,
         new DashDateFormatConverter());
 
-    // 15 - Resultado do Penúltimo CD4 – Sheet 1: Column O
+    // 19 - Resultado do Penúltimo CD4 (Ficha de Laboratório/Ficha e-Lab) – Sheet 1: Column S
     patientDataSetDefinition.addColumn(
-        "second_cd4_result",
-        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultBeforeMostRecentCd4(),
+        "second_cd4_result_lab",
+        listOfPatientsEligibleForCd4RequestDataDefinitionQueries
+            .getLastCd4ResultBeforeMostRecentCd4(
+                Arrays.asList(
+                    hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
+                    hivMetadata.getFsrEncounterType().getEncounterTypeId())),
         MAPPING2,
         new NotApplicableIfNullConverter());
 
-    //     16 - Data de Registo de Estadio – Sheet 1: Column P
+    //     20 - Data de Registo de Estadio – Sheet 1: Column P
     patientDataSetDefinition.addColumn(
         "last_estadio_date",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getDateOfEstadioByTheEndOfPeriod(),
