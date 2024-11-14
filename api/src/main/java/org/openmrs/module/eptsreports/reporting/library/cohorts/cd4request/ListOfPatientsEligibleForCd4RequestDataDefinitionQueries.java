@@ -954,7 +954,7 @@ public class ListOfPatientsEligibleForCd4RequestDataDefinitionQueries {
 
     String query =
         " SELECT result.person_id, Max(result.most_recent) AS most_recent FROM ( "
-            + getPatientsWithCD4AbsoluteResultOnPeriodQuery(true)
+            + getPatientsWithCD4AbsoluteResultOnPeriodQuery()
             + " ) result GROUP BY result.person_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -997,7 +997,7 @@ public class ListOfPatientsEligibleForCd4RequestDataDefinitionQueries {
             + "               ON e.encounter_id = o.encounter_id "
             + " INNER JOIN ( "
             + " SELECT result.person_id, Max(result.most_recent) AS most_recent FROM ( "
-            + getPatientsWithCD4AbsoluteResultOnPeriodQuery(true)
+            + getPatientsWithCD4AbsoluteResultOnPeriodQuery()
             + " ) result GROUP BY result.person_id "
             + " ) last_cd4 ON last_cd4.person_id = ps.person_id "
             + "WHERE  ps.voided = 0 "
@@ -1091,6 +1091,135 @@ public class ListOfPatientsEligibleForCd4RequestDataDefinitionQueries {
     return sqlPatientDataDefinition;
   }
 
+  /**
+   * <b>Data da Última Carga Viral</b>
+   * <li>A data do registo mais recente de resultado de Carga Viral (quantitativo) na “Ficha Clínica
+   *     – Ficha Mestra” ou “Ficha e-Lab” ou “Ficha de Laboratório”, ocorrido até o fim do período
+   *     de avaliação
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getMostRecentVLResultDate(List<Integer> encounterTypes) {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Data da Última Carga Viral");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, String> map = new HashMap<>();
+    map.put("encounterTypes", StringUtils.join(encounterTypes, ","));
+    map.put("856", String.valueOf(hivMetadata.getHivViralLoadConcept().getConceptId()));
+    map.put("1305", String.valueOf(hivMetadata.getHivViralLoadQualitative().getConceptId()));
+
+    String query =
+        " SELECT result_date.patient_id, MAX(result_date.most_recent) FROM ( "
+            + getVLoadResultAndMostRecent()
+            + " ) AS result_date GROUP BY result_date.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>Resultado da Última Carga Viral</b>
+   * <li>O registo mais recente de resultado do Carga Viral (quantitativo), na “Ficha Clínica –
+   *     Ficha Mestra” ou “Ficha e-Lab” ou “Ficha de Laboratório”, ocorrido até o fim do período de
+   *     avaliação,
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getMostRecentVLResult(List<Integer> encounterTypes) {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Resultado da Última Carga Viral");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, String> map = new HashMap<>();
+    map.put("encounterTypes", StringUtils.join(encounterTypes, ","));
+    map.put("856", String.valueOf(hivMetadata.getHivViralLoadConcept().getConceptId()));
+    map.put("1305", String.valueOf(hivMetadata.getHivViralLoadQualitative().getConceptId()));
+
+    String query =
+        " SELECT vl_result.patient_id, vl_result.viral_load FROM ( "
+            + getVLoadResultAndMostRecent()
+            + " ) AS vl_result GROUP BY vl_result.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>Data da Penúltima Carga Viral</b>
+   * <li>A data do registo que antecede o registo mais recente de Carga Viral (quantitativo) na
+   *     “Ficha Clínica – Ficha Mestra” ou “Ficha e-Lab” ou “Ficha de Laboratório”, ocorrido até o
+   *     fim do período de avaliação
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getLastVLResultDateBeforeMostRecentVLResultDate(
+      List<Integer> encounterTypes) {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Resultado da Penúltima Carga Viral");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, String> map = new HashMap<>();
+    map.put("encounterTypes", StringUtils.join(encounterTypes, ","));
+    map.put("856", String.valueOf(hivMetadata.getHivViralLoadConcept().getConceptId()));
+    map.put("1305", String.valueOf(hivMetadata.getHivViralLoadQualitative().getConceptId()));
+
+    String query =
+        " SELECT second_result_date.patient_id, MAX(second_result_date.second_vl) FROM ( "
+            + getSecondVLResultOrResultDateBeforeMostRecent()
+            + " ) AS second_result_date GROUP BY second_result_date.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>Resultado da Penúltima Carga Viral</b>
+   * <li>O registro que antecede o registo mais recente de resultado de Carga Viral (quantitativo)
+   *     na “Ficha Clínica – Ficha Mestra” ou “Ficha e-Lab” ou “Ficha de Laboratório”, ocorrido até
+   *     o fim do período de avaliação
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getLastVLResultBeforeMostRecentVLResultDate(List<Integer> encounterTypes) {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Resultado da Penúltima Carga Viral");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, String> map = new HashMap<>();
+    map.put("encounterTypes", StringUtils.join(encounterTypes, ","));
+    map.put("856", String.valueOf(hivMetadata.getHivViralLoadConcept().getConceptId()));
+    map.put("1305", String.valueOf(hivMetadata.getHivViralLoadQualitative().getConceptId()));
+
+    String query =
+        " SELECT second_result.patient_id, second_result.viral_load FROM ( "
+            + getSecondVLResultOrResultDateBeforeMostRecent()
+            + " ) AS second_result GROUP BY second_result.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
   private String getLastCd4OrResultDateBeforeMostRecentCd4() {
     return " SELECT ps.person_id, IF(o.concept_id = ${165515}, o.value_coded, o.value_numeric) AS cd4_result, DATE(last_cd4.second_date) AS second_cd4_result "
         + " FROM   person ps "
@@ -1126,8 +1255,8 @@ public class ListOfPatientsEligibleForCd4RequestDataDefinitionQueries {
         + "       INNER JOIN obs o "
         + "               ON e.encounter_id = o.encounter_id "
         + " INNER JOIN ( "
-        + " SELECT result.person_id, Max(result.most_recent) AS most_recent FROM ( "
-        + getPatientsWithCD4AbsoluteResultOnPeriodQuery(true)
+        + " SELECT result.person_id, Max(result.most_recent) 'AS most_recent FROM ( "
+        + getPatientsWithCD4AbsoluteResultOnPeriodQuery()
         + " ) result GROUP BY result.person_id ) "
         + " last_cd4 ON last_cd4.person_id = ps.person_id "
         + "WHERE  ps.voided = 0 "
@@ -1151,34 +1280,150 @@ public class ListOfPatientsEligibleForCd4RequestDataDefinitionQueries {
    *     “Ficha e-Lab” ou “Ficha de Laboratório” até o fim do período de avaliação (“Data Resultado
    *     CD4” <= “Data Fim Avaliação”)
    *
-   * @param mostRecentDateOrCd4Result Flag to return Most Recent date or Cd4 Result
    * @return {@link String}
    */
-  private String getPatientsWithCD4AbsoluteResultOnPeriodQuery(boolean mostRecentDateOrCd4Result) {
+  private String getPatientsWithCD4AbsoluteResultOnPeriodQuery() {
 
-    String fromSQL =
-        " FROM   person ps "
-            + "       INNER JOIN encounter e "
-            + "               ON ps.person_id = e.patient_id "
-            + "       INNER JOIN obs o "
-            + "               ON e.encounter_id = o.encounter_id "
-            + "WHERE  ps.voided = 0 "
-            + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "       AND e.encounter_type IN ( ${encounterTypes} ) "
-            + "       AND ( ( o.concept_id = ${1695} "
-            + "             AND o.value_numeric IS NOT NULL ) "
-            + "        OR ( o.concept_id = ${730} "
-            + "             AND o.value_numeric IS NOT NULL ) "
-            + "        OR ( o.concept_id = ${165515} "
-            + "             AND o.value_coded IS NOT NULL ) ) "
-            + "      AND DATE(e.encounter_datetime) <= :endDate "
-            + "      AND e.location_id = :location "
-            + " GROUP BY ps.person_id ";
+    return " SELECT ps.person_id, Max(DATE(e.encounter_datetime)) AS most_recent "
+        + " FROM   person ps "
+        + "       INNER JOIN encounter e "
+        + "               ON ps.person_id = e.patient_id "
+        + "       INNER JOIN obs o "
+        + "               ON e.encounter_id = o.encounter_id "
+        + "WHERE  ps.voided = 0 "
+        + "       AND e.voided = 0 "
+        + "       AND o.voided = 0 "
+        + "       AND e.encounter_type IN ( ${encounterTypes} ) "
+        + "       AND ( ( o.concept_id = ${1695} "
+        + "             AND o.value_numeric IS NOT NULL ) "
+        + "        OR ( o.concept_id = ${730} "
+        + "             AND o.value_numeric IS NOT NULL ) "
+        + "        OR ( o.concept_id = ${165515} "
+        + "             AND o.value_coded IS NOT NULL ) ) "
+        + "      AND DATE(e.encounter_datetime) <= :endDate "
+        + "      AND e.location_id = :location "
+        + " GROUP BY ps.person_id ";
+  }
 
-    return mostRecentDateOrCd4Result
-        ? " SELECT ps.person_id, Max(DATE(e.encounter_datetime)) AS most_recent ".concat(fromSQL)
-        : " SELECT ps.person_id, IF(o.concept_id = ${165515}, o.value_coded, o.value_numeric) AS cd4_result "
-            .concat(fromSQL);
+  private String getVLoadResultAndMostRecent() {
+    return "SELECT p.patient_id, "
+        + "       last_vl.most_recent, "
+        + "  IF(o.concept_id = 856, o.value_numeric, (IF(o2.value_coded = 165331, CONCAT('MENOR QUE ',o2.comments), (IF(e.encounter_type = 51 and o2.value_coded=1306, 'NIVEL DE DETECÇÃO BAIXO',(IF(e.encounter_type in (6,9) and o2.value_coded=1306, 'NIVEL BAIXO DE DETECÇÃO',o2.value_coded)))) )) ) AS "
+        + "                          viral_load "
+        + "FROM   patient p "
+        + "       INNER JOIN encounter e "
+        + "               ON p.patient_id = e.patient_id "
+        + "       INNER JOIN obs o "
+        + "               ON e.encounter_id = o.encounter_id "
+        + "       INNER JOIN obs o2 "
+        + "               ON e.encounter_id = o2.encounter_id "
+        + "       INNER JOIN ("
+        + " SELECT result.patient_id, MAX(result.most_recent) as most_recent FROM ( "
+        + "                   SELECT p.patient_id, "
+        + "                          Max(DATE(e.encounter_datetime)) AS most_recent "
+        + "                   FROM   patient p "
+        + "                          INNER JOIN encounter e "
+        + "                                  ON e.patient_id = p.patient_id "
+        + "                          INNER JOIN obs o "
+        + "                                  ON o.encounter_id = e.encounter_id "
+        + "                   WHERE  e.encounter_type IN( ${encounterTypes} ) "
+        + "                          AND ( ( o.concept_id = ${856} "
+        + "                                  AND o.value_numeric IS NOT NULL ) "
+        + "                                 OR ( o.concept_id = ${1305} "
+        + "                                      AND o.value_coded IS NOT NULL ) ) "
+        + "                          AND DATE(e.encounter_datetime) <= :endDate "
+        + "                          AND e.location_id = :location "
+        + "                          AND e.voided = 0 "
+        + "                          AND p.voided = 0 "
+        + "                          AND o.voided = 0 "
+        + "                   GROUP  BY p.patient_id"
+        + "    ) result GROUP BY result.patient_id "
+        + ") last_vl "
+        + "               ON last_vl.patient_id = p.patient_id "
+        + "WHERE  e.encounter_type IN( ${encounterTypes} ) "
+        + "       AND ( ( o.concept_id = ${856} "
+        + "               AND o.value_numeric IS NOT NULL ) "
+        + "              OR ( o2.concept_id = ${1305} "
+        + "                   AND o2.value_coded IS NOT NULL ) ) "
+        + "       AND DATE(e.encounter_datetime) = last_vl.most_recent "
+        + "       AND e.location_id = :location "
+        + "       AND e.voided = 0 "
+        + "       AND p.voided = 0 "
+        + "       AND o.voided = 0 "
+        + "       AND o2.voided = 0 "
+        + "GROUP  BY p.patient_id";
+  }
+
+  public String getSecondVLResultOrResultDateBeforeMostRecent() {
+    return "SELECT p.patient_id, "
+        + "       last_vl.last_vl AS second_vl, "
+        + "  IF(o.concept_id = 856, o.value_numeric, (IF(o.value_coded = 165331, CONCAT('MENOR QUE ',o.comments), (IF(e.encounter_type = 51 and o.value_coded=1306, 'NIVEL DE DETECÇÃO BAIXO',(IF(e.encounter_type in (6,9) and o.value_coded=1306, 'NIVEL BAIXO DE DETECÇÃO',o.value_coded)))) )) ) AS "
+        + "                          viral_load "
+        + "FROM   patient p "
+        + "       INNER JOIN encounter e "
+        + "               ON p.patient_id = e.patient_id "
+        + "       INNER JOIN obs o "
+        + "               ON e.encounter_id = o.encounter_id "
+        + "       INNER JOIN ("
+        + " SELECT result_date.patient_id, MAX(result_date.second_vl_date) as last_vl FROM ( "
+        + getMostRecentVLBeforeLastVLDate()
+        + " ) AS result_date GROUP BY result_date.patient_id "
+        + ") last_vl "
+        + "               ON last_vl.patient_id = p.patient_id "
+        + "WHERE  e.encounter_type IN( ${encounterTypes} ) "
+        + "       AND ( ( o.concept_id = ${856} "
+        + "               AND o.value_numeric IS NOT NULL ) "
+        + "              OR ( o.concept_id = ${1305} "
+        + "                   AND o.value_coded IS NOT NULL ) ) "
+        + "       AND DATE(e.encounter_datetime) = last_vl.last_vl "
+        + "       AND e.location_id = :location "
+        + "       AND e.voided = 0 "
+        + "       AND p.voided = 0 "
+        + "       AND o.voided = 0 "
+        + "GROUP  BY p.patient_id";
+  }
+
+  private String getMostRecentVLBeforeLastVLDate() {
+    return "SELECT p.patient_id, "
+        + "       MAX(DATE(e.encounter_datetime)) AS second_vl_date "
+        + "FROM   patient p "
+        + "       INNER JOIN encounter e "
+        + "               ON p.patient_id = e.patient_id "
+        + "       INNER JOIN obs o "
+        + "               ON e.encounter_id = o.encounter_id "
+        + "       INNER JOIN ("
+        + " SELECT result.patient_id, MAX(result.most_recent) as most_recent FROM ( "
+        + "                   SELECT p.patient_id, "
+        + "                          Max(DATE(e.encounter_datetime)) AS most_recent "
+        + "                   FROM   patient p "
+        + "                          INNER JOIN encounter e "
+        + "                                  ON e.patient_id = p.patient_id "
+        + "                          INNER JOIN obs o "
+        + "                                  ON o.encounter_id = e.encounter_id "
+        + "                   WHERE  e.encounter_type IN( ${encounterTypes} ) "
+        + "                          AND ( ( o.concept_id = ${856} "
+        + "                                  AND o.value_numeric IS NOT NULL ) "
+        + "                                 OR ( o.concept_id = ${1305} "
+        + "                                      AND o.value_coded IS NOT NULL ) ) "
+        + "                          AND DATE(e.encounter_datetime) <= :endDate "
+        + "                          AND e.location_id = :location "
+        + "                          AND e.voided = 0 "
+        + "                          AND p.voided = 0 "
+        + "                          AND o.voided = 0 "
+        + "                   GROUP  BY p.patient_id"
+        + "    ) result GROUP BY result.patient_id "
+        + ") last_vl "
+        + "               ON last_vl.patient_id = p.patient_id "
+        + "WHERE  e.encounter_type IN( ${encounterTypes} ) "
+        + "       AND ( ( o.concept_id = ${856} "
+        + "               AND o.value_numeric IS NOT NULL ) "
+        + "              OR ( o.concept_id = ${1305} "
+        + "                   AND o.value_coded IS NOT NULL ) ) "
+        + "       AND DATE(e.encounter_datetime) < last_vl.most_recent "
+        + "       AND e.location_id = :location "
+        + "       AND e.voided = 0 "
+        + "       AND p.voided = 0 "
+        + "       AND o.voided = 0 "
+        + "GROUP  BY p.patient_id";
   }
 }

@@ -83,7 +83,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
 
     patientDataSetDefinition.addColumn("id", new PersonIdDataDefinition(), "");
 
-    // 1- NID sheet 1 - Column A
+    //     1- NID sheet 1 - Column A
     patientDataSetDefinition.addColumn(
         "nid",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getNID(
@@ -109,7 +109,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         "art_start",
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getArtStartDate(),
         MAPPING2,
-        new DashDateFormatConverter());
+        new ForwardSlashDateConverter());
 
     //  6  - Transferido de Outra US- Sheet 1: Column F
     patientDataSetDefinition.addColumn(
@@ -131,7 +131,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         "last_consultation",
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getLastClinicalConsultationDate(),
         MAPPING2,
-        new DashDateFormatConverter());
+        new ForwardSlashDateConverter());
 
     // 9 - Data da Próxima Consulta Clínica Agendada – Sheet 1: Column I
     patientDataSetDefinition.addColumn(
@@ -139,7 +139,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries
             .getNextConsultationDateOnLastClinicalConsultationDate(),
         MAPPING2,
-        new DashDateFormatConverter());
+        new ForwardSlashDateConverter());
 
     //     10 - Motivo para Elegibilidade de CD4- Sheet 1: Column J
     patientDataSetDefinition.addColumn(
@@ -152,7 +152,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         "cd4_request_date",
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getLastCd4ResquestDate(),
         MAPPING2,
-        new DashDateFormatConverter());
+        new ForwardSlashDateConverter());
 
     // 12 - Data do Último CD4 (Ficha Clínica) – Sheet 1: Column L
     patientDataSetDefinition.addColumn(
@@ -221,7 +221,7 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
                     hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
                     hivMetadata.getFsrEncounterType().getEncounterTypeId())),
         MAPPING2,
-        new DashDateFormatConverter());
+        new ForwardSlashDateConverter());
 
     // 19 - Resultado do Penúltimo CD4 (Ficha de Laboratório/Ficha e-Lab) – Sheet 1: Column S
     patientDataSetDefinition.addColumn(
@@ -234,61 +234,119 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         MAPPING2,
         new NotApplicableIfNullConverter());
 
-    //     20 - Data de Registo de Estadio – Sheet 1: Column P
+    //     20 - Data de Registo de Estadio – Sheet 1: Column T
     patientDataSetDefinition.addColumn(
         "last_estadio_date",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getDateOfEstadioByTheEndOfPeriod(),
         MAPPING2,
-        new DashDateFormatConverter());
+        new ForwardSlashDateConverter());
 
-    // 17 - Infecções Estadio OMS – Sheet 1: Column Q
+    // 21 - Infecções Estadio OMS – Sheet 1: Column U
     patientDataSetDefinition.addColumn(
         "last_estadio_result",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getResultOfEstadioByTheEndOfPeriod(),
         MAPPING2,
         new NotApplicableIfNullConverter());
 
-    // 18 - Motivo de Mudança de Estadiamento Clínico - 1 – Sheet 1: Column R
+    // 22 - Motivo de Mudança de Estadiamento Clínico - 1 – Sheet 1: Column V
     patientDataSetDefinition.addColumn(
         "reason_change_estadio",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getReasonToChangeEstadio1(),
         MAPPING2,
         new ObservationToConceptNameConverter());
 
-    // 19 - Motivo de Mudança de Estadiamento Clínico - 2 – Sheet 1: Column S
+    // 23 - Motivo de Mudança de Estadiamento Clínico - 2 – Sheet 1: Column W
     patientDataSetDefinition.addColumn(
         "reason_change_estadio2",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getReasonToChangeEstadio2(),
         MAPPING2,
         new ObservationToConceptNameConverter());
 
-    // 20 - Resultado da Última Carga Viral – Sheet 1: Column T
+    // 24 - Data da Última Carga Viral (Ficha Clínica) – Sheet 1: Column X
     patientDataSetDefinition.addColumn(
         "vl_result_date",
-        listOfPatientsInAdvancedHivIllnessCohortQueries.getMostRecentVLResultDate(),
+        listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getMostRecentVLResultDate(
+            Arrays.asList(
+                hivMetadata.getHivViralLoadConcept().getConceptId(),
+                hivMetadata.getHivViralLoadQualitative().getConceptId())),
         MAPPING2,
-        new DashDateFormatConverter());
+        new ForwardSlashDateConverter());
 
-    // 21 -Data da Último Carga Viral – Sheet 1: Column U
+    // 25 - Resultado da Última Carga Viral (Ficha Clínica)  – Sheet 1: Column Y
     patientDataSetDefinition.addColumn(
         "vl_result",
-        listOfPatientsInAdvancedHivIllnessCohortQueries.getMostRecentVLResult(),
+        listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getMostRecentVLResult(
+            Arrays.asList(
+                hivMetadata.getHivViralLoadConcept().getConceptId(),
+                hivMetadata.getHivViralLoadQualitative().getConceptId())),
         MAPPING2,
         new ViralLoadQualitativeLabelConverter());
 
-    // 22 - Resultado da Penúltima Carga Viral – Sheet 1: Column V
+    // 26 - Data da Penúltima Carga Viral (Ficha Clínica)  – Sheet 1: Column Z
     patientDataSetDefinition.addColumn(
         "second_vl_resultdate",
-        listOfPatientsInAdvancedHivIllnessCohortQueries
-            .getLastVLResultDateBeforeMostRecentVLResultDate(),
+        listOfPatientsEligibleForCd4RequestDataDefinitionQueries
+            .getLastVLResultDateBeforeMostRecentVLResultDate(
+                Arrays.asList(
+                    hivMetadata.getHivViralLoadConcept().getConceptId(),
+                    hivMetadata.getHivViralLoadQualitative().getConceptId())),
         MAPPING2,
-        new DashDateFormatConverter());
+        new ForwardSlashDateConverter());
 
-    // 23 - Data da Penúltima Carga Viral – Sheet 1: Column W
+    // 27 - Resultado da Penúltima Carga Viral (Ficha Clínica) – Sheet 1: Column AA
     patientDataSetDefinition.addColumn(
         "second_vl_result",
-        listOfPatientsInAdvancedHivIllnessCohortQueries
-            .getLastVLResultBeforeMostRecentVLResultDate(),
+        listOfPatientsEligibleForCd4RequestDataDefinitionQueries
+            .getLastVLResultBeforeMostRecentVLResultDate(
+                Arrays.asList(
+                    hivMetadata.getHivViralLoadConcept().getConceptId(),
+                    hivMetadata.getHivViralLoadQualitative().getConceptId())),
+        MAPPING2,
+        new ViralLoadQualitativeLabelConverter());
+
+    // 28 - Data da Última Carga Viral (Ficha de Laboratório ou Ficha e-Lab) – Sheet 1: Column
+    //     AB
+    patientDataSetDefinition.addColumn(
+        "vl_result_date_lab",
+        listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getMostRecentVLResultDate(
+            Arrays.asList(
+                hivMetadata.getHivViralLoadConcept().getConceptId(),
+                hivMetadata.getHivViralLoadQualitative().getConceptId())),
+        MAPPING2,
+        new ForwardSlashDateConverter());
+
+    // 29 -Resultado da Última Carga Viral (Ficha de Laboratório ou Ficha e-Lab)  – Sheet 1: Column
+    // AC
+    patientDataSetDefinition.addColumn(
+        "vl_result_lab",
+        listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getMostRecentVLResult(
+            Arrays.asList(
+                hivMetadata.getHivViralLoadConcept().getConceptId(),
+                hivMetadata.getHivViralLoadQualitative().getConceptId())),
+        MAPPING2,
+        new ViralLoadQualitativeLabelConverter());
+
+    // 30 - Data da Penúltima Carga Viral (Ficha de Laboratório ou Ficha e-Lab)  – Sheet 1: Column
+    // AD
+    patientDataSetDefinition.addColumn(
+        "second_vl_resultdate_lab",
+        listOfPatientsEligibleForCd4RequestDataDefinitionQueries
+            .getLastVLResultDateBeforeMostRecentVLResultDate(
+                Arrays.asList(
+                    hivMetadata.getHivViralLoadConcept().getConceptId(),
+                    hivMetadata.getHivViralLoadQualitative().getConceptId())),
+        MAPPING2,
+        new ForwardSlashDateConverter());
+
+    // 31 - Resultado da Penúltima Carga Viral (Ficha de Laboratório ou Ficha e-Lab) – Sheet 1:
+    // Column AE
+    patientDataSetDefinition.addColumn(
+        "second_vl_result_lab",
+        listOfPatientsEligibleForCd4RequestDataDefinitionQueries
+            .getLastVLResultBeforeMostRecentVLResultDate(
+                Arrays.asList(
+                    hivMetadata.getHivViralLoadConcept().getConceptId(),
+                    hivMetadata.getHivViralLoadQualitative().getConceptId())),
         MAPPING2,
         new ViralLoadQualitativeLabelConverter());
 
