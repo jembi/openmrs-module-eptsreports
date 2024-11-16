@@ -715,11 +715,10 @@ public class TPTCompletionCohortQueries {
         "tpt5", EptsReportUtils.map(getTxCurrWithTPTInLast7Months(), mapping));
 
     compositionCohortDefinition.setCompositionString(
-        "(tpt1 AND TBtreatment AND (TbScreening AND TbPositive)) AND NOT tpt5");
+        "(tpt1 AND NOT (TBtreatment OR (TbScreening AND TbPositive))) AND NOT tpt5");
 
     return compositionCohortDefinition;
   }
-
   /**
    * <b>IMER1</b>: User_Story_ TPT <br>
    *
