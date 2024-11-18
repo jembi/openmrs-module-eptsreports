@@ -712,7 +712,10 @@ public class TPTCompletionCohortQueries {
             "startDate=${endDate-14d},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "tpt5", EptsReportUtils.map(getTxCurrWithTPTInLast7Months(), mapping));
+        "tpt5",
+        EptsReportUtils.map(
+            getTxCurrWithTPTInLast7Months(),
+            "startDate=${endDate-210d},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
         "(tpt1 AND NOT (TBtreatment OR (TbScreening AND TbPositive))) AND NOT tpt5");
