@@ -7895,7 +7895,7 @@ public class QualityImprovement2020CohortQueries {
         break;
       case 9:
         comp.setName(
-            "% de Crianças (2-9 anos) inscritas há 12 meses em algum MDS (DT) que receberam pelo menos um resultado de CV");
+            "% de Crianças (2-9 anos) activas em TARV e inscritos há 24 meses em algum MDS (DT) que receberam o segundo resultado de CV");
         break;
       case 10:
         comp.setName(
@@ -12116,7 +12116,7 @@ public class QualityImprovement2020CohortQueries {
             + "                          AND p.voided = 0 "
             + "                          AND e.voided = 0 "
             + "                          AND o.voided = 0) vl_result  ON two_dispensations.patient_id = vl_result.patient_id "
-            + "WHERE  vl_result.vl_date > two_dispensations.second_date "
+            + "WHERE  vl_result.vl_date >= two_dispensations.second_date "
             + "       AND vl_result.vl_date <= :revisionEndDate";
 
     StringSubstitutor sb = new StringSubstitutor(map);
