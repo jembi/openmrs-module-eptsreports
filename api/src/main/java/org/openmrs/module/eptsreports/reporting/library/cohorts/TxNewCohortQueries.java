@@ -482,6 +482,9 @@ public class TxNewCohortQueries {
             + commonQueries.getARTStartDate(true)
             + " ) art ON art.patient_id = e.patient_id "
             + "INNER JOIN ( "
+            + "SELECT first_cd4.patient_id,"
+            + "       MIN(cd4_date) AS cd4_date "
+            + " FROM ("
             + "SELECT e.patient_id, DATE(e.encounter_datetime) cd4_date "
             + "FROM encounter e "
             + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -514,6 +517,8 @@ public class TxNewCohortQueries {
             + "AND o.concept_id = ${23896} "
             + "AND o2.concept_id = ${1190} "
             + "AND o2.value_datetime BETWEEN :startDate AND :endDate "
+            + " ) first_cd4 "
+            + "GROUP BY first_cd4.patient_id "
             + ") cd4 ON cd4.patient_id = e.patient_id "
             + "WHERE e.voided = 0 "
             + "AND o.voided = 0 "
