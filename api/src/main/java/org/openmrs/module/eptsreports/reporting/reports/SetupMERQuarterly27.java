@@ -106,12 +106,12 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
 
   @Override
   public String getName() {
-    return "PEPFAR MER 2.7 Quarterly";
+    return "PEPFAR MER 2.8 Quarterly";
   }
 
   @Override
   public String getDescription() {
-    return "MER 2.7 Quarterly Report";
+    return "MER 2.8 Quarterly Report";
   }
 
   @Override
@@ -129,9 +129,9 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
         "TXML", Mapped.mapStraightThrough(txMlDataset25.constructtxMlDataset()));
     rd.addDataSetDefinition("R", Mapped.mapStraightThrough(txRttDataset.constructTxRttDataset()));
     rd.addDataSetDefinition(
-        "T", Mapped.mapStraightThrough(transferredInDataset.constructTransferInDataset()));
+            "PL", Mapped.mapStraightThrough(txRTTPLHIVDateset.constructTxRTTPLHIVDateset()));
     rd.addDataSetDefinition(
-        "PL", Mapped.mapStraightThrough(txRTTPLHIVDateset.constructTxRTTPLHIVDateset()));
+        "T", Mapped.mapStraightThrough(transferredInDataset.constructTransferInDataset()));
     rd.addDataSetDefinition(
         "PREP", Mapped.mapStraightThrough(prepNewDataset.constructPrepNewDataset()));
     rd.addDataSetDefinition(
