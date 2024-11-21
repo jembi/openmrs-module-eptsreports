@@ -1406,7 +1406,7 @@ public class ListOfPatientsEligibleForCd4RequestDataDefinitionQueries {
         + "       INNER JOIN obs o "
         + "               ON e.encounter_id = o.encounter_id "
         + " INNER JOIN ( "
-        + " SELECT result.person_id, Max(result.most_recent) 'AS most_recent FROM ( "
+        + " SELECT result.person_id, Max(result.most_recent) AS most_recent FROM ( "
         + getPatientsWithCD4AbsoluteResultOnPeriodQuery()
         + " ) result GROUP BY result.person_id ) "
         + " last_cd4 ON last_cd4.person_id = ps.person_id "
