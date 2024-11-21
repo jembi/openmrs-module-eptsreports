@@ -237,7 +237,8 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
    *
    * @see #getPatientsWithVlResultGreaterThan1000Copies() Ultimo Resultado VL > 1000
    * @see #getPatientsWithSecondVlResultGreaterThan1000Copies() Penultimo Resultado VL > 1000
-   * @see #getPatientsWithCd4ResultsOnLastVlDate() Ultimo Resultado CD4 apos Ultimo Resultado VL
+   * @see #getPatientsWithCd4ResultsOnLastVlDate(Boolean) Ultimo Resultado CD4 apos Ultimo Resultado
+   *     VL
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithTwoHighVlResultsOnFCC3() {
@@ -251,7 +252,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
 
     CohortDefinition lastVlResult = getPatientsWithVlResultGreaterThan1000Copies();
     CohortDefinition secondVlResult = getPatientsWithSecondVlResultGreaterThan1000Copies();
-    CohortDefinition lastCd4ResultAfterLastVl = getPatientsWithCd4ResultsOnLastVlDate();
+    CohortDefinition lastCd4ResultAfterLastVl = getPatientsWithCd4ResultsOnLastVlDate(true);
 
     compositionCohortDefinition.addSearch(
         "LASTVL", map(lastVlResult, "endDate=${endDate},location=${location}"));
@@ -287,7 +288,8 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
    *
    * @see #getPatientsWithVlResultOnLabGreaterThan1000Copies() Ultimo Resultado VL > 1000
    * @see #getPatientsWithSecondVlResultOnLabGreaterThan1000Copies() Penultimo Resultado VL > 1000
-   * @see #getPatientsWithCd4ResultsOnLastVlDate() Ultimo Resultado CD4 apos Ultimo Resultado VL
+   * @see #getPatientsWithCd4ResultsOnLastVlDate(Boolean) Ultimo Resultado CD4 apos Ultimo Resultado
+   *     VL
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithTwoHighVlResultsOnLabC3() {
@@ -302,7 +304,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
 
     CohortDefinition lastVlResultLab = getPatientsWithVlResultOnLabGreaterThan1000Copies();
     CohortDefinition secondVlResultLab = getPatientsWithSecondVlResultOnLabGreaterThan1000Copies();
-    CohortDefinition lastCd4ResultAfterLastVl = getPatientsWithCd4ResultsOnLastVlDate();
+    CohortDefinition lastCd4ResultAfterLastVl = getPatientsWithCd4ResultsOnLastVlDate(false);
 
     compositionCohortDefinition.addSearch(
         "LASTVL", map(lastVlResultLab, "endDate=${endDate},location=${location}"));
@@ -769,7 +771,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsWithCd4ResultsOnLastVlDate() {
+  public CohortDefinition getPatientsWithCd4ResultsOnLastVlDate(Boolean fcOrLab) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("resultado do CD4 apos Data Último Resultado CV");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -783,6 +785,8 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
 
     String query =
         "SELECT pa.patient_id "
@@ -793,7 +797,10 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "        INNER JOIN obs "
             + "                   ON obs.encounter_id = enc.encounter_id "
             + " INNER JOIN ( "
-            + ListOfPatientsEligibleForCd4RequestQueries.getLastVlResultDate()
+                .concat(
+                    fcOrLab
+                        ? ListOfPatientsEligibleForCd4RequestQueries.getLastVlResultDate()
+                        : ListOfPatientsEligibleForCd4RequestQueries.getLastVlResultDateOnLab())
             + " ) last_vl ON last_vl.patient_id = pa.patient_id "
             + "WHERE  pa.voided = 0 "
             + "  AND enc.voided = 0 "
@@ -909,6 +916,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
+    map.put("165513", hivMetadata.getCD4CountLessThanOrEqualTo200Concept().getConceptId());
 
     String query =
         "SELECT pa.patient_id "
@@ -935,8 +943,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "             AND obs.value_numeric < 30) "
             + "        OR "
             + "        (obs.concept_id = ${165515} "
-            + "             AND obs.value_numeric IS NOT NULL "
-            + "             AND obs.value_numeric < 200) "
+            + "             AND obs.value_coded = ${165513}) "
             + "      ) "
             + "       AND enc.encounter_datetime = cd4_date.last_cd4 "
             + "  AND enc.location_id = :location "
