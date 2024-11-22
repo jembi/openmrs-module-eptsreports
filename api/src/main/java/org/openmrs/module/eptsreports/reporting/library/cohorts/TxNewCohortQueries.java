@@ -393,9 +393,9 @@ public class TxNewCohortQueries {
       Integer maxAge) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Cd4 And Age");
-    cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition getCd4Result = getCd4Result(cd4, semiCd4);
     CohortDefinition age = ageCohortQueries.createXtoYAgeCohort("Age", minAge, maxAge);
@@ -483,7 +483,6 @@ public class TxNewCohortQueries {
             + "             MIN(DATE(e.encounter_datetime)) AS cd4_date "
             + "         FROM encounter e "
             + "                  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                  INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
             + "INNER JOIN ( "
             + commonQueries.getARTStartDate(true)
             + " ) art ON art.patient_id = e.patient_id "
@@ -491,11 +490,12 @@ public class TxNewCohortQueries {
             + "             e.voided = 0 "
             + "           AND o.voided = 0 "
             + "           AND e.location_id = :location "
+            + "           AND e.encounter_type IN (${6}, ${13}, ${51}) "
+            + "           AND o.concept_id IN (${1695}, ${165515}) "
             + "           AND o.value_numeric IS NOT NULL "
             + "           AND DATE(e.encounter_datetime) BETWEEN DATE_SUB(art.first_pickup, INTERVAL 90 DAY) "
             + "             AND DATE_ADD(art.first_pickup, INTERVAL 28 DAY) "
-            + "           AND e.encounter_type IN (${6}, ${13}, ${51}) "
-            + "           AND o.concept_id IN (${1695}, ${165515}) "
+            + "             AND DATE(e.encounter_datetime) BETWEEN :startDate AND :endDate "
             + "         GROUP BY e.patient_id "
             + "         UNION "
             + "         SELECT "
@@ -503,7 +503,6 @@ public class TxNewCohortQueries {
             + "             MIN(DATE(o.obs_datetime)) AS cd4_date "
             + "         FROM encounter e "
             + "                  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                  INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
             + "INNER JOIN ( "
             + commonQueries.getARTStartDate(true)
             + " ) art ON art.patient_id = e.patient_id "
@@ -511,11 +510,12 @@ public class TxNewCohortQueries {
             + "             e.voided = 0 "
             + "           AND o.voided = 0 "
             + "           AND e.location_id = :location "
+            + "           AND e.encounter_type = ${53} "
+            + "           AND o.concept_id IN (${1695}, ${165515}) "
             + "           AND o.value_numeric IS NOT NULL "
             + "           AND DATE(o.obs_datetime) BETWEEN DATE_SUB(art.first_pickup, INTERVAL 90 DAY) "
             + "             AND DATE_ADD(art.first_pickup, INTERVAL 28 DAY) "
-            + "           AND e.encounter_type = ${53} "
-            + "           AND o.concept_id IN (${1695}, ${165515}) "
+            + "             AND DATE(o.obs_datetime) BETWEEN :startDate AND :endDate "
             + "         GROUP BY e.patient_id "
             + "         UNION "
             + "         SELECT "
@@ -530,14 +530,15 @@ public class TxNewCohortQueries {
             + "         WHERE "
             + "             e.voided = 0 "
             + "           AND o.voided = 0 "
+            + "           AND o2.voided = 0 "
             + "           AND e.location_id = :location "
-            + "           AND o.value_numeric IS NOT NULL "
-            + "           AND DATE(o2.value_datetime) BETWEEN DATE_SUB(art.first_pickup, INTERVAL 90 DAY) "
-            + "             AND DATE_ADD(art.first_pickup, INTERVAL 28 DAY) "
             + "           AND e.encounter_type = ${53} "
             + "           AND o.concept_id = ${23896} "
+            + "           AND o.value_numeric IS NOT NULL "
             + "           AND o2.concept_id = ${1190} "
-            + "           AND o2.voided = 0 "
+            + "           AND DATE(o2.value_datetime) BETWEEN DATE_SUB(art.first_pickup, INTERVAL 90 DAY) "
+            + "             AND DATE_ADD(art.first_pickup, INTERVAL 28 DAY) "
+            + "             AND DATE(o2.value_datetime) BETWEEN :startDate AND :endDate "
             + "         GROUP BY e.patient_id "
             + "     ) cd4_client "
             + "GROUP BY cd4_client.patient_id "
