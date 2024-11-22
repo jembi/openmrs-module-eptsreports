@@ -32,6 +32,8 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
 
   private TxPvlsDataset txPvlsDataset;
 
+  private TxPvlsDataset txPvlsSupplementalDataset;
+
   private TxNewDataset txNewDataset;
 
   private TxCurrDataset txCurrDataset;
@@ -73,7 +75,8 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
       PrepCtDataset prepCtDataset,
       PrepOtherDisaggregationDataset prepOtherDisaggregationDataset,
       PmtctEidDataset pmtctEidDataset,
-      PmtctHeiDataset pmtctHeiDataset) {
+      PmtctHeiDataset pmtctHeiDataset,
+      TxPvlsDataset txPvlsSupplementalDataset) {
     this.txPvlsDataset = txPvlsDataset;
     this.txNewDataset = txNewDataset;
     this.txCurrDataset = txCurrDataset;
@@ -82,6 +85,7 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
     this.genericCohortQueries = genericCohortQueries;
     this.transferredInDataset = transferredInDataset;
     this.txRTTPLHIVDateset = txRTTPLHIVDateset;
+    this.txPvlsSupplementalDataset = txPvlsSupplementalDataset;
     this.prepNewDataset = prepNewDataset;
     this.prepCtDataset = prepCtDataset;
     this.prepOtherDisaggregationDataset = prepOtherDisaggregationDataset;
@@ -126,10 +130,13 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
         "C", Mapped.mapStraightThrough(txCurrDataset.constructTxCurrDataset(true)));
     rd.addDataSetDefinition("P", Mapped.mapStraightThrough(txPvlsDataset.constructTxPvlsDatset()));
     rd.addDataSetDefinition(
+        "PS",
+        Mapped.mapStraightThrough(txPvlsSupplementalDataset.constructTxPvlsSupplementalDatset()));
+    rd.addDataSetDefinition(
         "TXML", Mapped.mapStraightThrough(txMlDataset25.constructtxMlDataset()));
     rd.addDataSetDefinition("R", Mapped.mapStraightThrough(txRttDataset.constructTxRttDataset()));
     rd.addDataSetDefinition(
-            "PL", Mapped.mapStraightThrough(txRTTPLHIVDateset.constructTxRTTPLHIVDateset()));
+        "PL", Mapped.mapStraightThrough(txRTTPLHIVDateset.constructTxRTTPLHIVDateset()));
     rd.addDataSetDefinition(
         "T", Mapped.mapStraightThrough(transferredInDataset.constructTransferInDataset()));
     rd.addDataSetDefinition(
