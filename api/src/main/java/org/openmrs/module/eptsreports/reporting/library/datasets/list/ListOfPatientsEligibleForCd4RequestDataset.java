@@ -267,8 +267,8 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         "vl_result_date",
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getMostRecentVLResultDate(
             Arrays.asList(
-                hivMetadata.getHivViralLoadConcept().getConceptId(),
-                hivMetadata.getHivViralLoadQualitative().getConceptId())),
+                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
+                hivMetadata.getFsrEncounterType().getEncounterTypeId())),
         MAPPING2,
         new ForwardSlashDateConverter());
 
@@ -277,8 +277,8 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         "vl_result",
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getMostRecentVLResult(
             Arrays.asList(
-                hivMetadata.getHivViralLoadConcept().getConceptId(),
-                hivMetadata.getHivViralLoadQualitative().getConceptId())),
+                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
+                hivMetadata.getFsrEncounterType().getEncounterTypeId())),
         MAPPING2,
         new ViralLoadQualitativeLabelConverter());
 
@@ -288,8 +288,8 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries
             .getLastVLResultDateBeforeMostRecentVLResultDate(
                 Arrays.asList(
-                    hivMetadata.getHivViralLoadConcept().getConceptId(),
-                    hivMetadata.getHivViralLoadQualitative().getConceptId())),
+                    hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
+                    hivMetadata.getFsrEncounterType().getEncounterTypeId())),
         MAPPING2,
         new ForwardSlashDateConverter());
 
@@ -299,8 +299,8 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries
             .getLastVLResultBeforeMostRecentVLResultDate(
                 Arrays.asList(
-                    hivMetadata.getHivViralLoadConcept().getConceptId(),
-                    hivMetadata.getHivViralLoadQualitative().getConceptId())),
+                    hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
+                    hivMetadata.getFsrEncounterType().getEncounterTypeId())),
         MAPPING2,
         new ViralLoadQualitativeLabelConverter());
 
@@ -310,8 +310,8 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         "vl_result_date_lab",
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getMostRecentVLResultDate(
             Arrays.asList(
-                hivMetadata.getHivViralLoadConcept().getConceptId(),
-                hivMetadata.getHivViralLoadQualitative().getConceptId())),
+                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
+                hivMetadata.getFsrEncounterType().getEncounterTypeId())),
         MAPPING2,
         new ForwardSlashDateConverter());
 
@@ -321,8 +321,8 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         "vl_result_lab",
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getMostRecentVLResult(
             Arrays.asList(
-                hivMetadata.getHivViralLoadConcept().getConceptId(),
-                hivMetadata.getHivViralLoadQualitative().getConceptId())),
+                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
+                hivMetadata.getFsrEncounterType().getEncounterTypeId())),
         MAPPING2,
         new ViralLoadQualitativeLabelConverter());
 
@@ -333,8 +333,8 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries
             .getLastVLResultDateBeforeMostRecentVLResultDate(
                 Arrays.asList(
-                    hivMetadata.getHivViralLoadConcept().getConceptId(),
-                    hivMetadata.getHivViralLoadQualitative().getConceptId())),
+                    hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
+                    hivMetadata.getFsrEncounterType().getEncounterTypeId())),
         MAPPING2,
         new ForwardSlashDateConverter());
 
@@ -345,8 +345,8 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries
             .getLastVLResultBeforeMostRecentVLResultDate(
                 Arrays.asList(
-                    hivMetadata.getHivViralLoadConcept().getConceptId(),
-                    hivMetadata.getHivViralLoadQualitative().getConceptId())),
+                    hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
+                    hivMetadata.getFsrEncounterType().getEncounterTypeId())),
         MAPPING2,
         new ViralLoadQualitativeLabelConverter());
 
