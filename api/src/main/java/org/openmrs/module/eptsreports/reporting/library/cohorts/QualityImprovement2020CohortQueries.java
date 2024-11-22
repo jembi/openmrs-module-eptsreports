@@ -11962,7 +11962,7 @@ public class QualityImprovement2020CohortQueries {
             + "                          AND e.voided = 0 "
             + "                          AND o.voided = 0) vl_result "
             + "               ON two_dispensations.patient_id = vl_result.patient_id "
-            + "WHERE  vl_result.vl_date > two_dispensations.second_date AND vl_result.vl_date <= :revisionEndDate";
+            + "WHERE  vl_result.vl_date >= two_dispensations.second_date AND vl_result.vl_date <= :revisionEndDate";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
