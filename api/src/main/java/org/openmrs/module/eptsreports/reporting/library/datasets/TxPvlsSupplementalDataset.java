@@ -68,31 +68,28 @@ public class TxPvlsSupplementalDataset extends BaseDataSet {
   }
 
   private void addDenominatorColumns(CohortIndicatorDataSetDefinition dsd, String mappings) {
-    // Denominator -------------------------------------------------------------
-    // Totals
+
     dsd.addColumn(
-        "VLD",
-        "Total patients with Viral load - Denominator",
+        "TOTAL",
+        "Pregnant And Breastfeeding have vl results and on ART more than 3 months Denominator",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "patients with viral load",
+                "Total Pregnant And Breastfeeding have vl results and on ART more than 3 months Denominator",
                 EptsReportUtils.map(
-                    txPvls.getPatientsWithViralLoadResultsAndOnArtForMoreThan3Months(), mappings)),
+                    txPvls.getPregnantAndBreastfeedingWomenWithViralLoadResults(), mappings)),
             mappings),
         "");
 
-    // Get Adult and children patients with viral load
-    addRow(
-        dsd,
-        "DSA",
-        "Patients with Viral Load on Denominator Sex/Age",
+    // Pregnant women on ART for more than 3 months and have VL results
+    dsd.addColumn(
+        "Pregnant",
+        "Pregnant, have vl results and on ART more than 3 months Denominator",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "viral load results adults and children",
-                EptsReportUtils.map(
-                    txPvls.getPatientsWithViralLoadResultsAndOnArtForMoreThan3Months(), mappings)),
+                "Pregnant, have vl results and on ART more than 3 months Denominator",
+                EptsReportUtils.map(txPvls.getPregnantWomanTxPvlsSupplemental(), mappings)),
             mappings),
-        getAdultChildrenColumns());
+        "");
 
     // Breastfeeding & Pregnant
     // Breastfeeding and on ART for more than 3 months and have VL results
@@ -106,30 +103,6 @@ public class TxPvlsSupplementalDataset extends BaseDataSet {
                     txPvls.getBreastfeedingWomenWhoHaveViralLoadResults(), mappings)),
             mappings),
         "");
-
-    // Pregnant women on ART for more than 3 months and have VL results
-    dsd.addColumn(
-        "Pregnant",
-        "Pregnant, have vl results and on ART more than 3 months Denominator",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Pregnant, have vl results and on ART more than 3 months Denominator",
-                EptsReportUtils.map(txPvls.getPregnantWomenWithViralLoadResults(), mappings)),
-            mappings),
-        "");
-
-    // Denominator Key Population
-    addRow(
-        dsd,
-        "KPD",
-        "Key population patients and are on routine and target Denominator",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Key population patients and are on routine and target Denominator",
-                EptsReportUtils.map(
-                    txPvls.getPatientsWithViralLoadResultsAndOnArtForMoreThan3Months(), mappings)),
-            mappings),
-        getKpColumns());
   }
 
   private void addNumeratorColumns(CohortIndicatorDataSetDefinition dsd, String mappings) {

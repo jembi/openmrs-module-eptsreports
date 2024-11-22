@@ -1311,4 +1311,186 @@ public class TxPvlsCohortQueries {
     sqlCohortDefinition.setQuery(mappedQuery);
     return sqlCohortDefinition;
   }
+
+  public CohortDefinition getPregnantAndBreastfeedingWomenWithViralLoadResults() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Get pregnant women with viral load results denominator");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+    cd.addSearch(
+        "results",
+        EptsReportUtils.map(getPatientsWithViralLoadResultsAndOnArtForMoreThan3Months(), mappings));
+    cd.addSearch(
+        "pregnant",
+        EptsReportUtils.map(
+            this.getPregnantWomanTxPvlsSupplemental(), "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "breastfeeding",
+        EptsReportUtils.map(getBreastfeedingPatients(), "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("results AND (pregnant OR breastfeeding)");
+    return cd;
+  }
+
+  public CohortDefinition getPregnantWomanTxPvlsSupplemental() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Pregnant");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+    Map<String, Integer> map = new HashMap<>();
+
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("5", hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("1600", hivMetadata.getPregnancyDueDate().getConceptId());
+    map.put("23821", hivMetadata.getSampleCollectionDateAndTime().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("6334", hivMetadata.getCriteriaForArtStart().getConceptId());
+    map.put("8", hivMetadata.getPtvEtvProgram().getProgramId());
+    map.put("1279", hivMetadata.getNumberOfWeeksPregnant().getConceptId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("6331", hivMetadata.getBPlusConcept().getConceptId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("5599", hivMetadata.getPriorDeliveryDateConcept().getConceptId());
+    map.put("6332", hivMetadata.getBreastfeeding().getConceptId());
+    map.put("27", hivMetadata.getPatientGaveBirthWorkflowState().getProgramWorkflowStateId());
+
+    String query =
+        "SELECT pregnant.patient_id FROM ( "
+            + "SELECT pg.patient_id "
+            + "              Max(pg.pregnancy_date) AS pg_date "
+            + "                  FROM (SELECT p.patient_id, "
+            + "                                     MAX(e.encounter_datetime) AS pregnancy_date "
+            + "                              FROM   patient p "
+            + "                                         INNER JOIN person p2 "
+            + "                                                    ON p2.person_id = p.patient_id "
+            + "                                         INNER JOIN encounter e "
+            + "                                                    ON e.patient_id = p.patient_id "
+            + "                                         INNER JOIN obs o "
+            + "                                                    ON o.encounter_id = e.encounter_id "
+            + "                              WHERE  p.voided = 0 "
+            + "                                AND p2.voided = 0 "
+            + "                                AND e.voided = 0 "
+            + "                                AND o.voided = 0 "
+            + "                                AND e.encounter_type IN (${6}, ${51}) "
+            + "                                AND p2.gender = 'F' "
+            + "                                AND o.concept_id =${1982} "
+            + "                                AND o.value_coded =${1065}  "
+            + "                                AND e.location_id = :location "
+            + "                                AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
+            + "                              GROUP BY p.patient_id "
+            + "                              UNION "
+            + "                              SELECT pp.patient_id, "
+            + "                                     pp.date_enrolled AS pregnancy_date "
+            + "                              FROM   patient_program pp "
+            + "                                         INNER JOIN person p "
+            + "                                                    ON p.person_id = pp.patient_id "
+            + "                                         INNER JOIN encounter e "
+            + "                                                    ON e.patient_id = pp.patient_id "
+            + "                              WHERE  p.gender = 'F' "
+            + "                                AND pp.program_id =${8}"
+            + "                                AND e.location_id = :location "
+            + "                                AND p.voided = 0 "
+            + "                                AND pp.voided = 0 "
+            + "                                AND pp.date_enrolled BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
+            + "                              UNION "
+            + "                              SELECT p.patient_id, "
+            + "                                     o2.value_datetime AS pregnancy_date "
+            + "                              FROM   patient p "
+            + "                                         INNER JOIN person p2 "
+            + "                                                    ON p2.person_id = p.patient_id "
+            + "                                         INNER JOIN encounter e "
+            + "                                                    ON e.patient_id = p.patient_id "
+            + "                                         INNER JOIN obs o "
+            + "                                                    ON o.encounter_id = e.encounter_id "
+            + "                                         INNER JOIN obs o2 "
+            + "                                                    ON o2.encounter_id = e.encounter_id "
+            + "                              WHERE p.voided = 0 "
+            + "                                AND p2.voided = 0 "
+            + "                                AND e.voided = 0 "
+            + "                                AND o.voided = 0 "
+            + "                                AND o2.voided = 0 "
+            + "                                AND p2.gender = 'F' "
+            + "                                AND e.encounter_type =${53} "
+            + "                                AND ( o.concept_id = ${1982} "
+            + "                                AND o.value_coded =${1065} ) "
+            + "                                AND ( o2.concept_id = ${1190} "
+            + "                                AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate ) "
+            + "                                AND e.location_id = :location) pg "
+            + "WHERE  pg.patient_id NOT IN ( "
+            + "                   SELECT e.patient_id "
+            + "                   FROM   encounter e "
+            + "                              INNER JOIN obs o "
+            + "                                         ON o.encounter_id = e.encounter_id "
+            + "                   WHERE o.voided = 0 "
+            + "                     AND e.voided = 0 "
+            + "                     AND e.encounter_type IN (${6}, ${51}) "
+            + "                     AND e.location_id = :location "
+            + "                     AND o.concept_id =${6332} "
+            + "                     AND o.value_coded =${1065}  "
+            + "                     AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
+            + "                     AND e.encounter_datetime > pg.pg_date "
+            + "                   UNION "
+            + "                   SELECT e.patient_id "
+            + "                   FROM   encounter e "
+            + "                              INNER JOIN obs o "
+            + "                                         ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  e.encounter_type IN ( ${5}, ${6} ) "
+            + "                     AND o.concept_id = ${6334} "
+            + "                     AND o.value_coded =${6332} "
+            + "                     AND e.voided = 0 "
+            + "                     AND o.voided = 0 "
+            + "                     AND e.location_id = :location "
+            + "                     AND e.patient_id = pregnant.patient_id "
+            + "                     AND e.encounter_datetime > pregnant.pg_date "
+            + "                     AND e.encounter_datetime BETWEEN "
+            + "                       Timestampadd(month, -18, pregnant.last_vl) AND "
+            + "                       pregnant.last_vl "
+            + "                   UNION "
+            + "                   SELECT pp.patient_id "
+            + "                   FROM   patient_program pp "
+            + "                              INNER JOIN patient_state ps "
+            + "                                         ON ps.patient_program_id = "
+            + "                                            pp.patient_program_id "
+            + "                   WHERE  pp.program_id =${8}"
+            + "                     AND ps.state =${27} "
+            + "                     AND pp.location_id = :location "
+            + "                     AND pp.voided = 0 "
+            + "                     AND ps.voided = 0 "
+            + "                     AND pp.patient_id = pregnant.patient_id "
+            + "                     AND ps.start_date > pg.pg_date "
+            + "                     AND ps.start_date BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
+            + "                   UNION "
+            + "                   SELECT e.patient_id "
+            + "                   FROM   encounter e "
+            + "                              INNER JOIN obs o "
+            + "                                         ON o.encounter_id = e.encounter_id "
+            + "                              INNER JOIN obs o2 "
+            + "                                         ON o2.encounter_id = e.encounter_id "
+            + "                   WHERE  e.encounter_type =${53} "
+            + "                     AND e.location_id = :location "
+            + "                     AND pregnant.patient_id = e.patient_id "
+            + "                     AND ( ( o.concept_id =${6332} "
+            + "                     AND o.value_coded =${1065} ) "
+            + "                     AND (o2.concept_id =${1190} "
+            + "                     AND o2.value_datetime > pg.pg_date "
+            + "                     AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate ) ) "
+            + "                     AND e.voided = 0 "
+            + "                     AND o.voided = 0 "
+            + "                     AND o2.voided = 0 ) "
+            + "       GROUP  BY pg.patient_id) pregnant ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
 }
