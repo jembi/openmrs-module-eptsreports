@@ -32,7 +32,7 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
 
   private TxPvlsDataset txPvlsDataset;
 
-  private TxPvlsDataset txPvlsSupplementalDataset;
+  private TxPvlsSupplementalDataset txPvlsSupplementalDataset;
 
   private TxNewDataset txNewDataset;
 
@@ -71,12 +71,12 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
       CXCASCRNDataset cxcascrnDataset,
       CXCASCRNPositiveDataset cxcascrnPositiveDataset,
       TXCXCADataset txcxcaDataset,
+      TxPvlsSupplementalDataset txPvlsSupplementalDataset,
       PrepNewDataset prepNewDataset,
       PrepCtDataset prepCtDataset,
       PrepOtherDisaggregationDataset prepOtherDisaggregationDataset,
       PmtctEidDataset pmtctEidDataset,
-      PmtctHeiDataset pmtctHeiDataset,
-      TxPvlsDataset txPvlsSupplementalDataset) {
+      PmtctHeiDataset pmtctHeiDataset) {
     this.txPvlsDataset = txPvlsDataset;
     this.txNewDataset = txNewDataset;
     this.txCurrDataset = txCurrDataset;
