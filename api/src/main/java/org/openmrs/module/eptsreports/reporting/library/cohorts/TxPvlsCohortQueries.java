@@ -1364,7 +1364,7 @@ public class TxPvlsCohortQueries {
 
     String query =
         "SELECT pregnant.patient_id FROM ( "
-            + "SELECT pg.patient_id "
+            + "SELECT pg.patient_id, "
             + "              Max(pg.pregnancy_date) AS pg_date "
             + "                  FROM (SELECT p.patient_id, "
             + "                                     MAX(e.encounter_datetime) AS pregnancy_date "
@@ -1436,23 +1436,7 @@ public class TxPvlsCohortQueries {
             + "                     AND o.concept_id =${6332} "
             + "                     AND o.value_coded =${1065}  "
             + "                     AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
-            + "                     AND e.encounter_datetime > pg.pg_date "
-            + "                   UNION "
-            + "                   SELECT e.patient_id "
-            + "                   FROM   encounter e "
-            + "                              INNER JOIN obs o "
-            + "                                         ON o.encounter_id = e.encounter_id "
-            + "                   WHERE  e.encounter_type IN ( ${5}, ${6} ) "
-            + "                     AND o.concept_id = ${6334} "
-            + "                     AND o.value_coded =${6332} "
-            + "                     AND e.voided = 0 "
-            + "                     AND o.voided = 0 "
-            + "                     AND e.location_id = :location "
-            + "                     AND e.patient_id = pregnant.patient_id "
-            + "                     AND e.encounter_datetime > pregnant.pg_date "
-            + "                     AND e.encounter_datetime BETWEEN "
-            + "                       Timestampadd(month, -18, pregnant.last_vl) AND "
-            + "                       pregnant.last_vl "
+            + "                     AND e.encounter_datetime > pg.pregnancy_date "
             + "                   UNION "
             + "                   SELECT pp.patient_id "
             + "                   FROM   patient_program pp "
@@ -1464,8 +1448,7 @@ public class TxPvlsCohortQueries {
             + "                     AND pp.location_id = :location "
             + "                     AND pp.voided = 0 "
             + "                     AND ps.voided = 0 "
-            + "                     AND pp.patient_id = pregnant.patient_id "
-            + "                     AND ps.start_date > pg.pg_date "
+            + "                     AND ps.start_date > pg.pregnancy_date "
             + "                     AND ps.start_date BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
             + "                   UNION "
             + "                   SELECT e.patient_id "
@@ -1476,11 +1459,10 @@ public class TxPvlsCohortQueries {
             + "                                         ON o2.encounter_id = e.encounter_id "
             + "                   WHERE  e.encounter_type =${53} "
             + "                     AND e.location_id = :location "
-            + "                     AND pregnant.patient_id = e.patient_id "
             + "                     AND ( ( o.concept_id =${6332} "
             + "                     AND o.value_coded =${1065} ) "
             + "                     AND (o2.concept_id =${1190} "
-            + "                     AND o2.value_datetime > pg.pg_date "
+            + "                     AND o2.value_datetime > pg.pregnancy_date "
             + "                     AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate ) ) "
             + "                     AND e.voided = 0 "
             + "                     AND o.voided = 0 "
@@ -1490,6 +1472,8 @@ public class TxPvlsCohortQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    System.out.println(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
   }
