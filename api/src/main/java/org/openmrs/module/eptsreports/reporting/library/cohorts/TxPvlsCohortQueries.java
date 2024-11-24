@@ -1312,26 +1312,36 @@ public class TxPvlsCohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * PVLS_PBFW_FR2
+   *
+   * <p>Indicator denominators
+   *
+   * <p>The system will generate the TX_PVLS supplemental coverage denominators as the number PW
+   * (PVLS_PBFW_FR3) and BF (PVLS_PBFW_FR4) clients on ART for at least 90 days who were eligible to
+   * receive a VL test during the 12 months prior to the reporting end date.
+   *
+   * @return @{@link CohortDefinition}
+   */
   public CohortDefinition getPregnantAndBreastfeedingWomenWithViralLoadResults() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Get pregnant women with viral load results denominator");
+    cd.setName("Get pregnant and breastfeeding women with viral load results");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+
     cd.addSearch(
-        "results",
+        "eligible",
         EptsReportUtils.map(getPatientsWithViralLoadResultsAndOnArtForMoreThan3Months(), mappings));
-    cd.addSearch(
-        "pregnant",
-        EptsReportUtils.map(
-            this.getPregnantWomanTxPvlsSupplemental(true),
-            "endDate=${endDate},location=${location}"));
+
+    cd.addSearch("pregnant", EptsReportUtils.map(this.getPregnantComposition(), mappings));
+
     cd.addSearch(
         "breastfeeding",
         EptsReportUtils.map(getBreastfeedingPatients(), "endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("results AND (pregnant OR breastfeeding)");
+    cd.setCompositionString("eligible AND (pregnant OR breastfeeding)");
     return cd;
   }
 
@@ -1506,5 +1516,60 @@ public class TxPvlsCohortQueries {
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
+  }
+
+  /**
+   * PVLS_PBFW_FR3
+   *
+   * <p>Eligible for a VL test and on ART for 90 days (Pregnant Women)
+   *
+   * <p>The system will generate the number of pregnant women (PVLS_PBFW_FR3.1) that are eligible to
+   * receive a VL test in the 12 months prior to the reporting end date (Date pregnancy registered
+   * >= endDate-12 months and <= endDate).
+   *
+   * <ul>
+   *   <li><b>Excluding:</b>
+   *       <ul>
+   *         <li>Clients whose difference between the date of the most recent record of pregnancy in
+   *             the last 12 months and the ART start date (PVLS_PBFW_FR5) is less than 90 days.
+   *         <li>Clients who are pregnant (PVLS_PBFW_FR3.1) in the 9 months prior to reporting
+   *             endDate – 12 months.
+   *       </ul>
+   * </ul>
+   *
+   * <p>The system will consider the most recent record of pregnancy falling in the 12 months prior
+   * to the reporting end date among the listed sources as Date Pregnancy Registered.
+   *
+   * <p><b>Note:</b> If the client has both states (pregnant and breastfeeding) during the 12-month
+   * period, the most recent state should be considered. If the client has both states registered on
+   * the same day, then the client should be considered pregnant.
+   *
+   * @return @{@link CohortDefinition}
+   */
+  public CohortDefinition getPregnantComposition() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Get pregnant women with viral load results denominator");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+
+    cd.addSearch(
+        "eligible",
+        EptsReportUtils.map(getPatientsWithViralLoadResultsAndOnArtForMoreThan3Months(), mappings));
+
+    cd.addSearch(
+        "pregnantInclusion",
+        EptsReportUtils.map(
+            this.getPregnantWomanTxPvlsSupplemental(true),
+            "endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "pregnantExclusion",
+        EptsReportUtils.map(
+            getPregnantWomanTxPvlsSupplemental(false), "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("(eligible AND pregnantInclusion) AND NOT pregnantExclusion");
+    return cd;
   }
 }

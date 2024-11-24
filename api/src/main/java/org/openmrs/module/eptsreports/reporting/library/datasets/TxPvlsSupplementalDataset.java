@@ -68,7 +68,7 @@ public class TxPvlsSupplementalDataset extends BaseDataSet {
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
                 "Pregnant, have vl results and on ART more than 3 months Denominator",
-                EptsReportUtils.map(txPvls.getPregnantWomanTxPvlsSupplemental(true), mappings)),
+                EptsReportUtils.map(txPvls.getPregnantComposition(), mappings)),
             mappings),
         "");
 
