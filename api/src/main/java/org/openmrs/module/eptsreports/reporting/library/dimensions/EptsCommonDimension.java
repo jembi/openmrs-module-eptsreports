@@ -295,7 +295,7 @@ public class EptsCommonDimension {
         "pregnant-dah",
         EptsReportUtils.map(
             intensiveMonitoringCohortQueries.getMI15C(),
-            "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
+            "startDate=${startDate-7m},endDate=${startDate-3m-1d},location=${location}"));
     return dim;
   }
 

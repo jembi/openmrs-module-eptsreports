@@ -239,7 +239,7 @@ public class ResumoMensalDAHCohortQueries {
         "B12",
         map(
             resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfPreviousMonthB12(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            "startDate=${startDate-4m},endDate=${startDate-3m-1d},location=${location}"));
 
     cd.addSearch(
         "I1",
@@ -324,10 +324,17 @@ public class ResumoMensalDAHCohortQueries {
     cd.setName("Relatório – Indicador 10 Resultado de CD4 baixo");
     cd.addParameters(getCohortParameters());
 
-    cd.addSearch("haveCd4Results", mapStraightThrough(getPatientsWhoHaveCd4Results()));
+    cd.addSearch(
+        "haveCd4Results",
+        map(
+            getPatientsWhoHaveCd4ResultsComposition(),
+            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        "cd4ByAgeAndResult", mapStraightThrough(getPatientsWithCD4BasedOnAgeAndCd4Results()));
+        "cd4ByAgeAndResult",
+        map(
+            getPatientsWithCD4BasedOnAgeAndCd4Results(),
+            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "onDAH",
@@ -353,7 +360,7 @@ public class ResumoMensalDAHCohortQueries {
    *     Clínica” com “Data de Consulta” ocorrida durante o período (>= “Data Início” e <= “Data
    *     Fim) e resultado igual a “Positivo” ou “Negativo”.
    *
-   * @see #getPatientsWhoHaveCd4Results
+   * @see #getPatientsWhoHaveCd4ResultsComposition
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithTBLAMResults() {
@@ -365,21 +372,22 @@ public class ResumoMensalDAHCohortQueries {
     cd.addSearch(
         "haveCd4Results",
         map(
-            getPatientsWhoHaveCd4Results(),
-            "startDate=${startDate-1m},endDate=${endDate},location=${location}"));
+            getPatientsWhoHaveCd4ResultsComposition(),
+            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "cd4ByAgeAndResult",
         map(
             getPatientsWithCD4BasedOnAgeAndCd4Results(),
-            "startDate=${startDate-1m},endDate=${endDate},location=${location}"));
+            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "tbLamResults",
-        mapStraightThrough(
+        map(
             getPatientsWithPositiveOrNegativeTestResults(
                 Collections.singletonList(tbMetadata.getTestTBLAM()),
-                Arrays.asList(hivMetadata.getPositive(), hivMetadata.getNegative()))));
+                Arrays.asList(hivMetadata.getPositive(), hivMetadata.getNegative())),
+            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "onDAH",
@@ -411,14 +419,19 @@ public class ResumoMensalDAHCohortQueries {
     cd.setName("Relatório – Indicador 12 Resultado de TB LAM Positivo");
     cd.addParameters(getCohortParameters());
 
-    cd.addSearch("tbLamResults", mapStraightThrough(getPatientsWithTBLAMResults()));
+    cd.addSearch(
+        "tbLamResults",
+        map(
+            getPatientsWithTBLAMResults(),
+            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "tbLamPositive",
-        mapStraightThrough(
+        map(
             getPatientsWithPositiveOrNegativeTestResults(
                 Collections.singletonList(tbMetadata.getTestTBLAM()),
-                Collections.singletonList(hivMetadata.getPositive()))));
+                Collections.singletonList(hivMetadata.getPositive())),
+            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "onDAH",
@@ -452,11 +465,7 @@ public class ResumoMensalDAHCohortQueries {
     cd.setName("Relatório – Indicador 13 CD4 Baixo e Resultado de CrAg Sérico");
     cd.addParameters(getCohortParameters());
 
-    cd.addSearch(
-        "haveLowCd4Results",
-        map(
-            getPatientsWithLowCd4Results(),
-            "startDate=${startDate-1m},endDate=${endDate},location=${location}"));
+    cd.addSearch("haveLowCd4Results", mapStraightThrough(getPatientsWithLowCd4Results()));
 
     cd.addSearch(
         "cragResults",
@@ -500,11 +509,12 @@ public class ResumoMensalDAHCohortQueries {
 
     cd.addSearch(
         "cragPositive",
-        mapStraightThrough(
+        map(
             getPatientsWithPositiveOrNegativeTestResults(
                 Arrays.asList(
                     hivMetadata.getCragSoroLabsetConcept(), hivMetadata.getCragSoroConcept()),
-                Collections.singletonList(hivMetadata.getPositive()))));
+                Collections.singletonList(hivMetadata.getPositive())),
+            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "onDAH",
@@ -537,9 +547,10 @@ public class ResumoMensalDAHCohortQueries {
 
     cd.addSearch(
         "cragResults",
-        mapStraightThrough(
+        map(
             getPatientsWithPositiveOrNegativeCragLCRResults(
-                Arrays.asList(hivMetadata.getPositive(), hivMetadata.getNegative()))));
+                Arrays.asList(hivMetadata.getPositive(), hivMetadata.getNegative())),
+            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "onDAH",
@@ -568,7 +579,11 @@ public class ResumoMensalDAHCohortQueries {
 
     cd.addSearch("cragPositive", mapStraightThrough(getPatientsWithLowCd4AndPositiveCragResults()));
 
-    cd.addSearch("mccPreventivo", mapStraightThrough(getPatientsWhoStartedMccPreventivo()));
+    cd.addSearch(
+        "mccPreventivo",
+        map(
+            getPatientsWhoStartedMccPreventivo(),
+            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "onDAH",
@@ -602,11 +617,16 @@ public class ResumoMensalDAHCohortQueries {
 
     cd.addSearch(
         "cragLCRPositive",
-        mapStraightThrough(
+        map(
             getPatientsWithPositiveOrNegativeCragLCRResults(
-                Collections.singletonList(hivMetadata.getPositive()))));
+                Collections.singletonList(hivMetadata.getPositive())),
+            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
 
-    cd.addSearch("mmcTreatment", mapStraightThrough(getPatientsInMccTretament()));
+    cd.addSearch(
+        "mmcTreatment",
+        map(
+            getPatientsInMccTretament(),
+            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "onDAH",
@@ -956,6 +976,30 @@ public class ResumoMensalDAHCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
+  public CohortDefinition getPatientsWhoHaveCd4ResultsComposition() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Número de utentes com resultado de CD4 de rastreio disponível");
+    cd.addParameters(getCohortParameters());
+
+    CohortDefinition cd4Results = getPatientsWhoHaveCd4Results();
+    CohortDefinition cd4Request = getPatientsWhoHaveCd4Request();
+
+    cd.addSearch("cd4Results", mapStraightThrough(cd4Results));
+    cd.addSearch("cd4Request", mapStraightThrough(cd4Request));
+
+    cd.setCompositionString("cd4Results AND cd4Request");
+    return cd;
+  }
+
+  /**
+   * Filtrando os utentes com o respectivo “Resultado de CD4” (identificado nos critérios acima
+   * definidos) de acordo com a seguinte definição:
+   * <li>< 750 para os utentes com idade < 1 ano
+   * <li>< 500 para os utentes com idade entre 1 a 4anos
+   * <li>< 200 (absoluto) ou “<=200” (semi-quantitativo) para os utentes com idade >= 5 anos
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientsWithCD4BasedOnAgeAndCd4Results() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName(
@@ -1234,7 +1278,10 @@ public class ResumoMensalDAHCohortQueries {
     cd.addParameters(getCohortParameters());
 
     cd.addSearch(
-        "onSKIndication", mapStraightThrough(getPatientsWithSarcomaSKAndQuimiotherapyIndication()));
+        "onSKIndication",
+        map(
+            getPatientsWithSarcomaSKAndQuimiotherapyIndication(),
+            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "onDAH",
@@ -1262,7 +1309,9 @@ public class ResumoMensalDAHCohortQueries {
 
     cd.addSearch(
         "onSKIndicationStartedQuimio",
-        mapStraightThrough(getPatientsWithSarcomaSKAndStartedQuimiotherapy()));
+        map(
+            getPatientsWithSarcomaSKAndStartedQuimiotherapy(),
+            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "onDAH",
@@ -1406,10 +1455,12 @@ public class ResumoMensalDAHCohortQueries {
 
     if (eightToNine) {
       cd.addSearch(
-          "B1", map(rmB1, "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
+          "B1",
+          map(rmB1, "startDate=${startDate-6m},endDate=${startDate-3m-1d},location=${location}"));
 
       cd.addSearch(
-          "A2", map(rmA2, "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
+          "A2",
+          map(rmA2, "startDate=${startDate-6m},endDate=${startDate-3m-1d},location=${location}"));
     } else {
       cd.addSearch(
           "B1",
@@ -1472,14 +1523,15 @@ public class ResumoMensalDAHCohortQueries {
     if (eightToNine) {
       cd.addSearch(
           "B3P1",
-          map(rmB3, "startDate=${startDate-2m},endDate=${endDate-2m},location=${location}"));
+          map(rmB3, "startDate=${startDate-6m},endDate=${startDate-5m-1d},location=${location}"));
 
       cd.addSearch(
           "B3P2",
-          map(rmB3, "startDate=${startDate-1m},endDate=${endDate-1m},location=${location}"));
+          map(rmB3, "startDate=${startDate-5m},endDate=${startDate-4m-1d},location=${location}"));
 
       cd.addSearch(
-          "B3P3", map(rmB3, "startDate=${startDate},endDate=${endDate},location=${location}"));
+          "B3P3",
+          map(rmB3, "startDate=${startDate-4m},endDate=${startDate-3m-1d},location=${location}"));
     } else {
       cd.addSearch(
           "B3P1",
@@ -1555,7 +1607,8 @@ public class ResumoMensalDAHCohortQueries {
 
     if (eightToNine) {
       cd.addSearch(
-          "B12", map(rmb12, "startDate=${startDate},endDate=${endDate},location=${location}"));
+          "B12",
+          map(rmb12, "startDate=${startDate-4m},endDate=${startDate-3m-1d},location=${location}"));
     } else {
       cd.addSearch(
           "B12",
@@ -1606,7 +1659,9 @@ public class ResumoMensalDAHCohortQueries {
 
     cd.addSearch(
         "RM",
-        map(rmDefinition, "startDate=${startDate-2m},endDate=${endDate},location=${location}"));
+        map(
+            rmDefinition,
+            "startDate=${startDate-6m},endDate=${startDate-3m-1d},location=${location}"));
 
     cd.addSearch(
         "tarvSituation", mapStraightThrough(getPatientsWithAnyArtSituationOrWithoutFichaDAH()));

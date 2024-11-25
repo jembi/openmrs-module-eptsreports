@@ -413,14 +413,18 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
     return mapStraightThrough(
         eptsGeneralIndicator.getIndicator(
             "Relatório- Indicador 8 – Pedido de CD4",
-            mapStraightThrough(resumoMensalDAHCohortQueries.getPatientsWhoHaveCd4Request())));
+            map(
+                resumoMensalDAHCohortQueries.getPatientsWhoHaveCd4Request(),
+                "startDate=${startDate-4m+1d},endDate=${startDate-3m},location=${location}")));
   }
 
   private Mapped<CohortIndicator> getPatientsWhoHaveCd4Results() {
     return mapStraightThrough(
         eptsGeneralIndicator.getIndicator(
             "Relatório- Indicador 9 – Resultado de CD4",
-            mapStraightThrough(resumoMensalDAHCohortQueries.getPatientsWhoHaveCd4Results())));
+            map(
+                resumoMensalDAHCohortQueries.getPatientsWhoHaveCd4ResultsComposition(),
+                "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}")));
   }
 
   private Mapped<CohortIndicator> getPatientsWithLowCd4Results() {
