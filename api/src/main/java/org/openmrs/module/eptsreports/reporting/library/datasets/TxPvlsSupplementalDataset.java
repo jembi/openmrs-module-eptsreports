@@ -81,7 +81,7 @@ public class TxPvlsSupplementalDataset extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "Breast feeding, have vl results and on ART more than 3 months Denominator",
                 EptsReportUtils.map(
-                    txPvls.getBreastfeedingWomenWhoHaveViralLoadResults(), mappings)),
+                    txPvls.getBreastfeedingWomenWithVlResultComposition(), mappings)),
             mappings),
         "");
   }
