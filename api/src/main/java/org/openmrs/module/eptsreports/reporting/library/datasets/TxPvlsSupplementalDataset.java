@@ -39,7 +39,7 @@ public class TxPvlsSupplementalDataset extends BaseDataSet {
   public DataSetDefinition constructTxPvlsSupplementalDatset() {
 
     CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
-    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String mappings = "endDate=${endDate},location=${location}";
     dsd.setName("TxPvlsSupplemental");
     dsd.addParameters(getParameters());
 
@@ -52,22 +52,22 @@ public class TxPvlsSupplementalDataset extends BaseDataSet {
 
     dsd.addColumn(
         "TOTAL",
-        "Pregnant And Breastfeeding have vl results and on ART more than 3 months Denominator",
+        "Pregnant And Breastfeeding who are eligible for VL test and on ART for more than 3 months Denominator",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "Total Pregnant And Breastfeeding have vl results and on ART more than 3 months Denominator",
+                "Total of Pregnant And Breastfeeding who are eligible for VL test and on ART for more than 3 months Denominator",
                 EptsReportUtils.map(
-                    txPvls.getPregnantAndBreastfeedingWomenWithViralLoadResults(), mappings)),
+                    txPvls.getPregnantAndBreastfeedingWomenEligibleForVL(), mappings)),
             mappings),
         "");
 
     // Pregnant women on ART for more than 3 months and have VL results
     dsd.addColumn(
         "Pregnant",
-        "Pregnant, have vl results and on ART more than 3 months Denominator",
+        "Pregnant Eligible for a VL test and on ART for 90 days",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "Pregnant, have vl results and on ART more than 3 months Denominator",
+                "Pregnant Eligible for a VL test and on ART for 90 days",
                 EptsReportUtils.map(txPvls.getPregnantComposition(), mappings)),
             mappings),
         "");
@@ -76,10 +76,10 @@ public class TxPvlsSupplementalDataset extends BaseDataSet {
     // Breastfeeding and on ART for more than 3 months and have VL results
     dsd.addColumn(
         "Breastfeeding",
-        "Breast feeding, have vl results and on ART more than 3 months Denominator",
+        "Breastfeeding Eligible for a VL test and on ART for 90 days",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "Breast feeding, have vl results and on ART more than 3 months Denominator",
+                "Breastfeeding Eligible for a VL test and on ART for 90 days",
                 EptsReportUtils.map(
                     txPvls.getBreastfeedingWomenWithVlResultComposition(), mappings)),
             mappings),
