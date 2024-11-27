@@ -227,12 +227,10 @@ public class TxNewCohortQueries {
     txNewComposition.addParameter(new Parameter("location", "location", Location.class));
 
     String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
-    String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
+    String mapping2 = "endDate=${endDate},location=${location}";
 
     CohortDefinition startedART = getPatientsStartedArtDuringReportingPeriod();
-    CohortDefinition transferredIn =
-        resumoMensalCohortQueries
-            .getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2E();
+    CohortDefinition transferredIn = getPatientsWhoAreTransferredIn();
 
     txNewComposition.getSearches().put("startedART", EptsReportUtils.map(startedART, mapping1));
     txNewComposition
@@ -774,5 +772,105 @@ public class TxNewCohortQueries {
     cd.setCompositionString("txnew AND NOT (cd4Under200AndAge OR cd4Above200AndAge)");
 
     return cd;
+  }
+
+  public CohortDefinition getPatientsWhoAreTransferredIn() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Transferred-in patients");
+    cd.addParameter(new Parameter("endDate", "endDate Date", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.setQuery(
+        getTxNewPatientsWhoAreTransferredIn(
+            hivMetadata.getARTProgram().getProgramId(),
+            hivMetadata
+                .getPateintTransferedFromOtherFacilityWorkflowState()
+                .getProgramWorkflowStateId(),
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            hivMetadata.getTransferredFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId(),
+            hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId()));
+    return cd;
+  }
+
+  public static String getTxNewPatientsWhoAreTransferredIn(
+      int artProgram,
+      int artCareTransferredFromOtherFacility,
+      int mastercard,
+      int transferFromOther,
+      int yes,
+      int typeOfPatientTransferredFrom,
+      int dateOfArtPickUp,
+      int dateOfMasterCardFileOpening) {
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM patient p "
+            + "JOIN patient_program pp "
+            + "    ON p.patient_id = pp.patient_id "
+            + "JOIN patient_state ps "
+            + "    ON ps.patient_program_id = pp.patient_program_id "
+            + "JOIN ( "
+            + "    SELECT p.patient_id, "
+            + "           MIN(ps.start_date) AS first_state "
+            + "    FROM patient p "
+            + "    INNER JOIN patient_program pg "
+            + "        ON p.patient_id = pg.patient_id "
+            + "    INNER JOIN patient_state ps "
+            + "        ON pg.patient_program_id = ps.patient_program_id "
+            + "    WHERE p.voided = 0 "
+            + "      AND pg.voided = 0 "
+            + "      AND ps.voided = 0 "
+            + "      AND pg.program_id = ${artProgram} "
+            + "      AND ps.start_date <= :endDate "
+            + "      AND pg.location_id = :location "
+            + "    GROUP BY p.patient_id "
+            + ") earliest "
+            + "    ON ps.start_date = earliest.first_state "
+            + "WHERE p.voided = 0 "
+            + "  AND pp.voided = 0 "
+            + "  AND ps.voided = 0 "
+            + "  AND pp.program_id = ${artProgram} "
+            + "  AND ps.state = ${artCareTransferredFromOtherFacility} "
+            + "  AND pp.location_id = :location "
+            + " "
+            + "UNION "
+            + " "
+            + "SELECT p.patient_id "
+            + "FROM patient p "
+            + "JOIN encounter e "
+            + "    ON p.patient_id = e.patient_id "
+            + "JOIN obs transf "
+            + "    ON transf.encounter_id = e.encounter_id "
+            + "JOIN obs type "
+            + "    ON type.encounter_id = e.encounter_id "
+            + "JOIN obs opening "
+            + "    ON opening.encounter_id = e.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND transf.voided = 0 "
+            + "  AND type.voided = 0 "
+            + "  AND opening.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ${mastercard} "
+            + "  AND transf.concept_id = ${transferFromOther} "
+            + "  AND transf.value_coded = ${yes} "
+            + "  AND type.concept_id = ${typeOfPatientTransferredFrom} "
+            + "  AND type.value_coded = ${dateOfArtPickUp} "
+            + "  AND opening.concept_id = ${dateOfMasterCardFileOpening} "
+            + "  AND opening.value_datetime <= :endDate;";
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("artProgram", artProgram);
+    valuesMap.put("artCareTransferredFromOtherFacility", artCareTransferredFromOtherFacility);
+    valuesMap.put("mastercard", mastercard);
+    valuesMap.put("transferFromOther", transferFromOther);
+    valuesMap.put("yes", yes);
+    valuesMap.put("typeOfPatientTransferredFrom", typeOfPatientTransferredFrom);
+    valuesMap.put("dateOfArtPickUp", dateOfArtPickUp);
+    valuesMap.put("dateOfMasterCardFileOpening", dateOfMasterCardFileOpening);
+    StringSubstitutor sub = new StringSubstitutor(valuesMap);
+    return sub.replace(query);
   }
 }
