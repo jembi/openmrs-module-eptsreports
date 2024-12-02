@@ -3,6 +3,7 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
 import org.openmrs.Location;
@@ -303,12 +304,16 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     CohortDefinition negativeTbLam = getPatientsWithTbLamResult(TbLamResult.NEGATIVE);
 
+    CohortDefinition positiveTbLam = getPatientsWithTbLamResult(TbLamResult.POSITIVE);
+
     cd.addSearch(
         "severeImmunosuppressionAndWithTbLamResult",
         EptsReportUtils.map(severeImmunosuppressionAndWithTbLamResult, mappings));
     cd.addSearch("negativeTbLam", EptsReportUtils.map(negativeTbLam, mappings));
+    cd.addSearch("positiveTbLam", EptsReportUtils.map(positiveTbLam, mappings));
 
-    cd.setCompositionString("severeImmunosuppressionAndWithTbLamResult AND negativeTbLam");
+    cd.setCompositionString(
+        "severeImmunosuppressionAndWithTbLamResult AND (negativeTbLam AND NOT positiveTbLam)");
 
     return cd;
   }
