@@ -18,8 +18,9 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-@Deprecated
+@Component
 public class SetupResumoMensalDAHReport extends EptsDataExportManager {
 
   private ResumoMensalDAHDatasetDefinition resumoMensalDAHDatasetDefinition;
@@ -83,7 +84,7 @@ public class SetupResumoMensalDAHReport extends EptsDataExportManager {
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "MISAU_SESP_MASC_Resumo_Mensal_DAH_v2_2.xls",
+              "MISAU_SESP_MASC_Resumo_Mensal_DAH_v2_3.xls",
               "Resumo Mensal de DAH",
               getExcelDesignUuid(),
               null);
