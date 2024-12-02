@@ -1289,7 +1289,13 @@ public class ResumoMensalDAHCohortQueries {
             getPatientsWhoStartedFollowupOnDAHComposition(),
             "startDate=${endDate},endDate={endDate},location=${location}"));
 
-    cd.setCompositionString("onDAH AND onSKIndication");
+    cd.addSearch(
+        "cd4Request",
+        map(
+            getPatientsWhoHaveCd4Request(),
+            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("onDAH AND onSKIndication AND cd4Request");
     return cd;
   }
 
@@ -1319,7 +1325,13 @@ public class ResumoMensalDAHCohortQueries {
             getPatientsWhoStartedFollowupOnDAHComposition(),
             "startDate=${endDate},endDate={endDate},location=${location}"));
 
-    cd.setCompositionString("onDAH AND onSKIndicationStartedQuimio");
+    cd.addSearch(
+        "cd4Request",
+        map(
+            getPatientsWhoHaveCd4Request(),
+            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("onDAH AND onSKIndicationStartedQuimio AND cd4Request");
     return cd;
   }
 
