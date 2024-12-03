@@ -41,6 +41,24 @@ public class ResumoMensalCcrCohortQueries {
     this.commonMetadata = commonMetadata;
   }
 
+  public String get1stCcrConsulation() {
+    return "SELECT "
+        + "  p.patient_id, "
+        + "  Min(e.encounter_datetime) AS enrollment_date "
+        + "FROM "
+        + "  patient p "
+        + "  INNER JOIN encounter e ON p.patient_id = e.patient_id "
+        + "WHERE "
+        + "  p.voided = 0 "
+        + "  AND e.voided = 0 "
+        + "  AND e.encounter_type = ${92} "
+        + "  AND e.location_id = :location "
+        + "  AND e.encounter_datetime >= :startDate "
+        + "  AND e.encounter_datetime <= :endDate "
+        + "GROUP BY "
+        + "  p.patient_id";
+  }
+
   /**
    * CCR-FR7
    *
@@ -67,23 +85,7 @@ public class ResumoMensalCcrCohortQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
 
-    String query =
-        "SELECT "
-            + "    p.patient_id, "
-            + "    MIN(e.encounter_datetime) AS enrollment_date "
-            + "FROM "
-            + "    patient p "
-            + "    INNER JOIN encounter e "
-            + "        ON p.patient_id = e.patient_id "
-            + "WHERE "
-            + "    p.voided = 0 "
-            + "    AND e.voided = 0 "
-            + "    AND e.encounter_type = ${92} "
-            + "    AND e.location_id = :location "
-            + "    AND e.encounter_datetime >= :startDate "
-            + "    AND e.encounter_datetime <= :endDate "
-            + "GROUP BY "
-            + "    p.patient_id";
+    String query = "SELECT p.patient_id " + " FROM ( " + get1stCcrConsulation() + " ) ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -123,12 +125,14 @@ public class ResumoMensalCcrCohortQueries {
 
     String query =
         "SELECT "
-            + "    p.patient_id, "
-            + "    MIN(e.encounter_datetime) AS enrollment_date "
+            + "    p.patient_id "
             + "FROM "
             + "    patient p "
             + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "     INNER JOIN ( "
+            + get1stCcrConsulation()
+            + ")ccr ON ccr.patient_id = p.patient_id "
             + "WHERE "
             + "    p.voided = 0 "
             + "    AND e.voided = 0 "

@@ -6115,4 +6115,52 @@ public class HivMetadata extends ProgramsMetadata {
             .getGlobalProperty("eptsreports.cd4CountGreaterThan200ConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>enconter_type_id = 23756</b>
+   *
+   * <p><b>Name:</b> WEIGHT / STATURE
+   *
+   * <p><b>Description:</b> A weight or stature used on nutrition assessment for children
+   *
+   * @return {@link Concept}
+   */
+  public Concept getWeightStatureConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.weightStatureConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>enconter_type_id = 165496</b>
+   *
+   * <p><b>Name:</b> SEVERE ACUTE MALNUTRITION < -3 DP
+   *
+   * <p><b>Description:</b> SEVERE ACUTE MALNUTRITION
+   *
+   * @return {@link Concept}
+   */
+  public Concept getSevereAcuteMalnutritionConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.severeAcuteMalnutrituinConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>enconter_type_id = 165497</b>
+   *
+   * <p><b>Name:</b> MODERATE NUTRITION ≥ -3 AND < -2 DP
+   *
+   * <p><b>Description:</b> MODERATE NUTRITION
+   *
+   * @return {@link Concept}
+   */
+  public Concept getModerateNutritionConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.moderateNutrituinConceptUuid");
+    return getConcept(uuid);
+  }
 }
