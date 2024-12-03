@@ -226,7 +226,7 @@ public class ResumoMensalCcrCohortQueries {
   }
 
   /**
-   * <b>CCR-FR8</b>
+   * <b>CCR-FR9</b>
    *
    * <p><b>Indicador 3</b> - Crianças com desnutrição aguda moderada
    *
@@ -262,6 +262,47 @@ public class ResumoMensalCcrCohortQueries {
         "damConsultation", map(getDamChildren(hivMetadata.getModerateNutritionConcept()), mapping));
 
     cd.setCompositionString("damReason AND damConsultation");
+    return cd;
+  }
+
+  /**
+   * <b>CCR-FR10</b>
+   *
+   * <p><b>Indicador 4</b> - Crianças com desnutrição aguda grave
+   *
+   * <p>O sistema irá produzir o indicador 4 “Total de crianças com desnutrição aguda grave”, da
+   * seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta durante o período de reporte
+   *       (CCR-FR FR7) e o “Motivo da consulta” igual a "Desnutrição Aguda” registado na “Ficha
+   *       Resumo de CCR” com a “Data de Abertura do Processo” ocorrida durante do periodo de
+   *       reporte (“Data de abertura do processo”>= “Data Início” e <= “Data Fim”)
+   *   <li>Filtrando as que tiveram o registo de “Peso/Estatura(DP)” igual a "Desnutrição Aguda
+   *       Grave” na primeira “Ficha de Seguimento de CCR” registada durante o período de reporte
+   *       (“Data da Consulta” >= “Data Início” e <= “Data Fim”).
+   * </ul>
+   *
+   * <p><b>Nota:</b> em caso de existirem mais que uma “Ficha de Seguimento de CCR” durante o
+   * período será considerada a informação registada na primeira ficha.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenWithSevereAcuteMalnutrition() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças com desnutrição aguda grave");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch(
+        "dagReason",
+        map(getChildrenWithVisitReason(hivMetadata.getChronicMalnutritionConcept()), mapping));
+    cd.addSearch(
+        "dagConsultation",
+        map(getDamChildren(hivMetadata.getSevereAcuteMalnutritionConcept()), mapping));
+
+    cd.setCompositionString("dagReason AND dagConsultation");
     return cd;
   }
 }

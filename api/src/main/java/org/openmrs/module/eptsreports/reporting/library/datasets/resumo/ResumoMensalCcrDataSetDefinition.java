@@ -79,6 +79,8 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
 
     dsd.addColumn("DAM", "Crianças com desnutrição aguda moderada", getChildrenWithDam(), "");
 
+    dsd.addColumn("DAG", "Crianças com desnutrição aguda grave", getChildrenWithDag(), "");
+
     return dsd;
   }
 
@@ -104,5 +106,13 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
             "Crianças com desnutrição aguda moderada",
             mapStraightThrough(
                 resumoMensalCcrCohortQueries.getChildrenWithModerateAcuteMalnutrition())));
+  }
+
+  private Mapped<CohortIndicator> getChildrenWithDag() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Crianças com desnutrição aguda grave",
+            mapStraightThrough(
+                resumoMensalCcrCohortQueries.getChildrenWithSevereAcuteMalnutrition())));
   }
 }
