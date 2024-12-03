@@ -1491,7 +1491,7 @@ public class ResumoMensalDAHCohortQueries {
         "PREGNANT",
         map(
             intensiveMonitoringCohortQueries.getMI15C(),
-            "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
+            "startDate=${startDate-7m},endDate=${startDate-3m-1d},location=${location}"));
 
     cd.setCompositionString(
         eightToNine ? "(B1 OR A2) AND NOT PREGNANT" : "(newOnArt OR B1 OR A2) AND NOT PREGNANT");
@@ -1571,7 +1571,7 @@ public class ResumoMensalDAHCohortQueries {
         "PREGNANT",
         map(
             intensiveMonitoringCohortQueries.getMI15C(),
-            "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
+            "startDate=${startDate-7m},endDate=${startDate-3m-1d},location=${location}"));
 
     cd.addSearch(
         "newArt", mapStraightThrough(getPatientsWhoAreNewInArtDisaggregation(eightToNine)));
@@ -1634,7 +1634,7 @@ public class ResumoMensalDAHCohortQueries {
         "PREGNANT",
         map(
             intensiveMonitoringCohortQueries.getMI15C(),
-            "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
+            "startDate=${startDate-7m},endDate=${startDate-3m-1d},location=${location}"));
 
     cd.addSearch(
         "restarted", mapStraightThrough(getPatientsWhoRestartedArtDisaggregation(eightToNine)));
