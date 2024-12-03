@@ -14,7 +14,7 @@
 
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import static org.openmrs.module.eptsreports.reporting.library.queries.ResumoMensalQueries.*;
+import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -41,6 +41,8 @@ public class ResumoMensalCcrCohortQueries {
     this.commonMetadata = commonMetadata;
   }
 
+  String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
+
   public String get1stCcrConsulation() {
     return "SELECT "
         + "  p.patient_id, "
@@ -52,6 +54,24 @@ public class ResumoMensalCcrCohortQueries {
         + "  p.voided = 0 "
         + "  AND e.voided = 0 "
         + "  AND e.encounter_type = ${92} "
+        + "  AND e.location_id = :location "
+        + "  AND e.encounter_datetime >= :startDate "
+        + "  AND e.encounter_datetime <= :endDate "
+        + "GROUP BY "
+        + "  p.patient_id";
+  }
+
+  public String get1stCcrSeguimentoConsulation() {
+    return "SELECT "
+        + "  p.patient_id, "
+        + "  Min(e.encounter_datetime) AS first_consultation_date "
+        + "FROM "
+        + "  patient p "
+        + "  INNER JOIN encounter e ON p.patient_id = e.patient_id "
+        + "WHERE "
+        + "  p.voided = 0 "
+        + "  AND e.voided = 0 "
+        + "  AND e.encounter_type = ${93} "
         + "  AND e.location_id = :location "
         + "  AND e.encounter_datetime >= :startDate "
         + "  AND e.encounter_datetime <= :endDate "
@@ -111,7 +131,7 @@ public class ResumoMensalCcrCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getChildrenWithTurbeculosisContact(Concept reasonConcept) {
+  public CohortDefinition getChildrenWithVisitReason(Concept reasonConcept) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Children With Turbeculosis Contact");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -150,6 +170,98 @@ public class ResumoMensalCcrCohortQueries {
 
     cd.setQuery(stringSubstitutor.replace(query));
 
+    return cd;
+  }
+
+  /**
+   *
+   *
+   * <ul>
+   *   <li>Filtrando as que tiveram o registo de “Peso/Estatura(DP)” igual a "Desnutrição Aguda
+   *       Moderada” na primeira “Ficha de Seguimento de CCR” registada durante o período de reporte
+   *       (“Data da Consulta” >= “Data Início” e <= “Data Fim”).
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getDamChildren(Concept answerConcept) {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Crianças com desnutrição aguda moderada (DAM)");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23756", hivMetadata.getWeightStatureConcept().getConceptId());
+    map.put("answerConcept", answerConcept.getConceptId());
+
+    String query =
+        "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "     INNER JOIN ( "
+            + get1stCcrSeguimentoConsulation()
+            + ")ccr ON ccr.patient_id = p.patient_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${93} "
+            + "    AND o.concept_id = ${23756} "
+            + "    AND o.value_coded = ${answerConcept} "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_datetime = ccr.first_consultation_date "
+            + "GROUP BY "
+            + "    p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * <b>CCR-FR8</b>
+   *
+   * <p><b>Indicador 3</b> - Crianças com desnutrição aguda moderada
+   *
+   * <p>O sistema irá produzir o indicador 3 “Total de crianças com desnutrição aguda moderada”, da
+   * seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta durante o período de reporte
+   *       (CCR-FR7) e o “Motivo da consulta” igual a "Desnutrição Aguda” registado na “Ficha Resumo
+   *       de CCR” com a “Data de Abertura do Processo” ocorrida durante do periodo de reporte
+   *       (“Data de abertura do processo”>= “Data Início” e <= “Data Fim”)
+   *   <li>Filtrando as que tiveram o registo de “Peso/Estatura(DP)” igual a "Desnutrição Aguda
+   *       Moderada” na primeira “Ficha de Seguimento de CCR” registada durante o período de reporte
+   *       (“Data da Consulta” >= “Data Início” e <= “Data Fim”).
+   * </ul>
+   *
+   * <p><b>Nota:</b> em caso de existirem mais que uma “Ficha de Seguimento de CCR” durante o
+   * período será considerada a informação registada na primeira ficha.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenWithModerateAcuteMalnutrition() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças com desnutrição aguda moderada");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch(
+        "damReason",
+        map(getChildrenWithVisitReason(hivMetadata.getChronicMalnutritionConcept()), mapping));
+    cd.addSearch(
+        "damConsultation", map(getDamChildren(hivMetadata.getModerateNutritionConcept()), mapping));
+
+    cd.setCompositionString("damReason AND damConsultation");
     return cd;
   }
 }

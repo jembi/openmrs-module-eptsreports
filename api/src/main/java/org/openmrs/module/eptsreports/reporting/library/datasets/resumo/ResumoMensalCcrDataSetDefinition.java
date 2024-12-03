@@ -77,6 +77,8 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
     dsd.addColumn(
         "TUBERCULOSIS", "Crianças com contacto com tuberculose", getChildrenWithTbContact(), "");
 
+    dsd.addColumn("DAM", "Crianças com desnutrição aguda moderada", getChildrenWithDam(), "");
+
     return dsd;
   }
 
@@ -92,7 +94,15 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "Crianças com contacto com tuberculose",
             mapStraightThrough(
-                resumoMensalCcrCohortQueries.getChildrenWithTurbeculosisContact(
+                resumoMensalCcrCohortQueries.getChildrenWithVisitReason(
                     commonMetadata.getContactoTbConcept()))));
+  }
+
+  private Mapped<CohortIndicator> getChildrenWithDam() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Crianças com desnutrição aguda moderada",
+            mapStraightThrough(
+                resumoMensalCcrCohortQueries.getChildrenWithModerateAcuteMalnutrition())));
   }
 }
