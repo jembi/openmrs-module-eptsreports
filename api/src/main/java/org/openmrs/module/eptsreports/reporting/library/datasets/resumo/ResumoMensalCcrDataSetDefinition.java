@@ -14,7 +14,10 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets.resumo;
 
 import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
+import org.openmrs.module.eptsreports.metadata.CommonMetadata;
+import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCcrCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.BaseDataSet;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
@@ -22,6 +25,8 @@ import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDim
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
 import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
+import org.openmrs.module.reporting.evaluation.parameter.Mapped;
+import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -35,6 +40,10 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
 
   private ResumoMensalCcrCohortQueries resumoMensalCcrCohortQueries;
 
+  private CommonMetadata commonMetadata;
+
+  private HivMetadata hivMetadata;
+
   @Autowired
   @Qualifier("commonAgeDimensionCohort")
   private AgeDimensionCohortInterface ageDimensionCohort;
@@ -43,10 +52,14 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
   public ResumoMensalCcrDataSetDefinition(
       EptsCommonDimension eptsCommonDimension,
       EptsGeneralIndicator eptsGeneralIndicator,
-      ResumoMensalCcrCohortQueries resumoMensalCcrCohortQueries) {
+      ResumoMensalCcrCohortQueries resumoMensalCcrCohortQueries,
+      CommonMetadata commonMetadata,
+      HivMetadata hivMetadata) {
     this.eptsCommonDimension = eptsCommonDimension;
     this.eptsGeneralIndicator = eptsGeneralIndicator;
     this.resumoMensalCcrCohortQueries = resumoMensalCcrCohortQueries;
+    this.commonMetadata = commonMetadata;
+    this.hivMetadata = hivMetadata;
   }
 
   public DataSetDefinition constructResumoMensalDataset() {
@@ -59,6 +72,27 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
     dsd.addDimension(
         "age", map(eptsCommonDimension.age(ageDimensionCohort), "effectiveDate=${endDate}"));
 
+    dsd.addColumn("FIRST", "Total de 1as Consultas", getChildrenWithFirstConsultation(), "");
+
+    dsd.addColumn(
+        "TUBERCULOSIS", "Crianças com contacto com tuberculose", getChildrenWithTbContact(), "");
+
     return dsd;
+  }
+
+  private Mapped<CohortIndicator> getChildrenWithFirstConsultation() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Total de 1as Consultas",
+            mapStraightThrough(resumoMensalCcrCohortQueries.getPatients1stConsultation())));
+  }
+
+  private Mapped<CohortIndicator> getChildrenWithTbContact() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Crianças com contacto com tuberculose",
+            mapStraightThrough(
+                resumoMensalCcrCohortQueries.getChildrenWithTurbeculosisContact(
+                    commonMetadata.getContactoTbConcept()))));
   }
 }
