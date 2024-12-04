@@ -2525,19 +2525,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "   		  AND e.location_id = :location "
             + "   		  AND e.encounter_type = ${6} "
             + "   		  AND o.concept_id = ${23703} "
-            + "   		  AND ( ";
-    if (keyPopConcept.getConceptId() == 1377) {
-      sql += "                (p.gender = 'M' AND o.value_coded = ${keypop}) ";
-    } else if (keyPopConcept.getConceptId() == 1901) {
-      sql += "                (p.gender = 'F' AND o.value_coded = ${keypop}) ";
-    } else {
-      sql +=
-          "                   (p.gender = 'M' AND o.value_coded = ${keypop}) "
-              + "             OR "
-              + "             (p.gender = 'F' AND o.value_coded = ${keypop}) ";
-    }
-    sql +=
-        "                   ) "
+            + "   		  AND o.value_coded = ${keypop} "
             + "         AND e.encounter_datetime <= CURRENT_DATE() "
             + "       GROUP  BY p.person_id "
             + "   ) AS has_kpop ON p.patient_id = has_kpop.patient_id"
