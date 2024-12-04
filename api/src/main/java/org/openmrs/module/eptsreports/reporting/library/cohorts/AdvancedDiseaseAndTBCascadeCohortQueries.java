@@ -3,7 +3,6 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
 import org.openmrs.Location;
@@ -1302,7 +1301,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "                   WHERE  e.voided = 0 "
             + "                          AND o.voided = 0 "
-            + "                          AND e.encounter_type IN ( ${6}, ${13} ) "
+            + "                          AND e.encounter_type IN ( ${6}, ${13}, ${51} ) "
             + "                          AND o.concept_id = ${23951} "
             + "                          AND o.value_coded IS NOT NULL "
             + "                          AND e.location_id = :location "
@@ -1935,7 +1934,6 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     StringSubstitutor sb = new StringSubstitutor(getMetadata());
     cd.setQuery(sb.replace(query));
-
     return cd;
   }
 
