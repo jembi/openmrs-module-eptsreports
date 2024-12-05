@@ -4400,7 +4400,7 @@
 
 	<globalProperty>
 		<property>eptsreports.weightStatureConceptUuid</property>
-		<defaultValue>d33778f5-9bc2-4e04-aa5a-0af6002c540af</defaultValue>
+		<defaultValue>d33778f5-9bc2-4e04-aa5a-0af6002c540a</defaultValue>
 		<description>
 			UUID for WEIGHT / STATURE concept
 		</description>

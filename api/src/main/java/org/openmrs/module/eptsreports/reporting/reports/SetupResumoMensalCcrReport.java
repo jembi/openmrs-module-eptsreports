@@ -16,10 +16,7 @@ package org.openmrs.module.eptsreports.reporting.reports;
 import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.LocationDataSetDefinition;
@@ -90,7 +87,7 @@ public class SetupResumoMensalCcrReport extends EptsDataExportManager {
 
   @Override
   public List<ReportDesign> constructReportDesigns(ReportDefinition reportDefinition) {
-    ReportDesign reportDesign = null;
+    ReportDesign reportDesign;
     try {
       reportDesign =
           createXlsReportDesign(
@@ -106,7 +103,7 @@ public class SetupResumoMensalCcrReport extends EptsDataExportManager {
       throw new ReportingException(e.toString());
     }
 
-    return Arrays.asList(reportDesign);
+    return Collections.singletonList(reportDesign);
   }
 
   @Override

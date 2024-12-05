@@ -265,7 +265,8 @@ public class ResumoMensalCcrCohortQueries {
         "damReason",
         map(
             getChildrenWithVisitReason(
-                Arrays.asList(hivMetadata.getChronicMalnutritionConcept().getConceptId())),
+                Collections.singletonList(
+                    hivMetadata.getChronicMalnutritionConcept().getConceptId())),
             mapping));
     cd.addSearch(
         "damConsultation", map(getDamChildren(hivMetadata.getModerateNutritionConcept()), mapping));
@@ -308,7 +309,8 @@ public class ResumoMensalCcrCohortQueries {
         "dagReason",
         map(
             getChildrenWithVisitReason(
-                Arrays.asList(hivMetadata.getChronicMalnutritionConcept().getConceptId())),
+                Collections.singletonList(
+                    hivMetadata.getChronicMalnutritionConcept().getConceptId())),
             mapping));
     cd.addSearch(
         "dagConsultation",
@@ -414,7 +416,10 @@ public class ResumoMensalCcrCohortQueries {
   }
 
   /**
-   * O registo de “Tratamento Nutricional CSB” igual a "Sim” na primeira “Ficha de Seguimento de CCR” ocorrida durante do periodo de avaliação (“Data da consulta >= “StartDate” e <= “EndDate”).
+   * O registo de “Tratamento Nutricional CSB” igual a "Sim” na primeira “Ficha de Seguimento de
+   * CCR” ocorrida durante do periodo de avaliação (“Data da consulta >= “StartDate” e <=
+   * “EndDate”).
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getChildrenWhoReceivedCsb() {
@@ -430,26 +435,26 @@ public class ResumoMensalCcrCohortQueries {
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
 
     String query =
-            "SELECT "
-                    + "    p.patient_id "
-                    + "FROM "
-                    + "    patient p "
-                    + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
-                    + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-                    + "     INNER JOIN ( "
-                    + get1stCcrSeguimentoConsulation()
-                    + ")ccr ON ccr.patient_id = p.patient_id "
-                    + "WHERE "
-                    + "    p.voided = 0 "
-                    + "    AND e.voided = 0 "
-                    + "    AND o.voided = 0 "
-                    + "    AND e.encounter_type = ${93} "
-                    + "    AND o.concept_id = ${2151} "
-                    + "    AND o.value_coded = ${1065} "
-                    + "    AND e.location_id = :location "
-                    + "    AND e.encounter_datetime = ccr.first_consultation_date "
-                    + "GROUP BY "
-                    + "    p.patient_id";
+        "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "     INNER JOIN ( "
+            + get1stCcrSeguimentoConsulation()
+            + ")ccr ON ccr.patient_id = p.patient_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${93} "
+            + "    AND o.concept_id = ${2151} "
+            + "    AND o.value_coded = ${1065} "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_datetime = ccr.first_consultation_date "
+            + "GROUP BY "
+            + "    p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -459,7 +464,10 @@ public class ResumoMensalCcrCohortQueries {
   }
 
   /**
-   * Filtrando as que tiveram o registo de “Tratamento Nutricional CSB” igual a "Sim” na primeira “Ficha de Seguimento de CCR” registada durante o período de reporte (“Data da Consulta” >= “Data Início” e <= “Data Fim”).
+   * Filtrando as que tiveram o registo de “Tratamento Nutricional CSB” igual a "Sim” na primeira
+   * “Ficha de Seguimento de CCR” registada durante o período de reporte (“Data da Consulta” >=
+   * “Data Início” e <= “Data Fim”).
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getChildrenWhoStartedCtz() {
@@ -475,26 +483,26 @@ public class ResumoMensalCcrCohortQueries {
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
 
     String query =
-            "SELECT "
-                    + "    p.patient_id "
-                    + "FROM "
-                    + "    patient p "
-                    + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
-                    + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-                    + "     INNER JOIN ( "
-                    + get1stCcrSeguimentoConsulation()
-                    + ")ccr ON ccr.patient_id = p.patient_id "
-                    + "WHERE "
-                    + "    p.voided = 0 "
-                    + "    AND e.voided = 0 "
-                    + "    AND o.voided = 0 "
-                    + "    AND e.encounter_type = ${93} "
-                    + "    AND o.concept_id = ${6121} "
-                    + "    AND o.value_coded = ${1065} "
-                    + "    AND e.location_id = :location "
-                    + "    AND e.encounter_datetime = ccr.first_consultation_date "
-                    + "GROUP BY "
-                    + "    p.patient_id";
+        "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "     INNER JOIN ( "
+            + get1stCcrSeguimentoConsulation()
+            + ")ccr ON ccr.patient_id = p.patient_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${93} "
+            + "    AND o.concept_id = ${6121} "
+            + "    AND o.value_coded = ${1065} "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_datetime = ccr.first_consultation_date "
+            + "GROUP BY "
+            + "    p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -578,15 +586,19 @@ public class ResumoMensalCcrCohortQueries {
    *
    * <p><b>Indicador 9 - </b>Crianças que receberam CSB/suplemento nutricional
    *
-   * <p>O sistema irá produzir o Indicador 9 “Total de crianças que receberam CSB/suplemento nutricional”, da seguinte forma:
+   * <p>O sistema irá produzir o Indicador 9 “Total de crianças que receberam CSB/suplemento
+   * nutricional”, da seguinte forma:
    *
    * <ul>
    *   <li>Incluindo todas as crianças que tiveram a 1ª consulta durante o período de reporte (CCR-
    *       FR7)
-   *   <li>Filtrando as que tiveram o registo de “Tratamento Nutricional CSB” igual a "Sim” na primeira “Ficha de Seguimento de CCR” registada durante o período de reporte (“Data da Consulta” >= “Data Início” e <= “Data Fim”).
+   *   <li>Filtrando as que tiveram o registo de “Tratamento Nutricional CSB” igual a "Sim” na
+   *       primeira “Ficha de Seguimento de CCR” registada durante o período de reporte (“Data da
+   *       Consulta” >= “Data Início” e <= “Data Fim”).
    * </ul>
    *
-   * <p><b>Mota:</b> em caso de existirem mais que uma “Ficha de Seguimento de CCR” durante o período será considerada a informação registada na primeira ficha.
+   * <p><b>Mota:</b> em caso de existirem mais que uma “Ficha de Seguimento de CCR” durante o
+   * período será considerada a informação registada na primeira ficha.
    *
    * @return {@link CohortDefinition}
    */
@@ -616,7 +628,7 @@ public class ResumoMensalCcrCohortQueries {
     map.put("Age", Age);
 
     String query =
-            "SELECT "
+        "SELECT "
             + "    pr.person_id "
             + "FROM "
             + "    person pr "
@@ -644,7 +656,6 @@ public class ResumoMensalCcrCohortQueries {
             + "  AND ccr.enrollment_date IS NOT NULL "
             + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, ccr.enrollment_date) < ${Age}";
 
-
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
@@ -657,14 +668,19 @@ public class ResumoMensalCcrCohortQueries {
    *
    * <p><b>Indicador 10 - </b>Crianças que iniciaram CTZ < 2 meses de idade
    *
-   * <p>O sistema irá produzir o Indicador 10 “Total de crianças que iniciaram CTZ < 2 meses de idade” da seguinte forma:
+   * <p>O sistema irá produzir o Indicador 10 “Total de crianças que iniciaram CTZ < 2 meses de
+   * idade” da seguinte forma:
    *
    * <ul>
-   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta durante o período de reporte (CCR- FR7) e com idade < 2 meses (CCR-FR5)
-   *   <li>Filtrando as que tiveram o registo de “Profilaxia com cotrimoxazol” igual a "Sim” na primeira “Ficha de Seguimento de CCR” registada durante o período de reporte (“Data da Consulta” >= “Data Início” e <= “Data Fim”).
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta durante o período de reporte (CCR-
+   *       FR7) e com idade < 2 meses (CCR-FR5)
+   *   <li>Filtrando as que tiveram o registo de “Profilaxia com cotrimoxazol” igual a "Sim” na
+   *       primeira “Ficha de Seguimento de CCR” registada durante o período de reporte (“Data da
+   *       Consulta” >= “Data Início” e <= “Data Fim”).
    * </ul>
    *
-   * <p><b>Mota:</b> em caso de existirem mais que uma “Ficha de Seguimento de CCR” durante o período será considerada a informação registada na primeira ficha.
+   * <p><b>Mota:</b> em caso de existirem mais que uma “Ficha de Seguimento de CCR” durante o
+   * período será considerada a informação registada na primeira ficha.
    *
    * @return {@link CohortDefinition}
    */
@@ -682,5 +698,4 @@ public class ResumoMensalCcrCohortQueries {
     cd.setCompositionString("firstConsultation AND bellow2monthsOfAge AND receivedCtz");
     return cd;
   }
-
 }

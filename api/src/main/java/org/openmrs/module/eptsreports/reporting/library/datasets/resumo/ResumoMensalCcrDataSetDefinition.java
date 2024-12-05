@@ -13,50 +13,39 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.datasets.resumo;
 
-import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
 import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
 import java.util.Arrays;
+import java.util.Collections;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCcrCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.BaseDataSet;
-import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
-import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
 import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
 
-  private EptsCommonDimension eptsCommonDimension;
+  private final EptsGeneralIndicator eptsGeneralIndicator;
 
-  private EptsGeneralIndicator eptsGeneralIndicator;
+  private final ResumoMensalCcrCohortQueries resumoMensalCcrCohortQueries;
 
-  private ResumoMensalCcrCohortQueries resumoMensalCcrCohortQueries;
+  private final CommonMetadata commonMetadata;
 
-  private CommonMetadata commonMetadata;
-
-  private HivMetadata hivMetadata;
-
-  @Autowired
-  @Qualifier("commonAgeDimensionCohort")
-  private AgeDimensionCohortInterface ageDimensionCohort;
+  private final HivMetadata hivMetadata;
 
   @Autowired
   public ResumoMensalCcrDataSetDefinition(
-      EptsCommonDimension eptsCommonDimension,
       EptsGeneralIndicator eptsGeneralIndicator,
       ResumoMensalCcrCohortQueries resumoMensalCcrCohortQueries,
       CommonMetadata commonMetadata,
       HivMetadata hivMetadata) {
-    this.eptsCommonDimension = eptsCommonDimension;
     this.eptsGeneralIndicator = eptsGeneralIndicator;
     this.resumoMensalCcrCohortQueries = resumoMensalCcrCohortQueries;
     this.commonMetadata = commonMetadata;
@@ -65,13 +54,8 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
 
   public DataSetDefinition constructResumoMensalDataset() {
     CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
-    String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
     dsd.setName("Resumo Mensal CCR Dataset");
     dsd.addParameters(getParameters());
-
-    dsd.addDimension("gender", map(eptsCommonDimension.gender(), ""));
-    dsd.addDimension(
-        "age", map(eptsCommonDimension.age(ageDimensionCohort), "effectiveDate=${endDate}"));
 
     dsd.addColumn("FIRST", "Total de 1as Consultas", getChildrenWithFirstConsultation(), "");
 
@@ -92,9 +76,17 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
 
     dsd.addColumn("ATPU", "Crianças que receberam ATPU", getChildrenWhoReceivedAtpuonCcr(), "");
 
-    dsd.addColumn("CSB", "Crianças que receberam CSB/suplemento nutricional", getChildrenWhoReceivedCsbOnCcr(), "");
+    dsd.addColumn(
+        "CSB",
+        "Crianças que receberam CSB/suplemento nutricional",
+        getChildrenWhoReceivedCsbOnCcr(),
+        "");
 
-    dsd.addColumn("CTZ", "Crianças que iniciaram CTZ < 2 meses de idade", getChildrenWhoStartedCtzBellow2MonthsOfAge(), "");
+    dsd.addColumn(
+        "CTZ",
+        "Crianças que iniciaram CTZ < 2 meses de idade",
+        getChildrenWhoStartedCtzBellow2MonthsOfAge(),
+        "");
 
     return dsd;
   }
@@ -112,7 +104,8 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
             "Crianças com contacto com tuberculose",
             mapStraightThrough(
                 resumoMensalCcrCohortQueries.getChildrenWithVisitReason(
-                    Arrays.asList(commonMetadata.getContactoTbConcept().getConceptId())))));
+                    Collections.singletonList(
+                        commonMetadata.getContactoTbConcept().getConceptId())))));
   }
 
   private Mapped<CohortIndicator> getChildrenWithDam() {
@@ -137,7 +130,7 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
             "Crianças com exposição ao HIV",
             mapStraightThrough(
                 resumoMensalCcrCohortQueries.getChildrenWithVisitReason(
-                    Arrays.asList(
+                    Collections.singletonList(
                         commonMetadata.getRecenNascidoMaeHivPositivoConcept().getConceptId())))));
   }
 
@@ -173,17 +166,17 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
 
   private Mapped<CohortIndicator> getChildrenWhoReceivedCsbOnCcr() {
     return mapStraightThrough(
-            eptsGeneralIndicator.getIndicator(
-                    "Crianças que receberam CSB/suplemento nutricional",
-                    mapStraightThrough(
-                            resumoMensalCcrCohortQueries.getChildrenWhoReceivedCsbOrNutritionalSuplement())));
+        eptsGeneralIndicator.getIndicator(
+            "Crianças que receberam CSB/suplemento nutricional",
+            mapStraightThrough(
+                resumoMensalCcrCohortQueries.getChildrenWhoReceivedCsbOrNutritionalSuplement())));
   }
 
   private Mapped<CohortIndicator> getChildrenWhoStartedCtzBellow2MonthsOfAge() {
     return mapStraightThrough(
-            eptsGeneralIndicator.getIndicator(
-                    "Crianças que iniciaram CTZ < 2 meses de idade",
-                    mapStraightThrough(
-                            resumoMensalCcrCohortQueries.getChildrenWhoStartedCtzBellow2MonthsOfAge())));
+        eptsGeneralIndicator.getIndicator(
+            "Crianças que iniciaram CTZ < 2 meses de idade",
+            mapStraightThrough(
+                resumoMensalCcrCohortQueries.getChildrenWhoStartedCtzBellow2MonthsOfAge())));
   }
 }

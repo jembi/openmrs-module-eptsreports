@@ -1274,8 +1274,7 @@ public class CommonMetadata extends Metadata {
    */
   public Concept getCotrimoxazolConcept() {
     String uuid =
-            Context.getAdministrationService()
-                    .getGlobalProperty("eptsreports.cotrimoxazolConceptUuid");
+        Context.getAdministrationService().getGlobalProperty("eptsreports.cotrimoxazolConceptUuid");
     return getConcept(uuid);
   }
 }
