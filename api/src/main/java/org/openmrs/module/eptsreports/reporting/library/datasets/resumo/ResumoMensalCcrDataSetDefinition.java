@@ -90,6 +90,8 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
     dsd.addColumn(
         "INH", "Crianças que iniciaram Isoniazida na CCR", getChildrenWhoStartedInhOnCcr(), "");
 
+    dsd.addColumn("ATPU", "Crianças que receberam ATPU", getChildrenWhoReceivedAtpuonCcr(), "");
+
     return dsd;
   }
 
@@ -155,5 +157,13 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "Crianças que iniciaram Isoniazida na CCR",
             mapStraightThrough(resumoMensalCcrCohortQueries.getChildrenWhoStartedINH())));
+  }
+
+  private Mapped<CohortIndicator> getChildrenWhoReceivedAtpuonCcr() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Crianças que receberam ATPU",
+            mapStraightThrough(
+                resumoMensalCcrCohortQueries.getChildrenWhoReceivedNutritionalTreatment())));
   }
 }

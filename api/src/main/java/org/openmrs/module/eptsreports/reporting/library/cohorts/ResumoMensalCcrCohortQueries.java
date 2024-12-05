@@ -318,6 +318,13 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
+  /**
+   * O registo de “Diagnóstico Tratamento” igual a "Profilaxia com Isoniazida” na primeira “Ficha de
+   * Seguimento de CCR” ocorrida durante do periodo de avaliação (“Data da consulta >=“StartDate” e
+   * <= “EndDate”).
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getChildrenWhoStartedIsoziazida() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Crianças que iniciaram Isoniazida na CCR");
@@ -359,6 +366,74 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
+  /**
+   * O registo de “Tratamento Nutricional ATPU” igual a "Sim” na primeira “Ficha de Seguimento de
+   * CCR” ocorrida durante do periodo de avaliação (“Data da consulta >=“StartDate” e <= “EndDate”).
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenWhoReceivedAtpu() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Tratamento Nutricional ATPU");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("6143", commonMetadata.getATPUSupplememtConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+
+    String query =
+        "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "     INNER JOIN ( "
+            + get1stCcrSeguimentoConsulation()
+            + ")ccr ON ccr.patient_id = p.patient_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${93} "
+            + "    AND o.concept_id = ${6143} "
+            + "    AND o.value_coded = ${1065} "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_datetime = ccr.first_consultation_date "
+            + "GROUP BY "
+            + "    p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * CCR-FR13
+   *
+   * <p><b>Indicador 7 - </b>Crianças que iniciaram Isoniazida na CCR
+   *
+   * <p>O sistema irá produzir o Indicador 7 “Total de crianças que iniciaram Isoniazida na CCR” da
+   * seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta durante o período de reporte (CCR-
+   *       FR7)
+   *   <li>Filtrando as que tiveram o registo de “Diagnóstico Tratamento” igual a "Profilaxia com
+   *       Isoniazida” na primeira “Ficha de Seguimento de CCR” registada durante o período de
+   *       reporte (“Data da Consulta” >= “Data Início” e <= “Data Fim”).
+   * </ul>
+   *
+   * <p><b>Mota:</b> em caso de existirem mais que uma “Ficha de Seguimento de CCR” durante o
+   * período será considerada a informação registada na primeira ficha.
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getChildrenWhoStartedINH() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Crianças que iniciaram Isoniazida na CCR");
@@ -370,6 +445,41 @@ public class ResumoMensalCcrCohortQueries {
     cd.addSearch("startedInh", map(getChildrenWhoStartedIsoziazida(), mapping));
 
     cd.setCompositionString("firstConsultation AND startedInh");
+    return cd;
+  }
+
+  /**
+   * CCR-FR14
+   *
+   * <p><b>Indicador 6 - </b>Crianças que receberam ATPU
+   *
+   * <p>O sistema irá produzir o Indicador 8 “Total de crianças que receberam ATPU”, da seguinte
+   * forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta durante o período de reporte (CCR-
+   *       FR7)
+   *   <li>Filtrando as que tiveram o registo de “Tratamento Nutricional ATPU” igual a "Sim” na
+   *       primeira “Ficha de Seguimento de CCR” registada durante o período de reporte (“Data da
+   *       Consulta” >= “Data Início” e <= “Data Fim”)..
+   * </ul>
+   *
+   * <p><b>Mota:</b> em caso de existirem mais que uma “Ficha de Seguimento de CCR” durante o
+   * período será considerada a informação registada na primeira ficha.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenWhoReceivedNutritionalTreatment() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças que receberam ATPU");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping));
+    cd.addSearch("receivedAtpu", map(getChildrenWhoReceivedAtpu(), mapping));
+
+    cd.setCompositionString("firstConsultation AND receivedAtpu");
     return cd;
   }
 }
