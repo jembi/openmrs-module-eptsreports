@@ -415,7 +415,7 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
             "Relatório- Indicador 8 – Pedido de CD4",
             map(
                 resumoMensalDAHCohortQueries.getPatientsWhoHaveCd4Request(),
-                "startDate=${startDate-4m+1d},endDate=${startDate-3m},location=${location}")));
+                "startDate=${startDate-4m+1d},endDate=${startDate-3m-1d},location=${location}")));
   }
 
   private Mapped<CohortIndicator> getPatientsWhoHaveCd4Results() {
@@ -424,7 +424,7 @@ public class ResumoMensalDAHDatasetDefinition extends BaseDataSet {
             "Relatório- Indicador 9 – Resultado de CD4",
             map(
                 resumoMensalDAHCohortQueries.getPatientsWhoHaveCd4ResultsComposition(),
-                "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}")));
+                "startDate=${startDate},endDate=${endDate},location=${location}")));
   }
 
   private Mapped<CohortIndicator> getPatientsWithLowCd4Results() {

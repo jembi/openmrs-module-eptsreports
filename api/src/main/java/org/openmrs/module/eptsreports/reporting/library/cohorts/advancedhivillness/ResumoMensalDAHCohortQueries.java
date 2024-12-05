@@ -328,7 +328,7 @@ public class ResumoMensalDAHCohortQueries {
         "haveCd4Results",
         map(
             getPatientsWhoHaveCd4ResultsComposition(),
-            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "cd4ByAgeAndResult",
@@ -373,7 +373,7 @@ public class ResumoMensalDAHCohortQueries {
         "haveCd4Results",
         map(
             getPatientsWhoHaveCd4ResultsComposition(),
-            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "cd4ByAgeAndResult",
@@ -423,7 +423,7 @@ public class ResumoMensalDAHCohortQueries {
         "tbLamResults",
         map(
             getPatientsWithTBLAMResults(),
-            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "tbLamPositive",
@@ -984,8 +984,14 @@ public class ResumoMensalDAHCohortQueries {
     CohortDefinition cd4Results = getPatientsWhoHaveCd4Results();
     CohortDefinition cd4Request = getPatientsWhoHaveCd4Request();
 
-    cd.addSearch("cd4Results", mapStraightThrough(cd4Results));
-    cd.addSearch("cd4Request", mapStraightThrough(cd4Request));
+    cd.addSearch(
+        "cd4Results",
+        map(cd4Results, "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "cd4Request",
+        map(
+            cd4Request,
+            "startDate=${startDate-4m+1d},endDate=${startDate-3m-1d},location=${location}"));
 
     cd.setCompositionString("cd4Results AND cd4Request");
     return cd;
@@ -1293,7 +1299,7 @@ public class ResumoMensalDAHCohortQueries {
         "cd4Request",
         map(
             getPatientsWhoHaveCd4Request(),
-            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
+            "startDate=${startDate-4m+1d},endDate=${startDate-3m-1d},location=${location}"));
 
     cd.setCompositionString("onDAH AND onSKIndication AND cd4Request");
     return cd;
@@ -1329,7 +1335,7 @@ public class ResumoMensalDAHCohortQueries {
         "cd4Request",
         map(
             getPatientsWhoHaveCd4Request(),
-            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
+            "startDate=${startDate-4m+1d},endDate=${startDate-3m-1d},location=${location}"));
 
     cd.setCompositionString("onDAH AND onSKIndicationStartedQuimio AND cd4Request");
     return cd;
