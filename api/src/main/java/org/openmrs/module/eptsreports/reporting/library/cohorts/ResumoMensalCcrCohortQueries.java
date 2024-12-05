@@ -16,9 +16,8 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
 import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
 import org.openmrs.Location;
@@ -131,17 +130,20 @@ public class ResumoMensalCcrCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getChildrenWithVisitReason(Concept reasonConcept) {
+  public CohortDefinition getChildrenWithVisitReason(List<Integer> reasonsConcept) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Children With Turbeculosis Contact");
+    cd.setName("Children With Tuberculosis Contact");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Health Facility", Location.class));
 
-    Map<String, Integer> map = new HashMap<>();
-    map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
-    map.put("1874", commonMetadata.getMotivoConsultaCriancaRiscoConcept().getConceptId());
-    map.put("reasonConcept", reasonConcept.getConceptId());
+    Map<String, String> map = new HashMap<>();
+    map.put("92", String.valueOf(hivMetadata.getCCRResumoEncounterType().getEncounterTypeId()));
+    map.put(
+        "1874",
+        String.valueOf(commonMetadata.getMotivoConsultaCriancaRiscoConcept().getConceptId()));
+    map.put(
+        "reasonConcept", StringUtils.join(reasonsConcept, ",")); // Une os conceitos com vírgulas
 
     String query =
         "SELECT "
@@ -150,7 +152,7 @@ public class ResumoMensalCcrCohortQueries {
             + "    patient p "
             + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "     INNER JOIN ( "
+            + "    INNER JOIN ( "
             + get1stCcrConsulation()
             + ")ccr ON ccr.patient_id = p.patient_id "
             + "WHERE "
@@ -159,7 +161,7 @@ public class ResumoMensalCcrCohortQueries {
             + "    AND o.voided = 0 "
             + "    AND e.encounter_type = ${92} "
             + "    AND o.concept_id = ${1874} "
-            + "    AND o.value_coded = ${reasonConcept} "
+            + "    AND o.value_coded IN (${reasonConcept}) " // Usa IN em vez de FIND_IN_SET
             + "    AND e.location_id = :location "
             + "    AND e.encounter_datetime >= :startDate "
             + "    AND e.encounter_datetime <= :endDate "
@@ -257,7 +259,10 @@ public class ResumoMensalCcrCohortQueries {
 
     cd.addSearch(
         "damReason",
-        map(getChildrenWithVisitReason(hivMetadata.getChronicMalnutritionConcept()), mapping));
+        map(
+            getChildrenWithVisitReason(
+                Arrays.asList(hivMetadata.getChronicMalnutritionConcept().getConceptId())),
+            mapping));
     cd.addSearch(
         "damConsultation", map(getDamChildren(hivMetadata.getModerateNutritionConcept()), mapping));
 
@@ -297,7 +302,10 @@ public class ResumoMensalCcrCohortQueries {
 
     cd.addSearch(
         "dagReason",
-        map(getChildrenWithVisitReason(hivMetadata.getChronicMalnutritionConcept()), mapping));
+        map(
+            getChildrenWithVisitReason(
+                Arrays.asList(hivMetadata.getChronicMalnutritionConcept().getConceptId())),
+            mapping));
     cd.addSearch(
         "dagConsultation",
         map(getDamChildren(hivMetadata.getSevereAcuteMalnutritionConcept()), mapping));

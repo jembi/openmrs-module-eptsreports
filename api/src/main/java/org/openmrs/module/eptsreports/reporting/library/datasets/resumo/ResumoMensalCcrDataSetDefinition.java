@@ -16,6 +16,7 @@ package org.openmrs.module.eptsreports.reporting.library.datasets.resumo;
 import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
 import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
+import java.util.Arrays;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCcrCohortQueries;
@@ -81,6 +82,11 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
 
     dsd.addColumn("DAG", "Crianças com desnutrição aguda grave", getChildrenWithDag(), "");
 
+    dsd.addColumn("HIV", "Crianças com exposição ao HIV", getChildrenWithHivExposure(), "");
+
+    dsd.addColumn(
+        "OTHER", "Crianças com outra condição de Risco", getChildrenWithAnotherRiskCondition(), "");
+
     return dsd;
   }
 
@@ -97,7 +103,7 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
             "Crianças com contacto com tuberculose",
             mapStraightThrough(
                 resumoMensalCcrCohortQueries.getChildrenWithVisitReason(
-                    commonMetadata.getContactoTbConcept()))));
+                    Arrays.asList(commonMetadata.getContactoTbConcept().getConceptId())))));
   }
 
   private Mapped<CohortIndicator> getChildrenWithDam() {
@@ -114,5 +120,30 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
             "Crianças com desnutrição aguda grave",
             mapStraightThrough(
                 resumoMensalCcrCohortQueries.getChildrenWithSevereAcuteMalnutrition())));
+  }
+
+  private Mapped<CohortIndicator> getChildrenWithHivExposure() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Crianças com exposição ao HIV",
+            mapStraightThrough(
+                resumoMensalCcrCohortQueries.getChildrenWithVisitReason(
+                    Arrays.asList(
+                        commonMetadata.getRecenNascidoMaeHivPositivoConcept().getConceptId())))));
+  }
+
+  private Mapped<CohortIndicator> getChildrenWithAnotherRiskCondition() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Crianças com outra condição de Risco",
+            mapStraightThrough(
+                resumoMensalCcrCohortQueries.getChildrenWithVisitReason(
+                    Arrays.asList(
+                        commonMetadata.getPrematuridadeConcept().getConceptId(),
+                        commonMetadata.getCriancaMaeAusenteConcept().getConceptId(),
+                        commonMetadata.getTwinsConcept().getConceptId(),
+                        commonMetadata.getDesmameBruscoAleitamentoArtificalConcept().getConceptId(),
+                        commonMetadata.getMigracaoRecenteFamiliaConcept().getConceptId(),
+                        hivMetadata.getOtherOrNonCodedConcept().getConceptId())))));
   }
 }
