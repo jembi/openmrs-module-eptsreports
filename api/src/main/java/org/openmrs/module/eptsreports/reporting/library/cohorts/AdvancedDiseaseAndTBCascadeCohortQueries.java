@@ -1355,7 +1355,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "                   WHERE  e.voided = 0 "
             + "                          AND o.voided = 0 "
-            + "                          AND e.encounter_type IN ( ${6}, ${13} ) "
+            + "                          AND e.encounter_type IN ( ${6}, ${13}, ${51} ) "
             + "                          AND o.concept_id = ${23951} "
             + "                          AND o.value_coded = ".concat(tbLamResult.getValueCoded())
             + "                          AND e.location_id = :location "
@@ -1577,7 +1577,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                          AND o.voided = 0 "
             + "                          AND o2.voided = 0 "
             + "                          AND o3.voided = 0 "
-            + "                          AND e.encounter_type = ${13}  "
+            + "                          AND e.encounter_type IN (${13}, ${51})  "
             + "                          AND o.concept_id = ${23951} "
             + "                          AND o.value_coded = ${703} "
             + "                          AND o2.concept_id = ${165185} "
