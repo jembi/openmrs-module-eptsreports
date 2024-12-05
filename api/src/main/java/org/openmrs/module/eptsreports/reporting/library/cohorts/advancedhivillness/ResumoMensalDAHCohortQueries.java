@@ -444,7 +444,7 @@ public class ResumoMensalDAHCohortQueries {
   }
 
   /**
-   * <b> Relatório – Indicador 13 CD4 Baixo e Resultado de CrAg Sérico</b>
+   * <b> Relatório – Indicador 13 CD4 Baixo e Resultado de CrAg Sérvico</b>
    * <li>Incluindo todos os utentes com resultado de CD4 baixo durante o período compreendido entre
    *     “Data Início” menos (-) 1 mês e “Data Fim” (seguindo os critérios definidos no Indicador 10
    *     – RF16 com período diferente)
@@ -462,18 +462,19 @@ public class ResumoMensalDAHCohortQueries {
   public CohortDefinition getPatientsWithLowCd4AndCragResults() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    cd.setName("Relatório – Indicador 13 CD4 Baixo e Resultado de CrAg Sérico");
+    cd.setName("Relatório – Indicador 13 CD4 Baixo e Resultado de CrAg Sérvico");
     cd.addParameters(getCohortParameters());
 
     cd.addSearch("haveLowCd4Results", mapStraightThrough(getPatientsWithLowCd4Results()));
 
     cd.addSearch(
         "cragResults",
-        mapStraightThrough(
+        map(
             getPatientsWithPositiveOrNegativeTestResults(
                 Arrays.asList(
                     hivMetadata.getCragSoroLabsetConcept(), hivMetadata.getCragSoroConcept()),
-                Arrays.asList(hivMetadata.getPositive(), hivMetadata.getNegative()))));
+                Arrays.asList(hivMetadata.getPositive(), hivMetadata.getNegative())),
+            "startDate=${startDate-4m+1d},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "onDAH",
