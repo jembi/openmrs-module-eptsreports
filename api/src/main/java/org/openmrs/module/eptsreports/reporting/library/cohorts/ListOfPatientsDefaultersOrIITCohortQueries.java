@@ -2540,6 +2540,47 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     return spdd;
   }
 
+  /**
+   * <b>Date of the most recent clinical consultation with Key Population (Populacao Chave)
+   * registered by report generation date</b>
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getLastRegisteredKeyPopulationDate() {
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+    spdd.setName("Patient's Most Recent Date of Ficha Clinica with KPOP Registered");
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("1377", hivMetadata.getHomosexualConcept().getConceptId());
+    valuesMap.put("20454", hivMetadata.getDrugUseConcept().getConceptId());
+    valuesMap.put("20426", hivMetadata.getImprisonmentConcept().getConceptId());
+    valuesMap.put("1901", hivMetadata.getSexWorkerConcept().getConceptId());
+    valuesMap.put("165205", hivMetadata.getTransGenderConcept().getConceptId());
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("23703", hivMetadata.getKeyPopulationConcept().getConceptId());
+
+    String sql =
+        "       SELECT p.person_id AS patient_id, Max(e.encounter_datetime) AS last_date "
+            + "   	  FROM   person p "
+            + "   	  INNER JOIN encounter e  ON e.patient_id = p.person_id "
+            + "   	  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "   	  WHERE e.voided = 0 "
+            + "   		  AND p.voided = 0 "
+            + "   		  AND o.voided = 0 "
+            + "   		  AND e.location_id = :location "
+            + "   		  AND e.encounter_type = ${6} "
+            + "   		  AND o.concept_id = ${23703} "
+            + "   		  AND o.value_coded IN (${1377},${20454},${20426},${1901},${165205} ) "
+            + "         AND e.encounter_datetime <= CURRENT_DATE() "
+            + "       GROUP  BY p.person_id ";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(sql));
+    return spdd;
+  }
+
   public DataDefinition getLastOVCDate(PersonAttributeType ovcType, Boolean checkEstado) {
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
     spdd.setName("OVC registered in the demographic module");

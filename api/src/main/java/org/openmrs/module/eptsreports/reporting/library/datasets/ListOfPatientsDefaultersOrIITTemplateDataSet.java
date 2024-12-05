@@ -318,13 +318,12 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         "location=${location}",
         new DispensationTypeMdcConverter());
 
-    // 31 - Data da consulta mais recente - Sheet 1: Column AE
+    // 31 - Data da Consulta mais recente com PopChave informado - Sheet 1: Column AE
     pdd.addColumn(
-        "mdc_consultation_date",
-        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
-            .getMostRecentMdcConsultationDate(),
-        "location=${location}");
-
+        "keypop_date",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulationDate(),
+        "location=${location}",
+        new ForwardSlashDateConverter());
     // 32 - HSH - Sheet 1: Column AF
     pdd.addColumn(
         "keypop_hsh",
