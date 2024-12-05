@@ -4422,4 +4422,12 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>eptsreports.cotrimoxazolConceptUuid</property>
+		<defaultValue>2616b3c9-9a99-4b9a-b673-10871f4a4c71</defaultValue>
+		<description>
+			COTRIMOXAZOLE USE Concept
+		</description>
+	</globalProperty>
+
 </module>

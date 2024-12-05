@@ -1262,4 +1262,20 @@ public class CommonMetadata extends Metadata {
             .getGlobalProperty("eptsreports.diastolicBoodPressureConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 6121</b>
+   *
+   * <p><b>Name:</b> COTRIMOXAZOLE USE
+   *
+   * <p><b>Description:</b> COTRIMOXAZOLE PROPYLAXIS
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCotrimoxazolConcept() {
+    String uuid =
+            Context.getAdministrationService()
+                    .getGlobalProperty("eptsreports.cotrimoxazolConceptUuid");
+    return getConcept(uuid);
+  }
 }

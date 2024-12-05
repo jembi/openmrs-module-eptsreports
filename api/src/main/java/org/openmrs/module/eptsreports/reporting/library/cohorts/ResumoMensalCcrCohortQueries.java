@@ -426,7 +426,7 @@ public class ResumoMensalCcrCohortQueries {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
-    map.put("6143", commonMetadata.getATPUSupplememtConcept().getConceptId());
+    map.put("2151", commonMetadata.getSojaSupplememtConcept().getConceptId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
 
     String query =
@@ -445,6 +445,51 @@ public class ResumoMensalCcrCohortQueries {
                     + "    AND o.voided = 0 "
                     + "    AND e.encounter_type = ${93} "
                     + "    AND o.concept_id = ${2151} "
+                    + "    AND o.value_coded = ${1065} "
+                    + "    AND e.location_id = :location "
+                    + "    AND e.encounter_datetime = ccr.first_consultation_date "
+                    + "GROUP BY "
+                    + "    p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * Filtrando as que tiveram o registo de “Tratamento Nutricional CSB” igual a "Sim” na primeira “Ficha de Seguimento de CCR” registada durante o período de reporte (“Data da Consulta” >= “Data Início” e <= “Data Fim”).
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenWhoStartedCtz() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Crianças que iniciaram CTZ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("6121", commonMetadata.getCotrimoxazolConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+
+    String query =
+            "SELECT "
+                    + "    p.patient_id "
+                    + "FROM "
+                    + "    patient p "
+                    + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+                    + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+                    + "     INNER JOIN ( "
+                    + get1stCcrSeguimentoConsulation()
+                    + ")ccr ON ccr.patient_id = p.patient_id "
+                    + "WHERE "
+                    + "    p.voided = 0 "
+                    + "    AND e.voided = 0 "
+                    + "    AND o.voided = 0 "
+                    + "    AND e.encounter_type = ${93} "
+                    + "    AND o.concept_id = ${6121} "
                     + "    AND o.value_coded = ${1065} "
                     + "    AND e.location_id = :location "
                     + "    AND e.encounter_datetime = ccr.first_consultation_date "
@@ -558,4 +603,84 @@ public class ResumoMensalCcrCohortQueries {
     cd.setCompositionString("firstConsultation AND receivedCsb");
     return cd;
   }
+
+  public CohortDefinition getInfantAge(Integer Age) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Infant Age");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
+    map.put("Age", Age);
+
+    String query =
+            "SELECT "
+            + "    pr.person_id "
+            + "FROM "
+            + "    person pr "
+            + "        INNER JOIN ( "
+            + "        SELECT "
+            + "            p.patient_id, "
+            + "            MIN(e.encounter_datetime) AS enrollment_date "
+            + "        FROM "
+            + "            patient p "
+            + "                INNER JOIN encounter e "
+            + "                           ON p.patient_id = e.patient_id "
+            + "        WHERE "
+            + "            p.voided = 0 "
+            + "          AND e.voided = 0 "
+            + "          AND e.encounter_type = ${92} "
+            + "          AND e.location_id = :location "
+            + "          AND e.encounter_datetime >= :startDate "
+            + "          AND e.encounter_datetime <= :endDate "
+            + "        GROUP BY "
+            + "            p.patient_id "
+            + "    ) ccr "
+            + "                   ON pr.person_id = ccr.patient_id "
+            + "WHERE "
+            + "    pr.birthdate IS NOT NULL "
+            + "  AND ccr.enrollment_date IS NOT NULL "
+            + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, ccr.enrollment_date) < ${Age}";
+
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * CCR-FR16
+   *
+   * <p><b>Indicador 10 - </b>Crianças que iniciaram CTZ < 2 meses de idade
+   *
+   * <p>O sistema irá produzir o Indicador 10 “Total de crianças que iniciaram CTZ < 2 meses de idade” da seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta durante o período de reporte (CCR- FR7) e com idade < 2 meses (CCR-FR5)
+   *   <li>Filtrando as que tiveram o registo de “Profilaxia com cotrimoxazol” igual a "Sim” na primeira “Ficha de Seguimento de CCR” registada durante o período de reporte (“Data da Consulta” >= “Data Início” e <= “Data Fim”).
+   * </ul>
+   *
+   * <p><b>Mota:</b> em caso de existirem mais que uma “Ficha de Seguimento de CCR” durante o período será considerada a informação registada na primeira ficha.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenWhoStartedCtzBellow2MonthsOfAge() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças que iniciaram CTZ < 2 meses de idade");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping));
+    cd.addSearch("bellow2monthsOfAge", map(getInfantAge(2), mapping));
+    cd.addSearch("receivedCtz", map(getChildrenWhoStartedCtz(), mapping));
+
+    cd.setCompositionString("firstConsultation AND bellow2monthsOfAge AND receivedCtz");
+    return cd;
+  }
+
 }

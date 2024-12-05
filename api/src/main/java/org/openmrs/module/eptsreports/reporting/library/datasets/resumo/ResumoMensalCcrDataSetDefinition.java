@@ -94,6 +94,8 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
 
     dsd.addColumn("CSB", "Crianças que receberam CSB/suplemento nutricional", getChildrenWhoReceivedCsbOnCcr(), "");
 
+    dsd.addColumn("CTZ", "Crianças que iniciaram CTZ < 2 meses de idade", getChildrenWhoStartedCtzBellow2MonthsOfAge(), "");
+
     return dsd;
   }
 
@@ -175,5 +177,13 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
                     "Crianças que receberam CSB/suplemento nutricional",
                     mapStraightThrough(
                             resumoMensalCcrCohortQueries.getChildrenWhoReceivedCsbOrNutritionalSuplement())));
+  }
+
+  private Mapped<CohortIndicator> getChildrenWhoStartedCtzBellow2MonthsOfAge() {
+    return mapStraightThrough(
+            eptsGeneralIndicator.getIndicator(
+                    "Crianças que iniciaram CTZ < 2 meses de idade",
+                    mapStraightThrough(
+                            resumoMensalCcrCohortQueries.getChildrenWhoStartedCtzBellow2MonthsOfAge())));
   }
 }
