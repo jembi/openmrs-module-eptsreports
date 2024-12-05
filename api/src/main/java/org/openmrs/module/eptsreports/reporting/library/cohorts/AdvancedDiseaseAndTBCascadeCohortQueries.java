@@ -1663,7 +1663,11 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     cd.addSearch("positiveTwoPlus", EptsReportUtils.map(positiveTwoPlus, mappings));
 
-    cd.setCompositionString("positiveTwoPlus AND NOT positiveThreePlus");
+    cd.addSearch(
+        "positiveFourPlus",
+        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeFourPlus(), mappings));
+
+    cd.setCompositionString("positiveTwoPlus AND NOT (positiveThreePlus OR positiveFourPlus)");
 
     return cd;
   }
@@ -1685,7 +1689,15 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     cd.addSearch("positiveOnePlus", EptsReportUtils.map(positiveOnePlus, mappings));
 
-    cd.setCompositionString("positiveOnePlus AND NOT positiveTwoPlus");
+    cd.addSearch(
+        "positiveThreePlus",
+        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeThreePlus(), mappings));
+    cd.addSearch(
+        "positiveFourPlus",
+        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeFourPlus(), mappings));
+
+    cd.setCompositionString(
+        "positiveOnePlus AND NOT (positiveTwoPlus OR positiveThreePlus OR positiveFourPlus)");
 
     return cd;
   }
@@ -1706,7 +1718,20 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
         "positiveOnePlus",
         EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeOnePlus(), mappings));
 
-    cd.setCompositionString("positive AND NOT positiveOnePlus");
+    cd.addSearch(
+        "positiveTwoPlus",
+        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeTwoPlus(), mappings));
+
+    cd.addSearch(
+        "positiveThreePlus",
+        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeThreePlus(), mappings));
+
+    cd.addSearch(
+        "positiveFourPlus",
+        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeFourPlus(), mappings));
+
+    cd.setCompositionString(
+        "positive AND NOT (positiveOnePlus OR positiveTwoPlus OR positiveThreePlus OR positiveFourPlus)");
 
     return cd;
   }
