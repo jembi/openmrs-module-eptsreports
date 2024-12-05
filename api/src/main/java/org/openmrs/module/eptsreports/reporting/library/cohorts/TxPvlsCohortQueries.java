@@ -1357,10 +1357,9 @@ public class TxPvlsCohortQueries {
    *       </ul>
    * </ul>
    *
-   * @param onPeriod true for current period Or false for 9 months before the period
    * @return @{@link CohortDefinition}
    */
-  public CohortDefinition getPregnantWomanTxPvlsSupplemental(boolean onPeriod) {
+  public CohortDefinition getPregnantWomanTxPvlsSupplemental() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Pregnant Client");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
@@ -1409,10 +1408,7 @@ public class TxPvlsCohortQueries {
             + "          AND o.concept_id = ${1982} "
             + "          AND o.value_coded = ${1065} "
             + "          AND e.location_id = :location "
-            + (onPeriod
-                ? "          AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
-                : "          AND e.encounter_datetime >= DATE_SUB(:endDate, INTERVAL 21 MONTH) "
-                    + "          AND e.encounter_datetime < DATE_SUB(:endDate, INTERVAL 12 MONTH) ")
+            + "          AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate "
             + "        GROUP BY p.patient_id "
             + "        UNION "
             + "        SELECT pp.patient_id, "
@@ -1426,10 +1422,7 @@ public class TxPvlsCohortQueries {
             + "          AND p.voided = 0 "
             + "          AND e.voided = 0 "
             + "          AND pp.voided = 0 "
-            + (onPeriod
-                ? "          AND pp.date_enrolled BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
-                : "          AND pp.date_enrolled >= DATE_SUB(:endDate, INTERVAL 21 MONTH) "
-                    + "          AND pp.date_enrolled < DATE_SUB(:endDate, INTERVAL 12 MONTH) ")
+            + "          AND pp.date_enrolled BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate "
             + "        GROUP BY pp.patient_id "
             + "        UNION "
             + "        SELECT p.patient_id, "
@@ -1449,10 +1442,7 @@ public class TxPvlsCohortQueries {
             + "          AND ( "
             + "              (o.concept_id = ${1982} AND o.value_coded = ${1065}) "
             + "              AND (o2.concept_id = ${1190} "
-            + (onPeriod
-                ? "              AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate ) ) "
-                : "              AND o2.value_datetime >= DATE_SUB(:endDate, INTERVAL 21 MONTH) "
-                    + "              AND o2.value_datetime < DATE_SUB(:endDate, INTERVAL 12 MONTH) ) ) ")
+            + "              AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate ) ) "
             + "          AND e.location_id = :location "
             + "        GROUP BY p.patient_id "
             + "    ) pg "
@@ -1466,10 +1456,7 @@ public class TxPvlsCohortQueries {
             + "      AND e.location_id = :location "
             + "      AND o.concept_id = ${6332} "
             + "      AND o.value_coded = ${1065} "
-            + (onPeriod
-                ? "      AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
-                : "      AND e.encounter_datetime >= DATE_SUB(:endDate, INTERVAL 21 MONTH) "
-                    + "      AND e.encounter_datetime < DATE_SUB(:endDate, INTERVAL 12 MONTH) ")
+            + "      AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate "
             + "      AND e.encounter_datetime > pg.pregnancy_date "
             + "    UNION "
             + "    SELECT pp.patient_id "
@@ -1481,10 +1468,7 @@ public class TxPvlsCohortQueries {
             + "      AND pp.voided = 0 "
             + "      AND ps.voided = 0 "
             + "      AND ps.start_date > pg.pregnancy_date "
-            + (onPeriod
-                ? "      AND ps.start_date BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
-                : "      AND ps.start_date >= DATE_SUB(:endDate, INTERVAL 21 MONTH) "
-                    + "      AND ps.start_date < DATE_SUB(:endDate, INTERVAL 12 MONTH) ")
+            + "      AND ps.start_date BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate "
             + "    UNION "
             + "    SELECT e.patient_id "
             + "    FROM   encounter e "
@@ -1496,10 +1480,7 @@ public class TxPvlsCohortQueries {
             + "          (o.concept_id = ${6332} AND o.value_coded = ${1065}) "
             + "          AND (o2.concept_id = ${1190} "
             + "               AND o2.value_datetime > pg.pregnancy_date "
-            + (onPeriod
-                ? "               AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate ) ) "
-                : "               AND o2.value_datetime >= DATE_SUB(:endDate, INTERVAL 21 MONTH) "
-                    + "               AND o2.value_datetime < DATE_SUB(:endDate, INTERVAL 12 MONTH) ) ) ")
+            + "               AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate ) ) "
             + "          AND e.voided = 0 "
             + "          AND o.voided = 0 "
             + "          AND o2.voided = 0 "
@@ -1519,7 +1500,7 @@ public class TxPvlsCohortQueries {
    *
    * <ul>
    *   <li>Clients whose difference between the date of the most recent record of pregnancy in the
-   *       last 12 months and the ART start date (PVLS_PBFW_FR5) is less than 90 days.
+   *       last 21 months and the ART start date (PVLS_PBFW_FR5) is less than 90 days.
    * </ul>
    *
    * @return @{@link CohortDefinition}
@@ -1575,7 +1556,7 @@ public class TxPvlsCohortQueries {
             + "          AND o.concept_id = ${1982} "
             + "          AND o.value_coded = ${1065} "
             + "          AND e.location_id = :location "
-            + "          AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
+            + "          AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate "
             + "        GROUP BY p.patient_id "
             + "        UNION "
             + "        SELECT pp.patient_id, "
@@ -1588,7 +1569,7 @@ public class TxPvlsCohortQueries {
             + "          AND e.location_id = :location "
             + "          AND p.voided = 0 "
             + "          AND pp.voided = 0 "
-            + "          AND pp.date_enrolled BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
+            + "          AND pp.date_enrolled BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate "
             + "        GROUP BY pp.patient_id "
             + "        UNION "
             + "        SELECT p.patient_id, "
@@ -1608,7 +1589,7 @@ public class TxPvlsCohortQueries {
             + "          AND ( "
             + "              (o.concept_id = ${1982} AND o.value_coded = ${1065}) "
             + "              AND (o2.concept_id = ${1190} "
-            + "                   AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate) "
+            + "                   AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate) "
             + "          ) "
             + "          AND e.location_id = :location "
             + "        GROUP BY p.patient_id "
@@ -1626,7 +1607,7 @@ public class TxPvlsCohortQueries {
             + "          AND e.location_id = :location "
             + "          AND o.concept_id = ${6332} "
             + "          AND o.value_coded = ${1065} "
-            + "          AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
+            + "          AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate "
             + "          AND e.encounter_datetime > pg.pregnancy_date "
             + "        UNION "
             + "        SELECT pp.patient_id "
@@ -1638,7 +1619,7 @@ public class TxPvlsCohortQueries {
             + "          AND pp.voided = 0 "
             + "          AND ps.voided = 0 "
             + "          AND ps.start_date > pg.pregnancy_date "
-            + "          AND ps.start_date BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
+            + "          AND ps.start_date BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate "
             + "        UNION "
             + "        SELECT e.patient_id "
             + "        FROM encounter e "
@@ -1650,7 +1631,7 @@ public class TxPvlsCohortQueries {
             + "              (o.concept_id = ${6332} AND o.value_coded = ${1065}) "
             + "              AND (o2.concept_id = ${1190} "
             + "                   AND o2.value_datetime > pg.pregnancy_date "
-            + "                   AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate) "
+            + "                   AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate) "
             + "          ) "
             + "          AND e.voided = 0 "
             + "          AND o.voided = 0 "
@@ -1673,23 +1654,21 @@ public class TxPvlsCohortQueries {
    * <p>Eligible for a VL test and on ART for 90 days (Pregnant Women)
    *
    * <p>The system will generate the number of pregnant women (PVLS_PBFW_FR3.1) that are eligible to
-   * receive a VL test in the 12 months prior to the reporting end date (Date pregnancy registered
-   * >= endDate-12 months and <= endDate).
+   * receive a VL test in the 21 months prior to the reporting end date (Date pregnancy registered
+   * >= endDate-21 months and <= endDate).
    *
    * <ul>
    *   <li><b>Excluding:</b>
    *       <ul>
    *         <li>Clients whose difference between the date of the most recent record of pregnancy in
-   *             the last 12 months and the ART start date (PVLS_PBFW_FR5) is less than 90 days.
-   *         <li>Clients who are pregnant (PVLS_PBFW_FR3.1) in the 9 months prior to reporting
-   *             endDate – 12 months.
+   *             the last 21 months and the ART start date (PVLS_PBFW_FR5) is less than 90 days.
    *       </ul>
    * </ul>
    *
-   * <p>The system will consider the most recent record of pregnancy falling in the 12 months prior
+   * <p>The system will consider the most recent record of pregnancy falling in the 21 months prior
    * to the reporting end date among the listed sources as Date Pregnancy Registered.
    *
-   * <p><b>Note:</b> If the client has both states (pregnant and breastfeeding) during the 12-month
+   * <p><b>Note:</b> If the client has both states (pregnant and breastfeeding) during the 21-month
    * period, the most recent state should be considered. If the client has both states registered on
    * the same day, then the client should be considered pregnant.
    *
@@ -1704,12 +1683,7 @@ public class TxPvlsCohortQueries {
     cd.addSearch(
         "pregnantInclusion",
         EptsReportUtils.map(
-            getPregnantWomanTxPvlsSupplemental(true), "endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "pregnant9monthsPriorPeriod",
-        EptsReportUtils.map(
-            getPregnantWomanTxPvlsSupplemental(false), "endDate=${endDate},location=${location}"));
+            getPregnantWomanTxPvlsSupplemental(), "endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "pregnantWithLessThan90DaysOfArt",
@@ -1717,8 +1691,7 @@ public class TxPvlsCohortQueries {
             getExclusionOfPregnantWomanOnArtForLessThan90DaysOfArt(),
             "endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString(
-        "pregnantInclusion AND NOT (pregnant9monthsPriorPeriod OR pregnantWithLessThan90DaysOfArt)");
+    cd.setCompositionString("pregnantInclusion AND NOT pregnantWithLessThan90DaysOfArt");
     return cd;
   }
 
@@ -1771,7 +1744,7 @@ public class TxPvlsCohortQueries {
             + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${6332} "
             + "       AND o.value_coded = ${1065} "
-            + "       AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
+            + "       AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate "
             + "     GROUP BY p.patient_id "
             + "     UNION "
             + "     SELECT pp.patient_id, "
@@ -1786,7 +1759,7 @@ public class TxPvlsCohortQueries {
             + "       AND pp.program_id = ${8} "
             + "       AND ps.state = ${27} "
             + "       AND pp.location_id = :location "
-            + "       AND ps.start_date BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
+            + "       AND ps.start_date BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate "
             + "     GROUP BY pp.patient_id "
             + "     UNION "
             + "     SELECT p.patient_id, hist.value_datetime AS last_date "
@@ -1807,7 +1780,7 @@ public class TxPvlsCohortQueries {
             + "       AND ( "
             + "         (o.concept_id = ${6332} AND o.value_coded = ${1065}) "
             + "         AND (hist.concept_id = ${1190} "
-            + "              AND hist.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate) "
+            + "              AND hist.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate) "
             + "       ) "
             + "     GROUP BY p.patient_id "
             + "   ) lactantes "
@@ -1825,7 +1798,7 @@ public class TxPvlsCohortQueries {
             + "       AND p2.voided = 0 "
             + "       AND p2.gender = 'F' "
             + "       AND e.encounter_datetime >= lactantes.last_date "
-            + "       AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
+            + "       AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate "
             + "     UNION "
             + "     SELECT pp.patient_id "
             + "     FROM patient_program pp "
@@ -1838,7 +1811,7 @@ public class TxPvlsCohortQueries {
             + "       AND e.voided = 0 "
             + "       AND e.location_id = :location "
             + "       AND pp.date_enrolled >= lactantes.last_date "
-            + "       AND pp.date_enrolled BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
+            + "       AND pp.date_enrolled BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate "
             + "     UNION "
             + "     SELECT e.patient_id "
             + "     FROM encounter e "
@@ -1849,7 +1822,7 @@ public class TxPvlsCohortQueries {
             + "       AND o.value_coded = ${1065} "
             + "       AND o2.concept_id = ${1190} "
             + "       AND o2.value_datetime >= lactantes.last_date "
-            + "       AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
+            + "       AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate "
             + "       AND e.location_id = :location "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
@@ -1917,7 +1890,7 @@ public class TxPvlsCohortQueries {
             + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${6332} "
             + "       AND o.value_coded = ${1065} "
-            + "       AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
+            + "       AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate "
             + "     GROUP BY p.patient_id "
             + "     UNION "
             + "     SELECT pp.patient_id, "
@@ -1932,7 +1905,7 @@ public class TxPvlsCohortQueries {
             + "       AND pp.program_id = ${8} "
             + "       AND ps.state = ${27} "
             + "       AND pp.location_id = :location "
-            + "       AND ps.start_date BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
+            + "       AND ps.start_date BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate "
             + "     GROUP BY pp.patient_id "
             + "     UNION "
             + "     SELECT p.patient_id, hist.value_datetime AS last_date "
@@ -1953,7 +1926,7 @@ public class TxPvlsCohortQueries {
             + "       AND ( "
             + "         (o.concept_id = ${6332} AND o.value_coded = ${1065}) "
             + "         AND (hist.concept_id = ${1190} "
-            + "              AND hist.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate) "
+            + "              AND hist.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate) "
             + "       ) "
             + "     GROUP BY p.patient_id "
             + "   ) lactantes "
@@ -1974,7 +1947,7 @@ public class TxPvlsCohortQueries {
             + "       AND p2.voided = 0 "
             + "       AND p2.gender = 'F' "
             + "       AND e.encounter_datetime >= lactantes.last_date "
-            + "       AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
+            + "       AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate "
             + "     UNION "
             + "     SELECT pp.patient_id "
             + "     FROM patient_program pp "
@@ -1987,7 +1960,7 @@ public class TxPvlsCohortQueries {
             + "       AND e.voided = 0 "
             + "       AND e.location_id = :location "
             + "       AND pp.date_enrolled >= lactantes.last_date "
-            + "       AND pp.date_enrolled BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
+            + "       AND pp.date_enrolled BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate "
             + "     UNION "
             + "     SELECT e.patient_id "
             + "     FROM encounter e "
@@ -1998,7 +1971,7 @@ public class TxPvlsCohortQueries {
             + "       AND o.value_coded = ${1065} "
             + "       AND o2.concept_id = ${1190} "
             + "       AND o2.value_datetime >= lactantes.last_date "
-            + "       AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 12 MONTH) AND :endDate "
+            + "       AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate "
             + "       AND e.location_id = :location "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
@@ -2023,7 +1996,7 @@ public class TxPvlsCohortQueries {
    * <p>Eligible for a VL test and on ART for 90 days (BreastfeedingWomen)
    *
    * <p>The system will generate the number of breastfeeding women that are eligible to receive a VL
-   * test in the 12 months prior to reporting end date as follows:
+   * test in the 30 months prior to reporting end date as follows:
    *
    * <ul>
    *   <li>All women with:
@@ -2033,18 +2006,18 @@ public class TxPvlsCohortQueries {
    *         <li>Breastfeeding registered at ART initiation in Ficha Resumo
    *         <li>Breastfeeding registered on e-Lab Form
    *       </ul>
-   *   <li>in the 12 months prior to the reporting end date (Date breastfeeding registered >=
-   *       endDate-12 months and <= endDate).
+   *   <li>in the 30 months prior to the reporting end date (Date breastfeeding registered >=
+   *       endDate-30 months and <= endDate).
    * </ul>
    *
    * <p><b>Excluding: </b>
    *
    * <ul>
    *   <li>Clients whose difference between the date of the most recent record of breastfeeding in
-   *       the last 12 months and the ART start date (PVLS_PBFW_FR5) is less than 90 days.
+   *       the last 30 months and the ART start date (PVLS_PBFW_FR5) is less than 90 days.
    * </ul>
    *
-   * <p>The system will consider the most recent record of breastfeeding falling in the 12 months
+   * <p>The system will consider the most recent record of breastfeeding falling in the 30 months
    * prior to the reporting end date among the listed sources as Date Breastfeeding Registered.
    *
    * @return CohortDefinition
