@@ -1826,7 +1826,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "          AND e.voided = 0 "
             + "          AND e.location_id = :location "
             + "          AND e.encounter_datetime <= :endDate "
-            + "          AND e.encounter_type IN (${18},${6})"
+            + "          AND e.encounter_type = ${18}"
             + "        GROUP BY "
             + "            p.patient_id "
             + "    ) AS most_recent "
@@ -1861,7 +1861,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "          AND e.voided = 0 "
             + "          AND e.location_id = :location "
             + "          AND e.encounter_datetime <= :endDate "
-            + "          AND e.encounter_type IN (${18},${6}) "
+            + "          AND e.encounter_type = ${6} "
             + "        GROUP BY "
             + "            p.patient_id "
             + "    ) AS most_recent "
@@ -2180,6 +2180,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    System.out.println(sqlPatientDataDefinition.getQuery());
 
     return sqlPatientDataDefinition;
   }
