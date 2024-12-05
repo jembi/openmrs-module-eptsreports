@@ -87,6 +87,9 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
     dsd.addColumn(
         "OTHER", "Crianças com outra condição de Risco", getChildrenWithAnotherRiskCondition(), "");
 
+    dsd.addColumn(
+        "INH", "Crianças que iniciaram Isoniazida na CCR", getChildrenWhoStartedInhOnCcr(), "");
+
     return dsd;
   }
 
@@ -145,5 +148,12 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
                         commonMetadata.getDesmameBruscoAleitamentoArtificalConcept().getConceptId(),
                         commonMetadata.getMigracaoRecenteFamiliaConcept().getConceptId(),
                         hivMetadata.getOtherOrNonCodedConcept().getConceptId())))));
+  }
+
+  private Mapped<CohortIndicator> getChildrenWhoStartedInhOnCcr() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Crianças que iniciaram Isoniazida na CCR",
+            mapStraightThrough(resumoMensalCcrCohortQueries.getChildrenWhoStartedINH())));
   }
 }

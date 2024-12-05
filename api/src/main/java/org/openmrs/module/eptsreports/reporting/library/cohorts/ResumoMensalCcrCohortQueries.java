@@ -23,6 +23,7 @@ import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.reporting.cohort.definition.*;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +34,14 @@ public class ResumoMensalCcrCohortQueries {
 
   private HivMetadata hivMetadata;
   private CommonMetadata commonMetadata;
+  private TbMetadata tbMetadata;
 
   @Autowired
-  public ResumoMensalCcrCohortQueries(HivMetadata hivMetadata, CommonMetadata commonMetadata) {
+  public ResumoMensalCcrCohortQueries(
+      HivMetadata hivMetadata, CommonMetadata commonMetadata, TbMetadata tbMetadata) {
     this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
+    this.tbMetadata = tbMetadata;
   }
 
   String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
@@ -104,7 +108,7 @@ public class ResumoMensalCcrCohortQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
 
-    String query = "SELECT p.patient_id " + " FROM ( " + get1stCcrConsulation() + " ) ";
+    String query = "SELECT ccr.patient_id " + " FROM ( " + get1stCcrConsulation() + " ) ccr ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -161,7 +165,7 @@ public class ResumoMensalCcrCohortQueries {
             + "    AND o.voided = 0 "
             + "    AND e.encounter_type = ${92} "
             + "    AND o.concept_id = ${1874} "
-            + "    AND o.value_coded IN (${reasonConcept}) " // Usa IN em vez de FIND_IN_SET
+            + "    AND o.value_coded IN (${reasonConcept}) "
             + "    AND e.location_id = :location "
             + "    AND e.encounter_datetime >= :startDate "
             + "    AND e.encounter_datetime <= :endDate "
@@ -311,6 +315,61 @@ public class ResumoMensalCcrCohortQueries {
         map(getDamChildren(hivMetadata.getSevereAcuteMalnutritionConcept()), mapping));
 
     cd.setCompositionString("dagReason AND dagConsultation");
+    return cd;
+  }
+
+  public CohortDefinition getChildrenWhoStartedIsoziazida() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Crianças que iniciaram Isoniazida na CCR");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
+
+    String query =
+        "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "     INNER JOIN ( "
+            + get1stCcrSeguimentoConsulation()
+            + ")ccr ON ccr.patient_id = p.patient_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${93} "
+            + "    AND o.concept_id = ${23985} "
+            + "    AND o.value_coded = ${656} "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_datetime = ccr.first_consultation_date "
+            + "GROUP BY "
+            + "    p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  public CohortDefinition getChildrenWhoStartedINH() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças que iniciaram Isoniazida na CCR");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping));
+    cd.addSearch("startedInh", map(getChildrenWhoStartedIsoziazida(), mapping));
+
+    cd.setCompositionString("firstConsultation AND startedInh");
     return cd;
   }
 }
