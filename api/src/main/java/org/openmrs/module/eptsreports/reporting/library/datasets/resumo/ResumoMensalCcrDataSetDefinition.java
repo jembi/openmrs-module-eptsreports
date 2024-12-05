@@ -83,9 +83,15 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
         "");
 
     dsd.addColumn(
-        "CTZ",
+        "CTZA",
         "Crianças que iniciaram CTZ < 2 meses de idade",
         getChildrenWhoStartedCtzBellow2MonthsOfAge(),
+        "");
+
+    dsd.addColumn(
+        "CTZB",
+        "Crianças que iniciaram CTZ >= 2 meses de idade",
+        getChildrenWhoStartedCtzAndAbove2MonthsOfAge(),
         "");
 
     return dsd;
@@ -178,5 +184,13 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
             "Crianças que iniciaram CTZ < 2 meses de idade",
             mapStraightThrough(
                 resumoMensalCcrCohortQueries.getChildrenWhoStartedCtzBellow2MonthsOfAge())));
+  }
+
+  private Mapped<CohortIndicator> getChildrenWhoStartedCtzAndAbove2MonthsOfAge() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Crianças que iniciaram CTZ >= 2 meses de idade",
+            mapStraightThrough(
+                resumoMensalCcrCohortQueries.getChildrenWhoStartedCtzAbove2MonthsOfAge())));
   }
 }

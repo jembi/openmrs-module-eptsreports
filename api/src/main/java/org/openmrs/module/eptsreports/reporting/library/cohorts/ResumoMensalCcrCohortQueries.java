@@ -616,7 +616,7 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getInfantAge(Integer Age) {
+  public CohortDefinition getInfantAge(boolean greaterThan, Integer Age) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Infant Age");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -653,8 +653,12 @@ public class ResumoMensalCcrCohortQueries {
             + "                   ON pr.person_id = ccr.patient_id "
             + "WHERE "
             + "    pr.birthdate IS NOT NULL "
-            + "  AND ccr.enrollment_date IS NOT NULL "
-            + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, ccr.enrollment_date) < ${Age}";
+            + "  AND ccr.enrollment_date IS NOT NULL ";
+    if (greaterThan) {
+      query = query + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, ccr.enrollment_date) >= ${Age}";
+    } else {
+      query = query + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, ccr.enrollment_date) < ${Age}";
+    }
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -692,10 +696,46 @@ public class ResumoMensalCcrCohortQueries {
     cd.addParameter(new Parameter("location", "Health Facility", Location.class));
 
     cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping));
-    cd.addSearch("bellow2monthsOfAge", map(getInfantAge(2), mapping));
+    cd.addSearch("bellow2monthsOfAge", map(getInfantAge(false, 2), mapping));
     cd.addSearch("receivedCtz", map(getChildrenWhoStartedCtz(), mapping));
 
     cd.setCompositionString("firstConsultation AND bellow2monthsOfAge AND receivedCtz");
+    return cd;
+  }
+
+  /**
+   * CCR-FR16
+   *
+   * <p><b>Indicador 11 - </b>Crianças que iniciaram CTZ >= 2 meses de idade
+   *
+   * <p>O sistema irá produzir o Indicador 11 “Total de crianças que iniciaram CTZ ≥ 2 meses de
+   * idade” da seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta durante o período de reporte (CCR-
+   *       FR7) e com idade >= 2 meses (CCR-FR5)
+   *   <li>Filtrando as que tiveram o registo de “Profilaxia com cotrimoxazol” igual a "Sim” na
+   *       primeira “Ficha de Seguimento de CCR” registada durante o período de reporte (“Data da
+   *       Consulta” >= “Data Início” e <= “Data Fim”).
+   * </ul>
+   *
+   * <p><b>Mota:</b> em caso de existirem mais que uma “Ficha de Seguimento de CCR” durante o
+   * período será considerada a informação registada na primeira ficha.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenWhoStartedCtzAbove2MonthsOfAge() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças que iniciaram CTZ >= 2 meses de idade");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping));
+    cd.addSearch("above2monthsOfAge", map(getInfantAge(true, 2), mapping));
+    cd.addSearch("receivedCtz", map(getChildrenWhoStartedCtz(), mapping));
+
+    cd.setCompositionString("firstConsultation AND above2monthsOfAge AND receivedCtz");
     return cd;
   }
 }
