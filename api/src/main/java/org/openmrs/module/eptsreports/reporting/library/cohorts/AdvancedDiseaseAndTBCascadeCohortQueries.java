@@ -214,7 +214,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     CohortDefinition cd500AgeBetweenOneAndFour =
         getPatientsWithCd4AndAge(Cd4CountComparison.LessThan500mm3, 1, 4);
     CohortDefinition cd750AgeUnderYear =
-        getPatientsWithCd4AndAge(Cd4CountComparison.LessThan750mm3, null, 1);
+        getPatientsWithCd4AndAgeLessThan1Year(Cd4CountComparison.LessThan750mm3);
 
     cd.addSearch("cd4Under200", EptsReportUtils.map(cd200AgeFiveOrOver, mappings));
     cd.addSearch("cd4Under500", EptsReportUtils.map(cd500AgeBetweenOneAndFour, mappings));
@@ -461,6 +461,52 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     cd.setCompositionString("absoluteCd4 AND age");
 
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWithCd4AndAgeLessThan1Year(Cd4CountComparison cd4) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Absolute Cd4");
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+
+    CohortDefinition absoluteCd4 = getPatientsWithAbsoluteCd4Count(cd4);
+    CohortDefinition age = getClientWithLessThanAYearOfAge();
+
+    cd.addSearch("absoluteCd4", EptsReportUtils.map(absoluteCd4, mappings));
+
+    cd.addSearch("age", EptsReportUtils.map(age, "evaluationDate=${endDate+1m}"));
+
+    cd.setCompositionString("absoluteCd4 AND age");
+
+    return cd;
+  }
+
+  public CohortDefinition getClientWithLessThanAYearOfAge() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Client Less than q year of age by report end date");
+    cd.addParameter(new Parameter("evaluationDate", "Report End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    String query =
+        "SELECT pat.patient_id "
+            + "FROM ( "
+            + "SELECT "
+            + "    p.patient_id, "
+            + "    FLOOR( "
+            + "            DATEDIFF(:evaluationDate, ps.birthdate)/ 365 "
+            + "    ) AS age "
+            + "FROM "
+            + "    patient p "
+            + "        INNER JOIN person ps ON p.patient_id = ps.person_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "  AND ps.voided = 0) pat "
+            + "WHERE pat.age < 1 ";
+
+    StringSubstitutor sb = new StringSubstitutor(getMetadata());
+    cd.setQuery(sb.replace(query));
     return cd;
   }
 
@@ -1959,6 +2005,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     StringSubstitutor sb = new StringSubstitutor(getMetadata());
     cd.setQuery(sb.replace(query));
+    System.out.println(cd.getQuery());
     return cd;
   }
 
