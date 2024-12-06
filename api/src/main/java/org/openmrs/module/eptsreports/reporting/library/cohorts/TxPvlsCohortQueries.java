@@ -1491,7 +1491,6 @@ public class TxPvlsCohortQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
-
     return sqlCohortDefinition;
   }
 
@@ -1536,7 +1535,7 @@ public class TxPvlsCohortQueries {
     map.put("27", hivMetadata.getPatientGaveBirthWorkflowState().getProgramWorkflowStateId());
 
     String query =
-        "SELECT not_eligible.patient_id "
+        "SELECT pat.patient_id "
             + "FROM ( "
             + "    SELECT pg.patient_id, "
             + "           MAX(pg.pregnancy_date) AS pg_date "
@@ -1594,9 +1593,6 @@ public class TxPvlsCohortQueries {
             + "          AND e.location_id = :location "
             + "        GROUP BY p.patient_id "
             + "    ) pg "
-            + "    INNER JOIN ("
-            + artStart
-            + ") art ON art.patient_id = pg.patient_id "
             + "    WHERE pg.patient_id NOT IN ( "
             + "        SELECT e.patient_id "
             + "        FROM encounter e "
@@ -1637,9 +1633,12 @@ public class TxPvlsCohortQueries {
             + "          AND o.voided = 0 "
             + "          AND o2.voided = 0 "
             + "    ) "
-            + "    AND TIMESTAMPDIFF(DAY, art.first_pickup, pg.pregnancy_date) < 90 "
             + "    GROUP BY pg.patient_id "
-            + ") not_eligible ";
+            + ") pat "
+            + "    INNER JOIN ("
+            + artStart
+            + ") art ON art.patient_id = pat.patient_id "
+            + " WHERE TIMESTAMPDIFF(DAY, art.first_pickup, pat.pg_date) < 90 ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1692,6 +1691,9 @@ public class TxPvlsCohortQueries {
             "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("pregnantInclusion AND NOT pregnantWithLessThan90DaysOfArt");
+    // cd.setCompositionString("pregnantInclusion AND pregnantWithLessThan90DaysOfArt");
+
+    
     return cd;
   }
 
