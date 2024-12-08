@@ -753,7 +753,7 @@ public class ResumoMensalCcrCohortQueries {
     String query =
         "SELECT pat.patient_id FROM ( "
             + "SELECT "
-            + "    p.patient_id, MIN(o.obs_datetime) AS first_pcr"
+            + "    p.patient_id, MIN(o.obs_datetime) AS first_pcr "
             + "FROM "
             + "    patient p "
             + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
@@ -762,12 +762,13 @@ public class ResumoMensalCcrCohortQueries {
             + "    p.voided = 0 "
             + "    AND e.voided = 0 "
             + "    AND o.voided = 0 "
-            + "    AND e.encounter_type = ${93} "
             + "    AND e.location_id = :location "
+            + "    AND e.encounter_type = ${93} "
             + "    AND o.concept_id = ${1998} "
             + "    AND o.obs_datetime BETWEEN :startDate AND :endDate "
             + "GROUP BY "
-            + "    p.patient_id ) pat";
+            + "    p.patient_id "
+            + ") pat";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -876,7 +877,7 @@ public class ResumoMensalCcrCohortQueries {
    * <ul>
    *   <li>Incluindo todas as crianças que tiveram a 1ª consulta durante o período de reporte (CCR-
    *       FR7)
-   *   <li>FFiltrando as que tiveram o registo de “PCR (data da colheita)”, na “Ficha de Seguimento
+   *   <li>Filtrando as que tiveram o registo de “PCR (data da colheita)”, na “Ficha de Seguimento
    *       de CCR”, sendo essa data “PCR (data da colheita)” durante o período de reporte (“PCR
    *       (data da colheita)” >= “Data Início” e <= “Data Fim”) e com idade >= 2 meses nesta data
    *       (“PCR (data da colheita” – “Data de Nascimento” >= 2 meses). Nota: no caso de existência
@@ -898,6 +899,206 @@ public class ResumoMensalCcrCohortQueries {
     cd.addSearch("pcrabove2monthsOfAge", map(getInfantAgeAtPcr(true, 2), mapping));
 
     cd.setCompositionString("firstConsultation AND received1stPcr AND pcrabove2monthsOfAge");
+    return cd;
+  }
+
+  public CohortDefinition getGeneralCcrQuery(Concept questionConcept, List<Integer> answerConcept) {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Ficha Seguimento CCR Query");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    Map<String, String> map = new HashMap<>();
+    map.put("93", String.valueOf(hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId()));
+    map.put("questionConcept", String.valueOf(questionConcept.getConceptId()));
+    map.put("answerConcept", StringUtils.join(answerConcept, ","));
+    String query =
+        "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "     INNER JOIN ( "
+            + get1stCcrSeguimentoConsulation()
+            + ")ccr ON ccr.patient_id = p.patient_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${93} "
+            + "    AND o.concept_id = ${questionConcept} "
+            + "    AND o.value_coded IN (${answerConcept}) "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_datetime = ccr.first_consultation_date "
+            + "GROUP BY "
+            + "    p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * CCR-FR20
+   *
+   * <p><b>Indicador 14 - </b> Crianças expostas ≥9 meses testadas com Teste Rápido de HIV
+   *
+   * <p>O sistema irá produzir o Indicador 14 “Total de crianças expostas ≥9 meses testadas com
+   * Teste Rápido de HIV”, da seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas crianças com exposição ao HIV durante o período de reporte (CCR-FR11) e
+   *       com idade >= 9 meses (CCR-FR5)
+   *   <li>Filtrando as que tiveram o registo de “HIV (teste rápido)” igual a "Positivo” ou
+   *       "Negativo” ou “Indeterminado” na primeira “Ficha de Seguimento de CCR” registada durante
+   *       o período de reporte (“Data da Consulta” >= “Data Início” e <= “Data Fim”).
+   * </ul>
+   *
+   * Nota: em caso de existirem mais que uma “Ficha de Seguimento de CCR” durante o período será
+   * considerada a informação registada na primeira ficha.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getExposedChildrenAbove9MonthsofAge() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças expostas ≥9 meses testadas com Teste Rápido de HIV");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch(
+        "hivExposure",
+        map(
+            getChildrenWithVisitReason(
+                Collections.singletonList(
+                    commonMetadata.getRecenNascidoMaeHivPositivoConcept().getConceptId())),
+            mapping));
+
+    cd.addSearch("above9monthsOfAge", map(getInfantAge(true, 9), mapping));
+
+    cd.addSearch(
+        "rapidTest",
+        map(
+            getGeneralCcrQuery(
+                hivMetadata.getHivRapidTest1QualitativeConcept(),
+                Arrays.asList(
+                    hivMetadata.getPositive().getConceptId(),
+                    hivMetadata.getNegative().getConceptId(),
+                    tbMetadata.getIndeterminate().getConceptId())),
+            mapping));
+
+    cd.setCompositionString("hivExposure AND above9monthsOfAge AND rapidTest");
+    return cd;
+  }
+
+  /**
+   * CCR-FR21
+   *
+   * <p><b>Indicador 15 - </b> Crianças não expostas ao HIV testadas com Teste Rápido de HIV
+   *
+   * <p>O sistema irá produzir o Indicador 15 “Total de crianças não expostas ao HIV testadas com
+   * Teste Rápido de HIV” da seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta durante o período de reporte (CCR-
+   *       FR7)
+   *   <li>Filtrando as que tiveram o registo de “HIV (teste rápido)” igual a "Positivo” ou
+   *       "Negativo” ou “Indeterminado” na primeira “Ficha de Seguimento de CCR” registada durante
+   *       o período de reporte (“Data da Consulta” >= “Data Início” e <= “Data Fim”)
+   *   <li>Excluindo todas crianças com exposição ao HIV durante o período de reporte (CCR-FR11)
+   * </ul>
+   *
+   * Nota: em caso de existirem mais que uma “Ficha de Seguimento de CCR” durante o período será
+   * considerada a informação registada na primeira ficha.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenTestedAndNotExposedToHiv() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças não expostas ao HIV testadas com Teste Rápido de HIV");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping));
+
+    cd.addSearch(
+        "rapidTest",
+        map(
+            getGeneralCcrQuery(
+                hivMetadata.getHivRapidTest1QualitativeConcept(),
+                Arrays.asList(
+                    hivMetadata.getPositive().getConceptId(),
+                    hivMetadata.getNegative().getConceptId(),
+                    tbMetadata.getIndeterminate().getConceptId())),
+            mapping));
+
+    cd.addSearch(
+        "hivExposure",
+        map(
+            getChildrenWithVisitReason(
+                Collections.singletonList(
+                    commonMetadata.getRecenNascidoMaeHivPositivoConcept().getConceptId())),
+            mapping));
+
+    cd.setCompositionString("(firstConsultation AND rapidTest) AND NOT hivExposure");
+    return cd;
+  }
+
+  /**
+   * CCR-FR22
+   *
+   * <p><b>Indicador 16 - </b> Crianças não expostas ao HIV, testadas com Teste Rápido que tiveram
+   * resultado positivo
+   *
+   * <p>O sistema irá produzir o Indicador 16 “Total de crianças não expostas ao HIV, testadas com
+   * Teste Rápido que tiveram resultado positivo”, da seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta durante o período de reporte (CCR-
+   *       FR7)
+   *   <li>Filtrando as que tiveram o registo de “HIV (teste rápido)” igual a "Positivo” na primeira
+   *       “Ficha de Seguimento de CCR” registada durante o período de reporte (“Data da Consulta”
+   *       >= “Data Início” e <= “Data Fim”).
+   *   <li>Excluindo todas crianças com exposição ao HIV durante o período de reporte (CCR-FR11)
+   * </ul>
+   *
+   * Nota: em caso de existirem mais que uma “Ficha de Seguimento de CCR” durante o período será
+   * considerada a informação registada na primeira ficha.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenNotExposedToHivWithPositiveTestResult() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "Crianças não expostas ao HIV, testadas com Teste Rápido que tiveram resultado positivo");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping));
+
+    cd.addSearch(
+        "rapidTestPositive",
+        map(
+            getGeneralCcrQuery(
+                hivMetadata.getHivRapidTest1QualitativeConcept(),
+                Collections.singletonList(hivMetadata.getPositive().getConceptId())),
+            mapping));
+
+    cd.addSearch(
+        "hivExposure",
+        map(
+            getChildrenWithVisitReason(
+                Collections.singletonList(
+                    commonMetadata.getRecenNascidoMaeHivPositivoConcept().getConceptId())),
+            mapping));
+
+    cd.setCompositionString("(firstConsultation AND rapidTestPositive) AND NOT hivExposure");
     return cd;
   }
 }

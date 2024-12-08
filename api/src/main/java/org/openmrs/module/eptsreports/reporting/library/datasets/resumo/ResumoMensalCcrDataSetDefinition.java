@@ -106,6 +106,24 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
         getChildrenFirstPcrCollectedAbove2MonthsofAge(),
         "");
 
+    dsd.addColumn(
+        "EXPOSED",
+        "Crianças expostas ≥9 meses testadas com Teste Rápido de HIV",
+        getChildrenAbove9MonthsofAgeExposedAndTested(),
+        "");
+
+    dsd.addColumn(
+        "NOTEXPOSED",
+        "Crianças não expostas ao HIV testadas com Teste Rápido de HIV",
+        getChildrenWithRapidTestAndNotExposedToHiv(),
+        "");
+
+    dsd.addColumn(
+        "NOTEXPOSEDPOSITIVE",
+        "Crianças não expostas ao HIV, testadas com Teste Rápido que tiveram resultado positivo",
+        getChildrenNotExposedToHivAndWithPositiveTestResult(),
+        "");
+
     return dsd;
   }
 
@@ -220,5 +238,29 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
             "1º PCR colhido >= 2 meses de idade",
             mapStraightThrough(
                 resumoMensalCcrCohortQueries.getChildrenFirstPcrCollectedAbove2MonthsofAge())));
+  }
+
+  private Mapped<CohortIndicator> getChildrenAbove9MonthsofAgeExposedAndTested() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Crianças expostas ≥9 meses testadas com Teste Rápido de HIV",
+            mapStraightThrough(
+                resumoMensalCcrCohortQueries.getExposedChildrenAbove9MonthsofAge())));
+  }
+
+  private Mapped<CohortIndicator> getChildrenWithRapidTestAndNotExposedToHiv() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Crianças não expostas ao HIV testadas com Teste Rápido de HIV",
+            mapStraightThrough(
+                resumoMensalCcrCohortQueries.getChildrenTestedAndNotExposedToHiv())));
+  }
+
+  private Mapped<CohortIndicator> getChildrenNotExposedToHivAndWithPositiveTestResult() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "Crianças não expostas ao HIV, testadas com Teste Rápido que tiveram resultado positivo",
+            mapStraightThrough(
+                resumoMensalCcrCohortQueries.getChildrenNotExposedToHivWithPositiveTestResult())));
   }
 }
