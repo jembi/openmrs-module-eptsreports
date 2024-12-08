@@ -94,6 +94,18 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
         getChildrenWhoStartedCtzAndAbove2MonthsOfAge(),
         "");
 
+    dsd.addColumn(
+        "PCRA",
+        "1º PCR colhido < 2 meses de idade",
+        getChildrenFirstPcrCollectedUnder2MonthsofAge(),
+        "");
+
+    dsd.addColumn(
+        "PCRB",
+        "1º PCR colhido >= 2 meses de idade",
+        getChildrenFirstPcrCollectedAbove2MonthsofAge(),
+        "");
+
     return dsd;
   }
 
@@ -192,5 +204,21 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
             "Crianças que iniciaram CTZ >= 2 meses de idade",
             mapStraightThrough(
                 resumoMensalCcrCohortQueries.getChildrenWhoStartedCtzAbove2MonthsOfAge())));
+  }
+
+  private Mapped<CohortIndicator> getChildrenFirstPcrCollectedUnder2MonthsofAge() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "1º PCR colhido < 2 meses de idade",
+            mapStraightThrough(
+                resumoMensalCcrCohortQueries.getChildrenFirstPcrCollectedUnder2MonthsofAge())));
+  }
+
+  private Mapped<CohortIndicator> getChildrenFirstPcrCollectedAbove2MonthsofAge() {
+    return mapStraightThrough(
+        eptsGeneralIndicator.getIndicator(
+            "1º PCR colhido >= 2 meses de idade",
+            mapStraightThrough(
+                resumoMensalCcrCohortQueries.getChildrenFirstPcrCollectedAbove2MonthsofAge())));
   }
 }

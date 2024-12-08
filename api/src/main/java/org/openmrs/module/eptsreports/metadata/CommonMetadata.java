@@ -1277,4 +1277,19 @@ public class CommonMetadata extends Metadata {
         Context.getAdministrationService().getGlobalProperty("eptsreports.cotrimoxazolConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 1998</b>
+   *
+   * <p><b>Name:</b> POLYMERASE CHAIN REACTION, DATE ORDERED
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getPcrConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.pcrConceptUuid");
+    return getConcept(uuid);
+  }
 }

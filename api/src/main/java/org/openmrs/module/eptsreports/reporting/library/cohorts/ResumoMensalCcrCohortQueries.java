@@ -738,4 +738,166 @@ public class ResumoMensalCcrCohortQueries {
     cd.setCompositionString("firstConsultation AND above2monthsOfAge AND receivedCtz");
     return cd;
   }
+
+  public CohortDefinition getChildrenFirstPcr() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("registo de PCR (data da colheita), na Ficha de Seguimento de CCR");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1998", commonMetadata.getPcrConcept().getConceptId());
+
+    String query =
+        "SELECT pat.patient_id FROM ( "
+            + "SELECT "
+            + "    p.patient_id, MIN(o.obs_datetime) AS first_pcr"
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${93} "
+            + "    AND e.location_id = :location "
+            + "    AND o.concept_id = ${1998} "
+            + "    AND o.obs_datetime BETWEEN :startDate AND :endDate "
+            + "GROUP BY "
+            + "    p.patient_id ) pat";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  public CohortDefinition getInfantAgeAtPcr(boolean greaterThan, Integer Age) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Infant Age at PCR");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1998", commonMetadata.getPcrConcept().getConceptId());
+    map.put("Age", Age);
+
+    String query =
+        "SELECT "
+            + "    pr.person_id "
+            + "FROM "
+            + "    person pr "
+            + "        INNER JOIN ( "
+            + "        SELECT "
+            + "            p.patient_id, "
+            + "            MIN(o.obs_datetime) AS first_pcr "
+            + "        FROM "
+            + "            patient p "
+            + "             INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "             INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "        WHERE "
+            + "            p.voided = 0 "
+            + "          AND e.voided = 0 "
+            + "          AND o.voided = 0 "
+            + "          AND e.location_id = :location "
+            + "          AND e.encounter_type = ${93} "
+            + "          AND o.concept_id = ${1998} "
+            + "          AND o.obs_datetime BETWEEN :startDate AND :endDate "
+            + "        GROUP BY "
+            + "            p.patient_id "
+            + "    ) pcr "
+            + "                   ON pr.person_id = pcr.patient_id "
+            + "WHERE "
+            + "    pr.birthdate IS NOT NULL "
+            + "  AND pcr.first_pcr IS NOT NULL ";
+    if (greaterThan) {
+      query = query + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, pcr.first_pcr) >= ${Age}";
+    } else {
+      query = query + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, pcr.first_pcr) < ${Age}";
+    }
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * CCR-FR18
+   *
+   * <p><b>Indicador 12 - </b>1º PCR colhido < 2 meses de idade
+   *
+   * <p>O sistema irá produzir o Indicador 12 “Total de 1º PCR colhido < 2 meses de idade”, da
+   * seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta durante o período de reporte (CCR-
+   *       FR7)
+   *   <li>Filtrando as que tiveram o registo de “PCR (data da colheita)”, na “Ficha de Seguimento
+   *       de CCR”, sendo essa data “PCR (data da colheita)” durante o período de reporte (“PCR
+   *       (data da colheita)” >= “Data Início” e <= “Data Fim”) e com idade <2 meses nesta data
+   *       (“PCR (data da colheita” – “Data de Nascimento” < 2 meses). Nota: no caso de existência
+   *       de registo de mais que uma data “PCR (data da colheita)” durante o período de reporte,
+   *       será considerada a primeira ocorrência.
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenFirstPcrCollectedUnder2MonthsofAge() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("1º PCR colhido < 2 meses de idade");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping));
+    cd.addSearch("received1stPcr", map(getChildrenFirstPcr(), mapping));
+    cd.addSearch("pcrbellow2monthsOfAge", map(getInfantAgeAtPcr(false, 2), mapping));
+
+    cd.setCompositionString("firstConsultation AND received1stPcr AND pcrbellow2monthsOfAge");
+    return cd;
+  }
+
+  /**
+   * CCR-FR19
+   *
+   * <p><b>Indicador 13 - </b>1º PCR colhido ≥ 2 meses de idade
+   *
+   * <p>O sistema irá produzir o Indicador 13 “Total de 1º PCR colhido ≥ 2 meses de idade”, da
+   * seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta durante o período de reporte (CCR-
+   *       FR7)
+   *   <li>FFiltrando as que tiveram o registo de “PCR (data da colheita)”, na “Ficha de Seguimento
+   *       de CCR”, sendo essa data “PCR (data da colheita)” durante o período de reporte (“PCR
+   *       (data da colheita)” >= “Data Início” e <= “Data Fim”) e com idade >= 2 meses nesta data
+   *       (“PCR (data da colheita” – “Data de Nascimento” >= 2 meses). Nota: no caso de existência
+   *       de registo de mais que uma data “PCR (data da colheita)” durante o período de reporte,
+   *       será considerada a primeira ocorrência.
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenFirstPcrCollectedAbove2MonthsofAge() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("1º PCR colhido >= 2 meses de idade");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping));
+    cd.addSearch("received1stPcr", map(getChildrenFirstPcr(), mapping));
+    cd.addSearch("pcrabove2monthsOfAge", map(getInfantAgeAtPcr(true, 2), mapping));
+
+    cd.setCompositionString("firstConsultation AND received1stPcr AND pcrabove2monthsOfAge");
+    return cd;
+  }
 }
