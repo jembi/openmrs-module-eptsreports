@@ -1858,6 +1858,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "          AND e.location_id = :location "
             + "          AND e.encounter_datetime <= :endDate "
             + "          AND e.encounter_type = ${6} "
+            + "          AND concept_id = ${23739} "
             + "        GROUP BY "
             + "            p.patient_id "
             + "    ) AS most_recent "
@@ -2176,7 +2177,6 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
-    System.out.println(sqlPatientDataDefinition.getQuery());
 
     return sqlPatientDataDefinition;
   }
