@@ -1885,7 +1885,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "      AND ee.voided = 0 "
             + "      AND ee.location_id = :location "
             + "      AND ee.encounter_type = ${18} "
-            + "      AND ee.encounter_datetime BETWEEN most_recent.encounter_date AND :endDate "
+            + "      AND ee.encounter_datetime = most_recent.encounter_date "
             + " ) "
             + "       UNION "
             + "SELECT "
