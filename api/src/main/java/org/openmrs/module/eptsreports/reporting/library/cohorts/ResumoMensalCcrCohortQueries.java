@@ -45,6 +45,7 @@ public class ResumoMensalCcrCohortQueries {
   }
 
   String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
+  String mapping2 = "startDate=${startDate-8m},endDate=${endDate-8m},location=${location}";
 
   public String get1stCcrConsulation() {
     return "SELECT "
@@ -1099,6 +1100,79 @@ public class ResumoMensalCcrCohortQueries {
             mapping));
 
     cd.setCompositionString("(firstConsultation AND rapidTestPositive) AND NOT hivExposure");
+    return cd;
+  }
+
+  public CohortDefinition getChildrenWhoCompletedsoziazida() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Crianças que completaram Isonizada – coorte de 9 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
+
+    String query =
+        "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${93} "
+            + "    AND o.concept_id = ${23985} "
+            + "    AND o.value_coded = ${656} "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "GROUP BY "
+            + "    p.patient_id "
+            + "HAVING "
+            + "    COUNT(e.encounter_id) >= 6";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * CCR-FR25 <b>Indicador 21-</b> Crianças que completaram Isonizada – coorte de 9 meses
+   *
+   * <p>O sistema irá produzir o Indicador 21 “Total de crianças que completaram Isoniazida”, da
+   * seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta há 9 meses atrás que tiveram
+   *       contacto com TB (CCR-FR23)
+   *   <li>Filtrando as crianças que tiveram registo de “Diagnóstico Tratamento” igual a "Profilaxia
+   *       com Isoniazida” em seis (6) consultas (“Ficha de Seguimento de CCR”) ocorridas entre
+   *       “Data Iníco” – 8 meses e “Data Fim”.
+   * </ul>
+   *
+   * <b>Nota:</b> as seis (6) consultas de CCR registadas na “Ficha de Seguimento de CCR” podem ser
+   * consecutivas ou não consecutivas.
+   *
+   * @return
+   */
+  public CohortDefinition getChildrenWhoCompletedINH() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças que completaram Isonizada – coorte de 9 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping2));
+    cd.addSearch("completedInh", map(getChildrenWhoCompletedsoziazida(), mapping2));
+
+    cd.setCompositionString("firstConsultation AND completedInh");
     return cd;
   }
 }

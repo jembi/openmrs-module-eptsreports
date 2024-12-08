@@ -22,6 +22,7 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCcrCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.BaseDataSet;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
+import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
@@ -57,71 +58,133 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
     dsd.setName("Resumo Mensal CCR Dataset");
     dsd.addParameters(getParameters());
 
+    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String cohort9months = "startDate=${startDate-8m},endDate=${endDate-8},location=${location}";
+
+    // Indicador 1- Total de 1as Consultas
     dsd.addColumn("FIRST", "Total de 1as Consultas", getChildrenWithFirstConsultation(), "");
 
+    // Indicador 2- Crianças com contacto com tuberculose
     dsd.addColumn(
         "TUBERCULOSIS", "Crianças com contacto com tuberculose", getChildrenWithTbContact(), "");
 
+    // Indicador 3 - Crianças com desnutrição aguda moderada
     dsd.addColumn("DAM", "Crianças com desnutrição aguda moderada", getChildrenWithDam(), "");
 
+    // Indicador 4 - Crianças com desnutrição aguda grave
     dsd.addColumn("DAG", "Crianças com desnutrição aguda grave", getChildrenWithDag(), "");
 
+    // Indicador 5 - Crianças com exposição ao HIV
     dsd.addColumn("HIV", "Crianças com exposição ao HIV", getChildrenWithHivExposure(), "");
 
+    // Indicador 6 - Crianças com outra condição de Risco
     dsd.addColumn(
         "OTHER", "Crianças com outra condição de Risco", getChildrenWithAnotherRiskCondition(), "");
 
+    // Indicador 7 - Crianças que iniciaram Isoniazida na CCR
     dsd.addColumn(
         "INH", "Crianças que iniciaram Isoniazida na CCR", getChildrenWhoStartedInhOnCcr(), "");
 
+    // Indicador 8 - Crianças que receberam ATPU
     dsd.addColumn("ATPU", "Crianças que receberam ATPU", getChildrenWhoReceivedAtpuonCcr(), "");
 
+    // Indicador 9- Crianças que receberam CSB/suplemento nutricional
     dsd.addColumn(
         "CSB",
         "Crianças que receberam CSB/suplemento nutricional",
         getChildrenWhoReceivedCsbOnCcr(),
         "");
 
+    // Indicador 10- Crianças que iniciaram CTZ < 2 meses de idade
     dsd.addColumn(
         "CTZA",
         "Crianças que iniciaram CTZ < 2 meses de idade",
         getChildrenWhoStartedCtzBellow2MonthsOfAge(),
         "");
 
+    // Indicador 11 - Crianças que iniciaram CTZ ≥ 2 meses de idade
     dsd.addColumn(
         "CTZB",
         "Crianças que iniciaram CTZ >= 2 meses de idade",
         getChildrenWhoStartedCtzAndAbove2MonthsOfAge(),
         "");
 
+    // Indicador 12 - 1º PCR colhido < 2 meses de idade
     dsd.addColumn(
         "PCRA",
         "1º PCR colhido < 2 meses de idade",
         getChildrenFirstPcrCollectedUnder2MonthsofAge(),
         "");
 
+    // Indicador 13 - 1º PCR colhido ≥ 2 meses de idade
     dsd.addColumn(
         "PCRB",
         "1º PCR colhido >= 2 meses de idade",
         getChildrenFirstPcrCollectedAbove2MonthsofAge(),
         "");
 
+    // Indicador 14 - Crianças expostas ≥9 meses testadas com Teste Rápido de HIV
     dsd.addColumn(
         "EXPOSED",
         "Crianças expostas ≥9 meses testadas com Teste Rápido de HIV",
         getChildrenAbove9MonthsofAgeExposedAndTested(),
         "");
 
+    // Indicador 15 - Crianças não expostas ao HIV testadas com Teste Rápido de HIV
     dsd.addColumn(
         "NOTEXPOSED",
         "Crianças não expostas ao HIV testadas com Teste Rápido de HIV",
         getChildrenWithRapidTestAndNotExposedToHiv(),
         "");
 
+    // Indicador 16 - Crianças não expostas ao HIV, testadas com Teste Rápido que tiveram resultado
+    // positivo
     dsd.addColumn(
         "NOTEXPOSEDPOSITIVE",
         "Crianças não expostas ao HIV, testadas com Teste Rápido que tiveram resultado positivo",
         getChildrenNotExposedToHivAndWithPositiveTestResult(),
+        "");
+
+    // Crianças com 1as Consultas – Coorte de 9 meses
+    CohortIndicator first9MONTHS =
+        eptsGeneralIndicator.getIndicator(
+            "FIRST9MONTHS",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getPatients1stConsultation(), cohort9months));
+
+    dsd.addColumn(
+        "F9M",
+        "Crianças com 1as Consultas – Coorte de 9 meses",
+        EptsReportUtils.map(first9MONTHS, cohort9months),
+        "");
+
+    // Indicador 20 - Crianças com contacto com TB – coorte de 9 meses
+    CohortIndicator tb9MONTHS =
+        eptsGeneralIndicator.getIndicator(
+            "TB9MONTHS",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getChildrenWithVisitReason(
+                    Collections.singletonList(
+                        commonMetadata.getContactoTbConcept().getConceptId())),
+                cohort9months));
+
+    dsd.addColumn(
+        "TB9M",
+        "Crianças com 1as Consultas – Coorte de 9 meses",
+        EptsReportUtils.map(tb9MONTHS, cohort9months),
+        "");
+
+    // Indicador 21 - Crianças que completaram Isonizada – coorte de 9 meses
+    CohortIndicator completedinh =
+        eptsGeneralIndicator.getIndicator(
+            "COMPLETEDINH",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getChildrenWhoCompletedINH(), cohort9months));
+
+    dsd.addColumn(
+        "CINH",
+        "Crianças que completaram Isonizada – coorte de 9 meses",
+        EptsReportUtils.map(completedinh, cohort9months),
         "");
 
     return dsd;
