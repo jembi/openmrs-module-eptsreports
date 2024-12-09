@@ -1403,6 +1403,48 @@ public class ResumoMensalCcrCohortQueries {
             + "    patient p "
             + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "    INNER JOIN ( "
+            + get1stCcrSeguimentoConsulation()
+            + "    ) ccr ON ccr.patient_id = p.patient_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${93} "
+            + "    AND o.concept_id = ${23756} "
+            + "    AND o.value_coded = ${165497} "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_datetime = ccr.first_consultation_date "
+            + "GROUP BY "
+            + "    p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  public CohortDefinition getChildrenWithDesnutricaoAgudaOnFichaResumoCcr() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Crianças com Desnutricao Aguda – coorte de 9");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("actualEndDate", "Actual End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
+    map.put("1874", commonMetadata.getMotivoConsultaCriancaRiscoConcept().getConceptId());
+    map.put("1844", hivMetadata.getChronicMalnutritionConcept().getConceptId());
+
+    String query =
+        "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "WHERE "
             + "    p.voided = 0 "
             + "    AND e.voided = 0 "
@@ -1413,9 +1455,30 @@ public class ResumoMensalCcrCohortQueries {
             + "    AND e.location_id = :location "
             + "    AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP BY "
-            + "    p.patient_id "
-            + "UNION "
-            + "SELECT "
+            + "    p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  public CohortDefinition getChildrenWhoDesnutricaoAgudaGrave() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Crianças com DAG – coorte de 9");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("actualEndDate", "Actual End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23756", hivMetadata.getWeightStatureConcept().getConceptId());
+    map.put("165496", hivMetadata.getSevereAcuteMalnutritionConcept().getConceptId());
+
+    String query =
+        "SELECT "
             + "    p.patient_id "
             + "FROM "
             + "    patient p "
@@ -1430,7 +1493,7 @@ public class ResumoMensalCcrCohortQueries {
             + "    AND o.voided = 0 "
             + "    AND e.encounter_type = ${93} "
             + "    AND o.concept_id = ${23756} "
-            + "    AND o.value_coded = ${165497} "
+            + "    AND o.value_coded = ${165496} "
             + "    AND e.location_id = :location "
             + "    AND e.encounter_datetime = ccr.first_consultation_date "
             + "GROUP BY "
@@ -1468,9 +1531,11 @@ public class ResumoMensalCcrCohortQueries {
     cd.addParameter(new Parameter("location", "Health Facility", Location.class));
 
     cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping2));
+    cd.addSearch(
+        "desnutricaoAguda", map(getChildrenWithDesnutricaoAgudaOnFichaResumoCcr(), mapping2));
     cd.addSearch("dam", map(getChildrenWhoDesnutricaoAgudaModerada(), mapping2));
 
-    cd.setCompositionString("firstConsultation AND dam");
+    cd.setCompositionString("firstConsultation AND desnutricaoAguda AND dam");
     return cd;
   }
 
@@ -1593,6 +1658,39 @@ public class ResumoMensalCcrCohortQueries {
     cd.addSearch("abandoned", map(getChildrenWhoAbandoned(), mapping3));
 
     cd.setCompositionString("damChild AND abandoned");
+    return cd;
+  }
+
+  /**
+   * CCR-FR31 <b>Indicador 27-</b> Crianças com DAG – coorte de 9 meses
+   *
+   * <p>O sistema irá produzir o Indicador 27 “Total de crianças com DAG” da seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta há 9 meses (CCR-FR23) e o “Motivo
+   *       da consulta” igual a "Desnutrição Aguda” registado na “Ficha Resumo de CCR” com a “Data
+   *       de Abertura do Processo” ocorrida há 9 meses (“Data de abertura do processo”>= “Data
+   *       Início” – 8 meses e <= “Data Fim” – 8 meses).
+   *   <li>Filtrando as que tiveram o registo de “Peso/Estatura(DP)” igual a "Desnutrição Aguda
+   *       Grave” na primeira “Ficha de Seguimento de CCR” registada há 9 meses atrás (“Data da
+   *       Consulta” >= “Data Início” – 8 meses e <= “Data Fim” – 8 meses).
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenWithDag() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças com DAG – coorte de 9 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping2));
+    cd.addSearch(
+        "desnutricaoAguda", map(getChildrenWithDesnutricaoAgudaOnFichaResumoCcr(), mapping2));
+    cd.addSearch("dag", map(getChildrenWhoDesnutricaoAgudaGrave(), mapping2));
+
+    cd.setCompositionString("firstConsultation AND desnutricaoAguda AND dag");
     return cd;
   }
 }
