@@ -152,12 +152,12 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "FIRST9MONTHS",
             EptsReportUtils.map(
-                resumoMensalCcrCohortQueries.getPatients1stConsultation(), cohort9months));
+                resumoMensalCcrCohortQueries.getPatients1stConsultation(), mappings));
 
     dsd.addColumn(
         "F9M",
         "Crianças com 1as Consultas – Coorte de 9 meses",
-        EptsReportUtils.map(first9MONTHS, cohort9months),
+        EptsReportUtils.map(first9MONTHS, mappings),
         "");
 
     // Indicador 20 - Crianças com contacto com TB – coorte de 9 meses
@@ -168,12 +168,12 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
                 resumoMensalCcrCohortQueries.getChildrenWithVisitReason(
                     Collections.singletonList(
                         commonMetadata.getContactoTbConcept().getConceptId())),
-                cohort9months));
+                mappings));
 
     dsd.addColumn(
         "TB9M",
         "Crianças com 1as Consultas – Coorte de 9 meses",
-        EptsReportUtils.map(tb9MONTHS, cohort9months),
+        EptsReportUtils.map(tb9MONTHS, mappings),
         "");
 
     // Indicador 21 - Crianças que completaram Isonizada – coorte de 9 meses
@@ -181,23 +181,48 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "COMPLETEDINH",
             EptsReportUtils.map(
-                resumoMensalCcrCohortQueries.getChildrenWhoCompletedINH(), cohort9months));
+                resumoMensalCcrCohortQueries.getChildrenWhoCompletedINH(), mappings));
 
     dsd.addColumn(
         "CINH",
         "Crianças que completaram Isonizada – coorte de 9 meses",
-        EptsReportUtils.map(completedinh, cohort9months),
+        EptsReportUtils.map(completedinh, mappings),
         "");
 
     // Indicador 22 - Crianças referidas para PNCT – coorte de 9 meses
     CohortIndicator pnct =
         eptsGeneralIndicator.getIndicator(
-            "PNCT", EptsReportUtils.map(resumoMensalCcrCohortQueries.getChildrenPnct(), mapping3));
+            "PNCT", EptsReportUtils.map(resumoMensalCcrCohortQueries.getChildrenPnct(), mappings));
 
     dsd.addColumn(
         "PNCT",
         "Crianças que completaram Isonizada – coorte de 9 meses",
-        EptsReportUtils.map(pnct, mapping3),
+        EptsReportUtils.map(pnct, mappings),
+        "");
+
+    // Indicador 23 - Crianças que abandonaram – coorte de 9 meses
+    CohortIndicator abandoned9MONTHS =
+        eptsGeneralIndicator.getIndicator(
+            "ABANDONED9MONTHS",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getChildrenWhoAbandonedBeforePeriod(), mappings));
+
+    dsd.addColumn(
+        "A9M",
+        "Crianças que abandonaram – coorte de 9 meses",
+        EptsReportUtils.map(abandoned9MONTHS, mappings),
+        "");
+
+    // Indicador 24 - Crianças com DAM recuperadas – coorte de 9 meses
+    CohortIndicator dam9MONTHS =
+        eptsGeneralIndicator.getIndicator(
+            "DAM9MONTHS",
+            EptsReportUtils.map(resumoMensalCcrCohortQueries.getChildrenWhitDam(), mappings));
+
+    dsd.addColumn(
+        "DAM9M",
+        "Crianças que abandonaram – coorte de 9 meses",
+        EptsReportUtils.map(dam9MONTHS, mappings),
         "");
 
     return dsd;

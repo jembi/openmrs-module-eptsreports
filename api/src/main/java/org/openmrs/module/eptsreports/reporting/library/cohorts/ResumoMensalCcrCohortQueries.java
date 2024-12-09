@@ -1289,4 +1289,194 @@ public class ResumoMensalCcrCohortQueries {
     cd.setCompositionString("firstConsultation AND pnct");
     return cd;
   }
+
+  public CohortDefinition getChildrenWhoAbandoned() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Crianças que abandonaram – coorte de 9 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("actualEndDate", "Actual End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1873", hivMetadata.getTipoDeAltaConcept().getConceptId());
+    map.put("1707", hivMetadata.getAbandonedConcept().getConceptId());
+
+    String query =
+        "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${92} "
+            + "    AND o.concept_id = ${1873} "
+            + "    AND o.value_coded = ${1707} "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "GROUP BY "
+            + "    p.patient_id "
+            + "UNION "
+            + "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "    INNER JOIN ( "
+            + getLastCcrSeguimentoConsulation()
+            + "    ) ccr ON ccr.patient_id = p.patient_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${93} "
+            + "    AND o.concept_id = ${1873} "
+            + "    AND o.value_coded = ${1707} "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_datetime = ccr.last_consultation_date "
+            + "GROUP BY "
+            + "    p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    System.out.println(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * CCR-FR27 <b>Indicador 23-</b> Crianças que abandonaram – coorte de 9 meses
+   *
+   * <p>O sistema irá produzir o Indicador 23 “Total de crianças que abandonaram”, da seguinte
+   * forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta há 9 meses atrás que tiveram
+   *       contacto com TB (CCR-FR23)
+   *   <li>Filtrando as crianças que tiveram registo de “Abandono” na “Ficha Resumo de CCR” com a
+   *       “Data de Abertura do Processo” ocorrida há 9 meses (“Data de abertura do processo”>=
+   *       “Data Início” – 8 meses e <= “Data Fim” – 8 meses) ou na última “Ficha de Seguimento de
+   *       CCR” registada no período compreendido entre “Data Iníco” – 8 meses e “Data Fim”.
+   * </ul>
+   *
+   * @return
+   */
+  public CohortDefinition getChildrenWhoAbandonedBeforePeriod() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças que abandonaram");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping2));
+    cd.addSearch("abandoned", map(getChildrenWhoAbandoned(), mapping3));
+
+    cd.setCompositionString("firstConsultation AND abandoned");
+    return cd;
+  }
+
+  public CohortDefinition getChildrenWhoDesnutricaoAgudaModerada() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Crianças com DAM – coorte de 9");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("actualEndDate", "Actual End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1874", commonMetadata.getMotivoConsultaCriancaRiscoConcept().getConceptId());
+    map.put("1844", hivMetadata.getChronicMalnutritionConcept().getConceptId());
+    map.put("23756", hivMetadata.getWeightStatureConcept().getConceptId());
+    map.put("165497", hivMetadata.getModerateNutritionConcept().getConceptId());
+
+    String query =
+        "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${92} "
+            + "    AND o.concept_id = ${1874} "
+            + "    AND o.value_coded = ${1844} "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "GROUP BY "
+            + "    p.patient_id "
+            + "UNION "
+            + "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "    INNER JOIN ( "
+            + get1stCcrSeguimentoConsulation()
+            + "    ) ccr ON ccr.patient_id = p.patient_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${93} "
+            + "    AND o.concept_id = ${23756} "
+            + "    AND o.value_coded = ${165497} "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_datetime = ccr.first_consultation_date "
+            + "GROUP BY "
+            + "    p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    System.out.println(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * CCR-FR28 <b>Indicador 24-</b> Crianças com DAM – coorte de 9 meses
+   *
+   * <p>O sistema irá produzir o Indicador 24 “Total de crianças com DAM”, da seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta há 9 meses (CCR-FR23) e o “Motivo
+   *       da consulta” igual a "Desnutrição Aguda” registado na “Ficha Resumo de CCR” com a “Data
+   *       de Abertura do Processo” ocorrida há 9 meses (“Data de abertura do processo”>= “Data
+   *       Início” – 8 meses e <= “Data Fim” – 8 meses).
+   *   <li>Filtrando as que tiveram o registo de “Peso/Estatura(DP)” igual a "Desnutrição Aguda
+   *       Moderada” na primeira “Ficha de Seguimento de CCR” registada há 9 meses atrás (“Data da
+   *       Consulta” >= “Data Início” – 8 meses e <= “Data Fim” – 8 meses).
+   * </ul>
+   *
+   * @return
+   */
+  public CohortDefinition getChildrenWhitDam() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças com DAM");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping2));
+    cd.addSearch("dam", map(getChildrenWhoDesnutricaoAgudaModerada(), mapping2));
+
+    cd.setCompositionString("firstConsultation AND dam");
+    return cd;
+  }
 }
