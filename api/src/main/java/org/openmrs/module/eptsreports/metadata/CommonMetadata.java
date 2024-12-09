@@ -1292,4 +1292,20 @@ public class CommonMetadata extends Metadata {
         Context.getAdministrationService().getGlobalProperty("eptsreports.pcrConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 1595</b>
+   *
+   * <p><b>Name:</b> MEDICAL INPATIENT
+   *
+   * <p><b>Description:</b> Generic answer to a question.
+   *
+   * @return {@link Concept}
+   */
+  public Concept getMedicalInpatientConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.medicalInpatientConceptUuid");
+    return getConcept(uuid);
+  }
 }

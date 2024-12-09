@@ -1693,4 +1693,76 @@ public class ResumoMensalCcrCohortQueries {
     cd.setCompositionString("firstConsultation AND desnutricaoAguda AND dag");
     return cd;
   }
+
+  public CohortDefinition getChildrenReferredForInternation() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Crianças com DAG que foram referidas para internamento – coorte de 9 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("actualEndDate", "Actual End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1595", hivMetadata.getMedicalInpatientConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+
+    String query =
+        "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "    INNER JOIN ( "
+            + getLastCcrSeguimentoConsulation()
+            + "    ) ccr ON ccr.patient_id = p.patient_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${93} "
+            + "    AND o.concept_id = ${1595} "
+            + "    AND o.value_coded = ${1065} "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_datetime = ccr.last_consultation_date "
+            + "GROUP BY "
+            + "    p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * CCR-FR32 <b>Indicador 28-</b> Crianças com DAG que foram referidas para internamento – coorte
+   * de 9 meses
+   *
+   * <p>O sistema irá produzir o Indicador 28 “Total de crianças com DAG que foram referidas para
+   * internamento”, da seguinte forma:
+   *
+   * <ul>
+   *   <li>incluindo todas as crianças com DAG que tiveram a 1ª consulta há 9 meses (CCR-FR31)
+   *   <li>Filtrando as que tiveram o registo de “Referido para Internamento” igual a "Sim” na
+   *       última consulta de CCR (“Ficha de Seguimento de CCR”) ocorrida no período compreendido
+   *       entre “Data da Consulta” >= “Data Início” – 8 meses e <= “Data Fim” ).
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenWithDagReferredForInternation() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças com DAG que foram referidas para internamento – coorte de 9 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("childrenDag", map(getChildrenWithDag(), mapping2));
+    cd.addSearch("internation", map(getChildrenReferredForInternation(), mapping3));
+
+    cd.setCompositionString("childrenDag AND internation");
+    return cd;
+  }
 }
