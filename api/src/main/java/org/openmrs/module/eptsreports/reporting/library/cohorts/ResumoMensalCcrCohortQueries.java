@@ -2072,11 +2072,134 @@ public class ResumoMensalCcrCohortQueries {
         "tarv",
         map(
             getGeneralResumoCcrQuery(
-                hivMetadata.gePmctMothersRegimeEncounterType(),
+                hivMetadata.gePmctMothersRegimeConcept(),
                 Collections.singletonList(hivMetadata.getArtStatus().getConceptId())),
             mapping2));
 
     cd.setCompositionString("exposed AND age AND tarv");
+    return cd;
+  }
+
+  public CohortDefinition getChildrenWithAleitamentoMaterno() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Crianças expostas com aleitamento ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("5526", commonMetadata.geBreastfedExclusivelyConcept().getConceptId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+
+    String query =
+        "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_type = ${93} "
+            + "    AND o.concept_id = ${5526} "
+            + "    AND o.value_coded = ${1065} "
+            + "    AND o.obs_datetime BETWEEN :startDate AND :endDate "
+            + "GROUP BY "
+            + "    p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  public CohortDefinition getInfantAgeOnBreastfed(Integer Age) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Infant Age");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("5526", commonMetadata.geBreastfedExclusivelyConcept().getConceptId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("Age", Age);
+
+    String query =
+        "SELECT "
+            + "    pr.person_id "
+            + "FROM "
+            + "    person pr "
+            + "        INNER JOIN ( "
+            + "        SELECT "
+            + "            p.patient_id, "
+            + "            e.encounter_datetime AS breastfed_date "
+            + "        FROM "
+            + "            patient p "
+            + "                INNER JOIN encounter e "
+            + "                           ON p.patient_id = e.patient_id "
+            + "        WHERE "
+            + "            p.voided = 0 "
+            + "          AND e.voided = 0 "
+            + "          AND e.encounter_type = ${93} "
+            + "          AND e.location_id = :location "
+            + "    AND o.concept_id = ${5526} "
+            + "    AND o.value_coded = ${1065} "
+            + "          AND e.encounter_datetime >= :startDate "
+            + "          AND e.encounter_datetime <= :endDate "
+            + "        GROUP BY "
+            + "            p.patient_id "
+            + "    ) ccr "
+            + "                   ON pr.person_id = ccr.patient_id "
+            + "WHERE "
+            + "    pr.birthdate IS NOT NULL "
+            + "  AND ccr.breastfed_date IS NOT NULL "
+            + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, ccr.breastfed_date) = ${Age}";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * CCR-FR38 <b>Indicador 34-</b> Crianças expostas com aleitamento materno exclusivo aos 5 meses –
+   * coorte de 9 meses
+   *
+   * <p>O sistema irá produzir o Indicador 34 “Total de crianças expostas com aleitamento materno
+   * exclusivo aos 5 meses” da seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta há 9 meses atrás que foram expostas
+   *       ao HIV (CCR-FR36).
+   *   <li>Filtrando as crianças que tiveram registo de “Aleitamento Materno Exclusivo” igual a
+   *       “Sim” numa “Ficha de Seguimento de CCR” registada no período compreendido entre “Data
+   *       Iníco” – 8 meses e “Data Fim”, tendo a criança nesta consulta idade = 5 meses (“Data
+   *       Consulta” menos “Data Nascimento” = 5 meses).
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getExposedChildrenWithBreastfed5MonthsOfAge() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "Crianças expostas com aleitamento materno exclusivo aos 5 meses – coorte de 9 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("exposed", map(getExposedChildren(), mapping2));
+    cd.addSearch("breastfed", map(getChildrenWithAleitamentoMaterno(), mapping2));
+    cd.addSearch("age", map(getInfantAgeOnBreastfed(5), mapping2));
+
+    cd.setCompositionString("exposed AND breastfed AND age");
     return cd;
   }
 }

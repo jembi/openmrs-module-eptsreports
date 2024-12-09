@@ -1308,4 +1308,21 @@ public class CommonMetadata extends Metadata {
             .getGlobalProperty("eptsreports.medicalInpatientConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>encounterType_id = 5526</b>
+   *
+   * <p><b>Name:</b> BREASTFED EXCLUSIVELY
+   *
+   * <p><b>Description:</b> Describes when mothers exclusively feed their children their own breast
+   * milk
+   *
+   * @return {@link Concept}
+   */
+  public Concept geBreastfedExclusivelyConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.breastfedExclusivelyConceptUuid");
+    return getConcept(uuid);
+  }
 }

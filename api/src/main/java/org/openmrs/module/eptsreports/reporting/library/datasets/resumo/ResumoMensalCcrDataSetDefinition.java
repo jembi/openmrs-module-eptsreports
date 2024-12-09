@@ -326,15 +326,31 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
 
     // Indicador 33 - Crianças expostas com 5 meses de idade e com mãe em TARV – coorte de 9 meses
     CohortIndicator exposed5MONTHS =
-            eptsGeneralIndicator.getIndicator(
-                    "EXPOSED5MONTHS",
-                    EptsReportUtils.map(resumoMensalCcrCohortQueries.getExposedChildren5MonthsOfAge(), mappings));
+        eptsGeneralIndicator.getIndicator(
+            "EXPOSED5MONTHS",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getExposedChildren5MonthsOfAge(), mappings));
 
     dsd.addColumn(
-            "E5M",
-            "Crianças expostas com 5 meses de idade e com mãe em TARV – coorte de 9 meses",
-            EptsReportUtils.map(exposed9MONTHS, mappings),
-            "");
+        "E5M",
+        "Crianças expostas com 5 meses de idade e com mãe em TARV – coorte de 9 meses",
+        EptsReportUtils.map(exposed9MONTHS, mappings),
+        "");
+
+    // Indicador 34 - Crianças expostas com aleitamento materno exclusivo aos 5 meses – coorte de 9
+    // meses
+    CohortIndicator exposedbreatfed5MONTHS =
+        eptsGeneralIndicator.getIndicator(
+            "EXPOSEDBREATFED5MONTHS",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getExposedChildrenWithBreastfed5MonthsOfAge(),
+                mappings));
+
+    dsd.addColumn(
+        "EB5M",
+        "Crianças expostas com aleitamento materno exclusivo aos 5 meses – coorte de 9 meses",
+        EptsReportUtils.map(exposedbreatfed5MONTHS, mappings),
+        "");
 
     return dsd;
   }

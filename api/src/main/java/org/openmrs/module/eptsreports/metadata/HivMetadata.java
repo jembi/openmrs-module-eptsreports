@@ -6173,10 +6173,10 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * @return {@link Concept}
    */
-  public Concept gePmctMothersRegimeEncounterType() {
+  public Concept gePmctMothersRegimeConcept() {
     String uuid =
         Context.getAdministrationService()
-            .getGlobalProperty("eptsreports.pmctMothersRegimeEncounterTypeUuid");
+            .getGlobalProperty("eptsreports.pmctMothersRegimeConceptUuid");
     return getConcept(uuid);
   }
 }

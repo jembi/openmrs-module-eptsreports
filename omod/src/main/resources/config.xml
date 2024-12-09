@@ -4447,10 +4447,18 @@
 	</globalProperty>
 
 	<globalProperty>
-		<property>eptsreports.pmctMothersRegimeEncounterTypeUuid</property>
+		<property>eptsreports.pmctMothersRegimeConceptUuid</property>
 		<defaultValue>b85c14bd-c40d-4a66-ba86-2403299b4e8c</defaultValue>
 		<description>
 			PMCT MOTHERS REGIME concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.breastfedExclusivelyConceptUuid</property>
+		<defaultValue>e1e6bb9a-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			BREASTFED EXCLUSIVELY concept
 		</description>
 	</globalProperty>
 
