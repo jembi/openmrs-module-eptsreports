@@ -299,6 +299,31 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(dagabandoned9MONTHS, mappings),
         "");
 
+    // Indicador 31 - Crianças com DAG que foram óbito – coorte de 9 meses
+    CohortIndicator dagdead9MONTHS =
+        eptsGeneralIndicator.getIndicator(
+            "DAGDEAD9MONTHS",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getChildrenWithDagWhoDied(), mappings));
+
+    dsd.addColumn(
+        "DD9M",
+        "Crianças com DAG que foram óbito – coorte de 9 meses",
+        EptsReportUtils.map(dagdead9MONTHS, mappings),
+        "");
+
+    // Indicador 32 - Crianças expostas – coorte de 9 meses
+    CohortIndicator exposed9MONTHS =
+        eptsGeneralIndicator.getIndicator(
+            "EXPOSED9MONTHS",
+            EptsReportUtils.map(resumoMensalCcrCohortQueries.getExposedChildren(), mappings));
+
+    dsd.addColumn(
+        "E9M",
+        "Crianças expostas – coorte de 9 meses",
+        EptsReportUtils.map(exposed9MONTHS, mappings),
+        "");
+
     return dsd;
   }
 
