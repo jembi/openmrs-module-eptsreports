@@ -4470,4 +4470,20 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>eptsreports.nevirapineConceptUuid</property>
+		<defaultValue>e1d3d5de-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			NEVIRAPINE concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.zidovudineConceptUuid</property>
+		<defaultValue>e1d5d988-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			ZIDOVUDINE concept
+		</description>
+	</globalProperty>
+
 </module>

@@ -368,6 +368,20 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(exposedmixedfeed5MONTHS, mappings),
         "");
 
+    // Indicador 36 - Crianças que receberam ARV aos 5 meses – coorte de 9 meses
+    CohortIndicator exposedarv5MONTHS =
+        eptsGeneralIndicator.getIndicator(
+            "EXPOSEDARV5MONTHS",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getExposedChildrenWhoReceivedArv5MonthsOfAge(),
+                mappings));
+
+    dsd.addColumn(
+        "EARV5M",
+        "Crianças que receberam ARV aos 5 meses – coorte de 9 meses",
+        EptsReportUtils.map(exposedarv5MONTHS, mappings),
+        "");
+
     return dsd;
   }
 

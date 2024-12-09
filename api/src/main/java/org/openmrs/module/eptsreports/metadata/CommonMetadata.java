@@ -1341,4 +1341,36 @@ public class CommonMetadata extends Metadata {
         Context.getAdministrationService().getGlobalProperty("eptsreports.mixedFeedingConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>encounterType_id = 631</b>
+   *
+   * <p><b>Name:</b> NEVIRAPINE
+   *
+   * <p><b>Description:</b> A non-nucleoside analogue that is used as an antiviral drug in the
+   * treatment of HIV infection.
+   *
+   * @return {@link Concept}
+   */
+  public Concept getNevirapineConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.nevirapineConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>encounterType_id = 797</b>
+   *
+   * <p><b>Name:</b> ZIDOVUDINE
+   *
+   * <p><b>Description:</b> Describes when families select to feed a child a combination of
+   * different foodstuffs (eg, breastmilk, formula, foods)
+   *
+   * @return {@link Concept}
+   */
+  public Concept getZidovudineConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.zidovudineConceptUuid");
+    return getConcept(uuid);
+  }
 }
