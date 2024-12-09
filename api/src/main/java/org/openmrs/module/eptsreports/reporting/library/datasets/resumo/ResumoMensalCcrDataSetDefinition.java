@@ -352,6 +352,22 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(exposedbreatfed5MONTHS, mappings),
         "");
 
+    // Indicador 35 - Total de crianças expostas com aleitamento materno exclusivo aos 5 meses –
+    // coorte 9 meses
+    // meses
+    CohortIndicator exposedmixedfeed5MONTHS =
+        eptsGeneralIndicator.getIndicator(
+            "EXPOSEDMIXEDFEED5MONTHS",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getExposedChildrenWithMixedFeeding5MonthsOfAge(),
+                mappings));
+
+    dsd.addColumn(
+        "EMX5M",
+        "Total de crianças expostas com aleitamento materno exclusivo aos 5 meses – coorte 9 meses",
+        EptsReportUtils.map(exposedmixedfeed5MONTHS, mappings),
+        "");
+
     return dsd;
   }
 

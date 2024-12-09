@@ -1319,10 +1319,26 @@ public class CommonMetadata extends Metadata {
    *
    * @return {@link Concept}
    */
-  public Concept geBreastfedExclusivelyConcept() {
+  public Concept getBreastfedExclusivelyConcept() {
     String uuid =
         Context.getAdministrationService()
             .getGlobalProperty("eptsreports.breastfedExclusivelyConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>encounterType_id = 6046</b>
+   *
+   * <p><b>Name:</b> MIXED FEEDING
+   *
+   * <p><b>Description:</b> Describes when families select to feed a child a combination of
+   * different foodstuffs (eg, breastmilk, formula, foods)
+   *
+   * @return {@link Concept}
+   */
+  public Concept getMixedFeedingConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.mixedFeedingConceptUuid");
     return getConcept(uuid);
   }
 }
