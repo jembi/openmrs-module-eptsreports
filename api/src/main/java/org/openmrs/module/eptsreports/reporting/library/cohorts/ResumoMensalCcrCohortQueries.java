@@ -46,6 +46,8 @@ public class ResumoMensalCcrCohortQueries {
 
   String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
   String mapping2 = "startDate=${startDate-8m},endDate=${endDate-8m},location=${location}";
+  String mapping3 =
+      "startDate=${startDate-8m},endDate=${endDate-8m},actualEndDate=${endDate},location=${location}";
 
   public String get1stCcrConsulation() {
     return "SELECT "
@@ -79,6 +81,24 @@ public class ResumoMensalCcrCohortQueries {
         + "  AND e.location_id = :location "
         + "  AND e.encounter_datetime >= :startDate "
         + "  AND e.encounter_datetime <= :endDate "
+        + "GROUP BY "
+        + "  p.patient_id";
+  }
+
+  public String getLastCcrSeguimentoConsulation() {
+    return "SELECT "
+        + "  p.patient_id, "
+        + "  MAX(e.encounter_datetime) AS last_consultation_date "
+        + "FROM "
+        + "  patient p "
+        + "  INNER JOIN encounter e ON p.patient_id = e.patient_id "
+        + "WHERE "
+        + "  p.voided = 0 "
+        + "  AND e.voided = 0 "
+        + "  AND e.encounter_type = ${93} "
+        + "  AND e.location_id = :location "
+        + "  AND e.encounter_datetime >= :startDate "
+        + "  AND e.encounter_datetime <= :actualEndDate "
         + "GROUP BY "
         + "  p.patient_id";
   }
@@ -147,8 +167,7 @@ public class ResumoMensalCcrCohortQueries {
     map.put(
         "1874",
         String.valueOf(commonMetadata.getMotivoConsultaCriancaRiscoConcept().getConceptId()));
-    map.put(
-        "reasonConcept", StringUtils.join(reasonsConcept, ",")); // Une os conceitos com vírgulas
+    map.put("reasonConcept", StringUtils.join(reasonsConcept, ","));
 
     String query =
         "SELECT "
@@ -1173,6 +1192,101 @@ public class ResumoMensalCcrCohortQueries {
     cd.addSearch("completedInh", map(getChildrenWhoCompletedsoziazida(), mapping2));
 
     cd.setCompositionString("firstConsultation AND completedInh");
+    return cd;
+  }
+
+  public CohortDefinition getChildrenReferredToPNTC() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Crianças referidas para PNCT – coorte de 9 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("actualEndDate", "Actual End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1873", hivMetadata.getTipoDeAltaConcept().getConceptId());
+    map.put("165483", hivMetadata.getTransferidoParaSectorTbConcept().getConceptId());
+
+    String query =
+        "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${92} "
+            + "    AND o.concept_id = ${1873} "
+            + "    AND o.value_coded = ${165483} "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "GROUP BY "
+            + "    p.patient_id "
+            + "UNION "
+            + "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "    INNER JOIN ( "
+            + getLastCcrSeguimentoConsulation()
+            + "    ) ccr ON ccr.patient_id = p.patient_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${93} "
+            + "    AND o.concept_id = ${1873} "
+            + "    AND o.value_coded = ${165483} "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_datetime = ccr.last_consultation_date "
+            + "GROUP BY "
+            + "    p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    System.out.println(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * CCR-FR26 <b>Indicador 22-</b> Crianças referidas para PNCT – coorte de 9 meses
+   *
+   * <p>O sistema irá produzir o Indicador 22 “Total de crianças referidas para PNCT”, da seguinte
+   * forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta há 9 meses atrás que tiveram
+   *       contacto com TB (CCR-FR23)
+   *   <li>Filtrando as crianças que tiveram registo de “Transferido para sector de TB” na “Ficha
+   *       Resumo de CCR” com a “Data de Abertura do Processo” ocorrida há 9 meses (“Data de
+   *       abertura do processo”>= “Data Início” – 8 meses e <= “Data Fim” – 8 meses) ou na última
+   *       “Ficha de Seguimento de CCR” registada no período compreendido entre “Data Iníco” – 8
+   *       meses e “Data Fim”.
+   * </ul>
+   *
+   * @return
+   */
+  public CohortDefinition getChildrenPnct() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças referidas para PNCT – coorte de 9 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping2));
+    cd.addSearch("pnct", map(getChildrenReferredToPNTC(), mapping3));
+
+    cd.setCompositionString("firstConsultation AND pnct");
     return cd;
   }
 }

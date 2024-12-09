@@ -60,6 +60,8 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
 
     String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
     String cohort9months = "startDate=${startDate-8m},endDate=${endDate-8},location=${location}";
+    String mapping3 =
+        "startDate=${startDate-8m},endDate=${endDate-8m},actualEndDate=${endDate}location=${location}";
 
     // Indicador 1- Total de 1as Consultas
     dsd.addColumn("FIRST", "Total de 1as Consultas", getChildrenWithFirstConsultation(), "");
@@ -185,6 +187,17 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
         "CINH",
         "Crianças que completaram Isonizada – coorte de 9 meses",
         EptsReportUtils.map(completedinh, cohort9months),
+        "");
+
+    // Indicador 22 - Crianças referidas para PNCT – coorte de 9 meses
+    CohortIndicator pnct =
+        eptsGeneralIndicator.getIndicator(
+            "PNCT", EptsReportUtils.map(resumoMensalCcrCohortQueries.getChildrenPnct(), mapping3));
+
+    dsd.addColumn(
+        "PNCT",
+        "Crianças que completaram Isonizada – coorte de 9 meses",
+        EptsReportUtils.map(pnct, mapping3),
         "");
 
     return dsd;
