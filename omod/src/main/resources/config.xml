@@ -4446,4 +4446,12 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>eptsreports.pmctMothersRegimeEncounterTypeUuid</property>
+		<defaultValue>b85c14bd-c40d-4a66-ba86-2403299b4e8c</defaultValue>
+		<description>
+			PMCT MOTHERS REGIME concept
+		</description>
+	</globalProperty>
+
 </module>

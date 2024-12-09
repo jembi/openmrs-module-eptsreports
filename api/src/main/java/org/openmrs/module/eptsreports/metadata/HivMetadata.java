@@ -6163,4 +6163,20 @@ public class HivMetadata extends ProgramsMetadata {
             .getGlobalProperty("eptsreports.moderateNutrituinConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>encounterType_id = 6394</b>
+   *
+   * <p><b>Name:</b> PMCT MOTHERS REGIME
+   *
+   * <p><b>Description:</b> ARV regimen for PMCT
+   *
+   * @return {@link Concept}
+   */
+  public Concept gePmctMothersRegimeEncounterType() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.pmctMothersRegimeEncounterTypeUuid");
+    return getConcept(uuid);
+  }
 }

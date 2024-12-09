@@ -1953,4 +1953,130 @@ public class ResumoMensalCcrCohortQueries {
     cd.setCompositionString("firstConsultation AND hivExposure");
     return cd;
   }
+
+  public CohortDefinition getExatInfantAge(Integer Age) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Infant Age");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
+    map.put("Age", Age);
+
+    String query =
+        "SELECT "
+            + "    pr.person_id "
+            + "FROM "
+            + "    person pr "
+            + "        INNER JOIN ( "
+            + "        SELECT "
+            + "            p.patient_id, "
+            + "            MIN(e.encounter_datetime) AS enrollment_date "
+            + "        FROM "
+            + "            patient p "
+            + "                INNER JOIN encounter e "
+            + "                           ON p.patient_id = e.patient_id "
+            + "        WHERE "
+            + "            p.voided = 0 "
+            + "          AND e.voided = 0 "
+            + "          AND e.encounter_type = ${92} "
+            + "          AND e.location_id = :location "
+            + "          AND e.encounter_datetime >= :startDate "
+            + "          AND e.encounter_datetime <= :endDate "
+            + "        GROUP BY "
+            + "            p.patient_id "
+            + "    ) ccr "
+            + "                   ON pr.person_id = ccr.patient_id "
+            + "WHERE "
+            + "    pr.birthdate IS NOT NULL "
+            + "  AND ccr.enrollment_date IS NOT NULL "
+            + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, ccr.enrollment_date) = ${Age}";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getGeneralResumoCcrQuery(
+      Concept questionConcept, List<Integer> answerConcept) {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Ficha Seguimento CCR Query");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    Map<String, String> map = new HashMap<>();
+    map.put("92", String.valueOf(hivMetadata.getCCRResumoEncounterType().getEncounterTypeId()));
+    map.put("questionConcept", String.valueOf(questionConcept.getConceptId()));
+    map.put("answerConcept", StringUtils.join(answerConcept, ","));
+    String query =
+        "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "     INNER JOIN ( "
+            + get1stCcrConsulation()
+            + ")ccr ON ccr.patient_id = p.patient_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_type = ${92} "
+            + "    AND o.concept_id = ${questionConcept} "
+            + "    AND o.value_coded IN (${answerConcept}) "
+            + "    AND e.encounter_datetime >= :startDate "
+            + "    AND e.encounter_datetime <= :endDate "
+            + "GROUP BY "
+            + "    p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * CCR-FR37 <b>Indicador 33-</b> Crianças expostas com 5 meses de idade e com mãe em TARV – coorte
+   * de 9 meses
+   *
+   * <p>O sistema irá produzir o Indicador 32 “Total de crianças expostas”, da seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta há 9 meses atrás que foram expostas
+   *       ao HIV (CCR-FR36) com idade igual a 5 meses (CCR-FR6).
+   *   <li>Filtrando as crianças que tiveram registo de “PTV Mãe” igual a “TARV” registado na “Ficha
+   *       Resumo de CCR” com a “Data de Abertura do Processo” ocorrida há 9 meses (“Data de
+   *       abertura do processo”>= “Data Início” – 8 meses e <= “Data Fim” – 8 meses).
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getExposedChildren5MonthsOfAge() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças expostas com 5 meses de idade e com mãe em TARV – coorte de 9 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("exposed", map(getExposedChildren(), mapping2));
+    cd.addSearch("age", map(getExatInfantAge(5), mapping2));
+    cd.addSearch(
+        "tarv",
+        map(
+            getGeneralResumoCcrQuery(
+                hivMetadata.gePmctMothersRegimeEncounterType(),
+                Collections.singletonList(hivMetadata.getArtStatus().getConceptId())),
+            mapping2));
+
+    cd.setCompositionString("exposed AND age AND tarv");
+    return cd;
+  }
 }
