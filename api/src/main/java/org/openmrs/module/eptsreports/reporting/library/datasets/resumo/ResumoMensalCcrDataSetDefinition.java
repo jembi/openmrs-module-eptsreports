@@ -273,6 +273,32 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(daginternation9MONTHS, mappings),
         "");
 
+    // Indicador 29 - Crianças com DAG recuperadas – coorte de 9 meses
+    CohortIndicator dagrestored9MONTHS =
+        eptsGeneralIndicator.getIndicator(
+            "DAGRESTORED9MONTHS",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getChildrenWithDagRestored(), mappings));
+
+    dsd.addColumn(
+        "DR9M",
+        "Crianças com DAG recuperadas – coorte de 9 meses",
+        EptsReportUtils.map(dagrestored9MONTHS, mappings),
+        "");
+
+    // Indicador 30 - Crianças que com DAG que abandonaram – coorte de 9 meses
+    CohortIndicator dagabandoned9MONTHS =
+        eptsGeneralIndicator.getIndicator(
+            "DAGABANDONED9MONTHS",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getChildrenWithDagWhoAbandoned(), mappings));
+
+    dsd.addColumn(
+        "DA9M",
+        "Crianças que com DAG que abandonaram – coorte de 9 meses",
+        EptsReportUtils.map(dagabandoned9MONTHS, mappings),
+        "");
+
     return dsd;
   }
 

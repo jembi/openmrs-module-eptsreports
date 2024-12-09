@@ -1765,4 +1765,66 @@ public class ResumoMensalCcrCohortQueries {
     cd.setCompositionString("childrenDag AND internation");
     return cd;
   }
+
+  /**
+   * CCR-FR33 <b>Indicador 29-</b> Crianças com DAG recuperadas – coorte de 9 meses
+   *
+   * <p>O sistema irá produzir o Indicador 29 “Total de Crianças com DAG recuperadas” da seguinte
+   * forma:
+   *
+   * <ul>
+   *   <li>incluindo todas as crianças com DAG que tiveram a 1ª consulta há 9 meses (CCR-FR31)
+   *   <li>Filtrando as crianças que tiveram registo de “Transferido para Consulta de Criança Sadia”
+   *       na “Ficha Resumo de CCR” com a “Data de Abertura do Processo” ocorrida há 9 meses (“Data
+   *       de abertura do processo”>= “Data Início” – 8 meses e <= “Data Fim” – 8 meses) ou na
+   *       última “Ficha de Seguimento de CCR” registada no período compreendido entre “Data Início”
+   *       – 8 meses e “Data Fim”.
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenWithDagRestored() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças com DAG recuperadas – coorte de 9 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("childrenDag", map(getChildrenWithDag(), mapping2));
+    cd.addSearch("restoredDam", map(getChildrenWithRestoredDam(), mapping3));
+
+    cd.setCompositionString("childrenDag AND restoredDam");
+    return cd;
+  }
+
+  /**
+   * CCR-FR34 <b>Indicador 30-</b> Crianças que com DAG que abandonaram – coorte de 9 meses
+   *
+   * <p>O sistema irá produzir o Indicador 29 “Total de Crianças com DAG recuperadas” da seguinte
+   * forma:
+   *
+   * <ul>
+   *   <li>incluindo todas as crianças com DAG que tiveram a 1ª consulta há 9 meses (CCR-FR31)
+   *   <li>Filtrando as crianças que tiveram registo de “Transferido para Consulta de Criança Sadia”
+   *       na “Ficha Resumo de CCR” com a “Data de Abertura do Processo” ocorrida há 9 meses (“Data
+   *       de abertura do processo”>= “Data Início” – 8 meses e <= “Data Fim” – 8 meses) ou na
+   *       última “Ficha de Seguimento de CCR” registada no período compreendido entre “Data Início”
+   *       – 8 meses e “Data Fim”.
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenWithDagWhoAbandoned() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças que com DAG que abandonaram – coorte de 9 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("childrenDag", map(getChildrenWithDag(), mapping2));
+    cd.addSearch("abandoned", map(getChildrenWhoAbandoned(), mapping3));
+
+    cd.setCompositionString("childrenDag AND abandoned");
+    return cd;
+  }
 }
