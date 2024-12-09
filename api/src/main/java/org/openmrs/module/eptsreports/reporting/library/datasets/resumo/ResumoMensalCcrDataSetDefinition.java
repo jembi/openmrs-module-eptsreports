@@ -59,9 +59,6 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
     dsd.addParameters(getParameters());
 
     String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
-    String cohort9months = "startDate=${startDate-8m},endDate=${endDate-8},location=${location}";
-    String mapping3 =
-        "startDate=${startDate-8m},endDate=${endDate-8m},actualEndDate=${endDate}location=${location}";
 
     // Indicador 1- Total de 1as Consultas
     dsd.addColumn("FIRST", "Total de 1as Consultas", getChildrenWithFirstConsultation(), "");
@@ -236,6 +233,19 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
         "RDAM9M",
         "Crianças com DAM recuperadas – coorte de 9 meses",
         EptsReportUtils.map(restoreddam9MONTHS, mappings),
+        "");
+
+    // Indicador 26 - Crianças com DAM que abandonaram – coorte de 9 meses
+    CohortIndicator abandoneddam9MONTHS =
+        eptsGeneralIndicator.getIndicator(
+            "ABANDONEDDAM9MONTHS",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getChildrenWhoAbandonedDam(), mappings));
+
+    dsd.addColumn(
+        "AD9M",
+        "Crianças com DAM que abandonaram – coorte de 9 meses",
+        EptsReportUtils.map(abandoneddam9MONTHS, mappings),
         "");
 
     return dsd;

@@ -1179,7 +1179,7 @@ public class ResumoMensalCcrCohortQueries {
    * <b>Nota:</b> as seis (6) consultas de CCR registadas na “Ficha de Seguimento de CCR” podem ser
    * consecutivas ou não consecutivas.
    *
-   * @return
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getChildrenWhoCompletedINH() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1272,7 +1272,7 @@ public class ResumoMensalCcrCohortQueries {
    *       meses e “Data Fim”.
    * </ul>
    *
-   * @return
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getChildrenPnct() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1364,7 +1364,7 @@ public class ResumoMensalCcrCohortQueries {
    *       CCR” registada no período compreendido entre “Data Iníco” – 8 meses e “Data Fim”.
    * </ul>
    *
-   * @return
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getChildrenWhoAbandonedBeforePeriod() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1458,7 +1458,7 @@ public class ResumoMensalCcrCohortQueries {
    *       Consulta” >= “Data Início” – 8 meses e <= “Data Fim” – 8 meses).
    * </ul>
    *
-   * @return
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getChildrenWithDam() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1550,7 +1550,7 @@ public class ResumoMensalCcrCohortQueries {
    *       – 8 meses e “Data Fim”.
    * </ul>
    *
-   * @return
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getChildrenWithRestoredDamBeforePeriod() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1563,6 +1563,36 @@ public class ResumoMensalCcrCohortQueries {
     cd.addSearch("restoredDam", map(getChildrenWithRestoredDam(), mapping3));
 
     cd.setCompositionString("damChild AND restoredDam");
+    return cd;
+  }
+
+  /**
+   * CCR-FR30 <b>Indicador 26-</b> Crianças com DAM que abandonaram – coorte de 9 meses
+   *
+   * <p>O sistema irá produzir o Indicador 26 “Total de Crianças com DAM que abandonaram”, da
+   * seguinte forma::
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças com DAM que tiveram a 1ª consulta há 9 meses (CCR-FR28)
+   *   <li>Filtrando as crianças que tiveram registo de “Abandono” na “Ficha Resumo de CCR” com a
+   *       “Data de Abertura do Processo” ocorrida há 9 meses (“Data de abertura do processo”>=
+   *       “Data Início” – 8 meses e <= “Data Fim” – 8 meses) ou na última “Ficha de Seguimento de
+   *       CCR” registada no período compreendido entre “Data Iníco” – 8 meses e “Data Fim”.
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenWhoAbandonedDam() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças com DAM que abandonaram – coorte de 9 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("damChild", map(getChildrenWithDam(), mapping2));
+    cd.addSearch("abandoned", map(getChildrenWhoAbandoned(), mapping3));
+
+    cd.setCompositionString("damChild AND abandoned");
     return cd;
   }
 }
