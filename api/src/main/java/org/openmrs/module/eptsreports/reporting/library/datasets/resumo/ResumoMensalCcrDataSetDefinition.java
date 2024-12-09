@@ -382,6 +382,36 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(exposedarv5MONTHS, mappings),
         "");
 
+    // Indicador 37 - PCR colhido <2 meses de idade  – coorte de 9 meses
+    CohortIndicator pcr2MONTHSA =
+        eptsGeneralIndicator.getIndicator(
+            "PCR2MONTHSA",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries
+                    .getExposedChildrenWhoReceivedPcrWithLessThan2MonthsOfAge(),
+                mappings));
+
+    dsd.addColumn(
+        "PCR2A",
+        "PCR colhido <2 meses de idade  – coorte de 9 meses",
+        EptsReportUtils.map(pcr2MONTHSA, mappings),
+        "");
+
+    // Indicador 38 - PCR colhido >=2 meses de idade  – coorte de 9 meses
+    CohortIndicator pcr2MONTHSB =
+        eptsGeneralIndicator.getIndicator(
+            "PCR2MONTHSB",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries
+                    .getExposedChildrenWhoReceivedPcrWithMoreThan2MonthsOfAge(),
+                mappings));
+
+    dsd.addColumn(
+        "PCR2B",
+        "PCR colhido >=2 meses de idade  – coorte de 9 meses",
+        EptsReportUtils.map(pcr2MONTHSB, mappings),
+        "");
+
     return dsd;
   }
 

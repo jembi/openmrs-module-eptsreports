@@ -2108,7 +2108,7 @@ public class ResumoMensalCcrCohortQueries {
             + "    AND e.encounter_type = ${93} "
             + "    AND o.concept_id = ${5526} "
             + "    AND o.value_coded = ${1065} "
-            + "    AND o.obs_datetime BETWEEN :startDate AND :endDate "
+            + "    AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP BY "
             + "    p.patient_id ";
 
@@ -2232,7 +2232,7 @@ public class ResumoMensalCcrCohortQueries {
             + "    AND e.encounter_type = ${93} "
             + "    AND o.concept_id = ${6046} "
             + "    AND o.value_coded = ${1065} "
-            + "    AND o.obs_datetime BETWEEN :startDate AND :endDate "
+            + "    AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP BY "
             + "    p.patient_id ";
 
@@ -2264,7 +2264,7 @@ public class ResumoMensalCcrCohortQueries {
             + "        INNER JOIN ( "
             + "        SELECT "
             + "            p.patient_id, "
-            + "            e.encounter_datetime AS breastfed_date "
+            + "            MAX(e.encounter_datetime) AS breastfed_date "
             + "        FROM "
             + "            patient p "
             + "             INNER JOIN encounter e ON p.patient_id = e.patient_id "
@@ -2357,7 +2357,7 @@ public class ResumoMensalCcrCohortQueries {
             + "    AND e.encounter_type = ${93} "
             + "    AND o.concept_id IN ( ${631}, ${797} ) "
             + "    AND o.value_coded = ${1065} "
-            + "    AND o.obs_datetime BETWEEN :startDate AND :endDate "
+            + "    AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP BY "
             + "    p.patient_id ";
 
@@ -2450,6 +2450,72 @@ public class ResumoMensalCcrCohortQueries {
     cd.addSearch("age", map(getInfantAgeOnArv(5), mapping4));
 
     cd.setCompositionString("exposed AND arv AND age");
+    return cd;
+  }
+
+  /**
+   * CCR-FR41 <b>Indicador 37-</b> PCR colhido <2 meses de idade – coorte de 9 meses
+   *
+   * <p>O sistema irá produzir o Indicador 37 “Total de PCR colhido <2 meses de idade” da seguinte
+   * forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta há 9 meses atrás que foram expostas
+   *       ao HIV (CCR-FR36).
+   *   <li>Filtrando as crianças que tiveram registo de “PCR (Data de Colheita), na “Ficha de
+   *       Seguimento de CCR” e ocorrida no período compreendido entre “Data Iníco” – 8 meses e
+   *       “Data Fim”, tendo a criança nesta data idade <2 meses (“PCR (Data de Colheita)” menos
+   *       “Data Nascimento” < 2 meses). Nota: em caso de existência de registo de mais que uma “PCR
+   *       (Data de Colheita) durante o período será considerada a primeira ocorrência.
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getExposedChildrenWhoReceivedPcrWithLessThan2MonthsOfAge() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("PCR colhido <2 meses de idade  – coorte de 9 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("exposed", map(getExposedChildren(), mapping2));
+    cd.addSearch("pcr", map(getChildrenFirstPcr(), mapping4));
+    cd.addSearch("age", map(getInfantAgeAtPcr(false, 2), mapping4));
+
+    cd.setCompositionString("exposed AND pcr AND age");
+    return cd;
+  }
+
+  /**
+   * CCR-FR42 <b>Indicador 38-</b> PCR colhido ≥2 meses de idade – coorte de 9 meses
+   *
+   * <p>O sistema irá produzir o Indicador 38 “Total de PCR colhido >=2 meses de idade”, da seguinte
+   * forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta há 9 meses atrás que foram expostas
+   *       ao HIV (CCR-FR36).
+   *   <li>Filtrando as crianças que tiveram registo de “PCR (Data de Colheita), na “Ficha de
+   *       Seguimento de CCR” e ocorrida no período compreendido entre “Data Iníco” – 8 meses e
+   *       “Data Fim”, tendo a criança nesta data idade >=2 meses (“PCR (Data de Colheita)” menos
+   *       “Data Nascimento” >= 2 meses). Nota: em caso de existência de registo de mais que uma
+   *       “PCR (Data de Colheita) durante o período será considerada a primeira ocorrência.
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getExposedChildrenWhoReceivedPcrWithMoreThan2MonthsOfAge() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("PCR colhido >=2 meses de idade  – coorte de 9 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("exposed", map(getExposedChildren(), mapping2));
+    cd.addSearch("pcr", map(getChildrenFirstPcr(), mapping4));
+    cd.addSearch("age", map(getInfantAgeAtPcr(true, 2), mapping4));
+
+    cd.setCompositionString("exposed AND pcr AND age");
     return cd;
   }
 }
