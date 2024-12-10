@@ -412,6 +412,34 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(pcr2MONTHSB, mappings),
         "");
 
+    // Indicador 39 - crianças com resultados PCR positivo <2 meses de idade  – coorte de 9 meses
+    CohortIndicator pcrpositive2MONTHSA =
+        eptsGeneralIndicator.getIndicator(
+            "PCRPOSITIVE2MONTHSA",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getChildrenWithPositivePcrBellow2MonthsOfAge(),
+                mappings));
+
+    dsd.addColumn(
+        "PCRP2A",
+        "crianças com resultados PCR positivo <2 meses de idade  – coorte de 9 meses",
+        EptsReportUtils.map(pcrpositive2MONTHSA, mappings),
+        "");
+
+    // Indicador 40 - crianças com resultados PCR positivo >= 2 meses de idade  – coorte de 9 meses
+    CohortIndicator pcrpositive2MONTHSB =
+        eptsGeneralIndicator.getIndicator(
+            "PCRPOSITIVE2MONTHSB",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getChildrenWithPositivePcrAbove2MonthsOfAge(),
+                mappings));
+
+    dsd.addColumn(
+        "PCRP2B",
+        "crianças com resultados PCR positivo >= 2 meses de idade  – coorte de 9 meses",
+        EptsReportUtils.map(pcrpositive2MONTHSB, mappings),
+        "");
+
     return dsd;
   }
 

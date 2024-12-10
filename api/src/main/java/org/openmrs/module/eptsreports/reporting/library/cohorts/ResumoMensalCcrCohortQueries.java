@@ -2518,4 +2518,167 @@ public class ResumoMensalCcrCohortQueries {
     cd.setCompositionString("exposed AND pcr AND age");
     return cd;
   }
+
+  public CohortDefinition getChildrenWithPositivePcr() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("registo de PCR (data da colheita), na Ficha de Seguimento de CCR");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1030", hivMetadata.getHivPCRQualitativeConceptUuid().getConceptId());
+    map.put("703", hivMetadata.getPositive().getConceptId());
+
+    String query =
+        "SELECT pat.patient_id FROM ( "
+            + "SELECT "
+            + "    p.patient_id, MAX(e.encounter_datetime) AS last_pcr "
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_type = ${93} "
+            + "    AND o.concept_id = ${1030} "
+            + "    AND o.value_coded = ${703} "
+            + "    AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "GROUP BY "
+            + "    p.patient_id "
+            + ") pat";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  public CohortDefinition getInfantAgeAtPcrResult(boolean greaterThan, Integer Age) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Infant Age at PCR");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1030", hivMetadata.getHivPCRQualitativeConceptUuid().getConceptId());
+    map.put("703", hivMetadata.getPositive().getConceptId());
+    map.put("Age", Age);
+
+    String query =
+        "SELECT "
+            + "    pr.person_id "
+            + "FROM "
+            + "    person pr "
+            + "        INNER JOIN ( "
+            + "        SELECT "
+            + "            p.patient_id, "
+            + "            MAX(e.encounter_datetime) AS last_pcr "
+            + "        FROM "
+            + "            patient p "
+            + "             INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "             INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "        WHERE "
+            + "            p.voided = 0 "
+            + "          AND e.voided = 0 "
+            + "          AND o.voided = 0 "
+            + "          AND e.location_id = :location "
+            + "          AND e.encounter_type = ${93} "
+            + "          AND o.concept_id = ${1030} "
+            + "          AND o.value_coded = ${703} "
+            + "          AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "        GROUP BY "
+            + "            p.patient_id "
+            + "    ) pcr "
+            + "                   ON pr.person_id = pcr.patient_id "
+            + "WHERE "
+            + "    pr.birthdate IS NOT NULL "
+            + "  AND pcr.last_pcr IS NOT NULL ";
+    if (greaterThan) {
+      query = query + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, pcr.last_pcr) >= ${Age}";
+    } else {
+      query = query + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, pcr.last_pcr) < ${Age}";
+    }
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * CCR-FR43 <b>Indicador 39-</b> crianças com resultados PCR positivo <2 meses de idade – coorte
+   * de 9 meses
+   *
+   * <p>O sistema irá produzir o Indicador 39 “Total de crianças com resultados PCR positivo <2
+   * meses de idade” da seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta há 9 meses atrás que foram expostas
+   *       ao HIV (CCR-FR36).
+   *   <li>Filtrando as crianças que tiveram registo de “PCR (Resultado) igual a “Positivo”, numa
+   *       “Ficha de Seguimento de CCR” registada no período compreendido entre “Data Iníco” – 8
+   *       meses e “Data Fim”, tendo a criança nesta data idade < 2 meses (“Data Consulta” menos
+   *       “Data Nascimento” < 2 meses). Nota: em caso de existência de registo de mais que uma
+   *       “Ficha de Seguimento de CCR” durante o período será considerado o primeiro registo.
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenWithPositivePcrBellow2MonthsOfAge() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("crianças com resultados PCR positivo <2 meses de idade  – coorte de 9 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("exposed", map(getExposedChildren(), mapping2));
+    cd.addSearch("pcr", map(getChildrenWithPositivePcr(), mapping4));
+    cd.addSearch("age", map(getInfantAgeAtPcrResult(false, 2), mapping4));
+
+    cd.setCompositionString("exposed AND pcr AND age");
+    return cd;
+  }
+
+  /**
+   * CCR-FR44 <b>Indicador 40-</b> crianças com resultados PCR positivo >= 2 meses de idade – coorte
+   * de 9 meses
+   *
+   * <p>O sistema irá produzir o Indicador 40 “Total de crianças com resultados PCR positivo >= 2
+   * meses de idade” da seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta há 9 meses atrás que foram expostas
+   *       ao HIV (CCR-FR36).
+   *   <li>Filtrando as crianças que tiveram registo de “PCR (Resultado) igual a “Positivo”, numa
+   *       “Ficha de Seguimento de CCR” registada no período compreendido entre “Data Iníco” – 8
+   *       meses e “Data Fim”, tendo a criança nesta data idade >= 2 meses (“Data Consulta” menos
+   *       “Data Nascimento” >= 2 meses). Nota: em caso de existência de registo de mais que uma
+   *       “Ficha de Seguimento de CCR” durante o período será considerado o primeiro registo.
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenWithPositivePcrAbove2MonthsOfAge() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("crianças com resultados PCR positivo >= 2 meses de idade  – coorte de 9 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("exposed", map(getExposedChildren(), mapping2));
+    cd.addSearch("pcr", map(getChildrenWithPositivePcr(), mapping4));
+    cd.addSearch("age", map(getInfantAgeAtPcrResult(true, 2), mapping4));
+
+    cd.setCompositionString("exposed AND pcr AND age");
+    return cd;
+  }
 }
