@@ -51,6 +51,8 @@ public class ResumoMensalCcrCohortQueries {
   String mapping4 = "startDate=${startDate-8m},endDate=${endDate},location=${location}";
   String mapping5 = "startDate=${startDate-17m},endDate=${endDate-17m},location=${location}";
   String mapping6 = "startDate=${startDate-17m},endDate=${endDate},location=${location}";
+  String mapping7 =
+      "startDate=${startDate-17m},endDate=${endDate-17m},actualEndDate=${endDate},location=${location}";
 
   public String get1stCcrConsulation() {
     return "SELECT "
@@ -2848,7 +2850,7 @@ public class ResumoMensalCcrCohortQueries {
     cd.addParameter(new Parameter("location", "Health Facility", Location.class));
 
     cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping5));
-    cd.addSearch("restoredDam", map(getChildrenWithRestoredDam(), mapping6));
+    cd.addSearch("restoredDam", map(getChildrenWithRestoredDam(), mapping7));
 
     cd.setCompositionString("damChild AND restoredDam");
     return cd;
@@ -2942,9 +2944,71 @@ public class ResumoMensalCcrCohortQueries {
     cd.addParameter(new Parameter("location", "Health Facility", Location.class));
 
     cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping5));
-    cd.addSearch("integrated", map(getChildrenWithIntegratedConsultation(), mapping6));
+    cd.addSearch("integrated", map(getChildrenWithIntegratedConsultation(), mapping7));
 
     cd.setCompositionString("damChild AND integrated");
+    return cd;
+  }
+
+  /**
+   * CCR-FR51 <b>Indicador 46-</b> Crianças expostas que abandonaram – coorte de 18 meses
+   *
+   * <p>O sistema irá produzir o Indicador 46 “Total de crianças expostas que abandonaram” da
+   * seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta há 18 meses atrás que foram
+   *       expostas ao HIV (CCR-FR46).
+   *   <li>Filtrando as crianças que tiveram registo de “Abandono” na “Ficha Resumo de CCR” com a
+   *       “Data de Abertura do Processo” ocorrida há 18 meses (“Data de abertura do processo”>=
+   *       “Data Início” – 17 meses e <= “Data Fim” – 17 meses) ou na última “Ficha de Seguimento de
+   *       CCR” registada no período compreendido entre “Data Início” – 17 meses e “Data Fim”.
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenWhoAbandonedIn18Months() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças expostas que abandonaram   – coorte de 18 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping5));
+    cd.addSearch("abandoned", map(getChildrenWhoAbandoned(), mapping7));
+
+    cd.setCompositionString("firstConsultation AND abandoned");
+    return cd;
+  }
+
+  /**
+   * CCR-FR52 <b>Indicador 47-</b> Crianças expostas que foram óbito – coorte de 18 meses
+   *
+   * <p>O sistema irá produzir o Indicador 47 “Total de crianças expostas que foram óbito” da
+   * seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta há 18 meses atrás que foram
+   *       expostas ao HIV (CCR-FR46).
+   *   <li>Filtrando as crianças que tiveram registo de “Óbito” na “Ficha Resumo de CCR” com a “Data
+   *       de Abertura do Processo” ocorrida há 18 meses (“Data de abertura do processo”>= “Data
+   *       Início” – 17 meses e <= “Data Fim” – 17 meses) ou na última “Ficha de Seguimento de CCR”
+   *       registada no período compreendido entre “Data Início” – 17 meses e “Data Fim”.
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenWithDagWhoDiedIn18Months() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças expostas que foram óbito  – coorte de 18 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping5));
+    cd.addSearch("died", map(getChildrenWhoDied(), mapping7));
+
+    cd.setCompositionString("firstConsultation AND died");
     return cd;
   }
 }

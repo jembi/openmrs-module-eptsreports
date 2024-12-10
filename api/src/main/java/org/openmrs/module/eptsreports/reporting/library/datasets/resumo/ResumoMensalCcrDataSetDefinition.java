@@ -526,6 +526,32 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(integrated18MONTHS, mappings),
         "");
 
+    // Indicador 46 - Crianças expostas que abandonaram – coorte de 18 meses
+    CohortIndicator abandoned18MONTHS =
+        eptsGeneralIndicator.getIndicator(
+            "ABANDONED18MONTHS",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getChildrenWhoAbandonedIn18Months(), mappings));
+
+    dsd.addColumn(
+        "AB18M",
+        "Crianças expostas que abandonaram   – coorte de 18 meses",
+        EptsReportUtils.map(abandoned18MONTHS, mappings),
+        "");
+
+    // Indicador 47 - Crianças expostas que foram óbito  – coorte de 18 meses
+    CohortIndicator died18MONTHS =
+        eptsGeneralIndicator.getIndicator(
+            "DIED18MONTHS",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getChildrenWithDagWhoDiedIn18Months(), mappings));
+
+    dsd.addColumn(
+        "DY18M",
+        "Crianças expostas que foram óbito  – coorte de 18 meses",
+        EptsReportUtils.map(died18MONTHS, mappings),
+        "");
+
     return dsd;
   }
 
