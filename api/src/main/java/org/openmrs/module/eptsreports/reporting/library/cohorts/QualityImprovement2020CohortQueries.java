@@ -8223,6 +8223,9 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition nextPickupBetween173And187 =
         QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(173, 187);
 
+    CohortDefinition nextPickupBetween335And395 =
+        QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(335, 395);
+
     compositionCohortDefinition.addSearch(
         "MDS",
         EptsReportUtils.map(
@@ -8245,7 +8248,13 @@ public class QualityImprovement2020CohortQueries {
             nextPickupBetween173And187,
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString("MDS OR DSDT OR FILA83 OR FILA173");
+    compositionCohortDefinition.addSearch(
+        "FILA335",
+        EptsReportUtils.map(
+            nextPickupBetween335And395,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString("MDS OR DSDT OR FILA83 OR FILA173 OR FILA335");
 
     return compositionCohortDefinition;
   }
@@ -9456,6 +9465,7 @@ public class QualityImprovement2020CohortQueries {
             ageCohortQueries.createXtoYAgeCohort("Ages", 2, 200), "effectiveDate=${endDate}"));
 
     cd.setCompositionString("MQ15DenMDS AND MDS AND AGE");
+ 
     return cd;
   }
 
