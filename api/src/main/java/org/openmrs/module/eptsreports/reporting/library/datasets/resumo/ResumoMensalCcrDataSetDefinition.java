@@ -59,6 +59,9 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
     dsd.addParameters(getParameters());
 
     String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String cohort9months = "startDate=${startDate-8m},endDate=${endDate-8m},location=${location}";
+    String cohort18months =
+        "startDate=${startDate-17m},endDate=${endDate-17m},location=${location}";
 
     // Indicador 1- Total de 1as Consultas
     dsd.addColumn("FIRST", "Total de 1as Consultas", getChildrenWithFirstConsultation(), "");
@@ -154,7 +157,7 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
     dsd.addColumn(
         "F9M",
         "Crianças com 1as Consultas – Coorte de 9 meses",
-        EptsReportUtils.map(first9MONTHS, mappings),
+        EptsReportUtils.map(first9MONTHS, cohort9months),
         "");
 
     // Indicador 20 - Crianças com contacto com TB – coorte de 9 meses
@@ -170,7 +173,7 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
     dsd.addColumn(
         "TB9M",
         "Crianças com 1as Consultas – Coorte de 9 meses",
-        EptsReportUtils.map(tb9MONTHS, mappings),
+        EptsReportUtils.map(tb9MONTHS, cohort9months),
         "");
 
     // Indicador 21 - Crianças que completaram Isonizada – coorte de 9 meses
@@ -438,6 +441,46 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
         "PCRP2B",
         "crianças com resultados PCR positivo >= 2 meses de idade  – coorte de 9 meses",
         EptsReportUtils.map(pcrpositive2MONTHSB, mappings),
+        "");
+
+    // Crianças com 1as Consultas – Coorte de 18 meses
+    CohortIndicator first18MONTHS =
+        eptsGeneralIndicator.getIndicator(
+            "FIRST18MONTHS",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getPatients1stConsultation(), mappings));
+
+    dsd.addColumn(
+        "F18M",
+        "Crianças com 1as Consultas – Coorte de 18 meses",
+        EptsReportUtils.map(first18MONTHS, cohort18months),
+        "");
+
+    // Indicador 41 - Crianças expostas – coorte de 18 meses
+    CohortIndicator exposed18MONTHS =
+        eptsGeneralIndicator.getIndicator(
+            "EXPOSED18MONTHS",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getExposedChildrenIn18Months(), mappings));
+
+    dsd.addColumn(
+        "E18M",
+        "Crianças expostas – coorte de 18 meses",
+        EptsReportUtils.map(exposed9MONTHS, mappings),
+        "");
+
+    // Indicador 42 - Crianças expostas com resultado definitivo de HIV positivo – coorte de 18
+    // meses
+    CohortIndicator pcrpositive18MONTHS =
+        eptsGeneralIndicator.getIndicator(
+            "PCRPOSITIVE18MONTHS",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getChildrenWithPositivePcrIn18Months(), mappings));
+
+    dsd.addColumn(
+        "PCRP18M",
+        "Crianças expostas com resultado definitivo de HIV positivo – coorte de 18 meses",
+        EptsReportUtils.map(exposed9MONTHS, mappings),
         "");
 
     return dsd;

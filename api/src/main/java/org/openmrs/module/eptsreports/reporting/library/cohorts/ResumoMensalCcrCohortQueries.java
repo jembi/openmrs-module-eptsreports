@@ -49,6 +49,8 @@ public class ResumoMensalCcrCohortQueries {
   String mapping3 =
       "startDate=${startDate-8m},endDate=${endDate-8m},actualEndDate=${endDate},location=${location}";
   String mapping4 = "startDate=${startDate-8m},endDate=${endDate},location=${location}";
+  String mapping5 = "startDate=${startDate-17m},endDate=${endDate-17m},location=${location}";
+  String mapping6 = "startDate=${startDate-17m},endDate=${endDate},location=${location}";
 
   public String get1stCcrConsulation() {
     return "SELECT "
@@ -2679,6 +2681,71 @@ public class ResumoMensalCcrCohortQueries {
     cd.addSearch("age", map(getInfantAgeAtPcrResult(true, 2), mapping4));
 
     cd.setCompositionString("exposed AND pcr AND age");
+    return cd;
+  }
+
+  /**
+   * CCR-FR46 <b>Indicador 41-</b> Crianças expostas – coorte de 18 meses
+   *
+   * <p>O sistema irá produzir o Indicador 41 “Total de crianças expostas”, da seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta há 18 meses (CCR-FR45) e o “Motivo
+   *       da consulta” igual a "Exposição ao HIV” registado na “Ficha Resumo de CCR” com a “Data de
+   *       Abertura do Processo” ocorrida há 18 meses (“Data de abertura do processo”>= “Data
+   *       Início” – 17 meses e <= “Data Fim” – 17 meses).
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getExposedChildrenIn18Months() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças expostas – coorte de 18 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping5));
+    cd.addSearch(
+        "hivExposure",
+        map(
+            getChildrenWithVisitReason(
+                Collections.singletonList(
+                    commonMetadata.getRecenNascidoMaeHivPositivoConcept().getConceptId())),
+            mapping5));
+
+    cd.setCompositionString("firstConsultation AND hivExposure");
+    return cd;
+  }
+
+  /**
+   * CCR-FR47 <b>Indicador 42-</b> Crianças expostas com resultado definitivo de HIV positivo –
+   * coorte de 18 meses
+   *
+   * <p>O sistema irá produzir o Indicador 42 “Total de crianças expostas com resultado definitivo
+   * de HIV positivo” da seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta há 18 meses atrás que foram
+   *       expostas ao HIV (CCR-FR46).
+   *   <li>Filtrando as crianças que tiveram o último registo de “PCR (Resultado)” como “Positivo”,
+   *       ou o último registo de “HIV (teste rápido)” como “Positivo”, na “Ficha de Seguimento de
+   *       CCR” registada no período compreendido entre “Data Iníco” – 17 meses e “Data Fim”.
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenWithPositivePcrIn18Months() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças expostas com resultado definitivo de HIV positivo – coorte de 18 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping5));
+    cd.addSearch("positivePcr", map(getChildrenWithPositivePcr(), mapping6));
+
+    cd.setCompositionString("firstConsultation AND positivePcr");
     return cd;
   }
 }
