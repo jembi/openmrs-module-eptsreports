@@ -266,9 +266,8 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
     patientDataSetDefinition.addColumn(
         "vl_result_date",
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getMostRecentVLResultDate(
-            Arrays.asList(
-                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
-                hivMetadata.getFsrEncounterType().getEncounterTypeId())),
+            Collections.singletonList(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId())),
         MAPPING2,
         new ForwardSlashDateConverter());
 
@@ -276,9 +275,8 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
     patientDataSetDefinition.addColumn(
         "vl_result",
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries.getMostRecentVLResult(
-            Arrays.asList(
-                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
-                hivMetadata.getFsrEncounterType().getEncounterTypeId())),
+            Collections.singletonList(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId())),
         MAPPING2,
         new ViralLoadQualitativeLabelConverter());
 
@@ -287,9 +285,8 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         "second_vl_resultdate",
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries
             .getLastVLResultDateBeforeMostRecentVLResultDate(
-                Arrays.asList(
-                    hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
-                    hivMetadata.getFsrEncounterType().getEncounterTypeId())),
+                Collections.singletonList(
+                    hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId())),
         MAPPING2,
         new ForwardSlashDateConverter());
 
@@ -298,9 +295,8 @@ public class ListOfPatientsEligibleForCd4RequestDataset extends BaseDataSet {
         "second_vl_result",
         listOfPatientsEligibleForCd4RequestDataDefinitionQueries
             .getLastVLResultBeforeMostRecentVLResultDate(
-                Arrays.asList(
-                    hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
-                    hivMetadata.getFsrEncounterType().getEncounterTypeId())),
+                Collections.singletonList(
+                    hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId())),
         MAPPING2,
         new ViralLoadQualitativeLabelConverter());
 
