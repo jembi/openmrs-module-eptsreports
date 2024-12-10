@@ -357,7 +357,6 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
 
     // Indicador 35 - Total de crianças expostas com aleitamento materno exclusivo aos 5 meses –
     // coorte 9 meses
-    // meses
     CohortIndicator exposedmixedfeed5MONTHS =
         eptsGeneralIndicator.getIndicator(
             "EXPOSEDMIXEDFEED5MONTHS",
