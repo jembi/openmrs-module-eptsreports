@@ -337,7 +337,7 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
     dsd.addColumn(
         "E5M",
         "Crianças expostas com 5 meses de idade e com mãe em TARV – coorte de 9 meses",
-        EptsReportUtils.map(exposed9MONTHS, mappings),
+        EptsReportUtils.map(exposed5MONTHS, mappings),
         "");
 
     // Indicador 34 - Crianças expostas com aleitamento materno exclusivo aos 5 meses – coorte de 9
@@ -466,7 +466,7 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
     dsd.addColumn(
         "E18M",
         "Crianças expostas – coorte de 18 meses",
-        EptsReportUtils.map(exposed9MONTHS, mappings),
+        EptsReportUtils.map(exposed18MONTHS, mappings),
         "");
 
     // Indicador 42 - Crianças expostas com resultado definitivo de HIV positivo – coorte de 18
@@ -480,7 +480,50 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
     dsd.addColumn(
         "PCRP18M",
         "Crianças expostas com resultado definitivo de HIV positivo – coorte de 18 meses",
-        EptsReportUtils.map(exposed9MONTHS, mappings),
+        EptsReportUtils.map(pcrpositive18MONTHS, mappings),
+        "");
+
+    // Indicador 43 - Crianças expostas com resultado definitivo de HIV negativo – coorte de 18
+    // meses
+    CohortIndicator pcrnegative18MONTHS =
+        eptsGeneralIndicator.getIndicator(
+            "PCRNEGATIVE18MONTHS",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getChildrenWithNegativePcrIn18Months(), mappings));
+
+    dsd.addColumn(
+        "PCRN18M",
+        "Crianças expostas com resultado definitivo de HIV negativo – coorte de 18 meses",
+        EptsReportUtils.map(pcrnegative18MONTHS, mappings),
+        "");
+
+    // Indicador 44 - Crianças expostas com transferidas para a Consulta Criança Sadia  – coorte de
+    // 18 meses
+    CohortIndicator transferred18MONTHS =
+        eptsGeneralIndicator.getIndicator(
+            "TRANSFERRED18MONTHS",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getChildrenTransferedForConsultation(), mappings));
+
+    dsd.addColumn(
+        "TC18M",
+        "Crianças expostas com transferidas para a Consulta Criança Sadia  – coorte de 18 meses",
+        EptsReportUtils.map(transferred18MONTHS, mappings),
+        "");
+
+    // Indicador 45 - Crianças expostas transferidas para as Consultas Integradas – coorte de 18
+    // meses
+    CohortIndicator integrated18MONTHS =
+        eptsGeneralIndicator.getIndicator(
+            "INTEGRATED18MONTHS",
+            EptsReportUtils.map(
+                resumoMensalCcrCohortQueries.getChildrenTransferedForIntegratedConsultation(),
+                mappings));
+
+    dsd.addColumn(
+        "INT18M",
+        "Crianças expostas transferidas para as Consultas Integradas – coorte de 18 meses",
+        EptsReportUtils.map(integrated18MONTHS, mappings),
         "");
 
     return dsd;

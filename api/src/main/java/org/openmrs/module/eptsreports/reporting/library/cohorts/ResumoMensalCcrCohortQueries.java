@@ -1610,7 +1610,7 @@ public class ResumoMensalCcrCohortQueries {
    * forma:
    *
    * <ul>
-   *   <li>ncluindo todas as crianças com DAM que tiveram a 1ª consulta há 9 meses (CCR-FR28)
+   *   <li>Incluindo todas as crianças com DAM que tiveram a 1ª consulta há 9 meses (CCR-FR28)
    *   <li>Filtrando as crianças que tiveram registo de “Transferido para Consulta de Criança Sadia”
    *       na “Ficha Resumo de CCR” com a “Data de Abertura do Processo” ocorrida há 9 meses (“Data
    *       de abertura do processo”>= “Data Início” – 8 meses e <= “Data Fim” – 8 meses) ou na
@@ -2561,6 +2561,46 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
+  public CohortDefinition getChildrenWithNegativePcr() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("HIV (teste rápido) como Negativo");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1030", hivMetadata.getHivPCRQualitativeConceptUuid().getConceptId());
+    map.put("664", hivMetadata.getNegative().getConceptId());
+
+    String query =
+        "SELECT pat.patient_id FROM ( "
+            + "SELECT "
+            + "    p.patient_id, MAX(e.encounter_datetime) AS last_pcr "
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_type = ${93} "
+            + "    AND o.concept_id = ${1030} "
+            + "    AND o.value_coded = ${664} "
+            + "    AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "GROUP BY "
+            + "    p.patient_id "
+            + ") pat";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
   public CohortDefinition getInfantAgeAtPcrResult(boolean greaterThan, Integer Age) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Infant Age at PCR");
@@ -2746,6 +2786,165 @@ public class ResumoMensalCcrCohortQueries {
     cd.addSearch("positivePcr", map(getChildrenWithPositivePcr(), mapping6));
 
     cd.setCompositionString("firstConsultation AND positivePcr");
+    return cd;
+  }
+
+  /**
+   * CCR-FR48 <b>Indicador 43-</b> Crianças expostas com resultado definitivo de HIV negativo –
+   * coorte de 18 meses
+   *
+   * <p>O sistema irá produzir o Indicador 42 “Total de crianças expostas com resultado definitivo
+   * de HIV positivo” da seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta há 18 meses atrás que foram
+   *       expostas ao HIV (CCR-FR46).
+   *   <li>Filtrando as crianças que tiveram o último registo de “HIV (teste rápido)” como
+   *       “Negativo”, na “Ficha de Seguimento de CCR” registada no período compreendido entre “Data
+   *       Iníco” – 17 meses e “Data Fim.
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenWithNegativePcrIn18Months() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças expostas com resultado definitivo de HIV negativo – coorte de 18 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping5));
+    cd.addSearch("negativePcr", map(getChildrenWithNegativePcr(), mapping6));
+
+    cd.setCompositionString("firstConsultation AND negativePcr");
+    return cd;
+  }
+
+  /**
+   * CCR-FR49 <b>Indicador 44-</b> Crianças expostas com transferidas para a Consulta Criança Sadia
+   * – coorte de 18 meses
+   *
+   * <p>O sistema irá produzir Indicador 44 “Total de crianças expostas transferidas para a Consulta
+   * Criança Sadia” da seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta há 18 meses atrás que foram
+   *       expostas ao HIV (CCR-FR46).
+   *   <li>Filtrando as crianças que tiveram registo de “Transferido para Consulta de Criança Sadia”
+   *       na “Ficha Resumo de CCR” com a “Data de Abertura do Processo” ocorrida há 18 meses (“Data
+   *       de abertura do processo”>= “Data Início” – 17 meses e <= “Data Fim” – 17 meses) ou na
+   *       última “Ficha de Seguimento de CCR” registada no período compreendido entre “Data Início”
+   *       – 17 meses e “Data Fim”.
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenTransferedForConsultation() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "Crianças expostas com transferidas para a Consulta Criança Sadia  – coorte de 18 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping5));
+    cd.addSearch("restoredDam", map(getChildrenWithRestoredDam(), mapping6));
+
+    cd.setCompositionString("damChild AND restoredDam");
+    return cd;
+  }
+
+  public CohortDefinition getChildrenWithIntegratedConsultation() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Crianças com DAM recuperadas");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("actualEndDate", "Actual End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
+    map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1873", hivMetadata.getTipoDeAltaConcept().getConceptId());
+    map.put("165484", hivMetadata.getTransferidoParaConsultasIntegradasConcept().getConceptId());
+
+    String query =
+        "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${92} "
+            + "    AND o.concept_id = ${1873} "
+            + "    AND o.value_coded = ${165484} "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "GROUP BY "
+            + "    p.patient_id "
+            + "UNION "
+            + "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "    INNER JOIN ( "
+            + getLastCcrSeguimentoConsulation()
+            + "    ) ccr ON ccr.patient_id = p.patient_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${93} "
+            + "    AND o.concept_id = ${1873} "
+            + "    AND o.value_coded = ${165484} "
+            + "    AND e.location_id = :location "
+            + "    AND e.encounter_datetime = ccr.last_consultation_date "
+            + "GROUP BY "
+            + "    p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * CCR-FR50 <b>Indicador 45-</b> Crianças expostas transferidas para as Consultas Integradas –
+   * coorte de 18 meses
+   *
+   * <p>O sistema irá produzir o Indicador 45 “Total de crianças expostas transferidas para as
+   * Consultas Integradas” da seguinte forma:
+   *
+   * <ul>
+   *   <li>Incluindo todas as crianças que tiveram a 1ª consulta há 18 meses atrás que foram
+   *       expostas ao HIV (CCR-FR46).
+   *   <li>Filtrando as crianças que tiveram registo de “Transferido para Consultas Integradas” na
+   *       “Ficha Resumo de CCR” com a “Data de Abertura do Processo” ocorrida há 18 meses (“Data de
+   *       abertura do processo”>= “Data Início” – 17 meses e <= “Data Fim” – 17 meses) ou na última
+   *       “Ficha de Seguimento de CCR” registada no período compreendido entre “Data Início” – 17
+   *       meses e “Data Fim”.
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getChildrenTransferedForIntegratedConsultation() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Crianças expostas transferidas para as Consultas Integradas – coorte de 18 meses");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Health Facility", Location.class));
+
+    cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping5));
+    cd.addSearch("integrated", map(getChildrenWithIntegratedConsultation(), mapping6));
+
+    cd.setCompositionString("damChild AND integrated");
     return cd;
   }
 }
