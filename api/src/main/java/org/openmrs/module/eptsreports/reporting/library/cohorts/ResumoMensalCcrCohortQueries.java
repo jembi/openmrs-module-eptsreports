@@ -2852,7 +2852,7 @@ public class ResumoMensalCcrCohortQueries {
     cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping5));
     cd.addSearch("restoredDam", map(getChildrenWithRestoredDam(), mapping7));
 
-    cd.setCompositionString("damChild AND restoredDam");
+    cd.setCompositionString("firstConsultation AND restoredDam");
     return cd;
   }
 
@@ -2946,7 +2946,7 @@ public class ResumoMensalCcrCohortQueries {
     cd.addSearch("firstConsultation", map(getPatients1stConsultation(), mapping5));
     cd.addSearch("integrated", map(getChildrenWithIntegratedConsultation(), mapping7));
 
-    cd.setCompositionString("damChild AND integrated");
+    cd.setCompositionString("firstConsultation AND integrated");
     return cd;
   }
 
