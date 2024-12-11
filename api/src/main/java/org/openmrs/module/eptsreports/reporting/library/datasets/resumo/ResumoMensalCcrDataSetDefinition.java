@@ -99,28 +99,28 @@ public class ResumoMensalCcrDataSetDefinition extends BaseDataSet {
 
     // Indicador 10- Crianças que iniciaram CTZ < 2 meses de idade
     dsd.addColumn(
-        "CTZA",
+        "CTZBELLOW2MONTHS",
         "Crianças que iniciaram CTZ < 2 meses de idade",
         getChildrenWhoStartedCtzBellow2MonthsOfAge(),
         "");
 
     // Indicador 11 - Crianças que iniciaram CTZ ≥ 2 meses de idade
     dsd.addColumn(
-        "CTZB",
+        "CTZABOVE2MONTHS",
         "Crianças que iniciaram CTZ >= 2 meses de idade",
         getChildrenWhoStartedCtzAndAbove2MonthsOfAge(),
         "");
 
     // Indicador 12 - 1º PCR colhido < 2 meses de idade
     dsd.addColumn(
-        "PCRA",
+        "PCRBELLOW2MONTHS",
         "1º PCR colhido < 2 meses de idade",
         getChildrenFirstPcrCollectedUnder2MonthsofAge(),
         "");
 
     // Indicador 13 - 1º PCR colhido ≥ 2 meses de idade
     dsd.addColumn(
-        "PCRB",
+        "PCRABOVE2MONTHS",
         "1º PCR colhido >= 2 meses de idade",
         getChildrenFirstPcrCollectedAbove2MonthsofAge(),
         "");
