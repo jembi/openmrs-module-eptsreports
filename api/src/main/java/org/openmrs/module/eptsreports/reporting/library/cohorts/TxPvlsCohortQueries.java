@@ -1976,10 +1976,10 @@ public class TxPvlsCohortQueries {
             + "   ) "
             + "   GROUP BY lactantes.patient_id "
             + ") pat"
-            + "    INNER JOIN ("
+            + "    LEFT JOIN ( "
             + artStart
-            + ") art ON art.patient_id = pat.patient_id "
-            + "  WHERE TIMESTAMPDIFF(DAY, art.first_pickup, pat.breastfeeding_date) < 90 ";
+            + " ) art ON art.patient_id = pat.patient_id "
+            + "  WHERE (art.first_pickup IS NULL OR Timestampdiff(day, art.first_pickup, pat.breastfeeding_date) < 90) ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
