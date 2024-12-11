@@ -2071,7 +2071,7 @@ public class ResumoMensalCcrCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Health Facility", Location.class));
 
-    cd.addSearch("exposed", map(getExposedChildren(), mapping2));
+    cd.addSearch("exposed", map(getExposedChildren(), mapping));
     cd.addSearch("age", map(getExatInfantAge(5), mapping2));
     cd.addSearch(
         "tarv",
@@ -2160,13 +2160,13 @@ public class ResumoMensalCcrCohortQueries {
             + "          AND e.encounter_datetime >= :startDate "
             + "          AND e.encounter_datetime <= :endDate "
             + "        GROUP BY "
-            + "            p.patient_id "
+            + "            p.patient_id, e.encounter_datetime "
             + "    ) ccr "
             + "                   ON pr.person_id = ccr.patient_id "
             + "WHERE "
             + "    pr.birthdate IS NOT NULL "
             + "  AND ccr.breastfed_date IS NOT NULL "
-            + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, ccr.breastfed_date) = ${Age}";
+            + "  AND DATEDIFF(ccr.breastfed_date, pr.birthdate) BETWEEN 150 AND 179";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -2201,7 +2201,7 @@ public class ResumoMensalCcrCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Health Facility", Location.class));
 
-    cd.addSearch("exposed", map(getExposedChildren(), mapping2));
+    cd.addSearch("exposed", map(getExposedChildren(), mapping));
     cd.addSearch("breastfed", map(getChildrenWithAleitamentoMaterno(), mapping4));
     cd.addSearch("age", map(getInfantAgeOnBreastfed(5), mapping4));
 
@@ -2268,7 +2268,7 @@ public class ResumoMensalCcrCohortQueries {
             + "        INNER JOIN ( "
             + "        SELECT "
             + "            p.patient_id, "
-            + "            MAX(e.encounter_datetime) AS breastfed_date "
+            + "            e.encounter_datetime AS breastfed_date "
             + "        FROM "
             + "            patient p "
             + "             INNER JOIN encounter e ON p.patient_id = e.patient_id "
@@ -2284,13 +2284,13 @@ public class ResumoMensalCcrCohortQueries {
             + "          AND e.encounter_datetime >= :startDate "
             + "          AND e.encounter_datetime <= :endDate "
             + "        GROUP BY "
-            + "            p.patient_id "
+            + "            p.patient_id, e.encounter_datetime "
             + "    ) ccr "
             + "                   ON pr.person_id = ccr.patient_id "
             + "WHERE "
             + "    pr.birthdate IS NOT NULL "
             + "  AND ccr.breastfed_date IS NOT NULL "
-            + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, ccr.breastfed_date) = ${Age}";
+            + "  AND DATEDIFF(ccr.breastfed_date, pr.birthdate) BETWEEN 150 AND 179";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -2325,7 +2325,7 @@ public class ResumoMensalCcrCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Health Facility", Location.class));
 
-    cd.addSearch("exposed", map(getExposedChildren(), mapping2));
+    cd.addSearch("exposed", map(getExposedChildren(), mapping));
     cd.addSearch("mixedFeed", map(getChildrenWithMixedFeeding(), mapping4));
     cd.addSearch("age", map(getInfantAgeOnMixedFeeding(5), mapping4));
 
@@ -2449,7 +2449,7 @@ public class ResumoMensalCcrCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Health Facility", Location.class));
 
-    cd.addSearch("exposed", map(getExposedChildren(), mapping2));
+    cd.addSearch("exposed", map(getExposedChildren(), mapping));
     cd.addSearch("arv", map(getChildrenWhoReceivedArv(), mapping4));
     cd.addSearch("age", map(getInfantAgeOnArv(5), mapping4));
 
@@ -2482,7 +2482,7 @@ public class ResumoMensalCcrCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Health Facility", Location.class));
 
-    cd.addSearch("exposed", map(getExposedChildren(), mapping2));
+    cd.addSearch("exposed", map(getExposedChildren(), mapping));
     cd.addSearch("pcr", map(getChildrenFirstPcr(), mapping4));
     cd.addSearch("age", map(getInfantAgeAtPcr(false, 2), mapping4));
 
@@ -2515,7 +2515,7 @@ public class ResumoMensalCcrCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Health Facility", Location.class));
 
-    cd.addSearch("exposed", map(getExposedChildren(), mapping2));
+    cd.addSearch("exposed", map(getExposedChildren(), mapping));
     cd.addSearch("pcr", map(getChildrenFirstPcr(), mapping4));
     cd.addSearch("age", map(getInfantAgeAtPcr(true, 2), mapping4));
 
@@ -2684,7 +2684,7 @@ public class ResumoMensalCcrCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Health Facility", Location.class));
 
-    cd.addSearch("exposed", map(getExposedChildren(), mapping2));
+    cd.addSearch("exposed", map(getExposedChildren(), mapping));
     cd.addSearch("pcr", map(getChildrenWithPositivePcr(), mapping4));
     cd.addSearch("age", map(getInfantAgeAtPcrResult(false, 2), mapping4));
 
@@ -2718,7 +2718,7 @@ public class ResumoMensalCcrCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Health Facility", Location.class));
 
-    cd.addSearch("exposed", map(getExposedChildren(), mapping2));
+    cd.addSearch("exposed", map(getExposedChildren(), mapping));
     cd.addSearch("pcr", map(getChildrenWithPositivePcr(), mapping4));
     cd.addSearch("age", map(getInfantAgeAtPcrResult(true, 2), mapping4));
 
