@@ -1890,7 +1890,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                     FROM   patient p "
             + "                                INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "                                INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                                INNER JOIN (SELECT e.patient_id, MAX(Date(e.encounter_datetime)) vl_date "
+            + "                                INNER JOIN (SELECT e.patient_id, MIN(Date(e.encounter_datetime)) vl_date "
             + "                                            FROM   encounter e "
             + "                                                       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "                                                AND e.voided = 0 "
@@ -2005,7 +2005,6 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     StringSubstitutor sb = new StringSubstitutor(getMetadata());
     cd.setQuery(sb.replace(query));
-    System.out.println(cd.getQuery());
     return cd;
   }
 
