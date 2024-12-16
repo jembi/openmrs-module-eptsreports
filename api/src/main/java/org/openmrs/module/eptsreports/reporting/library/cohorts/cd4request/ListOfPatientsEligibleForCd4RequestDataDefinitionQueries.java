@@ -1570,7 +1570,7 @@ public class ListOfPatientsEligibleForCd4RequestDataDefinitionQueries {
         + "               AND o.value_numeric IS NOT NULL ) "
         + "              OR ( o.concept_id = ${1305} "
         + "                   AND o.value_coded IS NOT NULL ) ) "
-        + "       AND DATE(e.encounter_datetime) < last_vl.most_recent "
+        + "       AND DATE(e.encounter_datetime) < DATE_SUB(last_vl.most_recent, INTERVAL 3 MONTH) "
         + "       AND e.location_id = :location "
         + "       AND e.voided = 0 "
         + "       AND p.voided = 0 "
