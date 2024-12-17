@@ -451,6 +451,11 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
             "cd4Eligibility=consecutiveVl",
             "consecutiveVlDisaggregation"),
         new ColumnParameters(
+            "cd4Eligibility-consecutiveVlAndCd4In33Days",
+            "Consecutive Vl With CD4 within 33 Days Disaggregation",
+            "cd4Eligibility=consecutiveVlAndCd4In33Days",
+            "consecutiveVlDisaggregationCd433Day"),
+        new ColumnParameters(
             "cd4Eligibility-reinitArt",
             "Reinitiated Art Disaggregation",
             "cd4Eligibility=reinitArt",

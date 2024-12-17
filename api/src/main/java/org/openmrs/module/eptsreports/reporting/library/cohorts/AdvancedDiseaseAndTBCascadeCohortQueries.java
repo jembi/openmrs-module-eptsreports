@@ -108,7 +108,8 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             anyResult,
             "inclusionStartDate=${startDate},startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("eligibleCd4 AND anyResult");
+    cd.setCompositionString("anyResult");
+    //    cd.setCompositionString("eligibleCd4 AND anyResult");
     return cd;
   }
 
@@ -1890,23 +1891,9 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                     FROM   patient p "
             + "                                INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "                                INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                                INNER JOIN (SELECT e.patient_id, MIN(Date(e.encounter_datetime)) vl_date "
-            + "                                            FROM   encounter e "
-            + "                                                       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                                                AND e.voided = 0 "
-            + "                                                AND o.voided = 0 "
-            + "                                                AND e.encounter_type IN ( ${13}, ${51} ) "
-            + "                                                AND e.location_id = :location "
-            + "                                                 AND ( ( o.concept_id = ${856} "
-            + "                                                     AND o.value_numeric IS NOT NULL ) "
-            + "                                                   OR ( o.concept_id = ${1305} "
-            + "                                                        AND o.value_coded IS NOT NULL ) ) "
-            + "                                                AND Date(e.encounter_datetime) BETWEEN :startDate AND :endDate "
-            + "                                            GROUP  BY e.patient_id)vl_inclusion "
-            + "                                           ON vl_inclusion.patient_id = e.patient_id "
             + "                     WHERE  e.encounter_type IN( ${13}, ${51} ) "
             + "                       AND e.location_id = :location "
-            + "                       AND Date(e.encounter_datetime) = vl_inclusion.vl_date "
+            + "                       AND Date(e.encounter_datetime) BETWEEN :startDate AND :endDate "
             + "                       AND e.voided = 0 "
             + "                       AND p.voided = 0 "
             + "                       AND o.voided = 0 "
@@ -1935,6 +1922,49 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                    AND o.concept_id = ${856} "
             + "                    AND o.value_numeric > 1000 "
             + "             GROUP  BY p.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(getMetadata());
+    cd.setQuery(sb.replace(query));
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWith2ConsecutiveVLsWithCD4In33Days() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Clients Who have a previous VL result > 1000");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM patient p "
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "INNER JOIN ( "
+            + "    SELECT p.patient_id, "
+            + "           MAX(Date(e.encounter_datetime)) AS last_vl1000_date "
+            + "    FROM patient p "
+            + "    INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "    WHERE e.encounter_type IN (${13}, ${51}) "
+            + "      AND e.location_id = :location "
+            + "      AND Date(e.encounter_datetime) BETWEEN :startDate AND :endDate "
+            + "      AND e.voided = 0 "
+            + "      AND p.voided = 0 "
+            + "      AND o.voided = 0 "
+            + "      AND o.concept_id = ${856} "
+            + "      AND o.value_numeric > 1000 "
+            + "    GROUP BY p.patient_id "
+            + ") last_vl100 ON last_vl100.patient_id = e.patient_id "
+            + "WHERE e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.encounter_type IN (${6}, ${13}, ${51}) "
+            + "  AND ( (o.concept_id = ${1695} AND o.value_numeric IS NOT NULL) "
+            + "        OR (o.concept_id = ${165515} AND o.value_coded IS NOT NULL) ) "
+            + "  AND e.location_id = :location "
+            + "  AND DATE(e.encounter_datetime) BETWEEN last_vl100.last_vl1000_date "
+            + "                                       AND DATE_ADD(last_vl100.last_vl1000_date, INTERVAL 33 DAY) "
+            + "GROUP BY p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(getMetadata());
     cd.setQuery(sb.replace(query));

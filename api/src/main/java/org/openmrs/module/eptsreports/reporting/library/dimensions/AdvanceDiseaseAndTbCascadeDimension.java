@@ -155,6 +155,13 @@ public class AdvanceDiseaseAndTbCascadeDimension {
             mappings));
 
     dim.addCohortDefinition(
+        "consecutiveVl33DaysCd4",
+        EptsReportUtils.map(
+            advancedDiseaseAndTBCascadeCohortQueries
+                .getPatientsWith2ConsecutiveVLsWithCD4In33Days(),
+            mappings));
+
+    dim.addCohortDefinition(
         "reinitArt",
         EptsReportUtils.map(
             advancedDiseaseAndTBCascadeCohortQueries.getPatientsWhoReinitiatedArt(), mappings));
