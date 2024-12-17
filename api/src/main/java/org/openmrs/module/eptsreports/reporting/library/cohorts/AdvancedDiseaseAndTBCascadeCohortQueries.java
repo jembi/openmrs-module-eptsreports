@@ -31,6 +31,12 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   private final CommonQueries commonQueries;
 
   private final String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+  private final String mappings2 = "endDate=${generationDate},location=${location}";
+  private final String mappings3 =
+      "startDate=${startDate},endDate=${generationDate},location=${location}";
+
+  private final String inclusionPeriod =
+      "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}";
 
   @Autowired
   public AdvancedDiseaseAndTBCascadeCohortQueries(
@@ -340,7 +346,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addSearch(
         "severeImmunodepressionAndWithTbLamPositiveResult",
         EptsReportUtils.map(severeImmunodepressionAndWithTbLamPositiveResult, mappings));
-    cd.addSearch("genXpert", EptsReportUtils.map(genXpert, mappings));
+    cd.addSearch("genXpert", EptsReportUtils.map(genXpert, mappings2));
 
     cd.setCompositionString("severeImmunodepressionAndWithTbLamPositiveResult AND NOT genXpert");
 
@@ -371,7 +377,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addSearch(
         "severeImmunodepressionAndWithTbLamPositiveResult",
         EptsReportUtils.map(severeImmunodepressionAndWithTbLamPositiveResult, mappings));
-    cd.addSearch("genXpert", EptsReportUtils.map(genXpert, mappings));
+    cd.addSearch("genXpert", EptsReportUtils.map(genXpert, mappings2));
 
     cd.setCompositionString("severeImmunodepressionAndWithTbLamPositiveResult AND genXpert");
 
@@ -438,7 +444,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addSearch(
         "severeImmunodepressionAndWithTbLamPositiveResult",
         EptsReportUtils.map(severeImmunodepressionAndWithTbLamPositiveResult, mappings));
-    cd.addSearch("onTb", EptsReportUtils.map(onTb, mappings));
+    cd.addSearch("onTb", EptsReportUtils.map(onTb, mappings3));
 
     cd.setCompositionString("severeImmunodepressionAndWithTbLamPositiveResult AND onTb");
 
@@ -1459,7 +1465,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                          AND o.concept_id = ${23723}"
             + "                          AND o.value_coded IS NOT NULL "
             + "                          AND e.location_id = :location "
-            + "                          AND e.encounter_datetime BETWEEN :startDate AND :endDate"
+            + "                          AND e.encounter_datetime <= :endDate "
             + "                   GROUP  BY e.patient_id "
             + "                   UNION "
             + "                   SELECT e.patient_id "
@@ -1471,7 +1477,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                          AND o.concept_id IN (${23723}, ${165189}) "
             + "                          AND o.value_coded IS NOT NULL "
             + "                          AND e.location_id = :location "
-            + "                          AND o.obs_datetime BETWEEN :startDate AND :endDate"
+            + "                          AND o.obs_datetime <= :endDate "
             + "                   GROUP  BY e.patient_id) tb_lam "
             + "               ON tb_lam.patient_id = p.patient_id "
             + "WHERE  p.voided = 0 "
