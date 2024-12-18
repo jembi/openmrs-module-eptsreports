@@ -35,9 +35,6 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   private final String mappings3 =
       "startDate=${startDate},endDate=${generationDate},location=${location}";
 
-  private final String inclusionPeriod =
-      "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}";
-
   @Autowired
   public AdvancedDiseaseAndTBCascadeCohortQueries(
       HivMetadata hivMetadata,
@@ -114,8 +111,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             anyResult,
             "inclusionStartDate=${startDate},startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("anyResult");
-    //    cd.setCompositionString("eligibleCd4 AND anyResult");
+    cd.setCompositionString("eligibleCd4 AND anyResult");
     return cd;
   }
 
