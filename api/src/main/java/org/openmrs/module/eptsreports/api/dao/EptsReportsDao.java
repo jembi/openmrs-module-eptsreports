@@ -33,7 +33,7 @@ public class EptsReportsDao {
             .getCurrentSession()
             .createSQLQuery(
                 "select concat(report_definition_uuid, '') as uuid from reporting_report_design where reporting_report_design.uuid = ?")
-            .setString(0, uuid)
+            .setParameter(1, uuid)
             .list();
     if (!list.isEmpty()) {
       return list.get(0);
@@ -49,16 +49,16 @@ public class EptsReportsDao {
             "delete from reporting_report_design_resource "
                 + "where reporting_report_design_resource.report_design_id = ("
                 + "select id from reporting_report_design where reporting_report_design.uuid = ?)")
-        .setString(0, designUuid)
+        .setParameter(1, designUuid)
         .executeUpdate();
     session
         .createSQLQuery(
             "delete from reporting_report_design where reporting_report_design.uuid = ?")
-        .setString(0, designUuid)
+        .setParameter(1, designUuid)
         .executeUpdate();
     session
         .createSQLQuery("delete from serialized_object where uuid = ?")
-        .setString(0, serializedObjectUuid)
+        .setParameter(1, serializedObjectUuid)
         .executeUpdate();
     transaction.commit();
   }
