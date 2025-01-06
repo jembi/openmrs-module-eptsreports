@@ -472,6 +472,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     valuesMap.put("165322", hivMetadata.getMdcState().getConceptId());
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
     valuesMap.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+    valuesMap.put("1267", hivMetadata.getCompletedConcept().getConceptId());
 
     String query =
         "SELECT dispensation.patient_id, "
@@ -523,50 +524,65 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     MDC1 {
       @Override
       public String getQuery() {
-        return " ( SELECT obs.value_coded "
-            + "FROM   obs "
-            + "WHERE  obs.encounter_id = dispensation.encounter_id "
-            + "       AND obs.concept_id = 165174 "
+        return " ( SELECT o1.value_coded "
+            + "FROM   obs o1 JOIN obs o2 ON o1.encounter_id = o2.encounter_id "
+            + "WHERE  o1.encounter_id = dispensation.encounter_id "
+            + "       AND o1.concept_id = ${165174} "
+            + "       AND o2.concept_id = ${165322} "
+            + "       AND o2.value_coded != ${1267} "
+            + "       AND o1.obs_group_id = o2.obs_group_id "
             + "LIMIT  1 ) MDC1 ";
       }
     },
     MDC2 {
       @Override
       public String getQuery() {
-        return " ( SELECT obs.value_coded "
-            + "FROM   obs "
-            + "WHERE  obs.encounter_id = dispensation.encounter_id "
-            + "       AND obs.concept_id = 165174 "
-            + "LIMIT  1,1 ) MDC2 ";
+        return "( SELECT o1.value_coded "
+            + "  FROM   obs o1 JOIN obs o2 ON o1.encounter_id = o2.encounter_id "
+            + "  WHERE  o1.encounter_id = dispensation.encounter_id "
+            + "    AND o1.concept_id = ${165174} "
+            + "    AND o2.concept_id = ${165322} "
+            + "    AND o2.value_coded != ${1267} "
+            + "    AND o1.obs_group_id = o2.obs_group_id "
+            + "  LIMIT  1,1 ) MDC2";
       }
     },
     MDC3 {
       @Override
       public String getQuery() {
-        return " ( SELECT obs.value_coded "
-            + "FROM   obs "
-            + "WHERE  obs.encounter_id = dispensation.encounter_id "
-            + "       AND obs.concept_id = 165174 "
+        return " ( SELECT o1.value_coded "
+            + "FROM   obs o1 JOIN obs o2 ON o1.encounter_id = o2.encounter_id "
+            + "WHERE  o1.encounter_id = dispensation.encounter_id "
+            + "       AND o1.concept_id = ${165174} "
+            + "       AND o2.concept_id = ${165322} "
+            + "       AND o2.value_coded != ${1267} "
+            + "       AND o1.obs_group_id = o2.obs_group_id "
             + "LIMIT  2,1 ) MDC3 ";
       }
     },
     MDC4 {
       @Override
       public String getQuery() {
-        return " ( SELECT obs.value_coded "
-            + "FROM   obs "
-            + "WHERE  obs.encounter_id = dispensation.encounter_id "
-            + "       AND obs.concept_id = 165174 "
+        return " ( SELECT o1.value_coded "
+            + "FROM   obs o1 JOIN obs o2 ON o1.encounter_id = o2.encounter_id "
+            + "WHERE  o1.encounter_id = dispensation.encounter_id "
+            + "       AND o1.concept_id = ${165174} "
+            + "       AND o2.concept_id = ${165322} "
+            + "       AND o2.value_coded != ${1267} "
+            + "       AND o1.obs_group_id = o2.obs_group_id "
             + "LIMIT  3,1 ) MDC4 ";
       }
     },
     MDC5 {
       @Override
       public String getQuery() {
-        return " ( SELECT obs.value_coded "
-            + "FROM   obs "
-            + "WHERE  obs.encounter_id = dispensation.encounter_id "
-            + "       AND obs.concept_id = 165174 "
+        return " ( SELECT o1.value_coded "
+            + "FROM   obs o1 JOIN obs o2 ON o1.encounter_id = o2.encounter_id "
+            + "WHERE  o1.encounter_id = dispensation.encounter_id "
+            + "       AND o1.concept_id = ${165174} "
+            + "       AND o2.concept_id = ${165322} "
+            + "       AND o2.value_coded != ${1267} "
+            + "       AND o1.obs_group_id = o2.obs_group_id "
             + "LIMIT  4,1 ) MDC5 ";
       }
     };
