@@ -7674,7 +7674,7 @@ public class QualityImprovement2020CohortQueries {
                 hivMetadata.getSemiannualDispensation(),
                 hivMetadata.getAnnualArvDispensationConcept()));
 
-    CohortDefinition transferOut = getTranferredOutPatients();
+    CohortDefinition transferOut = getTranferredOutPatientDuringRevisionPeriod();
 
     CohortDefinition dead = getDeadPatientsComposition();
 
@@ -7756,7 +7756,7 @@ public class QualityImprovement2020CohortQueries {
             resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13(),
             "endDate=${revisionEndDate},location=${location}"));
 
-    comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
+    comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING3));
 
     comp.addSearch(
         "dead", EptsReportUtils.map(dead, "endDate=${revisionEndDate},location=${location}"));
@@ -7895,7 +7895,7 @@ public class QualityImprovement2020CohortQueries {
         break;
       case 9:
         comp.setName(
-            "% de Crianças (2-9 anos) inscritas há 12 meses em algum MDS (DT) que receberam pelo menos um resultado de CV");
+            "% de Crianças (2-9 anos) activas em TARV e inscritos há 24 meses em algum MDS (DT) que receberam o segundo resultado de CV");
         break;
       case 10:
         comp.setName(
@@ -8223,6 +8223,9 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition nextPickupBetween173And187 =
         QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(173, 187);
 
+    CohortDefinition nextPickupBetween335And395 =
+        QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(335, 395);
+
     compositionCohortDefinition.addSearch(
         "MDS",
         EptsReportUtils.map(
@@ -8245,7 +8248,13 @@ public class QualityImprovement2020CohortQueries {
             nextPickupBetween173And187,
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString("MDS OR DSDT OR FILA83 OR FILA173");
+    compositionCohortDefinition.addSearch(
+        "FILA335",
+        EptsReportUtils.map(
+            nextPickupBetween335And395,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString("MDS OR DSDT OR FILA83 OR FILA173 OR FILA335");
 
     return compositionCohortDefinition;
   }
@@ -9456,6 +9465,7 @@ public class QualityImprovement2020CohortQueries {
             ageCohortQueries.createXtoYAgeCohort("Ages", 2, 200), "effectiveDate=${endDate}"));
 
     cd.setCompositionString("MQ15DenMDS AND MDS AND AGE");
+ 
     return cd;
   }
 
@@ -11962,7 +11972,7 @@ public class QualityImprovement2020CohortQueries {
             + "                          AND e.voided = 0 "
             + "                          AND o.voided = 0) vl_result "
             + "               ON two_dispensations.patient_id = vl_result.patient_id "
-            + "WHERE  vl_result.vl_date > two_dispensations.second_date AND vl_result.vl_date <= :revisionEndDate";
+            + "WHERE  vl_result.vl_date >= two_dispensations.second_date AND vl_result.vl_date <= :revisionEndDate";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -12116,7 +12126,7 @@ public class QualityImprovement2020CohortQueries {
             + "                          AND p.voided = 0 "
             + "                          AND e.voided = 0 "
             + "                          AND o.voided = 0) vl_result  ON two_dispensations.patient_id = vl_result.patient_id "
-            + "WHERE  vl_result.vl_date > two_dispensations.second_date "
+            + "WHERE  vl_result.vl_date >= two_dispensations.second_date "
             + "       AND vl_result.vl_date <= :revisionEndDate";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -13700,6 +13710,7 @@ public class QualityImprovement2020CohortQueries {
             + "                         AND o.voided = 0 "
             + "                         AND e.encounter_type = ${6} "
             + "                         AND e.location_id = :location "
+            + "                         AND e.encounter_datetime <= :revisionEndDate "
             + "                         AND o.concept_id = ${1268} "
             + "                         AND o.value_coded = ${1267} "
             + "                       GROUP  BY p.patient_id) tb_end "
@@ -15750,5 +15761,124 @@ public class QualityImprovement2020CohortQueries {
     }
 
     return compositionCohortDefinition;
+  }
+
+  /**
+   * <b>Utentes Transferidos Para Outra US</b>
+   *
+   * <p>O sistema irá identificar utentes “Transferido Para” outras US em TARV durante o período de
+   * revisão seleccionando os utentes registados como:
+   * <li>último registo de [“Mudança Estado Permanência TARV” (Coluna 21) = “T” (Transferido Para)
+   *     na “Ficha Clínica” com “Data da Consulta Actual” (Coluna 1, durante a qual se fez o registo
+   *     da mudança do estado de permanência TARV) durante o período de revisão (>= “Data Início
+   *     Revisão” e <= “Data Fim Revisão) ou
+   * <li>registados como “Mudança Estado Permanência TARV” = “Transferido Para”, último estado
+   *     registado na “Ficha Resumo” com “Data da Transferência”) durante o período de revisão (>=
+   *     “Data Início Revisão” e <= “Data Fim Revisão;
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getTranferredOutPatientDuringRevisionPeriod() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Utentes Transferidos Para Outra US");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+
+    String query =
+        "SELECT max_transferout.patient_id "
+            + "FROM  patient p "
+            + "          JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "          JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + " "
+            + "               JOIN ( "
+            + getLastPatientStateOfStayFromSources()
+            + "       ) max_transferout ON max_transferout.patient_id = p.patient_id "
+            + "WHERE    p.voided = 0 "
+            + "                     AND e.voided = 0 "
+            + "                     AND e.location_id = :location "
+            + "                     AND e.encounter_type = ${6} "
+            + "                     AND e.encounter_datetime = max_transferout.transferout_date "
+            + "                     AND o.voided = 0 "
+            + "                     AND o.concept_id = ${6273} "
+            + "                     AND o.value_coded = ${1706} "
+            + "GROUP  BY p.patient_id "
+            + "UNION "
+            + "SELECT max_transferout.patient_id "
+            + "FROM  patient p "
+            + "          JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "          JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + " "
+            + "          JOIN ( "
+            + getLastPatientStateOfStayFromSources()
+            + ") max_transferout ON max_transferout.patient_id = p.patient_id "
+            + "WHERE    p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ${53} "
+            + "  AND o.obs_datetime = max_transferout.transferout_date "
+            + "  AND o.voided = 0 "
+            + "  AND o.concept_id = ${6272} "
+            + "  AND o.value_coded = ${1706} "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  private static String getLastPatientStateOfStayFromSources() {
+    return "           SELECT transferout.patient_id, "
+        + "                  Max(transferout.transferout_date) transferout_date "
+        + "           FROM   (SELECT p.patient_id, "
+        + "                          Max(e.encounter_datetime) AS transferout_date "
+        + "                   FROM   patient p "
+        + "                              JOIN encounter e "
+        + "                                   ON p.patient_id = e.patient_id "
+        + "                              JOIN obs o "
+        + "                                   ON e.encounter_id = o.encounter_id "
+        + "                   WHERE  p.voided = 0 "
+        + "                     AND e.voided = 0 "
+        + "                     AND e.location_id = :location "
+        + "                     AND e.encounter_type = ${6} "
+        + "                     AND e.encounter_datetime >= :startDate "
+        + "                     AND e.encounter_datetime <= :endDate "
+        + "                     AND o.voided = 0 "
+        + "                     AND o.concept_id = ${6273} "
+        + "                     AND o.value_coded IS NOT NULL "
+        + "                   GROUP  BY p.patient_id "
+        + "                   UNION "
+        + "                   SELECT p.patient_id, "
+        + "                          Max(o.obs_datetime) AS transferout_date "
+        + "                   FROM   patient p "
+        + "                              JOIN encounter e "
+        + "                                   ON p.patient_id = e.patient_id "
+        + "                              JOIN obs o "
+        + "                                   ON e.encounter_id = o.encounter_id "
+        + "                   WHERE  p.voided = 0 "
+        + "                     AND e.voided = 0 "
+        + "                     AND e.location_id = :location "
+        + "                     AND e.encounter_type = ${53} "
+        + "                     AND o.obs_datetime >= :startDate "
+        + "                     AND o.obs_datetime <= :endDate "
+        + "                     AND o.voided = 0 "
+        + "                     AND o.concept_id = ${6272} "
+        + "                     AND o.value_coded IS NOT NULL "
+        + "                   GROUP  BY p.patient_id) transferout "
+        + "           GROUP  BY transferout.patient_id ";
   }
 }
