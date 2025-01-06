@@ -878,7 +878,7 @@ public class HivCohortQueries {
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(
-      boolean byEndOfReportingPeriod) {
+      boolean endDate) {
 
     SqlCohortDefinition definition = new SqlCohortDefinition();
     definition.setName(
@@ -911,10 +911,10 @@ public class HivCohortQueries {
             + "                 AND        e.encounter_type = ${18} "
             + "                 AND        o.concept_id = ${5096} ";
     query +=
-        byEndOfReportingPeriod
+        endDate
             ? "                 AND        e.encounter_datetime <= :endDate "
-            : "                 AND        e.encounter_datetime >= :startDate "
-                + "                 AND        e.encounter_datetime <= :endDate ";
+            : "                 AND        e.encounter_datetime <= CURRENT_DATE() ";
+
     query +=
         "                 AND        e.location_id = :location "
             + "               GROUP BY   p.patient_id "
@@ -932,17 +932,20 @@ public class HivCohortQueries {
             + "                 AND        e.encounter_type = ${52} "
             + "                 AND        o.concept_id = ${23866} ";
     query +=
-        byEndOfReportingPeriod
-            ? "                 AND        o.value_datetime  <= :endDate  "
-            : "                 AND        o.value_datetime  >= :startDate  "
-                + "                 AND        o.value_datetime  <= :endDate  ";
+        endDate
+            ? "                 AND        e.encounter_datetime <= :endDate "
+            : "                 AND        e.encounter_datetime <= CURRENT_DATE() ";
+
     query +=
         "                 AND        e.location_id = :location "
             + "               GROUP BY   p.patient_id "
             + " )  considered_transferred "
             + " GROUP BY considered_transferred.patient_id "
-            + " ) final "
-            + " WHERE  final.max_date  <= :endDate  ";
+            + " ) final ";
+    query +=
+        endDate
+            ? " WHERE  final.max_date  <= :endDate "
+            : " WHERE  final.max_date  <= CURRENT_DATE() ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
