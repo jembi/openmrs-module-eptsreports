@@ -516,7 +516,6 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
 
     StringSubstitutor sb = new StringSubstitutor(valuesMap);
     sqlPatientDataDefinition.setQuery(sb.replace(query));
-    System.out.println(sqlPatientDataDefinition.getQuery());
 
     return sqlPatientDataDefinition;
   }
