@@ -884,6 +884,7 @@ public class HivCohortQueries {
     definition.setName(
         "Patients Transfered Out between (next scheduled ART pick-up on FILA + 1 day) "
             + "and (the most recent ART pickup date on Ficha Recepção – Levantou ARVs + 31 days");
+    definition.addParameter(new Parameter("startDate", "startDate", Date.class));
     definition.addParameter(new Parameter("endDate", "endDate", Date.class));
     definition.addParameter(new Parameter("location", "location", Location.class));
 
@@ -913,6 +914,7 @@ public class HivCohortQueries {
         endDate
             ? "                 AND        e.encounter_datetime <= :endDate "
             : "                 AND        e.encounter_datetime <= CURRENT_DATE() ";
+
     query +=
         "                 AND        e.location_id = :location "
             + "               GROUP BY   p.patient_id "
@@ -933,6 +935,7 @@ public class HivCohortQueries {
         endDate
             ? "                 AND        e.encounter_datetime <= :endDate "
             : "                 AND        e.encounter_datetime <= CURRENT_DATE() ";
+
     query +=
         "                 AND        e.location_id = :location "
             + "               GROUP BY   p.patient_id "
