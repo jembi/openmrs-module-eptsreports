@@ -33,19 +33,19 @@ public class PmtctHeiDataset extends BaseDataSet {
   @Autowired private PmtctHeiCohortQueries pmtctHeiCohortQueries;
 
   /**
-   * Construction of the PMTCT - EID dataset
+   * Construction of the PMTCT - HEI dataset
    *
    * @return @{@link DataSetDefinition}
    */
   public DataSetDefinition constructPmtctHeiDataSet() {
     CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
-    dsd.setName("PMTCT-EID Dataset");
+    dsd.setName("PMTCT-HEI Dataset");
     dsd.addParameters(getParameters());
 
     dsd.addDimension(
         "infantAgeInMonths",
         EptsReportUtils.map(
-            eptsCommonDimension.getInfantAgeInMonths(),
+            eptsCommonDimension.getHeiInfantAgeInMonths(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dsd.addDimension(
@@ -68,7 +68,7 @@ public class PmtctHeiDataset extends BaseDataSet {
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dsd.addColumn(
-        "TOTAL",
+        "HEITOTAL",
         "The PMTCT_HEI numerator reports the number of HIV-exposed infants, with a virologic HIV test result returned in the reporting period, whose diagnostic sample was collected by 12 months of age.",
         EptsReportUtils.map(
             TOTAL, "startDate=${startDate},endDate=${endDate},location=${location}"),
