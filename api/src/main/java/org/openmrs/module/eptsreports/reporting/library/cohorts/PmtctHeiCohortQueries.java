@@ -215,11 +215,11 @@ public class PmtctHeiCohortQueries {
             + "    AND o.value_datetime <= :endDate ) "
             + "    AND (o2.concept_id = ${165502} ";
     if (firstSample) {
-      query = query + "        AND o2.value_coded IN (${165503}, ${165507}) ) ) ";
+      query += "        AND o2.value_coded IN (${165503}, ${165507}) ) ) ";
     } else {
-      query = query + "        AND o2.value_coded IN (${165506}, ${165510}) ) ) ";
+      query += "        AND o2.value_coded IN (${165506}, ${165510}) ) ) ";
     }
-    query = query + "GROUP BY p.patient_id";
+    query += "GROUP BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -350,9 +350,9 @@ public class PmtctHeiCohortQueries {
             + "  AND ee.location_id = :location "
             + "  AND oo.concept_id = ${1030} ";
     if (posiveResult) {
-      query = query + " AND oo.value_coded = ${703} ";
+      query += " AND oo.value_coded = ${703} ";
     } else {
-      query = query + " AND oo.value_coded = ${664} ";
+      query += " AND oo.value_coded = ${664} ";
     }
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);

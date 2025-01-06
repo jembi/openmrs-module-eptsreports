@@ -301,9 +301,9 @@ public class PmtctEidCohortQueries {
             + "  AND oo.value_datetime = hiv_sample.collection_date "
             + "  AND oo2.concept_id = ${165502} ";
     if (firstSample) {
-      query = query + " AND oo2.value_coded IN (${165503}, ${165507}) ";
+      query += " AND oo2.value_coded IN (${165503}, ${165507}) ";
     } else {
-      query = query + " AND oo2.value_coded IN (${165506}, ${165510}) ";
+      query += " AND oo2.value_coded IN (${165506}, ${165510}) ";
     }
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
