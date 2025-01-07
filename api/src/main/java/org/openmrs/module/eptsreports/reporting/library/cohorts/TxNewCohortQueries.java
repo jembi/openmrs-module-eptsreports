@@ -13,8 +13,6 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
-
 import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.EncounterType;
@@ -587,9 +585,7 @@ public class TxNewCohortQueries {
 
     CohortDefinition cd4Under200 =
         getPatientsWithCd4AndAge(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
-            5,
-            null);
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3, 5, null);
 
     cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping1));
     cd.addSearch(
@@ -658,9 +654,7 @@ public class TxNewCohortQueries {
 
     CohortDefinition cd4Under200AndAge =
         getPatientsWithCd4AndAge(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
-            5,
-            null);
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3, 5, null);
 
     cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping1));
 
@@ -704,9 +698,7 @@ public class TxNewCohortQueries {
 
     CohortDefinition cd4Under200AndAge =
         getPatientsWithCd4AndAge(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
-            5,
-            null);
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3, 5, null);
 
     CohortDefinition cd4Above200AndAge =
         getPatientsWithCd4AndAge(
