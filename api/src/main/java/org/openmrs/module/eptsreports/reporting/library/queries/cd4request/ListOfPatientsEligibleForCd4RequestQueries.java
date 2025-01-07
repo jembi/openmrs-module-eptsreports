@@ -23,6 +23,27 @@ public class ListOfPatientsEligibleForCd4RequestQueries {
         + "GROUP  BY p.patient_id ";
   }
 
+  public static String getLastVlResultDateOnLab() {
+    return "SELECT p.patient_id, "
+        + "       Max(DATE(e.encounter_datetime)) AS most_recent "
+        + "FROM   patient p "
+        + "       INNER JOIN encounter e "
+        + "               ON e.patient_id = p.patient_id "
+        + "       INNER JOIN obs o "
+        + "               ON o.encounter_id = e.encounter_id "
+        + "WHERE  e.encounter_type IN (${13},${51}) "
+        + "       AND ( ( o.concept_id = ${856} "
+        + "               AND o.value_numeric IS NOT NULL ) "
+        + "              OR ( o.concept_id = ${1305} "
+        + "                   AND o.value_coded IS NOT NULL ) ) "
+        + "       AND DATE(e.encounter_datetime) <= :endDate "
+        + "       AND e.location_id = :location "
+        + "       AND e.voided = 0 "
+        + "       AND p.voided = 0 "
+        + "       AND o.voided = 0 "
+        + "GROUP  BY p.patient_id ";
+  }
+
   /**
    * <b> utentes com registo do último “Resultado de CV” numa consulta clínica (Ficha Clínica –
    * Ficha Mestra)</b>
@@ -51,6 +72,34 @@ public class ListOfPatientsEligibleForCd4RequestQueries {
         + "                           GROUP  BY p.patient_id ";
   }
 
+  /**
+   * <b> utentes com registo do último “Resultado de CV” numa consulta clínica (Ficha Clínica –
+   * Ficha Mestra)</b>
+   *
+   * @return {@link String}
+   */
+  public static String getLastVlResultOnLab() {
+    return "SELECT p.patient_id, o.value_numeric AS viral_load  "
+        + "FROM   patient p  "
+        + "                                  INNER JOIN encounter e  "
+        + "                                          ON e.patient_id = p.patient_id  "
+        + "                                  INNER JOIN obs o  "
+        + "                                          ON o.encounter_id = e.encounter_id  "
+        + "                           INNER JOIN (  "
+        + getLastVlResultDateOnLab()
+        + " )last_vl ON last_vl.patient_id = p.patient_id  "
+        + "                           WHERE  e.encounter_type IN (${13},${51})  "
+        + "                                  AND o.concept_id = ${856}  "
+        + "                                          AND o.value_numeric IS NOT NULL "
+        + "                                          AND o.value_numeric > 1000 "
+        + "                                  AND DATE(e.encounter_datetime) = last_vl.most_recent  "
+        + "                                  AND e.location_id = :location  "
+        + "                                  AND e.voided = 0  "
+        + "                                  AND p.voided = 0  "
+        + "                                  AND o.voided = 0  "
+        + "                           GROUP  BY p.patient_id ";
+  }
+
   public static String getSecondVlResultDate() {
     return "SELECT p.patient_id, Max(e.encounter_datetime) AS second_most_recent  "
         + "FROM   patient p  "
@@ -66,7 +115,30 @@ public class ListOfPatientsEligibleForCd4RequestQueries {
         + "               AND o.value_numeric IS NOT NULL ) "
         + "              OR ( o.concept_id = ${1305} "
         + "                   AND o.value_coded IS NOT NULL ) ) "
-        + "       AND e.encounter_datetime < last_vl.most_recent "
+        + "       AND e.encounter_datetime <= DATE_SUB(last_vl.most_recent, INTERVAL 3 MONTH) "
+        + "       AND e.location_id = :location "
+        + "       AND e.voided = 0 "
+        + "       AND p.voided = 0 "
+        + "       AND o.voided = 0 "
+        + "GROUP  BY p.patient_id ";
+  }
+
+  public static String getSecondVlResultOnLabDate() {
+    return "SELECT p.patient_id, Max(DATE(e.encounter_datetime)) AS second_most_recent  "
+        + "FROM   patient p  "
+        + "                                  INNER JOIN encounter e  "
+        + "                                          ON e.patient_id = p.patient_id  "
+        + "                                  INNER JOIN obs o  "
+        + "                                          ON o.encounter_id = e.encounter_id  "
+        + "                           INNER JOIN (  "
+        + getLastVlResultDateOnLab()
+        + " )last_vl ON last_vl.patient_id = p.patient_id  "
+        + "WHERE  e.encounter_type IN (${13},${51}) "
+        + "       AND ( ( o.concept_id = ${856} "
+        + "               AND o.value_numeric IS NOT NULL ) "
+        + "              OR ( o.concept_id = ${1305} "
+        + "                   AND o.value_coded IS NOT NULL ) ) "
+        + "       AND DATE(e.encounter_datetime) <= DATE_SUB(last_vl.most_recent, INTERVAL 3 MONTH) "
         + "       AND e.location_id = :location "
         + "       AND e.voided = 0 "
         + "       AND p.voided = 0 "
@@ -95,6 +167,34 @@ public class ListOfPatientsEligibleForCd4RequestQueries {
         + "                                          AND o.value_numeric IS NOT NULL "
         + "                                          AND o.value_numeric > 1000 "
         + "                                  AND e.encounter_datetime = second_vl.second_most_recent  "
+        + "                                  AND e.location_id = :location  "
+        + "                                  AND e.voided = 0  "
+        + "                                  AND p.voided = 0  "
+        + "                                  AND o.voided = 0  "
+        + "                           GROUP  BY p.patient_id ";
+  }
+
+  /**
+   * <b> utentes com registo do penúltimo “Resultado de CV” numa consulta clínica (Ficha Clínica –
+   * Ficha Mestra)</b>
+   *
+   * @return {@link String}
+   */
+  public static String getSecondVlResultOnLab() {
+    return "SELECT p.patient_id, o.value_numeric AS second_viral_load  "
+        + "FROM   patient p  "
+        + "                                  INNER JOIN encounter e  "
+        + "                                          ON e.patient_id = p.patient_id  "
+        + "                                  INNER JOIN obs o  "
+        + "                                          ON o.encounter_id = e.encounter_id  "
+        + "                           INNER JOIN (  "
+        + getSecondVlResultOnLabDate()
+        + " )second_vl ON second_vl.patient_id = p.patient_id  "
+        + "                           WHERE  e.encounter_type IN (${13},${51})  "
+        + "                                  AND o.concept_id = ${856}  "
+        + "                                          AND o.value_numeric IS NOT NULL "
+        + "                                          AND o.value_numeric > 1000 "
+        + "                                  AND DATE(e.encounter_datetime) = second_vl.second_most_recent  "
         + "                                  AND e.location_id = :location  "
         + "                                  AND e.voided = 0  "
         + "                                  AND p.voided = 0  "
@@ -151,6 +251,7 @@ public class ListOfPatientsEligibleForCd4RequestQueries {
         + "        (obs.concept_id = ${1695} AND obs.value_numeric IS NOT NULL) "
         + "        OR "
         + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
+        + "        OR ( obs.concept_id = ${165515} AND obs.value_coded IS NOT NULL ) "
         + "      ) "
         + "  AND enc.encounter_datetime <= :endDate "
         + "  AND enc.location_id = :location "

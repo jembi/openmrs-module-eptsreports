@@ -318,47 +318,46 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         "location=${location}",
         new DispensationTypeMdcConverter());
 
-    // 31 - Data da consulta mais recente - Sheet 1: Column AE
+    // 31 - Data da Consulta mais recente com PopChave informado - Sheet 1: Column AE
     pdd.addColumn(
-        "mdc_consultation_date",
-        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
-            .getMostRecentMdcConsultationDate(),
-        "location=${location}");
-
+        "keypop_date",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulationDate(),
+        "location=${location}",
+        new ForwardSlashDateConverter());
     // 32 - HSH - Sheet 1: Column AF
     pdd.addColumn(
         "keypop_hsh",
         listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
             hivMetadata.getHomosexualConcept()),
-        "endDate=${endDate}");
+        "location=${location},endDate=${endDate}");
 
     // 33 - PID - Sheet 1: Column AG
     pdd.addColumn(
         "keypop_pid",
         listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
             hivMetadata.getDrugUseConcept()),
-        "endDate=${endDate}");
+        "location=${location},endDate=${endDate}");
 
     // 34 - REC - Sheet 1: Column AH
     pdd.addColumn(
         "keypop_rec",
         listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
             hivMetadata.getImprisonmentConcept()),
-        "endDate=${endDate}");
+        "location=${location},endDate=${endDate}");
 
     // 35 - MTS - Sheet 1: Column AI
     pdd.addColumn(
         "keypop_mts",
         listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
             hivMetadata.getSexWorkerConcept()),
-        "endDate=${endDate}");
+        "location=${location},endDate=${endDate}");
 
     // 36 - TG - Sheet 1: Column AJ
     pdd.addColumn(
         "keypop_tg",
         listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
             hivMetadata.getTransGenderConcept()),
-        "endDate=${endDate}");
+        "location=${location},endDate=${endDate}");
 
     // 37 - Data de Inscrição no OVC - Sheet 1: Column AJ
     pdd.addColumn(

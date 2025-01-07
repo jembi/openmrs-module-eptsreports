@@ -1395,10 +1395,8 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "              FROM patient p  "
             + "               INNER JOIN encounter e ON p.patient_id = e.patient_id  "
             + "               INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
-            + "               INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id  "
             + "                WHERE e.encounter_type = ${35}   "
             + "                 AND o.concept_id = ${6306}   "
-            + "                 AND o.value_coded = ${1065}   "
             + "                 AND p.voided = 0  "
             + "                 AND e.voided = 0  "
             + "                 AND o.voided = 0  "
@@ -1428,10 +1426,8 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "              FROM patient p  "
             + "               INNER JOIN encounter e ON p.patient_id = e.patient_id  "
             + "               INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
-            + "               INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id  "
             + "                WHERE e.encounter_type = ${35}   "
             + "                 AND o.concept_id = ${6306}   "
-            + "                 AND o.value_coded = ${1066}   "
             + "                 AND p.voided = 0  "
             + "                 AND e.voided = 0  "
             + "                 AND o.voided = 0  "
@@ -1826,7 +1822,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "          AND e.voided = 0 "
             + "          AND e.location_id = :location "
             + "          AND e.encounter_datetime <= :endDate "
-            + "          AND e.encounter_type = ${18} "
+            + "          AND e.encounter_type IN ( ${18}, ${6} ) "
             + "        GROUP BY "
             + "            p.patient_id "
             + "    ) AS most_recent "
@@ -1861,7 +1857,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "          AND e.voided = 0 "
             + "          AND e.location_id = :location "
             + "          AND e.encounter_datetime <= :endDate "
-            + "          AND e.encounter_type = ${6} "
+            + "          AND e.encounter_type IN ( ${18}, ${6} ) "
             + "        GROUP BY "
             + "            p.patient_id "
             + "    ) AS most_recent "
@@ -1876,7 +1872,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "  AND en.encounter_type = ${6} "
             + "  AND ob.concept_id = ${23739} "
             + "  AND ob.value_coded = ${1098} "
-            + "  AND en.encounter_datetime = most_recent.encounter_date "
+            + "  AND en.encounter_datetime BETWEEN most_recent.encounter_date AND :endDate "
             + "  AND en.patient_id NOT IN ( "
             + "    SELECT "
             + "        p.patient_id "
@@ -1888,7 +1884,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "      AND ee.voided = 0 "
             + "      AND ee.location_id = :location "
             + "      AND ee.encounter_type = ${18} "
-            + "      AND ee.encounter_datetime BETWEEN most_recent.encounter_date AND :endDate "
+            + "      AND ee.encounter_datetime = most_recent.encounter_date "
             + " ) "
             + "       UNION "
             + "SELECT "
@@ -1988,27 +1984,11 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                  patient p "
             + "                      INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "              WHERE "
-            + "                      e.encounter_type =  ${18}  AND p.voided = 0 "
+            + "                      e.encounter_type  IN ( ${18}, ${6} )  AND p.voided = 0 "
             + "                AND e.voided = 0 "
             + "                AND e.location_id = :location "
             + "                AND DATE(e.encounter_datetime) <= :endDate "
-            + "              GROUP BY p.patient_id "
-            + "UNION "
-            + "SELECT "
-            + "                                              e.patient_id, MAX(e.encounter_datetime) encounter_date "
-            + "              FROM "
-            + "                  patient p "
-            + "                      INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "                      INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "              WHERE "
-            + "                      e.encounter_type =  ${6} "
-            + "                AND (o.concept_id in ( ${23888} , ${23730} ) AND o.value_coded IN ( ${1256}  ,  ${1257} ) OR o.concept_id =  ${23739} ) "
-            + "                AND p.voided = 0 "
-            + "                AND o.voided = 0 "
-            + "                AND e.voided = 0 "
-            + "                AND e.location_id = :location "
-            + "                AND DATE(e.encounter_datetime) <= :endDate "
-            + "              GROUP BY p.patient_id) AS last_encounter "
+            + "              GROUP BY p.patient_id ) AS last_encounter "
             + "                 INNER JOIN "
             + "             encounter en ON en.patient_id = last_encounter.patient_id "
             + "                 AND DATE(en.encounter_datetime) = DATE(last_encounter.encounter_date) "
@@ -2087,25 +2067,11 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                  patient p "
             + "                      INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "              WHERE "
-            + "                      e.encounter_type =  ${18}  AND p.voided = 0 "
+            + "                      e.encounter_type  IN ( ${18}, ${6} )  AND p.voided = 0 "
             + "                AND e.voided = 0 "
             + "                AND e.location_id = :location "
             + "                AND DATE(e.encounter_datetime) <= :endDate "
-            + "              GROUP BY p.patient_id UNION SELECT "
-            + "                                              e.patient_id, MAX(e.encounter_datetime) encounter_date "
-            + "              FROM "
-            + "                  patient p "
-            + "                      INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "                      INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "              WHERE "
-            + "                      e.encounter_type =  ${6} "
-            + "                AND (o.value_coded IN ( ${1256}  ,  ${1257} ) OR o.concept_id =  ${23739} ) "
-            + "                AND p.voided = 0 "
-            + "                AND o.voided = 0 "
-            + "                AND e.voided = 0 "
-            + "                AND e.location_id = :location "
-            + "                AND DATE(e.encounter_datetime) <= :endDate "
-            + "              GROUP BY p.patient_id) AS last_encounter "
+            + "              GROUP BY p.patient_id  ) AS last_encounter "
             + "                 INNER JOIN "
             + "             encounter en ON en.patient_id = last_encounter.patient_id "
             + "                 AND DATE(en.encounter_datetime) = DATE(last_encounter.encounter_date) "
@@ -2138,25 +2104,11 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                  patient p "
             + "                      INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "              WHERE "
-            + "                      e.encounter_type =  ${18}  AND p.voided = 0 "
+            + "                      e.encounter_type IN ( ${18}, ${6} )  AND p.voided = 0 "
             + "                AND e.voided = 0 "
             + "                AND e.location_id = :location "
             + "                AND DATE(e.encounter_datetime) <= :endDate "
-            + "              GROUP BY p.patient_id UNION SELECT "
-            + "                                              e.patient_id, MAX(e.encounter_datetime) encounter_date "
-            + "              FROM "
-            + "                  patient p "
-            + "                      INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "                      INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "              WHERE "
-            + "                      e.encounter_type =  ${6} "
-            + "                AND (o.value_coded IN ( ${1256}  ,  ${1257} ) OR o.concept_id =  ${23739} ) "
-            + "                AND p.voided = 0 "
-            + "                AND o.voided = 0 "
-            + "                AND e.voided = 0 "
-            + "                AND e.location_id = :location "
-            + "                AND DATE(e.encounter_datetime) <= :endDate "
-            + "              GROUP BY p.patient_id) AS last_encounter "
+            + "              GROUP BY p.patient_id ) AS last_encounter "
             + "                 INNER JOIN "
             + "             encounter en ON en.patient_id = last_encounter.patient_id "
             + "                 AND DATE(en.encounter_datetime) = DATE(last_encounter.encounter_date) "
@@ -2525,19 +2477,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "   		  AND e.location_id = :location "
             + "   		  AND e.encounter_type = ${6} "
             + "   		  AND o.concept_id = ${23703} "
-            + "   		  AND ( ";
-    if (keyPopConcept.getConceptId() == 1377) {
-      sql += "                (p.gender = 'M' AND o.value_coded = ${keypop}) ";
-    } else if (keyPopConcept.getConceptId() == 1901) {
-      sql += "                (p.gender = 'F' AND o.value_coded = ${keypop}) ";
-    } else {
-      sql +=
-          "                   (p.gender = 'M' AND o.value_coded = ${keypop}) "
-              + "             OR "
-              + "             (p.gender = 'F' AND o.value_coded = ${keypop}) ";
-    }
-    sql +=
-        "                   ) "
+            + "   		  AND o.value_coded = ${keypop} "
             + "         AND e.encounter_datetime <= CURRENT_DATE() "
             + "       GROUP  BY p.person_id "
             + "   ) AS has_kpop ON p.patient_id = has_kpop.patient_id"
@@ -2545,6 +2485,47 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "     AND e.location_id = :location "
             + "   GROUP BY p.patient_id "
             + " ) S_or_N";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(sql));
+    return spdd;
+  }
+
+  /**
+   * <b>Date of the most recent clinical consultation with Key Population (Populacao Chave)
+   * registered by report generation date</b>
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getLastRegisteredKeyPopulationDate() {
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+    spdd.setName("Patient's Most Recent Date of Ficha Clinica with KPOP Registered");
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("1377", hivMetadata.getHomosexualConcept().getConceptId());
+    valuesMap.put("20454", hivMetadata.getDrugUseConcept().getConceptId());
+    valuesMap.put("20426", hivMetadata.getImprisonmentConcept().getConceptId());
+    valuesMap.put("1901", hivMetadata.getSexWorkerConcept().getConceptId());
+    valuesMap.put("165205", hivMetadata.getTransGenderConcept().getConceptId());
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("23703", hivMetadata.getKeyPopulationConcept().getConceptId());
+
+    String sql =
+        "       SELECT p.person_id AS patient_id, Max(e.encounter_datetime) AS last_date "
+            + "   	  FROM   person p "
+            + "   	  INNER JOIN encounter e  ON e.patient_id = p.person_id "
+            + "   	  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "   	  WHERE e.voided = 0 "
+            + "   		  AND p.voided = 0 "
+            + "   		  AND o.voided = 0 "
+            + "   		  AND e.location_id = :location "
+            + "   		  AND e.encounter_type = ${6} "
+            + "   		  AND o.concept_id = ${23703} "
+            + "   		  AND o.value_coded IN (${1377},${20454},${20426},${1901},${165205} ) "
+            + "         AND e.encounter_datetime <= CURRENT_DATE() "
+            + "       GROUP  BY p.person_id ";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
