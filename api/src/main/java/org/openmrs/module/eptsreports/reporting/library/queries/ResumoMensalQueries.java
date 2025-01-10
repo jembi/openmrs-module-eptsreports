@@ -205,9 +205,9 @@ public class ResumoMensalQueries {
             + "        AND patientTransf.value_coded = ${tarv} "
             + "        AND opening.concept_id = ${dateOfMasterCardFileOpening} ";
     if (isExclusion) {
-      query = query + "AND opening.value_datetime < :onOrAfter ";
+      query += "AND opening.value_datetime < :onOrAfter ";
     } else {
-      query = query + " AND opening.value_datetime BETWEEN :onOrAfter AND :onOrBefore  ";
+      query += " AND opening.value_datetime BETWEEN :onOrAfter AND :onOrBefore  ";
     }
     query =
         query
@@ -223,11 +223,11 @@ public class ResumoMensalQueries {
             + "       AND ps.state = ${transferredInState} "
             + "       AND pp.location_id = :location ";
     if (isExclusion) {
-      query = query + "    AND ps.start_date < :onOrAfter ";
+      query += "    AND ps.start_date < :onOrAfter ";
     } else {
-      query = query + "    AND ps.start_date BETWEEN :onOrAfter AND :onOrBefore ";
+      query += "    AND ps.start_date BETWEEN :onOrAfter AND :onOrBefore ";
     }
-    query = query + "    AND p.voided = 0 " + "    AND pp.voided = 0 " + "    AND ps.voided = 0";
+    query += "    AND p.voided = 0 " + "    AND pp.voided = 0 " + "    AND ps.voided = 0";
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("mastercard", mastercard);
