@@ -757,6 +757,7 @@ public class TxNewCohortQueries {
             5,
             null);
 
+
     CohortDefinition cd4Above200AndAge =
         getPatientsWithCd4AndAge(
             AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.GreaterThanOrEqualTo200mm3,
