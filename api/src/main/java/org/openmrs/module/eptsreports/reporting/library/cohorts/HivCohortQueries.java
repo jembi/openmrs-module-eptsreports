@@ -427,8 +427,7 @@ public class HivCohortQueries {
 
     CohortDefinition transferred = getPatientsTransferredOut(transferredOut, transferOutState);
 
-    CohortDefinition artPickup =
-        getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(true);
+    CohortDefinition artPickup = getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou();
 
     cd.addSearch(
         "transferredOut",
@@ -877,14 +876,12 @@ public class HivCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(
-      boolean endDate) {
+  public CohortDefinition getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou() {
 
     SqlCohortDefinition definition = new SqlCohortDefinition();
     definition.setName(
         "Patients Transfered Out between (next scheduled ART pick-up on FILA + 1 day) "
             + "and (the most recent ART pickup date on Ficha Recepção – Levantou ARVs + 31 days");
-    definition.addParameter(new Parameter("startDate", "startDate", Date.class));
     definition.addParameter(new Parameter("endDate", "endDate", Date.class));
     definition.addParameter(new Parameter("location", "location", Location.class));
 
@@ -909,14 +906,9 @@ public class HivCohortQueries {
             + "                 AND        e.voided = 0 "
             + "                 AND        o.voided = 0 "
             + "                 AND        e.encounter_type = ${18} "
-            + "                 AND        o.concept_id = ${5096} ";
-    query +=
-        endDate
-            ? "                 AND        e.encounter_datetime <= :endDate "
-            : "                 AND        e.encounter_datetime <= CURRENT_DATE() ";
-
-    query +=
-        "                 AND        e.location_id = :location "
+            + "                 AND        o.concept_id = ${5096} "
+            + "                 AND        e.encounter_datetime <= :endDate "
+            + "                 AND        e.location_id = :location "
             + "               GROUP BY   p.patient_id "
             + " UNION "
             + "               SELECT     p.patient_id, "
@@ -930,22 +922,14 @@ public class HivCohortQueries {
             + "                 AND        e.voided = 0 "
             + "                 AND        o.voided = 0 "
             + "                 AND        e.encounter_type = ${52} "
-            + "                 AND        o.concept_id = ${23866} ";
-    query +=
-        endDate
-            ? "                 AND        e.encounter_datetime <= :endDate "
-            : "                 AND        e.encounter_datetime <= CURRENT_DATE() ";
-
-    query +=
-        "                 AND        e.location_id = :location "
+            + "                 AND        o.concept_id = ${23866} "
+            + "                 AND        o.value_datetime  <= :endDate  "
+            + "                 AND        e.location_id = :location "
             + "               GROUP BY   p.patient_id "
             + " )  considered_transferred "
             + " GROUP BY considered_transferred.patient_id "
-            + " ) final ";
-    query +=
-        endDate
-            ? " WHERE  final.max_date  <= :endDate "
-            : " WHERE  final.max_date  <= CURRENT_DATE() ";
+            + " ) final "
+            + " WHERE  final.max_date  <= :endDate  ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 

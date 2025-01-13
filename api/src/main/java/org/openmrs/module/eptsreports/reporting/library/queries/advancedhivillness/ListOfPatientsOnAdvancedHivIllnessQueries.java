@@ -1084,15 +1084,31 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    * @see #getFirstEstadioQuery()
    * @return {@link String}
    */
-  public String getSecondEstadioQuery() {
-    return "    SELECT p.patient_id, MIN(e.encounter_datetime) AS second_date "
+  public String getFirstEstadioQueryWithEncounterId() {
+    return "    SELECT p.patient_id, e.encounter_id, e.encounter_datetime AS consultation_date "
         + "                             FROM   patient p "
         + "                                    INNER JOIN encounter e "
         + "                                            ON p.patient_id = e.patient_id "
         + "                                    INNER JOIN obs o "
         + "                                            ON e.encounter_id = o.encounter_id "
         + "                                    INNER JOIN ( "
-        + getFirstEstadioQuery()
+        + "                         SELECT p.patient_id,  "
+        + "                        Min(e.encounter_datetime) AS consultation_date "
+        + "                             FROM   patient p "
+        + "                                    INNER JOIN encounter e "
+        + "                                            ON p.patient_id = e.patient_id "
+        + "                                    INNER JOIN obs o "
+        + "                                            ON e.encounter_id = o.encounter_id "
+        + "                             WHERE  p.voided = 0 "
+        + "                                    AND e.voided = 0 "
+        + "                                    AND o.voided = 0 "
+        + "                                    AND e.encounter_type = ${6}  "
+        + "                                    AND o.concept_id = ${1406} "
+        + "                                    AND o.value_coded IN (${3},${42},${43},${60},${126},${507},${1294}, "
+        + "                                       ${1570},${5018},${5042},${5334},${5344},${5340},${5945},${6783},${6990},${7180},${14656}) "
+        + "                                    AND e.encounter_datetime <= :endDate "
+        + "                                    AND e.location_id = :location "
+        + "                             GROUP  BY p.patient_id "
         + "                                    ) first_consultation on first_consultation.patient_id = p.patient_id "
         + "                             WHERE  p.voided = 0 "
         + "                                    AND e.voided = 0 "
@@ -1101,7 +1117,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "                                    AND o.concept_id = ${1406} "
         + "                                    AND o.value_coded IN (${3},${42},${43},${60},${126},${507},${1294}, "
         + "                                                     ${1570},${5018},${5042},${5334},${5344},${5340},${5945},${6783},${6990},${7180},${14656}) "
-        + "                                    AND e.encounter_datetime > first_consultation.consultation_date "
+        + "                                    AND e.encounter_datetime = first_consultation.consultation_date "
         + "                                    AND e.location_id = :location "
         + "                             GROUP  BY p.patient_id ";
   }

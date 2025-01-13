@@ -44,7 +44,6 @@ public class TPTCompletionCohortQueries {
 
   @Autowired private TbPrevQueries tbPrevQueries;
   private final CommonQueries commonQueries;
-  @Autowired private HivCohortQueries hivCohortQueries;
 
   @Autowired
   public TPTCompletionCohortQueries(
@@ -481,14 +480,8 @@ public class TPTCompletionCohortQueries {
     definition.addSearch(
         "TRFOUT", EptsReportUtils.map(tbPrevCohortQueries.getPatientsTransferredOut(), mapping3));
 
-    definition.addSearch(
-        "ARTPICKUP",
-        EptsReportUtils.map(
-            hivCohortQueries.getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(false),
-            mapping3));
-
     definition.setCompositionString(
-        "(A AND  (A1 OR A2 OR A3 OR A4) OR (C1 OR C2 OR C3 OR C4 OR C5) ) AND NOT ((TRFOUT AND ARTPICKUP) OR B1B OR B2 OR B5Part1 OR B5Part2 OR B5Part3 OR B6Part1 OR B6Part2 OR B6Part3 OR D1 OR D2 OR D3 OR D4 OR D5)");
+        "(A AND  (A1 OR A2 OR A3 OR A4) OR (C1 OR C2 OR C3 OR C4 OR C5) ) AND NOT (TRFOUT OR B1B OR B2 OR B5Part1 OR B5Part2 OR B5Part3 OR B6Part1 OR B6Part2 OR B6Part3 OR D1 OR D2 OR D3 OR D4 OR D5)");
     return definition;
   }
 
@@ -691,37 +684,16 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     compositionCohortDefinition.addSearch(
-        "tpt1", EptsReportUtils.map(getTxCurrWithoutTPTCompletion(), mapping));
+        "tpt4", EptsReportUtils.map(getTxCurrEligibleForTPTCompletion(), mapping));
 
     compositionCohortDefinition.addSearch(
-        "TBtreatment",
-        EptsReportUtils.map(
-            txTbCohortQueries.txTbNumerator(),
-            "startDate=${endDate-1095d},endDate=${endDate},location=${location}"));
+        "tpt5", EptsReportUtils.map(getTxCurrWithTPTInLast7Months(), mapping));
 
-    compositionCohortDefinition.addSearch(
-        "TbScreening",
-        EptsReportUtils.map(
-            txTbCohortQueries.getDenominator(),
-            "startDate=${endDate-14d},endDate=${endDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "TbPositive",
-        EptsReportUtils.map(
-            txTbCohortQueries.positiveScreening(),
-            "startDate=${endDate-14d},endDate=${endDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "tpt5",
-        EptsReportUtils.map(
-            getTxCurrWithTPTInLast7Months(),
-            "startDate=${endDate-210d},endDate=${endDate},location=${location}"));
-
-    compositionCohortDefinition.setCompositionString(
-        "(tpt1 AND NOT (TBtreatment OR (TbScreening AND TbPositive))) AND NOT tpt5");
+    compositionCohortDefinition.setCompositionString("tpt4 AND NOT tpt5");
 
     return compositionCohortDefinition;
   }
+
   /**
    * <b>IMER1</b>: User_Story_ TPT <br>
    *
@@ -1182,7 +1154,7 @@ public class TPTCompletionCohortQueries {
             + "  AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1256} , ${1705})) "
                 .concat(
                     duringPeriod
-                        ? " AND o2.obs_datetime >= :startDate AND o2.obs_datetime < :endDate "
+                        ? " AND o2.obs_datetime >= :startDate AND o2.obs_datetime <= :endDate "
                         : " AND o2.obs_datetime <= :endDate ")
             + "  AND e.location_id = :location ";
 
@@ -2806,6 +2778,7 @@ public class TPTCompletionCohortQueries {
         "SELECT patient_id FROM ( " + arvStart + " ) initiated_art" + "   GROUP BY patient_id";
 
     sqlCohortDefinition.setQuery(query);
+    System.out.println(sqlCohortDefinition.getQuery());
     return sqlCohortDefinition;
   }
 }

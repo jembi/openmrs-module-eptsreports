@@ -8,12 +8,10 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.data.converter.ConceptNameConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.ForwardSlashDateConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.ViralLoadQualitativeLabelConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.StateOfStayArtPatientConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsEligibleForVLCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsEligibleForVLDataDefinitionQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
 import org.openmrs.module.reporting.data.converter.DataConverter;
@@ -42,9 +40,6 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
 
   private CommonMetadata commonMetadata;
 
-  private final ListOfPatientsInAdvancedHivIllnessCohortQueries
-      listOfPatientsInAdvancedHivIllnessCohortQueries;
-
   @Autowired
   public ListOfPatientsEligibleForVLDataSet(
       ListOfPatientsEligibleForVLDataDefinitionQueries
@@ -53,9 +48,7 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
       ListOfPatientsEligibleForVLCohortQueries listOfPatientsEligibleForVLCohortQueries,
       ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries,
       HivMetadata hivMetadata,
-      CommonMetadata commonMetadata,
-      ListOfPatientsInAdvancedHivIllnessCohortQueries
-          listOfPatientsInAdvancedHivIllnessCohortQueries) {
+      CommonMetadata commonMetadata) {
 
     this.listOfpatientsEligibleForVLDataDefinitionQueries =
         listOfpatientsEligibleForVLDataDefinitionQueries;
@@ -64,8 +57,6 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
     this.listOfPatientsDefaultersOrIITCohortQueries = listOfPatientsDefaultersOrIITCohortQueries;
     this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
-    this.listOfPatientsInAdvancedHivIllnessCohortQueries =
-        listOfPatientsInAdvancedHivIllnessCohortQueries;
   }
 
   public DataSetDefinition constructDataSet() {
@@ -136,15 +127,14 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
 
     pdd.addColumn(
         "last_vl_date",
-        listOfPatientsInAdvancedHivIllnessCohortQueries.getMostRecentVLResultDate(),
-        "endDate=${startDate},location=${location}",
-        new ForwardSlashDateConverter());
-
+        listOfpatientsEligibleForVLDataDefinitionQueries.getPatientsAndMostRecentVLResultDate(),
+        "startDate=${startDate},location=${location}",
+        null);
     pdd.addColumn(
         "recent_vl",
-        listOfPatientsInAdvancedHivIllnessCohortQueries.getMostRecentVLResult(),
-        "endDate=${startDate},location=${location}",
-        new ViralLoadQualitativeLabelConverter());
+        listOfpatientsEligibleForVLDataDefinitionQueries.getPatientsAndMostRecentViralLoad(),
+        "startDate=${startDate},location=${location}",
+        null);
 
     pdd.addColumn(
         "last_followup",
@@ -175,14 +165,14 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
         listOfpatientsEligibleForVLDataDefinitionQueries
             .getPatientsAndLastDrugPickUpDateOnFichaMestre(),
         "startDate=${startDate},location=${location}",
-        new ForwardSlashDateConverter());
+        null);
 
     pdd.addColumn(
         "next_pickup_mestre",
         listOfpatientsEligibleForVLDataDefinitionQueries
             .getPatientsAndNextpickUpDateOnFichaMestre(),
         "startDate=${startDate},location=${location}",
-        new ForwardSlashDateConverter());
+        null);
     pdd.addColumn(
         "apss_pp",
         listOfpatientsEligibleForVLDataDefinitionQueries
@@ -260,14 +250,13 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
         "saida_tarv",
         listOfpatientsEligibleForVLDataDefinitionQueries.getARTExitStatus(),
         "startDate=${startDate},endDate=${endDate},location=${location",
-        new NotApplicableIfNullConverter());
+        new StateOfStayArtPatientConverter());
 
     // Data de Saída de TARV - Sheet 1: Column AD */
     pdd.addColumn(
         "data_saida_tarv",
         listOfpatientsEligibleForVLDataDefinitionQueries.getARTExitDate(),
-        "endDate=${endDate}",
-        new NotApplicableIfNullConverter());
+        "endDate=${endDate}");
 
     // Observações - Sheet 1: Column AE */
     pdd.addColumn("pid", new PersonIdDataDefinition(), "");

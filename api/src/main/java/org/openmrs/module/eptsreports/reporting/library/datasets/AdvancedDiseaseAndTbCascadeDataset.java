@@ -84,7 +84,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(eligibleCd4Ind, inclusionPeriod),
         dissagregations());
 
-    // TB_DA_FR15 - Number of clients eligible for CD4 count who have a CD4 count within 33 days
+    // TB_DA_FR16 - Number of clients eligible for CD4 count who have a CD4 count within 33 days
     // (Cascade 1)
     CohortIndicator cd4CountInd =
         eptsGeneralIndicator.getIndicator(
@@ -112,7 +112,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
             "eligibleWithSevereImmunosuppression",
             EptsReportUtils.map(
                 advancedDiseaseAndTBCascadeCohortQueries
-                    .getEligibleClientsWithSevereImmunosuppressionWithin33Days(),
+                    .getEligibleClientsWithSevereImmunosuppression(),
                 mappings));
 
     dataSetDefinition.addColumn(
@@ -450,11 +450,6 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
             "Consecutive Vl Disaggregation",
             "cd4Eligibility=consecutiveVl",
             "consecutiveVlDisaggregation"),
-        new ColumnParameters(
-            "cd4Eligibility-consecutiveVlAndCd4In33Days",
-            "Consecutive Vl With CD4 within 33 Days Disaggregation",
-            "cd4Eligibility=consecutiveVlAndCd4In33Days",
-            "consecutiveVlDisaggregationCd433Day"),
         new ColumnParameters(
             "cd4Eligibility-reinitArt",
             "Reinitiated Art Disaggregation",

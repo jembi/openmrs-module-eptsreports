@@ -89,8 +89,6 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         listOfPatientsDefaultersOrIITCohortQueries.getBaseCohort(),
         "endDate=${endDate},minDay=${minDay},maxDay=${maxDay},location=${location}");
 
-    pdd.addColumn("counter", new PersonIdDataDefinition(), "", new ObjectCounterConverter());
-
     pdd.addColumn("id", new PersonIdDataDefinition(), "");
 
     // 1 - NID - Sheet 1: Column A
@@ -318,48 +316,49 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         "location=${location}",
         new DispensationTypeMdcConverter());
 
-    // 31 - Data da Consulta mais recente com PopChave informado - Sheet 1: Column AE
+    // 31 - Data da consulta mais recente - Sheet 1: Column AE
     pdd.addColumn(
-        "keypop_date",
-        listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulationDate(),
-        "location=${location}",
-        new ForwardSlashDateConverter());
+        "mdc_consultation_date",
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+            .getMostRecentMdcConsultationDate(),
+        "location=${location}");
+
     // 32 - HSH - Sheet 1: Column AF
     pdd.addColumn(
         "keypop_hsh",
         listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
             hivMetadata.getHomosexualConcept()),
-        "location=${location},endDate=${endDate}");
+        "endDate=${endDate}");
 
     // 33 - PID - Sheet 1: Column AG
     pdd.addColumn(
         "keypop_pid",
         listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
             hivMetadata.getDrugUseConcept()),
-        "location=${location},endDate=${endDate}");
+        "endDate=${endDate}");
 
     // 34 - REC - Sheet 1: Column AH
     pdd.addColumn(
         "keypop_rec",
         listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
             hivMetadata.getImprisonmentConcept()),
-        "location=${location},endDate=${endDate}");
+        "endDate=${endDate}");
 
     // 35 - MTS - Sheet 1: Column AI
     pdd.addColumn(
         "keypop_mts",
         listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
             hivMetadata.getSexWorkerConcept()),
-        "location=${location},endDate=${endDate}");
+        "endDate=${endDate}");
 
     // 36 - TG - Sheet 1: Column AJ
     pdd.addColumn(
         "keypop_tg",
         listOfPatientsDefaultersOrIITCohortQueries.getLastRegisteredKeyPopulation(
             hivMetadata.getTransGenderConcept()),
-        "location=${location},endDate=${endDate}");
+        "endDate=${endDate}");
 
-    // 37 - Data de Inscrição no OVC - Sheet 1: Column AJ
+    // 37 - Data de Inscrição no OVC - Sheet 1: Column AK
     pdd.addColumn(
         "ovc_data_inscricao",
         listOfPatientsDefaultersOrIITCohortQueries.getLastOVCDate(
@@ -367,7 +366,7 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         "endDate=${endDate}",
         new NotApplicableIfNullConverter());
 
-    // 38 - Data de Saída no OVC - Sheet 1: Column AK
+    // 38 - Data de Saída no OVC - Sheet 1: Column AL
     pdd.addColumn(
         "ovc_data_saida",
         listOfPatientsDefaultersOrIITCohortQueries.getLastOVCDate(
@@ -375,7 +374,7 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         "endDate=${endDate}",
         new NotApplicableIfNullConverter());
 
-    // 39 - Estado do Beneficiário - Sheet 1: Column AL
+    // 39 - Estado do Beneficiário - Sheet 1: Column AM
     pdd.addColumn(
         "ovc_estado_beneficiario",
         listOfPatientsDefaultersOrIITCohortQueries.getLastOVCDate(
@@ -383,42 +382,42 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         "endDate=${endDate}",
         new NotApplicableIfNullConverter());
 
-    // 40 - Last Drug Pick-up Date - Sheet 1: Column AM
+    // 40 - Last Drug Pick-up Date - Sheet 1: Column AN
     pdd.addColumn(
         "date_of_last_survey_fila",
         listChildrenOnARTandFormulationsDataset.getLastDrugPickupDate(),
         "endDate=${endDate},location=${location}",
         null);
 
-    // 41 - Last Drug Pick-up Date - Sheet 1: Column AN
+    // 41 - Last Drug Pick-up Date - Sheet 1: Column AO
     pdd.addColumn(
         "date_of_last_survey_reception_raised_ARV",
         listOfPatientsDefaultersOrIITCohortQueries.getLastDrugPickUpDate(),
         "endDate=${endDate},location=${location}",
         null);
 
-    // 42 - Next Drug pick-up Date - Sheet 1: Column AO
+    // 42 - Next Drug pick-up Date - Sheet 1: Column AP
     pdd.addColumn(
         "next_date_survey_fila",
         listChildrenOnARTandFormulationsDataset.getNextDrugPickupDate(),
         "endDate=${endDate},location=${location}",
         null);
 
-    // 43 - Next Drug pick-up Date - Sheet 1: Column AP
+    // 43 - Next Drug pick-up Date - Sheet 1: Column AQ
     pdd.addColumn(
         "next_date_survey _reception_raised_ARV",
         listOfPatientsDefaultersOrIITCohortQueries.getNextDrugPickUpDateARV(),
         "endDate=${endDate},location=${location}",
         null);
 
-    // 44 - Days of Delay - Sheet 1: Column AQ
+    // 44 - Days of Delay - Sheet 1: Column AR
     pdd.addColumn(
         "days_of_absence_to_survey",
         listOfPatientsDefaultersOrIITCohortQueries.getNumberOfDaysOfDelay(),
         "endDate=${endDate},location=${location}",
         null);
 
-    // 45 -Abandono Notificado - Sheet 1: Column AR
+    // 45 -Abandono Notificado - Sheet 1: Column AS
     pdd.addColumn(
         "abandono_notificado_date",
         listOfPatientsDefaultersOrIITCohortQueries.getLastAbandonoNotificado(),

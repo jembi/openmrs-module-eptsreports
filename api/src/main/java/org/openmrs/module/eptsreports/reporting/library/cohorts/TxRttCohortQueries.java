@@ -1069,7 +1069,9 @@ public class TxRttCohortQueries {
 
     CohortDefinition cd4Under200AndAge =
         getPatientsWithCd4AndAge(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3, 5, null);
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
+            5,
+            null);
 
     CohortDefinition notEligibleForCd4AndAge = getPatientsNotEligibleForCd4AndAge(5, null);
 
@@ -1137,7 +1139,9 @@ public class TxRttCohortQueries {
 
     CohortDefinition cd4Under200AndAge =
         getPatientsWithCd4AndAge(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3, 5, null);
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
+            5,
+            null);
 
     CohortDefinition notEligibleForCd4AndAge = getPatientsNotEligibleForCd4AndAge(5, null);
 
@@ -1181,7 +1185,9 @@ public class TxRttCohortQueries {
 
     CohortDefinition cd4Under200AndAge =
         getPatientsWithCd4AndAge(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3, 5, null);
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
+            5,
+            null);
 
     CohortDefinition cd4Above200AndAge =
         getPatientsWithCd4AndAge(
