@@ -9465,7 +9465,7 @@ public class QualityImprovement2020CohortQueries {
             ageCohortQueries.createXtoYAgeCohort("Ages", 2, 200), "effectiveDate=${endDate}"));
 
     cd.setCompositionString("MQ15DenMDS AND MDS AND AGE");
- 
+
     return cd;
   }
 
