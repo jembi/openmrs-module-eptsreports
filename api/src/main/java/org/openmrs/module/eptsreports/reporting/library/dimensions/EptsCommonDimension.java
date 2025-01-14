@@ -1158,13 +1158,34 @@ public class EptsCommonDimension {
     dim.addCohortDefinition(
         "lessThan2Months",
         EptsReportUtils.map(
-            pmtctEidCohortQueries.getInfantAge(0, 59),
+            pmtctEidCohortQueries.getInfantAge(0, 59, true),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dim.addCohortDefinition(
         "from2To12Months",
         EptsReportUtils.map(
-            pmtctEidCohortQueries.getInfantAge(60, 365),
+            pmtctEidCohortQueries.getInfantAge(60, 365, true),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    return dim;
+  }
+
+  public CohortDefinitionDimension getHeiInfantAgeInMonths() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.setName("Infant Age in Number of Days");
+    dim.addParameter(new Parameter("startDate", "startDate", Date.class));
+    dim.addParameter(new Parameter("endDate", "endDate", Date.class));
+    dim.addParameter(new Parameter("location", "location", Location.class));
+
+    dim.addCohortDefinition(
+        "lessThan2Months",
+        EptsReportUtils.map(
+            pmtctEidCohortQueries.getInfantAge(0, 59, false),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    dim.addCohortDefinition(
+        "from2To12Months",
+        EptsReportUtils.map(
+            pmtctEidCohortQueries.getInfantAge(60, 365, false),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     return dim;
   }
