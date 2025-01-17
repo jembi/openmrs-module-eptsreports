@@ -6115,4 +6115,20 @@ public class HivMetadata extends ProgramsMetadata {
             .getGlobalProperty("eptsreports.cd4CountGreaterThan200ConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * /** <b>concept_id = 165519</b>
+   *
+   * <p><b>Name:</b> CD4 SEMI-QUANTITATIVE AT ART STARTING
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCD4SemiQuantitativeAtArtStartingConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.cd4SemiQuantitativeAtArtStartingUuid");
+    return getConcept(uuid);
+  }
 }

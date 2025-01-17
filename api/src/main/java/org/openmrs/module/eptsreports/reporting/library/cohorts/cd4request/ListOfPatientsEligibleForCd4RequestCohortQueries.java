@@ -80,12 +80,8 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
    * <p>São elegíveis ao pedido de CD4 de seguimento (CD4_RF7); ou
    *
    * <p>São mulheres grávidas e elegíveis ao pedido de CD4 (CD4_RF8). <br>
-   * Excluindo todos os utentes que: <br>
-   *
-   * <p>Tenham sido transferidos para outra unidade sanitária até a data geração do relatório
-   * (DAH_RF22);
-   *
-   * <p>Tenham registo de óbito até a data geração do relatório (DAH_RF23)
+   * Filtrando todos os utentes activos em TARV no fim do período (seguindo os critérios do
+   * indicador B13 - Nº activos em TARV no fim do mês, do relatório “Resumo Mensal)<br>
    *
    * @see #getPatientWhoInitiatedTarvDuringPeriodC1() Iniciaram TARV
    * @see #getPatientWhoRestartedTarvAndEligibleForCd4RequestC2() Reiniciaram TARV
@@ -93,10 +89,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
    * @see #getPatientWithEstadiamentoIIIorIVC4() Condição activa de estadiamento clinico
    * @see #getPatientEligibleForCd4FollowupC5() Elegiveis ao pedido de CD4 Seguimento
    * @see #getPatientPregnantEligibleForCd4RequestC6() Elegiveis ao pedido de CD4 Seguimento
-   * @see ResumoMensalCohortQueries#getTranferredOutPatients() Tenham sido transferidos para outra
-   *     unidade sanitária
-   * @see #getTransferredOutPatientsByGenerationDate() Tenham registo de óbito até a data geração do
-   *     relatório
+   * @see ResumoMensalCohortQueries#getPatientsWhoWereActiveByEndOfMonthB13() Resumo Mensal B13
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsEligibleForCd4RequestComposition() {
@@ -116,8 +109,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     CohortDefinition estadio = getPatientWithEstadiamentoIIIorIVC4();
     CohortDefinition eligibleForCd4Followup = getPatientEligibleForCd4FollowupC5();
     CohortDefinition pregnant = getPatientPregnantEligibleForCd4RequestC6();
-    CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
-    CohortDefinition died = getTransferredOutPatientsByGenerationDate();
+    CohortDefinition rmB13 = resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
 
     compositionCohortDefinition.addSearch("STARTED", map(started, MAPPING2));
     compositionCohortDefinition.addSearch("RESTARTED", map(restarted, MAPPING2));
@@ -126,20 +118,15 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     compositionCohortDefinition.addSearch("ELIGIBLECD4", map(eligibleForCd4Followup, MAPPING5));
     compositionCohortDefinition.addSearch("PREGNANT", map(pregnant, MAPPING2));
     compositionCohortDefinition.addSearch(
-        "TRANSFERREDOUT",
-        map(
-            transferredOut,
-            "startDate=${startDate},endDate=${endDate},onOrBefore=${generationDate},location=${location}"));
-    compositionCohortDefinition.addSearch(
-        "DIED", map(died, "endDate=${generationDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
         "BASECOHORT",
         EptsReportUtils.map(
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
+    compositionCohortDefinition.addSearch(
+        "B13", map(rmB13, "endDate=${endDate},location=${location}"));
+
     compositionCohortDefinition.setCompositionString(
-        "((STARTED OR RESTARTED OR HIGHVL OR ESTADIO OR ELIGIBLECD4 OR PREGNANT) AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)");
+        "((STARTED OR RESTARTED OR HIGHVL OR ESTADIO OR ELIGIBLECD4 OR PREGNANT) AND B13) AND BASECOHORT");
 
     return compositionCohortDefinition;
   }
@@ -233,17 +220,16 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
   }
 
   /**
-   * <b>C3 - Utentes com 2 CV Altas</b>
+   * <b>C3 - Grupo de Utentes com 2 CVs Altas na Ficha Clínica</b>
    *
    * <p>incluindo todos os utentes com registo do último “Resultado de CV” numa consulta clínica
-   * (Ficha Clínica – Ficha Mestra) ocorrida 6 meses antes do período de reporte, cujo resultado é >
-   * 1000cps/ml (“Data Último Resultado CV” <= “Data Fim” – 6 meses e “Último Resultado CV”
-   * >1000cps/ml);
+   * (Ficha Clínica – Ficha Mestra) ocorrida até o fim período de reporte, cujo resultado é >
+   * 1000cps/ml (“Data Último Resultado CV” <= “Data Fim” e “Último Resultado CV” >1000cps/ml);
    *
    * <p>filtrando as utentes que tiveram registo do penúltimo “Resultado de CV” numa consulta
-   * clínica (Ficha Clínica – Ficha Mestra) ocorrida 6 meses antes do período de reporte, e cujo
-   * resultado também é >1000 cps/ml (“Data Penúltimo Resultado CV” <= “Data Fim” – 6 meses e
-   * “Penúltimo Resultado CV” >1000cps/ml);
+   * clínica (Ficha Clínica – Ficha Mestra) 3 meses antes da data do último resultado de CV até fim
+   * do período, e cujo resultado também é >1000 cps/ml (“Data Penúltimo Resultado CV” <= “data do
+   * último resultado de CV” – 3 meses e “Penúltimo Resultado CV” >1000cps/ml);
    *
    * <p>exluindo as utentes que tiveram registo do resultado do CD4 numa consulta clínica (Ficha
    * Clínica – Ficha Mestra) ocorrida entre “Data Último Resultado CV” e a data geração do
@@ -251,7 +237,99 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
    *
    * @see #getPatientsWithVlResultGreaterThan1000Copies() Ultimo Resultado VL > 1000
    * @see #getPatientsWithSecondVlResultGreaterThan1000Copies() Penultimo Resultado VL > 1000
-   * @see #getPatientsWithCd4ResultsOnLastVlDate() Ultimo Resultado CD4 apos Ultimo Resultado VL
+   * @see #getPatientsWithCd4ResultsOnLastVlDate(Boolean) Ultimo Resultado CD4 apos Ultimo Resultado
+   *     VL
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithTwoHighVlResultsOnFCC3() {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName("C3 - Grupo de Utentes com 2 CVs Altas na FC");
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("generationDate", "generationDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition lastVlResult = getPatientsWithVlResultGreaterThan1000Copies();
+    CohortDefinition secondVlResult = getPatientsWithSecondVlResultGreaterThan1000Copies();
+    CohortDefinition lastCd4ResultAfterLastVl = getPatientsWithCd4ResultsOnLastVlDate(true);
+
+    compositionCohortDefinition.addSearch(
+        "LASTVL", map(lastVlResult, "endDate=${endDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "SECONDVL", map(secondVlResult, "endDate=${endDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "LASTCD4",
+        map(
+            lastCd4ResultAfterLastVl,
+            "endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString("(LASTVL AND SECONDVL) AND NOT LASTCD4");
+
+    return compositionCohortDefinition;
+  }
+
+  /**
+   * <b>C3 - Grupo de Utentes com 2 CVs Altas na Fonte de Laboratório</b>
+   *
+   * <p>incluindo todos os utentes com registo do último “Resultado de CV” numa “Ficha de
+   * Labóratorio” ou “Ficha e-Lab” registada até o fim período de reporte, cujo resultado é >
+   * 1000cps/ml (“Data Último Resultado CV” <= “Data Fim” e “Último Resultado CV” >1000cps/ml);
+   *
+   * <p>filtrando as utentes que tiveram registo do penúltimo “Resultado de CV” numa consulta
+   * clínica “Ficha de Labóratorio” ou “Ficha e-Lab” resgistada 3 meses antes da data do último
+   * resultado de CV até fim do período, e cujo resultado também é >1000 cps/ml (“Data Penúltimo
+   * Resultado CV” <= “data do último resultado de CV” – 3 meses e “Penúltimo Resultado CV”
+   * >1000cps/ml);
+   *
+   * <p>excluindo as utentes que tiveram registo do resultado do CD4 numa consulta clínica (Ficha
+   * Clínica – Ficha Mestra) ocorrida entre “Data Último Resultado CV” e a data geração do
+   * relatório.
+   *
+   * @see #getPatientsWithVlResultOnLabGreaterThan1000Copies() Ultimo Resultado VL > 1000
+   * @see #getPatientsWithSecondVlResultOnLabGreaterThan1000Copies() Penultimo Resultado VL > 1000
+   * @see #getPatientsWithCd4ResultsOnLastVlDate(Boolean) Ultimo Resultado CD4 apos Ultimo Resultado
+   *     VL
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithTwoHighVlResultsOnLabC3() {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName(
+        "C3 - Grupo de Utentes com 2 CVs Altas na Fonte de Laboratório");
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("generationDate", "generationDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition lastVlResultLab = getPatientsWithVlResultOnLabGreaterThan1000Copies();
+    CohortDefinition secondVlResultLab = getPatientsWithSecondVlResultOnLabGreaterThan1000Copies();
+    CohortDefinition lastCd4ResultAfterLastVl = getPatientsWithCd4ResultsOnLastVlDate(false);
+
+    compositionCohortDefinition.addSearch(
+        "LASTVL", map(lastVlResultLab, "endDate=${endDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "SECONDVL", map(secondVlResultLab, "endDate=${endDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "LASTCD4",
+        map(
+            lastCd4ResultAfterLastVl,
+            "endDate=${endDate},generationDate=${generationDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString("(LASTVL AND SECONDVL) AND NOT LASTCD4");
+
+    return compositionCohortDefinition;
+  }
+
+  /**
+   * <b>C3 - Grupo de Utentes com 2 CVs Altas na Ficha Clínica</b>
+   *
+   * <p>Grupo de Utentes com 2 CVs Altas na Ficha Clínica OU
+   *
+   * <p>Grupo de Utentes com 2 CVs Altas na Fonte de Laboratório
+   *
+   * @see #getPatientsWithTwoHighVlResultsOnFCC3() Último Resultado VL > 1000 FC
+   * @see #getPatientsWithTwoHighVlResultsOnLabC3() Último Resultado VL > 1000 LAB
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithTwoHighVlResultsC3() {
@@ -263,21 +341,13 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
         new Parameter("generationDate", "generationDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition lastVlResult = getPatientsWithVlResultGreaterThan1000Copies();
-    CohortDefinition secondVlResult = getPatientsWithSecondVlResultGreaterThan1000Copies();
-    CohortDefinition lastCd4ResultAfterLastVl = getPatientsWithCd4ResultsOnLastVlDate();
+    CohortDefinition twoHighVlResultsOnFC = getPatientsWithTwoHighVlResultsOnFCC3();
+    CohortDefinition twoHighVlResultsOnLab = getPatientsWithTwoHighVlResultsOnLabC3();
 
-    compositionCohortDefinition.addSearch(
-        "LASTVL", map(lastVlResult, "endDate=${endDate-6m},location=${location}"));
-    compositionCohortDefinition.addSearch(
-        "SECONDVL", map(secondVlResult, "endDate=${endDate-6m},location=${location}"));
-    compositionCohortDefinition.addSearch(
-        "LASTCD4",
-        map(
-            lastCd4ResultAfterLastVl,
-            "endDate=${endDate-6m},generationDate=${generationDate},location=${location}"));
+    compositionCohortDefinition.addSearch("LASTVLFC", map(twoHighVlResultsOnFC, MAPPING5));
+    compositionCohortDefinition.addSearch("SECONDVLLAB", map(twoHighVlResultsOnLab, MAPPING5));
 
-    compositionCohortDefinition.setCompositionString("(LASTVL AND SECONDVL) AND NOT LASTCD4");
+    compositionCohortDefinition.setCompositionString("LASTVLFC OR SECONDVLLAB");
 
     return compositionCohortDefinition;
   }
@@ -435,6 +505,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("1705", hivMetadata.getRestartConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
 
     String query =
         "SELECT pa.patient_id "
@@ -452,6 +523,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "        (obs.concept_id = ${1695} AND obs.value_numeric IS NOT NULL) "
             + "        OR "
             + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
+            + "        OR ( obs.concept_id = ${165515} AND obs.value_coded IS NOT NULL ) "
             + "      ) "
                 .concat(
                     duringPeriod
@@ -605,10 +677,40 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
   }
 
   /**
+   * incluindo todos os utentes com registo do último “Resultado de CV” numa consulta clínica (Ficha
+   * Clínica – Ficha Mestra) ocorrida 6 meses antes do período de reporte, cujo resultado é >
+   * 1000cps/ml (“Data Último Resultado CV” <= “Data Fim” – 6 meses e “Último Resultado CV”
+   * >1000cps/ml);
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithVlResultOnLabGreaterThan1000Copies() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("utentes com registo do último “Resultado de CV” > 1000cps/ml");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+
+    String lastVlOnLabQuery = ListOfPatientsEligibleForCd4RequestQueries.getLastVlResultOnLab();
+    String query = new EptsQueriesUtil().patientIdQueryBuilder(lastVlOnLabQuery).getQuery();
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
    * utentes que tiveram registo do penúltimo “Resultado de CV” numa consulta clínica (Ficha Clínica
-   * – Ficha Mestra) ocorrida 6 meses antes do período de reporte, e cujo resultado também é >1000
-   * cps/ml (“Data Penúltimo Resultado CV” <= “Data Fim” – 6 meses e “Penúltimo Resultado CV”
-   * >1000cps/ml)
+   * – Ficha Mestra) 3 meses antes da data do último resultado de CV até fim do período, e cujo
+   * resultado também é >1000 cps/ml (“Data Penúltimo Resultado CV” <= “data do último resultado de
+   * CV” – 3 meses e “Penúltimo Resultado CV” >1000cps/ml)
    *
    * @return {@link CohortDefinition}
    */
@@ -634,12 +736,42 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
   }
 
   /**
+   * utentes que tiveram registo do penúltimo “Resultado de CV” numa consulta clínica (Ficha Clínica
+   * – Ficha Mestra) 3 meses antes da data do último resultado de CV até fim do período, e cujo
+   * resultado também é >1000 cps/ml (“Data Penúltimo Resultado CV” <= “data do último resultado de
+   * CV” – 3 meses e “Penúltimo Resultado CV” >1000cps/ml)
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithSecondVlResultOnLabGreaterThan1000Copies() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("utentes com registo do penúltimo “Resultado de CV” > 1000cps/ml");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+
+    String secondVlOnLabQuery = ListOfPatientsEligibleForCd4RequestQueries.getSecondVlResultOnLab();
+    String query = new EptsQueriesUtil().patientIdQueryBuilder(secondVlOnLabQuery).getQuery();
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
    * <b> utentes que tiveram registo do resultado do CD4 numa consulta clínica (Ficha Clínica –
    * Ficha Mestra) ocorrida entre “Data Último Resultado CV” e a data geração do relatório </b>
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsWithCd4ResultsOnLastVlDate() {
+  public CohortDefinition getPatientsWithCd4ResultsOnLastVlDate(Boolean fcOrLab) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("resultado do CD4 apos Data Último Resultado CV");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -652,6 +784,9 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
 
     String query =
         "SELECT pa.patient_id "
@@ -662,7 +797,10 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "        INNER JOIN obs "
             + "                   ON obs.encounter_id = enc.encounter_id "
             + " INNER JOIN ( "
-            + ListOfPatientsEligibleForCd4RequestQueries.getLastVlResultDate()
+                .concat(
+                    fcOrLab
+                        ? ListOfPatientsEligibleForCd4RequestQueries.getLastVlResultDate()
+                        : ListOfPatientsEligibleForCd4RequestQueries.getLastVlResultDateOnLab())
             + " ) last_vl ON last_vl.patient_id = pa.patient_id "
             + "WHERE  pa.voided = 0 "
             + "  AND enc.voided = 0 "
@@ -672,6 +810,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "        (obs.concept_id = ${1695} AND obs.value_numeric IS NOT NULL) "
             + "        OR "
             + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
+            + "        OR ( obs.concept_id = ${165515} AND obs.value_coded IS NOT NULL ) "
             + "      ) "
             + "       AND enc.encounter_datetime >= last_vl.most_recent "
             + "  AND enc.encounter_datetime <= :generationDate "
@@ -721,6 +860,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     map.put("42", tbMetadata.getPulmonaryTB().getConceptId());
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
     map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
 
     String query =
         "SELECT pa.patient_id "
@@ -741,6 +881,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "        (obs.concept_id = ${1695} AND obs.value_numeric IS NOT NULL) "
             + "        OR "
             + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
+            + "        OR ( obs.concept_id = ${165515} AND obs.value_coded IS NOT NULL ) "
             + "      ) "
             + "       AND enc.encounter_datetime >= estadio.first_date "
             + "  AND enc.encounter_datetime <= :generationDate "
@@ -775,6 +916,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
+    map.put("165513", hivMetadata.getCD4CountLessThanOrEqualTo200Concept().getConceptId());
 
     String query =
         "SELECT pa.patient_id "
@@ -801,8 +943,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "             AND obs.value_numeric < 30) "
             + "        OR "
             + "        (obs.concept_id = ${165515} "
-            + "             AND obs.value_numeric IS NOT NULL "
-            + "             AND obs.value_numeric < 200) "
+            + "             AND obs.value_coded = ${165513}) "
             + "      ) "
             + "       AND enc.encounter_datetime = cd4_date.last_cd4 "
             + "  AND enc.location_id = :location "
@@ -833,6 +974,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
 
     String query =
         "SELECT pa.patient_id "
@@ -853,6 +995,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "        (obs.concept_id = ${1695} AND obs.value_numeric IS NOT NULL) "
             + "        OR "
             + "        (obs.concept_id = ${730} AND obs.value_numeric IS NOT NULL) "
+            + "        OR ( obs.concept_id = ${165515} AND obs.value_coded IS NOT NULL ) "
             + "      ) "
             + "       AND enc.encounter_datetime >= DATE_ADD(cd4_date.last_cd4, INTERVAL 1 DAY) "
             + "  AND enc.encounter_datetime <= :generationDate "
@@ -919,6 +1062,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
 
     String query =
         "SELECT pa.patient_id "
@@ -941,6 +1085,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             + "        OR "
             + "        (obs.concept_id = ${730} "
             + "             AND obs.value_numeric IS NOT NULL ) "
+            + "        OR ( obs.concept_id = ${165515} AND obs.value_coded IS NOT NULL ) "
             + "      ) "
             + "  AND enc.encounter_datetime >= pregnant.pregnancy_date "
             + "  AND enc.encounter_datetime <= :generationDate "
@@ -1006,8 +1151,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
         new Parameter("generationDate", "generationDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
-    CohortDefinition died = getTransferredOutPatientsByGenerationDate();
+    CohortDefinition rmB13 = resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
 
     compositionCohortDefinition.addSearch(
         "C1",
@@ -1021,15 +1165,9 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "TRANSFERREDOUT",
-        map(
-            transferredOut,
-            "startDate=${startDate},endDate=${endDate},onOrBefore=${generationDate},location=${location}"));
-    compositionCohortDefinition.addSearch(
-        "DIED", map(died, "endDate=${generationDate},location=${location}"));
+        "B13", map(rmB13, "endDate=${endDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString(
-        "(C1 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)");
+    compositionCohortDefinition.setCompositionString("(C1 AND B13) AND BASECOHORT");
 
     return compositionCohortDefinition;
   }
@@ -1044,8 +1182,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
         new Parameter("generationDate", "generationDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
-    CohortDefinition died = getTransferredOutPatientsByGenerationDate();
+    CohortDefinition rmB13 = resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
 
     compositionCohortDefinition.addSearch(
         "C2",
@@ -1060,20 +1197,14 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "TRANSFERREDOUT",
-        map(
-            transferredOut,
-            "startDate=${startDate},endDate=${endDate},onOrBefore=${generationDate},location=${location}"));
-    compositionCohortDefinition.addSearch(
-        "DIED", map(died, "endDate=${generationDate},location=${location}"));
+        "B13", map(rmB13, "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "BASECOHORT",
         EptsReportUtils.map(
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString(
-        "((C2 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)) AND NOT C1");
+    compositionCohortDefinition.setCompositionString("((C2 AND B13) AND BASECOHORT) AND NOT C1");
 
     return compositionCohortDefinition;
   }
@@ -1088,8 +1219,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
         new Parameter("generationDate", "generationDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
-    CohortDefinition died = getTransferredOutPatientsByGenerationDate();
+    CohortDefinition rmB13 = resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
 
     compositionCohortDefinition.addSearch(
         "C1",
@@ -1110,12 +1240,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             "endDate=${endDate},generationDate=${generationDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "TRANSFERREDOUT",
-        map(
-            transferredOut,
-            "startDate=${startDate},endDate=${endDate},onOrBefore=${generationDate},location=${location}"));
-    compositionCohortDefinition.addSearch(
-        "DIED", map(died, "endDate=${generationDate},location=${location}"));
+        "B13", map(rmB13, "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "BASECOHORT",
@@ -1123,7 +1248,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
-        "((C3 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2)");
+        "((C3 AND B13) AND BASECOHORT) AND NOT (C1 OR C2)");
 
     return compositionCohortDefinition;
   }
@@ -1138,8 +1263,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
         new Parameter("generationDate", "generationDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
-    CohortDefinition died = getTransferredOutPatientsByGenerationDate();
+    CohortDefinition rmB13 = resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
 
     compositionCohortDefinition.addSearch(
         "C1",
@@ -1165,12 +1289,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "TRANSFERREDOUT",
-        map(
-            transferredOut,
-            "startDate=${startDate},endDate=${endDate},onOrBefore=${generationDate},location=${location}"));
-    compositionCohortDefinition.addSearch(
-        "DIED", map(died, "endDate=${generationDate},location=${location}"));
+        "B13", map(rmB13, "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "BASECOHORT",
@@ -1178,7 +1297,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
-        "((C4 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2 OR C3)");
+        "((C4 AND B13) AND BASECOHORT) AND NOT (C1 OR C2 OR C3)");
 
     return compositionCohortDefinition;
   }
@@ -1193,8 +1312,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
         new Parameter("generationDate", "generationDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
-    CohortDefinition died = getTransferredOutPatientsByGenerationDate();
+    CohortDefinition rmB13 = resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
 
     compositionCohortDefinition.addSearch(
         "C1",
@@ -1227,12 +1345,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             "endDate=${endDate},generationDate=${generationDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "TRANSFERREDOUT",
-        map(
-            transferredOut,
-            "startDate=${startDate},endDate=${endDate},onOrBefore=${generationDate},location=${location}"));
-    compositionCohortDefinition.addSearch(
-        "DIED", map(died, "endDate=${generationDate},location=${location}"));
+        "B13", map(rmB13, "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "BASECOHORT",
@@ -1240,7 +1353,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
-        "((C5 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2 OR C3 OR  C4)");
+        "((C5 AND B13) AND BASECOHORT) AND NOT (C1 OR C2 OR C3 OR  C4)");
 
     return compositionCohortDefinition;
   }
@@ -1255,8 +1368,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
         new Parameter("generationDate", "generationDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition transferredOut = resumoMensalCohortQueries.getTranferredOutPatients();
-    CohortDefinition died = getTransferredOutPatientsByGenerationDate();
+    CohortDefinition rmB13 = resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
 
     compositionCohortDefinition.addSearch(
         "C1",
@@ -1294,12 +1406,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "TRANSFERREDOUT",
-        map(
-            transferredOut,
-            "startDate=${startDate},endDate=${endDate},onOrBefore=${generationDate},location=${location}"));
-    compositionCohortDefinition.addSearch(
-        "DIED", map(died, "endDate=${generationDate},location=${location}"));
+        "B13", map(rmB13, "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "BASECOHORT",
@@ -1307,7 +1414,7 @@ public class ListOfPatientsEligibleForCd4RequestCohortQueries {
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
-        "((C6 AND BASECOHORT) AND NOT (TRANSFERREDOUT OR DIED)) AND NOT (C1 OR C2 OR C3 OR C4 OR C5)");
+        "((C6 AND B13) AND BASECOHORT) AND NOT (C1 OR C2 OR C3 OR C4 OR C5)");
 
     return compositionCohortDefinition;
   }
