@@ -81,7 +81,7 @@ public class SetupListOfPatientsDefaultersOrIITReport extends EptsDataExportMana
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Template_List_Patients_Defaulters_IIT_TARV_v1.7.xls",
+              "Template_List_Patients_Defaulters_IIT_TARV_v1.8.xls",
               "List Patients Defaulters IIT TARV Report",
               getExcelDesignUuid(),
               null);

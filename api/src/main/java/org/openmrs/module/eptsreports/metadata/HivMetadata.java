@@ -6117,7 +6117,7 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * <b>enconter_type_id = 23756</b>
+   * <b>concept_id = 23756</b>
    *
    * <p><b>Name:</b> WEIGHT / STATURE
    *
@@ -6133,7 +6133,7 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * <b>enconter_type_id = 165496</b>
+   * <b>concept_id = 165496</b>
    *
    * <p><b>Name:</b> SEVERE ACUTE MALNUTRITION < -3 DP
    *
@@ -6149,7 +6149,7 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * <b>enconter_type_id = 165497</b>
+   * <b>concept_id = 165497</b>
    *
    * <p><b>Name:</b> MODERATE NUTRITION ≥ -3 AND < -2 DP
    *
@@ -6165,7 +6165,7 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * <b>encounterType_id = 6394</b>
+   * <b>concept_id = 6394</b>
    *
    * <p><b>Name:</b> PMCT MOTHERS REGIME
    *
@@ -6177,6 +6177,22 @@ public class HivMetadata extends ProgramsMetadata {
     String uuid =
         Context.getAdministrationService()
             .getGlobalProperty("eptsreports.pmctMothersRegimeConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * /** <b>concept_id = 165519</b>
+   *
+   * <p><b>Name:</b> CD4 SEMI-QUANTITATIVE AT ART STARTING
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCD4SemiQuantitativeAtArtStartingConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.cd4SemiQuantitativeAtArtStartingUuid");
     return getConcept(uuid);
   }
 }

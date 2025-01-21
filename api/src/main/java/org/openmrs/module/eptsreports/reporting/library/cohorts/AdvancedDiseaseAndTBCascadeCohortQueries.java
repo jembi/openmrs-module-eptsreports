@@ -31,6 +31,9 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   private final CommonQueries commonQueries;
 
   private final String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+  private final String mappings2 = "endDate=${generationDate},location=${location}";
+  private final String mappings3 =
+      "startDate=${startDate},endDate=${generationDate},location=${location}";
 
   @Autowired
   public AdvancedDiseaseAndTBCascadeCohortQueries(
@@ -102,10 +105,13 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     CohortDefinition anyResult = getPatientsWithCD4Count();
 
     cd.addSearch("eligibleCd4", EptsReportUtils.map(eligibleCd4, mappings));
-    cd.addSearch("anyResult", EptsReportUtils.map(anyResult, mappings));
+    cd.addSearch(
+        "anyResult",
+        EptsReportUtils.map(
+            anyResult,
+            "inclusionStartDate=${startDate},startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("eligibleCd4 AND anyResult");
-
     return cd;
   }
 
@@ -135,7 +141,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getEligibleClientsWithSevereImmunosuppression() {
+  public CohortDefinition getEligibleClientsWithSevereImmunosuppressionWithin33Days() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("showing severe immunodepression");
@@ -145,11 +151,14 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     CohortDefinition cd4Count = getClientsWithCd4Count();
     CohortDefinition cd200AgeFiveOrOver =
-        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo200mm3AA, 5, null);
+        getPatientsWithImmunusupresiveCd4AndAgeWithin33Days(
+            Cd4CountComparison.LessThan200mm3, 5, null);
     CohortDefinition cd500AgeBetweenOneAndFour =
-        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo500mm3, 1, 4);
+        getPatientsWithImmunusupresiveCd4AndAgeWithin33Days(
+            Cd4CountComparison.LessThan500mm3, 1, 4);
     CohortDefinition cd750AgeUnderYear =
-        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo750mm3, null, 1);
+        getPatientsWithImmunusupresiveCd4AndAgeWithin33Days(
+            Cd4CountComparison.LessThan750mm3, null, 1);
 
     cd.addSearch("cd4Count", EptsReportUtils.map(cd4Count, mappings));
     cd.addSearch("cd4Under200", EptsReportUtils.map(cd200AgeFiveOrOver, mappings));
@@ -174,7 +183,8 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
 
-    CohortDefinition severeImmunosuppression = getEligibleClientsWithSevereImmunosuppression();
+    CohortDefinition severeImmunosuppression =
+        getEligibleClientsWithSevereImmunosuppressionWithin33Days();
 
     CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
 
@@ -203,11 +213,11 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
 
     CohortDefinition cd200AgeFiveOrOver =
-        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo200mm3AA, 5, null);
+        getPatientsWithCd4AndAge(Cd4CountComparison.LessThan200mm3, 5, null);
     CohortDefinition cd500AgeBetweenOneAndFour =
-        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo500mm3, 1, 4);
+        getPatientsWithCd4AndAge(Cd4CountComparison.LessThan500mm3, 1, 4);
     CohortDefinition cd750AgeUnderYear =
-        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo750mm3, null, 1);
+        getPatientsWithCd4AndAgeLessThan1Year(Cd4CountComparison.LessThan750mm3);
 
     cd.addSearch("cd4Under200", EptsReportUtils.map(cd200AgeFiveOrOver, mappings));
     cd.addSearch("cd4Under500", EptsReportUtils.map(cd500AgeBetweenOneAndFour, mappings));
@@ -296,12 +306,16 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     CohortDefinition negativeTbLam = getPatientsWithTbLamResult(TbLamResult.NEGATIVE);
 
+    CohortDefinition positiveTbLam = getPatientsWithTbLamResult(TbLamResult.POSITIVE);
+
     cd.addSearch(
         "severeImmunosuppressionAndWithTbLamResult",
         EptsReportUtils.map(severeImmunosuppressionAndWithTbLamResult, mappings));
     cd.addSearch("negativeTbLam", EptsReportUtils.map(negativeTbLam, mappings));
+    cd.addSearch("positiveTbLam", EptsReportUtils.map(positiveTbLam, mappings));
 
-    cd.setCompositionString("severeImmunosuppressionAndWithTbLamResult AND negativeTbLam");
+    cd.setCompositionString(
+        "severeImmunosuppressionAndWithTbLamResult AND (negativeTbLam AND NOT positiveTbLam)");
 
     return cd;
   }
@@ -328,7 +342,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addSearch(
         "severeImmunodepressionAndWithTbLamPositiveResult",
         EptsReportUtils.map(severeImmunodepressionAndWithTbLamPositiveResult, mappings));
-    cd.addSearch("genXpert", EptsReportUtils.map(genXpert, mappings));
+    cd.addSearch("genXpert", EptsReportUtils.map(genXpert, mappings2));
 
     cd.setCompositionString("severeImmunodepressionAndWithTbLamPositiveResult AND NOT genXpert");
 
@@ -359,7 +373,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addSearch(
         "severeImmunodepressionAndWithTbLamPositiveResult",
         EptsReportUtils.map(severeImmunodepressionAndWithTbLamPositiveResult, mappings));
-    cd.addSearch("genXpert", EptsReportUtils.map(genXpert, mappings));
+    cd.addSearch("genXpert", EptsReportUtils.map(genXpert, mappings2));
 
     cd.setCompositionString("severeImmunodepressionAndWithTbLamPositiveResult AND genXpert");
 
@@ -426,18 +440,13 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addSearch(
         "severeImmunodepressionAndWithTbLamPositiveResult",
         EptsReportUtils.map(severeImmunodepressionAndWithTbLamPositiveResult, mappings));
-    cd.addSearch("onTb", EptsReportUtils.map(onTb, mappings));
+    cd.addSearch("onTb", EptsReportUtils.map(onTb, mappings3));
 
     cd.setCompositionString("severeImmunodepressionAndWithTbLamPositiveResult AND onTb");
 
     return cd;
   }
-  /**
-   * @param cd4 - Absolute CD4 count
-   * @param minAge minimum age of patient base on effective date
-   * @param maxAge maximum age of patent base on effective date
-   * @return CohortDefinition
-   */
+
   private CohortDefinition getPatientsWithCd4AndAge(
       Cd4CountComparison cd4, Integer minAge, Integer maxAge) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -447,6 +456,78 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
 
     CohortDefinition absoluteCd4 = getPatientsWithAbsoluteCd4Count(cd4);
+    CohortDefinition age = ageCohortQueries.createXtoYAgeCohort("Age", minAge, maxAge);
+
+    cd.addSearch("absoluteCd4", EptsReportUtils.map(absoluteCd4, mappings));
+
+    cd.addSearch("age", EptsReportUtils.map(age, "effectiveDate=${endDate}"));
+
+    cd.setCompositionString("absoluteCd4 AND age");
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWithCd4AndAgeLessThan1Year(Cd4CountComparison cd4) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Absolute Cd4");
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+
+    CohortDefinition absoluteCd4 = getPatientsWithAbsoluteCd4Count(cd4);
+    CohortDefinition age = getClientWithLessThanAYearOfAge();
+
+    cd.addSearch("absoluteCd4", EptsReportUtils.map(absoluteCd4, mappings));
+
+    cd.addSearch("age", EptsReportUtils.map(age, "evaluationDate=${endDate+1m}"));
+
+    cd.setCompositionString("absoluteCd4 AND age");
+
+    return cd;
+  }
+
+  public CohortDefinition getClientWithLessThanAYearOfAge() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Client Less than q year of age by report end date");
+    cd.addParameter(new Parameter("evaluationDate", "Report End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    String query =
+        "SELECT pat.patient_id "
+            + "FROM ( "
+            + "SELECT "
+            + "    p.patient_id, "
+            + "    FLOOR( "
+            + "            DATEDIFF(:evaluationDate, ps.birthdate)/ 365 "
+            + "    ) AS age "
+            + "FROM "
+            + "    patient p "
+            + "        INNER JOIN person ps ON p.patient_id = ps.person_id "
+            + "WHERE "
+            + "    p.voided = 0 "
+            + "  AND ps.voided = 0) pat "
+            + "WHERE pat.age < 1 ";
+
+    StringSubstitutor sb = new StringSubstitutor(getMetadata());
+    cd.setQuery(sb.replace(query));
+    return cd;
+  }
+
+  /**
+   * @param cd4 - Absolute CD4 count
+   * @param minAge minimum age of patient base on effective date
+   * @param maxAge maximum age of patent base on effective date
+   * @return CohortDefinition
+   */
+  private CohortDefinition getPatientsWithImmunusupresiveCd4AndAgeWithin33Days(
+      Cd4CountComparison cd4, Integer minAge, Integer maxAge) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Absolute Cd4");
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+
+    CohortDefinition absoluteCd4 = getPatientsWithAbsoluteCd4CountIn33DaysofEligibility(cd4);
     CohortDefinition age = ageCohortQueries.createXtoYAgeCohort("Age", minAge, maxAge);
 
     cd.addSearch("absoluteCd4", EptsReportUtils.map(absoluteCd4, mappings));
@@ -511,7 +592,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Number of clients with a CD4 count during inclusion period");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("inclusionStartDate", "Inclusion Start Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "End Date", Location.class));
@@ -553,6 +634,87 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     StringSubstitutor sb = new StringSubstitutor(getMetadata());
     cd.setQuery(sb.replace(query));
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWithCD4CountShowingImmunosupression(
+      Cd4CountComparison cd4CountComparison) {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Number of clients with a CD4 count during inclusion period");
+
+    cd.addParameter(new Parameter("inclusionStartDate", "Inclusion Start Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    String query =
+        "SELECT immunosupressed.patient_id "
+            + "FROM ( "
+            + "    SELECT p.patient_id, "
+            + "           MAX(DATE(e.encounter_datetime)) AS last_cd4 "
+            + "    FROM patient p "
+            + "    INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "    INNER JOIN ( "
+            + getEligibilityDateQuery()
+            + "    ) eligible ON eligible.patient_id = p.patient_id  "
+            + "    WHERE e.voided = 0 "
+            + "      AND o.voided = 0 "
+            + "      AND e.encounter_type IN (${6}, ${13}, ${51}) "
+            + "      AND ((o.concept_id = ${1695} AND o.value_numeric IS NOT NULL) "
+            + "           OR (o.concept_id IN (${165515}, ${165519}) AND o.value_coded IS NOT NULL)) "
+            + "      AND e.location_id = :location "
+            + "      AND DATE(e.encounter_datetime) BETWEEN eligible.eligibility_date AND DATE_ADD(eligible.eligibility_date, INTERVAL 33 DAY) "
+            + "    GROUP BY p.patient_id "
+            + ") immunosupressed "
+            + "INNER JOIN encounter e ON e.patient_id = immunosupressed.patient_id "
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "WHERE e.voided = 0 AND o.voided = 0 "
+            + "  AND e.encounter_type IN (${6}, ${13}, ${51}) "
+            + "  AND DATE(e.encounter_datetime) = immunosupressed.last_cd4 "
+            + "  AND ((o.concept_id = ${1695} AND "
+            + cd4CountComparison.getProposition()
+            + ") "
+            + "       OR (o.concept_id IN (${165515}, ${165519}) AND o.value_coded = "
+            + (cd4CountComparison.name().contains("Greater") ? "${1254}" : "${165513}")
+            + ")) "
+            + "  AND e.location_id = :location "
+            + "UNION "
+            + "SELECT immunosupressed.patient_id "
+            + "FROM ( "
+            + "    SELECT p.patient_id, "
+            + "           MAX(o.obs_datetime) AS last_cd4 "
+            + "    FROM patient p "
+            + "    INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "    INNER JOIN ( "
+            + getEligibilityDateQuery()
+            + "    ) eligible ON eligible.patient_id = p.patient_id  "
+            + "    WHERE e.voided = 0 "
+            + "      AND o.voided = 0 "
+            + "      AND e.encounter_type IN (${53}, ${90}) "
+            + "      AND ((o.concept_id = ${1695} AND o.value_numeric IS NOT NULL) "
+            + "           OR (o.concept_id IN (${165515}, ${165519}) AND o.value_coded IS NOT NULL)) "
+            + "      AND e.location_id = :location "
+            + "      AND o.obs_datetime BETWEEN eligible.eligibility_date AND DATE_ADD(eligible.eligibility_date, INTERVAL 33 DAY) "
+            + "    GROUP BY p.patient_id "
+            + ") immunosupressed "
+            + "INNER JOIN encounter e ON e.patient_id = immunosupressed.patient_id "
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "WHERE e.voided = 0 AND o.voided = 0 "
+            + "  AND e.encounter_type IN (${53}, ${90}) "
+            + "  AND o.obs_datetime = immunosupressed.last_cd4 "
+            + "  AND ((o.concept_id = ${1695} AND "
+            + cd4CountComparison.getProposition()
+            + ") "
+            + "       OR (o.concept_id IN (${165515}, ${165519}) AND o.value_coded = "
+            + (cd4CountComparison.name().contains("Greater") ? "${1254}" : "${165513}")
+            + ")) "
+            + "  AND e.location_id = :location ";
+
+    StringSubstitutor sb = new StringSubstitutor(getMetadata());
+    cd.setQuery(sb.replace(query));
+
     return cd;
   }
 
@@ -1188,7 +1350,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "                   WHERE  e.voided = 0 "
             + "                          AND o.voided = 0 "
-            + "                          AND e.encounter_type IN ( ${6}, ${13} ) "
+            + "                          AND e.encounter_type IN ( ${6}, ${13}, ${51} ) "
             + "                          AND o.concept_id = ${23951} "
             + "                          AND o.value_coded IS NOT NULL "
             + "                          AND e.location_id = :location "
@@ -1242,7 +1404,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "                   WHERE  e.voided = 0 "
             + "                          AND o.voided = 0 "
-            + "                          AND e.encounter_type IN ( ${6}, ${13} ) "
+            + "                          AND e.encounter_type IN ( ${6}, ${13}, ${51} ) "
             + "                          AND o.concept_id = ${23951} "
             + "                          AND o.value_coded = ".concat(tbLamResult.getValueCoded())
             + "                          AND e.location_id = :location "
@@ -1299,7 +1461,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                          AND o.concept_id = ${23723}"
             + "                          AND o.value_coded IS NOT NULL "
             + "                          AND e.location_id = :location "
-            + "                          AND e.encounter_datetime BETWEEN :startDate AND :endDate"
+            + "                          AND e.encounter_datetime <= :endDate "
             + "                   GROUP  BY e.patient_id "
             + "                   UNION "
             + "                   SELECT e.patient_id "
@@ -1311,7 +1473,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                          AND o.concept_id IN (${23723}, ${165189}) "
             + "                          AND o.value_coded IS NOT NULL "
             + "                          AND e.location_id = :location "
-            + "                          AND o.obs_datetime BETWEEN :startDate AND :endDate"
+            + "                          AND o.obs_datetime <= :endDate "
             + "                   GROUP  BY e.patient_id) tb_lam "
             + "               ON tb_lam.patient_id = p.patient_id "
             + "WHERE  p.voided = 0 "
@@ -1464,7 +1626,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                          AND o.voided = 0 "
             + "                          AND o2.voided = 0 "
             + "                          AND o3.voided = 0 "
-            + "                          AND e.encounter_type = ${13}  "
+            + "                          AND e.encounter_type IN (${13}, ${51})  "
             + "                          AND o.concept_id = ${23951} "
             + "                          AND o.value_coded = ${703} "
             + "                          AND o2.concept_id = ${165185} "
@@ -1550,7 +1712,11 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     cd.addSearch("positiveTwoPlus", EptsReportUtils.map(positiveTwoPlus, mappings));
 
-    cd.setCompositionString("positiveTwoPlus AND NOT positiveThreePlus");
+    cd.addSearch(
+        "positiveFourPlus",
+        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeFourPlus(), mappings));
+
+    cd.setCompositionString("positiveTwoPlus AND NOT (positiveThreePlus OR positiveFourPlus)");
 
     return cd;
   }
@@ -1572,7 +1738,15 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     cd.addSearch("positiveOnePlus", EptsReportUtils.map(positiveOnePlus, mappings));
 
-    cd.setCompositionString("positiveOnePlus AND NOT positiveTwoPlus");
+    cd.addSearch(
+        "positiveThreePlus",
+        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeThreePlus(), mappings));
+    cd.addSearch(
+        "positiveFourPlus",
+        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeFourPlus(), mappings));
+
+    cd.setCompositionString(
+        "positiveOnePlus AND NOT (positiveTwoPlus OR positiveThreePlus OR positiveFourPlus)");
 
     return cd;
   }
@@ -1593,7 +1767,20 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
         "positiveOnePlus",
         EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeOnePlus(), mappings));
 
-    cd.setCompositionString("positive AND NOT positiveOnePlus");
+    cd.addSearch(
+        "positiveTwoPlus",
+        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeTwoPlus(), mappings));
+
+    cd.addSearch(
+        "positiveThreePlus",
+        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeThreePlus(), mappings));
+
+    cd.addSearch(
+        "positiveFourPlus",
+        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeFourPlus(), mappings));
+
+    cd.setCompositionString(
+        "positive AND NOT (positiveOnePlus OR positiveTwoPlus OR positiveThreePlus OR positiveFourPlus)");
 
     return cd;
   }
@@ -1706,23 +1893,9 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                     FROM   patient p "
             + "                                INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "                                INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                                INNER JOIN (SELECT e.patient_id, MAX(Date(e.encounter_datetime)) vl_date "
-            + "                                            FROM   encounter e "
-            + "                                                       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                                                AND e.voided = 0 "
-            + "                                                AND o.voided = 0 "
-            + "                                                AND e.encounter_type IN ( ${13}, ${51} ) "
-            + "                                                AND e.location_id = :location "
-            + "                                                 AND ( ( o.concept_id = ${856} "
-            + "                                                     AND o.value_numeric IS NOT NULL ) "
-            + "                                                   OR ( o.concept_id = ${1305} "
-            + "                                                        AND o.value_coded IS NOT NULL ) ) "
-            + "                                                AND Date(e.encounter_datetime) BETWEEN :startDate AND :endDate "
-            + "                                            GROUP  BY e.patient_id)vl_inclusion "
-            + "                                           ON vl_inclusion.patient_id = e.patient_id "
             + "                     WHERE  e.encounter_type IN( ${13}, ${51} ) "
             + "                       AND e.location_id = :location "
-            + "                       AND Date(e.encounter_datetime) = vl_inclusion.vl_date "
+            + "                       AND Date(e.encounter_datetime) BETWEEN :startDate AND :endDate "
             + "                       AND e.voided = 0 "
             + "                       AND p.voided = 0 "
             + "                       AND o.voided = 0 "
@@ -1757,6 +1930,49 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     return cd;
   }
 
+  public CohortDefinition getPatientsWith2ConsecutiveVLsWithCD4In33Days() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Clients Who have a previous VL result > 1000");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM patient p "
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "INNER JOIN ( "
+            + "    SELECT p.patient_id, "
+            + "           MAX(Date(e.encounter_datetime)) AS last_vl1000_date "
+            + "    FROM patient p "
+            + "    INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "    WHERE e.encounter_type IN (${13}, ${51}) "
+            + "      AND e.location_id = :location "
+            + "      AND Date(e.encounter_datetime) BETWEEN :startDate AND :endDate "
+            + "      AND e.voided = 0 "
+            + "      AND p.voided = 0 "
+            + "      AND o.voided = 0 "
+            + "      AND o.concept_id = ${856} "
+            + "      AND o.value_numeric > 1000 "
+            + "    GROUP BY p.patient_id "
+            + ") last_vl100 ON last_vl100.patient_id = e.patient_id "
+            + "WHERE e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.encounter_type IN (${6}, ${13}, ${51}) "
+            + "  AND ( (o.concept_id = ${1695} AND o.value_numeric IS NOT NULL) "
+            + "        OR (o.concept_id = ${165515} AND o.value_coded IS NOT NULL) ) "
+            + "  AND e.location_id = :location "
+            + "  AND DATE(e.encounter_datetime) BETWEEN last_vl100.last_vl1000_date "
+            + "                                       AND DATE_ADD(last_vl100.last_vl1000_date, INTERVAL 33 DAY) "
+            + "GROUP BY p.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(getMetadata());
+    cd.setQuery(sb.replace(query));
+    return cd;
+  }
+
   /**
    * Absolute CD4 Count
    *
@@ -1781,7 +1997,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                          WHERE  e.encounter_type IN ( ${6}, ${13}, ${51} ) "
             + "                                 AND e.location_id = :location "
             + "                                 AND Date(e.encounter_datetime) BETWEEN :startDate AND :endDate "
-            + "                                 AND o.concept_id = ${1695} "
+            + "                                 AND o.concept_id IN (${1695},${165515}) "
             + "                                 AND e.voided = 0 "
             + "                                 AND o.voided = 0 "
             + "                          UNION "
@@ -1792,7 +2008,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                                 AND e.location_id = :location "
             + "                                 AND e.voided = 0 "
             + "                                 AND o.voided = 0 "
-            + "                                 AND o.concept_id = ${1695} "
+            + "                                 AND o.concept_id IN (${1695},${165515},${165519}) "
             + "                                 AND o.obs_datetime BETWEEN :startDate AND :endDate "
             + "                           ) recent_cd4 "
             + "                   GROUP  BY recent_cd4.patient_id) cd4 "
@@ -1801,8 +2017,19 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
             + "       AND e.location_id = :location "
-            + "       AND o.concept_id = ${1695} "
+            + "       AND ( (o.concept_id = ${1695} "
             + "       AND  ".concat(cd4CountComparison.getProposition())
+            + " ) "
+            + "      OR   ( o.concept_id IN (${165515},${165519}) AND o.value_coded = ";
+
+    if (cd4CountComparison.name().contains("Greater")) {
+      query += "${1254}";
+    } else {
+      query += "${165513}";
+    }
+
+    query +=
+        " ) ) "
             + "       AND ( ( Date(e.encounter_datetime) = cd4.recent_date AND e.encounter_type IN ( ${6}, ${13}, ${51} ) ) "
             + "              OR ( Date(o.obs_datetime) = cd4.recent_date  AND e.encounter_type IN ( ${90}, ${53} ) )"
             + "    ) "
@@ -1833,6 +2060,24 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     return cd;
   }
 
+  public CohortDefinition getPatientsWithAbsoluteCd4CountIn33DaysofEligibility(
+      Cd4CountComparison cd4CountComparison) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients with Absolute CD4 Count");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    cd.addSearch(
+        cd4CountComparison.getSearchKey(),
+        EptsReportUtils.map(
+            getPatientsWithCD4CountShowingImmunosupression(cd4CountComparison),
+            "inclusionStartDate=${startDate},startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString(cd4CountComparison.getCompositionString());
+    return cd;
+  }
+
   private String getArtStartDate() {
     String arvStart = commonQueries.getARTStartDate(true);
 
@@ -1845,189 +2090,292 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     return query;
   }
 
-  private static String getPregnantWithoutCd4Query() {
-    return " SELECT pregnant_eligible.patient_id, "
-        + " IF((pregnant_eligible.eligible_date < :startDate), "
-        + " ( "
-        + getLastPregnancyDateIfEligibilityDateBeforeInclusionPeriod()
-        + " ), "
-        + " IF ( (pregnant_eligible.eligible_date >= :startDate AND pregnant_eligible.eligible_date <= :endDate), "
-        + "  ( "
-        + getFirstPregnancyDateIfEligibilityDateInInclusionPeriod()
-        + " ), pregnant_eligible.eligible_date) ) AS eligibility_date "
-        + " FROM ( "
-        + " SELECT pg.patient_id, "
-        + "               MIN(pg.pregnancy_date) AS eligible_date "
-        + "        FROM   (SELECT p.patient_id, "
-        + "                       e.encounter_datetime AS pregnancy_date "
-        + "                FROM   patient p "
-        + "                       INNER JOIN person p2 "
-        + "                               ON p2.person_id = p.patient_id "
-        + "                       INNER JOIN encounter e "
-        + "                               ON e.patient_id = p.patient_id "
-        + "                       INNER JOIN obs o "
-        + "                               ON o.encounter_id = e.encounter_id "
-        + "                WHERE  e.encounter_type IN ( ${5}, ${6} ) "
-        + "                       AND p2.gender = 'F' "
-        + "                       AND ( o.concept_id = ${1982} "
-        + "                             AND o.value_coded = ${1065} ) "
-        + "                       AND e.location_id = :location "
-        + "                       AND p.voided = 0 "
-        + "                       AND e.encounter_datetime BETWEEN "
-        + "                           DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
-        + "                       AND p2.voided = 0 "
-        + "                       AND e.voided = 0 "
-        + "                       AND o.voided = 0 "
-        + "                UNION "
-        + "                SELECT p.patient_id, "
-        + "                       e.encounter_datetime AS pregnancy_date "
-        + "                FROM   patient p "
-        + "                       INNER JOIN person p2 "
-        + "                               ON p2.person_id = p.patient_id "
-        + "                       INNER JOIN encounter e "
-        + "                               ON e.patient_id = p.patient_id "
-        + "                       INNER JOIN obs o "
-        + "                               ON o.encounter_id = e.encounter_id "
-        + "                WHERE  p2.gender = 'F' "
-        + "                       AND e.encounter_type IN ( ${5}, ${6} ) "
-        + "                       AND o.concept_id = ${1279} "
-        + "                       AND e.location_id = :location "
-        + "                       AND p.voided = 0 "
-        + "                       AND p2.voided = 0 "
-        + "                       AND e.voided = 0 "
-        + "                       AND o.voided = 0 "
-        + "                       AND e.encounter_datetime BETWEEN "
-        + "                           DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
-        + "                UNION "
-        + "                SELECT p.patient_id, "
-        + "                       e.encounter_datetime AS pregnancy_date "
-        + "                FROM   patient p "
-        + "                       INNER JOIN person p2 "
-        + "                               ON p2.person_id = p.patient_id "
-        + "                       INNER JOIN encounter e "
-        + "                               ON e.patient_id = p.patient_id "
-        + "                       INNER JOIN obs o "
-        + "                               ON o.encounter_id = e.encounter_id "
-        + "                WHERE  p2.gender = 'F' "
-        + "                       AND e.encounter_type IN ( ${5}, ${6} ) "
-        + "                       AND o.concept_id = ${1600} "
-        + "                       AND e.location_id = :location "
-        + "                       AND p.voided = 0 "
-        + "                       AND p2.voided = 0 "
-        + "                       AND e.voided = 0 "
-        + "                       AND o.voided = 0 "
-        + "                       AND e.encounter_datetime BETWEEN "
-        + "                           DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
-        + "                UNION "
-        + "                SELECT p.patient_id, "
-        + "                       e.encounter_datetime AS pregnancy_date "
-        + "                FROM   patient p "
-        + "                       INNER JOIN person p2 "
-        + "                               ON p2.person_id = p.patient_id "
-        + "                       INNER JOIN encounter e "
-        + "                               ON e.patient_id = p.patient_id "
-        + "                       INNER JOIN obs o "
-        + "                               ON o.encounter_id = e.encounter_id "
-        + "                WHERE  p2.gender = 'F' "
-        + "                       AND e.encounter_type = ${6} "
-        + "                       AND ( o.concept_id = ${6334} "
-        + "                             AND o.value_coded = ${6331} ) "
-        + "                       AND e.location_id = :location "
-        + "                       AND p.voided = 0 "
-        + "                       AND p2.voided = 0 "
-        + "                       AND e.voided = 0 "
-        + "                       AND o.voided = 0 "
-        + "                       AND e.encounter_datetime BETWEEN "
-        + "                           DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
-        + "                UNION "
-        + "                SELECT pp.patient_id, "
-        + "                       pp.date_enrolled AS pregnancy_date "
-        + "                FROM   patient_program pp "
-        + "                       INNER JOIN person p "
-        + "                               ON p.person_id = pp.patient_id "
-        + "                       INNER JOIN encounter e "
-        + "                               ON e.patient_id = pp.patient_id "
-        + "                WHERE  p.gender = 'F' "
-        + "                       AND pp.program_id = ${8} "
-        + "                       AND e.location_id = :location "
-        + "                       AND p.voided = 0 "
-        + "                       AND pp.voided = 0 "
-        + "                       AND pp.date_enrolled BETWEEN "
-        + "                           DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
-        + "                UNION "
-        + "                SELECT p.patient_id, "
-        + "                       o2.value_datetime AS pregnancy_date "
-        + "                FROM   patient p "
-        + "                       INNER JOIN person p2 "
-        + "                               ON p2.person_id = p.patient_id "
-        + "                       INNER JOIN encounter e "
-        + "                               ON e.patient_id = p.patient_id "
-        + "                       INNER JOIN obs o "
-        + "                               ON o.encounter_id = e.encounter_id "
-        + "                       INNER JOIN obs o2 "
-        + "                               ON o2.encounter_id = e.encounter_id "
-        + "                WHERE  p2.gender = 'F' "
-        + "                       AND e.encounter_type = ${53} "
-        + "                       AND ( o.concept_id = ${1982} "
-        + "                             AND o.value_coded = ${1065} ) "
-        + "                       AND ( o2.concept_id = ${1190} "
-        + "                             AND o2.value_datetime BETWEEN "
-        + "                                 DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate ) "
-        + "                       AND e.location_id = :location "
-        + "                       AND p.voided = 0 "
-        + "                       AND p2.voided = 0 "
-        + "                       AND e.voided = 0 "
-        + "                       AND o.voided = 0 "
-        + "                       AND o2.voided = 0 "
-        + "                UNION "
-        + "                SELECT p.patient_id, "
-        + "                       e.encounter_datetime AS pregnancy_date "
-        + "                FROM   patient p "
-        + "                       INNER JOIN person p2 "
-        + "                               ON p2.person_id = p.patient_id "
-        + "                       INNER JOIN encounter e "
-        + "                               ON e.patient_id = p.patient_id "
-        + "                       INNER JOIN obs o "
-        + "                               ON o.encounter_id = e.encounter_id "
-        + "                WHERE  p2.gender = 'F' "
-        + "                       AND e.encounter_type = ${6} "
-        + "                       AND ( o.concept_id = ${1982} "
-        + "                             AND o.value_coded = ${1065} ) "
-        + "                       AND e.location_id = :location "
-        + "                       AND p.voided = 0 "
-        + "                       AND p2.voided = 0 "
-        + "                       AND e.voided = 0 "
-        + "                       AND o.voided = 0 "
-        + "                       AND e.encounter_datetime BETWEEN "
-        + "                           DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
-        + "                UNION "
-        + "                SELECT p.patient_id, "
-        + "                       Date(o2.value_datetime) AS pregnancy_date "
-        + "                FROM   patient p "
-        + "                       INNER JOIN person p2 "
-        + "                               ON p2.person_id = p.patient_id "
-        + "                       INNER JOIN encounter e "
-        + "                               ON e.patient_id = p.patient_id "
-        + "                       INNER JOIN obs o "
-        + "                               ON o.encounter_id = e.encounter_id "
-        + "                       INNER JOIN obs o2 "
-        + "                               ON o2.encounter_id = e.encounter_id "
-        + "                WHERE  p2.gender = 'F' "
-        + "                       AND e.encounter_type = ${51} "
-        + "                       AND ( o.concept_id = ${1982} "
-        + "                             AND o.value_coded = ${1065} ) "
-        + "                       AND ( o2.concept_id = ${23821} "
-        + "                             AND Date(o2.value_datetime) BETWEEN "
-        + "                                 DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
-        + "                           ) "
-        + "                       AND e.location_id = :location "
-        + "                       AND p.voided = 0 "
-        + "                       AND p2.voided = 0 "
-        + "                       AND e.voided = 0 "
-        + "                       AND o.voided = 0 "
-        + "                       AND o2.voided = 0) pg "
-        + "        GROUP  BY pg.patient_id  ) pregnant_eligible "
-        + "        GROUP  BY pregnant_eligible.patient_id ";
+  private static String getPregnantsWithoutCD4() {
+    return "SELECT pregnant.patient_id, pregnant.pg_date AS eligibility_date "
+        + "FROM ( "
+        + "    SELECT pg.patient_id, MAX(pg.pregnancy_date) AS pg_date "
+        + "    FROM ( "
+        + "        SELECT p.patient_id, e.encounter_datetime AS pregnancy_date "
+        + "        FROM patient p "
+        + "        INNER JOIN person p2 ON p2.person_id = p.patient_id "
+        + "        INNER JOIN encounter e ON e.patient_id = p.patient_id "
+        + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "        WHERE e.encounter_type IN (${5}, ${6}) "
+        + "        AND p2.gender = 'F' "
+        + "        AND (o.concept_id = ${1982} AND o.value_coded = ${1065}) "
+        + "        AND e.location_id = :location "
+        + "        AND p.voided = 0 "
+        + "        AND e.encounter_datetime BETWEEN "
+        + "            DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
+        + "        AND p2.voided = 0 "
+        + "        AND e.voided = 0 "
+        + "        AND o.voided = 0 "
+        + "        UNION "
+        + "        SELECT p.patient_id, e.encounter_datetime AS pregnancy_date "
+        + "        FROM patient p "
+        + "        INNER JOIN person p2 ON p2.person_id = p.patient_id "
+        + "        INNER JOIN encounter e ON e.patient_id = p.patient_id "
+        + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "        WHERE p2.gender = 'F' "
+        + "        AND e.encounter_type IN (${5}, ${6}) "
+        + "        AND o.concept_id = ${1279} "
+        + "        AND e.location_id = :location "
+        + "        AND p.voided = 0 "
+        + "        AND p2.voided = 0 "
+        + "        AND e.voided = 0 "
+        + "        AND o.voided = 0 "
+        + "        AND e.encounter_datetime BETWEEN "
+        + "            DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
+        + "        UNION "
+        + "        SELECT p.patient_id, e.encounter_datetime AS pregnancy_date "
+        + "        FROM patient p "
+        + "        INNER JOIN person p2 ON p2.person_id = p.patient_id "
+        + "        INNER JOIN encounter e ON e.patient_id = p.patient_id "
+        + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "        WHERE p2.gender = 'F' "
+        + "        AND e.encounter_type IN (${5}, ${6}) "
+        + "        AND o.concept_id = ${1600} "
+        + "        AND e.location_id = :location "
+        + "        AND p.voided = 0 "
+        + "        AND p2.voided = 0 "
+        + "        AND e.voided = 0 "
+        + "        AND o.voided = 0 "
+        + "        AND e.encounter_datetime BETWEEN "
+        + "            DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
+        + "        UNION "
+        + "        SELECT pp.patient_id, pp.date_enrolled AS pregnancy_date "
+        + "        FROM patient_program pp "
+        + "        INNER JOIN person p ON p.person_id = pp.patient_id "
+        + "        WHERE p.gender = 'F' "
+        + "        AND pp.program_id = ${8} "
+        + "        AND pp.location_id = :location "
+        + "        AND p.voided = 0 "
+        + "        AND pp.voided = 0 "
+        + "        AND pp.date_enrolled BETWEEN "
+        + "            DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
+        + "        UNION "
+        + "        SELECT p.patient_id, o2.value_datetime AS pregnancy_date "
+        + "        FROM patient p "
+        + "        INNER JOIN person p2 ON p2.person_id = p.patient_id "
+        + "        INNER JOIN encounter e ON e.patient_id = p.patient_id "
+        + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "        INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+        + "        WHERE p2.gender = 'F' "
+        + "        AND e.encounter_type = ${53} "
+        + "        AND (o.concept_id = ${1982} AND o.value_coded = ${1065}) "
+        + "        AND (o2.concept_id = ${1190} AND o2.value_datetime BETWEEN "
+        + "            DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate ) "
+        + "        AND e.location_id = :location "
+        + "        AND p.voided = 0 "
+        + "        AND p2.voided = 0 "
+        + "        AND e.voided = 0 "
+        + "        AND o.voided = 0 "
+        + "        AND o2.voided = 0 "
+        + "    ) pg "
+        + "    GROUP BY pg.patient_id "
+        + ") pregnant "
+        + "LEFT JOIN ( "
+        + "    SELECT bf.patient_id, MAX(bf.breastfeeding_date) AS breastfeeding_date "
+        + "    FROM ( "
+        + "        SELECT e.patient_id, o.value_datetime AS breastfeeding_date "
+        + "        FROM encounter e "
+        + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "        WHERE e.encounter_type IN (${5}, ${6}) "
+        + "        AND o.concept_id = ${5599} "
+        + "        AND e.location_id = :location "
+        + "        AND o.value_datetime BETWEEN "
+        + "            DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
+        + "        AND e.voided = 0 "
+        + "        AND o.voided = 0 "
+        + "        UNION "
+        + "        SELECT e.patient_id, e.encounter_datetime AS breastfeeding_date "
+        + "        FROM encounter e "
+        + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "        WHERE e.encounter_type = ${6} "
+        + "        AND e.location_id = :location "
+        + "        AND (o.concept_id = ${6332} AND o.value_coded = ${1065}) "
+        + "        AND e.encounter_datetime BETWEEN "
+        + "            DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
+        + "        AND o.voided = 0 "
+        + "        AND e.voided = 0 "
+        + "        UNION "
+        + "        SELECT e.patient_id, e.encounter_datetime AS breastfeeding_date "
+        + "        FROM encounter e "
+        + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "        WHERE e.encounter_type IN (${5}, ${6}) "
+        + "        AND o.concept_id = ${6334} AND o.value_coded = ${6332} "
+        + "        AND e.voided = 0 AND o.voided = 0 "
+        + "        AND e.location_id = :location "
+        + "        AND e.encounter_datetime BETWEEN "
+        + "            DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
+        + "        UNION "
+        + "        SELECT pp.patient_id, ps.start_date AS breastfeeding_date "
+        + "        FROM patient_program pp "
+        + "        INNER JOIN patient_state ps ON ps.patient_program_id = pp.patient_program_id "
+        + "        WHERE pp.program_id = ${8} "
+        + "        AND ps.state = ${27} "
+        + "        AND pp.location_id = :location "
+        + "        AND pp.voided = 0 "
+        + "        AND ps.voided = 0 "
+        + "        AND ps.start_date BETWEEN "
+        + "            DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
+        + "        UNION "
+        + "        SELECT e.patient_id, o2.value_datetime AS breastfeeding_date "
+        + "        FROM encounter e "
+        + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "        INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+        + "        WHERE e.encounter_type = ${53} "
+        + "        AND (o.concept_id = ${6332} AND o.value_coded = ${1065}) "
+        + "        AND (o2.concept_id = ${1190} AND o2.value_datetime BETWEEN "
+        + "            DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate ) "
+        + "        AND e.location_id = :location "
+        + "        AND e.voided = 0 "
+        + "        AND o.voided = 0 "
+        + "        UNION "
+        + "        SELECT e.patient_id, DATE(o2.value_datetime) AS breastfeeding_date "
+        + "        FROM encounter e "
+        + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "        INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+        + "        WHERE e.encounter_type = ${51} "
+        + "        AND o.concept_id = ${6332} AND o.value_coded = ${1065} "
+        + "        AND o2.concept_id = ${23821} "
+        + "        AND DATE(o2.value_datetime) BETWEEN "
+        + "            DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
+        + "        AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
+        + "        AND e.location_id = :location "
+        + "    ) bf "
+        + "    GROUP BY bf.patient_id "
+        + ") breastfeeding ON pregnant.patient_id = breastfeeding.patient_id "
+        + "WHERE ((pregnant.pg_date IS NOT NULL AND pregnant.pg_date >= breastfeeding.breastfeeding_date) "
+        + "OR (breastfeeding.breastfeeding_date IS NULL)) "
+        + "AND pregnant.patient_id NOT IN ( "
+        + "    SELECT pregnant.patient_id "
+        + "    FROM ( "
+        + "        SELECT pg.patient_id, MIN(pg.pregnancy_date) AS pg_date "
+        + "        FROM ( "
+        + "            SELECT p.patient_id, e.encounter_datetime AS pregnancy_date "
+        + "            FROM patient p "
+        + "            INNER JOIN person p2 ON p2.person_id = p.patient_id "
+        + "            INNER JOIN encounter e ON e.patient_id = p.patient_id "
+        + "            INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "            WHERE e.encounter_type IN (${5}, ${6}) "
+        + "            AND p2.gender = 'F' "
+        + "            AND (o.concept_id = ${1982} AND o.value_coded = ${1065}) "
+        + "            AND e.location_id = :location "
+        + "            AND p.voided = 0 "
+        + "            AND e.encounter_datetime BETWEEN "
+        + "                DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
+        + "            AND p2.voided = 0 "
+        + "            AND e.voided = 0 "
+        + "            AND o.voided = 0 "
+        + "            UNION "
+        + "            SELECT p.patient_id, e.encounter_datetime AS pregnancy_date "
+        + "            FROM patient p "
+        + "            INNER JOIN person p2 ON p2.person_id = p.patient_id "
+        + "            INNER JOIN encounter e ON e.patient_id = p.patient_id "
+        + "            INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "            WHERE p2.gender = 'F' "
+        + "            AND e.encounter_type IN (${5}, ${6}) "
+        + "            AND o.concept_id = ${1279} "
+        + "            AND e.location_id = :location "
+        + "            AND p.voided = 0 "
+        + "            AND p2.voided = 0 "
+        + "            AND e.voided = 0 "
+        + "            AND o.voided = 0 "
+        + "            AND e.encounter_datetime BETWEEN "
+        + "                DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
+        + "            UNION "
+        + "            SELECT p.patient_id, e.encounter_datetime AS pregnancy_date "
+        + "            FROM patient p "
+        + "            INNER JOIN person p2 ON p2.person_id = p.patient_id "
+        + "            INNER JOIN encounter e ON e.patient_id = p.patient_id "
+        + "            INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "            WHERE p2.gender = 'F' "
+        + "            AND e.encounter_type IN (${5}, ${6}) "
+        + "            AND o.concept_id = ${1600} "
+        + "            AND e.location_id = :location "
+        + "            AND p.voided = 0 "
+        + "            AND p2.voided = 0 "
+        + "            AND e.voided = 0 "
+        + "            AND o.voided = 0 "
+        + "            AND e.encounter_datetime BETWEEN "
+        + "                DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
+        + "            UNION "
+        + "            SELECT p.patient_id, e.encounter_datetime AS pregnancy_date "
+        + "            FROM patient p "
+        + "            INNER JOIN person p2 ON p2.person_id = p.patient_id "
+        + "            INNER JOIN encounter e ON e.patient_id = p.patient_id "
+        + "            INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "            WHERE p2.gender = 'F' "
+        + "            AND e.encounter_type = ${6} "
+        + "            AND (o.concept_id = ${6334} AND o.value_coded = ${6331}) "
+        + "            AND e.location_id = :location "
+        + "            AND p.voided = 0 "
+        + "            AND p2.voided = 0 "
+        + "            AND e.voided = 0 "
+        + "            AND o.voided = 0 "
+        + "            AND e.encounter_datetime BETWEEN "
+        + "                DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
+        + "            UNION "
+        + "            SELECT pp.patient_id, pp.date_enrolled AS pregnancy_date "
+        + "            FROM patient_program pp "
+        + "            INNER JOIN person p ON p.person_id = pp.patient_id "
+        + "            WHERE p.gender = 'F' "
+        + "            AND pp.program_id = ${8} "
+        + "            AND pp.location_id = :location "
+        + "            AND p.voided = 0 "
+        + "            AND pp.voided = 0 "
+        + "            AND pp.date_enrolled BETWEEN "
+        + "                DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
+        + "            UNION "
+        + "            SELECT p.patient_id, o2.value_datetime AS pregnancy_date "
+        + "            FROM patient p "
+        + "            INNER JOIN person p2 ON p2.person_id = p.patient_id "
+        + "            INNER JOIN encounter e ON e.patient_id = p.patient_id "
+        + "            INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "            INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+        + "            WHERE p2.gender = 'F' "
+        + "            AND e.encounter_type = ${53} "
+        + "            AND (o.concept_id = ${1982} AND o.value_coded = ${1065}) "
+        + "            AND (o2.concept_id = ${1190} AND o2.value_datetime BETWEEN "
+        + "                DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate) "
+        + "            AND e.location_id = :location "
+        + "            AND p.voided = 0 "
+        + "            AND p2.voided = 0 "
+        + "            AND e.voided = 0 "
+        + "            AND o.voided = 0 "
+        + "            AND o2.voided = 0 "
+        + "        ) pg "
+        + "        GROUP BY pg.patient_id "
+        + "    ) pregnant "
+        + "    WHERE EXISTS ( "
+        + "        SELECT e.patient_id "
+        + "        FROM encounter e "
+        + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "        WHERE e.voided = 0 "
+        + "        AND o.voided = 0 "
+        + "        AND e.patient_id = pregnant.patient_id "
+        + "        AND e.encounter_type IN (${6}, ${13}, ${51}) "
+        + "        AND ((o.concept_id = ${1695} AND o.value_numeric IS NOT NULL) "
+        + "        OR (o.concept_id = ${165515} AND o.value_coded IS NOT NULL)) "
+        + "        AND e.location_id = :location "
+        + "        AND Date(e.encounter_datetime) >= pregnant.pg_date "
+        + "        AND Date(e.encounter_datetime) <= :inclusionStartDate "
+        + "        UNION "
+        + "        SELECT e.patient_id "
+        + "        FROM encounter e "
+        + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "        WHERE e.voided = 0 "
+        + "        AND o.voided = 0 "
+        + "        AND e.patient_id = pregnant.patient_id "
+        + "        AND e.encounter_type IN (${53}, ${90}) "
+        + "        AND ((o.concept_id = ${1695} AND o.value_numeric IS NOT NULL) "
+        + "        OR (o.concept_id = ${165515} AND o.value_coded IS NOT NULL)) "
+        + "        AND e.location_id = :location "
+        + "        AND o.obs_datetime >= pregnant.pg_date "
+        + "        AND o.obs_datetime <= :inclusionStartDate "
+        + "    ) "
+        + ")";
   }
 
   private static String getCd4CountOnPeriod() {
@@ -2525,8 +2873,220 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
         + "        GROUP  BY pg.patient_id ";
   }
 
+  private static String getPregnantWithoutCd4Query() {
+    return " SELECT pregnant_eligible.patient_id, "
+        + " IF((pregnant_eligible.eligible_date < :startDate), "
+        + " ( "
+        + getLastPregnancyDateIfEligibilityDateBeforeInclusionPeriod()
+        + " ), "
+        + " IF ( (pregnant_eligible.eligible_date >= :startDate AND pregnant_eligible.eligible_date <= :endDate), "
+        + "  ( "
+        + getFirstPregnancyDateIfEligibilityDateInInclusionPeriod()
+        + " ), pregnant_eligible.eligible_date) ) AS eligibility_date "
+        + " FROM ( "
+        + " SELECT pg.patient_id, "
+        + "               MIN(pg.pregnancy_date) AS eligible_date "
+        + "        FROM   (SELECT p.patient_id, "
+        + "                       e.encounter_datetime AS pregnancy_date "
+        + "                FROM   patient p "
+        + "                       INNER JOIN person p2 "
+        + "                               ON p2.person_id = p.patient_id "
+        + "                       INNER JOIN encounter e "
+        + "                               ON e.patient_id = p.patient_id "
+        + "                       INNER JOIN obs o "
+        + "                               ON o.encounter_id = e.encounter_id "
+        + "                WHERE  e.encounter_type IN ( ${5}, ${6} ) "
+        + "                       AND p2.gender = 'F' "
+        + "                       AND ( o.concept_id = ${1982} "
+        + "                             AND o.value_coded = ${1065} ) "
+        + "                       AND e.location_id = :location "
+        + "                       AND p.voided = 0 "
+        + "                       AND e.encounter_datetime BETWEEN "
+        + "                           DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
+        + "                       AND p2.voided = 0 "
+        + "                       AND e.voided = 0 "
+        + "                       AND o.voided = 0 "
+        + "                UNION "
+        + "                SELECT p.patient_id, "
+        + "                       e.encounter_datetime AS pregnancy_date "
+        + "                FROM   patient p "
+        + "                       INNER JOIN person p2 "
+        + "                               ON p2.person_id = p.patient_id "
+        + "                       INNER JOIN encounter e "
+        + "                               ON e.patient_id = p.patient_id "
+        + "                       INNER JOIN obs o "
+        + "                               ON o.encounter_id = e.encounter_id "
+        + "                WHERE  p2.gender = 'F' "
+        + "                       AND e.encounter_type IN ( ${5}, ${6} ) "
+        + "                       AND o.concept_id = ${1279} "
+        + "                       AND e.location_id = :location "
+        + "                       AND p.voided = 0 "
+        + "                       AND p2.voided = 0 "
+        + "                       AND e.voided = 0 "
+        + "                       AND o.voided = 0 "
+        + "                       AND e.encounter_datetime BETWEEN "
+        + "                           DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
+        + "                UNION "
+        + "                SELECT p.patient_id, "
+        + "                       e.encounter_datetime AS pregnancy_date "
+        + "                FROM   patient p "
+        + "                       INNER JOIN person p2 "
+        + "                               ON p2.person_id = p.patient_id "
+        + "                       INNER JOIN encounter e "
+        + "                               ON e.patient_id = p.patient_id "
+        + "                       INNER JOIN obs o "
+        + "                               ON o.encounter_id = e.encounter_id "
+        + "                WHERE  p2.gender = 'F' "
+        + "                       AND e.encounter_type IN ( ${5}, ${6} ) "
+        + "                       AND o.concept_id = ${1600} "
+        + "                       AND e.location_id = :location "
+        + "                       AND p.voided = 0 "
+        + "                       AND p2.voided = 0 "
+        + "                       AND e.voided = 0 "
+        + "                       AND o.voided = 0 "
+        + "                       AND e.encounter_datetime BETWEEN "
+        + "                           DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
+        + "                UNION "
+        + "                SELECT p.patient_id, "
+        + "                       e.encounter_datetime AS pregnancy_date "
+        + "                FROM   patient p "
+        + "                       INNER JOIN person p2 "
+        + "                               ON p2.person_id = p.patient_id "
+        + "                       INNER JOIN encounter e "
+        + "                               ON e.patient_id = p.patient_id "
+        + "                       INNER JOIN obs o "
+        + "                               ON o.encounter_id = e.encounter_id "
+        + "                WHERE  p2.gender = 'F' "
+        + "                       AND e.encounter_type = ${6} "
+        + "                       AND ( o.concept_id = ${6334} "
+        + "                             AND o.value_coded = ${6331} ) "
+        + "                       AND e.location_id = :location "
+        + "                       AND p.voided = 0 "
+        + "                       AND p2.voided = 0 "
+        + "                       AND e.voided = 0 "
+        + "                       AND o.voided = 0 "
+        + "                       AND e.encounter_datetime BETWEEN "
+        + "                           DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
+        + "                UNION "
+        + "                SELECT pp.patient_id, "
+        + "                       pp.date_enrolled AS pregnancy_date "
+        + "                FROM   patient_program pp "
+        + "                       INNER JOIN person p "
+        + "                               ON p.person_id = pp.patient_id "
+        + "                       INNER JOIN encounter e "
+        + "                               ON e.patient_id = pp.patient_id "
+        + "                WHERE  p.gender = 'F' "
+        + "                       AND pp.program_id = ${8} "
+        + "                       AND e.location_id = :location "
+        + "                       AND p.voided = 0 "
+        + "                       AND pp.voided = 0 "
+        + "                       AND pp.date_enrolled BETWEEN "
+        + "                           DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
+        + "                UNION "
+        + "                SELECT p.patient_id, "
+        + "                       o2.value_datetime AS pregnancy_date "
+        + "                FROM   patient p "
+        + "                       INNER JOIN person p2 "
+        + "                               ON p2.person_id = p.patient_id "
+        + "                       INNER JOIN encounter e "
+        + "                               ON e.patient_id = p.patient_id "
+        + "                       INNER JOIN obs o "
+        + "                               ON o.encounter_id = e.encounter_id "
+        + "                       INNER JOIN obs o2 "
+        + "                               ON o2.encounter_id = e.encounter_id "
+        + "                WHERE  p2.gender = 'F' "
+        + "                       AND e.encounter_type = ${53} "
+        + "                       AND ( o.concept_id = ${1982} "
+        + "                             AND o.value_coded = ${1065} ) "
+        + "                       AND ( o2.concept_id = ${1190} "
+        + "                             AND o2.value_datetime BETWEEN "
+        + "                                 DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate ) "
+        + "                       AND e.location_id = :location "
+        + "                       AND p.voided = 0 "
+        + "                       AND p2.voided = 0 "
+        + "                       AND e.voided = 0 "
+        + "                       AND o.voided = 0 "
+        + "                       AND o2.voided = 0 "
+        + "                UNION "
+        + "                SELECT p.patient_id, "
+        + "                       e.encounter_datetime AS pregnancy_date "
+        + "                FROM   patient p "
+        + "                       INNER JOIN person p2 "
+        + "                               ON p2.person_id = p.patient_id "
+        + "                       INNER JOIN encounter e "
+        + "                               ON e.patient_id = p.patient_id "
+        + "                       INNER JOIN obs o "
+        + "                               ON o.encounter_id = e.encounter_id "
+        + "                WHERE  p2.gender = 'F' "
+        + "                       AND e.encounter_type = ${6} "
+        + "                       AND ( o.concept_id = ${1982} "
+        + "                             AND o.value_coded = ${1065} ) "
+        + "                       AND e.location_id = :location "
+        + "                       AND p.voided = 0 "
+        + "                       AND p2.voided = 0 "
+        + "                       AND e.voided = 0 "
+        + "                       AND o.voided = 0 "
+        + "                       AND e.encounter_datetime BETWEEN "
+        + "                           DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
+        + "                UNION "
+        + "                SELECT p.patient_id, "
+        + "                       Date(o2.value_datetime) AS pregnancy_date "
+        + "                FROM   patient p "
+        + "                       INNER JOIN person p2 "
+        + "                               ON p2.person_id = p.patient_id "
+        + "                       INNER JOIN encounter e "
+        + "                               ON e.patient_id = p.patient_id "
+        + "                       INNER JOIN obs o "
+        + "                               ON o.encounter_id = e.encounter_id "
+        + "                       INNER JOIN obs o2 "
+        + "                               ON o2.encounter_id = e.encounter_id "
+        + "                WHERE  p2.gender = 'F' "
+        + "                       AND e.encounter_type = ${51} "
+        + "                       AND ( o.concept_id = ${1982} "
+        + "                             AND o.value_coded = ${1065} ) "
+        + "                       AND ( o2.concept_id = ${23821} "
+        + "                             AND Date(o2.value_datetime) BETWEEN "
+        + "                                 DATE_SUB(:startDate, INTERVAL 8 MONTH) AND :endDate "
+        + "                           ) "
+        + "                       AND e.location_id = :location "
+        + "                       AND p.voided = 0 "
+        + "                       AND p2.voided = 0 "
+        + "                       AND e.voided = 0 "
+        + "                       AND o.voided = 0 "
+        + "                       AND o2.voided = 0) pg "
+        + "        GROUP  BY pg.patient_id  ) pregnant_eligible "
+        + "        WHERE pregnant_eligible.patient_id NOT IN ("
+        + "        SELECT e.patient_id "
+        + "        FROM encounter e "
+        + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "        WHERE e.voided = 0 "
+        + "        AND o.voided = 0 "
+        + "        AND e.patient_id = pregnant_eligible.patient_id "
+        + "        AND e.encounter_type IN (${6}, ${13}, ${51}) "
+        + "        AND ((o.concept_id = ${1695} AND o.value_numeric IS NOT NULL) "
+        + "        OR (o.concept_id = ${165515} AND o.value_coded IS NOT NULL)) "
+        + "        AND e.location_id = :location "
+        + "        AND Date(e.encounter_datetime) >= pregnant_eligible.eligible_date "
+        + "        AND Date(e.encounter_datetime) <= :inclusionStartDate "
+        + "        UNION "
+        + "        SELECT e.patient_id "
+        + "        FROM encounter e "
+        + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "        WHERE e.voided = 0 "
+        + "        AND o.voided = 0 "
+        + "        AND e.patient_id = pregnant_eligible.patient_id "
+        + "        AND e.encounter_type IN (${53}, ${90}) "
+        + "        AND ((o.concept_id = ${1695} AND o.value_numeric IS NOT NULL) "
+        + "        OR (o.concept_id = ${165515} AND o.value_coded IS NOT NULL)) "
+        + "        AND e.location_id = :location "
+        + "        AND o.obs_datetime >= pregnant_eligible.eligible_date "
+        + "        AND o.obs_datetime <= :inclusionStartDate "
+        + " ) "
+        + "        GROUP  BY pregnant_eligible.patient_id ";
+  }
+
   public enum Cd4CountComparison {
-    LessThanOrEqualTo200mm3 {
+    LessThan200mm3 {
       @Override
       public String getProposition() {
         return "o.value_numeric < 200";
@@ -2542,23 +3102,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
         return "A";
       }
     },
-    LessThanOrEqualTo200mm3AA {
-      @Override
-      public String getProposition() {
-        return "o.value_numeric <= 200";
-      }
-
-      @Override
-      public String getCompositionString() {
-        return getSearchKey();
-      }
-
-      @Override
-      public String getSearchKey() {
-        return "AA";
-      }
-    },
-    LessThanOrEqualTo500mm3 {
+    LessThan500mm3 {
       @Override
       public String getProposition() {
         return "o.value_numeric < 500";
@@ -2574,7 +3118,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
         return "B";
       }
     },
-    LessThanOrEqualTo750mm3 {
+    LessThan750mm3 {
       @Override
       public String getProposition() {
         return "o.value_numeric < 750";
@@ -2686,6 +3230,9 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     map.put("5599", hivMetadata.getPriorDeliveryDateConcept().getConceptId());
     map.put("6332", hivMetadata.getBreastfeeding().getConceptId());
     map.put("27", hivMetadata.getPatientGaveBirthWorkflowState().getProgramWorkflowStateId());
+    map.put("165513", hivMetadata.getCD4CountLessThanOrEqualTo200Concept().getConceptId());
+    map.put("165519", hivMetadata.getCD4SemiQuantitativeAtArtStartingConcept().getConceptId());
+    map.put("1254", hivMetadata.getCD4CountGreaterThan200Concept().getConceptId());
     return map;
   }
 
