@@ -32,6 +32,8 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
 
   private TxPvlsDataset txPvlsDataset;
 
+  private TxPvlsSupplementalDataset txPvlsSupplementalDataset;
+
   private TxNewDataset txNewDataset;
 
   private TxCurrDataset txCurrDataset;
@@ -69,6 +71,7 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
       CXCASCRNDataset cxcascrnDataset,
       CXCASCRNPositiveDataset cxcascrnPositiveDataset,
       TXCXCADataset txcxcaDataset,
+      TxPvlsSupplementalDataset txPvlsSupplementalDataset,
       PrepNewDataset prepNewDataset,
       PrepCtDataset prepCtDataset,
       PrepOtherDisaggregationDataset prepOtherDisaggregationDataset,
@@ -82,6 +85,7 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
     this.genericCohortQueries = genericCohortQueries;
     this.transferredInDataset = transferredInDataset;
     this.txRTTPLHIVDateset = txRTTPLHIVDateset;
+    this.txPvlsSupplementalDataset = txPvlsSupplementalDataset;
     this.prepNewDataset = prepNewDataset;
     this.prepCtDataset = prepCtDataset;
     this.prepOtherDisaggregationDataset = prepOtherDisaggregationDataset;
@@ -126,12 +130,15 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
         "C", Mapped.mapStraightThrough(txCurrDataset.constructTxCurrDataset(true)));
     rd.addDataSetDefinition("P", Mapped.mapStraightThrough(txPvlsDataset.constructTxPvlsDatset()));
     rd.addDataSetDefinition(
+        "PS",
+        Mapped.mapStraightThrough(txPvlsSupplementalDataset.constructTxPvlsSupplementalDatset()));
+    rd.addDataSetDefinition(
         "TXML", Mapped.mapStraightThrough(txMlDataset25.constructtxMlDataset()));
     rd.addDataSetDefinition("R", Mapped.mapStraightThrough(txRttDataset.constructTxRttDataset()));
     rd.addDataSetDefinition(
-        "T", Mapped.mapStraightThrough(transferredInDataset.constructTransferInDataset()));
-    rd.addDataSetDefinition(
         "PL", Mapped.mapStraightThrough(txRTTPLHIVDateset.constructTxRTTPLHIVDateset()));
+    rd.addDataSetDefinition(
+        "T", Mapped.mapStraightThrough(transferredInDataset.constructTransferInDataset()));
     rd.addDataSetDefinition(
         "PREP", Mapped.mapStraightThrough(prepNewDataset.constructPrepNewDataset()));
     rd.addDataSetDefinition(
@@ -162,8 +169,8 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
       rd =
           createXlsReportDesign(
               reportDefinition,
-              "SESP_MER2.7_TEMP_Quarterly_v1.3.xls",
-              "PEPFAR MER 2.7 Quarterly Report",
+              "SESP_MER2.8_TEMP_Quarterly_v1.4.xls",
+              "PEPFAR MER 2.8 Quarterly Report",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();

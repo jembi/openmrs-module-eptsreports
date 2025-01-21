@@ -1311,4 +1311,735 @@ public class TxPvlsCohortQueries {
     sqlCohortDefinition.setQuery(mappedQuery);
     return sqlCohortDefinition;
   }
+
+  /**
+   * PVLS_PBFW_FR2
+   *
+   * <p>Indicator denominators
+   *
+   * <p>The system will generate the TX_PVLS supplemental coverage denominators as the number PW
+   * (PVLS_PBFW_FR3) and BF (PVLS_PBFW_FR4) clients on ART for at least 90 days who were eligible to
+   * receive a VL test during the 12 months prior to the reporting end date.
+   *
+   * @return @{@link CohortDefinition}
+   */
+  public CohortDefinition getPregnantAndBreastfeedingWomenEligibleForVL() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Get pregnant and breastfeeding women with eligible for VL");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    String mappings = "endDate=${endDate},location=${location}";
+
+    cd.addSearch("pregnant", EptsReportUtils.map(this.getPregnantComposition(), mappings));
+
+    cd.addSearch(
+        "breastfeeding",
+        EptsReportUtils.map(this.getBreastfeedingWomenWithVlResultComposition(), mappings));
+
+    cd.setCompositionString("pregnant OR breastfeeding");
+    return cd;
+  }
+
+  /**
+   * <b>PVLS_PBFW_FR3.1</b>
+   *
+   * <p>Pregnant Women
+   *
+   * <p>The system will identify pregnant women as follows:
+   *
+   * <ul>
+   *   <li>All women with:
+   *       <ul>
+   *         <li>Pregnancy registered on Ficha Clínica or
+   *         <li>Enrollment date in Program-PTV or
+   *         <li>Pregnancy registered at ART initiation on Ficha Resumo
+   *         <li>Pregnancy registered on e-Lab Form
+   *       </ul>
+   * </ul>
+   *
+   * @return @{@link CohortDefinition}
+   */
+  public CohortDefinition getPregnantWomanTxPvlsSupplemental() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Pregnant Client");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+    Map<String, Integer> map = new HashMap<>();
+
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("5", hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("1600", hivMetadata.getPregnancyDueDate().getConceptId());
+    map.put("23821", hivMetadata.getSampleCollectionDateAndTime().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("6334", hivMetadata.getCriteriaForArtStart().getConceptId());
+    map.put("8", hivMetadata.getPtvEtvProgram().getProgramId());
+    map.put("1279", hivMetadata.getNumberOfWeeksPregnant().getConceptId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("6331", hivMetadata.getBPlusConcept().getConceptId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("5599", hivMetadata.getPriorDeliveryDateConcept().getConceptId());
+    map.put("6332", hivMetadata.getBreastfeeding().getConceptId());
+    map.put("27", hivMetadata.getPatientGaveBirthWorkflowState().getProgramWorkflowStateId());
+
+    String query =
+        "SELECT pregnant.patient_id "
+            + "FROM ( "
+            + "    SELECT pg.patient_id, "
+            + "           MAX(pg.pregnancy_date) AS pg_date "
+            + "    FROM ( "
+            + "        SELECT p.patient_id, "
+            + "               MAX(e.encounter_datetime) AS pregnancy_date "
+            + "        FROM   patient p "
+            + "        INNER JOIN person p2 ON p2.person_id = p.patient_id "
+            + "        INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "        WHERE  p.voided = 0 "
+            + "          AND p2.voided = 0 "
+            + "          AND e.voided = 0 "
+            + "          AND o.voided = 0 "
+            + "          AND e.encounter_type IN (${6}, ${51}) "
+            + "          AND p2.gender = 'F' "
+            + "          AND o.concept_id = ${1982} "
+            + "          AND o.value_coded = ${1065} "
+            + "          AND e.location_id = :location "
+            + "          AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate "
+            + "        GROUP BY p.patient_id "
+            + "        UNION "
+            + "        SELECT pp.patient_id, "
+            + "               MAX(pp.date_enrolled) AS pregnancy_date "
+            + "        FROM   patient_program pp "
+            + "        INNER JOIN person p ON p.person_id = pp.patient_id "
+            + "        INNER JOIN encounter e ON e.patient_id = pp.patient_id "
+            + "        WHERE  p.gender = 'F' "
+            + "          AND pp.program_id = ${8} "
+            + "          AND e.location_id = :location "
+            + "          AND p.voided = 0 "
+            + "          AND e.voided = 0 "
+            + "          AND pp.voided = 0 "
+            + "          AND pp.date_enrolled BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate "
+            + "        GROUP BY pp.patient_id "
+            + "        UNION "
+            + "        SELECT p.patient_id, "
+            + "               o2.value_datetime AS pregnancy_date "
+            + "        FROM   patient p "
+            + "        INNER JOIN person p2 ON p2.person_id = p.patient_id "
+            + "        INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "        INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "        WHERE  p.voided = 0 "
+            + "          AND p2.voided = 0 "
+            + "          AND e.voided = 0 "
+            + "          AND o.voided = 0 "
+            + "          AND o2.voided = 0 "
+            + "          AND p2.gender = 'F' "
+            + "          AND e.encounter_type = ${53} "
+            + "          AND ( "
+            + "              (o.concept_id = ${1982} AND o.value_coded = ${1065}) "
+            + "              AND (o2.concept_id = ${1190} "
+            + "              AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate ) ) "
+            + "          AND e.location_id = :location "
+            + "        GROUP BY p.patient_id "
+            + "    ) pg "
+            + "WHERE  pg.patient_id NOT IN ( "
+            + "    SELECT e.patient_id "
+            + "    FROM   encounter e "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "    WHERE  o.voided = 0 "
+            + "      AND e.voided = 0 "
+            + "      AND e.encounter_type IN (${6}, ${51}) "
+            + "      AND e.location_id = :location "
+            + "      AND o.concept_id = ${6332} "
+            + "      AND o.value_coded = ${1065} "
+            + "      AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate "
+            + "      AND e.encounter_datetime > pg.pregnancy_date "
+            + "    UNION "
+            + "    SELECT pp.patient_id "
+            + "    FROM   patient_program pp "
+            + "    INNER JOIN patient_state ps ON ps.patient_program_id = pp.patient_program_id "
+            + "    WHERE  pp.program_id = ${8} "
+            + "      AND ps.state = ${27} "
+            + "      AND pp.location_id = :location "
+            + "      AND pp.voided = 0 "
+            + "      AND ps.voided = 0 "
+            + "      AND ps.start_date > pg.pregnancy_date "
+            + "      AND ps.start_date BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate "
+            + "    UNION "
+            + "    SELECT e.patient_id "
+            + "    FROM   encounter e "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "    INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "    WHERE  e.encounter_type = ${53} "
+            + "      AND e.location_id = :location "
+            + "      AND ( "
+            + "          (o.concept_id = ${6332} AND o.value_coded = ${1065}) "
+            + "          AND (o2.concept_id = ${1190} "
+            + "               AND o2.value_datetime > pg.pregnancy_date "
+            + "               AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate ) ) "
+            + "          AND e.voided = 0 "
+            + "          AND o.voided = 0 "
+            + "          AND o2.voided = 0 "
+            + "    ) "
+            + "GROUP BY pg.patient_id "
+            + ") pregnant ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Excluding:</b>
+   *
+   * <ul>
+   *   <li>Clients whose difference between the date of the most recent record of pregnancy in the
+   *       last 21 months and the ART start date (PVLS_PBFW_FR5) is less than 90 days.
+   * </ul>
+   *
+   * @return @{@link CohortDefinition}
+   */
+  public CohortDefinition getExclusionOfPregnantWomanOnArtForLessThan90DaysOfArt() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Exclusion - Pregnant Client with less than 90 days on ART");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+    Map<String, Integer> map = new HashMap<>();
+
+    String artStart = commonQueries.getARTStartDate(true);
+
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("5", hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("1600", hivMetadata.getPregnancyDueDate().getConceptId());
+    map.put("23821", hivMetadata.getSampleCollectionDateAndTime().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("6334", hivMetadata.getCriteriaForArtStart().getConceptId());
+    map.put("8", hivMetadata.getPtvEtvProgram().getProgramId());
+    map.put("1279", hivMetadata.getNumberOfWeeksPregnant().getConceptId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("6331", hivMetadata.getBPlusConcept().getConceptId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("5599", hivMetadata.getPriorDeliveryDateConcept().getConceptId());
+    map.put("6332", hivMetadata.getBreastfeeding().getConceptId());
+    map.put("27", hivMetadata.getPatientGaveBirthWorkflowState().getProgramWorkflowStateId());
+
+    String query =
+        "SELECT pat.patient_id "
+            + "FROM ( "
+            + "    SELECT pg.patient_id, "
+            + "           MAX(pg.pregnancy_date) AS pg_date "
+            + "    FROM ( "
+            + "        SELECT p.patient_id, "
+            + "               MAX(e.encounter_datetime) AS pregnancy_date "
+            + "        FROM patient p "
+            + "        INNER JOIN person p2 ON p2.person_id = p.patient_id "
+            + "        INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "        WHERE p.voided = 0 "
+            + "          AND p2.voided = 0 "
+            + "          AND e.voided = 0 "
+            + "          AND o.voided = 0 "
+            + "          AND e.encounter_type IN (${6}, ${51}) "
+            + "          AND p2.gender = 'F' "
+            + "          AND o.concept_id = ${1982} "
+            + "          AND o.value_coded = ${1065} "
+            + "          AND e.location_id = :location "
+            + "          AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate "
+            + "        GROUP BY p.patient_id "
+            + "        UNION "
+            + "        SELECT pp.patient_id, "
+            + "               MAX(pp.date_enrolled) AS pregnancy_date "
+            + "        FROM patient_program pp "
+            + "        INNER JOIN person p ON p.person_id = pp.patient_id "
+            + "        INNER JOIN encounter e ON e.patient_id = pp.patient_id "
+            + "        WHERE p.gender = 'F' "
+            + "          AND pp.program_id = ${8} "
+            + "          AND e.location_id = :location "
+            + "          AND p.voided = 0 "
+            + "          AND pp.voided = 0 "
+            + "          AND pp.date_enrolled BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate "
+            + "        GROUP BY pp.patient_id "
+            + "        UNION "
+            + "        SELECT p.patient_id, "
+            + "               o2.value_datetime AS pregnancy_date "
+            + "        FROM patient p "
+            + "        INNER JOIN person p2 ON p2.person_id = p.patient_id "
+            + "        INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "        INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "        WHERE p.voided = 0 "
+            + "          AND p2.voided = 0 "
+            + "          AND e.voided = 0 "
+            + "          AND o.voided = 0 "
+            + "          AND o2.voided = 0 "
+            + "          AND p2.gender = 'F' "
+            + "          AND e.encounter_type = ${53} "
+            + "          AND ( "
+            + "              (o.concept_id = ${1982} AND o.value_coded = ${1065}) "
+            + "              AND (o2.concept_id = ${1190} "
+            + "                   AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate) "
+            + "          ) "
+            + "          AND e.location_id = :location "
+            + "        GROUP BY p.patient_id "
+            + "    ) pg "
+            + "    WHERE pg.patient_id NOT IN ( "
+            + "        SELECT e.patient_id "
+            + "        FROM encounter e "
+            + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "        WHERE o.voided = 0 "
+            + "          AND e.voided = 0 "
+            + "          AND e.encounter_type IN (${6}, ${51}) "
+            + "          AND e.location_id = :location "
+            + "          AND o.concept_id = ${6332} "
+            + "          AND o.value_coded = ${1065} "
+            + "          AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate "
+            + "          AND e.encounter_datetime > pg.pregnancy_date "
+            + "        UNION "
+            + "        SELECT pp.patient_id "
+            + "        FROM patient_program pp "
+            + "        INNER JOIN patient_state ps ON ps.patient_program_id = pp.patient_program_id "
+            + "        WHERE pp.program_id = ${8} "
+            + "          AND ps.state = ${27} "
+            + "          AND pp.location_id = :location "
+            + "          AND pp.voided = 0 "
+            + "          AND ps.voided = 0 "
+            + "          AND ps.start_date > pg.pregnancy_date "
+            + "          AND ps.start_date BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate "
+            + "        UNION "
+            + "        SELECT e.patient_id "
+            + "        FROM encounter e "
+            + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "        INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "        WHERE e.encounter_type = ${53} "
+            + "          AND e.location_id = :location "
+            + "          AND ( "
+            + "              (o.concept_id = ${6332} AND o.value_coded = ${1065}) "
+            + "              AND (o2.concept_id = ${1190} "
+            + "                   AND o2.value_datetime > pg.pregnancy_date "
+            + "                   AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate) "
+            + "          ) "
+            + "          AND e.voided = 0 "
+            + "          AND o.voided = 0 "
+            + "          AND o2.voided = 0 "
+            + "    ) "
+            + "    GROUP BY pg.patient_id "
+            + ") pat "
+            + "    LEFT JOIN ( "
+            + artStart
+            + " ) art ON art.patient_id = pat.patient_id "
+            + " WHERE (art.first_pickup IS NULL OR TIMESTAMPDIFF(DAY, art.first_pickup, pat.pg_date) < 90) ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * PVLS_PBFW_FR3
+   *
+   * <p>Eligible for a VL test and on ART for 90 days (Pregnant Women)
+   *
+   * <p>The system will generate the number of pregnant women (PVLS_PBFW_FR3.1) that are eligible to
+   * receive a VL test in the 21 months prior to the reporting end date (Date pregnancy registered
+   * >= endDate-21 months and <= endDate).
+   *
+   * <ul>
+   *   <li><b>Excluding:</b>
+   *       <ul>
+   *         <li>Clients whose difference between the date of the most recent record of pregnancy in
+   *             the last 21 months and the ART start date (PVLS_PBFW_FR5) is less than 90 days.
+   *       </ul>
+   * </ul>
+   *
+   * <p>The system will consider the most recent record of pregnancy falling in the 21 months prior
+   * to the reporting end date among the listed sources as Date Pregnancy Registered.
+   *
+   * <p><b>Note:</b> If the client has both states (pregnant and breastfeeding) during the 21-month
+   * period, the most recent state should be considered. If the client has both states registered on
+   * the same day, then the client should be considered pregnant.
+   *
+   * @return @{@link CohortDefinition}
+   */
+  public CohortDefinition getPregnantComposition() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Pregnant Eligible for a VL test and on ART for 90 days");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "pregnantInclusion",
+        EptsReportUtils.map(
+            getPregnantWomanTxPvlsSupplemental(), "endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "pregnantWithLessThan90DaysOfArt",
+        EptsReportUtils.map(
+            getExclusionOfPregnantWomanOnArtForLessThan90DaysOfArt(),
+            "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("pregnantInclusion AND NOT pregnantWithLessThan90DaysOfArt");
+
+    return cd;
+  }
+
+  public CohortDefinition getBreastfeedingWomanTxPvlsSupplemental() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Breastfeeding Woman");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("1600", hivMetadata.getPregnancyDueDate().getConceptId());
+    map.put("1279", hivMetadata.getNumberOfWeeksPregnant().getConceptId());
+    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
+    map.put("6331", hivMetadata.getBpostiveConcept().getConceptId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("5", hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("5599", hivMetadata.getPriorDeliveryDateConcept().getConceptId());
+    map.put("23821", hivMetadata.getSampleCollectionDateAndTime().getConceptId());
+    map.put("6332", hivMetadata.getBreastfeeding().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("6334", hivMetadata.getCriteriaForArtStart().getConceptId());
+    map.put("8", hivMetadata.getPtvEtvProgram().getProgramId());
+    map.put("27", hivMetadata.getPatientGaveBirthWorkflowState().getProgramWorkflowStateId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+
+    String query =
+        " SELECT breastfeeding.patient_id "
+            + " FROM ( "
+            + "   SELECT lactantes.patient_id, "
+            + "          MAX(lactantes.last_date) AS breastfeeding_date "
+            + "   FROM ( "
+            + "     SELECT p.patient_id, "
+            + "            MAX(e.encounter_datetime) AS last_date "
+            + "     FROM patient p "
+            + "     INNER JOIN person p2 ON p2.person_id = p.patient_id "
+            + "     INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "     INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "     WHERE p2.gender = 'F' "
+            + "       AND o.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND p.voided = 0 "
+            + "       AND p2.voided = 0 "
+            + "       AND e.encounter_type IN (${6}, ${51}) "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${6332} "
+            + "       AND o.value_coded = ${1065} "
+            + "       AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate "
+            + "     GROUP BY p.patient_id "
+            + "     UNION "
+            + "     SELECT pp.patient_id, "
+            + "            MAX(ps.start_date) AS last_date "
+            + "     FROM patient_program pp "
+            + "     INNER JOIN person p ON p.person_id = pp.patient_id "
+            + "     INNER JOIN patient_state ps ON ps.patient_program_id = pp.patient_program_id "
+            + "     WHERE p.gender = 'F' "
+            + "       AND pp.voided = 0 "
+            + "       AND ps.voided = 0 "
+            + "       AND p.voided = 0 "
+            + "       AND pp.program_id = ${8} "
+            + "       AND ps.state = ${27} "
+            + "       AND pp.location_id = :location "
+            + "       AND ps.start_date BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate "
+            + "     GROUP BY pp.patient_id "
+            + "     UNION "
+            + "     SELECT p.patient_id, hist.value_datetime AS last_date "
+            + "     FROM patient p "
+            + "     INNER JOIN person pe ON p.patient_id = pe.person_id "
+            + "     INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "     INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "     INNER JOIN obs hist ON e.encounter_id = hist.encounter_id "
+            + "     INNER JOIN person p2 ON p2.person_id = p.patient_id "
+            + "     WHERE p.voided = 0 "
+            + "       AND p2.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND p2.gender = 'F' "
+            + "       AND o.voided = 0 "
+            + "       AND pe.voided = 0 "
+            + "       AND hist.voided = 0 "
+            + "       AND e.encounter_type = ${53} "
+            + "       AND ( "
+            + "         (o.concept_id = ${6332} AND o.value_coded = ${1065}) "
+            + "         AND (hist.concept_id = ${1190} "
+            + "              AND hist.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate) "
+            + "       ) "
+            + "     GROUP BY p.patient_id "
+            + "   ) lactantes "
+            + "   WHERE lactantes.patient_id NOT IN ( "
+            + "     SELECT e.patient_id "
+            + "     FROM encounter e "
+            + "     INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "     INNER JOIN person p2 ON p2.person_id = e.patient_id "
+            + "     WHERE e.encounter_type IN (${6}, ${51}) "
+            + "       AND o.concept_id = ${1982} "
+            + "       AND o.value_coded = ${1065} "
+            + "       AND e.location_id = :location "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND p2.voided = 0 "
+            + "       AND p2.gender = 'F' "
+            + "       AND e.encounter_datetime >= lactantes.last_date "
+            + "       AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate "
+            + "     UNION "
+            + "     SELECT pp.patient_id "
+            + "     FROM patient_program pp "
+            + "     INNER JOIN person p ON p.person_id = pp.patient_id "
+            + "     INNER JOIN encounter e ON e.patient_id = pp.patient_id "
+            + "     WHERE pp.program_id = ${8} "
+            + "       AND p.gender = 'F' "
+            + "       AND pp.voided = 0 "
+            + "       AND p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND pp.date_enrolled >= lactantes.last_date "
+            + "       AND pp.date_enrolled BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate "
+            + "     UNION "
+            + "     SELECT e.patient_id "
+            + "     FROM encounter e "
+            + "     INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "     INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "     WHERE e.encounter_type = ${53} "
+            + "       AND o.concept_id = ${1982} "
+            + "       AND o.value_coded = ${1065} "
+            + "       AND o2.concept_id = ${1190} "
+            + "       AND o2.value_datetime >= lactantes.last_date "
+            + "       AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate "
+            + "       AND e.location_id = :location "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND o2.voided = 0 "
+            + "   ) "
+            + "   GROUP BY lactantes.patient_id "
+            + " ) breastfeeding";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    String mappedQuery = stringSubstitutor.replace(query);
+
+    sqlCohortDefinition.setQuery(mappedQuery);
+
+    return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getBreastfeedingWomanExclusion() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Breastfeeding Woman Exclusion");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    String artStart = commonQueries.getARTStartDate(true);
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("1600", hivMetadata.getPregnancyDueDate().getConceptId());
+    map.put("1279", hivMetadata.getNumberOfWeeksPregnant().getConceptId());
+    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
+    map.put("6331", hivMetadata.getBpostiveConcept().getConceptId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("5", hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("5599", hivMetadata.getPriorDeliveryDateConcept().getConceptId());
+    map.put("23821", hivMetadata.getSampleCollectionDateAndTime().getConceptId());
+    map.put("6332", hivMetadata.getBreastfeeding().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("6334", hivMetadata.getCriteriaForArtStart().getConceptId());
+    map.put("8", hivMetadata.getPtvEtvProgram().getProgramId());
+    map.put("27", hivMetadata.getPatientGaveBirthWorkflowState().getProgramWorkflowStateId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+
+    String query =
+        " SELECT pat.patient_id FROM ("
+            + "   SELECT lactantes.patient_id, "
+            + "          MAX(lactantes.last_date) AS breastfeeding_date "
+            + "   FROM ( "
+            + "     SELECT p.patient_id, "
+            + "            MAX(e.encounter_datetime) AS last_date "
+            + "     FROM patient p "
+            + "     INNER JOIN person p2 ON p2.person_id = p.patient_id "
+            + "     INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "     INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "     WHERE p2.gender = 'F' "
+            + "       AND o.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND p.voided = 0 "
+            + "       AND p2.voided = 0 "
+            + "       AND e.encounter_type IN (${6}, ${51}) "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${6332} "
+            + "       AND o.value_coded = ${1065} "
+            + "       AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate "
+            + "     GROUP BY p.patient_id "
+            + "     UNION "
+            + "     SELECT pp.patient_id, "
+            + "            MAX(ps.start_date) AS last_date "
+            + "     FROM patient_program pp "
+            + "     INNER JOIN person p ON p.person_id = pp.patient_id "
+            + "     INNER JOIN patient_state ps ON ps.patient_program_id = pp.patient_program_id "
+            + "     WHERE p.gender = 'F' "
+            + "       AND pp.voided = 0 "
+            + "       AND ps.voided = 0 "
+            + "       AND p.voided = 0 "
+            + "       AND pp.program_id = ${8} "
+            + "       AND ps.state = ${27} "
+            + "       AND pp.location_id = :location "
+            + "       AND ps.start_date BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate "
+            + "     GROUP BY pp.patient_id "
+            + "     UNION "
+            + "     SELECT p.patient_id, hist.value_datetime AS last_date "
+            + "     FROM patient p "
+            + "     INNER JOIN person pe ON p.patient_id = pe.person_id "
+            + "     INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "     INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "     INNER JOIN obs hist ON e.encounter_id = hist.encounter_id "
+            + "     INNER JOIN person p2 ON p2.person_id = p.patient_id "
+            + "     WHERE p.voided = 0 "
+            + "       AND p2.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND p2.gender = 'F' "
+            + "       AND o.voided = 0 "
+            + "       AND pe.voided = 0 "
+            + "       AND hist.voided = 0 "
+            + "       AND e.encounter_type = ${53} "
+            + "       AND ( "
+            + "         (o.concept_id = ${6332} AND o.value_coded = ${1065}) "
+            + "         AND (hist.concept_id = ${1190} "
+            + "              AND hist.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 30 MONTH) AND :endDate) "
+            + "       ) "
+            + "     GROUP BY p.patient_id "
+            + "   ) lactantes "
+            + "   WHERE lactantes.patient_id NOT IN ( "
+            + "     SELECT e.patient_id "
+            + "     FROM encounter e "
+            + "     INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "     INNER JOIN person p2 ON p2.person_id = e.patient_id "
+            + "     WHERE e.encounter_type IN (${6}, ${51}) "
+            + "       AND o.concept_id = ${1982} "
+            + "       AND o.value_coded = ${1065} "
+            + "       AND e.location_id = :location "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND p2.voided = 0 "
+            + "       AND p2.gender = 'F' "
+            + "       AND e.encounter_datetime >= lactantes.last_date "
+            + "       AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate "
+            + "     UNION "
+            + "     SELECT pp.patient_id "
+            + "     FROM patient_program pp "
+            + "     INNER JOIN person p ON p.person_id = pp.patient_id "
+            + "     INNER JOIN encounter e ON e.patient_id = pp.patient_id "
+            + "     WHERE pp.program_id = ${8} "
+            + "       AND p.gender = 'F' "
+            + "       AND pp.voided = 0 "
+            + "       AND p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND pp.date_enrolled >= lactantes.last_date "
+            + "       AND pp.date_enrolled BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate "
+            + "     UNION "
+            + "     SELECT e.patient_id "
+            + "     FROM encounter e "
+            + "     INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "     INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "     WHERE e.encounter_type = ${53} "
+            + "       AND o.concept_id = ${1982} "
+            + "       AND o.value_coded = ${1065} "
+            + "       AND o2.concept_id = ${1190} "
+            + "       AND o2.value_datetime >= lactantes.last_date "
+            + "       AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 21 MONTH) AND :endDate "
+            + "       AND e.location_id = :location "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND o2.voided = 0 "
+            + "   ) "
+            + "   GROUP BY lactantes.patient_id "
+            + ") pat"
+            + "    LEFT JOIN ( "
+            + artStart
+            + " ) art ON art.patient_id = pat.patient_id "
+            + "  WHERE (art.first_pickup IS NULL OR Timestampdiff(day, art.first_pickup, pat.breastfeeding_date) < 90) ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    String mappedQuery = stringSubstitutor.replace(query);
+
+    sqlCohortDefinition.setQuery(mappedQuery);
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>PVLS_PBFW_FR4</b>
+   *
+   * <p>Eligible for a VL test and on ART for 90 days (BreastfeedingWomen)
+   *
+   * <p>The system will generate the number of breastfeeding women that are eligible to receive a VL
+   * test in the 30 months prior to reporting end date as follows:
+   *
+   * <ul>
+   *   <li>All women with:
+   *       <ul>
+   *         <li>Breastfeeding registered on Ficha Clinica or
+   *         <li>Birth registered in Program-PTV or
+   *         <li>Breastfeeding registered at ART initiation in Ficha Resumo
+   *         <li>Breastfeeding registered on e-Lab Form
+   *       </ul>
+   *   <li>in the 30 months prior to the reporting end date (Date breastfeeding registered >=
+   *       endDate-30 months and <= endDate).
+   * </ul>
+   *
+   * <p><b>Excluding: </b>
+   *
+   * <ul>
+   *   <li>Clients whose difference between the date of the most recent record of breastfeeding in
+   *       the last 30 months and the ART start date (PVLS_PBFW_FR5) is less than 90 days.
+   * </ul>
+   *
+   * <p>The system will consider the most recent record of breastfeeding falling in the 30 months
+   * prior to the reporting end date among the listed sources as Date Breastfeeding Registered.
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getBreastfeedingWomenWithVlResultComposition() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Breastfeeding Woman Eligible for a VL test and on ART for 90 days");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "breastfeeding",
+        EptsReportUtils.map(
+            getBreastfeedingWomanTxPvlsSupplemental(), "endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "breastfeedingExclusion",
+        EptsReportUtils.map(
+            getBreastfeedingWomanExclusion(), "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("breastfeeding AND NOT breastfeedingExclusion");
+
+    return cd;
+  }
 }
