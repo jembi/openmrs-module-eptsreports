@@ -620,7 +620,7 @@ public class TxNewCohortQueries {
 
     CohortDefinition cd4Under200 =
         getPatientsWithCd4AndAge(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3,
             AdvancedDiseaseAndTBCascadeCohortQueries.semiQuantitativeCd4CountComparison
                 .LessThanOrEqualTo200mm3,
             5,
@@ -695,7 +695,7 @@ public class TxNewCohortQueries {
 
     CohortDefinition cd4Under200AndAge =
         getPatientsWithCd4AndAge(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3,
             AdvancedDiseaseAndTBCascadeCohortQueries.semiQuantitativeCd4CountComparison
                 .LessThanOrEqualTo200mm3,
             5,
@@ -743,7 +743,7 @@ public class TxNewCohortQueries {
 
     CohortDefinition cd4Under200AndAge =
         getPatientsWithCd4AndAge(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3,
             AdvancedDiseaseAndTBCascadeCohortQueries.semiQuantitativeCd4CountComparison
                 .LessThanOrEqualTo200mm3,
             5,

@@ -1086,7 +1086,7 @@ public class TxRttCohortQueries {
 
     CohortDefinition cd4Under200AndAge =
         getPatientsWithCd4AndAge(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3,
             AdvancedDiseaseAndTBCascadeCohortQueries.semiQuantitativeCd4CountComparison
                 .LessThanOrEqualTo200mm3,
             5,
@@ -1160,12 +1160,11 @@ public class TxRttCohortQueries {
 
     CohortDefinition cd4Under200AndAge =
         getPatientsWithCd4AndAge(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3,
             AdvancedDiseaseAndTBCascadeCohortQueries.semiQuantitativeCd4CountComparison
                 .LessThanOrEqualTo200mm3,
             5,
             null);
-
     CohortDefinition notEligibleForCd4AndAge = getPatientsNotEligibleForCd4AndAge(5, null);
 
     cd.addSearch("txRtt", EptsReportUtils.map(txRtt, DEFAULT_MAPPING));
@@ -1208,7 +1207,7 @@ public class TxRttCohortQueries {
 
     CohortDefinition cd4Under200AndAge =
         getPatientsWithCd4AndAge(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3,
             AdvancedDiseaseAndTBCascadeCohortQueries.semiQuantitativeCd4CountComparison
                 .LessThanOrEqualTo200mm3,
             5,
