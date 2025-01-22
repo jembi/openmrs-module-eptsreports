@@ -670,7 +670,9 @@ public class TxRttCohortQueries {
    * @return CohortDefinition
    */
   public CohortDefinition getCd4Result(
-      AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison cd4CountComparison) {
+      AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison cd4CountComparison,
+      AdvancedDiseaseAndTBCascadeCohortQueries.semiQuantitativeCd4CountComparison
+          semiQuantitativeCd4CountComparison) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patients with CD4 Result");
@@ -687,6 +689,9 @@ public class TxRttCohortQueries {
     map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
+    map.put("165513", hivMetadata.getCD4CountLessThanOrEqualTo200Concept().getConceptId());
+    map.put("1254", hivMetadata.getCD4CountGreaterThan200Concept().getConceptId());
 
     String query =
         "SELECT patient_id "
@@ -741,8 +746,13 @@ public class TxRttCohortQueries {
             + "                       AND e.voided = 0 "
             + "                       AND o.voided = 0 "
             + "                       AND e.encounter_type IN ( ${6}, ${13}, ${51} ) "
-            + "                       AND o.concept_id = ${1695} "
+            + "                       AND ( ( o.concept_id = ${1695} "
             + "                       AND  ".concat(cd4CountComparison.getProposition())
+            + "                           )  "
+            + "                       OR ( o.concept_id = ${165515} "
+            + "                       AND  "
+                .concat(semiQuantitativeCd4CountComparison.getProposition())
+            + "                           ) ) "
             + "                       AND e.location_id = :location "
             + "                       AND Date(e.encounter_datetime) >= "
             + "                           Date_sub(returned.first_pickup, "
@@ -802,7 +812,13 @@ public class TxRttCohortQueries {
             + "                       AND o.voided = 0 "
             + "                       AND e.encounter_type = ${53} "
             + "                       AND o.concept_id = ${1695} "
+            + "                       AND ( ( o.concept_id = ${1695} "
             + "                       AND  ".concat(cd4CountComparison.getProposition())
+            + "                           )  "
+            + "                       OR ( o.concept_id = ${165515} "
+            + "                       AND  "
+                .concat(semiQuantitativeCd4CountComparison.getProposition())
+            + "                           ) ) "
             + "                       AND e.location_id = :location "
             + "                       AND Date(o.obs_datetime) >= "
             + "                           Date_sub(returned.first_pickup, "
@@ -827,6 +843,7 @@ public class TxRttCohortQueries {
    */
   public CohortDefinition getPatientsWithCd4AndAge(
       AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison cd4,
+      AdvancedDiseaseAndTBCascadeCohortQueries.semiQuantitativeCd4CountComparison semiCd4,
       Integer minAge,
       Integer maxAge) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -835,7 +852,7 @@ public class TxRttCohortQueries {
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
 
-    CohortDefinition getCd4Result = getCd4Result(cd4);
+    CohortDefinition getCd4Result = getCd4Result(cd4, semiCd4);
     CohortDefinition age = ageCohortQueries.createXtoYAgeCohort("Age", minAge, maxAge);
 
     cd.addSearch("getCd4Result", EptsReportUtils.map(getCd4Result, DEFAULT_MAPPING));
@@ -1069,7 +1086,11 @@ public class TxRttCohortQueries {
 
     CohortDefinition cd4Under200AndAge =
         getPatientsWithCd4AndAge(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3, 5, null);
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3,
+            AdvancedDiseaseAndTBCascadeCohortQueries.semiQuantitativeCd4CountComparison
+                .LessThanOrEqualTo200mm3,
+            5,
+            null);
 
     CohortDefinition notEligibleForCd4AndAge = getPatientsNotEligibleForCd4AndAge(5, null);
 
@@ -1132,13 +1153,18 @@ public class TxRttCohortQueries {
     CohortDefinition cd4Above200AndAge =
         getPatientsWithCd4AndAge(
             AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.GreaterThanOrEqualTo200mm3,
+            AdvancedDiseaseAndTBCascadeCohortQueries.semiQuantitativeCd4CountComparison
+                .GreaterThanOrEqualTo200mm3,
             5,
             null);
 
     CohortDefinition cd4Under200AndAge =
         getPatientsWithCd4AndAge(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3, 5, null);
-
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3,
+            AdvancedDiseaseAndTBCascadeCohortQueries.semiQuantitativeCd4CountComparison
+                .LessThanOrEqualTo200mm3,
+            5,
+            null);
     CohortDefinition notEligibleForCd4AndAge = getPatientsNotEligibleForCd4AndAge(5, null);
 
     cd.addSearch("txRtt", EptsReportUtils.map(txRtt, DEFAULT_MAPPING));
@@ -1181,11 +1207,17 @@ public class TxRttCohortQueries {
 
     CohortDefinition cd4Under200AndAge =
         getPatientsWithCd4AndAge(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3, 5, null);
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3,
+            AdvancedDiseaseAndTBCascadeCohortQueries.semiQuantitativeCd4CountComparison
+                .LessThanOrEqualTo200mm3,
+            5,
+            null);
 
     CohortDefinition cd4Above200AndAge =
         getPatientsWithCd4AndAge(
             AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.GreaterThanOrEqualTo200mm3,
+            AdvancedDiseaseAndTBCascadeCohortQueries.semiQuantitativeCd4CountComparison
+                .GreaterThanOrEqualTo200mm3,
             5,
             null);
 
