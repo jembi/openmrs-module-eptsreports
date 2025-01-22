@@ -13961,8 +13961,6 @@ public class QualityImprovement2020CohortQueries {
         "RESTARTED33DAYSBEFORE",
         EptsReportUtils.map(getPatientsRestartedWithLessThan33Days(), MAPPING3));
 
-    cd.addSearch("RESULTS", EptsReportUtils.map(getCd4ResultAfterRestartDate(), MAPPING3));
-
     if (denominator == 4) {
       cd.addSearch(
           "AGE",
@@ -13975,7 +13973,7 @@ public class QualityImprovement2020CohortQueries {
               genericCohortQueries.getAgeOnRestartedStateOfStayAndCd4Request(0, 14), MAPPING3));
     }
 
-    cd.setCompositionString("(RESTARTED AND RESULTS AND AGE) AND NOT RESTARTED33DAYSBEFORE");
+    cd.setCompositionString("(RESTARTED AND AGE) AND NOT RESTARTED33DAYSBEFORE");
 
     return cd;
   }
