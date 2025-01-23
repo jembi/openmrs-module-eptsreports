@@ -641,7 +641,14 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getInfantAge(boolean greaterThan, Integer Age) {
+  /**
+   * Incluindo todas as crianças que tiveram a 1ª consulta durante o período de reporte (CCR- FR7) e
+   * com idade < 2 meses (CCR-FR5)
+   *
+   * @see #getChildrenWhoStartedCtzBellow2MonthsOfAge
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getInfantAge(boolean greaterThan, Integer age) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Infant Age");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -650,7 +657,7 @@ public class ResumoMensalCcrCohortQueries {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
-    map.put("Age", Age);
+    map.put("Age", age);
 
     String query =
         "SELECT "
@@ -680,9 +687,9 @@ public class ResumoMensalCcrCohortQueries {
             + "    pr.birthdate IS NOT NULL "
             + "  AND ccr.enrollment_date IS NOT NULL ";
     if (greaterThan) {
-      query = query + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, ccr.enrollment_date) >= ${Age}";
+      query += "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, ccr.enrollment_date) >= ${Age}";
     } else {
-      query = query + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, ccr.enrollment_date) < ${Age}";
+      query += "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, ccr.enrollment_date) < ${Age}";
     }
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -764,6 +771,14 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
+  /**
+   * filtrando as que tiveram o registo de “PCR (data da colheita)”, na “Ficha de Seguimento de
+   * CCR”, sendo essa data “PCR (data da colheita)” durante o período de reporte (“PCR (data da
+   * colheita)” >= “Data Início” e <= “Data Fim”)
+   *
+   * @see #getChildrenFirstPcrCollectedUnder2MonthsofAge
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getChildrenFirstPcr() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("registo de PCR (data da colheita), na Ficha de Seguimento de CCR");
@@ -802,7 +817,15 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getInfantAgeAtPcr(boolean greaterThan, Integer Age) {
+  /**
+   * com idade <2 meses nesta data “PCR (data da colheita” – “Data de Nascimento” < 2 meses). Nota:
+   * no caso de existência de registo de mais que uma data “PCR (data da colheita)” durante o
+   * período de reporte, será considerada a primeira ocorrência
+   *
+   * @see #getChildrenFirstPcrCollectedUnder2MonthsofAge
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getInfantAgeAtPcr(boolean greaterThan, Integer age) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Infant Age at PCR");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -812,7 +835,7 @@ public class ResumoMensalCcrCohortQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
     map.put("1998", commonMetadata.getPcrConcept().getConceptId());
-    map.put("Age", Age);
+    map.put("Age", age);
 
     String query =
         "SELECT "
@@ -843,9 +866,9 @@ public class ResumoMensalCcrCohortQueries {
             + "    pr.birthdate IS NOT NULL "
             + "  AND pcr.first_pcr IS NOT NULL ";
     if (greaterThan) {
-      query = query + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, pcr.first_pcr) >= ${Age}";
+      query += "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, pcr.first_pcr) >= ${Age}";
     } else {
-      query = query + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, pcr.first_pcr) < ${Age}";
+      query += "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, pcr.first_pcr) < ${Age}";
     }
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -927,17 +950,23 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getGeneralCcrQuery(Concept questionConcept, List<Integer> answerConcept) {
+  public CohortDefinition getGeneralCcrQuery(Concept questionConcept, List<Concept> answerConcept) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Ficha Seguimento CCR Query");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Health Facility", Location.class));
 
+    List<Integer> answerIds = new ArrayList<>();
+
+    for (Concept concept : answerConcept) {
+      answerIds.add(concept.getConceptId());
+    }
+
     Map<String, String> map = new HashMap<>();
     map.put("93", String.valueOf(hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId()));
     map.put("questionConcept", String.valueOf(questionConcept.getConceptId()));
-    map.put("answerConcept", StringUtils.join(answerConcept, ","));
+    map.put("answerConcept", StringUtils.join(answerIds, ","));
     String query =
         "SELECT "
             + "    p.patient_id "
@@ -1011,9 +1040,9 @@ public class ResumoMensalCcrCohortQueries {
             getGeneralCcrQuery(
                 hivMetadata.getHivRapidTest1QualitativeConcept(),
                 Arrays.asList(
-                    hivMetadata.getPositive().getConceptId(),
-                    hivMetadata.getNegative().getConceptId(),
-                    tbMetadata.getIndeterminate().getConceptId())),
+                    hivMetadata.getPositive(),
+                    hivMetadata.getNegative(),
+                    tbMetadata.getIndeterminate())),
             mapping));
 
     cd.setCompositionString("hivExposure AND above9monthsOfAge AND rapidTest");
@@ -1057,9 +1086,9 @@ public class ResumoMensalCcrCohortQueries {
             getGeneralCcrQuery(
                 hivMetadata.getHivRapidTest1QualitativeConcept(),
                 Arrays.asList(
-                    hivMetadata.getPositive().getConceptId(),
-                    hivMetadata.getNegative().getConceptId(),
-                    tbMetadata.getIndeterminate().getConceptId())),
+                    hivMetadata.getPositive(),
+                    hivMetadata.getNegative(),
+                    tbMetadata.getIndeterminate())),
             mapping));
 
     cd.addSearch(
@@ -1112,7 +1141,7 @@ public class ResumoMensalCcrCohortQueries {
         map(
             getGeneralCcrQuery(
                 hivMetadata.getHivRapidTest1QualitativeConcept(),
-                Collections.singletonList(hivMetadata.getPositive().getConceptId())),
+                Collections.singletonList(hivMetadata.getPositive())),
             mapping));
 
     cd.addSearch(
@@ -1127,6 +1156,14 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
+  /**
+   * Filtrando as crianças que tiveram registo de “Diagnóstico Tratamento” igual a "Profilaxia com
+   * Isoniazida” em seis (6) consultas (“Ficha de Seguimento de CCR”) ocorridas entre “Data Iníco” –
+   * 8 meses e “Data Fim”.
+   *
+   * @see #getChildrenWhoCompletedINH
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getChildrenWhoCompletedsoziazida() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Crianças que completaram Isonizada – coorte de 9 meses");
@@ -1544,6 +1581,16 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
+  /**
+   * Filtrando as crianças que tiveram registo de “Transferido para Consulta de Criança Sadia” na
+   * “Ficha Resumo de CCR” com a “Data de Abertura do Processo” ocorrida há 9 meses (“Data de
+   * abertura do processo”>= “Data Início” – 8 meses e <= “Data Fim” – 8 meses) ou na última “Ficha
+   * de Seguimento de CCR” registada no período compreendido entre “Data Início” – 8 meses e “Data
+   * Fim”
+   *
+   * @see #getChildrenWithRestoredDamBeforePeriod
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getChildrenWithRestoredDam() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Crianças com DAM recuperadas");
@@ -1699,6 +1746,14 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
+  /**
+   * Filtrando as que tiveram o registo de “Referido para Internamento” igual a "Sim” na ltima
+   * consulta de CCR (“Ficha de Seguimento de CCR”) ocorrida no período compreendido entre “Data da
+   * Consulta” >= “Data Início” – 8 meses e <= “Data Fim” )
+   *
+   * @see #getChildrenWithDagReferredForInternation
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getChildrenReferredForInternation() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Crianças com DAG que foram referidas para internamento – coorte de 9 meses");
@@ -1833,6 +1888,15 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
+  /**
+   * Filtrando as crianças que tiveram registo de “Óbito” na “Ficha Resumo de CCR” com a “Data de
+   * Abertura do Processo” ocorrida há 9 meses (“Data de abertura do processo”>= “Data Início” – 8
+   * meses e <= “Data Fim” – 8 meses) ou na última “Ficha de Seguimento de CCR” registada no período
+   * compreendido entre “Data Iníco” – 8 meses e “Data Fim”.
+   *
+   * @see #getChildrenWithDagWhoDied
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getChildrenWhoDied() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Crianças com DAG que foram óbito");
@@ -1959,6 +2023,10 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
+  /**
+   * @see #getExposedChildren5MonthsOfAge
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getExatInfantAge(Integer Age) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Infant Age");
@@ -2006,18 +2074,33 @@ public class ResumoMensalCcrCohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * Filtrando as crianças que tiveram registo de “PTV Mãe” igual a “TARV” registado na “Ficha
+   * Resumo de CCR” com a “Data de Abertura do Processo” ocorrida há 9 meses (“Data de abertura do
+   * processo”>= “Data Início” – 8 meses e <= “Data Fim” – 8 meses).
+   *
+   * @see #getExposedChildren5MonthsOfAge
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getGeneralResumoCcrQuery(
-      Concept questionConcept, List<Integer> answerConcept) {
+      Concept questionConcept, List<Concept> answerConcept) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Ficha Seguimento CCR Query");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Health Facility", Location.class));
 
+    List<Integer> answerIds = new ArrayList<>();
+
+    for (Concept concept : answerConcept) {
+      answerIds.add(concept.getConceptId());
+    }
+
     Map<String, String> map = new HashMap<>();
     map.put("92", String.valueOf(hivMetadata.getCCRResumoEncounterType().getEncounterTypeId()));
     map.put("questionConcept", String.valueOf(questionConcept.getConceptId()));
-    map.put("answerConcept", StringUtils.join(answerConcept, ","));
+    map.put("answerConcept", StringUtils.join(answerIds, ","));
+
     String query =
         "SELECT "
             + "    p.patient_id "
@@ -2078,13 +2161,21 @@ public class ResumoMensalCcrCohortQueries {
         map(
             getGeneralResumoCcrQuery(
                 hivMetadata.gePmctMothersRegimeConcept(),
-                Collections.singletonList(hivMetadata.getArtStatus().getConceptId())),
+                Collections.singletonList(hivMetadata.getArtStatus())),
             mapping2));
 
     cd.setCompositionString("exposed AND age AND tarv");
     return cd;
   }
 
+  /**
+   * Filtrando as crianças que tiveram registo de “Aleitamento Materno Exclusivo” igual a “Sim” numa
+   * “Ficha de Seguimento de CCR” registada no período compreendido entre “Data Iníco” – 8 meses e
+   * “Data Fim
+   *
+   * @see #getExposedChildrenWithBreastfed5MonthsOfAge
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getChildrenWithAleitamentoMaterno() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Crianças expostas com aleitamento ");
@@ -2123,6 +2214,10 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
+  /**
+   * @see #getExposedChildrenWithBreastfed5MonthsOfAge
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getInfantAgeOnBreastfed(Integer Age) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Infant Age");
@@ -2209,6 +2304,13 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
+  /**
+   * Filtrando as crianças que tiveram registo de “Aleitamento Misto” igual a “Sim” numa “Ficha de
+   * Seguimento de CCR” registada no período compreendido entre “Data Iníco” – 8 meses e “Data Fim”
+   *
+   * @see #getExposedChildrenWithMixedFeeding5MonthsOfAge
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getChildrenWithMixedFeeding() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Crianças expostas com aleitamento ");
@@ -2247,6 +2349,13 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
+  /**
+   * tendo a criança nesta consulta idade = 5 meses (“Data Consulta” menos “Data Nascimento” = 5
+   * meses)
+   *
+   * @see #getExposedChildrenWithMixedFeeding5MonthsOfAge
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getInfantAgeOnMixedFeeding(Integer Age) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Infant Age on Mixed Feeding");
@@ -2333,6 +2442,14 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
+  /**
+   * Filtrando as crianças que tiveram registo de “Profilaxia com Nevirapina” igual a “Sim” ou
+   * “Profilaxia com Zidovudina” igual a “Sim” numa “Ficha de Seguimento de CCR” registada no
+   * período compreendido entre “Data Iníco” – 8 meses e “Data Fim”
+   *
+   * @see #getExposedChildrenWhoReceivedArv5MonthsOfAge
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getChildrenWhoReceivedArv() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Crianças que receberam ARV ");
@@ -2372,6 +2489,14 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
+  /**
+   * Filtrando as crianças que tiveram registo de “Profilaxia com Nevirapina” igual a “Sim” ou
+   * “Profilaxia com Zidovudina” igual a “Sim” numa “Ficha de Seguimento de CCR” registada no
+   * período compreendido entre “Data Iníco” – 8 meses e “Data Fim”
+   *
+   * @see #getExposedChildrenWhoReceivedArv5MonthsOfAge
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getInfantAgeOnArv(Integer Age) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Infant Age on ARV");
@@ -2523,6 +2648,14 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
+  /**
+   * Filtrando as crianças que tiveram registo de “PCR (Resultado) igual a “Positivo”, numa “Ficha
+   * de Seguimento de CCR” registada no período compreendido entre “Data Iníco” – 8 meses e “Data
+   * Fim”
+   *
+   * @see #getChildrenWithPositivePcrBellow2MonthsOfAge
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getChildrenWithPositivePcr() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("registo de PCR (data da colheita), na Ficha de Seguimento de CCR");
@@ -2563,6 +2696,14 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
+  /**
+   * Filtrando as crianças que tiveram o último registo de “HIV (teste rápido)” como “Negativo”, na
+   * “Ficha de Seguimento de CCR” registada no período compreendido entre “Data Iníco” – 17 meses e
+   * “Data Fim.
+   *
+   * @see #getChildrenWithNegativePcrIn18Months
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getChildrenWithNegativePcr() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("HIV (teste rápido) como Negativo");
@@ -2603,7 +2744,17 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getInfantAgeAtPcrResult(boolean greaterThan, Integer Age) {
+  /**
+   * Filtrando as crianças que tiveram registo de “PCR (Resultado) igual a “Positivo”, numa “Ficha
+   * de Seguimento de CCR” registada no período compreendido entre “Data Iníco” – 8 meses e “Data
+   * Fim”, tendo a criança nesta data idade < 2 meses (“Data Consulta” menos “Data Nascimento” < 2
+   * meses). Nota: em caso de existência de registo de mais que uma “Ficha de Seguimento de CCR”
+   * durante o período será considerado o primeiro registo
+   *
+   * @see #getChildrenWithPositivePcrBellow2MonthsOfAge
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getInfantAgeAtPcrResult(boolean greaterThan, Integer age) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Infant Age at PCR");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -2614,7 +2765,7 @@ public class ResumoMensalCcrCohortQueries {
     map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
     map.put("1030", hivMetadata.getHivPCRQualitativeConceptUuid().getConceptId());
     map.put("703", hivMetadata.getPositive().getConceptId());
-    map.put("Age", Age);
+    map.put("Age", age);
 
     String query =
         "SELECT "
@@ -2624,7 +2775,7 @@ public class ResumoMensalCcrCohortQueries {
             + "        INNER JOIN ( "
             + "        SELECT "
             + "            p.patient_id, "
-            + "            MAX(e.encounter_datetime) AS last_pcr "
+            + "            MIN(e.encounter_datetime) AS last_pcr "
             + "        FROM "
             + "            patient p "
             + "             INNER JOIN encounter e ON p.patient_id = e.patient_id "
@@ -2646,9 +2797,9 @@ public class ResumoMensalCcrCohortQueries {
             + "    pr.birthdate IS NOT NULL "
             + "  AND pcr.last_pcr IS NOT NULL ";
     if (greaterThan) {
-      query = query + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, pcr.last_pcr) >= ${Age}";
+      query += "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, pcr.last_pcr) >= ${Age}";
     } else {
-      query = query + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, pcr.last_pcr) < ${Age}";
+      query += "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, pcr.last_pcr) < ${Age}";
     }
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -2856,6 +3007,16 @@ public class ResumoMensalCcrCohortQueries {
     return cd;
   }
 
+  /**
+   * Filtrando as crianças que tiveram registo de “Transferido para Consultas Integradas” na “Ficha
+   * Resumo de CCR” com a “Data de Abertura do Processo” ocorrida há 18 meses (“Data de abertura do
+   * processo”>= “Data Início” – 17 meses e <= “Data Fim” – 17 meses) ou na última “Ficha de
+   * Seguimento de CCR” registada no período compreendido entre “Data Início” – 17 meses e “Data
+   * Fim”
+   *
+   * @see #getChildrenTransferedForIntegratedConsultation
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getChildrenWithIntegratedConsultation() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Crianças com DAM recuperadas");
