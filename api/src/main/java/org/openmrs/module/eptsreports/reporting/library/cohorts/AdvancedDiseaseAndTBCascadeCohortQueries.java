@@ -1871,7 +1871,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
    *
    * @return CohortDefinition
    */
-  private CohortDefinition getPatientsUnsuppressedVLPreviousInclusion() {
+  public CohortDefinition getPatientsUnsuppressedVLPreviousInclusion() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Clients Who have a previous VL result > 1000");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -1942,30 +1942,62 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "FROM patient p "
             + "INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "INNER JOIN ( "
-            + "    SELECT p.patient_id, "
-            + "           MAX(Date(e.encounter_datetime)) AS last_vl1000_date "
+            + "INNER JOIN ("
+            + "    SELECT p.patient_id, prior_vl.eligible_date AS eligibility_date "
             + "    FROM patient p "
             + "    INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "    INNER JOIN ("
+            + "        SELECT p.patient_id, "
+            + "               MAX(DATE(e.encounter_datetime)) AS consecutive, "
+            + "               last_vl100.last_vl1000_date AS eligible_date "
+            + "        FROM patient p "
+            + "        INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "        INNER JOIN ("
+            + "            SELECT p.patient_id, "
+            + "                   MAX(DATE(e.encounter_datetime)) AS last_vl1000_date "
+            + "            FROM patient p "
+            + "            INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "            INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "            WHERE e.encounter_type IN (${13}, ${51}) "
+            + "              AND e.location_id = :location "
+            + "              AND DATE(e.encounter_datetime) BETWEEN :startDate AND :endDate "
+            + "              AND e.voided = 0 "
+            + "              AND p.voided = 0 "
+            + "              AND o.voided = 0 "
+            + "              AND o.concept_id = ${856} "
+            + "              AND o.value_numeric > 1000 "
+            + "            GROUP BY p.patient_id "
+            + "        ) last_vl100 ON last_vl100.patient_id = e.patient_id "
+            + "        WHERE e.encounter_type IN (${13}, ${51}) "
+            + "          AND e.location_id = :location "
+            + "          AND DATE(e.encounter_datetime) < last_vl100.last_vl1000_date "
+            + "          AND e.voided = 0 "
+            + "          AND o.voided = 0 "
+            + "          AND p.voided = 0 "
+            + "          AND ((o.concept_id = ${856} AND o.value_numeric IS NOT NULL) "
+            + "               OR (o.concept_id = ${1305} AND o.value_coded IS NOT NULL)) "
+            + "        GROUP BY p.patient_id "
+            + "    ) prior_vl ON prior_vl.patient_id = e.patient_id "
             + "    WHERE e.encounter_type IN (${13}, ${51}) "
             + "      AND e.location_id = :location "
-            + "      AND Date(e.encounter_datetime) BETWEEN :startDate AND :endDate "
+            + "      AND DATE(e.encounter_datetime) = prior_vl.consecutive "
             + "      AND e.voided = 0 "
             + "      AND p.voided = 0 "
             + "      AND o.voided = 0 "
             + "      AND o.concept_id = ${856} "
             + "      AND o.value_numeric > 1000 "
             + "    GROUP BY p.patient_id "
-            + ") last_vl100 ON last_vl100.patient_id = e.patient_id "
+            + "  ) last_vl100 ON last_vl100.patient_id = e.patient_id "
             + "WHERE e.voided = 0 "
             + "  AND o.voided = 0 "
             + "  AND e.encounter_type IN (${6}, ${13}, ${51}) "
-            + "  AND ( (o.concept_id = ${1695} AND o.value_numeric IS NOT NULL) "
-            + "        OR (o.concept_id = ${165515} AND o.value_coded IS NOT NULL) ) "
+            + "  AND ((o.concept_id = ${1695} AND o.value_numeric IS NOT NULL) "
+            + "       OR (o.concept_id = ${165515} AND o.value_coded IS NOT NULL)) "
             + "  AND e.location_id = :location "
-            + "  AND DATE(e.encounter_datetime) BETWEEN last_vl100.last_vl1000_date "
-            + "                                       AND DATE_ADD(last_vl100.last_vl1000_date, INTERVAL 33 DAY) "
+            + "  AND DATE(e.encounter_datetime) BETWEEN last_vl100.eligibility_date "
+            + "      AND DATE_ADD(last_vl100.eligibility_date, INTERVAL 33 DAY) "
             + "GROUP BY p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(getMetadata());
@@ -3181,6 +3213,48 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
       @Override
       public String getSearchKey() {
         return "F";
+      }
+    };
+
+    public abstract String getProposition();
+
+    public abstract String getCompositionString();
+
+    public abstract String getSearchKey();
+  }
+
+  public enum semiQuantitativeCd4CountComparison {
+    LessThanOrEqualTo200mm3 {
+      @Override
+      public String getProposition() {
+        return "o.value_coded = ${165513}";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getSearchKey();
+      }
+
+      @Override
+      public String getSearchKey() {
+        return "AA";
+      }
+    },
+
+    GreaterThanOrEqualTo200mm3 {
+      @Override
+      public String getProposition() {
+        return "o.value_coded =${1254}";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getSearchKey();
+      }
+
+      @Override
+      public String getSearchKey() {
+        return "BB";
       }
     };
 
