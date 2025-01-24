@@ -2027,7 +2027,7 @@ public class ResumoMensalCcrCohortQueries {
    * @see #getExposedChildren5MonthsOfAge
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getExatInfantAge(Integer Age) {
+  public CohortDefinition getExatInfantAge(Integer age) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Infant Age");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -2036,7 +2036,7 @@ public class ResumoMensalCcrCohortQueries {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("92", hivMetadata.getCCRResumoEncounterType().getEncounterTypeId());
-    map.put("Age", Age);
+    map.put("age", age);
 
     String query =
         "SELECT "
@@ -2065,7 +2065,7 @@ public class ResumoMensalCcrCohortQueries {
             + "WHERE "
             + "    pr.birthdate IS NOT NULL "
             + "  AND ccr.enrollment_date IS NOT NULL "
-            + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, ccr.enrollment_date) = ${Age}";
+            + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, ccr.enrollment_date) = ${age}";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -2215,10 +2215,12 @@ public class ResumoMensalCcrCohortQueries {
   }
 
   /**
+   * Crianças expostas com aleitamento materno exclusivo aos 5 meses
+   *
    * @see #getExposedChildrenWithBreastfed5MonthsOfAge
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getInfantAgeOnBreastfed(Integer Age) {
+  public CohortDefinition getInfantAgeOnBreastfed() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Infant Age");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -2229,7 +2231,6 @@ public class ResumoMensalCcrCohortQueries {
     map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
     map.put("5526", commonMetadata.getBreastfedExclusivelyConcept().getConceptId());
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
-    map.put("Age", Age);
 
     String query =
         "SELECT "
@@ -2261,7 +2262,7 @@ public class ResumoMensalCcrCohortQueries {
             + "WHERE "
             + "    pr.birthdate IS NOT NULL "
             + "  AND ccr.breastfed_date IS NOT NULL "
-            + "  AND DATEDIFF(ccr.breastfed_date, pr.birthdate) BETWEEN 150 AND 179";
+            + "  AND DATEDIFF('DAY', pr.birthdate, ccr.breastfed_date) BETWEEN 150 AND 179";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -2298,7 +2299,7 @@ public class ResumoMensalCcrCohortQueries {
 
     cd.addSearch("exposed", map(getExposedChildren(), mapping));
     cd.addSearch("breastfed", map(getChildrenWithAleitamentoMaterno(), mapping4));
-    cd.addSearch("age", map(getInfantAgeOnBreastfed(5), mapping4));
+    cd.addSearch("age", map(getInfantAgeOnBreastfed(), mapping4));
 
     cd.setCompositionString("exposed AND breastfed AND age");
     return cd;
@@ -2356,7 +2357,7 @@ public class ResumoMensalCcrCohortQueries {
    * @see #getExposedChildrenWithMixedFeeding5MonthsOfAge
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getInfantAgeOnMixedFeeding(Integer Age) {
+  public CohortDefinition getInfantAgeOnMixedFeeding() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Infant Age on Mixed Feeding");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -2367,7 +2368,6 @@ public class ResumoMensalCcrCohortQueries {
     map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
     map.put("6046", commonMetadata.getMixedFeedingConcept().getConceptId());
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
-    map.put("Age", Age);
 
     String query =
         "SELECT "
@@ -2399,7 +2399,7 @@ public class ResumoMensalCcrCohortQueries {
             + "WHERE "
             + "    pr.birthdate IS NOT NULL "
             + "  AND ccr.breastfed_date IS NOT NULL "
-            + "  AND DATEDIFF(ccr.breastfed_date, pr.birthdate) BETWEEN 150 AND 179";
+            + "  AND DATEDIFF('DAY', pr.birthdate, ccr.breastfed_date) BETWEEN 150 AND 179";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -2436,7 +2436,7 @@ public class ResumoMensalCcrCohortQueries {
 
     cd.addSearch("exposed", map(getExposedChildren(), mapping));
     cd.addSearch("mixedFeed", map(getChildrenWithMixedFeeding(), mapping4));
-    cd.addSearch("age", map(getInfantAgeOnMixedFeeding(5), mapping4));
+    cd.addSearch("age", map(getInfantAgeOnMixedFeeding(), mapping4));
 
     cd.setCompositionString("exposed AND mixedFeed AND age");
     return cd;
@@ -2497,7 +2497,7 @@ public class ResumoMensalCcrCohortQueries {
    * @see #getExposedChildrenWhoReceivedArv5MonthsOfAge
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getInfantAgeOnArv(Integer Age) {
+  public CohortDefinition getInfantAgeOnArv(Integer age) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Infant Age on ARV");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -2509,7 +2509,7 @@ public class ResumoMensalCcrCohortQueries {
     map.put("631", commonMetadata.getNevirapineConcept().getConceptId());
     map.put("797", hivMetadata.getZidovudineConcept().getConceptId());
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
-    map.put("Age", Age);
+    map.put("age", age);
 
     String query =
         "SELECT "
@@ -2541,7 +2541,7 @@ public class ResumoMensalCcrCohortQueries {
             + "WHERE "
             + "    pr.birthdate IS NOT NULL "
             + "  AND ccr.breastfed_date IS NOT NULL "
-            + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, ccr.breastfed_date) = ${Age}";
+            + "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, ccr.breastfed_date) = ${age}";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -2765,7 +2765,7 @@ public class ResumoMensalCcrCohortQueries {
     map.put("93", hivMetadata.getCCRSeguimentoEncounterType().getEncounterTypeId());
     map.put("1030", hivMetadata.getHivPCRQualitativeConceptUuid().getConceptId());
     map.put("703", hivMetadata.getPositive().getConceptId());
-    map.put("Age", age);
+    map.put("age", age);
 
     String query =
         "SELECT "
@@ -2797,9 +2797,9 @@ public class ResumoMensalCcrCohortQueries {
             + "    pr.birthdate IS NOT NULL "
             + "  AND pcr.last_pcr IS NOT NULL ";
     if (greaterThan) {
-      query += "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, pcr.last_pcr) >= ${Age}";
+      query += "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, pcr.last_pcr) >= ${age}";
     } else {
-      query += "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, pcr.last_pcr) < ${Age}";
+      query += "  AND TIMESTAMPDIFF(MONTH , pr.birthdate, pcr.last_pcr) < ${age}";
     }
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
