@@ -2262,11 +2262,13 @@ public class ResumoMensalCcrCohortQueries {
             + "WHERE "
             + "    pr.birthdate IS NOT NULL "
             + "  AND ccr.breastfed_date IS NOT NULL "
-            + "  AND DATEDIFF('DAY', pr.birthdate, ccr.breastfed_date) BETWEEN 150 AND 179";
+            + "  AND TIMESTAMPDIFF( DAY, pr.birthdate, ccr.breastfed_date ) BETWEEN 150 AND 179";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    System.out.println(sqlCohortDefinition.getQuery());
 
     return sqlCohortDefinition;
   }
@@ -2399,7 +2401,7 @@ public class ResumoMensalCcrCohortQueries {
             + "WHERE "
             + "    pr.birthdate IS NOT NULL "
             + "  AND ccr.breastfed_date IS NOT NULL "
-            + "  AND DATEDIFF('DAY', pr.birthdate, ccr.breastfed_date) BETWEEN 150 AND 179";
+            + "  AND TIMESTAMPDIFF( DAY, pr.birthdate, ccr.breastfed_date ) BETWEEN 150 AND 179";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
