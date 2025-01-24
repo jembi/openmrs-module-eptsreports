@@ -6117,6 +6117,70 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
+   * <b>concept_id = 23756</b>
+   *
+   * <p><b>Name:</b> WEIGHT / STATURE
+   *
+   * <p><b>Description:</b> A weight or stature used on nutrition assessment for children
+   *
+   * @return {@link Concept}
+   */
+  public Concept getWeightStatureConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.weightStatureConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165496</b>
+   *
+   * <p><b>Name:</b> SEVERE ACUTE MALNUTRITION < -3 DP
+   *
+   * <p><b>Description:</b> SEVERE ACUTE MALNUTRITION
+   *
+   * @return {@link Concept}
+   */
+  public Concept getSevereAcuteMalnutritionConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.severeAcuteMalnutrituinConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165497</b>
+   *
+   * <p><b>Name:</b> MODERATE NUTRITION ≥ -3 AND < -2 DP
+   *
+   * <p><b>Description:</b> MODERATE NUTRITION
+   *
+   * @return {@link Concept}
+   */
+  public Concept getModerateNutritionConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.moderateNutrituinConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 6394</b>
+   *
+   * <p><b>Name:</b> PMCT MOTHERS REGIME
+   *
+   * <p><b>Description:</b> ARV regimen for PMCT
+   *
+   * @return {@link Concept}
+   */
+  public Concept gePmctMothersRegimeConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.pmctMothersRegimeConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
    * /** <b>concept_id = 165519</b>
    *
    * <p><b>Name:</b> CD4 SEMI-QUANTITATIVE AT ART STARTING

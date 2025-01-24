@@ -1262,4 +1262,115 @@ public class CommonMetadata extends Metadata {
             .getGlobalProperty("eptsreports.diastolicBoodPressureConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 6121</b>
+   *
+   * <p><b>Name:</b> COTRIMOXAZOLE USE
+   *
+   * <p><b>Description:</b> COTRIMOXAZOLE PROPYLAXIS
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCotrimoxazolConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.cotrimoxazolConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 1998</b>
+   *
+   * <p><b>Name:</b> POLYMERASE CHAIN REACTION, DATE ORDERED
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getPcrConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.pcrConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 1595</b>
+   *
+   * <p><b>Name:</b> MEDICAL INPATIENT
+   *
+   * <p><b>Description:</b> Generic answer to a question.
+   *
+   * @return {@link Concept}
+   */
+  public Concept getMedicalInpatientConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.medicalInpatientConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>encounterType_id = 5526</b>
+   *
+   * <p><b>Name:</b> BREASTFED EXCLUSIVELY
+   *
+   * <p><b>Description:</b> Describes when mothers exclusively feed their children their own breast
+   * milk
+   *
+   * @return {@link Concept}
+   */
+  public Concept getBreastfedExclusivelyConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.breastfedExclusivelyConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>encounterType_id = 6046</b>
+   *
+   * <p><b>Name:</b> MIXED FEEDING
+   *
+   * <p><b>Description:</b> Describes when families select to feed a child a combination of
+   * different foodstuffs (eg, breastmilk, formula, foods)
+   *
+   * @return {@link Concept}
+   */
+  public Concept getMixedFeedingConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.mixedFeedingConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>encounterType_id = 631</b>
+   *
+   * <p><b>Name:</b> NEVIRAPINE
+   *
+   * <p><b>Description:</b> A non-nucleoside analogue that is used as an antiviral drug in the
+   * treatment of HIV infection.
+   *
+   * @return {@link Concept}
+   */
+  public Concept getNevirapineConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.nevirapineConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>encounterType_id = 797</b>
+   *
+   * <p><b>Name:</b> ZIDOVUDINE
+   *
+   * <p><b>Description:</b> Describes when families select to feed a child a combination of
+   * different foodstuffs (eg, breastmilk, formula, foods)
+   *
+   * @return {@link Concept}
+   */
+  public Concept getZidovudineConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.zidovudineConceptUuid");
+    return getConcept(uuid);
+  }
 }

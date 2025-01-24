@@ -4399,10 +4399,98 @@
 	</globalProperty>
 
 	<globalProperty>
+		<property>eptsreports.weightStatureConceptUuid</property>
+		<defaultValue>d33778f5-9bc2-4e04-aa5a-0af6002c540a</defaultValue>
+		<description>
+			UUID for WEIGHT / STATURE concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.severeAcuteMalnutrituinConceptUuid</property>
+		<defaultValue>1103b731-2e64-4a9a-a248-6691fa426c7a</defaultValue>
+		<description>
+			UUID for SEVERE ACUTE MALNUTRITION concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.moderateNutrituinConceptUuid</property>
+		<defaultValue>a269150d-3894-4ba0-91e2-12e143570ace</defaultValue>
+		<description>
+			UUID for MODERATE NUTRITION concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.cotrimoxazolConceptUuid</property>
+		<defaultValue>2616b3c9-9a99-4b9a-b673-10871f4a4c71</defaultValue>
+		<description>
+			COTRIMOXAZOLE USE Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.pcrConceptUuid</property>
+		<defaultValue>e1e06dd0-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			PCR Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.medicalInpatientConceptUuid</property>
+		<defaultValue>e1dca3ee-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			MEDICAL INPATIENT Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.pmctMothersRegimeConceptUuid</property>
+		<defaultValue>b85c14bd-c40d-4a66-ba86-2403299b4e8c</defaultValue>
+		<description>
+			PMCT MOTHERS REGIME concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.breastfedExclusivelyConceptUuid</property>
+		<defaultValue>e1e6bb9a-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			BREASTFED EXCLUSIVELY concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.mixedFeedingConceptUuid</property>
+		<defaultValue>e1eb7c5c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			MIXED FEEDING concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.nevirapineConceptUuid</property>
+		<defaultValue>e1d3d5de-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			NEVIRAPINE concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.zidovudineConceptUuid</property>
+		<defaultValue>e1d5d988-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			ZIDOVUDINE concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
 		<property>@MODULE_ID@.cd4SemiQuantitativeAtArtStartingUuid</property>
 		<defaultValue>4b878ebf-8e5c-4aa4-bc2a-daeb54c2dcfa</defaultValue>
 		<description>
-			UUID FOR CD4 SEMI-QUANTITATIVE AT ART STARTING CONCEPT
+		UUID FOR CD4 SEMI-QUANTITATIVE AT ART STARTING concept
 		</description>
 	</globalProperty>
 
