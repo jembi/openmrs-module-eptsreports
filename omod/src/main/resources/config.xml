@@ -4398,4 +4398,12 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.cd4SemiQuantitativeAtArtStartingUuid</property>
+		<defaultValue>4b878ebf-8e5c-4aa4-bc2a-daeb54c2dcfa</defaultValue>
+		<description>
+			UUID FOR CD4 SEMI-QUANTITATIVE AT ART STARTING CONCEPT
+		</description>
+	</globalProperty>
+
 </module>

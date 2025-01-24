@@ -175,6 +175,8 @@ public class ResumoMensalQueries {
       int dateOfMasterCardFileOpening,
       int programEnrolled,
       int transferredInState,
+      int typePatientTransferredFrom,
+      int tarv,
       boolean isExclusion) {
     String query =
         "SELECT p.patient_id "
@@ -183,18 +185,24 @@ public class ResumoMensalQueries {
             + "         ON p.patient_id = e.patient_id "
             + "       JOIN obs transf "
             + "         ON transf.encounter_id = e.encounter_id "
+            + "       JOIN obs patientTransf "
+            + "         ON patientTransf.encounter_id = e.encounter_id "
             + "       JOIN obs type "
             + "         ON type.encounter_id = e.encounter_id "
             + "       JOIN obs opening "
             + "         ON opening.encounter_id = e.encounter_id "
             + "WHERE  p.voided = 0 "
             + "        AND e.voided = 0 "
+            + "        AND transf.voided = 0 "
+            + "        AND opening.voided = 0 "
+            + "        AND patientTransf.voided = 0 "
+            + "        AND type.voided = 0 "
             + "        AND e.encounter_type = ${mastercard} "
             + "        AND e.location_id = :location "
-            + "        AND transf.voided = 0 "
             + "        AND transf.concept_id = ${transferFromOther} "
             + "        AND transf.value_coded = ${yes} "
-            + "        AND opening.voided = 0 "
+            + "        AND patientTransf.concept_id = ${typePatientTransferredFrom} "
+            + "        AND patientTransf.value_coded = ${tarv} "
             + "        AND opening.concept_id = ${dateOfMasterCardFileOpening} ";
     if (isExclusion) {
       query = query + "AND opening.value_datetime < :onOrAfter ";
@@ -203,7 +211,7 @@ public class ResumoMensalQueries {
     }
     query =
         query
-            + "        AND type.voided = 0 "
+            + " GROUP BY p.patient_id "
             + "UNION "
             + "SELECT p.patient_id "
             + "FROM patient p   "
@@ -228,6 +236,8 @@ public class ResumoMensalQueries {
     valuesMap.put("dateOfMasterCardFileOpening", dateOfMasterCardFileOpening);
     valuesMap.put("programEnrolled", programEnrolled);
     valuesMap.put("transferredInState", transferredInState);
+    valuesMap.put("typePatientTransferredFrom", typePatientTransferredFrom);
+    valuesMap.put("tarv", tarv);
     StringSubstitutor sub = new StringSubstitutor(valuesMap);
     return sub.replace(query);
   }

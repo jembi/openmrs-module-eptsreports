@@ -13,8 +13,6 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
-
 import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.EncounterType;
@@ -229,12 +227,10 @@ public class TxNewCohortQueries {
     txNewComposition.addParameter(new Parameter("location", "location", Location.class));
 
     String mapping1 = "startDate=${startDate},endDate=${endDate},location=${location}";
-    String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
+    String mapping2 = "endDate=${endDate},location=${location}";
 
     CohortDefinition startedART = getPatientsStartedArtDuringReportingPeriod();
-    CohortDefinition transferredIn =
-        resumoMensalCohortQueries
-            .getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2E();
+    CohortDefinition transferredIn = getPatientsWhoAreTransferredIn();
 
     txNewComposition.getSearches().put("startedART", EptsReportUtils.map(startedART, mapping1));
     txNewComposition
@@ -390,20 +386,22 @@ public class TxNewCohortQueries {
 
   public CohortDefinition getPatientsWithCd4AndAge(
       AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison cd4,
+      AdvancedDiseaseAndTBCascadeCohortQueries.semiQuantitativeCd4CountComparison semiCd4,
       Integer minAge,
       Integer maxAge) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Cd4 And Age");
-    cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition getCd4Result = getCd4Result(cd4);
+    CohortDefinition getCd4Result = getCd4Result(cd4, semiCd4);
     CohortDefinition age = ageCohortQueries.createXtoYAgeCohort("Age", minAge, maxAge);
 
     cd.addSearch(
         "getCd4Result",
-        EptsReportUtils.map(getCd4Result, "endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(
+            getCd4Result, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch("age", EptsReportUtils.map(age, "effectiveDate=${endDate}"));
 
@@ -413,20 +411,21 @@ public class TxNewCohortQueries {
   }
 
   /**
-   * <b>Patients with an absolute CD4 result <200/mm3 registered in the following sources:</b>
+   * <b>Patients with an absolute CD4 result <200/mm3 or Semi-Quantitative registered in the
+   * following sources:</b>
    *
    * <ul>
-   *   <li>CD4 absolute value at ART initiation marked on Ficha Resumo OR
-   *   <li>Last CD4 absolute value marked on Ficha Resumo OR
-   *   <li>CD4 absolute result marked in the Investigações - Resultados Laboratoriais section on
-   *       Ficha Clínica OR
-   *   <li>CD4 absolute result registered on the Lab Form OR
-   *   <li>CD4 absolute result registered on the e-Lab Form
+   *   <li>CD4 absolute value or semi-quantitative at ART initiation marked on Ficha Resumo OR
+   *   <li>Last CD4 absolute value or semi-quantitative marked on Ficha Resumo OR
+   *   <li>CD4 absolute result or semi-quantitative marked in the Investigações - Resultados
+   *       Laboratoriais section on Ficha Clínica OR
+   *   <li>CD4 absolute result or semi-quantitative registered on the Lab Form OR
+   *   <li>CD4 absolute result or semi-quantitative registered on the e-Lab Form
    * </ul>
    *
-   * <p>The system will consider the oldest CD4 result date falling between patient ART Start Date -
-   * 90 days and ART Start Date + 28 days from the different sources listed above for the evaluation
-   * of the result (< 200).
+   * <p>The system will consider the oldest CD4 result date between patient ART Start Date - 90 days
+   * and ART Start Date + 28 days from the different sources listed above for the evaluation of the
+   * result (< 200).
    *
    * <p><b>Notes: </b>For the CD4 at ART initiation registered on Ficha Resumo, the “ART Start Date”
    * that is registered on the same Ficha Resumo will be considered as the CD4 result date. For
@@ -434,12 +433,15 @@ public class TxNewCohortQueries {
    * <200/mm3 will be prioritized.
    *
    * @param cd4CountComparison
+   * @param semiQuantitativeCd4CountComparison
    */
   public CohortDefinition getCd4Result(
-      AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison cd4CountComparison) {
+      AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison cd4CountComparison,
+      AdvancedDiseaseAndTBCascadeCohortQueries.semiQuantitativeCd4CountComparison
+          semiQuantitativeCd4CountComparison) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Number of patientes who initiated TARV - Fila and ARV Pickup");
+    cd.setName("CD4 Results");
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -456,78 +458,108 @@ public class TxNewCohortQueries {
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
     map.put("23896", hivMetadata.getArtInitiationCd4Concept().getConceptId());
     map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("165515", hivMetadata.getCD4SemiQuantitativeConcept().getConceptId());
+    map.put("165513", hivMetadata.getCD4CountLessThanOrEqualTo200Concept().getConceptId());
+    map.put("1254", hivMetadata.getCD4CountGreaterThan200Concept().getConceptId());
 
     CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
 
     String query =
         "SELECT p.patient_id "
-            + "FROM   patient p "
-            + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "       INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
-            + "       INNER JOIN (SELECT e.patient_id,MIN(DATE(cd4.cd4_date)) cd4_date "
-            + "                   FROM   encounter e "
-            + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                          INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
-            + "                          INNER JOIN ( "
+            + "FROM patient p "
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "INNER JOIN ( "
+            + "SELECT e.patient_id, MIN(DATE(cd4.cd4_date)) cd4_date "
+            + "FROM encounter e "
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "INNER JOIN ( "
             + commonQueries.getARTStartDate(true)
-            + "                 ) art "
-            + "  ON art.patient_id = e.patient_id "
-            + "  INNER JOIN (SELECT e.patient_id,DATE(e.encounter_datetime) cd4_date "
-            + "            FROM   encounter e "
-            + "            INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "            WHERE  e.encounter_type IN ( ${6}, ${13}, ${51} ) "
-            + "            AND e.location_id = :location "
-            + "            AND DATE(e.encounter_datetime) <= :endDate "
-            + "            AND o.concept_id = ${1695} "
-            + "            AND e.voided = 0 "
-            + "            AND o.voided = 0 "
-            + "            UNION "
-            + "            SELECT e.patient_id,DATE(o.obs_datetime) AS cd4_date "
-            + "            FROM   encounter e "
-            + "            INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "            WHERE  e.encounter_type = ${53} "
-            + "            AND e.location_id = :location "
-            + "            AND e.voided = 0 "
-            + "            AND o.voided = 0 "
-            + "            AND o.concept_id = ${1695} "
-            + "            AND o.obs_datetime <= :endDate"
-            + "            UNION "
-            + "            SELECT e.patient_id,DATE(o2.value_datetime) AS cd4_date "
-            + "            FROM   encounter e "
-            + "            INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "            INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
-            + "            WHERE  e.encounter_type = ${53} "
-            + "            AND e.location_id = :location "
-            + "            AND e.voided = 0 "
-            + "            AND o.voided = 0 "
-            + "            AND o2.voided = 0 "
-            + "            AND o.concept_id = ${23896} "
-            + "            AND o2.concept_id = ${1190} "
-            + "            AND o2.value_datetime <= :endDate"
-            + "     ) cd4 ON cd4.patient_id = e.patient_id "
-            + "   WHERE  e.voided = 0 "
-            + "   AND o.voided = 0 "
-            + "   AND e.location_id = :location "
-            + "   AND o.value_numeric IS NOT NULL "
-            + "   AND ( ( DATE(e.encounter_datetime) BETWEEN DATE_SUB(art.first_pickup, INTERVAL 90 day) AND DATE_ADD(art.first_pickup, INTERVAL 28 day) "
-            + "             AND e.encounter_type IN ( ${6}, ${13}, ${51}) AND o.concept_id = ${1695}  ) "
-            + "          OR (   ( DATE(o.obs_datetime) BETWEEN DATE_SUB(art.first_pickup, INTERVAL 90 day) AND DATE_ADD(art.first_pickup, INTERVAL 28 day) AND e.encounter_type = ${53} AND o.concept_id = ${1695} ) "
-            + "            OR ( DATE(o2.value_datetime) BETWEEN DATE_SUB(art.first_pickup, INTERVAL 90 day) AND DATE_ADD(art.first_pickup, INTERVAL 28 day) AND e.encounter_type = ${53} AND o.concept_id = ${23896} AND o2.concept_id = ${1190} AND o2.voided = 0) "
-            + "          ) "
+            + " ) art ON art.patient_id = e.patient_id "
+            + "INNER JOIN ( "
+            + "SELECT e.patient_id, DATE(e.encounter_datetime) cd4_date "
+            + "FROM encounter e "
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "WHERE e.encounter_type IN (${6}, ${13}, ${51}) "
+            + "AND e.location_id = :location "
+            + "AND DATE(e.encounter_datetime) <= :endDate "
+            + "AND o.concept_id IN (${1695}, ${165515}) "
+            + "AND e.voided = 0 "
+            + "AND o.voided = 0 "
+            + "UNION "
+            + "SELECT e.patient_id, DATE(o.obs_datetime) AS cd4_date "
+            + "FROM encounter e "
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "WHERE e.encounter_type = ${53} "
+            + "AND e.location_id = :location "
+            + "AND e.voided = 0 "
+            + "AND o.voided = 0 "
+            + "AND o.concept_id IN (${1695}, ${165515}) "
+            + "AND o.obs_datetime <= :endDate "
+            + "UNION "
+            + "SELECT e.patient_id, DATE(o2.value_datetime) AS cd4_date "
+            + "FROM encounter e "
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "WHERE e.encounter_type = ${53} "
+            + "AND e.location_id = :location "
+            + "AND e.voided = 0 "
+            + "AND o.voided = 0 "
+            + "AND o2.voided = 0 "
+            + "AND o.concept_id = ${23896} "
+            + "AND o2.concept_id = ${1190} "
+            + "AND o2.value_datetime <= :endDate "
+            + ") cd4 ON cd4.patient_id = e.patient_id "
+            + "WHERE e.voided = 0 "
+            + "AND o.voided = 0 "
+            + "AND e.location_id = :location "
+            + "AND o.value_numeric IS NOT NULL "
+            + "AND ( "
+            + "(DATE(e.encounter_datetime) BETWEEN DATE_SUB(art.first_pickup, INTERVAL 90 day) AND DATE_ADD(art.first_pickup, INTERVAL 28 day) "
+            + "AND e.encounter_type IN (${6}, ${13}, ${51}) AND o.concept_id IN (${1695}, ${165515})) "
+            + "OR ( "
+            + "(DATE(o.obs_datetime) BETWEEN DATE_SUB(art.first_pickup, INTERVAL 90 day) AND DATE_ADD(art.first_pickup, INTERVAL 28 day) "
+            + "AND e.encounter_type = ${53} AND o.concept_id IN (${1695}, ${165515})) "
+            + "OR ( "
+            + "DATE(o2.value_datetime) BETWEEN DATE_SUB(art.first_pickup, INTERVAL 90 day) AND DATE_ADD(art.first_pickup, INTERVAL 28 day) "
+            + "AND e.encounter_type = ${53} AND o.concept_id = ${23896} AND o2.concept_id = ${1190} AND o2.voided = 0 "
             + ") "
-            + "   GROUP  BY e.patient_id) min_cd4 ON min_cd4.patient_id = p.patient_id "
-            + " WHERE  p.voided = 0 "
-            + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "       AND e.location_id = :location "
-            + "       AND  ".concat(cd4CountComparison.getProposition())
-            + "       AND ( ( DATE(e.encounter_datetime) = min_cd4.cd4_date AND e.encounter_type IN ( ${6}, ${13}, ${51} ) AND o.concept_id = ${1695}  ) "
-            + "              OR ( ( DATE(o.obs_datetime) = min_cd4.cd4_date AND e.encounter_type = ${53} AND o.concept_id = ${1695} )  "
-            + "                OR ( DATE(o2.value_datetime) = min_cd4.cd4_date AND e.encounter_type = ${53} AND o.concept_id = ${23896} AND o2.concept_id = ${1190} AND o2.voided = 0 )"
-            + "               ) "
-            + "             ) "
-            + "GROUP  BY p.patient_id";
+            + ") "
+            + ") "
+            + "GROUP BY e.patient_id "
+            + ") min_cd4 ON min_cd4.patient_id = p.patient_id "
+            + "WHERE p.voided = 0 "
+            + "AND e.voided = 0 "
+            + "AND o.voided = 0 "
+            + "AND e.location_id = :location "
+            + "AND ( "
+            + "(DATE(e.encounter_datetime) = min_cd4.cd4_date AND e.encounter_type IN (${6}, ${13}, ${51}) AND o.concept_id = ${1695} "
+            + "AND "
+            + cd4CountComparison.getProposition()
+            + ") "
+            + "OR ( "
+            + "DATE(e.encounter_datetime) = min_cd4.cd4_date AND e.encounter_type IN (${6}, ${13}, ${51}) AND o.concept_id = ${165515} "
+            + "AND "
+            + semiQuantitativeCd4CountComparison.getProposition()
+            + ") "
+            + "OR ( "
+            + "DATE(o.obs_datetime) = min_cd4.cd4_date AND e.encounter_type = ${53} AND o.concept_id = ${1695} "
+            + "AND "
+            + cd4CountComparison.getProposition()
+            + ") "
+            + "OR ( "
+            + "DATE(o.obs_datetime) = min_cd4.cd4_date AND e.encounter_type = ${53} AND o.concept_id = ${165515} "
+            + "AND "
+            + semiQuantitativeCd4CountComparison.getProposition()
+            + ") "
+            + "OR ( "
+            + "DATE(o2.value_datetime) = min_cd4.cd4_date AND e.encounter_type = ${53} "
+            + "AND o.concept_id = ${23896} AND o2.concept_id = ${1190} AND o2.voided = 0 "
+            + ") "
+            + ") "
+            + "GROUP BY p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     cd.setQuery(sb.replace(query));
@@ -587,13 +619,14 @@ public class TxNewCohortQueries {
 
     CohortDefinition cd4Under200 =
         getPatientsWithCd4AndAge(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3,
+            AdvancedDiseaseAndTBCascadeCohortQueries.semiQuantitativeCd4CountComparison
+                .LessThanOrEqualTo200mm3,
             5,
             null);
 
     cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping1));
-    cd.addSearch(
-        "cd4Under200", EptsReportUtils.map(cd4Under200, "endDate=${endDate},location=${location}"));
+    cd.addSearch("cd4Under200", EptsReportUtils.map(cd4Under200, mapping1));
 
     cd.setCompositionString("txnew AND cd4Under200");
 
@@ -653,24 +686,24 @@ public class TxNewCohortQueries {
     CohortDefinition cd4Above200AndAge =
         getPatientsWithCd4AndAge(
             AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.GreaterThanOrEqualTo200mm3,
+            AdvancedDiseaseAndTBCascadeCohortQueries.semiQuantitativeCd4CountComparison
+                .GreaterThanOrEqualTo200mm3,
             5,
             null);
 
     CohortDefinition cd4Under200AndAge =
         getPatientsWithCd4AndAge(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3,
+            AdvancedDiseaseAndTBCascadeCohortQueries.semiQuantitativeCd4CountComparison
+                .LessThanOrEqualTo200mm3,
             5,
             null);
 
     cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping1));
 
-    cd.addSearch(
-        "cd4Above200AndAge",
-        EptsReportUtils.map(cd4Above200AndAge, "endDate=${endDate},location=${location}"));
+    cd.addSearch("cd4Above200AndAge", EptsReportUtils.map(cd4Above200AndAge, mapping1));
 
-    cd.addSearch(
-        "cd4Under200AndAge",
-        EptsReportUtils.map(cd4Under200AndAge, "endDate=${endDate},location=${location}"));
+    cd.addSearch("cd4Under200AndAge", EptsReportUtils.map(cd4Under200AndAge, mapping1));
 
     cd.setCompositionString("(txnew AND cd4Above200AndAge) AND NOT cd4Under200AndAge");
 
@@ -704,26 +737,126 @@ public class TxNewCohortQueries {
 
     CohortDefinition cd4Under200AndAge =
         getPatientsWithCd4AndAge(
-            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3,
+            AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThan200mm3,
+            AdvancedDiseaseAndTBCascadeCohortQueries.semiQuantitativeCd4CountComparison
+                .LessThanOrEqualTo200mm3,
             5,
             null);
 
     CohortDefinition cd4Above200AndAge =
         getPatientsWithCd4AndAge(
             AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.GreaterThanOrEqualTo200mm3,
+            AdvancedDiseaseAndTBCascadeCohortQueries.semiQuantitativeCd4CountComparison
+                .GreaterThanOrEqualTo200mm3,
             5,
             null);
 
     cd.addSearch("txnew", EptsReportUtils.map(txnew, mapping1));
-    cd.addSearch(
-        "cd4Under200AndAge",
-        EptsReportUtils.map(cd4Under200AndAge, "endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "cd4Above200AndAge",
-        EptsReportUtils.map(cd4Above200AndAge, "endDate=${endDate},location=${location}"));
+    cd.addSearch("cd4Under200AndAge", EptsReportUtils.map(cd4Under200AndAge, mapping1));
+    cd.addSearch("cd4Above200AndAge", EptsReportUtils.map(cd4Above200AndAge, mapping1));
 
     cd.setCompositionString("txnew AND NOT (cd4Under200AndAge OR cd4Above200AndAge)");
 
     return cd;
+  }
+
+  public CohortDefinition getPatientsWhoAreTransferredIn() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Transferred-in patients");
+    cd.addParameter(new Parameter("endDate", "endDate Date", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.setQuery(
+        getTxNewPatientsWhoAreTransferredIn(
+            hivMetadata.getARTProgram().getProgramId(),
+            hivMetadata
+                .getPateintTransferedFromOtherFacilityWorkflowState()
+                .getProgramWorkflowStateId(),
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            hivMetadata.getTransferredFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId(),
+            hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId()));
+    return cd;
+  }
+
+  public static String getTxNewPatientsWhoAreTransferredIn(
+      int artProgram,
+      int artCareTransferredFromOtherFacility,
+      int mastercard,
+      int transferFromOther,
+      int yes,
+      int typeOfPatientTransferredFrom,
+      int dateOfArtPickUp,
+      int dateOfMasterCardFileOpening) {
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM patient p "
+            + "JOIN patient_program pp "
+            + "    ON p.patient_id = pp.patient_id "
+            + "JOIN patient_state ps "
+            + "    ON ps.patient_program_id = pp.patient_program_id "
+            + "JOIN ( "
+            + "    SELECT p.patient_id, "
+            + "           MIN(ps.start_date) AS first_state "
+            + "    FROM patient p "
+            + "    INNER JOIN patient_program pg "
+            + "        ON p.patient_id = pg.patient_id "
+            + "    INNER JOIN patient_state ps "
+            + "        ON pg.patient_program_id = ps.patient_program_id "
+            + "    WHERE p.voided = 0 "
+            + "      AND pg.voided = 0 "
+            + "      AND ps.voided = 0 "
+            + "      AND pg.program_id = ${artProgram} "
+            + "      AND ps.start_date <= :endDate "
+            + "      AND pg.location_id = :location "
+            + "    GROUP BY p.patient_id "
+            + ") earliest "
+            + "    ON ps.start_date = earliest.first_state "
+            + "WHERE p.voided = 0 "
+            + "  AND pp.voided = 0 "
+            + "  AND ps.voided = 0 "
+            + "  AND pp.program_id = ${artProgram} "
+            + "  AND ps.state = ${artCareTransferredFromOtherFacility} "
+            + "  AND pp.location_id = :location "
+            + " "
+            + "UNION "
+            + " "
+            + "SELECT p.patient_id "
+            + "FROM patient p "
+            + "JOIN encounter e "
+            + "    ON p.patient_id = e.patient_id "
+            + "JOIN obs transf "
+            + "    ON transf.encounter_id = e.encounter_id "
+            + "JOIN obs type "
+            + "    ON type.encounter_id = e.encounter_id "
+            + "JOIN obs opening "
+            + "    ON opening.encounter_id = e.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND transf.voided = 0 "
+            + "  AND type.voided = 0 "
+            + "  AND opening.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ${mastercard} "
+            + "  AND transf.concept_id = ${transferFromOther} "
+            + "  AND transf.value_coded = ${yes} "
+            + "  AND type.concept_id = ${typeOfPatientTransferredFrom} "
+            + "  AND type.value_coded = ${dateOfArtPickUp} "
+            + "  AND opening.concept_id = ${dateOfMasterCardFileOpening} "
+            + "  AND opening.value_datetime <= :endDate;";
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("artProgram", artProgram);
+    valuesMap.put("artCareTransferredFromOtherFacility", artCareTransferredFromOtherFacility);
+    valuesMap.put("mastercard", mastercard);
+    valuesMap.put("transferFromOther", transferFromOther);
+    valuesMap.put("yes", yes);
+    valuesMap.put("typeOfPatientTransferredFrom", typeOfPatientTransferredFrom);
+    valuesMap.put("dateOfArtPickUp", dateOfArtPickUp);
+    valuesMap.put("dateOfMasterCardFileOpening", dateOfMasterCardFileOpening);
+    StringSubstitutor sub = new StringSubstitutor(valuesMap);
+    return sub.replace(query);
   }
 }

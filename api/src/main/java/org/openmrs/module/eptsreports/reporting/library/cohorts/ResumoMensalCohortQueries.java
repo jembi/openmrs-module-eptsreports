@@ -3797,6 +3797,8 @@ public class ResumoMensalCohortQueries {
             hivMetadata
                 .getTransferredFromOtherHealthFacilityWorkflowState()
                 .getProgramWorkflowStateId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId(),
             isExclusion));
     return cd;
   }

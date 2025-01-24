@@ -963,11 +963,11 @@ public class ResumoMensalDAHCohortQueries {
     cd.addParameters(getCohortParameters());
 
     CohortDefinition cd200overOrEqualTo5years =
-        getPatientsWithCD4BasedOnAgeAndCd4(Cd4CountComparison.LessThanOrEqualTo200mm3, 5, null);
+        getPatientsWithCD4BasedOnAgeAndCd4(Cd4CountComparison.LessThan200mm3, 5, null);
     CohortDefinition cd500betweenOneAnd5years =
-        getPatientsWithCD4BasedOnAgeAndCd4(Cd4CountComparison.LessThanOrEqualTo500mm3, 1, 4);
+        getPatientsWithCD4BasedOnAgeAndCd4(Cd4CountComparison.LessThan500mm3, 1, 4);
     CohortDefinition cd750bellowOneYear =
-        getPatientsWithCD4BasedOnAgeAndCd4(Cd4CountComparison.LessThanOrEqualTo750mm3, null, 1);
+        getPatientsWithCD4BasedOnAgeAndCd4(Cd4CountComparison.LessThan750mm3, null, 1);
     CohortDefinition semiQuantiativeUnder200 =
         getPatientsWithCD4BasedOnAgeAndSemiQuantitaiveCd4(5, null);
 
