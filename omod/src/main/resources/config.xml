@@ -4494,4 +4494,44 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.typeOfPrepUuid</property>
+		<defaultValue>5911de51-12c2-4d1d-b210-e4c1bcb9e96a</defaultValue>
+		<description>
+			UUID FOR TYPE OF PREP concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.oralOnDemandUuid</property>
+		<defaultValue>17034e38-6890-4127-99d9-5e53a3d61abf</defaultValue>
+		<description>
+			UUID ORAL - ON DEMAND concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.oralDiaryUuid</property>
+		<defaultValue>5246a61d-bafa-4261-b4b3-071957c8c3fb</defaultValue>
+		<description>
+			UUID ORAL DIARY concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.injectableUuid</property>
+		<defaultValue>d2c76dce-a0b9-45e4-a976-c6850cfffe0b</defaultValue>
+		<description>
+			UUID INJECTABLE concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.vaginalRingUuid</property>
+		<defaultValue>162473AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</defaultValue>
+		<description>
+			UUID VAGINAL RING concept
+		</description>
+	</globalProperty>
+
 </module>
