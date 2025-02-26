@@ -123,16 +123,6 @@ public class PrepCtDataset extends BaseDataSet {
         "KP=MSM");
 
     dsd.addColumn(
-        "TG-CT",
-        "PREP CT: Transgender",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Transgender",
-                EptsReportUtils.map(prepCtCohortQueries.getPREPCTNumerator(), mappings)),
-            mappings),
-        "KP=TG");
-
-    dsd.addColumn(
         "SW-CT",
         "PREP CT: Female sex workers",
         EptsReportUtils.map(
