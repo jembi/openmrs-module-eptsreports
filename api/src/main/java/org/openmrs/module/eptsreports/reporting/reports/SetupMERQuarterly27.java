@@ -141,16 +141,6 @@ public class SetupMERQuarterly27 extends EptsDataExportManager {
         "T", Mapped.mapStraightThrough(transferredInDataset.constructTransferInDataset()));
     rd.addDataSetDefinition(
         "PREP", Mapped.mapStraightThrough(prepNewDataset.constructPrepNewDataset()));
-    rd.addDataSetDefinition(
-        "PREPNUM", Mapped.mapStraightThrough(prepCtDataset.constructPrepCtDataset()));
-    rd.addDataSetDefinition(
-        "OTHERDISAGG",
-        Mapped.mapStraightThrough(
-            prepOtherDisaggregationDataset.constructPrepOtherDisaggregationDataset()));
-    rd.addDataSetDefinition(
-        "EID", Mapped.mapStraightThrough(pmtctEidDataset.constructPmtctEidDataSet()));
-    rd.addDataSetDefinition(
-        "HEI", Mapped.mapStraightThrough(pmtctHeiDataset.constructPmtctHeiDataSet()));
 
     rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
 
