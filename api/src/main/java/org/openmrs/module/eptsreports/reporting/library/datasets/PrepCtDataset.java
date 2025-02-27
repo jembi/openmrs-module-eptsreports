@@ -95,7 +95,7 @@ public class PrepCtDataset extends BaseDataSet {
 
     dsd.addColumn(
         "OTHER-CT",
-        "VAginal Ring",
+        "Vaginal Ring",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
                 "Oral", EptsReportUtils.map(prepCtCohortQueries.getPREPCTNumerator(), mappings)),

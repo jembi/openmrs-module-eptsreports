@@ -59,6 +59,8 @@ public class PrepNewDataset extends BaseDataSet {
         "maternity",
         EptsReportUtils.map(
             eptsCommonDimension.getPregnantAndBreastfeedingPatientsBasedOnPrepNew(), mappings));
+    dsd.addDimension(
+        "prepType", EptsReportUtils.map(eptsCommonDimension.getPrepTypeDimension(), mappings));
 
     dsd.addColumn(
         "Pregnant",
@@ -91,7 +93,29 @@ public class PrepNewDataset extends BaseDataSet {
                 EptsReportUtils.map(
                     prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
             mappings),
-        "");
+        "prepType=oral");
+
+    dsd.addColumn(
+        "INJECTABLE",
+        "Injectable",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Injectable",
+                EptsReportUtils.map(
+                    prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
+            mappings),
+        "prepType=injectible");
+
+    dsd.addColumn(
+        "OTHER",
+        "Vaginal Ring",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Vaginal Ring",
+                EptsReportUtils.map(
+                    prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
+            mappings),
+        "prepType=vaginalRing");
 
     dsd.addColumn(
         "TOTAL",
