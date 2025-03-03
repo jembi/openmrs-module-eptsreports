@@ -6195,4 +6195,78 @@ public class HivMetadata extends ProgramsMetadata {
             .getGlobalProperty("eptsreports.cd4SemiQuantitativeAtArtStartingUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * /** <b>concept_id = 165516</b>
+   *
+   * <p><b>Name:</b> TYPE OF PREP
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getTypeOfPrepConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.typeOfPrepUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * /** <b>concept_id = 165517</b>
+   *
+   * <p><b>Name:</b> ORAL - ON DEMAND
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getOralOnDemandConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.oralOnDemandUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * /** <b>concept_id = 165518</b>
+   *
+   * <p><b>Name:</b> ORAL- DIARY
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getOralDiaryConcept() {
+    String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.oralDiaryUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * /** <b>concept_id = 21959</b>
+   *
+   * <p><b>Name:</b> INJECTABLE
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getInjectableConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.injectableUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * /** <b>concept_id = 165514</b>
+   *
+   * <p><b>Name:</b> VAGINAL RING
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getVaginalRingConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.vaginalRingUuid");
+    return getConcept(uuid);
+  }
 }
