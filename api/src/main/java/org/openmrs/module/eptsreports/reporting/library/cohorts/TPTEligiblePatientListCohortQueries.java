@@ -1933,7 +1933,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                 ) AS tabela "
             + "                            ON tabela.patient_id = p.patient_id "
             + "             WHERE  p.voided = 0 "
-            + "                    AND ( (SELECT Count(*) "
+            + "                    AND ( (SELECT COUNT(DISTINCT ee.encounter_id) "
             + "                           FROM   patient pp "
             + "                                  join encounter ee "
             + "                                    ON pp.patient_id = ee.patient_id "
