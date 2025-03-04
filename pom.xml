@@ -15,13 +15,13 @@
 	<description>PEPFAR reports for EPTS project in Mozambique</description>
 
 	<properties>
-		<openmrsPlatformVersion>2.3.3</openmrsPlatformVersion>
-		<reportingVersion>1.14.0</reportingVersion>
+		<openmrsPlatformVersion>2.6.9</openmrsPlatformVersion>
+		<reportingVersion>1.25.0</reportingVersion>
 		<serializationVersion>0.2.14</serializationVersion>
-		<calculationVersion>1.2</calculationVersion>
-		<htmlWidgetsVersion>1.9.0</htmlWidgetsVersion>
+		<calculationVersion>1.2.1</calculationVersion>
+		<htmlWidgetsVersion>1.11.0</htmlWidgetsVersion>
 		<reportingcompatibilityVersion>2.0.7</reportingcompatibilityVersion>
-		<legacyUiVersion>1.5.0</legacyUiVersion>
+		<legacyUiVersion>1.16.0</legacyUiVersion>
 	</properties>
 
 	<url>https://wiki.openmrs.org/x/FQ4z</url>
@@ -181,6 +181,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.13.0</version>
 					<configuration>
 						<target>1.8</target>
 						<source>1.8</source>
