@@ -2034,7 +2034,8 @@ public class TPTEligiblePatientListCohortQueries {
             + "       AND e.encounter_type = ${6} "
             + "       AND o.concept_id = ${1719} "
             + "       AND o.value_coded = ${165307} "
-            + "       and o.obs_datetime BETWEEN tabela.encounter_datetime and DATE_ADD(tabela.encounter_datetime, interval 4 month) "
+            + "       and e.encounter_datetime BETWEEN tabela.encounter_datetime and DATE_ADD(tabela.encounter_datetime, interval 4 month) "
+            + "       and e.encounter_datetime <= :endDate "
             + " GROUP  BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
