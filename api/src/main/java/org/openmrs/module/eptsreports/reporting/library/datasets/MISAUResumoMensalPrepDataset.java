@@ -292,8 +292,7 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
     ColumnParameters sw = new ColumnParameters("sw", "Sex workers", "KP=SW", "19");
     ColumnParameters pri =
         new ColumnParameters("pri", "People in prison and other closed settings", "KP=PRI", "20");
-    ColumnParameters tg = new ColumnParameters("tg", "Transgender", "KP=TG", "22");
-    ColumnParameters outro = new ColumnParameters("outro", "Outro", "KP=OUT", "30");
+    ColumnParameters outro = new ColumnParameters("outro", "Outro", "KP=OUT, TG", "30");
 
     // Target group
     ColumnParameters ayr =
@@ -329,7 +328,6 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
         msm,
         sw,
         pri,
-        tg,
         ayr,
         pw,
         bw,
