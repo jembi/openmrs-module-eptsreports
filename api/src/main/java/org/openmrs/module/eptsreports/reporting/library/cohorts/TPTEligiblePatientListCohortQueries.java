@@ -1252,8 +1252,6 @@ public class TPTEligiblePatientListCohortQueries {
 
     sqlCohortDefinition.setQuery(sb.replace(query));
 
-    System.out.println(sqlCohortDefinition.getQuery());
-
     return sqlCohortDefinition;
   }
 
