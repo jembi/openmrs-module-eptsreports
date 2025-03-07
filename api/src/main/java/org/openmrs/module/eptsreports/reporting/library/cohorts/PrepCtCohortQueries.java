@@ -651,6 +651,32 @@ public class PrepCtCohortQueries {
     return cd;
   }
 
+  public CohortDefinition getPatientsWhoAreOutroOrTransgender() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Outro");
+    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition outro = getPatientsWhoAreOutro();
+
+    CohortDefinition transgender = getPatientsWhoAreTransgender();
+
+    cd.addSearch(
+        "outro",
+        EptsReportUtils.map(
+            outro, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "transgender",
+        EptsReportUtils.map(
+            transgender, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.setCompositionString("outro OR transgender");
+
+    return cd;
+  }
+
   public CohortDefinition getFemalePatientsWhoAreSexWorker() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Sex Worker");
