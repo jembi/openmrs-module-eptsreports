@@ -1218,7 +1218,7 @@ public class TPTEligiblePatientListCohortQueries {
             + " ) AS tabela  ON tabela.patient_id = p.patient_id    "
             + "                    WHERE p.voided = 0 "
             + "  AND ( "
-            + "           SELECT     count(e2.encounter_id) "
+            + "           SELECT     count(DISTINCT e2.encounter_id) "
             + "           FROM       encounter e2 "
             + "           INNER JOIN obs oo "
             + "           ON         e2.encounter_id = oo.encounter_id "
@@ -1251,6 +1251,8 @@ public class TPTEligiblePatientListCohortQueries {
     StringSubstitutor sb = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(sb.replace(query));
+
+    System.out.println(sqlCohortDefinition.getQuery());
 
     return sqlCohortDefinition;
   }
