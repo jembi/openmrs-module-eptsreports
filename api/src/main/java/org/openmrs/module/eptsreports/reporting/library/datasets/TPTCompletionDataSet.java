@@ -72,7 +72,7 @@ public class TPTCompletionDataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "TxCurrWithTPTInLast7Months",
             EptsReportUtils.map(
-                tPTCompletionCohortQueries.getTxCurrWithTPTInLast7Months(), mappings3));
+                tPTCompletionCohortQueries.getTxCurrWithTPTInLast7Months(), mappings));
 
     CohortIndicator txCurrEligibleForTPTInitiation =
         eptsGeneralIndicator.getIndicator(
