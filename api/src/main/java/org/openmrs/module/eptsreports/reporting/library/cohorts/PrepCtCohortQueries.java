@@ -900,6 +900,8 @@ public class PrepCtCohortQueries {
             hivMetadata.getCoupleResultsAreDifferentConcept());
     CohortDefinition exclusion = getPatientsOnTargetGroup(conceptExcluions);
 
+    CohortDefinition female = genderCohortQueries.femaleCohort();
+
     cd.addSearch(
         "PregnantWoman",
         EptsReportUtils.map(
@@ -915,7 +917,9 @@ public class PrepCtCohortQueries {
         EptsReportUtils.map(
             Keypop, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
-    cd.setCompositionString("PregnantWoman AND NOT (Exclusion OR KeyPopulation)");
+    cd.addSearch("female", EptsReportUtils.map(female, ""));
+
+    cd.setCompositionString("(PregnantWoman AND female) AND NOT (Exclusion OR KeyPopulation)");
 
     return cd;
   }
