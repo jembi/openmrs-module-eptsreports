@@ -62,6 +62,8 @@ public class PrepCtDataset extends BaseDataSet {
         "prepInterruption",
         EptsReportUtils.map(
             eptsCommonDimension.getClientsWithReasonForPrepInterruptionDisaggregation(), mappings));
+    dsd.addDimension(
+        "prepType", EptsReportUtils.map(eptsCommonDimension.getPrepTypeDimension(), mappings));
 
     dsd.addColumn(
         "TOTAL-CT",
@@ -80,7 +82,25 @@ public class PrepCtDataset extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "Oral", EptsReportUtils.map(prepCtCohortQueries.getPREPCTNumerator(), mappings)),
             mappings),
-        "");
+        "prepType=oral");
+
+    dsd.addColumn(
+        "INJECTIBLE-CT",
+        "Injectible",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Oral", EptsReportUtils.map(prepCtCohortQueries.getPREPCTNumerator(), mappings)),
+            mappings),
+        "prepType=injectible");
+
+    dsd.addColumn(
+        "OTHER-CT",
+        "Vaginal Ring",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Oral", EptsReportUtils.map(prepCtCohortQueries.getPREPCTNumerator(), mappings)),
+            mappings),
+        "prepType=vaginalRing");
 
     dsd.addColumn(
         "PID-CT",
@@ -101,16 +121,6 @@ public class PrepCtDataset extends BaseDataSet {
                 EptsReportUtils.map(prepCtCohortQueries.getPREPCTNumerator(), mappings)),
             mappings),
         "KP=MSM");
-
-    dsd.addColumn(
-        "TG-CT",
-        "PREP CT: Transgender",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Transgender",
-                EptsReportUtils.map(prepCtCohortQueries.getPREPCTNumerator(), mappings)),
-            mappings),
-        "KP=TG");
 
     dsd.addColumn(
         "SW-CT",

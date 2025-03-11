@@ -484,6 +484,8 @@ public class EptsCommonDimension {
     CohortDefinition maleSexWorkersKeyPopCohort =
         prepCtCohortQueries.getMalePatientsWhoAreSexWorker();
     CohortDefinition outroKeyPopCohort = prepCtCohortQueries.getPatientsWhoAreOutro();
+    CohortDefinition outroOrTransgenderKeyPopCohort =
+        prepCtCohortQueries.getPatientsWhoAreOutroOrTransgender();
     dim.addCohortDefinition("PID", mapStraightThrough(drugUserKeyPopCohort));
     dim.addCohortDefinition("MSM", mapStraightThrough(homosexualKeyPopCohort));
     dim.addCohortDefinition("PRI", mapStraightThrough(imprisonmentKeyPopCohort));
@@ -491,6 +493,7 @@ public class EptsCommonDimension {
     dim.addCohortDefinition("SW", mapStraightThrough(femaleSexWorkersKeyPopCohort));
     dim.addCohortDefinition("OUT", mapStraightThrough(outroKeyPopCohort));
     dim.addCohortDefinition("MSW", mapStraightThrough(maleSexWorkersKeyPopCohort));
+    dim.addCohortDefinition("OTHERTG", mapStraightThrough(outroOrTransgenderKeyPopCohort));
 
     return dim;
   }
@@ -1250,6 +1253,35 @@ public class EptsCommonDimension {
             pmtctHeiCohortQueries.getInfantsWithConfirmedArtInitiation(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
+    return dim;
+  }
+
+  /**
+   * Dimension for returning patients Last PREP Types during period
+   *
+   * @return @{@link CohortDefinitionDimension}
+   */
+  public CohortDefinitionDimension getPrepTypeDimension() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.addParameter(new Parameter("startDate", "startDate", Date.class));
+    dim.addParameter(new Parameter("endDate", "endDate", Date.class));
+    dim.addParameter(new Parameter("location", "location", Location.class));
+    dim.setName("Patients Last PREP Types during period");
+    dim.addCohortDefinition(
+        "oral",
+        EptsReportUtils.map(
+            prepCtCohortQueries.getPatientsWithLastPrepTypeEqualToOral(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    dim.addCohortDefinition(
+        "injectible",
+        EptsReportUtils.map(
+            prepCtCohortQueries.getPatientsWithLastPrepTypeEqualToInjectable(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    dim.addCohortDefinition(
+        "vaginalRing",
+        EptsReportUtils.map(
+            prepCtCohortQueries.getPatientsWithLastPrepTypeEqualToVaginalRing(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     return dim;
   }
 }

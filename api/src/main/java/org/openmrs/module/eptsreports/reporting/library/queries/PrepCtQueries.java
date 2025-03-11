@@ -989,4 +989,61 @@ public class PrepCtQueries {
 
     return stringSubstitutor.replace(query);
   }
+
+  /**
+   * The system will include clients from the PrEP_CT numerator (PREP_CT_FR2) in the PrEP type
+   * disaggregation as follows:
+   *
+   * <ul>
+   *   <li>Oral: Clents with the responses “Oral-Diario” or “Oral-Sob Demanda” registered for the
+   *       field “Tipo de PrEP” on the “Ficha de Consulta Inicial PrEP” or “Ficha de Consulta de
+   *       Seguimento PrEP” registered during the period.
+   *   <li>Injectable: Clients with the response “Injectável” registered for the field “Tipo de
+   *       PrEP” on the “Ficha de Consulta Inicial PrEP” or “Ficha de Consulta de Seguimento PrEP”
+   *       registered during the period.
+   *   <li>Other: Clients with the response “Anel” registered for the field “Tipo de PrEP” on the
+   *       “Ficha de Consulta Inicial PrEP” or “Ficha de Consulta de Seguimento PrEP” registered
+   *       during the period.
+   * </ul>
+   *
+   * @return {@link String}
+   */
+  public static String getPatientsWithLastPrepTypeDuringPeriod() {
+
+    return "SELECT p.patient_id, MAX(e.encounter_datetime) AS max_date "
+        + "FROM patient p "
+        + "    INNER JOIN encounter e ON e.patient_id = p.patient_id "
+        + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+        + "AND e.location_id = :location "
+        + "AND e.encounter_type IN (${81}, ${80}) "
+        + "AND o.concept_id = ${165516} "
+        + "AND o.value_coded IN (${165517}, ${165518}) "
+        + "AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+        + "GROUP BY p.patient_id "
+        + "UNION "
+        + "SELECT p.patient_id, MAX(e.encounter_datetime) AS max_date "
+        + "FROM patient p "
+        + "         INNER JOIN encounter e ON e.patient_id = p.patient_id "
+        + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+        + "  AND e.location_id = :location "
+        + "  AND e.encounter_type IN (${81}, ${80}) "
+        + "  AND o.concept_id = ${165516} "
+        + "  AND o.value_coded = ${21959} "
+        + "  AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+        + "GROUP BY p.patient_id "
+        + "UNION "
+        + "SELECT p.patient_id, MAX(e.encounter_datetime) AS max_date "
+        + "FROM patient p "
+        + "         INNER JOIN encounter e ON e.patient_id = p.patient_id "
+        + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+        + "  AND e.location_id = :location "
+        + "  AND e.encounter_type IN (${81}, ${80}) "
+        + "  AND o.concept_id = ${165516} "
+        + "  AND o.value_coded = ${165514} "
+        + "  AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+        + "GROUP BY p.patient_id";
+  }
 }

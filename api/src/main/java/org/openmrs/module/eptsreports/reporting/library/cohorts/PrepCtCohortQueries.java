@@ -651,6 +651,32 @@ public class PrepCtCohortQueries {
     return cd;
   }
 
+  public CohortDefinition getPatientsWhoAreOutroOrTransgender() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Outro");
+    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition outro = getPatientsWhoAreOutro();
+
+    CohortDefinition transgender = getPatientsWhoAreTransgender();
+
+    cd.addSearch(
+        "outro",
+        EptsReportUtils.map(
+            outro, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "transgender",
+        EptsReportUtils.map(
+            transgender, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.setCompositionString("outro OR transgender");
+
+    return cd;
+  }
+
   public CohortDefinition getFemalePatientsWhoAreSexWorker() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Sex Worker");
@@ -816,8 +842,8 @@ public class PrepCtCohortQueries {
   public CohortDefinition getPatientsWhoAreBreastfeeding() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Breastfeeding");
-    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
-    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition breastfeeding =
@@ -830,6 +856,8 @@ public class PrepCtCohortQueries {
             hivMetadata.getMilitaryOrPoliceConcept(),
             hivMetadata.getCoupleResultsAreDifferentConcept());
     CohortDefinition exclusion = getPatientsOnTargetGroup(conceptExcluions);
+
+    CohortDefinition female = genderCohortQueries.femaleCohort();
 
     cd.addSearch(
         "breastfeedingWoman",
@@ -846,7 +874,9 @@ public class PrepCtCohortQueries {
         EptsReportUtils.map(
             exclusion, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
-    cd.setCompositionString("breastfeedingWoman AND NOT (exclusion OR KeyPopulation)");
+    cd.addSearch("female", EptsReportUtils.map(female, ""));
+
+    cd.setCompositionString("(breastfeedingWoman AND female) AND NOT (exclusion OR KeyPopulation)");
 
     return cd;
   }
@@ -870,6 +900,8 @@ public class PrepCtCohortQueries {
             hivMetadata.getCoupleResultsAreDifferentConcept());
     CohortDefinition exclusion = getPatientsOnTargetGroup(conceptExcluions);
 
+    CohortDefinition female = genderCohortQueries.femaleCohort();
+
     cd.addSearch(
         "PregnantWoman",
         EptsReportUtils.map(
@@ -885,7 +917,9 @@ public class PrepCtCohortQueries {
         EptsReportUtils.map(
             Keypop, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
-    cd.setCompositionString("PregnantWoman AND NOT (Exclusion OR KeyPopulation)");
+    cd.addSearch("female", EptsReportUtils.map(female, ""));
+
+    cd.setCompositionString("(PregnantWoman AND female) AND NOT (Exclusion OR KeyPopulation)");
 
     return cd;
   }
@@ -1060,5 +1094,181 @@ public class PrepCtCohortQueries {
     cd.setCompositionString("(sexWorker AND male) AND NOT drugUser");
 
     return cd;
+  }
+
+  /**
+   * The system will include clients from the PrEP_CT numerator (PREP_CT_FR2) in the PrEP type
+   * disaggregation as follows:
+   *
+   * <ul>
+   *   <li>Oral: Clents with the responses “Oral-Diario” or “Oral-Sob Demanda” registered for the
+   *       field “Tipo de PrEP” on the “Ficha de Consulta Inicial PrEP” or “Ficha de Consulta de
+   *       Seguimento PrEP” registered during the period.
+   * </ul>
+   *
+   * Note 1: Clients with no response (Blank) for the field “Tipo de PrEP” on the selected “Ficha de
+   * Consulta Inicial PrEP” or “Ficha de Consulta de Seguimento PrEP” registered during the period
+   * will not be included in this disaggregation, and therefore the total of the disaggregation may
+   * not be equal to the PrEP_CT total.
+   *
+   * <p>Note 2: The PrEP type registered on the most recent “Ficha de Consulta Inicial PrEP” or
+   * “Ficha de Consulta de Seguimento PrEP” falling during the reporting period should be considered
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithLastPrepTypeEqualToOral() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Oral Prep Type");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("80", hivMetadata.getPrepInicialEncounterType().getEncounterTypeId());
+    map.put("81", hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId());
+    map.put("165516", hivMetadata.getTypeOfPrepConcept().getConceptId());
+    map.put("165517", hivMetadata.getOralOnDemandConcept().getConceptId());
+    map.put("165518", hivMetadata.getOralDiaryConcept().getConceptId());
+    map.put("21959", hivMetadata.getInjectableConcept().getConceptId());
+    map.put("165514", hivMetadata.getVaginalRingConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM patient p "
+            + "         INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "         INNER JOIN ( "
+            + PrepCtQueries.getPatientsWithLastPrepTypeDuringPeriod()
+            + "         ) prep_type ON p.patient_id = prep_type.patient_id  "
+            + "WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type IN (${81}, ${80}) "
+            + "  AND o.concept_id = ${165516} "
+            + "  AND o.value_coded IN (${165517}, ${165518}) "
+            + "  AND e.encounter_datetime = prep_type.max_date ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    String mappedQuery = stringSubstitutor.replace(query);
+
+    sqlCohortDefinition.setQuery(mappedQuery);
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * The system will include clients from the PrEP_CT numerator (PREP_CT_FR2) in the PrEP type
+   * disaggregation as follows:
+   * <li>Injectable: Clients with the response “Injectável” registered for the field “Tipo de PrEP”
+   *     on the “Ficha de Consulta Inicial PrEP” or “Ficha de Consulta de Seguimento PrEP”
+   *     registered during the period.
+   *
+   *     <p>Note 1: Clients with no response (Blank) for the field “Tipo de PrEP” on the selected
+   *     “Ficha de Consulta Inicial PrEP” or “Ficha de Consulta de Seguimento PrEP” registered
+   *     during the period will not be included in this disaggregation, and therefore the total of
+   *     the disaggregation may not be equal to the PrEP_CT total.
+   *
+   *     <p>Note 2: The PrEP type registered on the most recent “Ficha de Consulta Inicial PrEP” or
+   *     “Ficha de Consulta de Seguimento PrEP” falling during the reporting period should be
+   *     considered
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithLastPrepTypeEqualToInjectable() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Injectable Prep Type");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("80", hivMetadata.getPrepInicialEncounterType().getEncounterTypeId());
+    map.put("81", hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId());
+    map.put("165516", hivMetadata.getTypeOfPrepConcept().getConceptId());
+    map.put("165517", hivMetadata.getOralOnDemandConcept().getConceptId());
+    map.put("165518", hivMetadata.getOralDiaryConcept().getConceptId());
+    map.put("21959", hivMetadata.getInjectableConcept().getConceptId());
+    map.put("165514", hivMetadata.getVaginalRingConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM patient p "
+            + "         INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "         INNER JOIN ( "
+            + PrepCtQueries.getPatientsWithLastPrepTypeDuringPeriod()
+            + "         ) prep_type ON p.patient_id = prep_type.patient_id  "
+            + "WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type IN (${81}, ${80}) "
+            + "  AND o.concept_id = ${165516} "
+            + "  AND o.value_coded = ${21959} "
+            + "  AND e.encounter_datetime = prep_type.max_date ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    String mappedQuery = stringSubstitutor.replace(query);
+
+    sqlCohortDefinition.setQuery(mappedQuery);
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * The system will include clients from the PrEP_CT numerator (PREP_CT_FR2) in the PrEP type
+   * disaggregation as follows:
+   * <li>Other: Clients with the response “Anel” registered for the field “Tipo de PrEP” on the
+   *     “Ficha de Consulta Inicial PrEP” or “Ficha de Consulta de Seguimento PrEP” registered
+   *     during the period.
+   *
+   *     <p>Note 1: Clients with no response (Blank) for the field “Tipo de PrEP” on the selected
+   *     “Ficha de Consulta Inicial PrEP” or “Ficha de Consulta de Seguimento PrEP” registered
+   *     during the period will not be included in this disaggregation, and therefore the total of
+   *     the disaggregation may not be equal to the PrEP_CT total.
+   *
+   *     <p>Note 2: The PrEP type registered on the most recent “Ficha de Consulta Inicial PrEP” or
+   *     “Ficha de Consulta de Seguimento PrEP” falling during the reporting period should be
+   *     considered
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithLastPrepTypeEqualToVaginalRing() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Vaginal Ring Prep Type");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("80", hivMetadata.getPrepInicialEncounterType().getEncounterTypeId());
+    map.put("81", hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId());
+    map.put("165516", hivMetadata.getTypeOfPrepConcept().getConceptId());
+    map.put("165517", hivMetadata.getOralOnDemandConcept().getConceptId());
+    map.put("165518", hivMetadata.getOralDiaryConcept().getConceptId());
+    map.put("21959", hivMetadata.getInjectableConcept().getConceptId());
+    map.put("165514", hivMetadata.getVaginalRingConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM patient p "
+            + "         INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "         INNER JOIN ( "
+            + PrepCtQueries.getPatientsWithLastPrepTypeDuringPeriod()
+            + "         ) prep_type ON p.patient_id = prep_type.patient_id  "
+            + "WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type IN (${81}, ${80}) "
+            + "  AND o.concept_id = ${165516} "
+            + "  AND o.value_coded = ${165514} "
+            + "  AND e.encounter_datetime = prep_type.max_date ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    String mappedQuery = stringSubstitutor.replace(query);
+
+    sqlCohortDefinition.setQuery(mappedQuery);
+
+    return sqlCohortDefinition;
   }
 }
