@@ -842,8 +842,8 @@ public class PrepCtCohortQueries {
   public CohortDefinition getPatientsWhoAreBreastfeeding() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Breastfeeding");
-    cd.addParameter(new Parameter("onOrBefore", "Start Date", Date.class));
-    cd.addParameter(new Parameter("onOrAfter", "end Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition breastfeeding =
@@ -856,6 +856,8 @@ public class PrepCtCohortQueries {
             hivMetadata.getMilitaryOrPoliceConcept(),
             hivMetadata.getCoupleResultsAreDifferentConcept());
     CohortDefinition exclusion = getPatientsOnTargetGroup(conceptExcluions);
+
+    CohortDefinition female = genderCohortQueries.femaleCohort();
 
     cd.addSearch(
         "breastfeedingWoman",
@@ -872,7 +874,9 @@ public class PrepCtCohortQueries {
         EptsReportUtils.map(
             exclusion, "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
-    cd.setCompositionString("breastfeedingWoman AND NOT (exclusion OR KeyPopulation)");
+    cd.addSearch("female", EptsReportUtils.map(female, ""));
+
+    cd.setCompositionString("(breastfeedingWoman AND female) AND NOT (exclusion OR KeyPopulation)");
 
     return cd;
   }
