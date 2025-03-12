@@ -2773,8 +2773,8 @@ public class TPTCompletionCohortQueries {
             + "     MIN(inh.start_date) AS inh_start_date "
             + "     FROM ( "
             + Y
-            + "     GROUP BY inh.patient_id "
             + "     ) inh "
+            + "     GROUP BY inh.patient_id "
             + " ) inh_start ON inh_start.patient_id = p.patient_id "
             + "       WHERE p.voided =0 AND e.voided = 0 AND o.voided=0 AND o2.voided=0 "
             + "             AND e.encounter_type = ${53} AND e.location_id = :location "
