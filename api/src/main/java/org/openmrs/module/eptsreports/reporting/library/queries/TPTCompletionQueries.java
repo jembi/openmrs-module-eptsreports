@@ -57,7 +57,7 @@ public class TPTCompletionQueries {
             .concat(
                 duringPeriod
                     ? "  and o2.obs_datetime >= :startDate and o2.obs_datetime <= :endDate "
-                    : " and o2.obs_datetime <= :endDate ")
+                    : " and o2.obs_datetime < :endDate ")
         + " )  "
         + "UNION  "
         + "SELECT p.patient_id, "
