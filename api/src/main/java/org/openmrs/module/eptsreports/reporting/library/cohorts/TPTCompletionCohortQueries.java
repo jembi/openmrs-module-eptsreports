@@ -339,7 +339,7 @@ public class TPTCompletionCohortQueries {
 
     definition.addSearch("A3", EptsReportUtils.map(getINHStartA6(true), mapping3));
 
-    definition.addSearch("A4", EptsReportUtils.map(getINHStartA4(true), mapping3));
+    definition.addSearch("A4", EptsReportUtils.map(getINHStartA4(false), mapping3));
     definition.addSearch("A", EptsReportUtils.map(getPatientsInitiatedARTbyPeriod(), mapping));
 
     //    TREATMENT END DEFINITIONS
