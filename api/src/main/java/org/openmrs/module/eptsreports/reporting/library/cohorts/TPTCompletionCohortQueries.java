@@ -71,6 +71,8 @@ public class TPTCompletionCohortQueries {
   private final String mapping = "endDate=${endDate},location=${location}";
   private final String mapping2 = "onOrBefore=${endDate},location=${location}";
   private final String mapping3 = "startDate=${startDate},endDate=${endDate},location=${location}";
+  private final String mapping4 =
+      "startDate=${startDate},endDate=${endDate+1d},location=${location}";
 
   public CohortDefinition getPatientsThatCompletedProphylaticTreatment() {
     CalculationCohortDefinition cd =
@@ -634,7 +636,7 @@ public class TPTCompletionCohortQueries {
    *   <li>From all patients currently receiving ART who do not have a documented TPT Completion
    *       (TPT_FR8), the system will identify those who have initiated TPT in the past 7 months as
    *       follows: Patients who have Initiated TPT (TB_PREV - Denominator) in a 7-month period
-   *       before the end date.
+   *       before and including the reporting end date.
    *       <p>
    *       <p>For the 7-month period:
    *       <p>Start Date = Selected End Date – 210 days
@@ -659,7 +661,7 @@ public class TPTCompletionCohortQueries {
         "tpt1", EptsReportUtils.map(getTxCurrWithoutTPTCompletion(), mapping3));
 
     compositionCohortDefinition.addSearch(
-        "G", EptsReportUtils.map(getTbPrevDenominatorForTPTCompletion(), mapping3));
+        "G", EptsReportUtils.map(getTbPrevDenominatorForTPTCompletion(), mapping4));
 
     compositionCohortDefinition.setCompositionString("tpt1 AND G");
 
