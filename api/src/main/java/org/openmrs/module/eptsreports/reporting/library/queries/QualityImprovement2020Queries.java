@@ -274,33 +274,33 @@ public class QualityImprovement2020Queries {
    *
    * <ul>
    *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como “GA” e
-   *       o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida há 24
-   *       meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
-   *       Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
+   *       o respectivo “Estado” = “Início” na última consulta clínica (“Ficha Clínica”) decorrida
+   *       há 24 meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data
+   *       Consulta Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
    *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como “DT” e
-   *       o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida há 24
-   *       meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
-   *       Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
+   *       o respectivo “Estado” = “Início” na última consulta clínica (“Ficha Clínica”) decorrida
+   *       há 24 meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data
+   *       Consulta Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
    *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como “APE” e
-   *       o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida há 24
-   *       meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
-   *       Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
+   *       o respectivo “Estado” = “Início” na última consulta clínica (“Ficha Clínica”) decorrida
+   *       há 24 meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data
+   *       Consulta Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
    *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como “DD” e
-   *       o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida há 24
-   *       meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
-   *       Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
+   *       o respectivo “Estado” = “Início” na última consulta clínica (“Ficha Clínica”) decorrida
+   *       há 24 meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data
+   *       Consulta Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
    *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como “DS” e
-   *       o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida há 24
-   *       meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
-   *       Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
+   *       o respectivo “Estado” = “Início” na última consulta clínica (“Ficha Clínica”) decorrida
+   *       há 24 meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data
+   *       Consulta Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
    *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como “FR” e
-   *       o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida há 24
-   *       meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
-   *       Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
+   *       o respectivo “Estado” = “Início” na última consulta clínica (“Ficha Clínica”) decorrida
+   *       há 24 meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data
+   *       Consulta Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
    *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como “DA” e
-   *       o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida há 24
-   *       meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
-   *       Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
+   *       o respectivo “Estado” = “Início” na última consulta clínica (“Ficha Clínica”) decorrida
+   *       há 24 meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data
+   *       Consulta Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
    * </ul>
    *
    * @return SqlCohortDefinition
@@ -328,14 +328,31 @@ public class QualityImprovement2020Queries {
             + "           INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "           INNER JOIN obs otype ON otype.encounter_id = e.encounter_id "
             + "           INNER JOIN obs ostate ON ostate.encounter_id = e.encounter_id "
+            + "           INNER JOIN ( "
+            + "                   SELECT p.patient_id, MAX(e.encounter_datetime) last_mds "
+            + "                       FROM patient p "
+            + "                                INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                INNER JOIN obs o2 ON o.encounter_id = e.encounter_id "
+            + "                       WHERE p.voided = 0 "
+            + "                         AND e.voided = 0 "
+            + "                         AND o.voided = 0 "
+            + "                         AND o2.voided = 0 "
+            + "                         AND o.concept_id =  ${165174} "
+            + "                         AND o2.concept_id =  ${165322} "
+            + "                         AND e.encounter_type = ${6} "
+            + "                         AND e.encounter_datetime >= :startDate "
+            + "                         AND e.encounter_datetime <= :endDate "
+            + "                         AND o.obs_group_id = o2.obs_group_id "
+            + "                       GROUP BY p.patient_id"
+            + "           ) last_consultation ON last_consultation.patient_id = p.patient_id "
             + "WHERE  e.encounter_type = ${6} "
             + "  AND e.location_id = :location "
             + "  AND otype.concept_id = ${165174} "
             + "  AND otype.value_coded IN (${dispensationTypes}) "
             + "  AND ostate.concept_id = ${165322} "
             + "  AND ostate.value_coded IN (${states}) "
-            + "  AND e.encounter_datetime >= :startDate "
-            + "  AND e.encounter_datetime <= :endDate "
+            + "  AND e.encounter_datetime = last_consultation.last_mds "
             + "  AND otype.obs_group_id = ostate.obs_group_id "
             + "  AND e.voided = 0 "
             + "  AND p.voided = 0 "
