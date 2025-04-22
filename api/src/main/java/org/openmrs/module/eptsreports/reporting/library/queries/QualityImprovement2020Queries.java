@@ -2274,11 +2274,12 @@ public class QualityImprovement2020Queries {
   }
 
   /**
-   * <b>RF14</b>: Select all patients who restarted ART for at least 6 months following: all
-   * patients who have “Mudança de Estado de Permanência TARV”=”Reinício” na Ficha Clínica durante o
-   * período de inclusão (“Data Consulta Reinício TARV” >= “Data Início Inclusão” e <= “Data Fim
-   * Inclusão”), where “Data Última Consulta” durante o período de revisão, menos (-) “Data Consulta
-   * Reinício TARV” maior ou igual (>=) a 6 meses
+   * <b>RF14</b>: incluindo os utentes que reiniciaram TARV há pelo menos 6 meses, ou seja,
+   * incluindo todos os utentes que têm o registo de “Mudança de Estado de Permanência TARV” =
+   * “Reinício” na Ficha Clínica durante o período de inclusão (“Data Consulta Reinício TARV” >=
+   * “Data Início Inclusão” e <= “Data Fim Inclusão”), sendo a “Data Última Consulta” durante o
+   * período de revisão, menos (-) “Data Consulta Reinício TARV” maior (>) a 165 dias. Nota: “Data
+   * Última Consulta” é a data da última consulta clínica ocorrida durante o período de revisão.
    *
    * @return {@link String}
    */
@@ -2319,8 +2320,8 @@ public class QualityImprovement2020Queries {
         + "          AND e.encounter_datetime <= :endDate "
         + "          AND e.location_id = :location "
         + "        GROUP  BY p.patient_id) restarted "
-        + "WHERE  Timestampdiff(month, restarted.the_time,  "
-        + "                  restarted.last_consultation_date   ) >= 6";
+        + "WHERE  Timestampdiff(day, restarted.the_time,  "
+        + "                  restarted.last_consultation_date   ) > 165";
   }
 
   /**

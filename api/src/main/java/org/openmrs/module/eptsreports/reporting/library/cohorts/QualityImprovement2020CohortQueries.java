@@ -4862,13 +4862,14 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * <b>MQC13Part3B2</b>: B2NEW P1_2 <br>
+   * <b>RF15</b>: Utentes em 2ª Linha elegíveis ao pedido de CV <br>
    *
    * <ul>
-   *   <li>B2NEW P1_2- Select all patients who have the REGIME ARV SEGUNDA LINHA (Concept Id 21187,
-   *       value coded different NULL) recorded in Ficha Resumo (encounter type 53) and obs_datetime
-   *       >= inclusionStartDate and <= revisionEndDate AND at least for 6 months ( “Last Clinical
-   *       Consultation” (last encounter_datetime from B1) minus obs_datetime(from B2) >= 6 months)
+   *   <li>incluindo os utentes há pelo menos 6 meses na 2ª Linha de TARV, ou seja, incluindo todos
+   *       os utentes que têm o último registo de “Regime ARV Segunda Linha” na Ficha Resumo durante
+   *       o período de revisão (“Data Última 2ª Linha” >= “Data Início Revisão” e <= “Data Fim
+   *       Revisão”), sendo a “Data Última 2ª Linha” menos (-) “Data Última Consulta” maior (>) a
+   *       165 dias
    *
    * @return CohortDefinition
    */
@@ -4918,7 +4919,7 @@ public class QualityImprovement2020CohortQueries {
             + "       AND o.value_coded IS NOT NULL "
             + "       AND o.obs_datetime >= :startDate "
             + "       AND o.obs_datetime <= :revisionEndDate "
-            + "       AND TIMESTAMPDIFF(MONTH, o.obs_datetime,  last_clinical.last_visit) >= 6";
+            + "       AND TIMESTAMPDIFF(DAY, o.obs_datetime,  last_clinical.last_visit) > 165";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -5410,6 +5411,9 @@ public class QualityImprovement2020CohortQueries {
    * a “Carga Viral”, na Ficha Clínica nos últimos 12 meses da última consulta clínica (“Data Pedido
    * CV” >= “Data Última Consulta” menos (-) 12meses e < “Data Última Consulta”).</i> <br>
    * <br>
+   * <i>excluindo todos os utentes “Transferido de” outra US (seguindo os critérios definidos no
+   * RF6)</i><br>
+   * <br>
    * <i> <b>Nota: “Data Última Consulta” é a data da última consulta clínica ocorrida durante o
    * período de revisão.</i> <br>
    * <br>
@@ -5514,7 +5518,7 @@ public class QualityImprovement2020CohortQueries {
     MQ {
       @Override
       public String getCompositionString() {
-        return "(B2NEW OR RESTARTED OR (B3MQ AND NOT B3EMQ) ) AND NOT (ABANDONEDTARV OR B5EMQ)";
+        return "(B2NEW OR RESTARTED OR (B3MQ AND NOT B3EMQ) ) AND NOT (ABANDONEDTARV OR B5EMQ OR TRANSFERREDIN)";
       }
 
       @Override
@@ -5543,7 +5547,7 @@ public class QualityImprovement2020CohortQueries {
     MQ {
       @Override
       public String getCompositionString() {
-        return "(secondLineB2 AND NOT B2E) AND NOT (ABANDONEDTARV OR B5E)";
+        return "(secondLineB2 AND NOT B2E) AND NOT (ABANDONEDTARV OR B5E OR TRANSFERREDIN)";
       }
 
       @Override
@@ -5591,6 +5595,9 @@ public class QualityImprovement2020CohortQueries {
    * a “Carga Viral”, na Ficha Clínica nos últimos 12 meses da última consulta clínica (“Data Pedido
    * CV”>= “Data Última Consulta” menos (-) 12meses e < “Data Última Consulta”). Nota: “Data Última
    * Consulta” é a data da última consulta clínica ocorrida durante o período de revisão.</i> <br>
+   * <br>
+   * <i>excluindo todos os utentes “Transferido de” outra US (seguindo os critérios definidos no
+   * RF6)</i><br>
    * <br>
    */
   public CohortDefinition getUtentesSegundaLinha(UtentesSegundaLinhaPreposition preposition) {
@@ -13128,10 +13135,10 @@ public class QualityImprovement2020CohortQueries {
    * <b>MQC11B2</b>: Utentes em 1ª Linha elegíveis ao pedido de CV <br>
    *
    * <ul>
-   *   Todos utentes que Mudaram de Regime na 1ª Linha de TARV há pelo menos 6 meses, ou seja,
-   *   incluindo todos os utentes que têm o último registo da “Alternativa a Linha – 1ª Linha” na
-   *   Ficha Resumo, sendo a “Data Última Alternativa 1ª Linha” menos (-) “Data Última Consulta”
-   *   maior ou igual (>=) a 6 meses
+   *   incluindo os utentes que Mudaram de Regime na 1ª Linha de TARV há pelo menos 6 meses, ou
+   *   seja, incluindo todos os utentes que têm o último registo da “Alternativa a Linha – 1ª Linha”
+   *   na Ficha Resumo, sendo a “Data Última Alternativa 1ª Linha” menos (-) “Data Última Consulta”
+   *   maior (>) a 165 dias.
    * </ul>
    *
    * @return {@link CohortDefinition}
@@ -13140,7 +13147,7 @@ public class QualityImprovement2020CohortQueries {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
-        "utentes que Mudaram de Regime na 1ª Linha de TARV há pelo menos 6 meses");
+        "Utentes que Mudaram de Regime na 1ª Linha de TARV há mais de 165 dias");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
@@ -13195,8 +13202,8 @@ public class QualityImprovement2020CohortQueries {
             + "                          AND e.location_id = :location "
             + "                   GROUP  BY p.patient_id) regimen_change "
             + "               ON regimen_change.patient_id = p.patient_id "
-            + "WHERE  Timestampdiff(month, regimen_change.first_line_date, "
-            + "              last_consultation.encounter_datetime) >= 6 "
+            + "WHERE  Timestampdiff(day, regimen_change.first_line_date, "
+            + "              last_consultation.encounter_datetime) > 165 "
             + "GROUP  BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);

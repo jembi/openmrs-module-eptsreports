@@ -628,18 +628,19 @@ public class CommonCohortQueries {
   }
 
   /**
-   * <b>Description:</b>B2-NEW MOH Patients on Treatments for 6 Months
-   *
-   * <p><b>Technical Specs</b>
+   * <b>MQ Cat 13 - RF14: Utentes em 1ª Linha elegíveis ao pedido de CV</b>
    *
    * <blockquote>
    *
-   * B2 NEW - B2New - Select all patients with “LINHA TERAPEUTICA” (Concept Id 21151) equal to
-   * “PRIMEIRA LINHA” (concept id 21150) recorded in the Last Clinical Consultation (encounter type
-   * 6, encounter_datetime) occurred during the period (encounter_datetime >= startDateInclusion and
-   * <= endDateRevision) and Last Clinical Consultation Date (encounter_datetime) minus “Patient ART
-   * Start Date” (Concept Id 1190, value_datetime) recorded in Ficha Resumo (encounter type 53,
-   * encounter_datetime) >= 6 months)
+   * incluindo os utentes há pelo menos 6 meses na 1ª Linha de TARV, ou seja, incluindo todos os
+   * utentes que têm o último registo da “Linha Terapêutica” na Ficha Clínica durante o período de
+   * revisão igual a “1ª Linha” (última consulta, “Data 1ª Linha”>= “Data Início Revisão” e <= “Data
+   * Fim Revisão”), sendo a “Data 1ª Linha” menos (-) “Data do Início TARV” registada na Ficha
+   * Resumo maior (>) 165 dias
+   *
+   * <p>Nota: “Data do Início TARV” é a data início TARV registada na “Ficha Resumo”,
+   * independentemente do período. Caso exista o registo de mais que uma “Ficha Resumo” deve-se
+   * considerar a data de início TARV mais antiga.
    *
    * </blockquote>
    *
@@ -717,7 +718,7 @@ public class CommonCohortQueries {
         + "              AND p.voided = 0 "
         + "              AND e.voided = 0 "
         + "              AND o.voided = 0) arv_start_date ON arv_start_date.patient_id = pa.patient_id "
-        + "          AND DATE(arv_start_date.arv_date) <= DATE_SUB(first_line.encounter_datetime, INTERVAL 6 MONTH) "
+        + "          AND DATE(arv_start_date.arv_date) <= DATE_SUB(first_line.encounter_datetime, INTERVAL 165 DAY) "
         + " GROUP BY pa.patient_id ";
   }
 
