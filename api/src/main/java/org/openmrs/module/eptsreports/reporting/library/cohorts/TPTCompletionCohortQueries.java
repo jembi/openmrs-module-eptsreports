@@ -503,7 +503,7 @@ public class TPTCompletionCohortQueries {
         "TRFOUT", EptsReportUtils.map(tbPrevCohortQueries.getPatientsTransferredOut(), mapping3));
 
     definition.setCompositionString(
-        "(A AND  (A1 OR A2 OR A3 OR A4) OR (C1 OR C2 OR C3 OR C4 OR C5) ) AND NOT (TRFOUT OR B1B OR B2 OR B5Part1 OR B5Part2 OR B5Part3 OR B6Part1 OR B6Part2 OR B6Part3 OR D1 OR D2 OR D3 OR D4 OR D5)");
+        "(A AND  (A1 OR A2 OR A3 OR A4) OR (C1 OR C2 OR C3 OR C4 OR C5) ) AND NOT (TRFOUT AND NOT (B1B OR B2 OR B5Part1 OR B5Part2 OR B5Part3 OR B6Part1 OR B6Part2 OR B6Part3 OR D1 OR D2 OR D3 OR D4 OR D5))");
     return definition;
   }
 
