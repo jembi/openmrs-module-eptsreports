@@ -6070,7 +6070,7 @@ public class QualityImprovement2020CohortQueries {
   /**
    * os utentes que tiveram um registo do Resultado de Carga Viral (quantitativo ou qualitativo) na
    * Ficha Clínica ou na Ficha Resumo (“Última Carga Viral”), entre “Data de Início TARV” mais (+)
-   * 198 dias e “Data de Início TARV” mais (+) 297 dias. Nota: “Data do Início TARV” é a data
+   * 165 dias e “Data de Início TARV” mais (+) 297 dias. Nota: “Data do Início TARV” é a data
    * definida no RF5.1
    *
    * @return CohortDefinition
@@ -6133,7 +6133,7 @@ public class QualityImprovement2020CohortQueries {
             + "                   WHERE  data_inicio BETWEEN :startDate AND :endDate "
             + "                   GROUP  BY patient_id) art_tbl "
             + "               ON cv.patient_id = art_tbl.patient_id "
-            + "WHERE  cv.cv_encounter BETWEEN Date_add(art_tbl.data_inicio, INTERVAL 198 day) "
+            + "WHERE  cv.cv_encounter BETWEEN Date_add(art_tbl.data_inicio, INTERVAL 165 day) "
             + "                               AND "
             + "                                      Date_add(art_tbl.data_inicio, "
             + "                                      INTERVAL 297 day)";
@@ -6147,7 +6147,7 @@ public class QualityImprovement2020CohortQueries {
   /**
    * os utentes que tiveram um registo do Resultado de Carga Viral (quantitativo ou qualitativo) na
    * Ficha Clínica ou na Ficha Resumo (“Última Carga Viral”), entre “Data Última Alternativa 1ª
-   * Linha” mais (+) 198 dias e “Data Última Alternativa 1ª Linha” mais (+) 297 dias.
+   * Linha” mais (+) 165 dias e “Data Última Alternativa 1ª Linha” mais (+) 297 dias.
    *
    * @return CohortDefinition
    */
@@ -6222,7 +6222,7 @@ public class QualityImprovement2020CohortQueries {
             + "                                AND o.value_coded IS NOT NULL ) )) H_tbl "
             + "         ON H_tbl.patient_id = B1.patient_id "
             + "WHERE  H_tbl.encounter_datetime BETWEEN Date_add(B1.regime_date, "
-            + "                                        interval 198 day) AND "
+            + "                                        interval 165 day) AND "
             + "                                               Date_add(B1.regime_date, "
             + "                                               interval 297 day);  ";
 
@@ -6235,7 +6235,7 @@ public class QualityImprovement2020CohortQueries {
   /**
    * I - os utentes que tiveram um registo do Resultado de Carga Viral (quantitativo ou qualitativo)
    * na Ficha Clínica ou na Ficha Resumo (“Última Carga Viral”), entre “Data Última 2ª Linha” mais
-   * (+) 198 dias e “Data Última 2ª Linha” mais (+) 297 dias.
+   * (+) 165 dias e “Data Última 2ª Linha” mais (+) 297 dias.
    *
    * @return CohortDefinition
    */
@@ -6301,7 +6301,7 @@ public class QualityImprovement2020CohortQueries {
             + "             OR ( o.concept_id = ${1305}  "
             + "             AND o.value_coded IS NOT NULL ) )) I_tbl  "
             + "                  ON I_tbl.patient_id = B2.patient_id  "
-            + "         WHERE  I_tbl.encounter_datetime BETWEEN Date_add(B2.regime_date, interval 198 day) AND Date_add(B2.regime_date, interval 297 day)";
+            + "         WHERE  I_tbl.encounter_datetime BETWEEN Date_add(B2.regime_date, interval 165 day) AND Date_add(B2.regime_date, interval 297 day)";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
@@ -10543,7 +10543,7 @@ public class QualityImprovement2020CohortQueries {
   /**
    * J - Select all patients from Ficha Resumo (encounter type 53) with “HIV Carga viral”(Concept id
    * 856, value_numeric not null) and obs_datetime between “Patient ART Start Date” (the oldest date
-   * from A) + 198 days and “Patient ART Start Date” (the oldest date from query A) + 297 days.
+   * from A) + 165 days and “Patient ART Start Date” (the oldest date from query A) + 297 days.
    *
    * @return CohortDefinition
    */
@@ -10596,7 +10596,7 @@ public class QualityImprovement2020CohortQueries {
             + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${856}  "
             + "       AND o.value_numeric IS NOT NULL "
-            + "       AND o.obs_datetime BETWEEN Date_add(tabela.art_date, INTERVAL 198 day)  "
+            + "       AND o.obs_datetime BETWEEN Date_add(tabela.art_date, INTERVAL 165 day)  "
             + "                                  AND  "
             + "                                      Date_add(tabela.art_date, INTERVAL 297 day "
             + "                                      )  "
@@ -10612,7 +10612,7 @@ public class QualityImprovement2020CohortQueries {
   /**
    * K - Select all patients from Ficha Resumo (encounter type 53) with “HIV Carga viral”(Concept id
    * 856, value_numeric not null) and obs_datetimebetween “ALTERNATIVA A LINHA - 1a LINHA Date” (the
-   * most recent date from B1) + 198 days and “ALTERNATIVA A LINHA - 1a LINHA Date” (the most recent
+   * most recent date from B1) + 165 days and “ALTERNATIVA A LINHA - 1a LINHA Date” (the most recent
    * date from B1) +297 days.
    *
    * @return CohortDefinition
@@ -10701,7 +10701,7 @@ public class QualityImprovement2020CohortQueries {
             + "                        AND e.location_id = :location  "
             + "                        AND o.concept_id = ${856} "
             + "                        AND o.value_numeric IS NOT NULL  "
-            + "                        AND o.obs_datetime BETWEEN DATE_ADD(B1.regime_date, INTERVAL 198 DAY)  "
+            + "                        AND o.obs_datetime BETWEEN DATE_ADD(B1.regime_date, INTERVAL 165 DAY)  "
             + "                        AND DATE_ADD(B1.regime_date, INTERVAL 297 DAY) "
             + "                        GROUP BY p.patient_id  ";
 
@@ -10715,7 +10715,7 @@ public class QualityImprovement2020CohortQueries {
   /**
    * L - Select all patients from Ficha Resumo (encounter type 53) with “HIV Carga viral”(Concept id
    * 856, value_numeric not null) and obs_datetime between “Segunda Linha Date” (the most recent
-   * date from B2New) + 198 days and “Segunda Linha Date” (the most recent date from B2New) + 297
+   * date from B2New) + 165 days and “Segunda Linha Date” (the most recent date from B2New) + 297
    * days.
    *
    * @return CohortDefinition
@@ -10781,7 +10781,7 @@ public class QualityImprovement2020CohortQueries {
             + "                        AND e.location_id = :location  "
             + "                        AND o.concept_id = ${856} "
             + "                        AND o.value_numeric IS NOT NULL  "
-            + "                        AND o.obs_datetime BETWEEN DATE_ADD(B2NEW.last_consultation, INTERVAL 198 DAY)   "
+            + "                        AND o.obs_datetime BETWEEN DATE_ADD(B2NEW.last_consultation, INTERVAL 165 DAY)   "
             + "                        AND DATE_ADD(B2NEW.last_consultation, INTERVAL 297 DAY)  "
             + "                        GROUP BY p.patient_id";
 
