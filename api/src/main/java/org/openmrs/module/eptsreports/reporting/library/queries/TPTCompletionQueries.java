@@ -56,7 +56,7 @@ public class TPTCompletionQueries {
         + "      o2.value_coded = ${1257} "
             .concat(
                 duringPeriod
-                    ? "  and o2.obs_datetime >= :startDate and o2.obs_datetime <= :endDate "
+                    ? "  and o2.obs_datetime >= :startDate and o2.obs_datetime < :endDate "
                     : " and o2.obs_datetime < :endDate ")
         + " )  "
         + "UNION  "
