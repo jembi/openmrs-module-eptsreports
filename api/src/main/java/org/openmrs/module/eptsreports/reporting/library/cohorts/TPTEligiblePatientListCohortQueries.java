@@ -2035,15 +2035,16 @@ public class TPTEligiblePatientListCohortQueries {
   }
 
   /**
-   * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
+   * <b>TPT_FR7</b> Patients who completed 3HP Therapy <br>
    *
    * <ul>
-   *   <li>The patient date from M is registered on FILT (encounter type 60, encounter datetime<=
-   *       enddate) and:
-   *   <li>The patient has at least 1 drug pick-up on FILT (encounter type 60) with “Regime de TPT”
-   *       (concept id 23985) value coded “3HP” doxina” (concept id in [23954, 23984]) and “Tipo de
-   *       dispensa” (concept id 23986) with value coded “Trimestral” (concept id 23720) until a
-   *       4-month period from the 3HP Strat Date (date from M.2;) or
+   *   <li>If the 3HP Start Date is on FILT, the system will check if the patient has the following
+   *       number of drug pick-ups in a defined period of months after the 3HP Start Date (Including
+   *       the 3HP Start Date):
+   *       <ul>
+   *         <li>At least 1 drug pick-up registered on FILT with 3HP Trimestral (Regime de TPT= “3HP
+   *             or 3HP+Piridoxina” and Tipo de Dispensa = Trimestral) in the 4-month period
+   *       </ul>
    * </ul>
    *
    * @return CohortDefinition
