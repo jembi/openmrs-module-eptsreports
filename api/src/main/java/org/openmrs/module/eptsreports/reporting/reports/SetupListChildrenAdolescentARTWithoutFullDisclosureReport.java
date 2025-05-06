@@ -106,12 +106,12 @@ public class SetupListChildrenAdolescentARTWithoutFullDisclosureReport
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Template_ListChildrenAdolescentARTWithoutFullDisclosure_v0.3.xls",
+              "SESP_TEMP_List_Revelacao_Diagnostica_v1_1_1.xls",
               "List of Adolescent Children On ART Without Full Disclosure",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:9,dataset:LCA");
+      props.put("repeatingSections", "sheet:1,row:10,dataset:LCA");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
