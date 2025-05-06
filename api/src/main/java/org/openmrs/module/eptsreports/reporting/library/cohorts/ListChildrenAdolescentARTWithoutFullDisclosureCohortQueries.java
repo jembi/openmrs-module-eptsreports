@@ -42,7 +42,8 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
    */
   public CohortDefinition getBaseCohortForAdolescent() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("List Children Adolescent ART Without Full Disclosure - base cohort");
+    cd.setName(
+        "Patients between 8 and 14 yrs of age and on ART (MISAU definition- Indicator B13 of Resumo Mensal) ");
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addSearch(
@@ -52,8 +53,8 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
     cd.addSearch(
         "B13",
         EptsReportUtils.map(
-            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
-            "startDate=${endDate},endDate=${endDate},location=${location}"));
+            resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13(),
+            "endDate=${endDate},location=${location}"));
     cd.setCompositionString("age AND B13");
     return cd;
   }
