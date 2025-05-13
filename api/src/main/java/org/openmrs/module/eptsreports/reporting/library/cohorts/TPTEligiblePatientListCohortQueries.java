@@ -1165,19 +1165,18 @@ public class TPTEligiblePatientListCohortQueries {
   }
 
   /**
-   * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
+   * <b>TPT_FR5</b>:Patients who completed INH Therapy <br>
    *
    * <ul>
-   *   <li>B5 - If the INH Start Date (Y) is registered in Ficha Clinica or Ficha de Seguimento or
-   *       Ficha Resumo, the system will check if the patient has one of the following number of
-   *       consultations in a defined period of months from the INH Start Date to consider the
-   *       patient completed INH treatment:
-   *   <li>At least 5 consultations ((encounter type 6) (encounter type 9) Profilaxia TPT (concept
-   *       id 23985) value coded INH (concept id 656) and Estado da Profilaxia (concept id 165308)
-   *       value coded Início/continua (concept id in [1256,1257]) until a 7-month period after the
-   *       INH Start Date from the date Y2,3 or
-   *   <li>
-   *   <li>
+   *   <li>If the INH Start Date is registered on Ficha Clínica or Ficha de Seguimento or Ficha
+   *       Resumo, the system will check if the patient has the following number of consultations in
+   *       a defined period of months from the INH Start Date:
+   *       <ul>
+   *         <li>At least 5 consultations registered on Ficha Clínica or Ficha de Seguimento (Adulto
+   *             or Pediatria) with INH (Profilaxia TPT=” Isoniazida (INH)” and Estado da
+   *             Profilaxia=”Inicio(I)/Continua(C)”) in the 7-month period after the INH Start Date
+   *             (not Including the INH Start Date
+   *       </ul>
    * </ul>
    *
    * @return {@link CohortDefinition}
@@ -1211,42 +1210,31 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     String query =
-        " SELECT p.patient_id   "
-            + "            FROM   patient p   "
-            + "            INNER JOIN(   "
+        " SELECT tabela.patient_id   "
+            + "            FROM   (   "
             + getPatientWithInhFromY1to3Query(duringPeriod)
-            + " ) AS tabela  ON tabela.patient_id = p.patient_id    "
-            + "                    WHERE p.voided = 0 "
-            + "  AND ( "
-            + "           SELECT     count(e2.encounter_id) "
+            + " ) AS tabela  "
+            + " WHERE ( "
+            + "           SELECT     count(DISTINCT e2.encounter_id) "
             + "           FROM       encounter e2 "
             + "           INNER JOIN obs oo "
             + "           ON         e2.encounter_id = oo.encounter_id "
-            + "           INNER JOIN "
-            + "                      ( "
-            + "                                 SELECT     ee.encounter_id "
-            + "                                 FROM       encounter ee "
-            + "                                 INNER JOIN obs oo "
-            + "                                 ON         oo.encounter_id = ee.encounter_id "
-            + "                                 WHERE      ee.voided = 0 "
-            + "                                 AND        oo.voided = 0 "
-            + "                                 AND        ee.location_id = :location "
-            + "                                 AND        ee.encounter_type IN ( ${6}, "
-            + "                                                                  ${9} ) "
-            + "                                 AND        ( "
-            + "                                                       oo.concept_id = ${23985} "
-            + "                                            AND        oo.value_coded = ${656} ) "
-            + "                                 GROUP BY   ee.encounter_id ) consultations "
-            + "           ON         consultations.encounter_id = e2.encounter_id "
+            + "           INNER JOIN obs oo2 "
+            + "           ON         e2.encounter_id = oo2.encounter_id "
             + "           WHERE      e2.voided = 0 "
             + "           AND        oo.voided = 0 "
-            + "           AND        e2.patient_id = p.patient_id "
-            + "           AND        oo.concept_id = ${165308} "
-            + "           AND        oo.value_coded IN ( ${1256}, ${1257} ) "
-            + "           AND        e2.encounter_datetime <= :endDate "
+            + "           AND        oo2.voided = 0 "
+            + "           AND        e2.location_id = :location "
+            + "           AND        e2.encounter_type IN ( ${6}, ${9} ) "
+            + "           AND        e2.patient_id = tabela.patient_id "
+            + "           AND        oo.concept_id = ${23985} "
+            + "           AND        oo.value_coded = ${656} "
+            + "           AND        oo2.concept_id = ${165308} "
+            + "           AND        oo2.value_coded IN ( ${1256}, ${1257} ) "
             + "           AND        e2.encounter_datetime > tabela.start_date "
-            + "           AND        e2.encounter_datetime <= date_add(tabela.start_date, INTERVAL 7 month) ) >= 5 "
-            + "GROUP BY p.patient_id";
+            + "           AND        e2.encounter_datetime <= date_add(tabela.start_date, INTERVAL 7 month) "
+            + "           AND        e2.encounter_datetime <= :endDate ) >= 5 "
+            + "GROUP BY tabela.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -1933,7 +1921,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                 ) AS tabela "
             + "                            ON tabela.patient_id = p.patient_id "
             + "             WHERE  p.voided = 0 "
-            + "                    AND ( (SELECT Count(*) "
+            + "                    AND ( (SELECT COUNT(DISTINCT ee.encounter_id) "
             + "                           FROM   patient pp "
             + "                                  join encounter ee "
             + "                                    ON pp.patient_id = ee.patient_id "
@@ -2034,7 +2022,8 @@ public class TPTEligiblePatientListCohortQueries {
             + "       AND e.encounter_type = ${6} "
             + "       AND o.concept_id = ${1719} "
             + "       AND o.value_coded = ${165307} "
-            + "       and o.obs_datetime BETWEEN tabela.encounter_datetime and DATE_ADD(tabela.encounter_datetime, interval 4 month) "
+            + "       and e.encounter_datetime BETWEEN tabela.encounter_datetime and DATE_ADD(tabela.encounter_datetime, interval 4 month) "
+            + "       and e.encounter_datetime <= :endDate "
             + " GROUP  BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -2045,15 +2034,16 @@ public class TPTEligiblePatientListCohortQueries {
   }
 
   /**
-   * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
+   * <b>TPT_FR7</b> Patients who completed 3HP Therapy <br>
    *
    * <ul>
-   *   <li>The patient date from M is registered on FILT (encounter type 60, encounter datetime<=
-   *       enddate) and:
-   *   <li>The patient has at least 1 drug pick-up on FILT (encounter type 60) with “Regime de TPT”
-   *       (concept id 23985) value coded “3HP” doxina” (concept id in [23954, 23984]) and “Tipo de
-   *       dispensa” (concept id 23986) with value coded “Trimestral” (concept id 23720) until a
-   *       4-month period from the 3HP Strat Date (date from M.2;) or
+   *   <li>If the 3HP Start Date is on FILT, the system will check if the patient has the following
+   *       number of drug pick-ups in a defined period of months after the 3HP Start Date (Including
+   *       the 3HP Start Date):
+   *       <ul>
+   *         <li>At least 1 drug pick-up registered on FILT with 3HP Trimestral (Regime de TPT= “3HP
+   *             or 3HP+Piridoxina” and Tipo de Dispensa = Trimestral) in the 4-month period
+   *       </ul>
    * </ul>
    *
    * @return CohortDefinition
@@ -2106,8 +2096,6 @@ public class TPTEligiblePatientListCohortQueries {
             + " FROM   patient p   "
             + "       inner join encounter e  "
             + "               ON e.patient_id = p.patient_id  "
-            + "       inner join obs o    "
-            + "               ON o.encounter_id = e.encounter_id  "
             + "       inner join ( "
             + unionFiltQuery
             + "             "
@@ -2115,32 +2103,32 @@ public class TPTEligiblePatientListCohortQueries {
             + "               ON tabela.patient_id = p.patient_id "
             + " WHERE  p.voided = 0    "
             + "       AND e.voided = 0    "
-            + "       AND o.voided = 0    "
             + "       AND e.location_id = :location "
             + "       AND e.encounter_type = ${60}   "
-            + "       AND ( (SELECT Count(*)  "
+            + "       AND ( (SELECT Count(DISTINCT ee.encounter_id) "
             + "              FROM   patient pp    "
             + "                     join encounter ee "
             + "                       ON pp.patient_id = ee.patient_id    "
+            + "                     join obs oo "
+            + "                       ON oo.encounter_id = ee.encounter_id "
+            + "                     join obs oo2 "
+            + "                       ON oo2.encounter_id = ee.encounter_id  "
             + "              WHERE  pp.voided = 0 "
             + "                     AND ee.voided = 0 "
+            + "                     AND oo.voided = 0 "
+            + "                     AND oo2.voided = 0 "
             + "                     AND p.patient_id = pp.patient_id  "
             + "                     AND ee.encounter_type = ${60}    "
             + "                     AND ee.location_id = :location  "
-            + "                     AND ( EXISTS (SELECT o.person_id  "
-            + "                                   FROM   obs o    "
-            + "                                   WHERE  o.encounter_id = ee.encounter_id AND o.voided = 0 "
-            + "                                          AND o.concept_id = ${23985} "
-            + "                                          AND o.value_coded IN ( ${23954}, ${23984} ))   "
-            + "                           AND EXISTS (SELECT o.person_id  "
-            + "                                       FROM   obs o    "
-            + "                                       WHERE  o.encounter_id = ee.encounter_id AND o.voided = 0 "
-            + "                                              AND o.concept_id = ${23986} "
-            + "                                              AND o.value_coded IN ( ${23720} )) )    "
+            + "                     AND oo.concept_id = ${23985}  "
+            + "                     AND oo.value_coded IN ( ${23954}, ${23984} )  "
+            + "                     AND oo2.concept_id = ${23986}  "
+            + "                     AND oo2.value_coded = ${23720}  "
+            + "                     AND ee.encounter_datetime <= :endDate "
             + "                     AND ee.encounter_datetime BETWEEN "
             + "                         tabela.encounter_datetime AND "
             + "             Date_add(tabela.encounter_datetime,   "
-            + "             INTERVAL 7 MONTH)) >= 1 ) "
+            + "             INTERVAL 4 MONTH)) >= 1 ) "
             + " GROUP  BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);

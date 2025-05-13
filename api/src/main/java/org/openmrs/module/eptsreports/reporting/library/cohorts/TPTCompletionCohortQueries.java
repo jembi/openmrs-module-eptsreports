@@ -71,6 +71,8 @@ public class TPTCompletionCohortQueries {
   private final String mapping = "endDate=${endDate},location=${location}";
   private final String mapping2 = "onOrBefore=${endDate},location=${location}";
   private final String mapping3 = "startDate=${startDate},endDate=${endDate},location=${location}";
+  private final String mapping4 =
+      "startDate=${startDate},endDate=${endDate+1d},location=${location}";
 
   public CohortDefinition getPatientsThatCompletedProphylaticTreatment() {
     CalculationCohortDefinition cd =
@@ -295,6 +297,25 @@ public class TPTCompletionCohortQueries {
     return compositionCohortDefinition;
   }
 
+  /**
+   *
+   *
+   * <ul>
+   *   <li>Patients who have Initiated TPT (TB_PREV - Denominator) in a 7-month period before and
+   *       including the reporting end date.
+   *       <p>
+   *       <p>For the 7-month period:
+   *       <p>Start Date = Selected End Date – 210 days
+   *       <p>End Date = Selected End Date
+   *       <p>
+   *   <li>For the complete requirements definition to identify patients who initiated TPT therapy
+   *       please refer to the TB_PREV Indicator Requirements and Specification (Denominator –
+   *       TB_PREV_FR2), using the 7-month period start and end date instead of the previous
+   *       reporting period.
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getTbPrevDenominatorForTPTCompletion() {
     CompositionCohortDefinition definition = new CompositionCohortDefinition();
     definition.setName("TB-PREV Denominator Query");
@@ -302,15 +323,15 @@ public class TPTCompletionCohortQueries {
     definition.addParameter(new Parameter("endDate", "End Date", Date.class));
     definition.addParameter(new Parameter("location", "Location", Location.class));
 
-    definition.addSearch("C1", EptsReportUtils.map(get3HPStartC1(true), mapping3));
+    definition.addSearch("C1", EptsReportUtils.map(get3HPStartC1(true), mapping4));
 
-    definition.addSearch("C2", EptsReportUtils.map(get3HPStartC2(true), mapping3));
+    definition.addSearch("C2", EptsReportUtils.map(get3HPStartC2(true), mapping4));
 
-    definition.addSearch("C3", EptsReportUtils.map(get3HPStartC3(true), mapping3));
+    definition.addSearch("C3", EptsReportUtils.map(get3HPStartC3(true), mapping4));
 
-    definition.addSearch("C4", EptsReportUtils.map(get3HPStartC4(true), mapping3));
+    definition.addSearch("C4", EptsReportUtils.map(get3HPStartC4(true), mapping4));
 
-    definition.addSearch("C5", EptsReportUtils.map(getINHStartC5Query(true), mapping3));
+    definition.addSearch("C5", EptsReportUtils.map(getINHStartC5Query(true), mapping4));
 
     CohortDefinition A1Inh =
         getINHStartA2Part2(
@@ -333,13 +354,13 @@ public class TPTCompletionCohortQueries {
             hivMetadata.getStartDrugs().getConceptId(),
             true);
 
-    definition.addSearch("A1", EptsReportUtils.map(A1Inh, mapping3));
+    definition.addSearch("A1", EptsReportUtils.map(A1Inh, mapping4));
 
-    definition.addSearch("A2", EptsReportUtils.map(A2Inh, mapping3));
+    definition.addSearch("A2", EptsReportUtils.map(A2Inh, mapping4));
 
-    definition.addSearch("A3", EptsReportUtils.map(getINHStartA6(true), mapping3));
+    definition.addSearch("A3", EptsReportUtils.map(getINHStartA6(true), mapping4));
 
-    definition.addSearch("A4", EptsReportUtils.map(getINHStartA4(true), mapping3));
+    definition.addSearch("A4", EptsReportUtils.map(getINHStartA4(true), mapping4));
     definition.addSearch("A", EptsReportUtils.map(getPatientsInitiatedARTbyPeriod(), mapping));
 
     //    TREATMENT END DEFINITIONS
@@ -481,14 +502,8 @@ public class TPTCompletionCohortQueries {
     definition.addSearch(
         "TRFOUT", EptsReportUtils.map(tbPrevCohortQueries.getPatientsTransferredOut(), mapping3));
 
-    definition.addSearch(
-        "ARTPICKUP",
-        EptsReportUtils.map(
-            hivCohortQueries.getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(false),
-            mapping3));
-
     definition.setCompositionString(
-        "(A AND  (A1 OR A2 OR A3 OR A4) OR (C1 OR C2 OR C3 OR C4 OR C5) ) AND NOT ((TRFOUT AND ARTPICKUP) OR B1B OR B2 OR B5Part1 OR B5Part2 OR B5Part3 OR B6Part1 OR B6Part2 OR B6Part3 OR D1 OR D2 OR D3 OR D4 OR D5)");
+        "(A AND  (A1 OR A2 OR A3 OR A4) OR (C1 OR C2 OR C3 OR C4 OR C5) ) AND NOT (TRFOUT AND NOT (B1B OR B2 OR B5Part1 OR B5Part2 OR B5Part3 OR B6Part1 OR B6Part2 OR B6Part3 OR D1 OR D2 OR D3 OR D4 OR D5))");
     return definition;
   }
 
@@ -640,7 +655,7 @@ public class TPTCompletionCohortQueries {
    *   <li>From all patients currently receiving ART who do not have a documented TPT Completion
    *       (TPT_FR8), the system will identify those who have initiated TPT in the past 7 months as
    *       follows: Patients who have Initiated TPT (TB_PREV - Denominator) in a 7-month period
-   *       before the end date.
+   *       before and including the reporting end date.
    *       <p>
    *       <p>For the 7-month period:
    *       <p>Start Date = Selected End Date – 210 days
