@@ -1165,19 +1165,18 @@ public class TPTEligiblePatientListCohortQueries {
   }
 
   /**
-   * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
+   * <b>TPT_FR5</b>:Patients who completed INH Therapy <br>
    *
    * <ul>
-   *   <li>B5 - If the INH Start Date (Y) is registered in Ficha Clinica or Ficha de Seguimento or
-   *       Ficha Resumo, the system will check if the patient has one of the following number of
-   *       consultations in a defined period of months from the INH Start Date to consider the
-   *       patient completed INH treatment:
-   *   <li>At least 5 consultations ((encounter type 6) (encounter type 9) Profilaxia TPT (concept
-   *       id 23985) value coded INH (concept id 656) and Estado da Profilaxia (concept id 165308)
-   *       value coded Início/continua (concept id in [1256,1257]) until a 7-month period after the
-   *       INH Start Date from the date Y2,3 or
-   *   <li>
-   *   <li>
+   *   <li>If the INH Start Date is registered on Ficha Clínica or Ficha de Seguimento or Ficha
+   *       Resumo, the system will check if the patient has the following number of consultations in
+   *       a defined period of months from the INH Start Date:
+   *       <ul>
+   *         <li>At least 5 consultations registered on Ficha Clínica or Ficha de Seguimento (Adulto
+   *             or Pediatria) with INH (Profilaxia TPT=” Isoniazida (INH)” and Estado da
+   *             Profilaxia=”Inicio(I)/Continua(C)”) in the 7-month period after the INH Start Date
+   *             (not Including the INH Start Date
+   *       </ul>
    * </ul>
    *
    * @return {@link CohortDefinition}
@@ -1232,8 +1231,8 @@ public class TPTEligiblePatientListCohortQueries {
             + "           AND        oo.value_coded = ${656} "
             + "           AND        oo2.concept_id = ${165308} "
             + "           AND        oo2.value_coded IN ( ${1256}, ${1257} ) "
-            + "           AND        oo2.obs_datetime > tabela.start_date "
-            + "           AND        oo2.obs_datetime <= date_add(tabela.start_date, INTERVAL 7 month) "
+            + "           AND        e2.encounter_datetime > tabela.start_date "
+            + "           AND        e2.encounter_datetime <= date_add(tabela.start_date, INTERVAL 7 month) "
             + "           AND        e2.encounter_datetime <= :endDate ) >= 5 "
             + "GROUP BY tabela.patient_id";
 
