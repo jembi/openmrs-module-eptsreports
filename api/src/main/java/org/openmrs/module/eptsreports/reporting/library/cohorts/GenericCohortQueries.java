@@ -1155,15 +1155,18 @@ public class GenericCohortQueries {
   }
 
   /**
-   * <b>Idade do Utente na Data Reinício TARV</b>
+   * <b>Idade do Utente na Data Reinício TARV e Pedido CD4</b>
    *
-   * <p>
+   * <p>O sistema irá determinar a idade dos utentes na data de reinício do TARV com Pedido CD4, ou
+   * seja, irá calcular a idade com base na seguinte fórmula:
    * <li>Idade = “Data Consulta Reinício e Pedido CD4” - Data de Nascimento
    * <li>Nota1: A idade será calculada em anos.
-   * <li>Nota2:“Data Consulta Reinício e Pedido CD4” é a data da consulta clínica (Ficha Clínica)
-   *     com registo de “Mudança de Estado de Permanência” = “Reinício” e Pedido CD4 ocorrida
-   *     durante o período de revisão (“Data de Consulta Reinício” >= “Data Início Revisão” e <=
-   *     “Data Fim Revisão”)
+   * <li>Nota2: “Data Consulta Reinício e Pedido CD4” é a data da consulta clínica (Ficha Clínica)
+   *     com registo de “Mudança de Estado de Permanência” = “Reinício” e “Pedido CD4” ocorrida
+   *     durante o período de revisão (“Data de Consulta Reinício e Pedido” >= “Data Início Revisão”
+   *     e <= “Data Fim Revisão”). Nota: em caso de existência de mais que uma consulta com registo
+   *     de Reinício e Pedido CD4 durante o período de revisão, o sistema irá considerar o registo
+   *     mais recente.
    *
    * @param minAge Minimum age of a patient
    * @param maxAge Maximum age of a patient
