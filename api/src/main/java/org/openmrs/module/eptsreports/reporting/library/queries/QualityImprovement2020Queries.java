@@ -2691,7 +2691,7 @@ public class QualityImprovement2020Queries {
    */
   public static String getPatientsWithRestartedStateOfStayQuery() {
     return " SELECT p.patient_id, "
-        + "       Min(e.encounter_datetime) AS restart_date "
+        + "       MAX(e.encounter_datetime) AS restart_date "
         + "FROM   patient p "
         + "           JOIN encounter e "
         + "                ON p.patient_id = e.patient_id "
@@ -2732,7 +2732,6 @@ public class QualityImprovement2020Queries {
         + "  AND o2.voided = 0 "
         + "  AND e.encounter_type = ${6} "
         + "  AND obs.concept_id = ${6273} AND obs.value_coded = ${1705} "
-        + "  AND o2.concept_id = ${23722} AND o2.value_coded = ${1695} "
         + "  AND e.encounter_datetime >= :startDate "
         + "  AND e.encounter_datetime <= :endDate "
         + "  AND e.location_id = :location "
