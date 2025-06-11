@@ -13961,6 +13961,17 @@ public class QualityImprovement2020CohortQueries {
         "RESTARTED33DAYSBEFORE",
         EptsReportUtils.map(getPatientsRestartedWithLessThan33Days(), MAPPING3));
 
+    cd.addSearch(
+        "TRANSFERREDIN",
+        EptsReportUtils.map(
+            QualityImprovement2020Queries.getTransferredInPatients(
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+                hivMetadata.getPatientFoundYesConcept().getConceptId(),
+                hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+                hivMetadata.getArtStatus().getConceptId()),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
     if (denominator == 4) {
       cd.addSearch(
           "AGE",
@@ -13973,7 +13984,7 @@ public class QualityImprovement2020CohortQueries {
               genericCohortQueries.getAgeOnRestartedStateOfStayAndCd4Request(0, 14), MAPPING3));
     }
 
-    cd.setCompositionString("(RESTARTED AND AGE) AND NOT RESTARTED33DAYSBEFORE");
+    cd.setCompositionString("(RESTARTED AND AGE) AND NOT (RESTARTED33DAYSBEFORE OR TRANSFERREDIN)");
 
     return cd;
   }

@@ -1155,15 +1155,17 @@ public class GenericCohortQueries {
   }
 
   /**
-   * <b>Idade do Utente na Data Reinício TARV</b>
+   * RF11.1 <b>Idade do Utente na Data Reinício TARV</b>
    *
-   * <p>
-   * <li>Idade = “Data Consulta Reinício e Pedido CD4” - Data de Nascimento
+   * <p>O sistema irá determinar a idade dos utentes na data de reinício do TARV, ou seja, irá
+   * calcular a idade com base na seguinte fórmula:
+   * <li><b>Idade = “Data Consulta Reinício” - Data de Nascimento</b>
    * <li>Nota1: A idade será calculada em anos.
-   * <li>Nota2:“Data Consulta Reinício e Pedido CD4” é a data da consulta clínica (Ficha Clínica)
-   *     com registo de “Mudança de Estado de Permanência” = “Reinício” e Pedido CD4 ocorrida
-   *     durante o período de revisão (“Data de Consulta Reinício” >= “Data Início Revisão” e <=
-   *     “Data Fim Revisão”)
+   * <li>Nota2: “Data Consulta Reinício” é a data da consulta clínica (Ficha Clínica) com registo de
+   *     “Mudança de Estado de Permanência” = “Reinício” ocorrida durante o período de revisão
+   *     (“Data de Consulta Reinício” >= “Data Início Revisão” e <= “Data Fim Revisão”). Nota: em
+   *     caso de existência de mais que uma consulta com registo de Reinício durante o período de
+   *     revisão, o sistema irá considerar o registo mais recente.
    *
    * @param minAge Minimum age of a patient
    * @param maxAge Maximum age of a patient
@@ -1190,7 +1192,7 @@ public class GenericCohortQueries {
         "SELECT p.person_id "
             + "FROM person p "
             + "     INNER JOIN ( "
-            + QualityImprovement2020Queries.getPatientsWithRestartedStateOfStayAndCd4RequestQuery()
+            + QualityImprovement2020Queries.getPatientsWithRestartedStateOfStayQuery()
             + "     ) AS restarted ON p.person_id = restarted.patient_id "
             + " WHERE  ";
 
